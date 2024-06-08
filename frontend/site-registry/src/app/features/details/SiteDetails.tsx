@@ -84,6 +84,19 @@ const SiteDetails = () => {
     setEditSiteDetailsObject(details);
   }, [details]);
 
+  const handleUserClick = (value: string) => {
+    switch(value)
+    {
+      case UserType.External :
+       
+       break;
+      case UserType.Internal :
+      
+       break;
+      default:
+       break;
+    }
+  }
   const handleItemClick = (value: string) => {
     switch(value)
     {
@@ -164,6 +177,18 @@ const SiteDetails = () => {
         </button>
         <div className="d-flex gap-2 justify-align-center">
 
+         { <Actions label="User" items={ [
+                { 
+                    label:'External User',
+                    value: UserType.External
+                },
+                {
+                    label:'Internal User',
+                    value: UserType.Internal
+                },
+                
+            ]} 
+            onItemClick={handleUserClick} /> }
           {/* For Action Dropdown*/}
           {(!edit && viewMode === SiteDetailsMode.ViewOnlyMode && userType === UserType.Internal) && <Actions label="Action" items={ActionItems} onItemClick={handleItemClick} /> }
            

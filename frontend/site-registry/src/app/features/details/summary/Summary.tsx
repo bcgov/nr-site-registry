@@ -37,25 +37,17 @@ const Summary = () => {
 
 
     const detailsMode = useSelector(siteDetailsMode);
-
-    
-    
     const details = useSelector(selectSiteDetails);
-
     const [editSiteDetailsObject, setEditSiteDetailsObject] = useState(details);
-   
     const resetDetails = useSelector(resetSiteDetails);  
     useEffect(()=>{
-
         if(resetDetails)
         {
             setEditSiteDetailsObject(details);
         }
-
     },[resetDetails])
 
     const [edit, setEdit] = useState(false);
-  
     const [srMode, setSRMode] = useState(false);
 
     useEffect(() => {
@@ -82,10 +74,7 @@ const Summary = () => {
 
 
   const [location, setLocation] = useState([48.46762, -123.25458]);
-
   const dispatch = useDispatch<AppDispatch>();
-
-
 
   useEffect(()=>{
     let address = document.getElementsByTagName('h3');

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { FormFieldType, IFormField } from "./IFormField";
 import avatar from "../../images/avatar.png";
-import { formatDateRange } from "../../helpers/utility";
-import { DateRangePicker } from "rsuite";
+import { formatDate, formatDateRange } from "../../helpers/utility";
+import { DatePicker, DateRangePicker } from "rsuite";
 import { CalendarIcon } from "../common/icon";
 import { Link as RouterLink } from "react-router-dom";
+import { v4 } from "uuid";
 
 interface InputProps extends IFormField {
   children?: InputProps[];
@@ -112,7 +113,6 @@ export const TextInput: React.FC<InputProps> = ({
   // Replace any spaces in the label with underscores to create a valid id
   const inputTxtId = label.replace(/\s+/g, "_");
 
-  console.log("tableMode", tableMode);
   if (tableMode) {
     return (
       <td className="table-border-light content-text">
@@ -211,7 +211,6 @@ export const Dropdown: React.FC<InputProps> = ({
   const handleCheckBoxChange = (isChecked: boolean) => {
     onChange(isChecked);
   };
-
   const isFirstOptionGrey = value === "";
   if (tableMode) {
     return (
@@ -342,6 +341,7 @@ export const GroupInput: React.FC<InputProps> = ({
   customInputTextCss,
   customEditLabelCss,
   customEditInputTextCss,
+  isChildLabel,
   onChange,
 }) => {
   const [error, setError] = useState<string | null>(null);
@@ -424,20 +424,24 @@ export const GroupInput: React.FC<InputProps> = ({
       <div className="row">
         {isEditing ? (
           children?.map((child, index) => (
-            <div key={index} className="col">
-              {/* Render each child field as an input element */}
-              <input
-                type={child.type}
-                className={`form-control custom-input ${
-                  customEditInputTextCss ?? "custom-input-text"
-                } ${error && "error"}`}
-                placeholder={child.placeholder}
-                value={child.value ?? ""}
-                onChange={(e) => handleTextInputChange(e, child)}
-                aria-label={child.label} // Accessibility
-              />
-            </div>
-          ))
+                <div key={index} className="col">
+                  {
+                    isChildLabel &&
+                    <label className={`${!isEditing ? customLabelCss ?? "" : `form-label ${customEditLabelCss ?? "custom-label"}` }`}>{child.label}</label>
+                  }
+                  {/* Render each child field as an input element */}
+                  <input
+                    type={child.type}
+                    className={`form-control custom-input ${
+                      customEditInputTextCss ?? "custom-input-text"
+                    } ${error && "error"}`}
+                    placeholder={child.placeholder}
+                    value={child.value ?? ""}
+                    onChange={(e) => handleTextInputChange(e, child)}
+                    aria-label={child.label} // Accessibility
+                  />
+                </div>
+            ))
         ) : (
           <span className={`${customInputTextCss ?? ""}`}>
             {currentConcatenatedValue != undefined
@@ -451,7 +455,7 @@ export const GroupInput: React.FC<InputProps> = ({
   );
 };
 
-export const DateInput: React.FC<InputProps> = ({
+export const DateRangeInput: React.FC<InputProps> = ({
   label,
   placeholder,
   value,
@@ -514,6 +518,66 @@ export const DateInput: React.FC<InputProps> = ({
   );
 };
 
+export const DateInput: React.FC<InputProps> = ({
+  label,
+  placeholder,
+  value,
+  isEditing,
+  srMode,
+  customLabelCss,
+  customInputTextCss,
+  customEditLabelCss,
+  customEditInputTextCss,
+  onChange,
+}) => {
+  let dateRangeValue;
+  if (value) {
+    dateRangeValue = formatDate(value);
+  }
+
+  const handleCheckBoxChange = (isChecked: boolean) => {
+    onChange(isChecked);
+  };
+  // Replace any spaces in the label with underscores to create a valid id
+  const dateRangeId = label.replace(/\s+/g, "_") ;
+  return (
+    <div className="mb-3">
+      {srMode && (
+        <CheckBoxInput
+          type={FormFieldType.Checkbox}
+          label={dateRangeId}
+          isLabel={false}
+          onChange={handleCheckBoxChange}
+        />
+      )}
+      <label
+        htmlFor={dateRangeId}
+        className={`${
+          !isEditing
+            ? customLabelCss ?? ""
+            : `form-label ${customEditLabelCss ?? "custom-label"}`
+        }`}
+      >
+        {label}
+      </label>
+      {isEditing ? (
+        <DatePicker
+        id={dateRangeId}
+        aria-label={label}
+        className="custom-date-range"
+        placeholder={placeholder}
+        format="MMM dd, yyyy"
+        caretAs={CalendarIcon}
+        value={value}
+        onChange={(value) => onChange(value)}
+      />
+      ) : (
+        <p className={`${customInputTextCss ?? ""}`}>{dateRangeValue ?? ""}</p>
+      )}
+    </div>
+  );
+};
+
 export const CheckBoxInput: React.FC<InputProps> = ({
   label,
   isLabel,
@@ -525,13 +589,14 @@ export const CheckBoxInput: React.FC<InputProps> = ({
   type,
   value,
   onChange,
-  tableMode
+  tableMode,
 }) => {
-  const inputTxtId = label.replace(/\s+/g, "_");
+  const inputTxtId = label.replace(/\s+/g, "_")+ v4();
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.checked); // Toggle the checked state and pass it to the parent component
   };
 
+  
   if(tableMode)
     {
         return (
@@ -546,7 +611,7 @@ export const CheckBoxInput: React.FC<InputProps> = ({
                 checked={isChecked}
                 aria-label={label} // Accessibility
                 onChange={handleCheckboxChange}
-                disabled={!isEditing}
+                // disabled={!isEditing}
                 />
                 {isLabel && (
                 <label
@@ -578,6 +643,7 @@ export const CheckBoxInput: React.FC<InputProps> = ({
                 checked={isChecked}
                 aria-label={label} // Accessibility
                 onChange={handleCheckboxChange}
+                // disabled={!isEditing}
                 />
                 {isLabel && (
                 <label

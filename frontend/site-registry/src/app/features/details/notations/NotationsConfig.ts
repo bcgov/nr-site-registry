@@ -11,9 +11,9 @@ export const notationFormRowsInternal: IFormField[][] = [
             placeholder: 'Notation Type',
             graphQLPropertyName: 'notationType',
             options: [
-                { key: 'type1', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
+                 { key: 'type1', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
                  { key: 'type2', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
-                 { key: 'type2', value: 'RISK ASSESSMENT SUBMITTED'}
+                 { key: 'type3', value: 'RISK ASSESSMENT SUBMITTED'}
             ],
             value: '',
             colSize: 'col-lg-5 col-md-7 col-sm-11 col-10',
@@ -25,7 +25,7 @@ export const notationFormRowsInternal: IFormField[][] = [
         {
             type: FormFieldType.Date,
             label: 'Initiated Date',
-            placeholder: 'MM/DD/YY - MM/DD/YY',
+            placeholder: 'MM/DD/YY',
             graphQLPropertyName:'initialDate',
             value: [],
             colSize: 'col-lg-3 col-md-4 col-sm-12',
@@ -37,7 +37,7 @@ export const notationFormRowsInternal: IFormField[][] = [
         {
             type: FormFieldType.Date,
             label: 'Completed Date',
-            placeholder: 'MM/DD/YY - MM/DD/YYY',
+            placeholder: 'MM/DD/YY',
             graphQLPropertyName:'completedDate',
             value: [],
             colSize: 'col-lg-3 col-md-12 col-sm-12',
@@ -68,7 +68,7 @@ export const notationFormRowsInternal: IFormField[][] = [
         {
             type: FormFieldType.Date,
             label: 'Required Date',
-            placeholder: 'MM/DD/YY - MM/DD/YY',
+            placeholder: 'MM/DD/YY',
             graphQLPropertyName:'requiredDate',
             value: [],
             colSize: 'col-lg-3 col-md-6 col-sm-12',
@@ -83,7 +83,7 @@ export const notationFormRowsInternal: IFormField[][] = [
             placeholder: 'Ministry Contact',
             graphQLPropertyName: 'ministryContact',
             options: [
-                { key: 'contact1', value: 'Alex', imageUrl: avatar},
+                { key: 'contact1', value: 'Bradley Macejkovic', imageUrl: avatar},
                 { key: 'contact2', value: 'John', imageUrl: avatar}
             ],
             value: '',
@@ -101,7 +101,7 @@ export const notationFormRowsInternal: IFormField[][] = [
             type: FormFieldType.Text,
             label: 'Required Actions',
             placeholder: 'Required Actions',
-            graphQLPropertyName:'commonName',
+            graphQLPropertyName:'requiredActions',
             value: '',
             colSize: 'col-lg-12 col-md-12 col-sm-12',
             customLabelCss:'custom-notation-lbl-text',
@@ -136,9 +136,10 @@ export const notationFormRowExternal: IFormField[][] = [
             placeholder: 'Notation Type',
             graphQLPropertyName: 'notationType',
             options: [
-                { key: 'type1', value: 'Type 1'},
-                { key: 'type2', value: 'Type 2'}
-            ],
+                { key: 'type1', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
+                { key: 'type2', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
+                { key: 'type3', value: 'RISK ASSESSMENT SUBMITTED'}
+           ],
             value: '',
             colSize: 'col-xxl-11 col-xl-11 col-lg-11 col-md-11 col-sm-11 col-xs-11',
             customLabelCss:'custom-notation-lbl-text',
@@ -156,8 +157,8 @@ export const notationFormRowExternal: IFormField[][] = [
             placeholder: 'Notation Class',
             graphQLPropertyName: 'notationClass',
             options: [
-                { key: 'class1', value: 'Class 1'},
-                { key: 'class2', value: 'Class 2'}
+                { key: 'class1', value: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL'},
+                // { key: 'class2', value: 'Class 2'}
             ],
             value: '',
             colSize: 'col-xxl-6 col-xl-6 col-lg-12 col-md-12 col-sm-12 col-xs-12',
@@ -169,7 +170,7 @@ export const notationFormRowExternal: IFormField[][] = [
          {
             type: FormFieldType.Date,
             label: 'Initiated Date',
-            placeholder: 'MM/DD/YY - MM/DD/YY',
+            placeholder: 'MM/DD/YY',
             graphQLPropertyName:'initialDate',
             value: [],
             colSize: 'col-xxl-2 col-xl-2 col-lg-4 col-md-4 col-sm-6 col-xs-12',
@@ -181,7 +182,7 @@ export const notationFormRowExternal: IFormField[][] = [
         {
             type: FormFieldType.Date,
             label: 'Required Date',
-            placeholder: 'MM/DD/YY - MM/DD/YY',
+            placeholder: 'MM/DD/YY',
             graphQLPropertyName:'requiredDate',
             value: [],
             colSize: 'col-xxl-2 col-xl-2 col-lg-4 col-md-4 col-sm-6 col-xs-12',
@@ -189,11 +190,12 @@ export const notationFormRowExternal: IFormField[][] = [
             customInputTextCss:'custom-notation-input-text',
             customEditLabelCss:'custom-notation-edit-label',
             customEditInputTextCss:'custom-notation-edit-input',
+           
         },
         {
             type: FormFieldType.Date,
             label: 'Completed Date',
-            placeholder: 'MM/DD/YY - MM/DD/YYY',
+            placeholder: 'MM/DD/YY',
             graphQLPropertyName:'completedDate',
             value: [],
             colSize: 'col-xxl-2 col-xl-2 col-lg-4 col-md-4 col-sm-12 col-xs-12',
@@ -201,6 +203,7 @@ export const notationFormRowExternal: IFormField[][] = [
             customInputTextCss:'custom-notation-input-text',
             customEditLabelCss:'custom-notation-edit-label',
             customEditInputTextCss:'custom-notation-edit-input',
+           
         },
        
     ],
@@ -210,7 +213,7 @@ export const notationFormRowExternal: IFormField[][] = [
             type: FormFieldType.Text,
             label: 'Required Actions',
             placeholder: 'Required Actions',
-            graphQLPropertyName:'commonName',
+            graphQLPropertyName:'requiredActions',
             value: '',
             colSize: 'col-lg-12 col-md-12 col-sm-12',
             customLabelCss:'custom-notation-lbl-text',
@@ -242,8 +245,8 @@ export const notationFormRowExternal: IFormField[][] = [
             placeholder: 'Ministry Contact',
             graphQLPropertyName: 'ministryContact',
             options: [
-                { key: 'contact1', value: 'Ministry Contact 1', imageUrl: avatar},
-                { key: 'contact2', value: 'Ministry Contact 2', imageUrl: avatar}
+                { key: 'contact1', value: 'Alex', imageUrl: avatar},
+                { key: 'contact2', value: 'John', imageUrl: avatar}
             ],
             value: '',
             isImage: true,
@@ -264,8 +267,9 @@ export const notationFormRowsFirstChild: IFormField[][] = [
             placeholder: 'Notation Type',
             graphQLPropertyName: 'notationType',
             options: [
-                { key: 'type1', value: 'Type 1'},
-                { key: 'type2', value: 'Type 2'}
+                { key: 'type1', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
+                { key: 'type2', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
+                { key: 'type3', value: 'RISK ASSESSMENT SUBMITTED'}
             ],
             value: '',
             colSize: 'col-xxl-5 col-xl-5 col-lg-8 col-md-6 col-sm-12',
@@ -277,7 +281,7 @@ export const notationFormRowsFirstChild: IFormField[][] = [
         {
             type: FormFieldType.Date,
             label: 'Initiated Date',
-            placeholder: 'MM/DD/YY - MM/DD/YY',
+            placeholder: 'MM/DD/YY',
             graphQLPropertyName:'initialDate',
             value: [],
             colSize: 'col-lg-3 col-md-6 col-sm-12 d-none d-xl-block d-xxl-block',
@@ -285,11 +289,12 @@ export const notationFormRowsFirstChild: IFormField[][] = [
             customInputTextCss:'custom-notation-input-text',
             customEditLabelCss:'custom-notation-edit-label',
             customEditInputTextCss:'custom-notation-edit-input',
+           
         },
         {
             type: FormFieldType.Date,
             label: 'Completed Date',
-            placeholder: 'MM/DD/YY - MM/DD/YYY',
+            placeholder: 'MM/DD/YY',
             graphQLPropertyName:'completedDate',
             value: [],
             colSize: 'col-lg-4 col-md-6 col-sm-12 d-none d-xl-block d-xxl-block d-lg-block d-md-block',
@@ -297,6 +302,7 @@ export const notationFormRowsFirstChild: IFormField[][] = [
             customInputTextCss:'custom-notation-input-text',
             customEditLabelCss:'custom-notation-edit-label',
             customEditInputTextCss:'custom-notation-edit-input',
+           
         },
     ],
 ];
@@ -360,7 +366,7 @@ export const notationColumnInternal: TableColumn[] = [
         label: "SR",
         placeholder: '',
         graphQLPropertyName: "sr",
-        value: "",      
+        value: false,      
         tableMode: true,
       },
       columnSize: ColumnSize.Default

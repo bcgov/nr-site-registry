@@ -211,7 +211,7 @@ export const formRows: IFormField[][] = [
             ],
         },
         {
-            type: FormFieldType.Date,
+            type: FormFieldType.DateRange,
             label: 'Date Created',
             placeholder: 'MM/DD/YY - MM/DD/YY',
             graphQLPropertyName:'whenCreated',
@@ -219,7 +219,7 @@ export const formRows: IFormField[][] = [
             colSize: 'col-lg-4 col-md-6 col-sm-12',
         },
         {
-            type: FormFieldType.Date,
+            type: FormFieldType.DateRange,
             label: 'Last Updated',
             placeholder: 'MM/DD/YY - MM/DD/YYY',
             graphQLPropertyName:'whenUpdated',

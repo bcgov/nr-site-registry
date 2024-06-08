@@ -11,5 +11,7 @@ export interface IWidget {
     hideTable?:boolean;
     hideTitle?:boolean;
     editMode?:boolean;
+    srMode?:boolean;
     changeHandler:(event:any)=>void;
+    handleCheckBoxChange?:(event:any)=>void;
 }

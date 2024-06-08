@@ -15,6 +15,11 @@ export const formatDateRange = (range: [Date, Date]) => {
     return `${formattedStartDate} - ${formattedEndDate}`;
 };
 
+export const formatDate = (date: Date) => {
+    const formattedDate = format(date, 'MMMM do, yyyy');
+    return `${formattedDate}`;
+};
+
 export const flattenFormRows = (arr: IFormField[][]): IFormField[] => {
   const flattened: IFormField[] = [];
   

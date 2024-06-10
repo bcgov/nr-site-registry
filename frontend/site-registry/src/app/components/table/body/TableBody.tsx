@@ -6,6 +6,7 @@ import { TableColumn } from "../TableColumn";
 import { FormFieldType, IFormField } from "../../input-controls/IFormField";
 import { Label, TextInput , Link ,Dropdown,CheckBoxInput } from "../../input-controls/InputControls";
 import { ChangeTracker } from "../../common/IChangeType";
+import { v4 } from "uuid";
 
 interface TableBodyProps {
   isLoading: RequestStatus;
@@ -50,7 +51,7 @@ const TableBody: FC<TableBodyProps> = ({
           "property":propertyName,
           "value":value
         }
-
+        console.log(changeRecord)
         changeHandler(changeRecord);
     }
 
@@ -155,7 +156,8 @@ const TableBody: FC<TableBodyProps> = ({
                   customEditLabelCss={field.customEditLabelCss}
                   customEditInputTextCss={field.customEditInputTextCss}
                   placeholder={field.placeholder}
-                  value={value}
+                  isChecked={value === 'true' ? true : false}
+                  // value={value}
                   onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
                   type={field.type}
                   validation={field.validation}
@@ -213,9 +215,11 @@ const TableBody: FC<TableBodyProps> = ({
           {allowRowsSelect && (
             <td className="table-border-light content-text">
               <input
+                id={v4()}
                 type="checkbox"
                 className="checkbox-color"
                 aria-label="Select Row"
+                onChange={(event) => tableRecordChangeHandler(rowIndex,'select_row', event.target.checked)}
               />
             </td>
           )}

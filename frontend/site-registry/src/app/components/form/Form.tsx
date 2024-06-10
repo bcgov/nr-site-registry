@@ -2,7 +2,7 @@ import React from "react";
 import './Form.css';
 import 'rsuite/DateRangePicker/styles/index.css';
 import { FormFieldType, IFormField } from "../input-controls/IFormField";
-import { CheckBoxInput, DateInput, Dropdown ,GroupInput,TextInput, } from "../input-controls/InputControls";
+import { CheckBoxInput, DateInput, DateRangeInput, Dropdown ,GroupInput,TextInput, } from "../input-controls/InputControls";
  
 
 interface IFormRendererProps {
@@ -55,6 +55,21 @@ const Form: React.FC<IFormRendererProps>  = ({ formRows, formData, editMode, srM
                                     srMode = {srMode ?? false}
                                 />
                             )}
+                            {field.type === FormFieldType.DateRange && (
+                                <DateRangeInput
+                                    label={field.label}
+                                    customLabelCss = {field.customLabelCss}
+                                    customInputTextCss={field.customInputTextCss}
+                                    customEditLabelCss = {field.customEditLabelCss}
+                                    customEditInputTextCss={field.customEditInputTextCss}
+                                    placeholder={field.placeholder}
+                                    value={formData[field.graphQLPropertyName ?? ''] || []}
+                                    onChange={(value) => handleInputChange(field.graphQLPropertyName, value)}
+                                    type={field.type}
+                                    isEditing={editMode ?? true}
+                                    srMode = {srMode ?? false}
+                                />
+                            )}
                             {field.type === FormFieldType.Date && (
                                 <DateInput
                                     label={field.label}
@@ -63,7 +78,7 @@ const Form: React.FC<IFormRendererProps>  = ({ formRows, formData, editMode, srM
                                     customEditLabelCss = {field.customEditLabelCss}
                                     customEditInputTextCss={field.customEditInputTextCss}
                                     placeholder={field.placeholder}
-                                    value={formData[field.graphQLPropertyName ?? ''] || []}
+                                    value={formData[field.graphQLPropertyName ?? '']}
                                     onChange={(value) => handleInputChange(field.graphQLPropertyName, value)}
                                     type={field.type}
                                     isEditing={editMode ?? true}
@@ -88,6 +103,7 @@ const Form: React.FC<IFormRendererProps>  = ({ formRows, formData, editMode, srM
                                     type={field.type}
                                     value={formData[field.label] || ''}
                                     isEditing={editMode ?? true}
+                                    isChildLabel={field.isChildLabel ?? false}
                                     srMode = {srMode ?? false}
                                     customLabelCss = {field.customLabelCss}
                                     customInputTextCss={field.customInputTextCss}
@@ -104,6 +120,7 @@ const Form: React.FC<IFormRendererProps>  = ({ formRows, formData, editMode, srM
                                     customEditLabelCss={field.customEditLabelCss}
                                     customEditInputTextCss={field.customEditInputTextCss}
                                     isEditing={editMode ?? true}
+                                    isChecked ={formData[field.graphQLPropertyName ?? ''] || false}
                                     onChange={(value) => handleInputChange(field.graphQLPropertyName, value)}
                                 />
                             )}

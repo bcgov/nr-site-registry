@@ -10,3 +10,14 @@
 {
     height: 500px !important;
 }
+
+
+
+.parcel-container
+{
+    padding: var(--layout-margin-medium) var(--layout-margin-xxlarge) var(--layout-margin-large) var(--layout-margin-xxlarge);
+    gap: var(--layout-margin-medium);
+    border-radius: var(--layout-border-radius-medium);
+    display: flex;
+    flex-direction: column;
+}

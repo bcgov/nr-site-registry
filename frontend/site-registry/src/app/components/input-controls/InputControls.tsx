@@ -578,10 +578,11 @@ export const DateInput: React.FC<InputProps> = ({
         aria-label={label}
         className="custom-date-range"
         placeholder={placeholder}
-        format="MMM dd, yyyy"
+        format="MMMM do, yyyy"
         caretAs={CalendarIcon}
         value={value}
         onChange={(value) => onChange(value)}
+        oneTap
       />
       ) : (
         <p className={`${customInputTextCss ?? ""}`}>{dateRangeValue ?? ""}</p>

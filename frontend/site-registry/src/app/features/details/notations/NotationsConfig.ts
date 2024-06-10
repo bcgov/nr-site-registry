@@ -11,9 +11,9 @@ export const notationFormRowsInternal: IFormField[][] = [
             placeholder: 'Notation Type',
             graphQLPropertyName: 'notationType',
             options: [
-                 { key: 'type1', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
-                 { key: 'type2', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
-                 { key: 'type3', value: 'RISK ASSESSMENT SUBMITTED'}
+                 { key: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
+                 { key: 'WASTE MANAGEMENT APPROVAL ISSUED', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
+                 { key: 'RISK ASSESSMENT SUBMITTED', value: 'RISK ASSESSMENT SUBMITTED'}
             ],
             value: '',
             colSize: 'col-lg-5 col-md-7 col-sm-11 col-10',
@@ -27,7 +27,7 @@ export const notationFormRowsInternal: IFormField[][] = [
             label: 'Initiated Date',
             placeholder: 'MM/DD/YY',
             graphQLPropertyName:'initialDate',
-            value: [],
+            value: '',
             colSize: 'col-lg-3 col-md-4 col-sm-12',
             customLabelCss:'custom-notation-lbl-text',
             customInputTextCss:'custom-notation-input-text',
@@ -39,7 +39,7 @@ export const notationFormRowsInternal: IFormField[][] = [
             label: 'Completed Date',
             placeholder: 'MM/DD/YY',
             graphQLPropertyName:'completedDate',
-            value: [],
+            value:'',
             colSize: 'col-lg-3 col-md-12 col-sm-12',
             customLabelCss:'custom-notation-lbl-text',
             customInputTextCss:'custom-notation-input-text',
@@ -55,7 +55,7 @@ export const notationFormRowsInternal: IFormField[][] = [
             placeholder: 'Notation Class',
             graphQLPropertyName: 'notationClass',
             options: [
-                { key: 'class1', value: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL'},
+                { key: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL', value: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL'},
                 // { key: 'class2', value: 'Class 2'}
             ],
             value: '',
@@ -70,7 +70,7 @@ export const notationFormRowsInternal: IFormField[][] = [
             label: 'Required Date',
             placeholder: 'MM/DD/YY',
             graphQLPropertyName:'requiredDate',
-            value: [],
+            value: '',
             colSize: 'col-lg-3 col-md-6 col-sm-12',
             customLabelCss:'custom-notation-lbl-text',
             customInputTextCss:'custom-notation-input-text',
@@ -83,8 +83,8 @@ export const notationFormRowsInternal: IFormField[][] = [
             placeholder: 'Ministry Contact',
             graphQLPropertyName: 'ministryContact',
             options: [
-                { key: 'contact1', value: 'Bradley Macejkovic', imageUrl: avatar},
-                { key: 'contact2', value: 'John', imageUrl: avatar}
+                { key: 'Bradley Macejkovic', value: 'Bradley Macejkovic', imageUrl: avatar},
+                { key: 'John', value: 'John', imageUrl: avatar}
             ],
             value: '',
             isImage: true,
@@ -136,9 +136,9 @@ export const notationFormRowExternal: IFormField[][] = [
             placeholder: 'Notation Type',
             graphQLPropertyName: 'notationType',
             options: [
-                { key: 'type1', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
-                { key: 'type2', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
-                { key: 'type3', value: 'RISK ASSESSMENT SUBMITTED'}
+                { key: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
+                { key: 'WASTE MANAGEMENT APPROVAL ISSUED', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
+                { key: 'RISK ASSESSMENT SUBMITTED', value: 'RISK ASSESSMENT SUBMITTED'}
            ],
             value: '',
             colSize: 'col-xxl-11 col-xl-11 col-lg-11 col-md-11 col-sm-11 col-xs-11',
@@ -157,7 +157,7 @@ export const notationFormRowExternal: IFormField[][] = [
             placeholder: 'Notation Class',
             graphQLPropertyName: 'notationClass',
             options: [
-                { key: 'class1', value: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL'},
+                { key: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL', value: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL'},
                 // { key: 'class2', value: 'Class 2'}
             ],
             value: '',
@@ -245,8 +245,8 @@ export const notationFormRowExternal: IFormField[][] = [
             placeholder: 'Ministry Contact',
             graphQLPropertyName: 'ministryContact',
             options: [
-                { key: 'contact1', value: 'Alex', imageUrl: avatar},
-                { key: 'contact2', value: 'John', imageUrl: avatar}
+                { key: 'Alex', value: 'Alex', imageUrl: avatar},
+                { key: 'John', value: 'John', imageUrl: avatar}
             ],
             value: '',
             isImage: true,
@@ -267,9 +267,9 @@ export const notationFormRowsFirstChild: IFormField[][] = [
             placeholder: 'Notation Type',
             graphQLPropertyName: 'notationType',
             options: [
-                { key: 'type1', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
-                { key: 'type2', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
-                { key: 'type3', value: 'RISK ASSESSMENT SUBMITTED'}
+                { key: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
+                { key: 'WASTE MANAGEMENT APPROVAL ISSUED', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
+                { key: 'RISK ASSESSMENT SUBMITTED', value: 'RISK ASSESSMENT SUBMITTED'}
             ],
             value: '',
             colSize: 'col-xxl-5 col-xl-5 col-lg-8 col-md-6 col-sm-12',

@@ -101,43 +101,43 @@ const notationParticipantData3 = [
 const initialNotationData = [
   {
     notationId: 1,
-    notationType:'type1',
+    notationType:'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS',
     initialDate: new Date( '2013-05-30'),
     completedDate:new Date('2013-06-15'),
-    notationClass:'class1',
+    notationClass:'ENVIRONMENTAL MANAGEMENT ACT: GENERAL',
     requiredDate: new Date('2013-06-30'),
-    ministryContact:'contact1',
+    ministryContact:'John',
     requiredActions: 'Pending',
     note: 'REF # 9999-99',
     srTimeStamp: `Sent to SR on ${formatDate(new Date())}`,
     notationParticipant : notationParticipantData1,
   },
-  // {
-  //   notationId: 2,
-  //   notationType:'type2',
-  //   initialDate:new Date('2013-05-31'),
-  //   completedDate:new Date('2013-06-15'),
-  //   notationClass:'class1',
-  //   requiredDate:new Date('2013-06-29'),
-  //   ministryContact:'Bradley Macejkovic',
-  //   requiredActions: 'Pending',
-  //   note: 'REF # 9999-99',
-  //   srTimeStamp: `Sent to SR on ${formatDate(new Date('2013-06-30'))}`,
-  //   notationParticipant : notationParticipantData2,
-  // },
-  // {
-  //   notationId: 3,
-  //   notationType:'type3',
-  //   initialDate:new Date('2013-05-29'),
-  //   completedDate:new Date('2013-06-15'),
-  //   notationClass:'class1',
-  //   requiredDate:new Date('2013-06-30'),
-  //   ministryContact:'Bradley Macejkovic',
-  //   requiredActions: 'Urgent',
-  //   note: 'REF # 9999-99',
-  //   srTimeStamp: `Sent to SR on ${formatDate(new Date('2013-06-31'))}`,
-  //   notationParticipant : notationParticipantData3,
-  // },
+  {
+    notationId: 2,
+    notationType:'WASTE MANAGEMENT APPROVAL ISSUED',
+    initialDate:new Date('2013-05-31'),
+    completedDate:new Date('2013-06-15'),
+    notationClass:'ENVIRONMENTAL MANAGEMENT ACT: GENERAL',
+    requiredDate:new Date('2013-06-29'),
+    ministryContact:'Bradley Macejkovic',
+    requiredActions: 'Pending',
+    note: 'REF # 9999-99',
+    srTimeStamp: `Sent to SR on ${formatDate(new Date('2013-06-30'))}`,
+    notationParticipant : notationParticipantData2,
+  },
+  {
+    notationId: 3,
+    notationType:'RISK ASSESSMENT SUBMITTED',
+    initialDate:new Date('2013-05-29'),
+    completedDate:new Date('2013-06-15'),
+    notationClass:'ENVIRONMENTAL MANAGEMENT ACT: GENERAL',
+    requiredDate:new Date('2013-06-30'),
+    ministryContact:'Bradley Macejkovic',
+    requiredActions: 'Urgent',
+    note: 'REF # 9999-99',
+    srTimeStamp: `Sent to SR on ${formatDate(new Date('2013-06-31'))}`,
+    notationParticipant : notationParticipantData3,
+  },
 ];
 
 
@@ -157,27 +157,30 @@ const Notations: React.FC<INotations> = ({
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const searchTerm = event.target.value.toLowerCase().trim();
+      const searchTerm = event.target.value;
       setSearchTerm(searchTerm);
   
       const filteredData = initialNotationData.filter(notation => {
           // Check if any property of the notation object contains the searchTerm
-          return deepSearch(notation, searchTerm);
+          return deepSearch(notation, searchTerm.toLowerCase().trim());
       });
       setFormData(filteredData);
   };
   
   const deepSearch = (obj: any, searchTerm: string): boolean => {
       for (const key in obj) {
-          if (typeof obj[key] === 'object') {
+        const value = obj[key];
+        console.log(value)
+          if (typeof value === 'object') {
               if (deepSearch(obj[key], searchTerm)) {
                   return true;
               }
-          } else if (typeof obj[key] === 'string') {
-              if (obj[key].toLowerCase().includes(searchTerm)) {
+            }
+          // } else if (typeof value === 'string' || typeof value === 'number' || value instanceof Date) {
+              if (String(value).toLowerCase().includes(searchTerm)) {
                   return true;
               }
-          }
+          // }
       }
       return false;
   };

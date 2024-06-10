@@ -14,4 +14,5 @@ export interface IWidget {
     srMode?:boolean;
     changeHandler:(event:any)=>void;
     handleCheckBoxChange?:(event:any)=>void;
+    sortHandler?:(row:any, ascSort: boolean) =>void;
 }

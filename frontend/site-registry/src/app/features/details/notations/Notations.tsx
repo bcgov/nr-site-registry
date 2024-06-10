@@ -446,6 +446,28 @@ const Notations: React.FC<INotations> = ({
                                     hideTitle = { false } 
                                     editMode={ (viewMode === SiteDetailsMode.EditMode) && userType === UserType.Internal}
                                     srMode={ (viewMode === SiteDetailsMode.SRMode) && userType === UserType.Internal}
+                                    sortHandler={(row,ascDir)=>{
+
+                                      console.log("table sort handler", row, ascDir)
+
+                                      let property = row["graphQLPropertyName"];
+                                      let notationId =notation.notationId;
+                                      setFormData(prevData => {
+                                        return prevData.map(tempNotation => {
+                                            if (( notationId === tempNotation.notationId)) {
+                                                // Filter out selected rows from notationParticipant array
+                                                const updatedNotationParticipant = tempNotation.notationParticipant.sort(function(a:any, b:any) {
+                                                  if (ascDir) return (a[property] > b[property]) ? 1 : ((a[property] < b[property]) ? -1 : 0);
+                                                  else return (b[property] > a[property]) ? 1 : ((b[property] < a[property]) ? -1 : 0);
+                                              });
+                                                console.log("updatedNotationParticipant",updatedNotationParticipant);
+                                                return { ...tempNotation, notationParticipant: updatedNotationParticipant };
+                                            }
+                                            return notation;
+                                        });
+                                    });
+                                      
+                                    }}
                                     >
                             { viewMode === SiteDetailsMode.EditMode && userType === UserType.Internal &&
                                 <div className="d-flex gap-2">

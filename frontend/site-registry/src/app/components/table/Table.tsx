@@ -22,6 +22,7 @@ interface TableProps {
   changeHandler:(eventRecord:any)=>void,
   editMode: boolean,
   idColumnName:string;
+  sortHandler?:(row:any,ascSort:boolean)=>void
 }
 
 const Table: FC<TableProps> = ({
@@ -38,16 +39,18 @@ const Table: FC<TableProps> = ({
   allowRowsSelect,
   changeHandler,
   editMode,
-  idColumnName
+  idColumnName,
+  sortHandler
 }) => {
   
+  let  tableSortHandler = sortHandler ?? ((row,ascSort)=>{console.log("Handle Sort Event", row, ascSort)});
 
   return (
     <React.Fragment>
       <div className="tableWidth table-border-radius">
         <table className="table" aria-label={label}>
           <thead aria-label={`${label} Header`}>
-            <TableHeader columns={columns} allowRowsSelect={allowRowsSelect ?? false} />
+            <TableHeader columns={columns} allowRowsSelect={allowRowsSelect ?? false} sortHandler={tableSortHandler} />
           </thead>
             <TableBody isLoading={isLoading} columns={columns} data={data} allowRowsSelect={allowRowsSelect ?? false} changeHandler={changeHandler} editMode={editMode} idColumnName={idColumnName} />
         </table>

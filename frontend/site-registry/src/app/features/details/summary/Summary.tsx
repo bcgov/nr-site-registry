@@ -411,6 +411,7 @@ const Summary = () => {
           </div>
         }
       />
+      
       <PanelWithUpDown
         label="Parcel ID(s)"
         secondChild={

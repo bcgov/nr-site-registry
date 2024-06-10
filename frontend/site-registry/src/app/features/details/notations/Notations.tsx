@@ -99,7 +99,7 @@ const notationParticipantData3 = [
   ];
 
 const initialNotationData = [
-  {
+  {   
     notationId: 1,
     notationType:'type1',
     initialDate: new Date( '2013-05-30'),
@@ -112,32 +112,32 @@ const initialNotationData = [
     srTimeStamp: `Sent to SR on ${formatDate(new Date())}`,
     notationParticipant : notationParticipantData1,
   },
-  // {
-  //   notationId: 2,
-  //   notationType:'type2',
-  //   initialDate:new Date('2013-05-31'),
-  //   completedDate:new Date('2013-06-15'),
-  //   notationClass:'class1',
-  //   requiredDate:new Date('2013-06-29'),
-  //   ministryContact:'Bradley Macejkovic',
-  //   requiredActions: 'Pending',
-  //   note: 'REF # 9999-99',
-  //   srTimeStamp: `Sent to SR on ${formatDate(new Date('2013-06-30'))}`,
-  //   notationParticipant : notationParticipantData2,
-  // },
-  // {
-  //   notationId: 3,
-  //   notationType:'type3',
-  //   initialDate:new Date('2013-05-29'),
-  //   completedDate:new Date('2013-06-15'),
-  //   notationClass:'class1',
-  //   requiredDate:new Date('2013-06-30'),
-  //   ministryContact:'Bradley Macejkovic',
-  //   requiredActions: 'Urgent',
-  //   note: 'REF # 9999-99',
-  //   srTimeStamp: `Sent to SR on ${formatDate(new Date('2013-06-31'))}`,
-  //   notationParticipant : notationParticipantData3,
-  // },
+  {
+    notationId: 2,
+    notationType:'type2',
+    initialDate:new Date('2013-05-31'),
+    completedDate:new Date('2013-06-15'),
+    notationClass:'class1',
+    requiredDate:new Date('2013-06-29'),
+    ministryContact:'Bradley Macejkovic',
+    requiredActions: 'Pending',
+    note: 'REF # 9999-99',
+    srTimeStamp: `Sent to SR on ${formatDate(new Date('2013-06-30'))}`,
+    notationParticipant : notationParticipantData2,
+  },
+  {
+    notationId: 3,
+    notationType:'type3',
+    initialDate:new Date('2013-05-29'),
+    completedDate:new Date('2013-06-15'),
+    notationClass:'class1',
+    requiredDate:new Date('2013-06-30'),
+    ministryContact:'Bradley Macejkovic',
+    requiredActions: 'Urgent',
+    note: 'REF # 9999-99',
+    srTimeStamp: `Sent to SR on ${formatDate(new Date('2013-06-31'))}`,
+    notationParticipant : notationParticipantData3,
+  },
 ];
 
 

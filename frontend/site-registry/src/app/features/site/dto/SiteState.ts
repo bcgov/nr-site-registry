@@ -1,5 +1,7 @@
 import { ChangeTracker } from "../../../components/common/IChangeType";
 import { RequestStatus } from "../../../helpers/requests/status";
+import { UserMode } from "../../../helpers/requests/userMode";
+import { UserType } from "../../../helpers/requests/userType";
 import { SiteDetailsMode } from "../../details/dto/SiteDetailsMode";
 import { SiteResultDto, Sites } from "./Site"
 
@@ -23,4 +25,5 @@ export class SiteState
     changeTracker: ChangeTracker[] = [];
     siteDetailsMode: SiteDetailsMode = SiteDetailsMode.ViewOnlyMode;
     resetSiteDetails : boolean = false;
+    userType: UserType = UserType.External;
 }

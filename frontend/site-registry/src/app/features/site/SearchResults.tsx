@@ -57,6 +57,7 @@ const SearchResults: FC<ColumnProps> = ({
       allowRowsSelect={true}
       changeHandler={()=>{}}
       editMode={false}
+      idColumnName="id"
     ></Table>
   );
 };

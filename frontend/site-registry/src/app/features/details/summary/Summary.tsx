@@ -464,6 +464,7 @@ const Summary = () => {
             showPageOptions={false}
             changeHandler={() => {}}
             editMode={false}
+            idColumnName="id"
           />
         </div>
       </div>
@@ -483,6 +484,7 @@ const Summary = () => {
               console.log(eventRecord);
             }}
             editMode={false}
+            idColumnName="id"
           />
         </div>
       </div>

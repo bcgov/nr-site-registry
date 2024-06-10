@@ -623,7 +623,7 @@ export const CheckBoxInput: React.FC<InputProps> = ({
                 checked={isChecked}
                 aria-label={label} // Accessibility
                 onChange={handleCheckboxChange}
-                // disabled={!isEditing}
+                disabled={!isEditing}
                 />
                 {isLabel && (
                 <label

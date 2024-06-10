@@ -20,7 +20,8 @@ interface TableProps {
   showPageOptions? : boolean;
   allowRowsSelect? : boolean;
   changeHandler:(eventRecord:any)=>void,
-  editMode: boolean
+  editMode: boolean,
+  idColumnName:string;
 }
 
 const Table: FC<TableProps> = ({
@@ -36,7 +37,8 @@ const Table: FC<TableProps> = ({
   showPageOptions,
   allowRowsSelect,
   changeHandler,
-  editMode
+  editMode,
+  idColumnName
 }) => {
   
 
@@ -47,7 +49,7 @@ const Table: FC<TableProps> = ({
           <thead aria-label={`${label} Header`}>
             <TableHeader columns={columns} allowRowsSelect={allowRowsSelect ?? false} />
           </thead>
-            <TableBody isLoading={isLoading} columns={columns} data={data} allowRowsSelect={allowRowsSelect ?? false} changeHandler={changeHandler} editMode={editMode} />
+            <TableBody isLoading={isLoading} columns={columns} data={data} allowRowsSelect={allowRowsSelect ?? false} changeHandler={changeHandler} editMode={editMode} idColumnName={idColumnName} />
         </table>
       </div>
       <div>

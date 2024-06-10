@@ -9,6 +9,7 @@ import { GRAPHQL } from "../../../helpers/endpoints";
 import { act } from "react-dom/test-utils";
 import { useActionData } from "react-router-dom";
 import { SiteDetailsMode } from "../../details/dto/SiteDetailsMode";
+import { UserType } from "../../../helpers/requests/userType";
 
 const initialState: SiteState = {
   sites: [],
@@ -29,6 +30,7 @@ const initialState: SiteState = {
   changeTracker: [],
   siteDetailsMode: SiteDetailsMode.ViewOnlyMode,
   resetSiteDetails: false,
+  userType: UserType.External
 };
 
 export const fetchSitesDetails = createAsyncThunk(
@@ -204,6 +206,14 @@ const siteSlice = createSlice({
       };
       return newState;
     },
+    updateUserType:(state, action) =>
+    {
+      const newState = {
+        ...state       
+      };
+      newState.userType = action.payload;
+      return newState;
+    }
   },
   extraReducers(builder) {
     builder
@@ -253,6 +263,8 @@ export const selectSiteDetails = (state: any) => state.sites.siteDetails;
 export const trackedChanges = (state: any) => state.sites.changeTracker;
 export const siteDetailsMode = (state: any) => state.sites.siteDetailsMode;
 export const resetSiteDetails = (state: any) => state.sites.resetSiteDetails;
+export const userTypeOnlyForDemo = (state: any) => state.sites.userType;
+
 
 export const {
   siteAdded,
@@ -263,6 +275,7 @@ export const {
   trackChanges,
   clearTrackChanges,
   updateSiteDetailsMode,
+  updateUserType
 } = siteSlice.actions;
 
 export default siteSlice.reducer;

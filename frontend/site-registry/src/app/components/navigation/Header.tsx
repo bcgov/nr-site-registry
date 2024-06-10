@@ -1,5 +1,6 @@
 import logo from "../../../app/images/logos/logo-banner.png";
 import logoVertical from "../../../app/images/logos/logo-vertical.png"
+import { useDispatch } from "react-redux";
 
 import "./Header.css";
 import moon from "../../images/moon.png";
@@ -9,6 +10,11 @@ import MobileNavMenu from "./MobileNavMenu";
 import { ArrowDownIcon } from "../common/icon";
 import LanguageSwitcher from "../language/LanguageSwitcher";
 import UserAccount from "../account/UserAccount";
+import Actions from "../action/Actions";
+import { UserType } from "../../helpers/requests/userType";
+import { updateUserType } from "../../features/site/dto/SiteSlice";
+import { AppDispatch } from "../../Store";
+
 
 const Header = () => {
 
@@ -17,6 +23,22 @@ const Header = () => {
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
   };
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const handleUserClick = (value: string) => {
+    switch(value)
+    {
+      case UserType.External :    
+        dispatch(updateUserType(UserType.External));
+       break;
+      case UserType.Internal :
+        dispatch(updateUserType(UserType.Internal));
+       break;
+      default:
+       break;
+    }
+  }
 
   return (
     <header className="navbar">
@@ -29,6 +51,18 @@ const Header = () => {
       </div>
       <div className="header-right-corner-section d-flex align-items-center">
         <LanguageSwitcher/>
+         <Actions label="User" items={ [
+                { 
+                    label:'External User',
+                    value: UserType.External
+                },
+                {
+                    label:'Internal User',
+                    value: UserType.Internal
+                },
+                
+            ]} 
+            onItemClick={handleUserClick} /> 
         <button
           className="navbar-toggler display-upto-medium no-bg-br-outline" 
           type="button"

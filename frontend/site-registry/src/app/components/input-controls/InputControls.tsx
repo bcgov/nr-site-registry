@@ -273,6 +273,7 @@ export const Dropdown: React.FC<InputProps> = ({
               ? customLabelCss ?? ""
               : `form-label ${customEditLabelCss ?? "custom-label"}`
           }`}
+          aria-labelledby={label}
         >
           {label}
         </label>

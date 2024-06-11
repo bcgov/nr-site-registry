@@ -4,6 +4,7 @@ import Table from '../table/Table';
 import './Widget.css';
 import { CheckBoxInput } from '../input-controls/InputControls';
 import { FormFieldType } from '../input-controls/IFormField';
+import { RequestStatus } from '../../helpers/requests/status';
 
 const Widget: React.FC<IWidget> = ({
     title,
@@ -18,8 +19,12 @@ const Widget: React.FC<IWidget> = ({
     editMode,
     srMode,
     changeHandler,
-    handleCheckBoxChange
+    handleCheckBoxChange,
+    sortHandler
 }) => {
+
+  let  widgetSortHandler = sortHandler ?? ((row,ascSort)=>{console.log("Widget Handle Sort Event", row, ascSort)});
+
     return(
         <div className={`d-flex flex-column widget-container`}>
         {
@@ -48,13 +53,15 @@ const Widget: React.FC<IWidget> = ({
           <div>
             <Table
               label={title ?? ""}
-              isLoading={tableIsLoading}
+              isLoading={RequestStatus.success}
               columns={tableColumns}
               data={tableData}
               showPageOptions={false}
               allowRowsSelect={allowRowsSelect}
               changeHandler={changeHandler}
               editMode={editMode ?? false}
+              idColumnName='id'
+              sortHandler={widgetSortHandler}
             />
           </div>
         }

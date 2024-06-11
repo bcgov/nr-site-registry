@@ -14,6 +14,17 @@ interface InputProps extends IFormField {
   onChange: (value: any) => void;
 }
 
+
+const renderTableCell = (
+  content : JSX.Element | string
+) => {
+    return (
+      <td className="table-border-light content-text">
+        {content}
+      </td>
+    )
+}
+
 export const Link: React.FC<InputProps> = ({
   label,
   placeholder,
@@ -31,7 +42,7 @@ export const Link: React.FC<InputProps> = ({
   href,
 }) => {
   return (
-    <td className="table-border-light content-text">
+    renderTableCell(
       <RouterLink
         to={href + value}
         className={`${customInputTextCss ?? ""}`}
@@ -39,7 +50,7 @@ export const Link: React.FC<InputProps> = ({
       >
         View
       </RouterLink>
-    </td>
+    )
   );
 };
 
@@ -59,9 +70,9 @@ export const Label: React.FC<InputProps> = ({
   tableMode,
 }) => {
   return (
-    <td className="table-border-light content-text">
+    renderTableCell(
       <p className={`${customInputTextCss ?? ""}`}>{value}</p>
-    </td>
+    )
   );
 };
 
@@ -113,6 +124,7 @@ export const TextInput: React.FC<InputProps> = ({
   // Replace any spaces in the label with underscores to create a valid id
   const inputTxtId = label.replace(/\s+/g, "_");
 
+  // console.log("tableMode", tableMode);
   if (tableMode) {
     return (
       <td className="table-border-light content-text">
@@ -613,7 +625,7 @@ export const CheckBoxInput: React.FC<InputProps> = ({
                 checked={isChecked}
                 aria-label={label} // Accessibility
                 onChange={handleCheckboxChange}
-                // disabled={!isEditing}
+                disabled={!isEditing}
                 />
                 {isLabel && (
                 <label

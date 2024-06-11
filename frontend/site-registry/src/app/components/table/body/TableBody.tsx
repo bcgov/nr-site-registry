@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { SpinnerIcon } from "../../common/icon";
 import { RequestStatus } from "../../../helpers/requests/status";
 import { TableColumn } from "../TableColumn";
@@ -6,8 +6,6 @@ import { TableColumn } from "../TableColumn";
 import { FormFieldType, IFormField } from "../../input-controls/IFormField";
 import { Label, TextInput , Link ,Dropdown,CheckBoxInput } from "../../input-controls/InputControls";
 import { ChangeTracker } from "../../common/IChangeType";
-import { v4 } from "uuid";
-
 interface TableBodyProps {
   isLoading: RequestStatus;
   columns: TableColumn[];
@@ -17,6 +15,7 @@ interface TableBodyProps {
     data:any
   ) => void;
   editMode: boolean;
+  idColumnName:string;
 }
 
 const TableBody: FC<TableBodyProps> = ({
@@ -26,7 +25,33 @@ const TableBody: FC<TableBodyProps> = ({
   allowRowsSelect,
   changeHandler,
   editMode,
+  idColumnName,
 }) => {
+
+  const [selectedRowIds,SetSelectedRowsId] = useState([""]);
+
+
+  const handleSelectTableRow = (event:any,id:string,rowIndex:any)=>
+  {
+    if(event.target.checked)
+    {
+      SetSelectedRowsId([...selectedRowIds, id]);    
+    }
+    else
+    {
+      SetSelectedRowsId(selectedRowIds.filter(x=>x!== id));
+    }
+
+    tableRecordChangeHandler(rowIndex,'select_row', event.target.checked)
+  }
+
+  useEffect(()=>{ console.log('selectedRowIds',selectedRowIds)},[selectedRowIds]);
+
+
+  const isChecked = (id:string) =>{
+   return (selectedRowIds.indexOf(id) !== -1);
+  }
+
   const renderNoResultsFound = () => {
     return (
       <tr>
@@ -209,30 +234,29 @@ const TableBody: FC<TableBodyProps> = ({
   };
 
   const renderTableRow = (rowIndex: number) => {
+
+   const checkboxId = getValue(rowIndex,"id");
+   const rowChecked = isChecked(checkboxId);
+
     return (
       <React.Fragment key={rowIndex}>
         <tr>
           {allowRowsSelect && (
             <td className="table-border-light content-text">
               <input
-                id={v4()}
+                id={getValue(rowIndex,"id")}
                 type="checkbox"
                 className="checkbox-color"
                 aria-label="Select Row"
-                onChange={(event) => tableRecordChangeHandler(rowIndex,'select_row', event.target.checked)}
+                onChange={(event) =>{handleSelectTableRow(event,checkboxId,rowIndex)}}
+                checked={rowChecked}
               />
             </td>
           )}
           {columns &&
             columns.map((column, columnIndex) => {
               return renderTableCell(column, rowIndex, columnIndex);
-            })}
-          {/* <td className="table-border-light content-text">               
-                <a href={"/map?id=" + getValue(rowIndex, idColumnGQLPropName)}>View</a>
-              </td>
-              <td className="table-border-light content-text">
-              <a href={"/details?id=" + getValue(rowIndex, idColumnGQLPropName)}>Details</a>
-              </td> */}
+            })}      
         </tr>
       </React.Fragment>
     );

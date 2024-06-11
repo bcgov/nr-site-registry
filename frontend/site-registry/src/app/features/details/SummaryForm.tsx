@@ -100,6 +100,7 @@ const SummaryForm:FC<SummaryFormProps> = ({sitesDetails, edit,srMode, changeHand
             placeholder: "Deg",
             graphQLPropertyName: "longDegrees",
             value: "",
+              suffix: "d ",
             validation: {
               pattern: /^[0-9.\s]*$/,
               customMessage:
@@ -114,6 +115,7 @@ const SummaryForm:FC<SummaryFormProps> = ({sitesDetails, edit,srMode, changeHand
             label: "Minutes",
             placeholder: "Min",
             graphQLPropertyName: "longMinutes",
+            suffix: "m ",
             value: "",
             validation: {
               pattern: /^[0-9.\s]*$/,
@@ -127,6 +129,7 @@ const SummaryForm:FC<SummaryFormProps> = ({sitesDetails, edit,srMode, changeHand
             label: "Seconds",
             placeholder: "Sec",
             graphQLPropertyName: "longSeconds",
+            suffix: "s ",
             value: "",
             validation: {
               pattern: /^[0-9.\s]*$/,

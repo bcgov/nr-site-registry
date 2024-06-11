@@ -151,7 +151,6 @@ const Notations: React.FC<INotations> = ({
     const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
     const [formData, setFormData] =  useState<{ [key: string]: any | [Date, Date] }[]>(initialNotationData);
     const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
-    // const [btnDisabled, setBtnDisabled] = useState(true);
     const [srTimeStamp, setSRTimeStamp] = useState('Sent to SR on June 2nd, 2013');
     const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
     const [searchTerm, setSearchTerm] = useState('');
@@ -170,7 +169,6 @@ const Notations: React.FC<INotations> = ({
   const deepSearch = (obj: any, searchTerm: string): boolean => {
       for (const key in obj) {
         const value = obj[key];
-        console.log(value)
           if (typeof value === 'object') {
               if (deepSearch(obj[key], searchTerm)) {
                   return true;
@@ -212,7 +210,6 @@ const Notations: React.FC<INotations> = ({
       setFormData(initialNotationData)
     }, []);
 
-    useEffect(()=>{console.log('inside',formData)},[initialNotationData]);
     const handleInputChange = (id: number, graphQLPropertyName: any, value: String | [Date, Date]) => {
       if(viewMode === SiteDetailsMode.SRMode)
       {
@@ -247,11 +244,11 @@ const Notations: React.FC<INotations> = ({
 
     const [selectedRows, setSelectedRows] = useState<{notationId: any, participantId: any}[]>([]);
 
-    const handleRemoveParticipant = () => {
+    const handleRemoveParticipant = (notationId: any) => {
      // Remove selected rows from formData state
       setFormData(prevData => {
         return prevData.map(notation => {
-            if (selectedRows.some(row => row.notationId === notation.notationId)) {
+            if (notation.notationId === notationId) {
                 // Filter out selected rows from notationParticipant array
                 const updatedNotationParticipant = notation.notationParticipant.filter((participant:any) =>
                     !selectedRows.some(row => row.notationId === notation.notationId && row.participantId === participant.id)
@@ -267,7 +264,9 @@ const Notations: React.FC<INotations> = ({
     );
     dispatch(trackChanges(tracker.toPlainObject()));
     // Clear selectedRows state
-    setSelectedRows([]);
+
+    const updateSelectedRows =  selectedRows.filter(row => row.notationId !== notationId);
+    setSelectedRows(updateSelectedRows);
     
     };
 
@@ -378,9 +377,13 @@ const Notations: React.FC<INotations> = ({
     );
   };
 
+  const isAnyParticipantSelected = (notationId: any) => {
+   return selectedRows.some((row) => row.notationId === notationId)
+  };
+
     return (
       <>
-          <div className="row">
+          <div className="row" id="notations-component" data-testid="notations-component">
           { userType === UserType.Internal && (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode) &&
             <div className="col-lg-6 col-md-12 py-4">
               <button className={`d-flex align-items-center ${viewMode === SiteDetailsMode.EditMode ? `btn-add-notation` : `btn-add-notation-disable`} `} disabled= { viewMode === SiteDetailsMode.SRMode } onClick={handleOnAddNotation}
@@ -401,99 +404,102 @@ const Notations: React.FC<INotations> = ({
               </div>
             </div>
           </div>
-      
-        {
-          formData && formData.map((notation, index) =>
-           (<div key={index}>
-              {
-                (viewMode === SiteDetailsMode.SRMode) && userType === UserType.Internal && 
-                <CheckBoxInput
-                  type={FormFieldType.Checkbox}
-                  label={''}
-                  isLabel={false}
-                  onChange={(value) => handleParentChekBoxChange(notation.notationId, value)}
-                />
-              }
-              <PanelWithUpDown 
-                    firstChild = { 
-                        <div className="w-100">
-                          <Form formRows = {notationFormRowsFirstChild} 
-                                formData = {notation} 
-                                editMode = {viewMode === SiteDetailsMode.EditMode} 
-                                srMode= { viewMode === SiteDetailsMode.SRMode } 
-                                handleInputChange={(graphQLPropertyName, value) => handleInputChange(notation.notationId, graphQLPropertyName, value)}
-                          aria-label="Sort Notation Form"/>
-                        { userType === UserType.Internal && <span className="sr-time-stamp">{notation.srTimeStamp}</span> }
-                        </div>
-                        }
-                    secondChild = { 
-                        <div className="w-100">
-                            <Form formRows={ userType === UserType.External ? notationFormRowExternal : notationFormRowsInternal } 
-                                  formData={notation} 
-                                  editMode={viewMode === SiteDetailsMode.EditMode}  
-                                  srMode= { viewMode === SiteDetailsMode.SRMode } 
-                                  handleInputChange={(graphQLPropertyName, value) => handleInputChange(notation.notationId, graphQLPropertyName, value)}
-                                  aria-label="Sort Notation Form"/>
-                            <Widget changeHandler={(event) => handleTableChange(notation.notationId, event)}
-                                    handleCheckBoxChange={(event)=> handleWidgetCheckBox(event)}
-                                    title={'Notation Participants'} 
-                                    tableColumns={ userType === UserType.Internal ? notationColumnInternal : notationColumnExternal} 
-                                    tableData={notation.notationParticipant} 
-                                    tableIsLoading={loading} 
-                                    allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
-                                    aria-label="Notation Widget" 
-                                    hideTable = { false } 
-                                    hideTitle = { false } 
-                                    editMode={ (viewMode === SiteDetailsMode.EditMode) && userType === UserType.Internal}
-                                    srMode={ (viewMode === SiteDetailsMode.SRMode) && userType === UserType.Internal}
-                                    sortHandler={(row,ascDir)=>{
+          <div data-testid="notation-rows" className={`col-lg-12 overflow-auto p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`} style={{ maxHeight: '850px' }}>
+            {
+              formData && formData.map((notation, index) =>
+              (<div className={`${formData.length >= 6 ? 'me-2' : 'me-0'}`} key={index} >
+                  {
+                    (viewMode === SiteDetailsMode.SRMode) && userType === UserType.Internal && 
+                    <CheckBoxInput
+                      type={FormFieldType.Checkbox}
+                      label={''}
+                      isLabel={false}
+                      onChange={(value) => handleParentChekBoxChange(notation.notationId, value)}
+                    />
+                  }
+                  <PanelWithUpDown 
+                        firstChild = { 
+                            <div className="w-100">
+                              <Form formRows = {notationFormRowsFirstChild} 
+                                    formData = {notation} 
+                                    editMode = {viewMode === SiteDetailsMode.EditMode} 
+                                    srMode= { viewMode === SiteDetailsMode.SRMode } 
+                                    handleInputChange={(graphQLPropertyName, value) => handleInputChange(notation.notationId, graphQLPropertyName, value)}
+                              aria-label="Sort Notation Form"/>
+                            { userType === UserType.Internal && <span className="sr-time-stamp">{notation.srTimeStamp}</span> }
+                            </div>
+                            }
+                        secondChild = { 
+                            <div className="w-100">
+                                <Form formRows={ userType === UserType.External ? notationFormRowExternal : notationFormRowsInternal } 
+                                      formData={notation} 
+                                      editMode={viewMode === SiteDetailsMode.EditMode}  
+                                      srMode= { viewMode === SiteDetailsMode.SRMode } 
+                                      handleInputChange={(graphQLPropertyName, value) => handleInputChange(notation.notationId, graphQLPropertyName, value)}
+                                      aria-label="Sort Notation Form"/>
+                                <Widget changeHandler={(event) => handleTableChange(notation.notationId, event)}
+                                        handleCheckBoxChange={(event)=> handleWidgetCheckBox(event)}
+                                        title={'Notation Participants'} 
+                                        tableColumns={ userType === UserType.Internal ? notationColumnInternal : notationColumnExternal} 
+                                        tableData={notation.notationParticipant} 
+                                        tableIsLoading={loading} 
+                                        allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
+                                        aria-label="Notation Widget" 
+                                        hideTable = { false } 
+                                        hideTitle = { false } 
+                                        editMode={ (viewMode === SiteDetailsMode.EditMode) && userType === UserType.Internal}
+                                        srMode={ (viewMode === SiteDetailsMode.SRMode) && userType === UserType.Internal}
+                                        primaryKeycolumnName="id"
+                                        sortHandler={(row,ascDir)=>{
 
-                                      console.log("table sort handler", row, ascDir)
+                                          console.log("table sort handler", row, ascDir)
 
-                                      let property = row["graphQLPropertyName"];
-                                      let notationId =notation.notationId;
-                                      setFormData(prevData => {
-                                        return prevData.map(tempNotation => {
-                                            if (( notationId === tempNotation.notationId)) {
-                                                // Filter out selected rows from notationParticipant array
-                                                const updatedNotationParticipant = tempNotation.notationParticipant.sort(function(a:any, b:any) {
-                                                  if (ascDir) return (a[property] > b[property]) ? 1 : ((a[property] < b[property]) ? -1 : 0);
-                                                  else return (b[property] > a[property]) ? 1 : ((b[property] < a[property]) ? -1 : 0);
-                                              });
-                                                console.log("updatedNotationParticipant",updatedNotationParticipant);
-                                                return { ...tempNotation, notationParticipant: updatedNotationParticipant };
-                                            }
-                                            return notation;
+                                          let property = row["graphQLPropertyName"];
+                                          let notationId =notation.notationId;
+                                          setFormData(prevData => {
+                                            return prevData.map(tempNotation => {
+                                                if (( notationId === tempNotation.notationId)) {
+                                                    // Filter out selected rows from notationParticipant array
+                                                    const updatedNotationParticipant = tempNotation.notationParticipant.sort(function(a:any, b:any) {
+                                                      if (ascDir) return (a[property] > b[property]) ? 1 : ((a[property] < b[property]) ? -1 : 0);
+                                                      else return (b[property] > a[property]) ? 1 : ((b[property] < a[property]) ? -1 : 0);
+                                                  });
+                                                    console.log("updatedNotationParticipant",updatedNotationParticipant);
+                                                    return { ...tempNotation, notationParticipant: updatedNotationParticipant };
+                                                }
+                                                return notation;
+                                            });
                                         });
-                                    });
+                                          
+                                        }}
+                                        >
+                                { viewMode === SiteDetailsMode.EditMode && userType === UserType.Internal &&
+                                    <div className="d-flex gap-2" key={notation.notationId}>
+                                      <button id="add-participant-btn" className=" d-flex align-items-center notation-btn" type="button" onClick={() => handleAddParticipant(notation.notationId)} aria-label={'Add Participant'} >
+                                          <UserPlus className="btn-user-icon"/>
+                                          <span className="notation-btn-lbl">{'Add Participant'}</span>
+                                      </button>
                                       
-                                    }}
-                                    >
-                            { viewMode === SiteDetailsMode.EditMode && userType === UserType.Internal &&
-                                <div className="d-flex gap-2">
-                                  <button className=" d-flex align-items-center notation-btn" type="button" onClick={() => handleAddParticipant(notation.notationId)} aria-label={'Add Participant'} >
-                                      <UserPlus className="btn-user-icon"/>
-                                      <span className="notation-btn-lbl">{'Add Participant'}</span>
-                                  </button>
-                                  <button className={`d-flex align-items-center ${(selectedRows.length > 0) ? `notation-btn` : `notation-btn-disable`}`} disabled={selectedRows.length === 0} type="button" onClick={handleRemoveParticipant} aria-label={'Remove Participant'} >
-                                      <UserMinus className={`${(selectedRows.length > 0) ?`btn-user-icon`: `btn-user-icon-disabled`}`}/>
-                                      <span className={`${(selectedRows.length > 0) ? `notation-btn-lbl` : `notation-btn-lbl-disabled`}`}>{'Remove Participant'}</span>
-                                  </button>
-                                </div>
-                              }
-                              { viewMode === SiteDetailsMode.SRMode && userType === UserType.Internal &&
-                                <button className={`d-flex align-items-center ${(selectedRows.length > 0) ? `notation-btn` : `notation-btn-disable`}`} disabled={(selectedRows.length > 0)} type="button" onClick={handleRemoveParticipant} aria-label={'Set SR Visibility'} >
-                                  <span className={`${(selectedRows.length > 0) ? `notation-btn-lbl` : `notation-btn-lbl-disabled`}`}>{'Set SR Visibility'}</span>
-                                </button>
-                              }
-                            </Widget>
-                          { userType === UserType.Internal && <p className="sr-time-stamp">{notation.srTimeStamp}</p>}
-                        </div>
-                      }
-                />
-            </div>)
-          )
-        }
+                                      <button id="delete-participant-btn" className={`d-flex align-items-center ${isAnyParticipantSelected(notation.notationId) ? `notation-btn` : `notation-btn-disable`}`} disabled={!isAnyParticipantSelected(notation.notationId)} type="button" onClick={() => handleRemoveParticipant(notation.notationId)} aria-label={'Remove Participant'} >
+                                          <UserMinus className={`${isAnyParticipantSelected(notation.notationId) ?`btn-user-icon`: `btn-user-icon-disabled`}`}/>
+                                          <span className={`${isAnyParticipantSelected(notation.notationId) ? `notation-btn-lbl` : `notation-btn-lbl-disabled`}`}>{'Remove Participant'}</span>
+                                      </button>
+                                    </div>
+                                  }
+                                  { viewMode === SiteDetailsMode.SRMode && userType === UserType.Internal &&
+                                    <button className={`d-flex align-items-center ${(selectedRows.length > 0) ? `notation-btn` : `notation-btn-disable`}`} disabled={viewMode === SiteDetailsMode.SRMode} type="button" onClick={()=>{}} aria-label={'Set SR Visibility'} >
+                                      <span className={`${(selectedRows.length > 0) ? `notation-btn-lbl` : `notation-btn-lbl-disabled`}`}>{'Set SR Visibility'}</span>
+                                    </button>
+                                  }
+                                </Widget>
+                              { userType === UserType.Internal && <p className="sr-time-stamp">{notation.srTimeStamp}</p>}
+                            </div>
+                          }
+                    />
+                </div>)
+              )
+            }
+          </div>
       </>
     );
 }

@@ -18,6 +18,7 @@ const Widget: React.FC<IWidget> = ({
     hideTitle,
     editMode,
     srMode,
+    primaryKeycolumnName,
     changeHandler,
     handleCheckBoxChange,
     sortHandler
@@ -60,7 +61,7 @@ const Widget: React.FC<IWidget> = ({
               allowRowsSelect={allowRowsSelect}
               changeHandler={changeHandler}
               editMode={editMode ?? false}
-              idColumnName='id'
+              idColumnName={primaryKeycolumnName ?? ''}
               sortHandler={widgetSortHandler}
             />
           </div>

@@ -235,7 +235,7 @@ const TableBody: FC<TableBodyProps> = ({
 
   const renderTableRow = (rowIndex: number) => {
 
-   const checkboxId = getValue(rowIndex,"id");
+   const checkboxId = getValue(rowIndex,idColumnName);
    const rowChecked = isChecked(checkboxId);
 
     return (
@@ -244,7 +244,7 @@ const TableBody: FC<TableBodyProps> = ({
           {allowRowsSelect && (
             <td className="table-border-light content-text">
               <input
-                id={getValue(rowIndex,"id")}
+                id={getValue(rowIndex,idColumnName)}
                 type="checkbox"
                 className="checkbox-color"
                 aria-label="Select Row"

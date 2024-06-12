@@ -17,6 +17,7 @@
   inset: 45px auto auto auto;
   position:absolute;
   left:calc(100% - 410px);
+  z-index: 999;
 }
 
 .custom-item {

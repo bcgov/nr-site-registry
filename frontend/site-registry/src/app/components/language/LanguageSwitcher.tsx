@@ -75,7 +75,7 @@ const LanguageSwitcher = () => {
   return (
     <>
       {/* Dropdown component for language selection */}
-      <div aria-label="Language Selector" ref={divRef}>
+      <div id="language-selector" aria-label="Language Selector" ref={divRef}>
         {/* Dropdown toggle button */}
         <div id="language-dropdown" className="custom-toggle"
          aria-label="Language Menu" onClick={toggleBtn} >
@@ -87,7 +87,7 @@ const LanguageSwitcher = () => {
       </div>
         {/* Dropdown menu */}
         { isOpen && <div
-          
+          id="menu"
           className="custom-menu mt-4"
           role="menu"
           aria-labelledby="language-dropdown"
@@ -96,6 +96,7 @@ const LanguageSwitcher = () => {
           <div role="none">
             {/* Default option */}
             <div
+              id="menu-item"
               className="custom-item-first-child"
               role="menuitem"
               aria-disabled="true"
@@ -109,6 +110,7 @@ const LanguageSwitcher = () => {
           {LANGUAGE &&
             LANGUAGE.map((lang) => (
               <div
+                id="menu-item"
                 onClick={() => {changeLanguage(lang.key); setIsOpen(!isOpen)}}
                 className="custom-item d-flex w-100 align-items-center"
                 role="menuitem"

@@ -7,7 +7,6 @@ const NavigationPills: React.FC<INavigationPills> = ({ items, components }) => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   const handlePillClick = (index: number) => {
-    console.log(index)
     setActiveIndex(index);
   };
 

@@ -35,10 +35,11 @@ const SummaryForm:FC<SummaryFormProps> = ({sitesDetails, edit,srMode, changeHand
         type: FormFieldType.Group,
         label: "Latitude (D, M, S)",
         value: "",
+        isChildLabel: true,
         children: [
           {
             type: FormFieldType.Text,
-            label: "Deg",
+            label: "Degree",
             placeholder: "Deg",
             graphQLPropertyName: "latDegrees",
             value: "",
@@ -54,7 +55,7 @@ const SummaryForm:FC<SummaryFormProps> = ({sitesDetails, edit,srMode, changeHand
           },
           {
             type: FormFieldType.Text,
-            label: "Min",
+            label: "Minutes",
             placeholder: "Min",
             graphQLPropertyName: "latMinutes",
             value: "",
@@ -70,7 +71,7 @@ const SummaryForm:FC<SummaryFormProps> = ({sitesDetails, edit,srMode, changeHand
           },
           {
             type: FormFieldType.Text,
-            label: "Sec",
+            label: "Seconds",
             placeholder: "Sec",
             graphQLPropertyName: "latSeconds",
             value: "",
@@ -91,13 +92,15 @@ const SummaryForm:FC<SummaryFormProps> = ({sitesDetails, edit,srMode, changeHand
         type: FormFieldType.Group,
         label: "Longitude (D, M, S)",
         value: "",
+        isChildLabel:true,
         children: [
           {
             type: FormFieldType.Text,
-            label: "Deg",
+            label: "Degree",
             placeholder: "Deg",
             graphQLPropertyName: "longDegrees",
             value: "",
+              suffix: "d ",
             validation: {
               pattern: /^[0-9.\s]*$/,
               customMessage:
@@ -109,9 +112,10 @@ const SummaryForm:FC<SummaryFormProps> = ({sitesDetails, edit,srMode, changeHand
           },
           {
             type: FormFieldType.Text,
-            label: "Min",
+            label: "Minutes",
             placeholder: "Min",
             graphQLPropertyName: "longMinutes",
+            suffix: "m ",
             value: "",
             validation: {
               pattern: /^[0-9.\s]*$/,
@@ -122,9 +126,10 @@ const SummaryForm:FC<SummaryFormProps> = ({sitesDetails, edit,srMode, changeHand
           },
           {
             type: FormFieldType.Text,
-            label: "Sec",
+            label: "Seconds",
             placeholder: "Sec",
             graphQLPropertyName: "longSeconds",
+            suffix: "s ",
             value: "",
             validation: {
               pattern: /^[0-9.\s]*$/,

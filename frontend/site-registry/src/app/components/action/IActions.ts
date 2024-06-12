@@ -3,7 +3,7 @@ import { SiteDetailsMode } from "../../features/details/dto/SiteDetailsMode";
 
 export interface DropdownItem {
     label: string;
-    value: SiteDetailsMode;
+    value: any;
 }
 
 export interface IActions {

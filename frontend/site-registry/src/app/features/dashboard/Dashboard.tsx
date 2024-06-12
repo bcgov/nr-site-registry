@@ -13,6 +13,7 @@ import { UserType } from "../../helpers/requests/userType";
 import "./Dashboard.css";
 import PageContainer from "../../components/simple/PageContainer";
 import Widget from "../../components/widget/Widget";
+import { userTypeOnlyForDemo } from "../site/dto/SiteSlice";
 
 interface DashboardWidgetProps {
   title?: string;
@@ -38,7 +39,8 @@ const DashboardTableWidget: React.FC<DashboardWidgetProps> = ({
   allowRowsSelect,
   onButtonClick,
 }) => (
-  <Widget changeHandler={changeHandler} title={title} tableColumns={columns} tableData={data} tableIsLoading={loading} allowRowsSelect={allowRowsSelect}>
+  <Widget changeHandler={changeHandler} title={title} tableColumns={columns} tableData={data} tableIsLoading={loading} allowRowsSelect={allowRowsSelect}
+  primaryKeycolumnName="siteId">
     { buttonText && onButtonClick && 
       <button className="dashboard-btn" type="button" onClick={onButtonClick} aria-label={buttonText} >
         <span className="btn-lbl">{buttonText}</span>
@@ -55,6 +57,13 @@ const Dashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
   const sites = useSelector((state: any) => state.dashboard);
 
+  
+  const userTypeLocal = useSelector(userTypeOnlyForDemo);
+
+  useEffect(()=>{
+    setUserType(userTypeLocal);
+  },[userTypeLocal])
+
   useEffect(() => {
     dispatch(fetchRecentViews("1"));
   }, [dispatch]);
@@ -62,6 +71,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (sites.status === RequestStatus.success) {
       setData(sites.dashboard.recentView.data);
+      console.log('mmmm', sites.dashboard.recentView.data)
       setLoading(sites.status);
       setName("First Name");
     }

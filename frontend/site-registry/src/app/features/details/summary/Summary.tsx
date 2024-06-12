@@ -17,8 +17,12 @@ import { CustomPillButton } from "../../../components/simple/CustomButtons";
 import Table from "../../../components/table/Table";
 import "./Summary.css";
 import { SiteDetailsMode } from "../dto/SiteDetailsMode";
+import SearchInput from "../../../components/search/SearchInput";
 
 const Summary = () => {
+
+
+  const [parcelSearchTerm, SetParcelSearchTeam] = useState("");
 
   setTimeout(() => {
     let address = document.getElementsByTagName('h3');
@@ -37,25 +41,17 @@ const Summary = () => {
 
 
     const detailsMode = useSelector(siteDetailsMode);
-
-    
-    
     const details = useSelector(selectSiteDetails);
-
     const [editSiteDetailsObject, setEditSiteDetailsObject] = useState(details);
-   
     const resetDetails = useSelector(resetSiteDetails);  
     useEffect(()=>{
-
         if(resetDetails)
         {
             setEditSiteDetailsObject(details);
         }
-
     },[resetDetails])
 
     const [edit, setEdit] = useState(false);
-  
     const [srMode, setSRMode] = useState(false);
 
     useEffect(() => {
@@ -82,10 +78,7 @@ const Summary = () => {
 
 
   const [location, setLocation] = useState([48.46762, -123.25458]);
-
   const dispatch = useDispatch<AppDispatch>();
-
-
 
   useEffect(()=>{
     let address = document.getElementsByTagName('h3');
@@ -138,6 +131,14 @@ const Summary = () => {
     setParcelIds(parcelIds.filter((x) => x !== pid));
   };
 
+
+  const handleAddNewParcelId = (pid: string) => {
+    const tracker = new ChangeTracker(IChangeType.Added, "Parcel ID " + pid);
+    dispatch(trackChanges(tracker.toPlainObject()));
+    let parcelIdsLocal =[...parcelIds, parseInt(pid)];
+    //parcelIdsLocal.push();
+    setParcelIds(parcelIdsLocal);
+  };
 
   const data = [
     {
@@ -410,13 +411,30 @@ const Summary = () => {
           </div>
         }
       />
+      
       <PanelWithUpDown
         label="Parcel ID(s)"
         secondChild={
           !edit ? (
             <div>{parcelIds.join(", ")}</div>
           ) : (
+            <div className="parcel-container">
+              <div>
+              <SearchInput label={''} searchTerm={parcelSearchTerm} clearSearch={()=>{SetParcelSearchTeam("")}} handleSearchChange={(e)=>{
+                console.log("eeee",e)
+                if(e.target)
+                  {
+                    SetParcelSearchTeam(e.target.value)
+                  }
+                  else
+                  {
+                    SetParcelSearchTeam(e)
+                  }
+              }} options={["1213","12313","123132"]}
+               optionSelectHandler={(value)=>{handleAddNewParcelId(value)}} createNewLabel=" Parcel ID" createNewHandler={handleAddNewParcelId}/>
+              </div>
             <div className="parcel-edit-div">
+        
               {parcelIds.map((pid) => (
                 <CustomPillButton
                   key={pid}
@@ -424,6 +442,7 @@ const Summary = () => {
                   clickHandler={() => handleParcelIdDelete(pid)}
                 />
               ))}
+            </div>
             </div>
           )
         }
@@ -446,6 +465,7 @@ const Summary = () => {
             showPageOptions={false}
             changeHandler={() => {}}
             editMode={false}
+            idColumnName="id"
           />
         </div>
       </div>
@@ -465,6 +485,7 @@ const Summary = () => {
               console.log(eventRecord);
             }}
             editMode={false}
+            idColumnName="id"
           />
         </div>
       </div>

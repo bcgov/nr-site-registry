@@ -7,7 +7,7 @@ import { DropdownIcon, DropdownUpIcon } from "../common/icon";
 const UserAccount = ( props : any) =>{
     // Sample user data
     const userObj = {
-        name: 'Ipsum, Loren WLRS:EX',
+        name: 'John Doe WLRS:EX',
         profileImage: avatar, // URL to the profile image
     };
 
@@ -35,7 +35,7 @@ const UserAccount = ( props : any) =>{
                     <img src={user.profileImage} alt="User profile image." className="account-image"  aria-hidden="true"   role="img"
         aria-label="User profile image"/>
                     {/* User name */}
-                    <div className="p-3">{user.name}</div>
+                    <div id="user-name" className="p-3">{user.name}</div>
                     <div id="account-dropdown" className="account-custom-toggle-mobile align-item-center" aria-label="Account Menu Button">
                      { dropdownArrow ? <DropdownUpIcon/> : <DropdownIcon/> }
                     </div>

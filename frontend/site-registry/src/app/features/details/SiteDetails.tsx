@@ -26,6 +26,7 @@ import {
   clearTrackChanges,
   siteDetailsMode,
   updateSiteDetailsMode,
+  userTypeOnlyForDemo,
 } from "../site/dto/SiteSlice";
 import { AppDispatch } from "../../Store";
 import Notations from "./notations/Notations";
@@ -68,6 +69,13 @@ const SiteDetails = () => {
   const { id } = useParams();
 
   const details = useSelector(selectSiteDetails);
+
+  const userTypeLocal = useSelector(userTypeOnlyForDemo);
+
+  useEffect(()=>{
+    setUserType(userTypeLocal);
+  },[userTypeLocal])
+
   const [editSiteDetailsObject, setEditSiteDetailsObject] = useState(details);
   const savedChanges = useSelector(trackedChanges);
 
@@ -84,6 +92,7 @@ const SiteDetails = () => {
     setEditSiteDetailsObject(details);
   }, [details]);
 
+  
   const handleItemClick = (value: string) => {
     switch(value)
     {
@@ -164,6 +173,18 @@ const SiteDetails = () => {
         </button>
         <div className="d-flex gap-2 justify-align-center">
 
+         {/* { <Actions label="User" items={ [
+                { 
+                    label:'External User',
+                    value: UserType.External
+                },
+                {
+                    label:'Internal User',
+                    value: UserType.Internal
+                },
+                
+            ]} 
+            onItemClick={handleUserClick} /> } */}
           {/* For Action Dropdown*/}
           {(!edit && viewMode === SiteDetailsMode.ViewOnlyMode && userType === UserType.Internal) && <Actions label="Action" items={ActionItems} onItemClick={handleItemClick} /> }
            

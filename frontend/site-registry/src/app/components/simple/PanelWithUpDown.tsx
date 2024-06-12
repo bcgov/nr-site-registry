@@ -10,7 +10,7 @@ interface PanelWithUpDownProps {
 const PanelWithUpDown: FC<PanelWithUpDownProps> = ({ label, firstChild, secondChild }) => {
   const [showDetails, setShowDetails] = useState(false);
   return (
-    <div className="d-flex flex-column section-container" role="region" aria-label={label || "Section"} aria-expanded={showDetails}>
+    <div className="d-flex flex-column mb-3 section-container" role="region" aria-label={label || "Section"} aria-expanded={showDetails}>
       {
         label && 
          <div className="d-flex justify-content-between">

@@ -40,4 +40,62 @@
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
+    cursor: pointer;
   }
+
+
+.search-options
+{
+    position: absolute;
+    z-index: 1000;
+    top: 42px;
+    width: 100%;
+    background: white;
+    padding: var(--layout-padding-medium) 0px var(--layout-padding-medium) 0px;
+    gap: 8px;
+    border-radius: var(--layout-border-radius-medium);
+    opacity: 0px;
+    background: var(--surface-background-white, #FFFFFF);
+    /* box-shadow: 0px 6.4px 14.4px 0px #00000021; */
+    box-shadow: 0px 1.2px 3.6px 0px #0000001A;
+
+}
+
+.search-option-item
+{
+    height: 43px;
+    padding: var(--layout-padding-small) var(--layout-padding-medium) var(--layout-padding-small) var(--layout-padding-medium);
+    gap: var(--layout-margin-medium);
+    opacity: 0px;
+    cursor: pointer;
+}
+
+
+.search-create-new-section
+{
+    display: flex;
+    gap: var(--layout-margin-medium);
+    padding: var(--layout-padding-small) var(--layout-padding-medium) var(--layout-padding-small) var(--layout-padding-medium);
+    border-top: 1px solid var(--surface-border-light, #D8D8D8)
+}
+
+
+.search-box-container
+{
+    display: flex;
+    flex-direction: row;
+    gap: var(--layout-margin-small);
+}
+
+
+.search-add-new
+{
+    padding: var(--layout-padding-small) var(--layout-padding-medium) var(--layout-padding-small) var(--layout-padding-medium);  
+    border-radius: var(--layout-border-radius-medium);
+    background-color: var(--surface-primary-default, #053662);
+    display: flex;
+    color: white;
+    min-width: 136px;
+
+}
+

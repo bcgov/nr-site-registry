@@ -4,7 +4,7 @@ import axios from "axios";
 import { User } from "oidc-client-ts";
 import { getClientSettings } from "../auth/UserManagerSetting";
 import { format } from "date-fns";
-import { FormFieldType, IFormField } from "../components/form/IFormField";
+import { FormFieldType, IFormField } from "../components/input-controls/IFormField";
 
 
   

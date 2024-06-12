@@ -20,8 +20,8 @@ import Sort from "../../../components/sort/Sort";
 import SiteDetails from "../SiteDetails";
 import { SiteDetailsMode } from "../dto/SiteDetailsMode";
 import { setDate } from "date-fns";
-import { CheckBoxInput } from "../../../components/form/InputControls";
-import { FormFieldType } from "../../../components/form/IFormField";
+import { CheckBoxInput } from "../../../components/input-controls/InputControls";
+import { FormFieldType } from "../../../components/input-controls/IFormField";
 
 
 

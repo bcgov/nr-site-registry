@@ -1,4 +1,4 @@
-import { FormFieldType } from "../../../components/form/IFormField";
+import { FormFieldType } from "../../../components/input-controls/IFormField";
 import { TableColumn , ColumnSize } from "../../../components/table/TableColumn";
 
 const getSiteSearchResultsColumns = () => {

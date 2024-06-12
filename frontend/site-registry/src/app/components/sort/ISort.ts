@@ -1,6 +1,6 @@
 import { Mode } from "fs";
 import { UserMode } from "../../helpers/requests/userMode";
-import { IFormField } from "../form/IFormField";
+import { IFormField } from "../input-controls/IFormField";
 
 export interface ISort {
     editMode: boolean;

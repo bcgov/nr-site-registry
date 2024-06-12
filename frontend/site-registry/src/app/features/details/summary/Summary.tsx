@@ -11,13 +11,13 @@ import { AppDispatch } from "../../../Store";
 import { useDispatch, useSelector } from "react-redux";
 import { resetSiteDetails, selectSiteDetails, siteDetailsMode, trackChanges } from "../../site/dto/SiteSlice";
 import { RequestStatus } from "../../../helpers/requests/status";
+import { FormFieldType } from "../../../components/input-controls/IFormField";
 import { TableColumn } from "../../../components/table/TableColumn";
 import { CustomPillButton } from "../../../components/simple/CustomButtons";
 import Table from "../../../components/table/Table";
 import "./Summary.css";
 import { SiteDetailsMode } from "../dto/SiteDetailsMode";
 import SearchInput from "../../../components/search/SearchInput";
-import { FormFieldType } from "../../../components/form/IFormField";
 
 const Summary = () => {
 

@@ -2,9 +2,9 @@ import React from 'react';
 import { IWidget } from './IWidget';
 import Table from '../table/Table';
 import './Widget.css';
-import { CheckBoxInput } from '../form/InputControls';
+import { CheckBoxInput } from '../input-controls/InputControls';
+import { FormFieldType } from '../input-controls/IFormField';
 import { RequestStatus } from '../../helpers/requests/status';
-import { FormFieldType } from '../form/IFormField';
 
 const Widget: React.FC<IWidget> = ({
     title,

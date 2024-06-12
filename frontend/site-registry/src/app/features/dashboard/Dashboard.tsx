@@ -63,7 +63,7 @@ const Dashboard = () => {
     if (sites.status === RequestStatus.success) {
       setData(sites.dashboard.recentView.data);
       setLoading(sites.status);
-      setName("First Name");
+      setName("John");
     }
   }, [sites.status]);
 

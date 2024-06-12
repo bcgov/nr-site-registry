@@ -82,7 +82,7 @@ export const recentViewedColumns: TableColumn[] = [
     displayName: "Details",
     active: true,
     graphQLPropertyName: "siteId",
-    displayType: getLinkColumnType("Details","siteId","",'site/map/'),
+    displayType: getLinkColumnType("Details","siteId","",'site/details/'),
     linkRedirectionURL: 'site/details/',
   },
  

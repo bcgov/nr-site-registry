@@ -134,6 +134,7 @@ const SiteDetails = () => {
               {
                 dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
                 setEdit(false);
+                //dispatch(clearTrackChanges({}));
               }
           }}
         >

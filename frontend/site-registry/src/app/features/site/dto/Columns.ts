@@ -204,7 +204,7 @@ const getSiteSearchResultsColumns = () => {
     ),
     new TableColumn(
       17,
-      "View",
+      "Map",
       true,
       "id",
       4,

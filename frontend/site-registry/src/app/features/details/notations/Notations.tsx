@@ -376,6 +376,7 @@ const Notations: React.FC<INotations> = ({
       IChangeType.Modified,
       'Notation Participant Added'
     );
+    dispatch(trackChanges(tracker.toPlainObject()));
   };
 
     return (
@@ -463,7 +464,7 @@ const Notations: React.FC<INotations> = ({
                                                 console.log("updatedNotationParticipant",updatedNotationParticipant);
                                                 return { ...tempNotation, notationParticipant: updatedNotationParticipant };
                                             }
-                                            return notation;
+                                            return tempNotation;
                                         });
                                     });
                                       

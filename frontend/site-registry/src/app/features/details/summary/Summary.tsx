@@ -22,7 +22,7 @@ import SearchInput from "../../../components/search/SearchInput";
 const Summary = () => {
 
 
-  const [parcelSearchTerm, SetParcelSearchTeam] = useState("");
+  const [parcelSearchTerm, SetParcelSearchTerm] = useState("");
 
   setTimeout(() => {
     let address = document.getElementsByTagName('h3');
@@ -140,6 +140,13 @@ const Summary = () => {
     setParcelIds(parcelIdsLocal);
   };
 
+
+  const getPracelIDResults = ()=>{
+    let ids = ["1213","12313","123132"].filter(x=> x.indexOf(parcelSearchTerm) !== -1);  
+    return ids;
+    
+  }
+
   const data = [
     {
       notation: 1,
@@ -154,7 +161,7 @@ const Summary = () => {
   const activityData = [
     {
       id: 1,
-      activity: "some activity",
+      activity: "Modified Site Location Details",
       user: "Midhun",
       timeStamp: "23-04-1989 00:11:11",
     },
@@ -420,17 +427,17 @@ const Summary = () => {
           ) : (
             <div className="parcel-container">
               <div>
-              <SearchInput label={''} searchTerm={parcelSearchTerm} clearSearch={()=>{SetParcelSearchTeam("")}} handleSearchChange={(e)=>{
+              <SearchInput label={''} searchTerm={parcelSearchTerm} clearSearch={()=>{SetParcelSearchTerm("")}} handleSearchChange={(e)=>{
                 console.log("eeee",e)
                 if(e.target)
                   {
-                    SetParcelSearchTeam(e.target.value)
+                    SetParcelSearchTerm(e.target.value)
                   }
                   else
                   {
-                    SetParcelSearchTeam(e)
+                    SetParcelSearchTerm(e)
                   }
-              }} options={["1213","12313","123132"]}
+              }} options={getPracelIDResults()}
                optionSelectHandler={(value)=>{handleAddNewParcelId(value)}} createNewLabel=" Parcel ID" createNewHandler={handleAddNewParcelId}/>
               </div>
             <div className="parcel-edit-div">

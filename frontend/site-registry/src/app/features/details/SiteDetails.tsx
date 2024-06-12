@@ -44,7 +44,6 @@ import {
 } from "../../components/common/IChangeType";
 
 import "./SiteDetails.css"; // Ensure this import is correct
-import { FormFieldType } from "../../components/input-controls/IFormField";
 import { SiteDetailsMode } from "./dto/SiteDetailsMode";
 import { UserType } from "../../helpers/requests/userType";
 import { UserMode } from "../../helpers/requests/userMode";

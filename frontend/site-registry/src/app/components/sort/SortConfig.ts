@@ -1,4 +1,4 @@
-import { FormFieldType, IFormField } from "../input-controls/IFormField";
+import { FormFieldType, IFormField } from "../form/IFormField";
 
 
 export const notationSortBy: IFormField[][] =[

@@ -1,4 +1,4 @@
-import { FormFieldType, IFormField } from "../../../components/input-controls/IFormField";
+import { FormFieldType, IFormField } from "../../../components/form/IFormField";
 import { ColumnSize,  TableColumn } from "../../../components/table/TableColumn";
 import avatar from '../../../images/avatar.png';
 

@@ -676,3 +676,65 @@ export const CheckBoxInput: React.FC<InputProps> = ({
         );
     }
 };
+
+export const TextAreaInput: React.FC<InputProps> = ({
+  label,
+  placeholder,
+  value,
+  isEditing,
+  srMode,
+  customLabelCss,
+  customInputTextCss,
+  customEditLabelCss,
+  customEditInputTextCss,
+  onChange,
+  tableMode,
+}) => {
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onChange(e.target.value);
+  };
+
+  const textAreaId = label.replace(/\s+/g, "_");
+  const ContainerElement = tableMode ? 'td' : 'div';
+
+  return (
+    <ContainerElement className={tableMode ? "table-border-light content-text" : "mb-3"}>
+      {!tableMode && (
+        <>
+          {srMode && (
+            <CheckBoxInput
+              type={FormFieldType.Checkbox}
+              label={textAreaId}
+              isLabel={false}
+              onChange={(isChecked) => onChange(isChecked)}
+            />
+          )}
+          <label
+            htmlFor={textAreaId}
+            className={`${
+              !isEditing
+                ? customLabelCss ?? ""
+                : `form-label ${customEditLabelCss ?? "custom-label"}`
+            }`}
+          >
+            {label}
+          </label>
+        </>
+      )}
+      {isEditing ? (
+        <textarea
+          id={textAreaId}
+          className={`form-control custom-textarea ${
+            customEditInputTextCss ?? "custom-input-text"
+          }`}
+          placeholder={placeholder}
+          value={value ?? ""}
+          onChange={handleTextAreaChange}
+          aria-label={label}
+        />
+      ) : (
+        <p className={`${customInputTextCss ?? ""}`}>{value}</p>
+      )}
+    </ContainerElement>
+  );
+};

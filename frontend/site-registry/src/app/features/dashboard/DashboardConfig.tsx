@@ -1,4 +1,4 @@
-import { FormFieldType } from "../../components/input-controls/IFormField";
+import { FormFieldType } from "../../components/form/IFormField";
 import { ColumnSize,  TableColumn } from "../../components/table/TableColumn";
 
 

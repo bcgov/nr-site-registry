@@ -1,8 +1,8 @@
 import React from "react";
 import './Form.css';
 import 'rsuite/DateRangePicker/styles/index.css';
-import { FormFieldType, IFormField } from "../input-controls/IFormField";
-import { CheckBoxInput, DateInput, DateRangeInput, Dropdown ,GroupInput,TextInput, } from "../input-controls/InputControls";
+import { CheckBoxInput, DateInput, DateRangeInput, Dropdown ,GroupInput,TextInput, } from "./InputControls";
+import { FormFieldType, IFormField } from "./IFormField";
  
 
 interface IFormRendererProps {

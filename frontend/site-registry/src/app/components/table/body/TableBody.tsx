@@ -3,9 +3,9 @@ import { SpinnerIcon } from "../../common/icon";
 import { RequestStatus } from "../../../helpers/requests/status";
 import { TableColumn } from "../TableColumn";
 
-import { FormFieldType, IFormField } from "../../input-controls/IFormField";
-import { Label, TextInput , Link ,Dropdown,CheckBoxInput } from "../../input-controls/InputControls";
+import { Label, TextInput , Link ,Dropdown,CheckBoxInput } from "../../form/InputControls";
 import { ChangeTracker } from "../../common/IChangeType";
+import { FormFieldType } from "../../form/IFormField";
 interface TableBodyProps {
   isLoading: RequestStatus;
   columns: TableColumn[];

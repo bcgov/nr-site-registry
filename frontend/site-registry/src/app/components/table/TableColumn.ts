@@ -1,4 +1,3 @@
-import { IFormField } from "../input-controls/IFormField";
 
 // export enum ColumnType {
 //     Link,
@@ -8,6 +7,8 @@ import { IFormField } from "../input-controls/IFormField";
 //     Checkbox,
 //     Calender
 //   }
+
+import { IFormField } from "../form/IFormField";
 
 export enum ColumnSize{
   Default,

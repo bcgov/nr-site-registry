@@ -31,7 +31,7 @@ import {
 import { AppDispatch } from "../../Store";
 import Notations from "./notations/Notations";
 import NavigationPills from "../../components/navigation/navigationpills/NavigationPills";
-import { navComponents, navItems } from "./NavigationPillsConfig";
+import { dropDownNavItems, navComponents, navItems } from "./NavigationPillsConfig";
 import ModalDialog from "../../components/modaldialog/ModalDialog";
 import {
   CancelButton,
@@ -123,6 +123,8 @@ const SiteDetails = () => {
     setSave(false);
     setEdit(false);
   }
+
+
   return (
     <PageContainer role="details">
       {save && (
@@ -171,7 +173,7 @@ const SiteDetails = () => {
           <AngleLeft className="btn-icon" />
           <span className="btn-back-lbl">Back to</span>
         </button>
-        <div className="d-flex gap-2 justify-align-center">
+        <div className="d-flex gap-2 justify-align-center pe-2">
 
          {/* { <Actions label="User" items={ [
                 { 
@@ -225,7 +227,7 @@ const SiteDetails = () => {
           <CustomLabel label="2929 Fort" labelType="b-h1" />
         </div>
       </div>
-      <NavigationPills items={navItems} components={navComponents} />
+      <NavigationPills items={navItems} components={navComponents} dropdownItems={dropDownNavItems}/>
     </PageContainer>
   );
 };

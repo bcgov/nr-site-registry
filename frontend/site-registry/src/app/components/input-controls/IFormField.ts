@@ -3,6 +3,7 @@ export enum FormFieldType {
     Text = 'text',
     TextArea = 'textarea',
     DropDown = 'dropdown',
+    DropDownWithSearch = 'dropdownWithSearch',
     Date =  'date',
     DateRange =  'daterange',
     Group = 'group',
@@ -13,7 +14,7 @@ export enum FormFieldType {
 
 export interface IFormField {
     type: FormFieldType.Text | FormFieldType.DropDown | FormFieldType.Date | FormFieldType.Group | FormFieldType.Label | FormFieldType.Link | FormFieldType.Checkbox
-                             | FormFieldType.DateRange | FormFieldType.TextArea;
+                             | FormFieldType.DateRange | FormFieldType.TextArea | FormFieldType.DropDownWithSearch;
     label: string;
     isLabel?: boolean;
     placeholder?: string;

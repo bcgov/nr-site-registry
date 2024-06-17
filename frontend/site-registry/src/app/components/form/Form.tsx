@@ -2,7 +2,7 @@ import React from "react";
 import './Form.css';
 import 'rsuite/DateRangePicker/styles/index.css';
 import { FormFieldType, IFormField } from "../input-controls/IFormField";
-import { CheckBoxInput, DateInput, DateRangeInput, Dropdown ,GroupInput,TextAreaInput,TextInput, } from "../input-controls/InputControls";
+import { CheckBoxInput, DateInput, DateRangeInput, DropdownInput,DropdownSearchInput,GroupInput,TextAreaInput,TextInput, } from "../input-controls/InputControls";
  
 
 interface IFormRendererProps {
@@ -58,7 +58,7 @@ const Form: React.FC<IFormRendererProps>  = ({ formRows, formData, editMode, srM
                                 />
                             )}
                             {field.type === FormFieldType.DropDown && (
-                                <Dropdown
+                                <DropdownInput
                                     label={field.label}
                                     customLabelCss = {field.customLabelCss}
                                     customInputTextCss={field.customInputTextCss}
@@ -71,6 +71,22 @@ const Form: React.FC<IFormRendererProps>  = ({ formRows, formData, editMode, srM
                                     type={field.type}
                                     isEditing={editMode ?? true}
                                     isImage = {field.isImage}
+                                    srMode = {srMode ?? false}
+                                />
+                            )}
+                            {field.type === FormFieldType.DropDownWithSearch && (
+                                <DropdownSearchInput
+                                    label={field.label}
+                                    customLabelCss = {field.customLabelCss}
+                                    customInputTextCss={field.customInputTextCss}
+                                    customEditLabelCss = {field.customEditLabelCss}
+                                    customEditInputTextCss={field.customEditInputTextCss}
+                                    placeholder={field.placeholder}
+                                    options={field.options || []}
+                                    value={formData[field.graphQLPropertyName ?? ''] || ''}
+                                    onChange={(value) => handleInputChange(field.graphQLPropertyName, value)}
+                                    type={field.type}
+                                    isEditing={editMode ?? true}
                                     srMode = {srMode ?? false}
                                 />
                             )}

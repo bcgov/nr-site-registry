@@ -157,7 +157,7 @@ const Notations: React.FC<INotations> = ({
     const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
     const [searchTerm, setSearchTerm] = useState('');
 
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const searchTerm = event.target.value;
       setSearchTerm(searchTerm);
   

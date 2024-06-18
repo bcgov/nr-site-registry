@@ -15,11 +15,11 @@ export class SiteCrownLandContaminated {
     id: string;
 
     @Field()
-    @Column("double precision", { name: "estimated_cost_of_remediations", precision: 53 })
+    @Column("double precision", { name: "estimated_cost_of_remediations",})
     estimatedCostOfRemediations: number;
 
     @Field()
-    @Column("double precision", { name: "actual_cost_of_remediations", nullable: true, precision: 53 })
+    @Column("double precision", { name: "actual_cost_of_remediations", nullable: true, })
     actualCostOfRemediations: number | null;
 
     @Field()

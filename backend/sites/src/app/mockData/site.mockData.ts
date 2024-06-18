@@ -5,6 +5,7 @@ import { SiteCrownLandContaminated } from "../entities/siteCrownLandContaminated
 import { SiteRiskCd } from "../entities/siteRiskCd.entity";
 import { SiteStatusCd } from "../entities/siteStatusCd.entity";
 import { Sites } from "../entities/sites.entity";
+import { Snapshots } from "../entities/snapshots.entity";
 
 
 const siteCrownLandContaminated = new SiteCrownLandContaminated();
@@ -13,6 +14,7 @@ const sstCode: SiteStatusCd = { code: '1', description: 'test', sites: [], event
 const siteRiskCd: SiteRiskCd = { code: '1', description: 'test', sites: [] };
 const bceRegionCd: BceRegionCd = { code: '1', description: 'test', cityRegions: [], mailouts: [], peopleOrgs: [], sites: [] };
 const classCd: ClassificationCd = { code: '1', description: 'test', sites: [] };
+const snapshots =[new Snapshots()];
 
 export const sampleSites: Sites[] = [
     {
@@ -65,7 +67,8 @@ export const sampleSites: Sites[] = [
         siteRiskCode2: siteRiskCd,
         sstCode2: sstCode,
         siteCrownLandContaminated: siteCrownLandContaminated,
-        recentViewedSites: recentViewedSites
+        recentViewedSites: recentViewedSites,
+        snapshots:snapshots
     },
     {
         id: '222',
@@ -117,5 +120,6 @@ export const sampleSites: Sites[] = [
         siteRiskCode2: siteRiskCd,
         sstCode2: sstCode,
         siteCrownLandContaminated: siteCrownLandContaminated,
-        recentViewedSites: recentViewedSites
+        recentViewedSites: recentViewedSites,
+        snapshots:snapshots
     }];

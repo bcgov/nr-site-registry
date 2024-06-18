@@ -14,6 +14,7 @@ import { SiteRiskCd } from './siteRiskCd.entity';
 import { SiteStatusCd } from './siteStatusCd.entity';
 import { SiteCrownLandContaminated } from './siteCrownLandContaminated.entity'
 import { RecentViews } from './recentViews.entity';
+import { Snapshots } from './snapshots.entity';
 
 @ObjectType()
 @Index("site_bco", ["bcerCode", "classCode", "id", "rwmFlag", "sstCode",], {})
@@ -77,11 +78,11 @@ export class Sites {
     postalCode: string | null;
 
     @Field({nullable: true})
-    @Column("double precision", { name: "latdeg", nullable: true, precision: 53 })
+    @Column("double precision", { name: "latdeg", nullable: true,})
     latdeg: number | null;
 
     @Field({nullable: true})
-    @Column("double precision", { name: "longdeg", nullable: true, precision: 53 })
+    @Column("double precision", { name: "longdeg", nullable: true, })
     longdeg: number | null;
 
     @Field({nullable: true})
@@ -218,6 +219,10 @@ export class Sites {
     @OneToOne(() => SiteCrownLandContaminated, siteCrownLandContaminated => siteCrownLandContaminated.sites)
     siteCrownLandContaminated: SiteCrownLandContaminated;
 
+    @Field(() => RecentViews)
     @OneToMany(() => RecentViews, (recentViews) => recentViews.site)
     recentViewedSites: RecentViews[];
+
+    @OneToMany(() => Snapshots, (snapshots) => snapshots.site)
+    snapshots: Snapshots[];
 }

@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SiteService } from './site.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { Sites } from '../entities/sites.entity';
-import { FetchSiteDetail } from '../dto/response/fetchSiteResponse';
-import { sampleSites } from '../mockData/site.mockData';
+import { SiteService } from './site.service';
+import { Sites } from 'src/app/entities/sites.entity';
+import { FetchSiteDetail } from 'src/app/dto/response/fetchSiteResponse';
+import { sampleSites } from 'src/app/mockData/site.mockData';
 
 describe('SiteService', () => {
   let siteService: SiteService;

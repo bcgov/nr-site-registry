@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class MasterScript1711646316453 implements MigrationInterface {
-    name = 'MasterScript1711646316453'
+export class MasterScript1718744238400 implements MigrationInterface {
+    name = 'MasterScript1718744238400'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "sites"."profile_categories" ("id" bigint NOT NULL, "sequence_no" bigint NOT NULL, "description" character varying(200) NOT NULL, "question_type" character varying(1) NOT NULL, "effective_date" TIMESTAMP NOT NULL, "expiry_date" TIMESTAMP, "who_created" character varying(30) NOT NULL, "who_updated" character varying(30), "when_created" TIMESTAMP NOT NULL, "when_updated" TIMESTAMP, "category_precursor" character varying(300), CONSTRAINT "PK_ad4c4dbdc4185df6dc92444151a" PRIMARY KEY ("id"))`);
@@ -115,6 +115,9 @@ export class MasterScript1711646316453 implements MigrationInterface {
         await queryRunner.query(`CREATE UNIQUE INDEX "classification_cd_pkey" ON "sites"."classification_cd" ("code") `);
         await queryRunner.query(`CREATE TABLE "sites"."site_risk_cd" ("code" character varying(6) NOT NULL, "description" character varying(40) NOT NULL, CONSTRAINT "PK_5a8325ad2f61932d934e9e87813" PRIMARY KEY ("code"))`);
         await queryRunner.query(`CREATE UNIQUE INDEX "site_risk_cd_pkey" ON "sites"."site_risk_cd" ("code") `);
+        await queryRunner.query(`CREATE TABLE "sites"."recent_views" ("id" SERIAL NOT NULL, "user_id" character varying(30) NOT NULL, "site_id" bigint NOT NULL, "address" character varying(200) NOT NULL, "city" character varying(30) NOT NULL, "general_description" character varying(225), "when_updated" TIMESTAMP, "created" TIMESTAMP NOT NULL DEFAULT now(), "updated" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_b8f7207a9267d1c327d2e606402" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE INDEX "idx_user_id" ON "sites"."recent_views" ("user_id") `);
+        await queryRunner.query(`CREATE TABLE "sites"."snapshots" ("id" SERIAL NOT NULL, "user_id" character varying(30) NOT NULL, "site_id" bigint NOT NULL, "transaction_id" character varying NOT NULL, "snapshot_data" jsonb, "created" TIMESTAMP NOT NULL DEFAULT now(), "updated" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_f5661b5fd4224d23e26a631986b" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "sites"."sites" ("id" bigint NOT NULL, "bcer_code" character varying(6) NOT NULL, "sst_code" character varying(6) NOT NULL, "common_name" character varying(40) NOT NULL, "addr_type" character varying(7) NOT NULL, "addr_line_1" character varying(50) NOT NULL, "addr_line_2" character varying(50), "addr_line_3" character varying(50), "addr_line_4" character varying(50), "city" character varying(30) NOT NULL, "prov_state" character varying(2) NOT NULL, "postal_code" character varying(10), "latdeg" double precision, "longdeg" double precision, "victoria_file_no" character varying(40), "regional_file_no" character varying(40), "class_code" character varying(6), "general_description" character varying(255), "who_created" character varying(30) NOT NULL, "who_updated" character varying(30), "when_created" TIMESTAMP NOT NULL, "when_updated" TIMESTAMP, "rwm_flag" smallint NOT NULL, "rwm_general_desc_flag" smallint NOT NULL, "consultant_submitted" character(1), "long_degrees" smallint, "long_minutes" smallint, "long_seconds" numeric(4,2), "lat_degrees" smallint, "lat_minutes" smallint, "lat_seconds" numeric(4,2), "sr_status" character varying(1) NOT NULL DEFAULT 'Y', "latlong_reliability_flag" character varying(12) NOT NULL, "site_risk_code" character varying(6) NOT NULL DEFAULT 'UNC', "geometry" geometry, CONSTRAINT "UQ_e093eba174650da1012069caddf" UNIQUE ("victoria_file_no"), CONSTRAINT "PK_4f5eccb1dfde10c9170502595a7" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE UNIQUE INDEX "sites_victoria_file_no_key" ON "sites"."sites" ("victoria_file_no") `);
         await queryRunner.query(`CREATE INDEX "site_described_by_frgn" ON "sites"."sites" ("sst_code") `);
@@ -145,18 +148,18 @@ export class MasterScript1711646316453 implements MigrationInterface {
         await queryRunner.query(`CREATE UNIQUE INDEX "profile_submissions_pkey" ON "sites"."profile_submissions" ("sprof_date_completed", "sprof_site_id", "submcd_code") `);
         await queryRunner.query(`CREATE TABLE "sites"."submission_cd" ("code" character varying(6) NOT NULL, "description" character varying(40) NOT NULL, "used_in" character varying(4) NOT NULL, CONSTRAINT "PK_51386aa61774360a636f5acd29d" PRIMARY KEY ("code"))`);
         await queryRunner.query(`CREATE UNIQUE INDEX "submission_cd_pkey" ON "sites"."submission_cd" ("code") `);
-        await queryRunner.query(`CREATE TABLE "sites"."subdivisions" ("id" bigint NOT NULL, "date_noted" TIMESTAMP NOT NULL, "pin" character varying(9), "pid" character varying(9), "bcaa_folio_number" character varying(20), "entity_type" character varying(4), "addr_line_1" character varying(50), "addr_line_2" character varying(50), "addr_line_3" character varying(50), "addr_line_4" character varying(50), "city" character varying(30), "postal_code" character varying(10), "legal_description" character varying(255), "who_created" character varying(30) NOT NULL, "who_updated" character varying(30), "when_created" TIMESTAMP NOT NULL, "when_updated" TIMESTAMP, "crown_lands_file_no" character varying(7), "pid_status_cd" character varying(1) NOT NULL, "valid_pid" character(1), CONSTRAINT "UQ_ad7dfb7e17c409d8b025f8776a8" UNIQUE ("pin"), CONSTRAINT "UQ_2008492ca13515d645bfbf1699e" UNIQUE ("pid"), CONSTRAINT "PK_f521e4439b27c529d97c90d1907" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE UNIQUE INDEX "subdivisions_pid_pin_key" ON "sites"."subdivisions" ("pid", "pin") `);
-        await queryRunner.query(`CREATE UNIQUE INDEX "subdivisions_pkey" ON "sites"."subdivisions" ("id") `);
         await queryRunner.query(`CREATE TABLE "sites"."spatial_ref_sys" ("srid" integer NOT NULL, "auth_name" character varying(256), "auth_srid" integer, "srtext" character varying(2048), "proj4text" character varying(2048), CONSTRAINT "PK_ff8a45f5398d8ad47f3b844bb58" PRIMARY KEY ("srid"))`);
         await queryRunner.query(`CREATE UNIQUE INDEX "spatial_ref_sys_pkey" ON "sites"."spatial_ref_sys" ("srid") `);
-        await queryRunner.query(`CREATE TABLE "sites"."site_registry_module" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "sites" character(1), "site_location_description" character(1), "site_partics" character(1), "site_partic_notes" character(1), "site_partic_roles" character(1), "site_partic_dates" character(1), "notations" character(1), "notation_notes" character(1), "notation_actions" character(1), "notation_partics" character(1), "documents" character(1), "document_notes" character(1), "document_partics" character(1), "document_abstracts" character(1), "document_measure_pops" character(1), "document_measure_details" character(1), "associations" character(1), "association_notes" character(1), "association_dates" character(1), "suspect_land_uses" character(1), "suspect_land_use_notes" character(1), "aec_assessments" character(1), "aec_assessment_mig_potential" character(1), "aec_assessment_sources" character(1), "aec_assessment_medias" character(1), "aec_assessment_media_notes" character(1), "aec_assessment_pcocs" character(1), "aec_remed_plans" character(1), "aec_remed_plan_notes" character(1), "aec_remed_plan_items" character(1), "aec_remed_plan_item_measures" character(1), "aec_remed_approaches" character(1), CONSTRAINT "PK_7c6a966c058663ac877148f6f42" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "sites"."site_registry" ("site_id" bigint NOT NULL, "reg_flag" smallint, "reg_userid" character varying(16), "init_approval_date" TIMESTAMP, "last_approval_date" TIMESTAMP, "tombstone_date" TIMESTAMP, CONSTRAINT "PK_f9b6fe314837927a20473fa8540" PRIMARY KEY ("site_id"))`);
         await queryRunner.query(`CREATE UNIQUE INDEX "site_registry_pkey" ON "sites"."site_registry" ("site_id") `);
         await queryRunner.query(`CREATE INDEX "sitereg_bco" ON "sites"."site_registry" ("reg_flag", "site_id") `);
+        await queryRunner.query(`CREATE TABLE "sites"."site_registry_module" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "sites" character(1), "site_location_description" character(1), "site_partics" character(1), "site_partic_notes" character(1), "site_partic_roles" character(1), "site_partic_dates" character(1), "notations" character(1), "notation_notes" character(1), "notation_actions" character(1), "notation_partics" character(1), "documents" character(1), "document_notes" character(1), "document_partics" character(1), "document_abstracts" character(1), "document_measure_pops" character(1), "document_measure_details" character(1), "associations" character(1), "association_notes" character(1), "association_dates" character(1), "suspect_land_uses" character(1), "suspect_land_use_notes" character(1), "aec_assessments" character(1), "aec_assessment_mig_potential" character(1), "aec_assessment_sources" character(1), "aec_assessment_medias" character(1), "aec_assessment_media_notes" character(1), "aec_assessment_pcocs" character(1), "aec_remed_plans" character(1), "aec_remed_plan_notes" character(1), "aec_remed_plan_items" character(1), "aec_remed_plan_item_measures" character(1), "aec_remed_approaches" character(1), CONSTRAINT "PK_7c6a966c058663ac877148f6f42" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "sites"."subdivisions" ("id" bigint NOT NULL, "date_noted" TIMESTAMP NOT NULL, "pin" character varying(9), "pid" character varying(9), "bcaa_folio_number" character varying(20), "entity_type" character varying(4), "addr_line_1" character varying(50), "addr_line_2" character varying(50), "addr_line_3" character varying(50), "addr_line_4" character varying(50), "city" character varying(30), "postal_code" character varying(10), "legal_description" character varying(255), "who_created" character varying(30) NOT NULL, "who_updated" character varying(30), "when_created" TIMESTAMP NOT NULL, "when_updated" TIMESTAMP, "crown_lands_file_no" character varying(7), "pid_status_cd" character varying(1) NOT NULL, "valid_pid" character(1), CONSTRAINT "UQ_ad7dfb7e17c409d8b025f8776a8" UNIQUE ("pin"), CONSTRAINT "UQ_2008492ca13515d645bfbf1699e" UNIQUE ("pid"), CONSTRAINT "PK_f521e4439b27c529d97c90d1907" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE UNIQUE INDEX "subdivisions_pid_pin_key" ON "sites"."subdivisions" ("pid", "pin") `);
+        await queryRunner.query(`CREATE UNIQUE INDEX "subdivisions_pkey" ON "sites"."subdivisions" ("id") `);
         await queryRunner.query(`CREATE TABLE "sites"."plan_table" ("plan_id" uuid NOT NULL DEFAULT uuid_generate_v4(), "statement_id" character varying(30), "timestamp" TIMESTAMP, "remarks" character varying(80), "operation" character varying(30), "options" character varying(30), "object_node" character varying(128), "object_owner" character varying(30), "object_name" character varying(30), "object_instance" numeric(38,0), "object_type" character varying(30), "optimizer" character varying(255), "search_columns" numeric(38,0), "id" numeric(38,0), "parent_id" numeric(38,0), "position" numeric(38,0), "other" text, CONSTRAINT "PK_47862dc75dee14961bc390d6737" PRIMARY KEY ("plan_id"))`);
-        await queryRunner.query(`CREATE TABLE "sites"."lto_download" ("pid" character varying(9) NOT NULL, "pid_status_cd" character varying(1), "legal_description" character varying(255), "child_pid" character varying(9), "child_pid_status_cd" character varying(1), "child_legal_description" character varying(255), CONSTRAINT "PK_0bcb06db567ffea12eeb73f59fa" PRIMARY KEY ("pid"))`);
         await queryRunner.query(`CREATE TABLE "sites"."lto_prev_download" ("pid" character varying(9) NOT NULL, "pid_status_cd" character varying(1), "legal_description" character varying(255), "child_pid" character varying(9), "child_pid_status_cd" character varying(1), "child_legal_description" character varying(255), CONSTRAINT "PK_ca5a3547d8e33dcb25c3dbe64cd" PRIMARY KEY ("pid"))`);
+        await queryRunner.query(`CREATE TABLE "sites"."lto_download" ("pid" character varying(9) NOT NULL, "pid_status_cd" character varying(1), "legal_description" character varying(255), "child_pid" character varying(9), "child_pid_status_cd" character varying(1), "child_legal_description" character varying(255), CONSTRAINT "PK_0bcb06db567ffea12eeb73f59fa" PRIMARY KEY ("pid"))`);
         await queryRunner.query(`ALTER TABLE "sites"."profile_questions" ADD CONSTRAINT "FK_14edd82a4bb575de4f9f1cf07fe" FOREIGN KEY ("category_id") REFERENCES "sites"."profile_categories"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "sites"."profile_questions" ADD CONSTRAINT "FK_49ae5cf816287627cfd33bf2e0f" FOREIGN KEY ("parent_id") REFERENCES "sites"."profile_questions"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "sites"."profile_answers" ADD CONSTRAINT "FK_938ad8c705f3e2de4f81f3af1ef" FOREIGN KEY ("question_id") REFERENCES "sites"."profile_questions"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -196,6 +199,8 @@ export class MasterScript1711646316453 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "sites"."site_assocs" ADD CONSTRAINT "FK_25c8c940d25f3407fbff0e00d9e" FOREIGN KEY ("site_id") REFERENCES "sites"."sites"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "sites"."site_assocs" ADD CONSTRAINT "FK_fad080594a9ae08bb4a3faacdb9" FOREIGN KEY ("site_id_associated_with") REFERENCES "sites"."sites"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "sites"."site_subdivisions" ADD CONSTRAINT "FK_a832b6c43076e628fe78d50fb45" FOREIGN KEY ("site_id") REFERENCES "sites"."sites"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "sites"."recent_views" ADD CONSTRAINT "FK_8a9cc9a0a106e585a3df1097a60" FOREIGN KEY ("site_id") REFERENCES "sites"."sites"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "sites"."snapshots" ADD CONSTRAINT "FK_786430d3af1f2ba1cd0f71590b5" FOREIGN KEY ("site_id") REFERENCES "sites"."sites"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "sites"."sites" ADD CONSTRAINT "FK_fbd36524edbb3b52d4062de0d00" FOREIGN KEY ("bcer_code") REFERENCES "sites"."bce_region_cd"("code") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "sites"."sites" ADD CONSTRAINT "FK_ae06e875ad4cd80ba5a8d110699" FOREIGN KEY ("class_code") REFERENCES "sites"."classification_cd"("code") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "sites"."sites" ADD CONSTRAINT "FK_ce544ec8a4703f5341486694444" FOREIGN KEY ("site_risk_code") REFERENCES "sites"."site_risk_cd"("code") ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -229,6 +234,8 @@ export class MasterScript1711646316453 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "sites"."sites" DROP CONSTRAINT "FK_ce544ec8a4703f5341486694444"`);
         await queryRunner.query(`ALTER TABLE "sites"."sites" DROP CONSTRAINT "FK_ae06e875ad4cd80ba5a8d110699"`);
         await queryRunner.query(`ALTER TABLE "sites"."sites" DROP CONSTRAINT "FK_fbd36524edbb3b52d4062de0d00"`);
+        await queryRunner.query(`ALTER TABLE "sites"."snapshots" DROP CONSTRAINT "FK_786430d3af1f2ba1cd0f71590b5"`);
+        await queryRunner.query(`ALTER TABLE "sites"."recent_views" DROP CONSTRAINT "FK_8a9cc9a0a106e585a3df1097a60"`);
         await queryRunner.query(`ALTER TABLE "sites"."site_subdivisions" DROP CONSTRAINT "FK_a832b6c43076e628fe78d50fb45"`);
         await queryRunner.query(`ALTER TABLE "sites"."site_assocs" DROP CONSTRAINT "FK_fad080594a9ae08bb4a3faacdb9"`);
         await queryRunner.query(`ALTER TABLE "sites"."site_assocs" DROP CONSTRAINT "FK_25c8c940d25f3407fbff0e00d9e"`);
@@ -268,18 +275,18 @@ export class MasterScript1711646316453 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "sites"."profile_answers" DROP CONSTRAINT "FK_938ad8c705f3e2de4f81f3af1ef"`);
         await queryRunner.query(`ALTER TABLE "sites"."profile_questions" DROP CONSTRAINT "FK_49ae5cf816287627cfd33bf2e0f"`);
         await queryRunner.query(`ALTER TABLE "sites"."profile_questions" DROP CONSTRAINT "FK_14edd82a4bb575de4f9f1cf07fe"`);
-        await queryRunner.query(`DROP TABLE "sites"."lto_prev_download"`);
         await queryRunner.query(`DROP TABLE "sites"."lto_download"`);
+        await queryRunner.query(`DROP TABLE "sites"."lto_prev_download"`);
         await queryRunner.query(`DROP TABLE "sites"."plan_table"`);
-        await queryRunner.query(`DROP INDEX "sites"."sitereg_bco"`);
-        await queryRunner.query(`DROP INDEX "sites"."site_registry_pkey"`);
-        await queryRunner.query(`DROP TABLE "sites"."site_registry"`);
-        await queryRunner.query(`DROP TABLE "sites"."site_registry_module"`);
-        await queryRunner.query(`DROP INDEX "sites"."spatial_ref_sys_pkey"`);
-        await queryRunner.query(`DROP TABLE "sites"."spatial_ref_sys"`);
         await queryRunner.query(`DROP INDEX "sites"."subdivisions_pkey"`);
         await queryRunner.query(`DROP INDEX "sites"."subdivisions_pid_pin_key"`);
         await queryRunner.query(`DROP TABLE "sites"."subdivisions"`);
+        await queryRunner.query(`DROP TABLE "sites"."site_registry_module"`);
+        await queryRunner.query(`DROP INDEX "sites"."sitereg_bco"`);
+        await queryRunner.query(`DROP INDEX "sites"."site_registry_pkey"`);
+        await queryRunner.query(`DROP TABLE "sites"."site_registry"`);
+        await queryRunner.query(`DROP INDEX "sites"."spatial_ref_sys_pkey"`);
+        await queryRunner.query(`DROP TABLE "sites"."spatial_ref_sys"`);
         await queryRunner.query(`DROP INDEX "sites"."submission_cd_pkey"`);
         await queryRunner.query(`DROP TABLE "sites"."submission_cd"`);
         await queryRunner.query(`DROP INDEX "sites"."profile_submissions_pkey"`);
@@ -310,6 +317,9 @@ export class MasterScript1711646316453 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX "sites"."site_described_by_frgn"`);
         await queryRunner.query(`DROP INDEX "sites"."sites_victoria_file_no_key"`);
         await queryRunner.query(`DROP TABLE "sites"."sites"`);
+        await queryRunner.query(`DROP TABLE "sites"."snapshots"`);
+        await queryRunner.query(`DROP INDEX "sites"."idx_user_id"`);
+        await queryRunner.query(`DROP TABLE "sites"."recent_views"`);
         await queryRunner.query(`DROP INDEX "sites"."site_risk_cd_pkey"`);
         await queryRunner.query(`DROP TABLE "sites"."site_risk_cd"`);
         await queryRunner.query(`DROP INDEX "sites"."classification_cd_pkey"`);

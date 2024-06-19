@@ -78,11 +78,11 @@ export class Sites {
     postalCode: string | null;
 
     @Field({nullable: true})
-    @Column("double precision", { name: "latdeg", nullable: true,})
+    @Column("double precision", { name: "latdeg", nullable: true,  precision: 53})
     latdeg: number | null;
 
     @Field({nullable: true})
-    @Column("double precision", { name: "longdeg", nullable: true, })
+    @Column("double precision", { name: "longdeg", nullable: true,  precision: 53})
     longdeg: number | null;
 
     @Field({nullable: true})
@@ -219,7 +219,6 @@ export class Sites {
     @OneToOne(() => SiteCrownLandContaminated, siteCrownLandContaminated => siteCrownLandContaminated.sites)
     siteCrownLandContaminated: SiteCrownLandContaminated;
 
-    @Field(() => RecentViews)
     @OneToMany(() => RecentViews, (recentViews) => recentViews.site)
     recentViewedSites: RecentViews[];
 

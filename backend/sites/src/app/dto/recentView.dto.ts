@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsNotEmpty, IsString, IsOptional, IsDate, IsInt, Min } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsDate } from 'class-validator';
 
 @InputType()
 export class RecentViewDto {

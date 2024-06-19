@@ -1,10 +1,14 @@
 import { Field, ObjectType } from "@nestjs/graphql";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { Sites } from "./sites.entity";
+import GraphQLJSON from "graphql-type-json";
 
 @ObjectType()
 @Entity('snapshots')
+@Index('idx_snapshot_user_id', ['userId'])
+@Index('idx_snapshot', ['transactionId', 'userId', 'siteId'], {unique: true})
 export class Snapshots {
+    
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -20,9 +24,9 @@ export class Snapshots {
     @Column('character varying', { name: 'transaction_id'})
     transactionId:string;
 
-    @Field(() => JSON, {nullable: true})
-    @Column('jsonb', {name: 'snapshot_data', nullable: true})
-    snapshotData:JSON
+    @Field(() => GraphQLJSON)
+    @Column('jsonb', {name: 'snapshot_data'})
+    snapshotData: any;
 
     @CreateDateColumn({type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
     created: Date;

@@ -1,10 +1,10 @@
 import { ValidationPipe } from "@nestjs/common";
 import { Resolver, Query, Args, Int, Mutation } from "@nestjs/graphql";
 import { RoleMatchingMode, Roles } from "nest-keycloak-connect";
-import { SnapshotResponse } from "src/app/dto/response/fetchSiteResponse";
-import { SnapshotDto } from "src/app/dto/snapshot.dto";
-import { Snapshots } from "src/app/entities/snapshots.entity";
-import { SnapshotsService } from "src/app/services/snapshot/snapshot.service";
+import { SnapshotResponse } from "../../dto/response/fetchSiteResponse";
+import { SnapshotDto } from "../../dto/snapshot.dto";
+import { Snapshots } from "../../entities/snapshots.entity";
+import { SnapshotsService } from "../../services/snapshot/snapshot.service";
 
 @Resolver(() => Snapshots)
 export class SnapshotsResolver {

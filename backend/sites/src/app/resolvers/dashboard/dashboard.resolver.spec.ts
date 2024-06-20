@@ -2,9 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DashboardResolver } from './dashboard.resolver';
 import { DashboardResponse } from '../../dto/response/fetchSiteResponse';
 import { sampleSites } from '../../mockData/site.mockData';
-import { RecentViews } from '../../entities/recentViews.entity';
 import { RecentViewDto } from '../../dto/recentView.dto';
-import { DashboardService } from 'src/app/services/dashboard/dashboard.service';
+import { DashboardService } from '../../services/dashboard/dashboard.service';
 
 describe('DashboardResolver', () => {
   let resolver: DashboardResolver;

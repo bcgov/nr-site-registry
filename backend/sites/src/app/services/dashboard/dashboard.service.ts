@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
-import { RecentViews } from 'src/app/entities/recentViews.entity';
-import { RecentViewDto } from 'src/app/dto/recentView.dto';
+import { RecentViews } from '../../entities/recentViews.entity';
+import { RecentViewDto } from '../../dto/recentView.dto';
 
 @Injectable()
 export class DashboardService {

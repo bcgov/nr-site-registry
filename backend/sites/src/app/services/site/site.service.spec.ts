@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { SiteService } from './site.service';
-import { Sites } from 'src/app/entities/sites.entity';
-import { FetchSiteDetail } from 'src/app/dto/response/fetchSiteResponse';
-import { sampleSites } from 'src/app/mockData/site.mockData';
+import { Sites } from '../../entities/sites.entity';
+import { FetchSiteDetail } from '../../dto/response/fetchSiteResponse';
+import { sampleSites } from '../../mockData/site.mockData';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -21,7 +21,7 @@ describe('SiteService', () => {
               return [
                 { id: '123', commonName: 'victoria' },
                 { id: '121', commonName: 'duncan' },
-                { id: '222', commonName: 'vancouver' }
+                { id: '222', commonName: 'vancouver'}
               ];
             }),
             createQueryBuilder: jest.fn(() => ({

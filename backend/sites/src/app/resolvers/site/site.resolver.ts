@@ -1,8 +1,8 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { Resource, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
-import { FetchSiteDetail, FetchSiteResponse, SearchSiteResponse } from 'src/app/dto/response/fetchSiteResponse';
-import { Sites } from 'src/app/entities/sites.entity';
-import { SiteService } from 'src/app/services/site/site.service';
+import { FetchSiteDetail, FetchSiteResponse, SearchSiteResponse } from '../../dto/response/fetchSiteResponse';
+import { Sites } from '../../entities/sites.entity';
+import { SiteService } from '../../services/site/site.service';
 
 /**
  * Resolver for Region

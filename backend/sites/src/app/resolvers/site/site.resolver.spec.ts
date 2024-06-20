@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SiteResolver } from './site.resolver';
-import { SiteService } from 'src/app/services/site/site.service';
-import { FetchSiteResponse, SearchSiteResponse } from 'src/app/dto/response/fetchSiteResponse';
-import { sampleSites } from 'src/app/mockData/site.mockData';
+import { SiteService } from '../../services/site/site.service';
+import { FetchSiteResponse, SearchSiteResponse } from '../../dto/response/fetchSiteResponse';
+import { sampleSites } from '../../mockData/site.mockData';
 
 describe('SiteResolver', () => {
   let siteResolver: SiteResolver;

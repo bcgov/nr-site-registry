@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Sites } from '../../entities/sites.entity';
 import { BaseHttpResponse } from './baseHttpResponse';
 import { RecentViews } from '../../entities/recentViews.entity';
-import { Snapshots } from 'src/app/entities/snapshots.entity';
+import { Snapshots } from '../../entities/snapshots.entity';
 
 /**
  * Class for returing fetch site response from graphql services

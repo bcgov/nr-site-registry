@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { plainToInstance } from "class-transformer";
-import { SnapshotDto } from "src/app/dto/snapshot.dto";
-import { Snapshots } from "src/app/entities/snapshots.entity";
+import { SnapshotDto } from "../../dto/snapshot.dto";
+import { Snapshots } from "../../entities/snapshots.entity";
 import { Repository } from "typeorm";
 
 @Injectable()

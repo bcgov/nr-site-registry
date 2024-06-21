@@ -9,6 +9,10 @@ export interface DropdownItem {
 export interface IActions {
     label: string;
     items: DropdownItem[];
-    onItemClick: (value: string) => void;
+    disable?:boolean;
+    customCssToggleBtn?:string;
+    customCssMenu?:string;
+    customCssMenuItem?:string;
+    onItemClick: (value: string, index?:any) => void;
 }
   

@@ -1,11 +1,15 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { FormFieldType, IFormField } from "./IFormField";
 import avatar from "../../images/avatar.png";
+import infoIcon from '../../images/info-icon.png';
 import { formatDate, formatDateRange } from "../../helpers/utility";
 import { DatePicker, DateRangePicker } from "rsuite";
 import { CalendarIcon } from "../common/icon";
 import { Link as RouterLink } from "react-router-dom";
 import { v4 } from "uuid";
+import Dropdown from 'react-bootstrap/Dropdown';
+import Form from 'react-bootstrap/Form';
+import SearchInput from "../search/SearchInput";
 
 interface InputProps extends IFormField {
   children?: InputProps[];
@@ -194,7 +198,7 @@ export const TextInput: React.FC<InputProps> = ({
   }
 };
 
-export const Dropdown: React.FC<InputProps> = ({
+export const DropdownInput: React.FC<InputProps> = ({
   label,
   placeholder,
   options,
@@ -676,3 +680,162 @@ export const CheckBoxInput: React.FC<InputProps> = ({
         );
     }
 };
+
+export const TextAreaInput: React.FC<InputProps> = ({
+  label,
+  placeholder,
+  value,
+  isEditing,
+  srMode,
+  customLabelCss,
+  customInputTextCss,
+  customEditLabelCss,
+  customEditInputTextCss,
+  onChange,
+  tableMode,
+  textAreaRow,
+  textAreaColoum,
+}) => {
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onChange(e.target.value);
+  };
+
+  const textAreaId = label.replace(/\s+/g, "_");
+  const ContainerElement = tableMode ? 'td' : 'div';
+  const cols = textAreaColoum ??  undefined ;
+  const rows = textAreaRow ??  undefined ;
+  return (
+    <ContainerElement className={tableMode ? "table-border-light content-text" : "mb-3"}>
+      {!tableMode && (
+        <>
+          {srMode && (
+            <CheckBoxInput
+              type={FormFieldType.Checkbox}
+              label={textAreaId}
+              isLabel={false}
+              onChange={(isChecked) => onChange(isChecked)}
+            />
+          )}
+          <label
+            htmlFor={textAreaId}
+            className={`${
+              !isEditing
+                ? customLabelCss ?? ""
+                : `form-label ${customEditLabelCss ?? "custom-label"}`
+            }`}
+          >
+            {label}
+          </label>
+        </>
+      )}
+      {isEditing ? (
+        <textarea
+          id={textAreaId}
+          className={`form-control custom-textarea ${
+            customEditInputTextCss ?? "custom-input-text"
+          }`}
+          placeholder={placeholder}
+          value={value ?? ""}
+          onChange={handleTextAreaChange}
+          aria-label={label}
+          rows={rows}
+          cols={cols}
+        />
+      ) : (
+        <p className={`${customInputTextCss ?? ""}`}>{value}</p>
+      )}
+    </ContainerElement>
+  );
+};
+
+export const DropdownSearchInput: React.FC<InputProps> = ({
+  label,
+  placeholder,
+  options,
+  value,
+  isEditing,
+  srMode,
+  customLabelCss,
+  customInputTextCss,
+  customEditLabelCss,
+  customEditInputTextCss,
+  onChange,
+  tableMode,
+}) => {
+  const ContainerElement = tableMode ? 'td' : 'div';
+  const drdownId = label.replace(/\s+/g, "_");
+  const [searchTerm, setSearchTerm] = useState<string>('');
+
+  const handleSelectChange = (selectedValue: string) => {
+    onChange(selectedValue.trim());
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = event.target.value.trim();
+    setSearchTerm(searchTerm);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
+  };
+
+  const filteredOptions = options?.filter(option =>
+    option.value.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  
+  return (
+    <ContainerElement className={tableMode ? "table-border-light content-text" : "mb-3"}>
+         {srMode && (
+            <CheckBoxInput
+              type={FormFieldType.Checkbox}
+              label={label}
+              isLabel={false}
+              onChange={(isChecked) => onChange(isChecked)}
+            />
+          )}
+          <label
+            htmlFor={drdownId}
+            className={`${
+              !isEditing
+                ? customLabelCss ?? ""
+                : `form-label ${customEditLabelCss ?? "custom-label"}`
+            }`}>
+            {label}
+          </label>
+
+        {isEditing ? (
+        <Dropdown>
+          <Dropdown.Toggle id={drdownId} 
+                  className={`form-control d-flex align-items-center justify-content-between 
+                            custom-select custom-input
+                            ${customEditInputTextCss ?? "custom-input-text"}`}>
+            {value ? options?.find((opt) => opt.key === value)?.value : placeholder}
+          </Dropdown.Toggle>
+          <Dropdown.Menu className="w-100">
+            <div className="mx-2">
+              <SearchInput label={'Search Staff'} searchTerm={searchTerm} clearSearch={clearSearch} handleSearchChange={handleSearchChange}/>
+              {
+               filteredOptions?.length === 0 &&
+               <div className="py-2">
+                <img src={infoIcon} alt="info"  aria-hidden="true" role="img" aria-label="User image"/>
+                <span className="px-2 custom-not-found">No results found.</span>
+               </div>
+              }
+            </div>
+            <Dropdown.Divider/>
+            {filteredOptions?.map((option, index) => (
+              <Dropdown.Item key={index}   onClick={() => handleSelectChange(option.key)}>
+                {option.value}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
+      ) : (
+        <p className={`${customInputTextCss ?? ""}`}>
+          {options?.find((opt) => opt.key === value)?.value}
+        </p>
+      )}
+    </ContainerElement>
+  );
+}

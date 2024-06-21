@@ -2,9 +2,9 @@ import { RequestStatus } from "../../helpers/requests/status";
 
 export interface IWidget {
     title?: string;
-    tableIsLoading: RequestStatus;
-    tableColumns: any[];
-    tableData: any[];
+    tableIsLoading?: RequestStatus;
+    tableColumns?: any[];
+    tableData?: any[];
     customLabelCss?: string;
     children?: React.ReactNode;
     allowRowsSelect?:boolean;
@@ -13,7 +13,7 @@ export interface IWidget {
     editMode?:boolean;
     srMode?:boolean;
     primaryKeycolumnName?: string;
-    changeHandler:(event:any)=>void;
+    changeHandler?:(event:any)=>void;
     handleCheckBoxChange?:(event:any)=>void;
     sortHandler?:(row:any, ascSort: boolean) =>void;
 }

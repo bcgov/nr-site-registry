@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PanelWithUpDown from "../../../components/simple/PanelWithUpDown";
 import Form from "../../../components/form/Form";
-import { notationColumnInternal, notationFormRowsInternal, notationFormRowExternal, notationFormRowsFirstChild, notationColumnExternal } from "./NotationsConfig";
+import { notationColumnInternal, notationFormRowsInternal, notationFormRowExternal, notationFormRowsFirstChild, notationColumnExternal, notationFormRowEditMode, srVisibilityConfig } from "./NotationsConfig";
 import './Notations.css';
 import Widget from "../../../components/widget/Widget";
 import { RequestStatus } from "../../../helpers/requests/status";
@@ -22,6 +22,8 @@ import { SiteDetailsMode } from "../dto/SiteDetailsMode";
 import { setDate } from "date-fns";
 import { CheckBoxInput } from "../../../components/input-controls/InputControls";
 import { FormFieldType } from "../../../components/input-controls/IFormField";
+import Actions from "../../../components/action/Actions";
+import { SRVisibility } from "../../../helpers/requests/srVisibility";
 
 
 
@@ -155,7 +157,7 @@ const Notations: React.FC<INotations> = ({
     const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
     const [searchTerm, setSearchTerm] = useState('');
 
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const searchTerm = event.target.value;
       setSearchTerm(searchTerm);
   
@@ -246,6 +248,7 @@ const Notations: React.FC<INotations> = ({
 
     const handleRemoveParticipant = (notationId: any) => {
      // Remove selected rows from formData state
+     debugger;
       setFormData(prevData => {
         return prevData.map(notation => {
             if (notation.notationId === notationId) {
@@ -259,7 +262,7 @@ const Notations: React.FC<INotations> = ({
         });
     });
     const tracker = new ChangeTracker(
-      IChangeType.Modified,
+      IChangeType.Deleted,
       'Notation Participant Delete'
     );
     dispatch(trackChanges(tracker.toPlainObject()));
@@ -344,7 +347,7 @@ const Notations: React.FC<INotations> = ({
       // Add the new notation to formData
       setFormData(prevData => [...prevData, newNotation]);
       const tracker = new ChangeTracker(
-        IChangeType.Modified,
+        IChangeType.Added,
         'New Notation Added'
       );
       dispatch(trackChanges(tracker.toPlainObject()));
@@ -372,7 +375,7 @@ const Notations: React.FC<INotations> = ({
         });
     });
     const tracker = new ChangeTracker(
-      IChangeType.Modified,
+      IChangeType.Added,
       'Notation Participant Added'
     );
   };
@@ -381,9 +384,43 @@ const Notations: React.FC<INotations> = ({
    return selectedRows.some((row) => row.notationId === notationId)
   };
 
+  const handleTableSort = (row:any, ascDir:any, notationId:any) => {
+      console.log("table sort handler", row, ascDir)
+      let property = row["graphQLPropertyName"];
+      // let notationId =notation.notationId;
+      setFormData(prevData => {
+        return prevData.map(tempNotation => {
+            if (( notationId === tempNotation.notationId)) {
+                // Filter out selected rows from notationParticipant array
+                const updatedNotationParticipant = tempNotation.notationParticipant.sort(function(a:any, b:any) {
+                  if (ascDir) return (a[property] > b[property]) ? 1 : ((a[property] < b[property]) ? -1 : 0);
+                  else return (b[property] > a[property]) ? 1 : ((b[property] < a[property]) ? -1 : 0);
+              });
+                console.log("updatedNotationParticipant",updatedNotationParticipant);
+                return { ...tempNotation, notationParticipant: updatedNotationParticipant };
+            }
+            return tempNotation;
+        });
+    });
+  }
+
+  const handleItemClick = (value: string) => {
+    switch(value)
+    {
+      case SRVisibility.ShowSR:
+        alert('show')
+       break;
+      case SRVisibility.HideSR:
+        alert('hide')
+       break;
+      default:
+       break;
+    }
+ };
+
     return (
-      <>
-          <div className="row" id="notations-component" data-testid="notations-component">
+      <div className="px-2">
+          <div className="row pe-2" id="notations-component" data-testid="notations-component">
           { userType === UserType.Internal && (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode) &&
             <div className="col-lg-6 col-md-12 py-4">
               <button className={`d-flex align-items-center ${viewMode === SiteDetailsMode.EditMode ? `btn-add-notation` : `btn-add-notation-disable`} `} disabled= { viewMode === SiteDetailsMode.SRMode } onClick={handleOnAddNotation}
@@ -404,10 +441,10 @@ const Notations: React.FC<INotations> = ({
               </div>
             </div>
           </div>
-          <div data-testid="notation-rows" className={`col-lg-12 overflow-auto p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`} style={{ maxHeight: '850px' }}>
+          <div data-testid="notation-rows" className={`col-lg-12 overflow-auto p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`} style={{ maxHeight: '1000px'}}>
             {
               formData && formData.map((notation, index) =>
-              (<div className={`${formData.length >= 6 ? 'me-2' : 'me-0'}`} key={index} >
+              (<div key={index} >
                   {
                     (viewMode === SiteDetailsMode.SRMode) && userType === UserType.Internal && 
                     <CheckBoxInput
@@ -431,7 +468,7 @@ const Notations: React.FC<INotations> = ({
                             }
                         secondChild = { 
                             <div className="w-100">
-                                <Form formRows={ userType === UserType.External ? notationFormRowExternal : notationFormRowsInternal } 
+                                <Form formRows={ userType === UserType.External ? notationFormRowExternal : viewMode === SiteDetailsMode.EditMode ? notationFormRowEditMode :  viewMode === SiteDetailsMode.SRMode ? notationFormRowExternal : notationFormRowsInternal } 
                                       formData={notation} 
                                       editMode={viewMode === SiteDetailsMode.EditMode}  
                                       srMode= { viewMode === SiteDetailsMode.SRMode } 
@@ -442,7 +479,7 @@ const Notations: React.FC<INotations> = ({
                                         title={'Notation Participants'} 
                                         tableColumns={ userType === UserType.Internal ? notationColumnInternal : notationColumnExternal} 
                                         tableData={notation.notationParticipant} 
-                                        tableIsLoading={loading} 
+                                        tableIsLoading={notation.notationParticipant.Length > 0 ? loading : RequestStatus.idle} 
                                         allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
                                         aria-label="Notation Widget" 
                                         hideTable = { false } 
@@ -450,31 +487,10 @@ const Notations: React.FC<INotations> = ({
                                         editMode={ (viewMode === SiteDetailsMode.EditMode) && userType === UserType.Internal}
                                         srMode={ (viewMode === SiteDetailsMode.SRMode) && userType === UserType.Internal}
                                         primaryKeycolumnName="id"
-                                        sortHandler={(row,ascDir)=>{
-
-                                          console.log("table sort handler", row, ascDir)
-
-                                          let property = row["graphQLPropertyName"];
-                                          let notationId =notation.notationId;
-                                          setFormData(prevData => {
-                                            return prevData.map(tempNotation => {
-                                                if (( notationId === tempNotation.notationId)) {
-                                                    // Filter out selected rows from notationParticipant array
-                                                    const updatedNotationParticipant = tempNotation.notationParticipant.sort(function(a:any, b:any) {
-                                                      if (ascDir) return (a[property] > b[property]) ? 1 : ((a[property] < b[property]) ? -1 : 0);
-                                                      else return (b[property] > a[property]) ? 1 : ((b[property] < a[property]) ? -1 : 0);
-                                                  });
-                                                    console.log("updatedNotationParticipant",updatedNotationParticipant);
-                                                    return { ...tempNotation, notationParticipant: updatedNotationParticipant };
-                                                }
-                                                return notation;
-                                            });
-                                        });
-                                          
-                                        }}
+                                        sortHandler={(row,ascDir)=>{ handleTableSort(row, ascDir, notation.notationId)}}
                                         >
                                 { viewMode === SiteDetailsMode.EditMode && userType === UserType.Internal &&
-                                    <div className="d-flex gap-2" key={notation.notationId}>
+                                    <div className="d-flex gap-2 flex-wrap " key={notation.notationId}>
                                       <button id="add-participant-btn" className=" d-flex align-items-center notation-btn" type="button" onClick={() => handleAddParticipant(notation.notationId)} aria-label={'Add Participant'} >
                                           <UserPlus className="btn-user-icon"/>
                                           <span className="notation-btn-lbl">{'Add Participant'}</span>
@@ -487,9 +503,9 @@ const Notations: React.FC<INotations> = ({
                                     </div>
                                   }
                                   { viewMode === SiteDetailsMode.SRMode && userType === UserType.Internal &&
-                                    <button className={`d-flex align-items-center ${(selectedRows.length > 0) ? `notation-btn` : `notation-btn-disable`}`} disabled={viewMode === SiteDetailsMode.SRMode} type="button" onClick={()=>{}} aria-label={'Set SR Visibility'} >
-                                      <span className={`${(selectedRows.length > 0) ? `notation-btn-lbl` : `notation-btn-lbl-disabled`}`}>{'Set SR Visibility'}</span>
-                                    </button>
+                                      <Actions label="Set SR Visibility" items={srVisibilityConfig} onItemClick={handleItemClick} 
+                                               customCssToggleBtn={ false ? `notation-sr-btn` : `notation-sr-btn-disable`}
+                                               disable={viewMode === SiteDetailsMode.SRMode}/>
                                   }
                                 </Widget>
                               { userType === UserType.Internal && <p className="sr-time-stamp">{notation.srTimeStamp}</p>}
@@ -500,7 +516,7 @@ const Notations: React.FC<INotations> = ({
               )
             }
           </div>
-      </>
+      </div>
     );
 }
 

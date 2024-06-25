@@ -227,8 +227,7 @@ const Participants = () => {
                 return (b[property] > a[property]) ? 1 : ((b[property] < a[property]) ? -1 : 0);
             }
           );
-          console.log('updated...', {...prevData, ...updatedNotationParticipant})
-        return {...updatedNotationParticipant};
+        return [...updatedNotationParticipant];
       });
     }
 

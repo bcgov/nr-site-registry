@@ -4,7 +4,7 @@ import { RequestStatus } from "../../../helpers/requests/status";
 import { TableColumn } from "../TableColumn";
 
 import { FormFieldType, IFormField } from "../../input-controls/IFormField";
-import { Label, TextInput , Link, CheckBoxInput, DropdownInput } from "../../input-controls/InputControls";
+import { Label, TextInput , Link, CheckBoxInput, DropdownInput, DateInput, TextAreaInput, DropdownSearchInput } from "../../input-controls/InputControls";
 import { ChangeTracker } from "../../common/IChangeType";
 interface TableBodyProps {
   isLoading: RequestStatus;
@@ -27,7 +27,7 @@ const TableBody: FC<TableBodyProps> = ({
   editMode,
   idColumnName,
 }) => {
-
+  
   const [selectedRowIds,SetSelectedRowsId] = useState([""]);
 
 
@@ -69,26 +69,28 @@ const TableBody: FC<TableBodyProps> = ({
     );
   };
 
-  const tableRecordChangeHandler= (rowKey:number,propertyName:any,value:any)=>
+  const tableRecordChangeHandler= (rowKey:number,propertyName:any,value: string | [Date, Date])=>
     {
         const changeRecord = {
           "row": getDataRow(rowKey),
           "property":propertyName,
           "value":value
         }
-        console.log(changeRecord)
+        console.log("tableRecordChangeHandler", changeRecord)
         changeHandler(changeRecord);
     }
 
   const getTableCellHtml = (
     field: any,
     displayName: string,
-    value: string,
+    value: any,
     rowKey: number,
     href: string,
     changeHandler: any,
     editMode: boolean
   ) => {
+
+
     if (field.type === FormFieldType.Text) {
       return (
         <TextInput
@@ -194,6 +196,63 @@ const TableBody: FC<TableBodyProps> = ({
                 />
               );
             }
+            else if(field.type === FormFieldType.Date)
+              {
+                
+
+                return ( <DateInput
+                label={field.label}
+                customLabelCss = {field.customLabelCss}
+                customInputTextCss={field.customInputTextCss}
+                customEditLabelCss = {field.customEditLabelCss}
+                customEditInputTextCss={field.customEditInputTextCss}
+                placeholder={field.placeholder}
+                value={value}
+                onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
+                type={field.type}
+                isEditing={editMode ?? true}
+                tableMode={field.tableMode ?? false}
+            />);
+              }
+              else if(field.type === FormFieldType.TextArea)
+                {
+                  return (  <TextAreaInput
+                  label={field.label}
+                  customLabelCss = {field.customLabelCss}
+                  customInputTextCss={field.customInputTextCss}
+                  customEditLabelCss = {field.customEditLabelCss}
+                  customEditInputTextCss={field.customEditInputTextCss}
+                  placeholder={field.placeholder}
+                  value={value}
+                  onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
+                  type={field.type}
+                  validation={field.validation}
+                  allowNumbersOnly={field.allowNumbersOnly}
+                  isEditing={editMode ?? true}
+                  textAreaRow={field.textAreaRow}
+                  textAreaColoum={field.textAreaColoum}
+                  tableMode={field.tableMode ?? false}
+              />);
+                }
+              else if(field.type === FormFieldType.DropDownWithSearch)
+                {
+           
+                  return (
+                  <DropdownSearchInput
+                  label={field.label}
+                  customLabelCss = {field.customLabelCss}
+                  customInputTextCss={field.customInputTextCss}
+                  customEditLabelCss = {field.customEditLabelCss}
+                  customEditInputTextCss={field.customEditInputTextCss}
+                  placeholder={field.placeholder}
+                  options={field.options || []}
+                  value={value}
+                  onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
+                  type={field.type}
+                  isEditing={editMode ?? true}
+                  tableMode={field.tableMode ?? false}
+              />);
+                }
   };
 
   const getValue = (rowIndex: number, propertyName: string) => {

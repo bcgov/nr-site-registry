@@ -1,6 +1,7 @@
 import { DropdownItem } from "../../components/action/IActions";
 import Disclosure from "./disclosure/Disclosure";
 import Notations from "./notations/Notations";
+import Participants from "./participants/participants";
 import Summary from "./summary/Summary";
 
 export const navItems: string[] = [
@@ -17,7 +18,7 @@ export const navItems: string[] = [
 export const navComponents: JSX.Element[] = [
         <Summary/>, 
         <Notations/>,
-        <></>,
+        <Participants/>,
         <></>,
         <></>,
         <></>,

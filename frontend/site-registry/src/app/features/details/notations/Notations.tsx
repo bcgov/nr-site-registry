@@ -219,8 +219,8 @@ const Notations: React.FC<INotations> = ({
       }
       else
       {
-        setFormData((prevData) => {
-          return prevData.map((notation) => {
+        setFormData((prevData: any) => {
+          return prevData.map((notation: any) => {
               if (notation.notationId === id) {
                   return { ...notation, [graphQLPropertyName]: value };
               }
@@ -248,7 +248,6 @@ const Notations: React.FC<INotations> = ({
 
     const handleRemoveParticipant = (notationId: any) => {
      // Remove selected rows from formData state
-     debugger;
       setFormData(prevData => {
         return prevData.map(notation => {
             if (notation.notationId === notationId) {
@@ -378,6 +377,7 @@ const Notations: React.FC<INotations> = ({
       IChangeType.Added,
       'Notation Participant Added'
     );
+    dispatch(trackChanges(tracker.toPlainObject()));
   };
 
   const isAnyParticipantSelected = (notationId: any) => {
@@ -385,9 +385,7 @@ const Notations: React.FC<INotations> = ({
   };
 
   const handleTableSort = (row:any, ascDir:any, notationId:any) => {
-      console.log("table sort handler", row, ascDir)
       let property = row["graphQLPropertyName"];
-      // let notationId =notation.notationId;
       setFormData(prevData => {
         return prevData.map(tempNotation => {
             if (( notationId === tempNotation.notationId)) {
@@ -431,7 +429,7 @@ const Notations: React.FC<INotations> = ({
             </div>
           }
             <div className={`${userType === UserType.Internal && (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode) ? `col-lg-6 col-md-12` : `col-lg-12`}`}>
-              <div className="row align-items-center justify-content-between p-0">
+              <div className="row justify-content-between p-0">
                 <div className={`mb-3 ${userType === UserType.Internal ? (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode) ? `col` : `col-lg-8 col-md-12` : `col-xxl-8 col-xl-8 col-lg-8 col-md-12 col-sm-12 col-xs-12`}`}>
                   <SearchInput label={'Search'} searchTerm={searchTerm} clearSearch={clearSearch} handleSearchChange={handleSearchChange}/>
                 </div>            
@@ -479,7 +477,7 @@ const Notations: React.FC<INotations> = ({
                                         title={'Notation Participants'} 
                                         tableColumns={ userType === UserType.Internal ? notationColumnInternal : notationColumnExternal} 
                                         tableData={notation.notationParticipant} 
-                                        tableIsLoading={notation.notationParticipant.Length > 0 ? loading : RequestStatus.idle} 
+                                        tableIsLoading={notation.notationParticipant.length > 0 ? loading : RequestStatus.idle} 
                                         allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
                                         aria-label="Notation Widget" 
                                         hideTable = { false } 

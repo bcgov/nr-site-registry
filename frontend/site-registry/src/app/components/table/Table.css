@@ -109,7 +109,6 @@
     .table th:first-child {
         position: sticky;
         left: 0;
-
         z-index: 1;
     }
 
@@ -124,7 +123,6 @@
     .table th:nth-child(2) {
         position: sticky;
         left: 29px;
-
         z-index: 1;
     }
 

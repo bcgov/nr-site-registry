@@ -440,8 +440,9 @@ const Notations: React.FC<INotations> = ({
                                         handleCheckBoxChange={(event)=> handleWidgetCheckBox(event)}
                                         title={'Notation Participants'} 
                                         tableColumns={ userType === UserType.Internal ? notationColumnInternal : notationColumnExternal} 
-                                        tableData={ notation.eventPartics.map((x:any)=>{ return {...x, ...x.psnorg} }) }  
+                                        tableData={ notation.eventPartics.map((x:any)=>{ return {...x, ...x.psnorg} })} 
                                         tableIsLoading={notation.eventPartics.Length > 0 ? loading : RequestStatus.idle} 
+                                      
                                         allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
                                         aria-label="Notation Widget" 
                                         hideTable = { false } 

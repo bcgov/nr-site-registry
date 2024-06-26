@@ -14,10 +14,11 @@
 }
 
 .custom-input-text { 
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 24px;
+    font-size: 16px  !important;
+    font-weight: 400  !important;
+    line-height: 24px  !important;
     text-align: left;
+    color: var(--typography-color-secondary) !important;
 }
 
 .custom-input::placeholder {
@@ -88,4 +89,17 @@
 
 .custom-checkbox[type="checkbox"]:checked {
     background:#313132;
+}
+
+.custom-not-found {
+    color: var(--surface-primary-default, #053662);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px; /* 133.333% */
+}
+
+/* Important css remove dropdown.toggle icon used in react-bootstrap */
+.dropdown-toggle::after {
+    content: none !important;
 }

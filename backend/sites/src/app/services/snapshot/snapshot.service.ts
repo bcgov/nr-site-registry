@@ -1,9 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { plainToInstance } from "class-transformer";
 import { SnapshotDto } from "../../dto/snapshot.dto";
 import { Snapshots } from "../../entities/snapshots.entity";
 import { Repository } from "typeorm";
+import { validateOrReject } from "class-validator";
 
 @Injectable()
 export class SnapshotsService {
@@ -15,29 +16,40 @@ export class SnapshotsService {
     async getSnapshots() {
         try
         {
-            return await this.snapshotRepository.find();
+            const result = await this.snapshotRepository.find();
+            if (result)
+            {
+                return result;
+            }
         }
         catch(error)
         {
-            throw error;
+            throw new Error('Failed to retrieve snapshots.');
         }
     }
 
     async getSnapshotsByUserId(userId: string) {
         try
         {
-            return await this.snapshotRepository.find({where: { userId }})
+            const result = await this.snapshotRepository.find({where: { userId }});
+            if (result) {
+                return result;
+            }
         }
         catch(error)
         {
-            throw error;
+            throw new Error('Failed to retrieve snapshots by userId.');
         }
     }
 
     async getSnapshotsById(id: number) {
         try
         {
-            return await this.snapshotRepository.find({where: { id }});
+            const result = await this.snapshotRepository.find({where: { id }});
+            if(result)
+            {
+                return result;
+            }
         }
         catch(error) 
         {
@@ -49,6 +61,7 @@ export class SnapshotsService {
 
         try
         {
+            await validateOrReject(snapshotDto);
             const snapshot = plainToInstance(Snapshots, snapshotDto);
             const result = await this.snapshotRepository.save(snapshot);
             if(result)

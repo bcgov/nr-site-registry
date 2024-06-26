@@ -12,7 +12,7 @@ import { CircleXMarkIcon, MagnifyingGlassIcon, Plus, UserMinus, UserPlus } from 
 import { INotations } from "./INotations";
 // import { SiteDetailsMode } from "../../../helpers/requests/SiteDetailsMode";
 import { ChangeTracker, IChangeType } from "../../../components/common/IChangeType";
-import { resetSiteDetails, siteDetailsMode, trackChanges } from "../../site/dto/SiteSlice";
+import { resetSiteDetails, selectSiteDetails, siteDetailsMode, trackChanges } from "../../site/dto/SiteSlice";
 import { flattenFormRows, formatDate, formatDateRange } from "../../../helpers/utility";
 import Search from "../../site/Search";
 import SearchInput from "../../../components/search/SearchInput";
@@ -100,47 +100,7 @@ const notationParticipantData3 = [
     }
   ];
 
-const initialNotationData = [
-  {   
-    notationId: 1,
-    notationType:'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS',
-    initialDate: new Date( '2013-05-30'),
-    completedDate:new Date('2013-06-15'),
-    notationClass:'ENVIRONMENTAL MANAGEMENT ACT: GENERAL',
-    requiredDate: new Date('2013-06-30'),
-    ministryContact:'John',
-    requiredActions: 'Pending',
-    note: 'REF # 9999-99',
-    srTimeStamp: `Sent to SR on ${formatDate(new Date())}`,
-    notationParticipant : notationParticipantData1,
-  },
-  {
-    notationId: 2,
-    notationType:'WASTE MANAGEMENT APPROVAL ISSUED',
-    initialDate:new Date('2013-05-31'),
-    completedDate:new Date('2013-06-15'),
-    notationClass:'ENVIRONMENTAL MANAGEMENT ACT: GENERAL',
-    requiredDate:new Date('2013-06-29'),
-    ministryContact:'Bradley Macejkovic',
-    requiredActions: 'Pending',
-    note: 'REF # 9999-99',
-    srTimeStamp: `Sent to SR on ${formatDate(new Date('2013-06-30'))}`,
-    notationParticipant : notationParticipantData2,
-  },
-  {
-    notationId: 3,
-    notationType:'RISK ASSESSMENT SUBMITTED',
-    initialDate:new Date('2013-05-29'),
-    completedDate:new Date('2013-06-15'),
-    notationClass:'ENVIRONMENTAL MANAGEMENT ACT: GENERAL',
-    requiredDate:new Date('2013-06-30'),
-    ministryContact:'Bradley Macejkovic',
-    requiredActions: 'Urgent',
-    note: 'REF # 9999-99',
-    srTimeStamp: `Sent to SR on ${formatDate(new Date('2013-06-31'))}`,
-    notationParticipant : notationParticipantData3,
-  },
-];
+
 
 
 
@@ -149,9 +109,11 @@ const Notations: React.FC<INotations> = ({
     user,
   }) => {
 
+    const details = useSelector(selectSiteDetails);
+
     const [userType, setUserType] = useState<UserType>(UserType.Internal);
     const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
-    const [formData, setFormData] =  useState<{ [key: string]: any | [Date, Date] }[]>(initialNotationData);
+    const [formData, setFormData] =  useState<{ [key: string]: any | [Date, Date] }[]>(details.events);
     const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
     const [srTimeStamp, setSRTimeStamp] = useState('Sent to SR on June 2nd, 2013');
     const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
@@ -161,7 +123,7 @@ const Notations: React.FC<INotations> = ({
       const searchTerm = event.target.value;
       setSearchTerm(searchTerm);
   
-      const filteredData = initialNotationData.filter(notation => {
+      const filteredData = formData.filter(notation => {
           // Check if any property of the notation object contains the searchTerm
           return deepSearch(notation, searchTerm.toLowerCase().trim());
       });
@@ -194,7 +156,7 @@ const Notations: React.FC<INotations> = ({
 
     const clearSearch = () => {
       setSearchTerm('');
-      setFormData(initialNotationData)
+      setFormData(details.events)
     };
 
     
@@ -203,13 +165,13 @@ const Notations: React.FC<INotations> = ({
     useEffect(()=>{
         if(resetDetails)
         {
-          setFormData(initialNotationData)
+          setFormData(details.events)
           // setData(dummyData);
         }
     },[resetDetails]);
 
     useEffect(() => {
-      setFormData(initialNotationData)
+      setFormData(details.events)
     }, []);
 
     const handleInputChange = (id: number, graphQLPropertyName: any, value: String | [Date, Date]) => {

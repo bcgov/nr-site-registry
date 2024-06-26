@@ -2,42 +2,13 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Sites {
-  id: String!
-  bcerCode: String!
-  sstCode: String!
-  commonName: String!
-  addrType: String!
-  addrLine_1: String!
-  addrLine_2: String!
-  addrLine_3: String!
-  addrLine_4: String!
+type RecentViews {
+  userId: String!
+  siteId: String!
+  address: String!
   city: String!
-  provState: String!
-  postalCode: String!
-  latdeg: Float!
-  longdeg: Float!
-  victoriaFileNo: String!
-  regionalFileNo: String!
-  classCode: String!
-  generalDescription: String!
-  whoCreated: String!
-  whoUpdated: String!
-  whenCreated: DateTime!
-  whenUpdated: DateTime!
-  rwmFlag: Float!
-  rwmGeneralDescFlag: Float!
-  consultantSubmitted: String!
-  longDegrees: Float!
-  longMinutes: Float!
-  longSeconds: String!
-  latDegrees: Float!
-  latMinutes: Float!
-  latSeconds: String!
-  srStatus: String!
-  latlongReliabilityFlag: String!
-  siteRiskCode: String!
-  geometry: String!
+  generalDescription: String
+  whenUpdated: DateTime
 }
 
 """
@@ -45,13 +16,112 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Snapshots {
+  userId: String!
+  siteId: String!
+  transactionId: String!
+  snapshotData: JSON!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type Sites {
+  id: String!
+  bcerCode: String!
+  sstCode: String!
+  commonName: String!
+  addrType: String!
+  addrLine_1: String!
+  addrLine_2: String
+  addrLine_3: String
+  addrLine_4: String
+  city: String!
+  provState: String!
+  postalCode: String
+  latdeg: Float
+  longdeg: Float
+  victoriaFileNo: String
+  regionalFileNo: String
+  classCode: String
+  generalDescription: String
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  rwmGeneralDescFlag: Float!
+  consultantSubmitted: String
+  longDegrees: Float
+  longMinutes: Float
+  longSeconds: String
+  latDegrees: Float
+  latMinutes: Float
+  latSeconds: String
+  srStatus: String!
+  latlongReliabilityFlag: String!
+  siteRiskCode: String!
+  geometry: String
+}
+
 type FetchSiteResponse {
   httpStatusCode: Int!
   data: [Sites!]!
 }
 
+type FetchSiteDetail {
+  httpStatusCode: Int!
+  data: Sites!
+}
+
+type SearchSiteResponse {
+  sites: [Sites!]!
+  count: Float!
+  page: Float!
+  pageSize: Float!
+}
+
+type DashboardResponse {
+  httpStatusCode: Int!
+  message: String
+  data: [RecentViews!]
+}
+
+type SnapshotResponse {
+  httpStatusCode: Int!
+  message: String
+  data: [Snapshots!]
+}
+
 type Query {
   sites: FetchSiteResponse!
-  searchSites(searchParam: String!): [Sites!]!
-  findSiteBySiteId(siteId: String!): Sites!
+  searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
+  findSiteBySiteId(siteId: String!): FetchSiteDetail!
+  getRecentViewsByUserId(userId: String!): DashboardResponse!
+  getSnapshots: SnapshotResponse!
+  getSnapshotsByUserId(userId: String!): SnapshotResponse!
+  getSnapshotsById(id: Int!): SnapshotResponse!
+}
+
+type Mutation {
+  addRecentView(recentView: RecentViewDto!): DashboardResponse!
+  createSnapshot(snapshot: SnapshotDto!): SnapshotResponse!
+}
+
+input RecentViewDto {
+  userId: String!
+  siteId: String!
+  address: String!
+  city: String!
+  generalDescription: String
+  whenUpdated: DateTime
+}
+
+input SnapshotDto {
+  userId: String!
+  siteId: String!
+  transactionId: String!
+  snapshotData: JSON!
 }

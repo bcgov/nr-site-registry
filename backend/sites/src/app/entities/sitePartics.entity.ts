@@ -83,7 +83,8 @@ export class SitePartics {
   @OneToMany(() => SiteParticRoles, (siteParticRoles) => siteParticRoles.sp)
   siteParticRoles: SiteParticRoles[];
 
-  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.sitePartics)
+  @Field(()=>PeopleOrgs)
+  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.sitePartics, {eager: true})
   @JoinColumn([{ name: "psnorg_id", referencedColumnName: "id" }])
   psnorg: PeopleOrgs;
 

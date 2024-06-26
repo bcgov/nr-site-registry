@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DashboardService } from './dashboard.service';
-import { RecentViews } from '../entities/recentViews.entity';
 import { Repository } from 'typeorm';
-import { RecentViewDto } from '../dto/recentView.dto';
+import { RecentViewDto } from '../../dto/recentView.dto';
 import { plainToClass } from 'class-transformer';
-import { sampleSites } from '../mockData/site.mockData';
+import { sampleSites } from '../../mockData/site.mockData';
+import { RecentViews } from '../../entities/recentViews.entity';
 
 describe('DashboardService', () => {
   let service: DashboardService;

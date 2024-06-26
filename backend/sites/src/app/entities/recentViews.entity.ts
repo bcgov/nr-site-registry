@@ -11,7 +11,6 @@ import {
   BeforeUpdate,
 } from 'typeorm';
 import { Sites } from './sites.entity';
-import { SiteStaffs } from './siteStaffs.entity';
 
 @ObjectType()
 @Entity('recent_views')

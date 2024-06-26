@@ -1,8 +1,8 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { Resource, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
-import { FetchSiteResponse, SearchSiteResponse } from '../dto/response/fetchSiteResponse';
-import { Sites } from '../entities/sites.entity';
-import { SiteService } from '../services/site.service';
+import { FetchSiteDetail, FetchSiteResponse, SearchSiteResponse } from '../../dto/response/fetchSiteResponse';
+import { Sites } from '../../entities/sites.entity';
+import { SiteService } from '../../services/site/site.service';
 
 /**
  * Resolver for Region
@@ -58,7 +58,7 @@ export class SiteResolver {
     }
 
     @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
-    @Query(() => Sites, { name: 'findSiteBySiteId' })
+    @Query(() => FetchSiteDetail, { name: 'findSiteBySiteId' })
     findSiteBySiteId(@Args('siteId', { type: () => String }) siteId: string) {
         return this.siteService.findSiteBySiteId(siteId);
     }

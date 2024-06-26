@@ -72,6 +72,71 @@ export const graphqlSiteDetailsQuery = () => {
           city,
           generalDescription,
           siteRiskCode
+          events
+          {
+            id
+            siteId
+            eventDate
+    				completionDate
+            etypCode
+ 						note
+  					requirementDueDate
+        		siteId
+            eventDate
+    				completionDate
+            etypCode
+ 						note
+  					requirementDueDate
+            psnorgId
+            spId
+            siteId
+            eventDate
+            completionDate
+            etypCode
+            note
+            requirementDueDate
+            regionAppFlag
+            regionUserid
+            regionDate
+            whoCreated
+            whoUpdated
+            whenCreated
+            whenUpdated
+            rwmFlag
+            rwmNoteFlag
+            rwmApprovalDate
+            eclsCode
+            siteId
+            eventDate
+            completionDate
+            etypCode
+   					note
+  					requirementDueDate
+            requirementReceivedDate
+            eventPartics
+            {
+                eventId
+                spId
+                eprCode
+                psnorgId
+                whoCreated
+                whoUpdated
+                whenCreated
+                whenUpdated
+                rwmFlag
+                psnorg
+                {
+                  id
+                  firstName
+                  lastName
+                  location
+                  mailUserid
+                  whoCreated
+                  whoUpdated
+                  whenCreated
+                }
+            }
+          }
          }
          httpStatusCode
       }

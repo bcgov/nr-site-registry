@@ -136,20 +136,24 @@ export class Events {
   })
   requirementReceivedDate: Date | null;
 
-  @OneToMany(() => ConditionsText, (conditionsText) => conditionsText.event)
+  @Field(()=>[ConditionsText],{nullable: true})
+  @OneToMany(() => ConditionsText, (conditionsText) => conditionsText.event, {eager:true})
   conditionsTexts: ConditionsText[];
 
-  @OneToMany(() => EventPartics, (eventPartics) => eventPartics.event)
+  @Field(()=>[EventPartics],{nullable: true})
+  @OneToMany(() => EventPartics, (eventPartics) => eventPartics.event, {eager:true})
   eventPartics: EventPartics[];
 
-  @ManyToOne(() => EventTypeCd, (eventTypeCd) => eventTypeCd.events)
+  @Field(()=>EventTypeCd)
+  @ManyToOne(() => EventTypeCd, (eventTypeCd) => eventTypeCd.events, {eager:true})
   @JoinColumn([
     { name: "etyp_code", referencedColumnName: "code" },
     { name: "ecls_code", referencedColumnName: "eclsCode" },
   ])
   eventTypeCd: EventTypeCd;
 
-  @ManyToOne(() => Sites, (sites) => sites.events, { onDelete: "CASCADE" })
+  @Field(()=>Sites)
+  @ManyToOne(() => Sites, (sites) => sites.events, { onDelete: "CASCADE"})
   @JoinColumn([{ name: "site_id", referencedColumnName: "id" }])
   site: Sites;
 }

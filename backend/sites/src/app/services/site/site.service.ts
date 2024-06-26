@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { FetchSiteDetail, FetchSiteResponse, SearchSiteResponse } from '../dto/response/fetchSiteResponse';
-import { Sites } from '../entities/sites.entity';
-import { SiteUtil } from '../utils/site.util';
+import { FetchSiteDetail, FetchSiteResponse, SearchSiteResponse } from '../../dto/response/fetchSiteResponse';
+import { Sites } from '../../entities/sites.entity';
+import { SiteUtil } from '../../utils/site.util';
+import { RecentViews } from 'src/app/entities/recentViews.entity';
 /**
  * Nestjs Service For Region Entity
  */
@@ -145,7 +146,7 @@ export class SiteService {
 
         response.httpStatusCode = 200;
 
-        response.data = await this.siteRepository.findOneOrFail({ where: { id: siteId } });
+        response.data = await this.siteRepository.findOneOrFail({ where: { id: siteId }});
 
         return response;
     }

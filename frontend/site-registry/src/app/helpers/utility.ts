@@ -16,6 +16,12 @@ export const formatDateRange = (range: [Date, Date]) => {
 };
 
 export const formatDate = (date: Date) => {
+
+   if(typeof date === 'string')
+    {
+      date = new Date(date);
+    }
+    
     const formattedDate = format(date, 'MMMM do, yyyy');
     return `${formattedDate}`;
 };

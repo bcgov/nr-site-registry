@@ -1,10 +1,10 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { RecentViews } from '../entities/recentViews.entity';
-import { DashboardService } from '../services/dashboard.service';
 import { ValidationPipe } from '@nestjs/common';
-import { RecentViewDto } from '../dto/recentView.dto';
-import { DashboardResponse } from '../dto/response/fetchSiteResponse';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import { RecentViews } from '../../entities/recentViews.entity';
+import { DashboardService } from '../../services/dashboard/dashboard.service';
+import { RecentViewDto } from '../../dto/recentView.dto';
+import { DashboardResponse } from '../../dto/response/fetchSiteResponse';
 
 @Resolver(() => RecentViews)
 export class DashboardResolver {

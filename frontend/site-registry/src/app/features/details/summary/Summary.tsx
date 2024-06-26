@@ -18,6 +18,7 @@ import Table from "../../../components/table/Table";
 import "./Summary.css";
 import { SiteDetailsMode } from "../dto/SiteDetailsMode";
 import SearchInput from "../../../components/search/SearchInput";
+import { DropdownIcon, FolderPlusIcon, ShoppingCartIcon } from "../../../components/common/icon";
 
 const Summary = () => {
 
@@ -487,6 +488,23 @@ const Summary = () => {
             editMode={false}
             idColumnName="id"
           />
+        </div>
+      </div>
+
+      <div className="external-purchase-section">
+        <div className="external-purchase-info">
+          <span>In order to view this site’s details, please purchase access using the button below.</span>
+        </div>
+        <div className="external-purchase-buttons">
+        <button className="d-flex btn-cart align-items-center">
+                <ShoppingCartIcon className="btn-icon" />
+                <span className="btn-cart-lbl"> Add to Cart</span>
+              </button>
+              <button className="d-flex btn-folio align-items-center">
+                <FolderPlusIcon className="btn-folio-icon" />
+                <span className="btn-folio-lbl"> Add to Folio</span>
+                <DropdownIcon className="btn-folio-icon" />
+              </button>
         </div>
       </div>
     </div>

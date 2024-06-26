@@ -31,6 +31,7 @@ import {
     FaUserMinus,
     FaUserPlus,
     FaPlus,
+    FaMinus,
     } from "react-icons/fa6";
 
     import { BsFillPinMapFill } from "react-icons/bs";
@@ -68,4 +69,5 @@ import {
   export const UserPlus = FaUserPlus;
   export const UserMinus = FaUserMinus;
   export const Plus = FaPlus;
+  export const Minus = FaMinus;
   export const FillPinMapFill = BsFillPinMapFill;

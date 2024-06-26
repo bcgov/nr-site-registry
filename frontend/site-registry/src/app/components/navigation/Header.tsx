@@ -14,11 +14,15 @@ import Actions from "../action/Actions";
 import { UserType } from "../../helpers/requests/userType";
 import { updateUserType } from "../../features/site/dto/SiteSlice";
 import { AppDispatch } from "../../Store";
+import {LoginDropdown} from "../login/LoginDropdown"
+import { getUser } from "../../helpers/utility";
 
 
 const Header = () => {
 
   const [isOpen, setIsOpen] = useState(false);
+
+  const user = getUser();
 
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
@@ -51,7 +55,8 @@ const Header = () => {
       </div>
       <div className="header-right-corner-section d-flex align-items-center">
         <LanguageSwitcher/>
-         <Actions label="User" items={ [
+       
+         {/* <Actions label="User" items={ [
                 { 
                     label:'External User',
                     value: UserType.External
@@ -62,7 +67,7 @@ const Header = () => {
                 },
                 
             ]} 
-            onItemClick={handleUserClick} /> 
+            onItemClick={handleUserClick} />  */}
         <button
           className="navbar-toggler display-upto-medium no-bg-br-outline" 
           type="button"
@@ -78,7 +83,8 @@ const Header = () => {
           {/* Profile image */}
           <img src={moon} alt="Moon image for theme."/>
         </div>
-        {!isOpen && <UserAccount  mobileView={isOpen}/>}
+        {user == null &&  LoginDropdown("Login")}
+        {!isOpen && user !== null && <UserAccount  mobileView={isOpen}/>}
        
       </div>   
       <div role="menu"

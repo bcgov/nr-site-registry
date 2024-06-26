@@ -31,7 +31,7 @@ import {
 import { AppDispatch } from "../../Store";
 import Notations from "./notations/Notations";
 import NavigationPills from "../../components/navigation/navigationpills/NavigationPills";
-import { navComponents, navItems } from "./NavigationPillsConfig";
+import { dropDownNavItems, navComponents, navItems } from "./NavigationPillsConfig";
 import ModalDialog from "../../components/modaldialog/ModalDialog";
 import {
   CancelButton,
@@ -50,14 +50,17 @@ import { UserType } from "../../helpers/requests/userType";
 import { UserMode } from "../../helpers/requests/userMode";
 import Actions from "../../components/action/Actions";
 import { ActionItems } from "../../components/action/ActionsConfig";
+import { getUser } from "../../helpers/utility";
 
 const SiteDetails = () => {
  
+  console.log(getUser())
+
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
   const [save, setSave] = useState(false);
-  const [userType, setUserType] = useState<UserType>(UserType.Internal);
+  const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -70,11 +73,35 @@ const SiteDetails = () => {
 
   const details = useSelector(selectSiteDetails);
 
-  const userTypeLocal = useSelector(userTypeOnlyForDemo);
+  // const userTypeLocal = useSelector(userTypeOnlyForDemo);
+
+  // useEffect(()=>{
+  //   setUserType(userTypeLocal);
+  // },[userTypeLocal])
+
 
   useEffect(()=>{
-    setUserType(userTypeLocal);
-  },[userTypeLocal])
+
+    const loggedInUser = getUser();
+    if(loggedInUser?.profile.preferred_username?.indexOf("bceid") !== -1)
+      {
+        setUserType(UserType.External);
+      }
+      else if (loggedInUser?.profile.preferred_username?.indexOf("idir") !== -1)
+      {
+        setUserType(UserType.Internal);
+      }
+      else
+      {
+        // not logged in 
+        setUserType(UserType.External);
+  
+      }
+
+  }, [])
+ 
+
+
 
   const [editSiteDetailsObject, setEditSiteDetailsObject] = useState(details);
   const savedChanges = useSelector(trackedChanges);
@@ -123,6 +150,8 @@ const SiteDetails = () => {
     setSave(false);
     setEdit(false);
   }
+
+
   return (
     <PageContainer role="details">
       {save && (
@@ -171,7 +200,7 @@ const SiteDetails = () => {
           <AngleLeft className="btn-icon" />
           <span className="btn-back-lbl">Back to</span>
         </button>
-        <div className="d-flex gap-2 justify-align-center">
+        <div className="d-flex gap-2 justify-align-center pe-2">
 
          {/* { <Actions label="User" items={ [
                 { 
@@ -225,7 +254,7 @@ const SiteDetails = () => {
           <CustomLabel label="2929 Fort" labelType="b-h1" />
         </div>
       </div>
-      <NavigationPills items={navItems} components={navComponents} />
+      <NavigationPills items={navItems} components={navComponents} dropdownItems={dropDownNavItems}/>
     </PageContainer>
   );
 };

@@ -54,12 +54,12 @@ const Widget: React.FC<IWidget> = ({
           <div>
             <Table
               label={title ?? ""}
-              isLoading={RequestStatus.success}
-              columns={tableColumns}
+              isLoading={tableIsLoading ?? RequestStatus.idle}
+              columns={tableColumns ?? []}
               data={tableData}
               showPageOptions={false}
               allowRowsSelect={allowRowsSelect}
-              changeHandler={changeHandler}
+              changeHandler={changeHandler ?? (() => {})}
               editMode={editMode ?? false}
               idColumnName={primaryKeycolumnName ?? ''}
               sortHandler={widgetSortHandler}

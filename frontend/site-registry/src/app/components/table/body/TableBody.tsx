@@ -4,7 +4,7 @@ import { RequestStatus } from "../../../helpers/requests/status";
 import { TableColumn } from "../TableColumn";
 
 import { FormFieldType, IFormField } from "../../input-controls/IFormField";
-import { Label, TextInput , Link ,Dropdown,CheckBoxInput } from "../../input-controls/InputControls";
+import { Label, TextInput , Link, CheckBoxInput, DropdownInput } from "../../input-controls/InputControls";
 import { ChangeTracker } from "../../common/IChangeType";
 interface TableBodyProps {
   isLoading: RequestStatus;
@@ -152,7 +152,7 @@ const TableBody: FC<TableBodyProps> = ({
         else if(field.type === FormFieldType.DropDown)
           {
             return (
-              <Dropdown 
+              <DropdownInput 
                 label={field.label}
                 customLabelCss={field.customLabelCss}
                 customInputTextCss={field.customInputTextCss}

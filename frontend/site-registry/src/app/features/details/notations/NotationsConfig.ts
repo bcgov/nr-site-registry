@@ -1,5 +1,7 @@
+import { DropdownItem } from "../../../components/action/IActions";
 import { FormFieldType, IFormField } from "../../../components/input-controls/IFormField";
 import { ColumnSize,  TableColumn } from "../../../components/table/TableColumn";
+import { SRVisibility } from "../../../helpers/requests/srVisibility";
 import avatar from '../../../images/avatar.png';
 
 // When user type is Internal and can be any mode (Edit/SR)
@@ -126,6 +128,132 @@ export const notationFormRowsInternal: IFormField[][] = [
         },
     ],
 ];
+
+export const notationFormRowEditMode: IFormField[][] = [
+    [
+        {
+            type: FormFieldType.DropDown,
+            label: 'Notation Type',
+            placeholder: 'Notation Type',
+            graphQLPropertyName: 'notationType',
+            options: [
+                 { key: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
+                 { key: 'WASTE MANAGEMENT APPROVAL ISSUED', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
+                 { key: 'RISK ASSESSMENT SUBMITTED', value: 'RISK ASSESSMENT SUBMITTED'}
+            ],
+            value: '',
+            colSize: 'col-lg-11 col-md-11 col-sm-11 col-10',
+            customLabelCss:'custom-notation-lbl-text',
+            customInputTextCss:'custom-notation-input-text',
+            customEditLabelCss:'custom-notation-edit-label',
+            customEditInputTextCss:'custom-notation-edit-input',
+        },
+    ],
+    [
+        {
+            type: FormFieldType.DropDown,
+            label: 'Notation Class',
+            placeholder: 'Notation Class',
+            graphQLPropertyName: 'notationClass',
+            options: [
+                { key: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL', value: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL'},
+                // { key: 'class2', value: 'Class 2'}
+            ],
+            value: '',
+            colSize: 'col-lg-12 col-md-12 col-sm-12',
+            customLabelCss:'custom-notation-lbl-text',
+            customInputTextCss:'custom-notation-input-text',
+            customEditLabelCss:'custom-notation-edit-label',
+            customEditInputTextCss:'custom-notation-edit-input',
+        },
+    ],
+    [
+        {
+            type: FormFieldType.Date,
+            label: 'Initiated Date',
+            placeholder: 'MM/DD/YY',
+            graphQLPropertyName:'initialDate',
+            value: '',
+            colSize: 'col-lg-4 col-md-4 col-sm-12',
+            customLabelCss:'custom-notation-lbl-text',
+            customInputTextCss:'custom-notation-input-text',
+            customEditLabelCss:'custom-notation-edit-label',
+            customEditInputTextCss:'custom-notation-edit-input',
+        },
+        {
+            type: FormFieldType.Date,
+            label: 'Completed Date',
+            placeholder: 'MM/DD/YY',
+            graphQLPropertyName:'completedDate',
+            value:'',
+            colSize: 'col-lg-4 col-md-4 col-sm-12',
+            customLabelCss:'custom-notation-lbl-text',
+            customInputTextCss:'custom-notation-input-text',
+            customEditLabelCss:'custom-notation-edit-label',
+            customEditInputTextCss:'custom-notation-edit-input',
+        },
+        {
+            type: FormFieldType.Date,
+            label: 'Required Date',
+            placeholder: 'MM/DD/YY',
+            graphQLPropertyName:'requiredDate',
+            value: '',
+            colSize: 'col-lg-4 col-md-4 col-sm-12',
+            customLabelCss:'custom-notation-lbl-text',
+            customInputTextCss:'custom-notation-input-text',
+            customEditLabelCss:'custom-notation-edit-label',
+            customEditInputTextCss:'custom-notation-edit-input',
+        },
+    ],
+    [
+        {
+            type: FormFieldType.Text,
+            label: 'Required Actions',
+            placeholder: 'Required Actions',
+            graphQLPropertyName:'requiredActions',
+            value: '',
+            colSize: 'col-lg-12 col-md-12 col-sm-12',
+            customLabelCss:'custom-notation-lbl-text',
+            customInputTextCss:'custom-notation-input-text',
+            customEditLabelCss:'custom-notation-edit-label',
+            customEditInputTextCss:'custom-notation-edit-input',
+        },
+    ],
+    [
+        {
+            type: FormFieldType.Text,
+            label: 'Note',
+            placeholder: 'Note',
+            graphQLPropertyName:'note',
+            value: '',
+            colSize: 'col-lg-12 col-md-12 col-sm-12',
+            customLabelCss:'custom-notation-lbl-text',
+            customInputTextCss:'custom-notation-input-text',
+            customEditLabelCss:'custom-notation-edit-label',
+            customEditInputTextCss:'custom-notation-edit-input',
+        },
+    ],
+    [
+        {
+            type: FormFieldType.DropDown,
+            label: 'Ministry Contact',
+            placeholder: 'Ministry Contact',
+            graphQLPropertyName: 'ministryContact',
+            options: [
+                { key: 'Bradley Macejkovic', value: 'Bradley Macejkovic', imageUrl: avatar},
+                { key: 'John', value: 'John', imageUrl: avatar}
+            ],
+            value: '',
+            isImage: true,
+            colSize: 'col-lg-12 col-md-12 col-sm-12',
+            customLabelCss:'custom-notation-lbl-text',
+            customInputTextCss:'custom-notation-input-text',
+            customEditLabelCss:'custom-notation-edit-label',
+            customEditInputTextCss:'custom-notation-edit-input',
+        },
+    ]
+]
+
 
 // When user type is External
 export const notationFormRowExternal: IFormField[][] = [
@@ -307,8 +435,6 @@ export const notationFormRowsFirstChild: IFormField[][] = [
     ],
 ];
 
-
-
 export const notationColumnInternal: TableColumn[] = [
     {
       id: 1,
@@ -422,3 +548,13 @@ export const notationColumnExternal: TableColumn[] = [
     },
 ];
   
+export const srVisibilityConfig: DropdownItem[] = [
+    {
+        label:'Show on SR',
+        value: SRVisibility.ShowSR
+    },
+    {
+        label:'Hide on SR',
+        value: SRVisibility.HideSR
+    },
+]

@@ -3,11 +3,17 @@ import Dropdown from "react-bootstrap/Dropdown";
 import './UserAccount.css';
 import avatar from '../../images/avatar.png';
 import { DropdownIcon, DropdownUpIcon } from "../common/icon";
+import { useAuth } from "react-oidc-context";
+import { getUser } from "../../helpers/utility";
 
 const UserAccount = ( props : any) =>{
+
+  const authRedirectUri = ((window as any)._env_ && (window as any)._env_.REACT_APP_AUTH_LOGOUT_REDIRECT_URI ) || process.env.REACT_APP_AUTH_LOGOUT_REDIRECT_URI || 'http://localhost:4000/'
+  const auth = useAuth();
+  const loggedInUser = getUser();
     // Sample user data
     const userObj = {
-        name: 'John Doe WLRS:EX',
+        name: loggedInUser?.profile.given_name,
         profileImage: avatar, // URL to the profile image
     };
 
@@ -52,7 +58,12 @@ const UserAccount = ( props : any) =>{
                   {/* Logout */}
                   <div role="menuitem" aria-label="Log Out"
                   tabIndex={0} // Make focusable with keyboard
-                  className="account-custom-item-mobile">Log Out</div>
+                  className="account-custom-item-mobile"  onClick={() => {
+                    console.log("removed",authRedirectUri)
+                    auth.removeUser().then(() => {
+                      window.location.href = authRedirectUri
+                    });
+                  }}>Log Out</div>
               </div>
               }
           </div>
@@ -90,7 +101,12 @@ const UserAccount = ( props : any) =>{
                       <Dropdown.Item role="menuitem" className="account-custom-item" aria-label="Account Settings">Account Settings</Dropdown.Item>
 
                       {/* Logout */}
-                      <Dropdown.Item role="menuitem" className="account-custom-item" aria-label="Log Out">Log Out</Dropdown.Item>
+                      <Dropdown.Item role="menuitem" className="account-custom-item" aria-label="Log Out" onClick={() => {
+                    console.log("removed",authRedirectUri)
+                    auth.removeUser().then(() => {
+                      window.location.href = authRedirectUri
+                    });
+                  }}>Log Out</Dropdown.Item>
                     </div>
                 </Dropdown.Menu>
               </Dropdown>

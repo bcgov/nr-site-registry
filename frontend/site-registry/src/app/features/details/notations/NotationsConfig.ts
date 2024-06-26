@@ -9,11 +9,11 @@ export const notationFormRowsInternal: IFormField[][] = [
             type: FormFieldType.DropDown,
             label: 'Notation Type',
             placeholder: 'Notation Type',
-            graphQLPropertyName: 'notationType',
+            graphQLPropertyName: 'etypCode',
             options: [
-                 { key: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
-                 { key: 'WASTE MANAGEMENT APPROVAL ISSUED', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
-                 { key: 'RISK ASSESSMENT SUBMITTED', value: 'RISK ASSESSMENT SUBMITTED'}
+                 { key: '1', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
+                //  { key: '2', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
+                //  { key: 'RISK ASSESSMENT SUBMITTED', value: 'RISK ASSESSMENT SUBMITTED'}
             ],
             value: '',
             colSize: 'col-lg-5 col-md-7 col-sm-11 col-10',
@@ -26,7 +26,7 @@ export const notationFormRowsInternal: IFormField[][] = [
             type: FormFieldType.Date,
             label: 'Initiated Date',
             placeholder: 'MM/DD/YY',
-            graphQLPropertyName:'initialDate',
+            graphQLPropertyName:'eventDate',
             value: '',
             colSize: 'col-lg-3 col-md-4 col-sm-12',
             customLabelCss:'custom-notation-lbl-text',
@@ -38,7 +38,7 @@ export const notationFormRowsInternal: IFormField[][] = [
             type: FormFieldType.Date,
             label: 'Completed Date',
             placeholder: 'MM/DD/YY',
-            graphQLPropertyName:'completedDate',
+            graphQLPropertyName:'completionDate',
             value:'',
             colSize: 'col-lg-3 col-md-12 col-sm-12',
             customLabelCss:'custom-notation-lbl-text',
@@ -53,9 +53,9 @@ export const notationFormRowsInternal: IFormField[][] = [
             type: FormFieldType.DropDown,
             label: 'Notation Class',
             placeholder: 'Notation Class',
-            graphQLPropertyName: 'notationClass',
+            graphQLPropertyName: 'eclsCode',
             options: [
-                { key: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL', value: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL'},
+                { key: '1', value: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL'},
                 // { key: 'class2', value: 'Class 2'}
             ],
             value: '',
@@ -69,7 +69,7 @@ export const notationFormRowsInternal: IFormField[][] = [
             type: FormFieldType.Date,
             label: 'Required Date',
             placeholder: 'MM/DD/YY',
-            graphQLPropertyName:'requiredDate',
+            graphQLPropertyName:'requirementDueDate',
             value: '',
             colSize: 'col-lg-3 col-md-6 col-sm-12',
             customLabelCss:'custom-notation-lbl-text',
@@ -81,9 +81,9 @@ export const notationFormRowsInternal: IFormField[][] = [
             type: FormFieldType.DropDown,
             label: 'Ministry Contact',
             placeholder: 'Ministry Contact',
-            graphQLPropertyName: 'ministryContact',
+            graphQLPropertyName: 'whoUpdated',
             options: [
-                { key: 'Bradley Macejkovic', value: 'Bradley Macejkovic', imageUrl: avatar},
+                { key: 'Midhun', value: 'Bradley Macejkovic', imageUrl: avatar},
                 { key: 'John', value: 'John', imageUrl: avatar}
             ],
             value: '',
@@ -101,7 +101,7 @@ export const notationFormRowsInternal: IFormField[][] = [
             type: FormFieldType.Text,
             label: 'Required Actions',
             placeholder: 'Required Actions',
-            graphQLPropertyName:'requiredActions',
+            graphQLPropertyName:'note',
             value: '',
             colSize: 'col-lg-12 col-md-12 col-sm-12',
             customLabelCss:'custom-notation-lbl-text',
@@ -134,9 +134,9 @@ export const notationFormRowExternal: IFormField[][] = [
             type: FormFieldType.DropDown,
             label: 'Notation Type',
             placeholder: 'Notation Type',
-            graphQLPropertyName: 'notationType',
+            graphQLPropertyName: 'etypCode',
             options: [
-                { key: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
+                { key: '1', value: 'CERTIFICATE OF COMPLIANCE ISSUED USING RISK BASED STANDARDS'},
                 { key: 'WASTE MANAGEMENT APPROVAL ISSUED', value: 'WASTE MANAGEMENT APPROVAL ISSUED'},
                 { key: 'RISK ASSESSMENT SUBMITTED', value: 'RISK ASSESSMENT SUBMITTED'}
            ],
@@ -155,9 +155,9 @@ export const notationFormRowExternal: IFormField[][] = [
             type: FormFieldType.DropDown,
             label: 'Notation Class',
             placeholder: 'Notation Class',
-            graphQLPropertyName: 'notationClass',
+            graphQLPropertyName: 'eclsCode',
             options: [
-                { key: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL', value: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL'},
+                { key: '1', value: 'ENVIRONMENTAL MANAGEMENT ACT: GENERAL'},
                 // { key: 'class2', value: 'Class 2'}
             ],
             value: '',
@@ -171,7 +171,7 @@ export const notationFormRowExternal: IFormField[][] = [
             type: FormFieldType.Date,
             label: 'Initiated Date',
             placeholder: 'MM/DD/YY',
-            graphQLPropertyName:'initialDate',
+            graphQLPropertyName:'eventDate',
             value: [],
             colSize: 'col-xxl-2 col-xl-2 col-lg-4 col-md-4 col-sm-6 col-xs-12',
             customLabelCss:'custom-notation-lbl-text',
@@ -314,14 +314,14 @@ export const notationColumnInternal: TableColumn[] = [
       id: 1,
       displayName: "Role",
       active: true,
-      graphQLPropertyName: "role",
+      graphQLPropertyName: "eprCode",
       displayType:{
         type: FormFieldType.DropDown,
         label: "Text",        
-        graphQLPropertyName: "role",
+        graphQLPropertyName: "eprCode",
         value: "",
         options: [
-            {key:'CSAP', value:'CSAP'},
+            {key:'1', value:'CSAP'},
             {key:'CSSATEAM', value:'CSSA TEAM'},
             {key:'SDM', value:'SDM'},
             {key:'SITEOWNER', value:'SITE OWNER'}
@@ -340,12 +340,12 @@ export const notationColumnInternal: TableColumn[] = [
       id: 2,
       displayName: "Participant Name",
       active: true,
-      graphQLPropertyName: "participantName",
+      graphQLPropertyName: "firstName",
       displayType:{
         type: FormFieldType.Text,
         label: "Participant Name",
         placeholder: 'Please enter ',
-        graphQLPropertyName: "participantName",
+        graphQLPropertyName: "firstName",
         value: "",
         
         allowNumbersOnly: true,

@@ -70,7 +70,8 @@ export class EventPartics {
   @JoinColumn([{ name: "event_id", referencedColumnName: "id" }])
   event: Events;
 
-  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.eventPartics)
+  @Field(()=> PeopleOrgs, {nullable : true} )
+  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.eventPartics, {eager: true})
   @JoinColumn([{ name: "psnorg_id", referencedColumnName: "id" }])
   psnorg: PeopleOrgs;
 

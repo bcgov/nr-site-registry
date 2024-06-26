@@ -146,7 +146,7 @@ export class SiteService {
 
         response.httpStatusCode = 200;
 
-        response.data = await this.siteRepository.findOneOrFail({ where: { id: siteId }, relations:['recentViewedSites'] });
+        response.data = await this.siteRepository.findOneOrFail({ where: { id: siteId }});
 
         return response;
     }

@@ -18,44 +18,6 @@ import { useParams } from "react-router-dom";
 import GetConfig from "./ParticipantsConfig";
 import { IParticipant } from "./IParticipantState";
 import { v4 } from "uuid";
-// const siteParticipantdd = [
-//     {
-//         psnorgId: 1,
-//         prCode: "AL",
-//         displayName: "SHELL CANADA PRODUCTS",
-//         effectiveDate: new Date( '2013-05-30'),
-//         endDate: new Date('2024-05-05'),
-//         note: '',
-//         sr: false,
-//     },
-//     {
-//         psnorgId: 2,
-//         prCode: "AL",
-//         displayName: "SNC-LAVALIN ENVIRONMENT INC.",
-//         effectiveDate: new Date('2024-05-05'),
-//         endDate: new Date('2024-05-05'),
-//         note: 'Testing....',
-//         sr: false,
-//     },
-//     {
-//         psnorgId: 3,
-//         prCode: "EC",
-//         displayName: "Lorene Rutherford",
-//         effectiveDate: new Date('2024-05-05'),
-//         endDate: new Date('2024-05-05'),
-//         note: '',
-//         sr: false,
-//     },
-//     {
-//         psnorgId: 4,
-//         prCode: "MBCEC",
-//         displayName: "Roland Hintz",
-//         effectiveDate: new Date('2024-05-05'),
-//         endDate: new Date('2024-05-05'),
-//         note: '',
-//         sr: false,
-//     },
-// ]
 
 const Participants = () => {
     const { participantColumnInternal, participantColumnExternal, srVisibilityParcticConfig } = GetConfig();

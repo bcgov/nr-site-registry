@@ -50,6 +50,13 @@ import { SiteResolver } from './resolvers/site/site.resolver';
 import { Snapshots } from './entities/snapshots.entity';
 import { SnapshotsResolver } from './resolvers/snapshot/snapshot.resolver';
 import { SnapshotsService } from './services/snapshot/snapshot.service';
+import { ParticipantResolver } from './resolvers/participant/participant.resolver';
+import { ParticipantService } from './services/participant/participant.service';
+import { GenericResponseProvider } from './dto/response/genericResponseProvider';
+import { ParticipantRoleCdResolver } from './resolvers/dropdown/participantRoleCd.resolver';
+import { ParticipantRoleCdService } from './services/dropdown/participantRoleCd.service';
+import { PeopleOrgsResolver } from './resolvers/peopleOrganization/peopleOrg.resolver';
+import { PeopleOrgsService } from './services/peopleOrganization/peopleOrgs.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -61,7 +68,7 @@ import { SnapshotsService } from './services/snapshot/snapshot.service';
     ProfileAnswers, ProfileSubmissions, SiteProfileLandUses, SiteProfileOwners, ProfileQuestions, ProfileCategories, SubmissionCd,
     SiteDocPartics, PeopleOrgs, SiteParticRoles, ParticRoleCd, EventParticRoleCd, CityRegions, SiteContaminationClassXref,
     ContaminationClassCd, SiteCrownLandStatusCd, SisAddresses, SiteStaffs, DocParticRoleCd, LtoDownload, LtoPrevDownload,
-    PlanTable, SiteCrownLandContaminated, RecentViews, Snapshots])],
+    PlanTable, SiteCrownLandContaminated, RecentViews, Snapshots, ])],
   providers: [
     SiteResolver,
     SiteService,
@@ -69,6 +76,13 @@ import { SnapshotsService } from './services/snapshot/snapshot.service';
     DashboardService,
     SnapshotsResolver,
     SnapshotsService,
+    ParticipantResolver,
+    ParticipantService,
+    ParticipantRoleCdResolver,
+    ParticipantRoleCdService,
+    PeopleOrgsResolver,
+    PeopleOrgsService,
+    GenericResponseProvider
   ],
   controllers: [SiteController],
 })

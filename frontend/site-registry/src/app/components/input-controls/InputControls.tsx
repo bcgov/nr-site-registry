@@ -24,7 +24,7 @@ const renderTableCell = (
   content : JSX.Element | string
 ) => {
     return (
-      <td className="table-border-light content-text">
+      <td className="table-border-light">
         {content}
       </td>
     )
@@ -42,6 +42,8 @@ export const Link: React.FC<InputProps> = ({
   customInputTextCss,
   customEditLabelCss,
   customEditInputTextCss,
+  customLinkValue,
+  customIcon,
   onChange,
   tableMode,
   href,
@@ -50,10 +52,10 @@ export const Link: React.FC<InputProps> = ({
     renderTableCell(
       <RouterLink
         to={href + value}
-        className={`${customInputTextCss ?? ""}`}
+        className={`d-flex pt-1 ${customInputTextCss ?? ""}`}
         aria-label={`${label + " " + value}`}
       >
-        View
+       {customIcon && customIcon} <span className="ps-1">{customLinkValue ?? value}</span>
       </RouterLink>
     )
   );
@@ -71,12 +73,13 @@ export const Label: React.FC<InputProps> = ({
   customInputTextCss,
   customEditLabelCss,
   customEditInputTextCss,
+  
   onChange,
   tableMode,
 }) => {
   return (
     renderTableCell(
-      <p className={`${customInputTextCss ?? ""}`}>{value}</p>
+      <span className={`${customInputTextCss ?? ""}`}>{value}</span>
     )
   );
 };
@@ -129,33 +132,8 @@ export const TextInput: React.FC<InputProps> = ({
 
   // Replace any spaces in the label with underscores to create a valid id
   const inputTxtId = label.replace(/\s+/g, "_");
-
-  // console.log("tableMode", tableMode);
-  // if (tableMode) {
-  //   return (
-  //     <td className="table-border-light content-text">
-  //       {isEditing ? (
-  //         <input
-  //           type={type}
-  //           id={inputTxtId}
-  //           className={`form-control custom-input ${
-  //             customEditInputTextCss ?? "custom-input-text"
-  //           }  ${error && "error"}`}
-  //           placeholder={placeholder}
-  //           value={value ?? ""}
-  //           onChange={handleTextInputChange}
-  //           aria-label={label} // Accessibility
-  //           required={error ? true : false}
-  //         />
-  //       ) : (
-  //         <p className={`${customInputTextCss ?? ""}`}>{value}</p>
-  //       )}
-  //       {error && <div className="text-danger p-1 small">{error}</div>}
-  //     </td>
-  //   );
-  // } else {
     return (
-      <ContainerElement className={tableMode ? "table-border-light content-text" : "mb-3"}>
+      <ContainerElement className={tableMode ? "table-border-light" : "mb-3"}>
         {!tableMode && (
           <>
             {srMode && (
@@ -192,7 +170,7 @@ export const TextInput: React.FC<InputProps> = ({
             required={error ? true : false}
           />
         ) : (
-          <p className={`${customInputTextCss ?? ""}`}>{value}</p>
+          <span className={`${customInputTextCss ?? ""}`}>{value}</span>
         )}
         {error && <div className="text-danger p-1 small">{error}</div>}
       </ContainerElement>
@@ -232,50 +210,8 @@ export const DropdownInput: React.FC<InputProps> = ({
     onChange(isChecked);
   };
   const isFirstOptionGrey = value === "";
-  // if (tableMode) {
-  //   return (
-  //       <td className="table-border-light content-text">          
-  
-  //         {/* Create a select element with the form-select class */}
-  //         {isEditing ? (
-  //           <select
-  //             id={drdownId}
-  //             className={`form-select custom-input custom-select ${
-  //               customEditInputTextCss ?? "custom-input-text"
-  //             } ${selected ? "custom-option" : ""} ${
-  //               isFirstOptionGrey
-  //                 ? "custom-disabled-option"
-  //                 : "custom-primary-option"
-  //             }`}
-  //             value={value.trim() ?? ""}
-  //             onChange={handleSelectChange}
-  //             aria-label={label}
-  //             placeholder={placeholder}
-  //           >
-  //             <option value="" className="custom-disabled-option">
-  //               {placeholder}
-  //             </option>
-  //             {options?.map((option, index) => (
-  //               <option
-  //                 key={index}
-  //                 value={option.key}
-  //                 className="custom-option custom-primary-option"
-  //               >
-  //                 {option.value}
-  //               </option>
-  //             ))}
-  //           </select>
-  //         ) : (
-  //           <p className={`${customInputTextCss ?? ""}`}>
-  //             {options?.find((opt) => opt.key === value)?.value}
-  //           </p>
-  //         )}
-  //       </td>
-  //     );
-
-  // } else {
     return (
-      <ContainerElement className={tableMode ? "table-border-light content-text" : "d-inline  mb-3"}>
+      <ContainerElement className={tableMode ? "table-border-light" : "d-inline  mb-3"}>
         {srMode && (
           <CheckBoxInput
             type={FormFieldType.Checkbox}
@@ -339,14 +275,14 @@ export const DropdownInput: React.FC<InputProps> = ({
               role="img"
               aria-label="User image"
             />
-            <p className={`m-0 ${customInputTextCss ?? ""}`}>
+            <p className={`m-0 p-0 ${customInputTextCss ?? ""}`}>
               {options?.find((opt) => opt.key === value)?.value}
             </p>
           </div>
         ) : (
-          <p className={`${customInputTextCss ?? ""}`}>
+          <span className={`${customInputTextCss ?? ""}`}>
             {options?.find((opt) => opt.key === value)?.value}
-          </p>
+          </span>
         )}
       </ContainerElement>
     );
@@ -501,7 +437,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
   // Replace any spaces in the label with underscores to create a valid id
   const dateRangeId = label.replace(/\s+/g, "_");
   return (
-    <ContainerElement className={tableMode ? "table-border-light content-text" : "mb-3"}>
+    <ContainerElement className={tableMode ? "table-border-light" : "mb-3"}>
       {srMode && (
         <CheckBoxInput
           type={FormFieldType.Checkbox}
@@ -527,7 +463,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
           showOneCalendar
           ranges={[]}
           aria-label={label}
-          className="custom-date-range"
+          className={` w-100 ${customEditInputTextCss ?? "custom-date-range"}`}
           placeholder={placeholder}
           format="MM/dd/yy"
           character=" - "
@@ -536,7 +472,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
           onChange={(value) => onChange(value)}
         />
       ) : (
-        <p className={`${customInputTextCss ?? ""}`}>{dateRangeValue ?? ""}</p>
+        <span className={`${customInputTextCss ?? ""}`}>{dateRangeValue ?? ""}</span>
       )}
     </ContainerElement>
   );
@@ -557,7 +493,6 @@ export const DateInput: React.FC<InputProps> = ({
 }) => {
  
   const ContainerElement = tableMode ? 'td' : 'div';
-
   let dateValue;
   value = tableMode ? value != '' ? new Date(value) : null : value
   if (value) {
@@ -571,7 +506,7 @@ export const DateInput: React.FC<InputProps> = ({
   // Replace any spaces in the label with underscores to create a valid id
   const dateRangeId = label.replace(/\s+/g, "_") ;
   return (
-    <ContainerElement className={tableMode ? "table-border-light content-text" : "mb-3"}>
+    <ContainerElement className={tableMode ? "table-border-light" : "mb-3"}>
       {srMode && (
         <CheckBoxInput
           type={FormFieldType.Checkbox}
@@ -597,7 +532,7 @@ export const DateInput: React.FC<InputProps> = ({
         <DatePicker
         id={dateRangeId}
         aria-label={label}
-        className="custom-date-range"
+        className={` w-100 ${customEditInputTextCss ?? "custom-date-range"}`}
         placeholder={placeholder}
         format="MMMM d, yyyy"
         caretAs={CalendarIcon}
@@ -606,7 +541,7 @@ export const DateInput: React.FC<InputProps> = ({
         oneTap
       />
       ) : (
-        <p className={`${customInputTextCss ?? ""}`}>{dateValue ?? ""}</p>
+        <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{dateValue ?? ""}</span>
       )}
     </ContainerElement>
   );
@@ -631,43 +566,8 @@ export const CheckBoxInput: React.FC<InputProps> = ({
     onChange(e.target.checked); // Toggle the checked state and pass it to the parent component
   };
 
-  
-  // if(tableMode)
-  //   {
-  //       return (
-  //           <td className="table-border-light content-text">
-  //           <div className="">
-  //               <input
-  //               id={inputTxtId}
-  //               type={type}
-  //               className={`form-check-input custom-checkbox ${
-  //                   customEditInputTextCss ?? "custom-input-text"
-  //               }`}
-  //               checked={isChecked}
-  //               aria-label={label} // Accessibility
-  //               onChange={handleCheckboxChange}
-  //               disabled={!isEditing}
-  //               />
-  //               {isLabel && (
-  //               <label
-  //                   htmlFor={inputTxtId}
-  //                   className={`${
-  //                   !isEditing
-  //                       ? customLabelCss ?? ""
-  //                       : `px-1 form-label ${customEditLabelCss ?? "custom-label"}`
-  //                   }`}
-  //               >
-  //                   {label}
-  //               </label>
-  //               )}
-  //           </div>
-  //           </td>
-  //       );
-  //   }
-  //   else
-  //   {
-        return (
-          <ContainerElement className={tableMode ? "table-border-light content-text" : "d-inline mb-3"}>
+  return (
+          <ContainerElement className={tableMode ? "table-border-light" : "d-inline mb-3"}>
             <div className={tableMode ?"" : "d-inline form-check p-0"}>
                 <input
                 id={inputTxtId}
@@ -678,7 +578,6 @@ export const CheckBoxInput: React.FC<InputProps> = ({
                 checked={isChecked}
                 aria-label={label} // Accessibility
                 onChange={handleCheckboxChange}
-                // disabled={!isEditing}
                 />
                 {isLabel && !tableMode &&(
                 <label
@@ -695,7 +594,6 @@ export const CheckBoxInput: React.FC<InputProps> = ({
             </div>
             </ContainerElement>
         );
-    // }
 };
 
 export const TextAreaInput: React.FC<InputProps> = ({
@@ -722,7 +620,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
   const cols = textAreaColoum ??  undefined ;
   const rows = textAreaRow ??  undefined ;
   return (
-    <ContainerElement className={tableMode ? "table-border-light content-text" : "mb-3"}>
+    <ContainerElement className={tableMode ? "table-border-light" : "mb-3"}>
       {!tableMode && (
         <>
           {srMode && (
@@ -761,7 +659,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
           cols={cols}
         />
       ) : (
-        <p className={`${customInputTextCss ?? ""}`}>{value}</p>
+        <span className={`${customInputTextCss ?? ""}`}>{value}</span>
       )}
     </ContainerElement>
   );
@@ -801,9 +699,8 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
   const filteredOptions = options?.filter(option =>
     option.value.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   return (
-    <ContainerElement className={tableMode ? "table-border-light content-text" : "mb-3"}>
+    <ContainerElement className={tableMode ? "table-border-light" : "mb-3"}>
          {srMode && (
             <CheckBoxInput
               type={FormFieldType.Checkbox}
@@ -833,7 +730,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
                             ${customEditInputTextCss ?? "custom-input-text"}`}>
             {value ? options?.find((opt) => opt.key === value)?.value : placeholder}
           </Dropdown.Toggle>
-          <Dropdown.Menu className="w-100 custom-dropdown-menu">
+          <Dropdown.Menu className="custom-dropdown-menu">
             <div className="mx-2">
               <SearchInput label={'Search Staff'} searchTerm={searchTerm} clearSearch={clearSearch} handleSearchChange={handleSearchChange}/>
               {
@@ -845,17 +742,22 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
               }
             </div>
             <Dropdown.Divider/>
-            {filteredOptions?.map((option, index) => (
-              <Dropdown.Item key={index}   onClick={() => handleSelectChange(option.key)}>
-                {option.value}
-              </Dropdown.Item>
-            ))}
+            {filteredOptions?.map((option, index) => 
+              {
+                if(index <= 5)
+                {
+                 return(<Dropdown.Item key={index}   onClick={() => handleSelectChange(option.key)}>
+                    {option.value}
+                  </Dropdown.Item>)
+                }
+              }
+            )}
           </Dropdown.Menu>
         </Dropdown>
       ) : (
-        <p className={`${customInputTextCss ?? ""}`}>
+        <span className={`${customInputTextCss ?? ""}`}>
           {options?.find((opt) => opt.key === value)?.value}
-        </p>
+        </span>
       )}
     </ContainerElement>
   );

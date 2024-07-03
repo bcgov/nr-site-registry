@@ -59,7 +59,6 @@ const UserAccount = ( props : any) =>{
                   <div role="menuitem" aria-label="Log Out"
                   tabIndex={0} // Make focusable with keyboard
                   className="account-custom-item-mobile"  onClick={() => {
-                    console.log("removed",authRedirectUri)
                     auth.removeUser().then(() => {
                       window.location.href = authRedirectUri
                     });
@@ -102,7 +101,6 @@ const UserAccount = ( props : any) =>{
 
                       {/* Logout */}
                       <Dropdown.Item role="menuitem" className="account-custom-item" aria-label="Log Out" onClick={() => {
-                    console.log("removed",authRedirectUri)
                     auth.removeUser().then(() => {
                       window.location.href = authRedirectUri
                     });

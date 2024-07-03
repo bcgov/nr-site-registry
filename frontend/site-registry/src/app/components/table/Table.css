@@ -89,7 +89,7 @@
 
 .tableWidth {
     width: 100%;
-    overflow-x: scroll;
+    /* overflow-x: scroll; */
 }
 
 .table th {
@@ -114,16 +114,16 @@
 
 
     .table td:nth-child(2) {
-        position: sticky;
+        /* position: sticky; */
         left: 29px;
         background-color: white;
-        z-index: 1;
+        /* z-index: 1; */
     }
 
     .table th:nth-child(2) {
-        position: sticky;
+        /* position: sticky; */
         left: 29px;
-        z-index: 1;
+        /* z-index: 1; */
     }
 
 

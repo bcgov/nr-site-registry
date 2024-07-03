@@ -13,7 +13,7 @@ import { UserType } from "../../helpers/requests/userType";
 import "./Dashboard.css";
 import PageContainer from "../../components/simple/PageContainer";
 import Widget from "../../components/widget/Widget";
-import { userTypeOnlyForDemo } from "../site/dto/SiteSlice";
+import { getUser } from "../../helpers/utility";
 
 interface DashboardWidgetProps {
   title?: string;
@@ -50,30 +50,42 @@ const DashboardTableWidget: React.FC<DashboardWidgetProps> = ({
 );
 
 const Dashboard = () => {
-  const [name, setName] = useState<string>("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
   const [data, setData] = useState<any[]>([]);
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const dispatch = useDispatch<AppDispatch>();
   const sites = useSelector((state: any) => state.dashboard);
-
-  
-  const userTypeLocal = useSelector(userTypeOnlyForDemo);
-
+  const loggedInUser = getUser();
   useEffect(()=>{
-    setUserType(userTypeLocal);
-  },[userTypeLocal])
+ 
+    if(loggedInUser?.profile.preferred_username?.indexOf("bceid") !== -1)
+      {
+        setUserType(UserType.External);
+      }
+      else if (loggedInUser?.profile.preferred_username?.indexOf("idir") !== -1)
+      {
+        setUserType(UserType.Internal);
+        dispatch(fetchRecentViews(loggedInUser?.profile.preferred_username ?? ''));
+      }
+      else
+      {
+        // not logged in 
+        setUserType(UserType.External);
+      }
 
-  useEffect(() => {
-    dispatch(fetchRecentViews("1"));
-  }, [dispatch]);
+      setName(loggedInUser?.profile.given_name ?? '');
+     
+  }, [loggedInUser])
 
   useEffect(() => {
     if (sites.status === RequestStatus.success) {
       setData(sites.dashboard.recentView.data);
-      console.log('mmmm', sites.dashboard.recentView.data)
       setLoading(sites.status);
-      setName("First Name");
+    }
+    else
+    {
+      setLoading(RequestStatus.idle);
     }
   }, [sites.status]);
 
@@ -90,7 +102,7 @@ const Dashboard = () => {
         title="Recently Viewed"
         columns={recentViewedColumns}
         loading={loading}
-        data={data}
+        data={data ?? []}
         allowRowsSelect={true}
       />
       <DashboardTableWidget
@@ -108,7 +120,7 @@ const Dashboard = () => {
             : recentAssignedColumn
         }
         loading={loading}
-        data={data}
+        data={data ?? []}
         onButtonClick={handleButtonClick}
         allowRowsSelect={userType === UserType.Internal}
       />

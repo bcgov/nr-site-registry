@@ -234,10 +234,6 @@ const Notations: React.FC<INotations> = ({
     
     };
 
-    useEffect(()=>{
-      console.log(formData)
-    },[formData])
-
     const handleTableChange = (notationId: any, event: any) => {
       const isExist = formData.some(item => item.notationId === notationId && item.notationParticipant.some((participant: any) => participant.id === event.row.id));
       if (isExist && event.property.includes('select_row')) {
@@ -356,7 +352,6 @@ const Notations: React.FC<INotations> = ({
                   if (ascDir) return (a[property] > b[property]) ? 1 : ((a[property] < b[property]) ? -1 : 0);
                   else return (b[property] > a[property]) ? 1 : ((b[property] < a[property]) ? -1 : 0);
               });
-                console.log("updatedNotationParticipant",updatedNotationParticipant);
                 return { ...tempNotation, notationParticipant: updatedNotationParticipant };
             }
             return tempNotation;

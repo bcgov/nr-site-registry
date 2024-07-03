@@ -45,9 +45,6 @@ const TableBody: FC<TableBodyProps> = ({
     tableRecordChangeHandler(rowIndex,'select_row', event.target.checked)
   }
 
-  useEffect(()=>{ console.log('selectedRowIds',selectedRowIds)},[selectedRowIds]);
-
-
   const isChecked = (id:string) =>{
    return (selectedRowIds.indexOf(id) !== -1);
   }
@@ -76,7 +73,6 @@ const TableBody: FC<TableBodyProps> = ({
           "property":propertyName,
           "value":value
         }
-        console.log("tableRecordChangeHandler", changeRecord)
         changeHandler(changeRecord);
     }
 
@@ -148,6 +144,8 @@ const TableBody: FC<TableBodyProps> = ({
               isEditing={editMode ?? true}
               tableMode={field.tableMode ?? false}
               href={field.href}
+              customLinkValue={field.customLinkValue}
+              customIcon={field.customIcon}
             />
           );
         }
@@ -323,9 +321,9 @@ const TableBody: FC<TableBodyProps> = ({
 
   return (
     <tbody>
-      {data.length === 0
-        ? renderNoResultsFound()
-        : data.map((item: any, index: number) => renderTableRow(index))}
+        {data.length === 0
+          ? renderNoResultsFound()
+          : data.map((item: any, index: number) => renderTableRow(index))}
     </tbody>
   );
 };

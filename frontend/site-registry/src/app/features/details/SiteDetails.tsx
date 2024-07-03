@@ -51,7 +51,7 @@ import Actions from "../../components/action/Actions";
 import { ActionItems } from "../../components/action/ActionsConfig";
 import { getUser } from "../../helpers/utility";
 import { addRecentView } from "../dashboard/DashboardSlice";
-import { fetchParticipantRoleCd, fetchPeopleOrgs } from "./dropdowns/DropdownSlice";
+import { fetchParticipantRoleCd, fetchPeopleOrgsCd } from "./dropdowns/DropdownSlice";
 import { fetchSiteParticipants } from "./participants/ParticipantSlice";
 
 const SiteDetails = () => {
@@ -101,7 +101,7 @@ const SiteDetails = () => {
 
   useEffect(() => {
     dispatch(fetchSitesDetails({ siteId: id ?? "" }));
-    dispatch(fetchPeopleOrgs());
+    dispatch(fetchPeopleOrgsCd());
     dispatch(fetchParticipantRoleCd());
     dispatch(fetchSiteParticipants(id ?? ''));
   }, [id]);

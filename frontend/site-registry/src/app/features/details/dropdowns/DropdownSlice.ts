@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getAxiosInstance } from "../../../helpers/utility";
 import { GRAPHQL } from "../../../helpers/endpoints";
 import { print } from "graphql";
-import { graphQLParticipantRoleCd, graphQLPeopleOrgs } from "../../site/graphql/Dropdowns";
+import { graphQLParticipantRoleCd, graphQLPeopleOrgsCd } from "../../site/graphql/Dropdowns";
 import { RequestStatus } from "../../../helpers/requests/status";
 import { IDropdownsState } from "./IDropdownState";
 
@@ -18,15 +18,14 @@ const initialState : IDropdownsState = {
   };
   
 
-export const fetchPeopleOrgs = createAsyncThunk(
-    'dropdowns/getPeopleOrgs',
+export const fetchPeopleOrgsCd = createAsyncThunk(
+    'dropdowns/getPeopleOrgsCd',
     async () => {
       try
       {
         const response = await getAxiosInstance().post( GRAPHQL, {
-            query: print(graphQLPeopleOrgs())
+            query: print(graphQLPeopleOrgsCd())
         })
-     
         return response.data.data;
       }
       catch(error)
@@ -64,14 +63,14 @@ const dropdowns = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-          .addCase(fetchPeopleOrgs.pending, (state) => {
+          .addCase(fetchPeopleOrgsCd.pending, (state) => {
             state.status = RequestStatus.loading;
           })
-          .addCase(fetchPeopleOrgs.fulfilled, (state, action) => {
+          .addCase(fetchPeopleOrgsCd.fulfilled, (state, action) => {
             state.status = RequestStatus.success;
             state.dropdowns.participantNames = action.payload;
           })
-          .addCase(fetchPeopleOrgs.rejected, (state, action) => {
+          .addCase(fetchPeopleOrgsCd.rejected, (state, action) => {
             state.status = RequestStatus.failed;
             state.error = action.error.message;
           })
@@ -91,7 +90,7 @@ const dropdowns = createSlice({
 
   
 
-export const participantNameDrpdown = (state: any) => state.dropdown.dropdowns.participantNames.getPeopleOrgs;
+export const participantNameDrpdown = (state: any) => state.dropdown.dropdowns.participantNames.getPeopleOrgsCd;
 export const participantRoleDrpdown = (state: any) => state.dropdown.dropdowns.participantRoles.getParticipantRoleCd;
 
 export default dropdowns.reducer;

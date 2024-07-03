@@ -53,10 +53,8 @@ import { SnapshotsService } from './services/snapshot/snapshot.service';
 import { ParticipantResolver } from './resolvers/participant/participant.resolver';
 import { ParticipantService } from './services/participant/participant.service';
 import { GenericResponseProvider } from './dto/response/genericResponseProvider';
-import { ParticipantRoleCdResolver } from './resolvers/dropdown/participantRoleCd.resolver';
-import { ParticipantRoleCdService } from './services/dropdown/participantRoleCd.service';
-import { PeopleOrgsResolver } from './resolvers/peopleOrganization/peopleOrg.resolver';
-import { PeopleOrgsService } from './services/peopleOrganization/peopleOrgs.service';
+import { DropdownResolver } from './resolvers/dropdown/dropdown.resolver';
+import { DropdownService } from './services/dropdown/dropdown.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -78,10 +76,8 @@ import { PeopleOrgsService } from './services/peopleOrganization/peopleOrgs.serv
     SnapshotsService,
     ParticipantResolver,
     ParticipantService,
-    ParticipantRoleCdResolver,
-    ParticipantRoleCdService,
-    PeopleOrgsResolver,
-    PeopleOrgsService,
+    DropdownResolver,
+    DropdownService,
     GenericResponseProvider
   ],
   controllers: [SiteController],

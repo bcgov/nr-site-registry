@@ -20,12 +20,12 @@ export const graphQLParticipantRoleCd = () => {
     )
 }
 
-export const graphQLPeopleOrgs = () => {
+export const graphQLPeopleOrgsCd = () => {
     return(
         gql
-        `query getPeopleOrgs
+        `query getPeopleOrgsCd
         {
-            getPeopleOrgs
+            getPeopleOrgsCd
             {
                 httpStatusCode,
                 success,

@@ -10,7 +10,6 @@ export class SiteParticsResponse extends ResponseDto {
 }
 
 @ObjectType()
-// @InputType()
 export class SiteParticsDto {
   
   @Field()

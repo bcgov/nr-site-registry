@@ -420,30 +420,17 @@ type SiteParticsDto {
   description: String!
 }
 
-type ParticipantRoleCdResponse {
+type DropdownResponse {
   message: String
   httpStatusCode: Int
   success: Boolean
   timestamp: String
-  data: [ParticipantRoleCdDto!]
+  data: [DropdownDto!]
 }
 
-type ParticipantRoleCdDto {
+type DropdownDto {
   key: String!
-  value: DateTime!
-}
-
-type PeopleOrgsResponse {
-  message: String
-  httpStatusCode: Int
-  success: Boolean
-  timestamp: String
-  data: [PeopleOrgsDto!]
-}
-
-type PeopleOrgsDto {
-  key: String!
-  value: DateTime!
+  value: String!
 }
 
 type Query {
@@ -455,8 +442,8 @@ type Query {
   getSnapshotsByUserId(userId: String!): SnapshotResponse!
   getSnapshotsById(id: Int!): SnapshotResponse!
   getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
-  getParticipantRoleCd: ParticipantRoleCdResponse!
-  getPeopleOrgs: PeopleOrgsResponse!
+  getParticipantRoleCd: DropdownResponse!
+  getPeopleOrgsCd: DropdownResponse!
 }
 
 type Mutation {

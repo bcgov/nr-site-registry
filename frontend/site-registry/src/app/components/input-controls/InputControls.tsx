@@ -79,7 +79,7 @@ export const Label: React.FC<InputProps> = ({
 }) => {
   return (
     renderTableCell(
-      <span className={`${customInputTextCss ?? ""}`}>{value}</span>
+      <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{value}</span>
     )
   );
 };
@@ -170,7 +170,7 @@ export const TextInput: React.FC<InputProps> = ({
             required={error ? true : false}
           />
         ) : (
-          <span className={`${customInputTextCss ?? ""}`}>{value}</span>
+          <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{value}</span>
         )}
         {error && <div className="text-danger p-1 small">{error}</div>}
       </ContainerElement>
@@ -280,7 +280,7 @@ export const DropdownInput: React.FC<InputProps> = ({
             </p>
           </div>
         ) : (
-          <span className={`${customInputTextCss ?? ""}`}>
+          <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>
             {options?.find((opt) => opt.key === value)?.value}
           </span>
         )}
@@ -400,7 +400,7 @@ export const GroupInput: React.FC<InputProps> = ({
                 </div>
             ))
         ) : (
-          <span className={`${customInputTextCss ?? ""}`}>
+          <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>
             {currentConcatenatedValue != undefined
               ? currentConcatenatedValue
               : ""}
@@ -472,7 +472,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
           onChange={(value) => onChange(value)}
         />
       ) : (
-        <span className={`${customInputTextCss ?? ""}`}>{dateRangeValue ?? ""}</span>
+        <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{dateRangeValue ?? ""}</span>
       )}
     </ContainerElement>
   );
@@ -659,7 +659,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
           cols={cols}
         />
       ) : (
-        <span className={`${customInputTextCss ?? ""}`}>{value}</span>
+        <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{value}</span>
       )}
     </ContainerElement>
   );
@@ -755,7 +755,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
           </Dropdown.Menu>
         </Dropdown>
       ) : (
-        <span className={`${customInputTextCss ?? ""}`}>
+        <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>
           {options?.find((opt) => opt.key === value)?.value}
         </span>
       )}

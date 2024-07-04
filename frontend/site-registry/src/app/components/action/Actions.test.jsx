@@ -7,24 +7,32 @@ import Actions from './Actions';
 
 const mockStore = configureStore([thunk]);
 describe('Action component', () => {
-    let store;
+  let store;
 
-    beforeEach(() => {
-        store = mockStore({
-        Action: {},
-        });
+  beforeEach(() => {
+    store = mockStore({
+      Action: {},
     });
-    const items = [
-        { label: 'Action 1', value: 'Action 1' },
-        { label: 'Action 2', value: 'Action 2' },
-      ];
+  });
+  const items = [
+    { label: 'Action 1', value: 'Action 1' },
+    { label: 'Action 2', value: 'Action 2' },
+  ];
 
-    it('renders without crashing', () => {
-        render(<Provider store={store}><Actions label="Actions" items={items} onItemClick={() => {}} /></Provider>);
-      });
+  it('renders without crashing', () => {
+    render(
+      <Provider store={store}>
+        <Actions label="Actions" items={items} onItemClick={() => {}} />
+      </Provider>,
+    );
+  });
 
-    it('displays dropdown label', () => {
-        const { getByText } = render(<Provider store={store}><Actions label="Actions" items={items} onItemClick={() => {}} /></Provider>);
-        expect(getByText('Actions')).toBeInTheDocument();
-      });
+  it('displays dropdown label', () => {
+    const { getByText } = render(
+      <Provider store={store}>
+        <Actions label="Actions" items={items} onItemClick={() => {}} />
+      </Provider>,
+    );
+    expect(getByText('Actions')).toBeInTheDocument();
+  });
 });

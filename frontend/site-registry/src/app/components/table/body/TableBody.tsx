@@ -1,21 +1,25 @@
-import React, { FC, useEffect, useState } from "react";
-import { SpinnerIcon } from "../../common/icon";
-import { RequestStatus } from "../../../helpers/requests/status";
-import { TableColumn } from "../TableColumn";
+import React, { FC, useEffect, useState } from 'react';
+import { SpinnerIcon } from '../../common/icon';
+import { RequestStatus } from '../../../helpers/requests/status';
+import { TableColumn } from '../TableColumn';
 
-import { FormFieldType, IFormField } from "../../input-controls/IFormField";
-import { Label, TextInput , Link, CheckBoxInput, DropdownInput } from "../../input-controls/InputControls";
-import { ChangeTracker } from "../../common/IChangeType";
+import { FormFieldType, IFormField } from '../../input-controls/IFormField';
+import {
+  Label,
+  TextInput,
+  Link,
+  CheckBoxInput,
+  DropdownInput,
+} from '../../input-controls/InputControls';
+import { ChangeTracker } from '../../common/IChangeType';
 interface TableBodyProps {
   isLoading: RequestStatus;
   columns: TableColumn[];
   data: any;
   allowRowsSelect: boolean;
-  changeHandler: (
-    data:any
-  ) => void;
+  changeHandler: (data: any) => void;
   editMode: boolean;
-  idColumnName:string;
+  idColumnName: string;
 }
 
 const TableBody: FC<TableBodyProps> = ({
@@ -27,30 +31,25 @@ const TableBody: FC<TableBodyProps> = ({
   editMode,
   idColumnName,
 }) => {
+  const [selectedRowIds, SetSelectedRowsId] = useState(['']);
 
-  const [selectedRowIds,SetSelectedRowsId] = useState([""]);
-
-
-  const handleSelectTableRow = (event:any,id:string,rowIndex:any)=>
-  {
-    if(event.target.checked)
-    {
-      SetSelectedRowsId([...selectedRowIds, id]);    
-    }
-    else
-    {
-      SetSelectedRowsId(selectedRowIds.filter(x=>x!== id));
+  const handleSelectTableRow = (event: any, id: string, rowIndex: any) => {
+    if (event.target.checked) {
+      SetSelectedRowsId([...selectedRowIds, id]);
+    } else {
+      SetSelectedRowsId(selectedRowIds.filter((x) => x !== id));
     }
 
-    tableRecordChangeHandler(rowIndex,'select_row', event.target.checked)
-  }
+    tableRecordChangeHandler(rowIndex, 'select_row', event.target.checked);
+  };
 
-  useEffect(()=>{ console.log('selectedRowIds',selectedRowIds)},[selectedRowIds]);
+  useEffect(() => {
+    console.log('selectedRowIds', selectedRowIds);
+  }, [selectedRowIds]);
 
-
-  const isChecked = (id:string) =>{
-   return (selectedRowIds.indexOf(id) !== -1);
-  }
+  const isChecked = (id: string) => {
+    return selectedRowIds.indexOf(id) !== -1;
+  };
 
   const renderNoResultsFound = () => {
     return (
@@ -69,16 +68,19 @@ const TableBody: FC<TableBodyProps> = ({
     );
   };
 
-  const tableRecordChangeHandler= (rowKey:number,propertyName:any,value:any)=>
-    {
-        const changeRecord = {
-          "row": getDataRow(rowKey),
-          "property":propertyName,
-          "value":value
-        }
-        console.log(changeRecord)
-        changeHandler(changeRecord);
-    }
+  const tableRecordChangeHandler = (
+    rowKey: number,
+    propertyName: any,
+    value: any,
+  ) => {
+    const changeRecord = {
+      row: getDataRow(rowKey),
+      property: propertyName,
+      value: value,
+    };
+    console.log(changeRecord);
+    changeHandler(changeRecord);
+  };
 
   const getTableCellHtml = (
     field: any,
@@ -87,7 +89,7 @@ const TableBody: FC<TableBodyProps> = ({
     rowKey: number,
     href: string,
     changeHandler: any,
-    editMode: boolean
+    editMode: boolean,
   ) => {
     if (field.type === FormFieldType.Text) {
       return (
@@ -99,7 +101,9 @@ const TableBody: FC<TableBodyProps> = ({
           customEditInputTextCss={field.customEditInputTextCss}
           placeholder={field.placeholder}
           value={value}
-          onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
+          onChange={(value) =>
+            tableRecordChangeHandler(rowKey, field.graphQLPropertyName, value)
+          }
           type={field.type}
           validation={field.validation}
           allowNumbersOnly={field.allowNumbersOnly}
@@ -107,93 +111,93 @@ const TableBody: FC<TableBodyProps> = ({
           tableMode={field.tableMode ?? false}
         />
       );
-    }
-    else if(field.type === FormFieldType.Label)
-      {
-        return (
-          <Label
-            label={field.label}
-            customLabelCss={field.customLabelCss}
-            customInputTextCss={field.customInputTextCss}
-            customEditLabelCss={field.customEditLabelCss}
-            customEditInputTextCss={field.customEditInputTextCss}
-            placeholder={field.placeholder}
-            value={value}
-            onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
-            type={field.type}
-            validation={field.validation}
-            allowNumbersOnly={field.allowNumbersOnly}
-            isEditing={editMode ?? true}
-            tableMode={field.tableMode ?? false}
-          />
-        );
-      }
-      else if(field.type === FormFieldType.Link)
-        {
-          return (
-            <Link 
-              label={field.label}
-              customLabelCss={field.customLabelCss}
-              customInputTextCss={field.customInputTextCss}
-              customEditLabelCss={field.customEditLabelCss}
-              customEditInputTextCss={field.customEditInputTextCss}
-              placeholder={field.placeholder}
-              value={value}
-              onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
-              type={field.type}
-              validation={field.validation}
-              allowNumbersOnly={field.allowNumbersOnly}
-              isEditing={editMode ?? true}
-              tableMode={field.tableMode ?? false}
-              href={field.href}
-            />
-          );
-        }
-        else if(field.type === FormFieldType.DropDown)
-          {
-            return (
-              <DropdownInput 
-                label={field.label}
-                customLabelCss={field.customLabelCss}
-                customInputTextCss={field.customInputTextCss}
-                customEditLabelCss={field.customEditLabelCss}
-                customEditInputTextCss={field.customEditInputTextCss}
-                placeholder={field.placeholder}
-                value={value}
-                onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
-                type={field.type}
-                validation={field.validation}
-                allowNumbersOnly={field.allowNumbersOnly}
-                isEditing={editMode ?? true}
-                tableMode={field.tableMode ?? false}
-                href={field.href}
-                options={field.options}
-              />
-            );
+    } else if (field.type === FormFieldType.Label) {
+      return (
+        <Label
+          label={field.label}
+          customLabelCss={field.customLabelCss}
+          customInputTextCss={field.customInputTextCss}
+          customEditLabelCss={field.customEditLabelCss}
+          customEditInputTextCss={field.customEditInputTextCss}
+          placeholder={field.placeholder}
+          value={value}
+          onChange={(value) =>
+            tableRecordChangeHandler(rowKey, field.graphQLPropertyName, value)
           }
-          else if(field.type === FormFieldType.Checkbox)
-            {
-              return (
-                <CheckBoxInput 
-                  label={field.label}
-                  customLabelCss={field.customLabelCss}
-                  customInputTextCss={field.customInputTextCss}
-                  customEditLabelCss={field.customEditLabelCss}
-                  customEditInputTextCss={field.customEditInputTextCss}
-                  placeholder={field.placeholder}
-                  isChecked={value === 'true' ? true : false}
-                  // value={value}
-                  onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
-                  type={field.type}
-                  validation={field.validation}
-                  allowNumbersOnly={field.allowNumbersOnly}
-                  isEditing={editMode ?? true}
-                  tableMode={field.tableMode ?? false}
-                  href={field.href}
-                  options={field.options}
-                />
-              );
-            }
+          type={field.type}
+          validation={field.validation}
+          allowNumbersOnly={field.allowNumbersOnly}
+          isEditing={editMode ?? true}
+          tableMode={field.tableMode ?? false}
+        />
+      );
+    } else if (field.type === FormFieldType.Link) {
+      return (
+        <Link
+          label={field.label}
+          customLabelCss={field.customLabelCss}
+          customInputTextCss={field.customInputTextCss}
+          customEditLabelCss={field.customEditLabelCss}
+          customEditInputTextCss={field.customEditInputTextCss}
+          placeholder={field.placeholder}
+          value={value}
+          onChange={(value) =>
+            tableRecordChangeHandler(rowKey, field.graphQLPropertyName, value)
+          }
+          type={field.type}
+          validation={field.validation}
+          allowNumbersOnly={field.allowNumbersOnly}
+          isEditing={editMode ?? true}
+          tableMode={field.tableMode ?? false}
+          href={field.href}
+        />
+      );
+    } else if (field.type === FormFieldType.DropDown) {
+      return (
+        <DropdownInput
+          label={field.label}
+          customLabelCss={field.customLabelCss}
+          customInputTextCss={field.customInputTextCss}
+          customEditLabelCss={field.customEditLabelCss}
+          customEditInputTextCss={field.customEditInputTextCss}
+          placeholder={field.placeholder}
+          value={value}
+          onChange={(value) =>
+            tableRecordChangeHandler(rowKey, field.graphQLPropertyName, value)
+          }
+          type={field.type}
+          validation={field.validation}
+          allowNumbersOnly={field.allowNumbersOnly}
+          isEditing={editMode ?? true}
+          tableMode={field.tableMode ?? false}
+          href={field.href}
+          options={field.options}
+        />
+      );
+    } else if (field.type === FormFieldType.Checkbox) {
+      return (
+        <CheckBoxInput
+          label={field.label}
+          customLabelCss={field.customLabelCss}
+          customInputTextCss={field.customInputTextCss}
+          customEditLabelCss={field.customEditLabelCss}
+          customEditInputTextCss={field.customEditInputTextCss}
+          placeholder={field.placeholder}
+          isChecked={value === 'true' ? true : false}
+          // value={value}
+          onChange={(value) =>
+            tableRecordChangeHandler(rowKey, field.graphQLPropertyName, value)
+          }
+          type={field.type}
+          validation={field.validation}
+          allowNumbersOnly={field.allowNumbersOnly}
+          isEditing={editMode ?? true}
+          tableMode={field.tableMode ?? false}
+          href={field.href}
+          options={field.options}
+        />
+      );
+    }
   };
 
   const getValue = (rowIndex: number, propertyName: string) => {
@@ -207,36 +211,35 @@ const TableBody: FC<TableBodyProps> = ({
   const renderTableCell = (
     column: TableColumn,
     rowIndex: number,
-    columnIndex: number
+    columnIndex: number,
   ) => {
-    if (isNaN(rowIndex)) return "";
+    if (isNaN(rowIndex)) return '';
 
     if (data[rowIndex] === undefined) {
-      return "";
+      return '';
     }
 
     const cellValue =
       column.graphQLPropertyName &&
       column.graphQLPropertyName
-        .split(",")
+        .split(',')
         .map((graphQLPropertyName) => getValue(rowIndex, graphQLPropertyName))
-        .join(" ");
+        .join(' ');
 
     return getTableCellHtml(
       column.displayType,
       column.displayName,
-      cellValue ?? "",
+      cellValue ?? '',
       rowIndex,
-      column.linkRedirectionURL ?? "",
+      column.linkRedirectionURL ?? '',
       changeHandler,
-      editMode
+      editMode,
     );
   };
 
   const renderTableRow = (rowIndex: number) => {
-
-   const checkboxId = getValue(rowIndex,idColumnName);
-   const rowChecked = isChecked(checkboxId);
+    const checkboxId = getValue(rowIndex, idColumnName);
+    const rowChecked = isChecked(checkboxId);
 
     return (
       <React.Fragment key={rowIndex}>
@@ -244,11 +247,13 @@ const TableBody: FC<TableBodyProps> = ({
           {allowRowsSelect && (
             <td className="table-border-light content-text">
               <input
-                id={getValue(rowIndex,idColumnName)}
+                id={getValue(rowIndex, idColumnName)}
                 type="checkbox"
                 className="checkbox-color"
                 aria-label="Select Row"
-                onChange={(event) =>{handleSelectTableRow(event,checkboxId,rowIndex)}}
+                onChange={(event) => {
+                  handleSelectTableRow(event, checkboxId, rowIndex);
+                }}
                 checked={rowChecked}
               />
             </td>
@@ -256,7 +261,7 @@ const TableBody: FC<TableBodyProps> = ({
           {columns &&
             columns.map((column, columnIndex) => {
               return renderTableCell(column, rowIndex, columnIndex);
-            })}      
+            })}
         </tr>
       </React.Fragment>
     );

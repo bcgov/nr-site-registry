@@ -1,11 +1,11 @@
-import React, { FC } from "react";
-import { SpinnerIcon, SortIcon } from "../common/icon";
-import { RequestStatus } from "../../helpers/requests/status";
-import { TableColumn } from "./TableColumn";
-import "./Table.css";
-import Pagination from "./pagination/Pagination";
-import TableHeader from "./header/TableHeader";
-import TableBody from "./body/TableBody";
+import React, { FC } from 'react';
+import { SpinnerIcon, SortIcon } from '../common/icon';
+import { RequestStatus } from '../../helpers/requests/status';
+import { TableColumn } from './TableColumn';
+import './Table.css';
+import Pagination from './pagination/Pagination';
+import TableHeader from './header/TableHeader';
+import TableBody from './body/TableBody';
 
 interface TableProps {
   label: string;
@@ -17,12 +17,12 @@ interface TableProps {
   changeResultsPerPage?: (pageNumber: number) => void;
   currentPage?: number;
   resultsPerPage?: number;
-  showPageOptions? : boolean;
-  allowRowsSelect? : boolean;
-  changeHandler:(eventRecord:any)=>void,
-  editMode: boolean,
-  idColumnName:string;
-  sortHandler?:(row:any,ascSort:boolean)=>void
+  showPageOptions?: boolean;
+  allowRowsSelect?: boolean;
+  changeHandler: (eventRecord: any) => void;
+  editMode: boolean;
+  idColumnName: string;
+  sortHandler?: (row: any, ascSort: boolean) => void;
 }
 
 const Table: FC<TableProps> = ({
@@ -40,19 +40,34 @@ const Table: FC<TableProps> = ({
   changeHandler,
   editMode,
   idColumnName,
-  sortHandler
+  sortHandler,
 }) => {
-  
-  let  tableSortHandler = sortHandler ?? ((row,ascSort)=>{console.log("Handle Sort Event", row, ascSort)});
+  let tableSortHandler =
+    sortHandler ??
+    ((row, ascSort) => {
+      console.log('Handle Sort Event', row, ascSort);
+    });
 
   return (
     <React.Fragment>
       <div className="tableWidth table-border-radius">
         <table className="table" aria-label={label}>
           <thead aria-label={`${label} Header`}>
-            <TableHeader columns={columns} allowRowsSelect={allowRowsSelect ?? false} sortHandler={tableSortHandler} />
+            <TableHeader
+              columns={columns}
+              allowRowsSelect={allowRowsSelect ?? false}
+              sortHandler={tableSortHandler}
+            />
           </thead>
-            <TableBody isLoading={isLoading} columns={columns} data={data} allowRowsSelect={allowRowsSelect ?? false} changeHandler={changeHandler} editMode={editMode} idColumnName={idColumnName} />
+          <TableBody
+            isLoading={isLoading}
+            columns={columns}
+            data={data}
+            allowRowsSelect={allowRowsSelect ?? false}
+            changeHandler={changeHandler}
+            editMode={editMode}
+            idColumnName={idColumnName}
+          />
         </table>
       </div>
       <div>

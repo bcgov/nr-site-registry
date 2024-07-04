@@ -1,10 +1,10 @@
-import React, { Fragment, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import React, { Fragment, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
-import CustomLabel from "../../components/simple/CustomLabel";
-import PageContainer from "../../components/simple/PageContainer";
-import LabelComponent from "./LabelComponent";
+import CustomLabel from '../../components/simple/CustomLabel';
+import PageContainer from '../../components/simple/PageContainer';
+import LabelComponent from './LabelComponent';
 import {
   ChevronDown,
   ChevronUp,
@@ -12,12 +12,12 @@ import {
   DropdownIcon,
   FolderPlusIcon,
   ShoppingCartIcon,
-} from "../../components/common/icon";
-import { TableColumn } from "../../components/table/TableColumn";
-import Table from "../../components/table/Table";
-import { RequestStatus } from "../../helpers/requests/status";
-import SummaryForm from "./SummaryForm";
-import PanelWithUpDown from "../../components/simple/PanelWithUpDown";
+} from '../../components/common/icon';
+import { TableColumn } from '../../components/table/TableColumn';
+import Table from '../../components/table/Table';
+import { RequestStatus } from '../../helpers/requests/status';
+import SummaryForm from './SummaryForm';
+import PanelWithUpDown from '../../components/simple/PanelWithUpDown';
 import {
   fetchSitesDetails,
   selectSiteDetails,
@@ -27,34 +27,37 @@ import {
   siteDetailsMode,
   updateSiteDetailsMode,
   userTypeOnlyForDemo,
-} from "../site/dto/SiteSlice";
-import { AppDispatch } from "../../Store";
-import Notations from "./notations/Notations";
-import NavigationPills from "../../components/navigation/navigationpills/NavigationPills";
-import { dropDownNavItems, navComponents, navItems } from "./NavigationPillsConfig";
-import ModalDialog from "../../components/modaldialog/ModalDialog";
+} from '../site/dto/SiteSlice';
+import { AppDispatch } from '../../Store';
+import Notations from './notations/Notations';
+import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
+import {
+  dropDownNavItems,
+  navComponents,
+  navItems,
+} from './NavigationPillsConfig';
+import ModalDialog from '../../components/modaldialog/ModalDialog';
 import {
   CancelButton,
   CustomPillButton,
   SaveButton,
-} from "../../components/simple/CustomButtons";
+} from '../../components/simple/CustomButtons';
 import {
   ChangeTracker,
   IChangeType,
-} from "../../components/common/IChangeType";
+} from '../../components/common/IChangeType';
 
-import "./SiteDetails.css"; // Ensure this import is correct
-import { FormFieldType } from "../../components/input-controls/IFormField";
-import { SiteDetailsMode } from "./dto/SiteDetailsMode";
-import { UserType } from "../../helpers/requests/userType";
-import { UserMode } from "../../helpers/requests/userMode";
-import Actions from "../../components/action/Actions";
-import { ActionItems } from "../../components/action/ActionsConfig";
-import { getUser } from "../../helpers/utility";
+import './SiteDetails.css'; // Ensure this import is correct
+import { FormFieldType } from '../../components/input-controls/IFormField';
+import { SiteDetailsMode } from './dto/SiteDetailsMode';
+import { UserType } from '../../helpers/requests/userType';
+import { UserMode } from '../../helpers/requests/userMode';
+import Actions from '../../components/action/Actions';
+import { ActionItems } from '../../components/action/ActionsConfig';
+import { getUser } from '../../helpers/utility';
 
 const SiteDetails = () => {
- 
-  console.log(getUser())
+  console.log(getUser());
 
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
@@ -79,69 +82,57 @@ const SiteDetails = () => {
   //   setUserType(userTypeLocal);
   // },[userTypeLocal])
 
-
-  useEffect(()=>{
-
+  useEffect(() => {
     const loggedInUser = getUser();
-    if(loggedInUser?.profile.preferred_username?.indexOf("bceid") !== -1)
-      {
-        setUserType(UserType.External);
-      }
-      else if (loggedInUser?.profile.preferred_username?.indexOf("idir") !== -1)
-      {
-        setUserType(UserType.Internal);
-      }
-      else
-      {
-        // not logged in 
-        setUserType(UserType.External);
-  
-      }
-
-  }, [])
- 
-
-
+    if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
+      setUserType(UserType.External);
+    } else if (
+      loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
+    ) {
+      setUserType(UserType.Internal);
+    } else {
+      // not logged in
+      setUserType(UserType.External);
+    }
+  }, []);
 
   const [editSiteDetailsObject, setEditSiteDetailsObject] = useState(details);
   const savedChanges = useSelector(trackedChanges);
 
   const mode = useSelector(siteDetailsMode);
-  useEffect(()=> {
+  useEffect(() => {
     setViewMode(mode);
   }, [mode]);
 
   useEffect(() => {
-    dispatch(fetchSitesDetails({ siteId: id ?? "" }));
+    dispatch(fetchSitesDetails({ siteId: id ?? '' }));
   }, [id]);
 
   useEffect(() => {
     setEditSiteDetailsObject(details);
   }, [details]);
 
-  
   const handleItemClick = (value: string) => {
-    switch(value)
-    {
-      case SiteDetailsMode.EditMode :
-       setEdit(true);
-       setViewMode(SiteDetailsMode.EditMode);
-       dispatch(updateSiteDetailsMode(SiteDetailsMode.EditMode));
-       break;
-      case SiteDetailsMode.SRMode :
-       setEdit(true);
-       setViewMode(SiteDetailsMode.SRMode);
-       dispatch(updateSiteDetailsMode(SiteDetailsMode.SRMode));
-       break;
-      case SiteDetailsMode.ViewOnlyMode :
-       setEdit(false);
-       setViewMode(SiteDetailsMode.ViewOnlyMode);
-       dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
-       break;
+    switch (value) {
+      case SiteDetailsMode.EditMode:
+        setEdit(true);
+        setViewMode(SiteDetailsMode.EditMode);
+        dispatch(updateSiteDetailsMode(SiteDetailsMode.EditMode));
+        break;
+      case SiteDetailsMode.SRMode:
+        setEdit(true);
+        setViewMode(SiteDetailsMode.SRMode);
+        dispatch(updateSiteDetailsMode(SiteDetailsMode.SRMode));
+        break;
+      case SiteDetailsMode.ViewOnlyMode:
+        setEdit(false);
+        setViewMode(SiteDetailsMode.ViewOnlyMode);
+        dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+        break;
       default:
-       break;
+        break;
     }
- };
+  };
 
   const handleCancelButton = () => {
     dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
@@ -149,21 +140,18 @@ const SiteDetails = () => {
     //setEditSiteDetailsObject(details);
     setSave(false);
     setEdit(false);
-  }
-
+  };
 
   return (
     <PageContainer role="details">
       {save && (
         <ModalDialog
           closeHandler={(response) => {
-           
             setSave(false);
-            if(response)
-              {
-                dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
-                setEdit(false);
-              }
+            if (response) {
+              dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+              setEdit(false);
+            }
           }}
         >
           {savedChanges.length > 0 ? (
@@ -196,13 +184,15 @@ const SiteDetails = () => {
       )}
 
       <div className="d-flex justify-content-between">
-        <button className="d-flex btn-back align-items-center" onClick={onClickBackButton}>
+        <button
+          className="d-flex btn-back align-items-center"
+          onClick={onClickBackButton}
+        >
           <AngleLeft className="btn-icon" />
           <span className="btn-back-lbl">Back to</span>
         </button>
         <div className="d-flex gap-2 justify-align-center pe-2">
-
-         {/* { <Actions label="User" items={ [
+          {/* { <Actions label="User" items={ [
                 { 
                     label:'External User',
                     value: UserType.External
@@ -215,34 +205,46 @@ const SiteDetails = () => {
             ]} 
             onItemClick={handleUserClick} /> } */}
           {/* For Action Dropdown*/}
-          {(!edit && viewMode === SiteDetailsMode.ViewOnlyMode && userType === UserType.Internal) && <Actions label="Action" items={ActionItems} onItemClick={handleItemClick} /> }
-           
-           
+          {!edit &&
+            viewMode === SiteDetailsMode.ViewOnlyMode &&
+            userType === UserType.Internal && (
+              <Actions
+                label="Action"
+                items={ActionItems}
+                onItemClick={handleItemClick}
+              />
+            )}
+
           {/* For Edit / SR Dropdown*/}
-            <div className="d-flex gap-3 align-items-center">
-            {edit && userType === UserType.Internal &&
+          <div className="d-flex gap-3 align-items-center">
+            {edit && userType === UserType.Internal && (
               <>
-                <CustomLabel labelType="c-b" label={`${ viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`} />
+                <CustomLabel
+                  labelType="c-b"
+                  label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
+                />
                 <SaveButton clickHandler={() => setSave(true)} />
                 <CancelButton clickHandler={handleCancelButton} />
               </>
-            }
+            )}
           </div>
-          
+
           {/* For Cart /Folio Controls*/}
-          { (!edit && viewMode === SiteDetailsMode.ViewOnlyMode && userType === UserType.External) &&
-            <>
-              <button className="d-flex btn-cart align-items-center">
-                <ShoppingCartIcon className="btn-icon" />
-                <span className="btn-cart-lbl"> Add to Cart</span>
-              </button>
-              <button className="d-flex btn-folio align-items-center">
-                <FolderPlusIcon className="btn-folio-icon" />
-                <span className="btn-folio-lbl"> Add to Folio</span>
-                <DropdownIcon className="btn-folio-icon" />
-              </button>
-            </>
-          }
+          {!edit &&
+            viewMode === SiteDetailsMode.ViewOnlyMode &&
+            userType === UserType.External && (
+              <>
+                <button className="d-flex btn-cart align-items-center">
+                  <ShoppingCartIcon className="btn-icon" />
+                  <span className="btn-cart-lbl"> Add to Cart</span>
+                </button>
+                <button className="d-flex btn-folio align-items-center">
+                  <FolderPlusIcon className="btn-folio-icon" />
+                  <span className="btn-folio-lbl"> Add to Folio</span>
+                  <DropdownIcon className="btn-folio-icon" />
+                </button>
+              </>
+            )}
         </div>
       </div>
       <div className="section-details-header row">
@@ -254,7 +256,11 @@ const SiteDetails = () => {
           <CustomLabel label="2929 Fort" labelType="b-h1" />
         </div>
       </div>
-      <NavigationPills items={navItems} components={navComponents} dropdownItems={dropDownNavItems}/>
+      <NavigationPills
+        items={navItems}
+        components={navComponents}
+        dropdownItems={dropDownNavItems}
+      />
     </PageContainer>
   );
 };

@@ -1,14 +1,17 @@
-import React, { Children, ReactNode, useState } from "react";
-import "./ModalDialog.css";
-import { XmarkIcon, FloppyDisk  } from "../common/icon";
-import { CancelButton, SaveButton } from "../simple/CustomButtons";
+import React, { Children, ReactNode, useState } from 'react';
+import './ModalDialog.css';
+import { XmarkIcon, FloppyDisk } from '../common/icon';
+import { CancelButton, SaveButton } from '../simple/CustomButtons';
 
 interface ModalDialogCloseHandlerProps {
-  closeHandler: (save:boolean)=> void;
+  closeHandler: (save: boolean) => void;
   children: ReactNode;
 }
 
-const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({closeHandler,children}) => {
+const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
+  closeHandler,
+  children,
+}) => {
   const [open, setOpen] = useState<boolean>(true);
 
   const handleClose = () => {
@@ -18,7 +21,7 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({closeHandler,child
 
   const handleSave = () => {
     // Add save logic here
-    console.log("Save button clicked");
+    console.log('Save button clicked');
     setOpen(false);
     closeHandler(true);
   };
@@ -37,16 +40,10 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({closeHandler,child
                 onClick={handleClose}
               ></XmarkIcon>
             </div>
-            <div className="custom-modal-data">
-              {children}
-            </div>
+            <div className="custom-modal-data">{children}</div>
             <div className="custom-modal-actions-footer">
-             
-             <CancelButton clickHandler={handleClose}/>
-             <SaveButton clickHandler={handleSave}/>
-                
-                
-              
+              <CancelButton clickHandler={handleClose} />
+              <SaveButton clickHandler={handleSave} />
             </div>
           </div>
         </div>

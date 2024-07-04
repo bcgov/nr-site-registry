@@ -8,10 +8,10 @@
     "prettier": "^3.3.2"
   },
   "lint-staged": {
-    "*.{js,ts,json,css}": "prettier --write"
+    "*.{js,ts,jsx,tsx,json,css}": "prettier --write"
   },
   "scripts": {
-    "format": "prettier --write \"**/*.{js,ts,json,css}\"",
+    "format": "prettier --write \"**/*.{js,ts,jsx,tsx,json,css}\"",
     "prepare": "husky install"
   }
 }

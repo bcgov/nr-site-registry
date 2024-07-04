@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
-import Table from "../../components/table/Table";
-import { RequestStatus } from "../../helpers/requests/status";
+import { useEffect, useState } from 'react';
+import Table from '../../components/table/Table';
+import { RequestStatus } from '../../helpers/requests/status';
 import {
   recentAssignedColumn,
   recentFoliosColumns,
   recentViewedColumns,
-} from "./DashboardConfig";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../Store";
-import { fetchRecentViews } from "./DashboardSlice";
-import { UserType } from "../../helpers/requests/userType";
-import "./Dashboard.css";
-import PageContainer from "../../components/simple/PageContainer";
-import Widget from "../../components/widget/Widget";
-import { userTypeOnlyForDemo } from "../site/dto/SiteSlice";
+} from './DashboardConfig';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../Store';
+import { fetchRecentViews } from './DashboardSlice';
+import { UserType } from '../../helpers/requests/userType';
+import './Dashboard.css';
+import PageContainer from '../../components/simple/PageContainer';
+import Widget from '../../components/widget/Widget';
+import { userTypeOnlyForDemo } from '../site/dto/SiteSlice';
 
 interface DashboardWidgetProps {
   title?: string;
@@ -21,14 +21,13 @@ interface DashboardWidgetProps {
   columns: any[];
   loading: RequestStatus;
   data: any[];
-  allowRowsSelect?:boolean;
+  allowRowsSelect?: boolean;
   onButtonClick?: () => void;
 }
 
-const changeHandler = (event:any) => {
+const changeHandler = (event: any) => {
   console.log(event);
-}
-
+};
 
 const DashboardTableWidget: React.FC<DashboardWidgetProps> = ({
   title,
@@ -39,51 +38,61 @@ const DashboardTableWidget: React.FC<DashboardWidgetProps> = ({
   allowRowsSelect,
   onButtonClick,
 }) => (
-  <Widget changeHandler={changeHandler} title={title} tableColumns={columns} tableData={data} tableIsLoading={loading} allowRowsSelect={allowRowsSelect}
-  primaryKeycolumnName="siteId">
-    { buttonText && onButtonClick && 
-      <button className="dashboard-btn" type="button" onClick={onButtonClick} aria-label={buttonText} >
+  <Widget
+    changeHandler={changeHandler}
+    title={title}
+    tableColumns={columns}
+    tableData={data}
+    tableIsLoading={loading}
+    allowRowsSelect={allowRowsSelect}
+    primaryKeycolumnName="siteId"
+  >
+    {buttonText && onButtonClick && (
+      <button
+        className="dashboard-btn"
+        type="button"
+        onClick={onButtonClick}
+        aria-label={buttonText}
+      >
         <span className="btn-lbl">{buttonText}</span>
       </button>
-     }
+    )}
   </Widget>
 );
 
 const Dashboard = () => {
-  const [name, setName] = useState<string>("");
+  const [name, setName] = useState<string>('');
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
   const [data, setData] = useState<any[]>([]);
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const dispatch = useDispatch<AppDispatch>();
   const sites = useSelector((state: any) => state.dashboard);
 
-  
   const userTypeLocal = useSelector(userTypeOnlyForDemo);
 
-  useEffect(()=>{
+  useEffect(() => {
     setUserType(userTypeLocal);
-  },[userTypeLocal])
+  }, [userTypeLocal]);
 
   useEffect(() => {
-    dispatch(fetchRecentViews("1"));
+    dispatch(fetchRecentViews('1'));
   }, [dispatch]);
 
   useEffect(() => {
     if (sites.status === RequestStatus.success) {
       setData(sites.dashboard.recentView.data);
-      console.log('mmmm', sites.dashboard.recentView.data)
+      console.log('mmmm', sites.dashboard.recentView.data);
       setLoading(sites.status);
-      setName("First Name");
+      setName('First Name');
     }
   }, [sites.status]);
 
   const handleButtonClick = () => {
-    alert("Button clicked!");
+    alert('Button clicked!');
     // Additional logic can be added here
   };
 
   return (
-
     <PageContainer role="Dashboard">
       <h1 className="dashboard-title">Welcome, {name}</h1>
       <DashboardTableWidget
@@ -96,11 +105,11 @@ const Dashboard = () => {
       <DashboardTableWidget
         title={
           userType === UserType.External
-            ? "Recently Modified Folios"
-            : "Sites from Applications recently assigned to me"
+            ? 'Recently Modified Folios'
+            : 'Sites from Applications recently assigned to me'
         }
         buttonText={
-          userType === UserType.External ? "View All Folios" : "View All"
+          userType === UserType.External ? 'View All Folios' : 'View All'
         }
         columns={
           userType === UserType.External
@@ -115,6 +124,5 @@ const Dashboard = () => {
     </PageContainer>
   );
 };
-
 
 export default Dashboard;

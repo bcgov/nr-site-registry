@@ -32,7 +32,7 @@ const HeaderCell: FC<HeaderCellProps> = ({ item, index, sortHandler }) => {
       scope="col"
       className={`table-header-th ${
         getColumnSize(item.columnSize)
-      } `}
+      }  ${item.stickyCol ? 'positionSticky': ''} `}
     >
       {item.displayName}
       <SortIcon

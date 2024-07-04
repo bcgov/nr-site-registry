@@ -39,11 +39,11 @@ export class SitePartics {
   @Column("timestamp without time zone", { name: "effective_date" })
   effectiveDate: Date;
   
-  @Field()
+  @Field({nullable: true})
   @Column("timestamp without time zone", { name: "end_date", nullable: true })
   endDate: Date | null;
   
-  @Field()
+  @Field({nullable: true})
   @Column("character", { name: "note", nullable: true, length: 255 })
   note: string | null;
   
@@ -51,7 +51,7 @@ export class SitePartics {
   @Column("character", { name: "who_created", length: 30 })
   whoCreated: string;
   
-  @Field()
+  @Field({nullable: true})
   @Column("character", { name: "who_updated", nullable: true, length: 30 })
   whoUpdated: string | null;
   
@@ -59,7 +59,7 @@ export class SitePartics {
   @Column("timestamp without time zone", { name: "when_created" })
   whenCreated: Date;
   
-  @Field()
+  @Field({nullable: true})
   @Column("timestamp without time zone", {
     name: "when_updated",
     nullable: true,
@@ -80,10 +80,12 @@ export class SitePartics {
   @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sp)
   siteDocPartics: SiteDocPartics[];
 
-  @OneToMany(() => SiteParticRoles, (siteParticRoles) => siteParticRoles.sp)
+  @Field(()=>[SiteParticRoles])
+  @OneToMany(() => SiteParticRoles, (siteParticRoles) => siteParticRoles.sp, {eager: true})
   siteParticRoles: SiteParticRoles[];
 
-  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.sitePartics)
+  @Field(()=>PeopleOrgs)
+  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.sitePartics, {eager: true})
   @JoinColumn([{ name: "psnorg_id", referencedColumnName: "id" }])
   psnorg: PeopleOrgs;
 

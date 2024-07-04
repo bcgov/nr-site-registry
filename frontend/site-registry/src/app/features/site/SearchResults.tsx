@@ -38,9 +38,6 @@ const SearchResults: FC<ColumnProps> = ({
     pageChange(currentPage, resultsPerPage);
   }, [currentPage, resultsPerPage]);
 
-  useEffect(() => {
-    console.log("loadingState", columns);
-  }, [requestStatus]);
 
   return (
     <Table

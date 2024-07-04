@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { Unprotected } from 'nest-keycloak-connect';
-import { FetchSiteDetail, FetchSiteResponse } from '../dto/response/fetchSiteResponse';
-import { SiteService } from '../services/site.service';
+import { FetchSiteDetail, FetchSiteResponse } from '../dto/response/genericResponse';
+import { SiteService } from '../services/site/site.service';
 
 @Controller('site')
 @Unprotected()

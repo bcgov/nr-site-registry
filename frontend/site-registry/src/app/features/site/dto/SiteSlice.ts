@@ -158,7 +158,6 @@ const siteSlice = createSlice({
       return newState;
     },
     updatePageSizeSetting: (state, action) => {
-      console.log("reste");
       const newState = {
         ...state,
       };
@@ -167,7 +166,6 @@ const siteSlice = createSlice({
       return newState;
     },
     trackChanges: (state, action) => {
-      console.log("tracking change", state, action);
 
      let recordExists =   state.changeTracker.filter((tracked)=>{
          return tracked.changeType === action.payload.changeType && tracked.label === action.payload.label
@@ -188,14 +186,12 @@ const siteSlice = createSlice({
       }
     },
     clearTrackChanges: (state, action) => {
-      console.log("tracking change", state, action);
       const newState = {
         ...state,
         changeTracker: [],
         resetSiteDetails: true,
       };
 
-      console.log("tracking change 2 ", newState);
 
       return newState;
     },
@@ -224,7 +220,6 @@ const siteSlice = createSlice({
       })
       .addCase(fetchSites.fulfilled, (state, action) => {
         const newState = { ...state };
-        console.log("newState", newState, action);
         newState.fetchStatus = RequestStatus.success;
         newState.sites = action.payload.sites;
         newState.resultsCount = action.payload.count;
@@ -264,7 +259,6 @@ export const trackedChanges = (state: any) => state.sites.changeTracker;
 export const siteDetailsMode = (state: any) => state.sites.siteDetailsMode;
 export const resetSiteDetails = (state: any) => state.sites.resetSiteDetails;
 export const userTypeOnlyForDemo = (state: any) => state.sites.userType;
-
 
 export const {
   siteAdded,

@@ -84,10 +84,8 @@ export const disclosureScheduleInternalConfig: TableColumn[] = [
               {key:'F2', value:'F2*'},
           ],
           value: "",
-        //   allowNumbersOnly: true,
           colSize: "col-lg-6 col-md-6 col-sm-12",
-        //   customLabelCss: "custom-lbl-text",
-        //   customInputTextCss: "custom-input-text",
+          customInputTextCss: "custom-disclosure-input-text-tbl",
           tableMode: true,
          
          
@@ -105,10 +103,8 @@ export const disclosureScheduleInternalConfig: TableColumn[] = [
           placeholder: 'Enter Description.',
           graphQLPropertyName: "discription",
           value: "",
-        //   allowNumbersOnly: true,
           colSize: "col-lg-6 col-md-6 col-sm-12",
-        //   customLabelCss: "custom-lbl-text",
-        //   customInputTextCss: "custom-input-text",
+          customInputTextCss: "custom-disclosure-input-text-tbl",
           tableMode: true,
         },
         columnSize: ColumnSize.Triple
@@ -146,10 +142,8 @@ export const disclosureScheduleExternalConfig: TableColumn[] = [
               {key:'F2', value:'F2*'},
           ],
           value: "",
-        //   allowNumbersOnly: true,
           colSize: "col-lg-6 col-md-6 col-sm-12",
-        //   customLabelCss: "custom-lbl-text",
-        //   customInputTextCss: "custom-input-text",
+          customInputTextCss: "custom-disclosure-input-text-tbl",
           tableMode: true,
          
          
@@ -167,10 +161,8 @@ export const disclosureScheduleExternalConfig: TableColumn[] = [
           placeholder: 'Enter Description.',
           graphQLPropertyName: "discription",
           value: "",
-        //   allowNumbersOnly: true,
           colSize: "col-lg-6 col-md-6 col-sm-12",
-        //   customLabelCss: "custom-lbl-text",
-        //   customInputTextCss: "custom-input-text",
+          customInputTextCss: "custom-disclosure-input-text-tbl",
           tableMode: true,
         },
         columnSize: ColumnSize.Triple

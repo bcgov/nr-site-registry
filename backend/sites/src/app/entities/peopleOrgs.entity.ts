@@ -25,7 +25,7 @@ export class PeopleOrgs {
   @Column("bigint", { primary: true, name: "id" })
   id: string;
 
-  @Field()
+  @Field({nullable: true})
   @Column("character varying", {
     name: "organization_name",
     nullable: true,

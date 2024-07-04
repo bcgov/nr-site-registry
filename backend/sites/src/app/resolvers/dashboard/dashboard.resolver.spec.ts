@@ -1,10 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DashboardResolver } from './dashboard.resolver';
-import { DashboardService } from '../services/dashboard.service';
-import { DashboardResponse } from '../dto/response/fetchSiteResponse';
-import { sampleSites } from '../mockData/site.mockData';
-import { RecentViews } from '../../app/entities/recentViews.entity';
-import { RecentViewDto } from '../dto/recentView.dto';
+import { sampleSites } from '../../mockData/site.mockData';
+import { RecentViewDto } from '../../dto/recentView.dto';
+import { DashboardService } from '../../services/dashboard/dashboard.service';
 
 describe('DashboardResolver', () => {
   let resolver: DashboardResolver;
@@ -44,7 +42,7 @@ describe('DashboardResolver', () => {
     ];
     it('should return recent views for valid userId', async () => {
       const userId = '1';
-      const expectedResult: DashboardResponse = {
+      const expectedResult = {
         httpStatusCode: 200,
         message: 'Success',
         data: res,

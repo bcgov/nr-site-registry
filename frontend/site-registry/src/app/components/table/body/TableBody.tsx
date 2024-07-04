@@ -4,7 +4,7 @@ import { RequestStatus } from "../../../helpers/requests/status";
 import { TableColumn } from "../TableColumn";
 
 import { FormFieldType, IFormField } from "../../input-controls/IFormField";
-import { Label, TextInput , Link, CheckBoxInput, DropdownInput, DeleteIcon } from "../../input-controls/InputControls";
+import { Label, TextInput , Link, CheckBoxInput, DropdownInput, DateInput, TextAreaInput, DropdownSearchInput, DeleteIcon } from "../../input-controls/InputControls";
 import { ChangeTracker } from "../../common/IChangeType";
 interface TableBodyProps {
   isLoading: RequestStatus;
@@ -29,7 +29,7 @@ const TableBody: FC<TableBodyProps> = ({
   idColumnName,
   rowDeleteHandler
 }) => {
-
+  
   const [selectedRowIds,SetSelectedRowsId] = useState([""]);
 
 
@@ -46,9 +46,6 @@ const TableBody: FC<TableBodyProps> = ({
 
     tableRecordChangeHandler(rowIndex,'select_row', event.target.checked)
   }
-
-  useEffect(()=>{ console.log('selectedRowIds',selectedRowIds)},[selectedRowIds]);
-
 
   const isChecked = (id:string) =>{
    return (selectedRowIds.indexOf(id) !== -1);
@@ -71,7 +68,7 @@ const TableBody: FC<TableBodyProps> = ({
     );
   };
 
-  const tableRecordChangeHandler= (rowKey:number,propertyName:any,value:any, isDeleteRow?:boolean)=>
+  const tableRecordChangeHandler= (rowKey:number,propertyName:any,value:any, isDeleteRow?:boolean )=>
     {
       
         const changeRecord = {
@@ -96,6 +93,8 @@ const TableBody: FC<TableBodyProps> = ({
     changeHandler: any,
     editMode: boolean
   ) => {
+
+
     if (field.type === FormFieldType.Text) {
       return (
         <TextInput
@@ -112,6 +111,7 @@ const TableBody: FC<TableBodyProps> = ({
           allowNumbersOnly={field.allowNumbersOnly}
           isEditing={editMode ?? true}
           tableMode={field.tableMode ?? false}
+          stickyCol = {field.stickyCol}
         />
       );
     }
@@ -132,6 +132,7 @@ const TableBody: FC<TableBodyProps> = ({
             allowNumbersOnly={field.allowNumbersOnly}
             isEditing={editMode ?? true}
             tableMode={field.tableMode ?? false}
+            stickyCol = {field.stickyCol}
           />
         );
       }
@@ -152,7 +153,10 @@ const TableBody: FC<TableBodyProps> = ({
               allowNumbersOnly={field.allowNumbersOnly}
               isEditing={editMode ?? true}
               tableMode={field.tableMode ?? false}
+              stickyCol = {field.stickyCol}
               href={field.href}
+              customLinkValue={field.customLinkValue}
+              customIcon={field.customIcon}
             />
           );
         }
@@ -173,6 +177,7 @@ const TableBody: FC<TableBodyProps> = ({
                 allowNumbersOnly={field.allowNumbersOnly}
                 isEditing={editMode ?? true}
                 tableMode={field.tableMode ?? false}
+                stickyCol = {field.stickyCol}
                 href={field.href}
                 options={field.options}
               />
@@ -196,32 +201,72 @@ const TableBody: FC<TableBodyProps> = ({
                   allowNumbersOnly={field.allowNumbersOnly}
                   isEditing={editMode ?? true}
                   tableMode={field.tableMode ?? false}
+                  stickyCol = {field.stickyCol}
                   href={field.href}
                   options={field.options}
                 />
               );
             }
-          else if( field.type === FormFieldType.DeleteIcon)
-            {
-              return (
-                <DeleteIcon 
+            else if(field.type === FormFieldType.Date)
+              {
+                
+
+                return ( <DateInput
+                label={field.label}
+                customLabelCss = {field.customLabelCss}
+                customInputTextCss={field.customInputTextCss}
+                customEditLabelCss = {field.customEditLabelCss}
+                customEditInputTextCss={field.customEditInputTextCss}
+                placeholder={field.placeholder}
+                value={value}
+                onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
+                type={field.type}
+                isEditing={editMode ?? true}
+                tableMode={field.tableMode ?? false}
+                stickyCol = {field.stickyCol}
+            />);
+              }
+              else if(field.type === FormFieldType.TextArea)
+                {
+                  return (  <TextAreaInput
                   label={field.label}
-                  customLabelCss={field.customLabelCss}
+                  customLabelCss = {field.customLabelCss}
                   customInputTextCss={field.customInputTextCss}
-                  customEditLabelCss={field.customEditLabelCss}
+                  customEditLabelCss = {field.customEditLabelCss}
                   customEditInputTextCss={field.customEditInputTextCss}
                   placeholder={field.placeholder}
                   value={value}
-                  onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value,true)}
+                  onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
                   type={field.type}
                   validation={field.validation}
                   allowNumbersOnly={field.allowNumbersOnly}
                   isEditing={editMode ?? true}
+                  textAreaRow={field.textAreaRow}
+                  textAreaColoum={field.textAreaColoum}
                   tableMode={field.tableMode ?? false}
-                  href={field.href}
-                />
-              );
-            }
+                  stickyCol = {field.stickyCol}
+              />);
+                }
+              else if(field.type === FormFieldType.DropDownWithSearch)
+                {
+           
+                  return (
+                  <DropdownSearchInput
+                  label={field.label}
+                  customLabelCss = {field.customLabelCss}
+                  customInputTextCss={field.customInputTextCss}
+                  customEditLabelCss = {field.customEditLabelCss}
+                  customEditInputTextCss={field.customEditInputTextCss}
+                  placeholder={field.placeholder}
+                  options={field.options || []}
+                  value={value}
+                  onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
+                  type={field.type}
+                  isEditing={editMode ?? true}
+                  tableMode={field.tableMode ?? false}
+                  stickyCol = {field.stickyCol}
+              />);
+                }
   };
 
   const getValue = (rowIndex: number, propertyName: string) => {
@@ -270,7 +315,7 @@ const TableBody: FC<TableBodyProps> = ({
       <React.Fragment key={rowIndex}>
         <tr>
           {allowRowsSelect && (
-            <td className="table-border-light content-text">
+            <td className="table-border-light content-text positionSticky">
               <input
                 id={getValue(rowIndex,idColumnName)}
                 type="checkbox"
@@ -292,9 +337,9 @@ const TableBody: FC<TableBodyProps> = ({
 
   return (
     <tbody>
-      {data.length === 0
-        ? renderNoResultsFound()
-        : data.map((item: any, index: number) => renderTableRow(index))}
+        {data.length === 0
+          ? renderNoResultsFound()
+          : data.map((item: any, index: number) => renderTableRow(index))}
     </tbody>
   );
 };

@@ -81,7 +81,6 @@ const Search = () => {
   useEffect(() => {}, []);
 
   const search = (value: any) => {
-    console.log(sites);
     return sites;
   };
 
@@ -95,7 +94,6 @@ const Search = () => {
       "currentPage": pageRequested,
       "pageSize": resultsCount
     }));
-    console.log(pageRequested,resultsCount)
   }
 
   useEffect(() => {
@@ -128,10 +126,8 @@ const Search = () => {
       dispatch(fetchSites({ searchParam: event.target.value }));
       dispatch(updateSearchQuery(event.target.value))
     } else {
-      console.log("reset");
       dispatch(resetSites(null));
     }
-    console.log(searchText);
   };
 
   const customStyle: React.CSSProperties = {
@@ -224,7 +220,6 @@ const Search = () => {
                     displayColumn ? "active" : ""
                   } `}
                   onClick={() => {
-                    // console.log(columns);
                     SetDisplayColumns(!displayColumn);
                     SetDisplayFilters(false);
                   }}
@@ -265,7 +260,6 @@ const Search = () => {
                     <div
                       className={`table-actions-items`}
                       onClick={() => {
-                        // console.log(columns);
                         SetDisplayColumns(!displayColumn);
                         SetDisplayFilters(false);
                       }}

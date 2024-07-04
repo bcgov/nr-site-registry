@@ -35,7 +35,6 @@ const Summary = () => {
   },[addCartItemStatus])
 
 
-
   const [parcelSearchTerm, SetParcelSearchTeam] = useState("");
 
   setTimeout(() => {
@@ -120,7 +119,6 @@ const Summary = () => {
             "Site Location Details SR Mode For " + trackerLabel
           );
           dispatch(trackChanges(tracker.toPlainObject()));
-          console.log({[graphQLPropertyName]:value})
     }
     else
     {
@@ -458,7 +456,6 @@ const Summary = () => {
             <div className="parcel-container">
               <div>
               <SearchInput label={''} searchTerm={parcelSearchTerm} clearSearch={()=>{SetParcelSearchTeam("")}} handleSearchChange={(e)=>{
-                console.log("eeee",e)
                 if(e.target)
                   {
                     SetParcelSearchTeam(e.target.value)
@@ -518,9 +515,7 @@ const Summary = () => {
             totalResults={activityData.length}
             allowRowsSelect={false}
             showPageOptions={false}
-            changeHandler={(eventRecord) => {
-              console.log(eventRecord);
-            }}
+            changeHandler={() => { }}
             editMode={false}
             idColumnName="id"
           />

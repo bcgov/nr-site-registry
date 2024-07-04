@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SiteResolver } from './resolvers/site.resolver';
-import { SiteService } from './services/site.service';
+import { SiteService } from './services/site/site.service';
 import { SiteController } from './controllers/site.controller';
 import { Sites } from './entities/sites.entity';
 import { Events } from './entities/events.entity';
@@ -44,9 +43,18 @@ import { LtoDownload } from './entities/ltoDownload.entity';
 import { LtoPrevDownload } from './entities/ltoPrevDownload.entity';
 import { PlanTable } from './entities/planTable.entity';
 import { SiteCrownLandContaminated } from './entities/siteCrownLandContaminated.entity';
-import { DashboardResolver } from './resolvers/dashboard.resolver';
-import { DashboardService } from './services/dashboard.service';
 import { RecentViews } from './entities/recentViews.entity';
+import { DashboardResolver } from './resolvers/dashboard/dashboard.resolver';
+import { DashboardService } from './services/dashboard/dashboard.service';
+import { SiteResolver } from './resolvers/site/site.resolver';
+import { Snapshots } from './entities/snapshots.entity';
+import { SnapshotsResolver } from './resolvers/snapshot/snapshot.resolver';
+import { SnapshotsService } from './services/snapshot/snapshot.service';
+import { ParticipantResolver } from './resolvers/participant/participant.resolver';
+import { ParticipantService } from './services/participant/participant.service';
+import { GenericResponseProvider } from './dto/response/genericResponseProvider';
+import { DropdownResolver } from './resolvers/dropdown/dropdown.resolver';
+import { DropdownService } from './services/dropdown/dropdown.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -58,12 +66,19 @@ import { RecentViews } from './entities/recentViews.entity';
     ProfileAnswers, ProfileSubmissions, SiteProfileLandUses, SiteProfileOwners, ProfileQuestions, ProfileCategories, SubmissionCd,
     SiteDocPartics, PeopleOrgs, SiteParticRoles, ParticRoleCd, EventParticRoleCd, CityRegions, SiteContaminationClassXref,
     ContaminationClassCd, SiteCrownLandStatusCd, SisAddresses, SiteStaffs, DocParticRoleCd, LtoDownload, LtoPrevDownload,
-    PlanTable, SiteCrownLandContaminated, RecentViews])],
+    PlanTable, SiteCrownLandContaminated, RecentViews, Snapshots, ])],
   providers: [
     SiteResolver,
     SiteService,
     DashboardResolver,
-    DashboardService
+    DashboardService,
+    SnapshotsResolver,
+    SnapshotsService,
+    ParticipantResolver,
+    ParticipantService,
+    DropdownResolver,
+    DropdownService,
+    GenericResponseProvider
   ],
   controllers: [SiteController],
 })

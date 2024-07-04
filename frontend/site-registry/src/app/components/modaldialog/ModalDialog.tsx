@@ -20,7 +20,6 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({closeHandler,child
 
   const handleSave = () => {
     // Add save logic here
-    console.log("Save button clicked");
     setOpen(false);
     closeHandler(true);
   };

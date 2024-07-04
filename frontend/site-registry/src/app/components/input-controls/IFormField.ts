@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 
 export enum FormFieldType {
     Text = 'text',
@@ -28,6 +29,8 @@ export interface IFormField {
     allowNumbersOnly?: boolean; 
     options?: {key :string, value: string, imageUrl?: any}[];
     value?: any;
+    customLinkValue?:any;
+    customIcon?:ReactNode;
     isChecked?: boolean;
     isDateRange?: boolean;
     children?: IFormField[];
@@ -42,6 +45,7 @@ export interface IFormField {
         customMessage?: string;
     };
     tableMode?:boolean;
+    stickyCol?:boolean;
     href?:string
     textAreaRow?:number;
     textAreaColoum?:number;

@@ -76,7 +76,7 @@ const Dashboard = () => {
 
       setName(loggedInUser?.profile.given_name ?? '');
      
-  }, [loggedInUser])
+  }, [])
 
   useEffect(() => {
     if (sites.status === RequestStatus.success) {

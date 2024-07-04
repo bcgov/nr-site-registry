@@ -66,7 +66,7 @@ const TableBody: FC<TableBodyProps> = ({
     );
   };
 
-  const tableRecordChangeHandler= (rowKey:number,propertyName:any,value: string | [Date, Date])=>
+  const tableRecordChangeHandler= (rowKey:number,propertyName:any,value:any )=>
     {
         const changeRecord = {
           "row": getDataRow(rowKey),
@@ -79,7 +79,7 @@ const TableBody: FC<TableBodyProps> = ({
   const getTableCellHtml = (
     field: any,
     displayName: string,
-    value: any,
+    value: string,
     rowKey: number,
     href: string,
     changeHandler: any,

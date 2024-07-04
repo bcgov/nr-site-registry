@@ -21,10 +21,11 @@ interface InputProps extends IFormField {
 
 
 const renderTableCell = (
-  content : JSX.Element | string
+  content : JSX.Element | string,
+  stickyCol?: boolean
 ) => {
     return (
-      <td className="table-border-light">
+      <td className={`"table-border-light" ${stickyCol ? 'positionSticky': ''}`}>
         {content}
       </td>
     )
@@ -46,6 +47,7 @@ export const Link: React.FC<InputProps> = ({
   customIcon,
   onChange,
   tableMode,
+  stickyCol,
   href,
 }) => {
   return (
@@ -56,7 +58,8 @@ export const Link: React.FC<InputProps> = ({
         aria-label={`${label + " " + value}`}
       >
        {customIcon && customIcon} <span className="ps-1">{customLinkValue ?? value}</span>
-      </RouterLink>
+      </RouterLink>,
+      stickyCol
     )
   );
 };
@@ -73,13 +76,14 @@ export const Label: React.FC<InputProps> = ({
   customInputTextCss,
   customEditLabelCss,
   customEditInputTextCss,
-  
+  stickyCol,
   onChange,
   tableMode,
 }) => {
   return (
     renderTableCell(
-      <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{value}</span>
+      <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{value}</span>,
+      stickyCol
     )
   );
 };
@@ -97,6 +101,7 @@ export const TextInput: React.FC<InputProps> = ({
   customInputTextCss,
   customEditLabelCss,
   customEditInputTextCss,
+  stickyCol,
   onChange,
   tableMode,
 }) => {
@@ -133,7 +138,7 @@ export const TextInput: React.FC<InputProps> = ({
   // Replace any spaces in the label with underscores to create a valid id
   const inputTxtId = label.replace(/\s+/g, "_");
     return (
-      <ContainerElement className={tableMode ? "table-border-light" : "mb-3"}>
+      <ContainerElement className={`${tableMode ? "table-border-light" : "mb-3"} ${tableMode && stickyCol ? 'positionSticky': ''} `}>
         {!tableMode && (
           <>
             {srMode && (
@@ -676,6 +681,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
   customInputTextCss,
   customEditLabelCss,
   customEditInputTextCss,
+  stickyCol,
   onChange,
   tableMode,
 }) => {
@@ -700,7 +706,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
     option.value.toLowerCase().includes(searchTerm.toLowerCase())
   );
   return (
-    <ContainerElement className={tableMode ? "table-border-light" : "mb-3"}>
+    <ContainerElement className={`${tableMode ? "table-border-light" : "mb-3"} ${tableMode && stickyCol ? 'position-sticky': ''} `}>
          {srMode && (
             <CheckBoxInput
               type={FormFieldType.Checkbox}

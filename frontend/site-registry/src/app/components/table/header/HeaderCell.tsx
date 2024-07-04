@@ -23,7 +23,7 @@ const HeaderCell : FC<HeaderCellProps> = ({item, index,sortHandler}) => {
                   item.displayName === "Last Updated Date"
                     ? "hide-custom"
                     : ""
-                } ${item.columnSize === ColumnSize.Triple ? "triple": ""} `}
+                } ${item.columnSize === ColumnSize.Triple ? "triple": ""}  ${item.stickyCol ? 'positionSticky': ''} `}
               >
                 {item.displayName}
                 <SortIcon className="column-sort-icon" onClick={()=>{

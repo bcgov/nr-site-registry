@@ -103,6 +103,7 @@ const TableBody: FC<TableBodyProps> = ({
           allowNumbersOnly={field.allowNumbersOnly}
           isEditing={editMode ?? true}
           tableMode={field.tableMode ?? false}
+          stickyCol = {field.stickyCol}
         />
       );
     }
@@ -123,6 +124,7 @@ const TableBody: FC<TableBodyProps> = ({
             allowNumbersOnly={field.allowNumbersOnly}
             isEditing={editMode ?? true}
             tableMode={field.tableMode ?? false}
+            stickyCol = {field.stickyCol}
           />
         );
       }
@@ -143,6 +145,7 @@ const TableBody: FC<TableBodyProps> = ({
               allowNumbersOnly={field.allowNumbersOnly}
               isEditing={editMode ?? true}
               tableMode={field.tableMode ?? false}
+              stickyCol = {field.stickyCol}
               href={field.href}
               customLinkValue={field.customLinkValue}
               customIcon={field.customIcon}
@@ -166,6 +169,7 @@ const TableBody: FC<TableBodyProps> = ({
                 allowNumbersOnly={field.allowNumbersOnly}
                 isEditing={editMode ?? true}
                 tableMode={field.tableMode ?? false}
+                stickyCol = {field.stickyCol}
                 href={field.href}
                 options={field.options}
               />
@@ -189,6 +193,7 @@ const TableBody: FC<TableBodyProps> = ({
                   allowNumbersOnly={field.allowNumbersOnly}
                   isEditing={editMode ?? true}
                   tableMode={field.tableMode ?? false}
+                  stickyCol = {field.stickyCol}
                   href={field.href}
                   options={field.options}
                 />
@@ -210,6 +215,7 @@ const TableBody: FC<TableBodyProps> = ({
                 type={field.type}
                 isEditing={editMode ?? true}
                 tableMode={field.tableMode ?? false}
+                stickyCol = {field.stickyCol}
             />);
               }
               else if(field.type === FormFieldType.TextArea)
@@ -230,6 +236,7 @@ const TableBody: FC<TableBodyProps> = ({
                   textAreaRow={field.textAreaRow}
                   textAreaColoum={field.textAreaColoum}
                   tableMode={field.tableMode ?? false}
+                  stickyCol = {field.stickyCol}
               />);
                 }
               else if(field.type === FormFieldType.DropDownWithSearch)
@@ -249,6 +256,7 @@ const TableBody: FC<TableBodyProps> = ({
                   type={field.type}
                   isEditing={editMode ?? true}
                   tableMode={field.tableMode ?? false}
+                  stickyCol = {field.stickyCol}
               />);
                 }
   };
@@ -299,7 +307,7 @@ const TableBody: FC<TableBodyProps> = ({
       <React.Fragment key={rowIndex}>
         <tr>
           {allowRowsSelect && (
-            <td className="table-border-light content-text">
+            <td className="table-border-light content-text positionSticky">
               <input
                 id={getValue(rowIndex,idColumnName)}
                 type="checkbox"

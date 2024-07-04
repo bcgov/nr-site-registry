@@ -44,6 +44,7 @@ export interface IFormField {
         customMessage?: string;
     };
     tableMode?:boolean;
+    stickyCol?:boolean;
     href?:string
     textAreaRow?:number;
     textAreaColoum?:number;

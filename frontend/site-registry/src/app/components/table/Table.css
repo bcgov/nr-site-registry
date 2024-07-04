@@ -89,7 +89,7 @@
 
 .tableWidth {
     width: 100%;
-    /* overflow-x: scroll; */
+    overflow-x: scroll;
 }
 
 .table th {
@@ -98,26 +98,38 @@
 
 
 @media (min-width: 576px) {
-
-    .table td:first-child {
-        position: sticky;
-        left: 0;
+   
+    .positionSticky {
+        position: sticky !important; 
+        /* left: 29px; */
         background-color: white;
         z-index: 1;
+     }
+
+    .table td:first-child {
+        /* position: sticky; */
+        left: 0;
+        background-color: white;
+        /* z-index: 1; */
     }
 
     .table th:first-child {
-        position: sticky;
+        /* position: sticky; */
         left: 0;
-        z-index: 1;
+        /* z-index: 1; */
     }
 
+ 
+    /* .positionSticky {
+        position: sticky !important; 
+        left: 29px;
+     } */
 
     .table td:nth-child(2) {
         /* position: sticky; */
         left: 29px;
         background-color: white;
-        /* z-index: 1; */
+    
     }
 
     .table th:nth-child(2) {
@@ -128,30 +140,29 @@
 
 
     .table td:last-child {
-        position: sticky;
+        /* position: sticky; */
         right: 0;
         background-color: white;
-        z-index: 1;
+        /* z-index: 1; */
     }
 
     .table th:last-child {
-        position: sticky;
+        /* position: sticky; */
         right: 0;
-        z-index: 1;
+        /* z-index: 1; */
     }
 
     .table td:nth-last-child(2) {
-        position: sticky;
+        /* position: sticky; */
         right: 100px;
         background-color: white;
-        z-index: 1;
+        /* z-index: 1; */
     }
 
     .table th:nth-last-child(2) {
-        position: sticky;
+        /* position: sticky; */
         right: 100px;
-
-        z-index: 1;
+        /* z-index: 1; */
     }
 }
 

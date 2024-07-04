@@ -171,73 +171,73 @@ export class Sites {
     geometry: string | null;
 
     @Field(()=>[Events])
-    @OneToMany(() => Events, events => events.site, {eager: true})
+    @OneToMany(() => Events, events => events.site,)
     events: Events[];
 
     @Field(()=>[LandHistories])
-    @OneToMany(() => LandHistories, landHistories => landHistories.site, {eager: true})
+    @OneToMany(() => LandHistories, landHistories => landHistories.site,)
     landHistories: LandHistories[];
 
     @Field(()=>[Mailout])
-    @OneToMany(() => Mailout, mailout => mailout.site, {eager: true})
+    @OneToMany(() => Mailout, mailout => mailout.site,)
     mailouts: Mailout[];
 
     @Field(()=>[SiteAssocs])
-    @OneToMany(() => SiteAssocs, siteAssocs => siteAssocs.site, {eager: true})
+    @OneToMany(() => SiteAssocs, siteAssocs => siteAssocs.site,)
     siteAssocs: SiteAssocs[];
 
     @Field(()=>[SiteAssocs])
-    @OneToMany(() => SiteAssocs, siteAssocs => siteAssocs.siteIdAssociatedWith2, {eager: true})
+    @OneToMany(() => SiteAssocs, siteAssocs => siteAssocs.siteIdAssociatedWith2,)
     siteAssocs2: SiteAssocs[];
 
     @Field(()=>[SiteDocs])
-    @OneToMany(() => SiteDocs, siteDocs => siteDocs.site, {eager: true})
+    @OneToMany(() => SiteDocs, siteDocs => siteDocs.site,)
     siteDocs: SiteDocs[];
 
     @Field(()=>[SitePartics])
-    @OneToMany(() => SitePartics, sitePartics => sitePartics.site, {eager: true})
+    @OneToMany(() => SitePartics, sitePartics => sitePartics.site,)
     sitePartics: SitePartics[];
 
     @Field(()=>[SiteProfiles])
-    @OneToMany(() => SiteProfiles, siteProfiles => siteProfiles.site, {eager: true})
+    @OneToMany(() => SiteProfiles, siteProfiles => siteProfiles.site,)
     siteProfiles: SiteProfiles[];
 
     @Field(()=>SiteSubdivisions)
-    @OneToMany(() => SiteSubdivisions, siteSubdivisions => siteSubdivisions.site, {eager: true})
+    @OneToMany(() => SiteSubdivisions, siteSubdivisions => siteSubdivisions.site,)
     siteSubdivisions: SiteSubdivisions[];
 
     @Field(()=>BceRegionCd)
-    @ManyToOne(() => BceRegionCd, bceRegionCd => bceRegionCd.sites, {eager: true})
+    @ManyToOne(() => BceRegionCd, bceRegionCd => bceRegionCd.sites,)
     @JoinColumn([{ name: "bcer_code", referencedColumnName: "code" },
     ])
     bcerCode2: BceRegionCd;
 
     @Field(()=>ClassificationCd)
-    @ManyToOne(() => ClassificationCd, classificationCd => classificationCd.sites, {eager: true})
+    @ManyToOne(() => ClassificationCd, classificationCd => classificationCd.sites,)
     @JoinColumn([{ name: "class_code", referencedColumnName: "code" },
     ])
     classCode2: ClassificationCd;
 
     @Field(()=>SiteRiskCd)
-    @ManyToOne(() => SiteRiskCd, siteRiskCd => siteRiskCd.sites, {eager: true})
+    @ManyToOne(() => SiteRiskCd, siteRiskCd => siteRiskCd.sites,)
     @JoinColumn([{ name: "site_risk_code", referencedColumnName: "code" },
     ])
     siteRiskCode2: SiteRiskCd;
 
     @Field(()=>SiteStatusCd)
-    @ManyToOne(() => SiteStatusCd, siteStatusCd => siteStatusCd.sites, {eager: true})
+    @ManyToOne(() => SiteStatusCd, siteStatusCd => siteStatusCd.sites,)
     @JoinColumn([{ name: "sst_code", referencedColumnName: "code" },
     ])
     sstCode2: SiteStatusCd;
 
     @Field(()=>SiteCrownLandContaminated)
-    @OneToOne(() => SiteCrownLandContaminated, siteCrownLandContaminated => siteCrownLandContaminated.sites, {eager: true})
+    @OneToOne(() => SiteCrownLandContaminated, siteCrownLandContaminated => siteCrownLandContaminated.sites,)
     siteCrownLandContaminated: SiteCrownLandContaminated;
 
     @Field(()=>[RecentViews], {nullable : true})
-    @OneToMany(() => RecentViews, (recentViews) => recentViews.site, {eager: true})
+    @OneToMany(() => RecentViews, (recentViews) => recentViews.site,)
     recentViewedSites: RecentViews[];
 
-    @OneToMany(() => Snapshots, (snapshots) => snapshots.site, {eager: true})
+    @OneToMany(() => Snapshots, (snapshots) => snapshots.site,)
     snapshots: Snapshots[];
 }

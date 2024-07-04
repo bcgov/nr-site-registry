@@ -4,7 +4,6 @@ import './LoginDropdown.css'
 
 export const LoginDropdown = (title:string,width_override?:number) =>{
     const auth = useAuth();
-    console.log("auth",auth)
     return(
         <Dropdown id="login-selector-dropdown"  >
             <Dropdown.Toggle id="login-selector-dropdown-toggle" className="login-btn-lh">

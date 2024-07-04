@@ -43,7 +43,7 @@ const Table: FC<TableProps> = ({
   sortHandler
 }) => {
   
-  let  tableSortHandler = sortHandler ?? ((row,ascSort)=>{console.log("Handle Sort Event", row, ascSort)});
+  let  tableSortHandler = sortHandler ?? ((row,ascSort)=>{});
 
   return (
     <React.Fragment>

@@ -40,7 +40,7 @@ const SiteFilterForm : React.FC<childProps> = ({cancelSearchFilter}) => {
             if(key === 'whenCreated' || key === 'whenUpdated' )
             {
                 let dateRangeValue = formatDateRange(value);
-                filteredFormData[key] = dateRangeValue
+                filteredFormData[key] = value;
                 filters.push({ key, value: dateRangeValue, label: currLabel?.label ?? '' });
             }
             else if (value.trim() !== '') {

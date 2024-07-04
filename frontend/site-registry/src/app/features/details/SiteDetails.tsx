@@ -26,7 +26,6 @@ import {
   clearTrackChanges,
   siteDetailsMode,
   updateSiteDetailsMode,
-  userTypeOnlyForDemo,
 } from "../site/dto/SiteSlice";
 import { AppDispatch } from "../../Store";
 import Notations from "./notations/Notations";
@@ -51,11 +50,12 @@ import { UserMode } from "../../helpers/requests/userMode";
 import Actions from "../../components/action/Actions";
 import { ActionItems } from "../../components/action/ActionsConfig";
 import { getUser } from "../../helpers/utility";
+import { addRecentView } from "../dashboard/DashboardSlice";
+import { fetchParticipantRoleCd, fetchPeopleOrgsCd } from "./dropdowns/DropdownSlice";
+import { fetchSiteParticipants } from "./participants/ParticipantSlice";
 
 const SiteDetails = () => {
  
-  console.log(getUser())
-
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
@@ -64,6 +64,7 @@ const SiteDetails = () => {
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
 
   const dispatch = useDispatch<AppDispatch>();
+    
   const navigate = useNavigate();
   const onClickBackButton = () => {
     navigate(-1);
@@ -72,17 +73,8 @@ const SiteDetails = () => {
   const { id } = useParams();
 
   const details = useSelector(selectSiteDetails);
-
-  // const userTypeLocal = useSelector(userTypeOnlyForDemo);
-
-  // useEffect(()=>{
-  //   setUserType(userTypeLocal);
-  // },[userTypeLocal])
-
-
+  const loggedInUser = getUser();
   useEffect(()=>{
-
-    const loggedInUser = getUser();
     if(loggedInUser?.profile.preferred_username?.indexOf("bceid") !== -1)
       {
         setUserType(UserType.External);
@@ -97,15 +89,11 @@ const SiteDetails = () => {
         setUserType(UserType.External);
   
       }
-
   }, [])
  
 
-
-
-  const [editSiteDetailsObject, setEditSiteDetailsObject] = useState(details);
+ 
   const savedChanges = useSelector(trackedChanges);
-
   const mode = useSelector(siteDetailsMode);
   useEffect(()=> {
     setViewMode(mode);
@@ -113,10 +101,16 @@ const SiteDetails = () => {
 
   useEffect(() => {
     dispatch(fetchSitesDetails({ siteId: id ?? "" }));
+    dispatch(fetchPeopleOrgsCd());
+    dispatch(fetchParticipantRoleCd());
+    dispatch(fetchSiteParticipants(id ?? ''));
   }, [id]);
 
   useEffect(() => {
-    setEditSiteDetailsObject(details);
+    if(details && details.id === id)
+    {
+      handleAddRecentView(details);
+    }
   }, [details]);
 
   
@@ -146,11 +140,31 @@ const SiteDetails = () => {
   const handleCancelButton = () => {
     dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
     dispatch(clearTrackChanges({}));
-    //setEditSiteDetailsObject(details);
     setSave(false);
     setEdit(false);
   }
 
+  const handleAddRecentView = async (details: any) => {
+    try {
+      if(details)
+      {
+        await dispatch(
+          addRecentView({
+            userId: loggedInUser?.profile.preferred_username ?? '',
+            siteId: details.id,
+            address: details.addrLine_1,
+            city: details.city,
+            generalDescription: details.generalDescription,
+            whenUpdated: new Date(details.whenUpdated),
+          })
+        );
+      }
+    } 
+    catch (error) 
+    {
+        throw error;
+    }
+  };
 
   return (
     <PageContainer role="details">

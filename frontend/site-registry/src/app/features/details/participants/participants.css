@@ -1,0 +1,41 @@
+.custom-participant-widget-lbl {
+    padding: var(--layout-padding-small) 0px var(--layout-padding-small) 0px !important;
+    border-bottom: 1px solid var(--surface-border-light, #d8d8d8) !important;
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    line-height: 40px !important;
+    text-align: left;
+    color: var(--typography-color-primary, #2D2D2D) !important;
+}
+
+.custom-participant-lbl-text {
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 16px !important;
+    text-align: left;
+    color: var(--typography-color-secondary, #474543) !important;
+}
+
+.custom-participant-input-text {
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 16px !important;
+    text-align: left;
+    color: var(--typography-color-primary, #2D2D2D) !important;
+}
+
+.custom-participant-edit-label {
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 16px !important;
+    text-align: left;
+    color: var(--typography-color-secondary, #474543) !important;
+}
+
+.custom-participant-edit-input {
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: 16px !important;
+    text-align: left;
+    color: var(--typography-color-secondary, #474543) !important;
+}

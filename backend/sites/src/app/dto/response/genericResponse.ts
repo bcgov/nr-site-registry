@@ -1,8 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Sites } from '../../entities/sites.entity';
 import { BaseHttpResponse } from './baseHttpResponse';
-import { RecentViews } from '../../entities/recentViews.entity';
-import { Snapshots } from '../../entities/snapshots.entity';
 
 /**
  * Class for returing fetch site response from graphql services
@@ -11,6 +9,11 @@ import { Snapshots } from '../../entities/snapshots.entity';
 export class FetchSiteResponse extends BaseHttpResponse {
     @Field(() => [Sites])
     data: Sites[];
+
+    constructor(message?: string, httpStatusCode?: number, success?: boolean, data?: Sites[] | null) {
+        super(message, httpStatusCode, success);
+        this.data = data;
+    }
 }
 
 /**
@@ -20,6 +23,11 @@ export class FetchSiteResponse extends BaseHttpResponse {
 export class FetchSiteDetail extends BaseHttpResponse {
     @Field(() => Sites)
     data: Sites;
+
+    constructor(message?: string, httpStatusCode?: number, success?: boolean, data?: Sites | null) {
+        super(message, httpStatusCode, success);
+        this.data = data;
+    }
 }
 
 /**
@@ -41,21 +49,10 @@ export class SearchSiteResponse {
 
 }
 
-
-@ObjectType()
-export class DashboardResponse extends BaseHttpResponse{
-    @Field({nullable:true})
-    message: string;
-
-    @Field(() => [RecentViews],  { nullable: true })
-    data: RecentViews[] | null;
-}
-
-@ObjectType()
-export class SnapshotResponse extends BaseHttpResponse {
-    @Field({nullable:true})
-    message: string;
-
-    @Field(() => [Snapshots],  { nullable: true })
-    data: Snapshots[] | null;
+export class GenericResponse<T> extends BaseHttpResponse{
+    data?: T;
+    constructor(message?: string, httpStatusCode?: number, success?: boolean, data?: T | null) {
+        super(message, httpStatusCode, success);
+        this.data = data;
+    }
 }

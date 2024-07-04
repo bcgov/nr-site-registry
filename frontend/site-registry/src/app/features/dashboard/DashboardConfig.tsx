@@ -1,9 +1,9 @@
-import { FormFieldType } from "../../components/input-controls/IFormField";
+import { FormFieldType, IFormField } from "../../components/input-controls/IFormField";
 import { ColumnSize,  TableColumn } from "../../components/table/TableColumn";
 
 
 
-const getColumnType = (label:string, propertyName:string, value:string) =>
+const getColumnType = (label:string, propertyName:string, value:string) : IFormField =>
   {
     return   {
       type: FormFieldType.Label,
@@ -16,7 +16,7 @@ const getColumnType = (label:string, propertyName:string, value:string) =>
     }
   }
   
-  const getLinkColumnType = (label:string, propertyName:string, value:string, href:string) =>
+  const getLinkColumnType = (label:string, propertyName:string, value:string, href:string) : IFormField =>
     {
       return   {
         type: FormFieldType.Link,

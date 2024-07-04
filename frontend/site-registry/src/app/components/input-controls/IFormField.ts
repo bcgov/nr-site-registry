@@ -10,11 +10,12 @@ export enum FormFieldType {
     Label = 'label',
     Link = 'link',
     Checkbox = 'checkbox',
+    DeleteIcon = 'deleteIcon'
 }
 
 export interface IFormField {
     type: FormFieldType.Text | FormFieldType.DropDown | FormFieldType.Date | FormFieldType.Group | FormFieldType.Label | FormFieldType.Link | FormFieldType.Checkbox
-                             | FormFieldType.DateRange | FormFieldType.TextArea | FormFieldType.DropDownWithSearch;
+                             | FormFieldType.DateRange | FormFieldType.TextArea | FormFieldType.DropDownWithSearch | FormFieldType.DeleteIcon;
     label: string;
     isLabel?: boolean;
     placeholder?: string;

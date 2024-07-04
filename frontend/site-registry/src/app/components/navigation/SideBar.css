@@ -143,3 +143,9 @@
 .currentPath .sideBarDisplayText:hover {
     color: var(--side-bar-text-hover-color) !important;
 }
+
+.cart-items-number
+{
+    display: block;
+    text-decoration: none;
+}

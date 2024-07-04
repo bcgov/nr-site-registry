@@ -24,15 +24,7 @@ const TableHeader:FC<TableHeaderProps> = ({columns,allowRowsSelect, sortHandler}
           {columns &&
             columns.map((item, index) => (
               <HeaderCell item={item} index={index} sortHandler={sortHandler}/>
-            ))}
-          {/* <th scope="col" className={`table-header-th`}>
-            View Map
-            <SortIcon className="column-sort-icon" />
-          </th>
-          <th scope="col" className={`table-header-th`}>
-            Details
-            <SortIcon className="column-sort-icon" />
-          </th> */}
+            ))}        
         </tr>
       );
 }

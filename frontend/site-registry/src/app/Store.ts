@@ -7,6 +7,7 @@ import commonDataReducer from "./features/common/CommonDataSlice";
 import siteReducer from "./features/site/dto/SiteSlice";
 import thunk from 'redux-thunk';
 import dashboardReducer from "./features/dashboard/DashboardSlice";
+import cartReducer from "./features/cart/CartSlice";
 
 
 const persistedStore: any = loadFromLocalStorage();
@@ -15,7 +16,8 @@ export const store = configureStore({
   reducer: {  
     commonData: commonDataReducer,
     sites:siteReducer,
-    dashboard: dashboardReducer
+    dashboard: dashboardReducer,
+    cart: cartReducer
   },
 });
 

@@ -27,7 +27,6 @@ describe('DashboardResolver', () => {
     service = module.get<DashboardService>(DashboardService);
   });
 
-  
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -38,8 +37,30 @@ describe('DashboardResolver', () => {
 
   describe('getRecentViewsByUserId', () => {
     const res = [
-      { id: 1, userId:'1', siteId: '1', address: '123 Street', city: 'City', generalDescription: 'Description', whenUpdated: new Date(), created: new Date(), updated: new Date(),  site: sampleSites[0] },
-      { id: 2, userId:'1', siteId: '2', address: '456 Street', city: 'City', generalDescription: 'Description', whenUpdated: new Date(), created: new Date(), updated: new Date(), site: sampleSites[0] },
+      {
+        id: 1,
+        userId: '1',
+        siteId: '1',
+        address: '123 Street',
+        city: 'City',
+        generalDescription: 'Description',
+        whenUpdated: new Date(),
+        created: new Date(),
+        updated: new Date(),
+        site: sampleSites[0],
+      },
+      {
+        id: 2,
+        userId: '1',
+        siteId: '2',
+        address: '456 Street',
+        city: 'City',
+        generalDescription: 'Description',
+        whenUpdated: new Date(),
+        created: new Date(),
+        updated: new Date(),
+        site: sampleSites[0],
+      },
     ];
     it('should return recent views for valid userId', async () => {
       const userId = '1';
@@ -48,7 +69,9 @@ describe('DashboardResolver', () => {
         message: 'Success',
         data: res,
       };
-      jest.spyOn(service, 'getRecentViewsByUserId').mockResolvedValueOnce(expectedResult.data);
+      jest
+        .spyOn(service, 'getRecentViewsByUserId')
+        .mockResolvedValueOnce(expectedResult.data);
 
       const result = await resolver.getRecentViewsByUserId(userId);
 
@@ -80,8 +103,10 @@ describe('DashboardResolver', () => {
 
     it('should add recent view for valid input', async () => {
       const recentView: RecentViewDto = recentViewDto;
-      const expectedResult ='Record is inserted successfully.';
-      jest.spyOn(service, 'addRecentView').mockResolvedValueOnce(expectedResult);
+      const expectedResult = 'Record is inserted successfully.';
+      jest
+        .spyOn(service, 'addRecentView')
+        .mockResolvedValueOnce(expectedResult);
 
       const result = await resolver.addRecentView(recentView);
 

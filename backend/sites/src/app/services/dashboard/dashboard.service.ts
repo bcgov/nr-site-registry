@@ -26,7 +26,9 @@ export class DashboardService {
 
     try {
       // Check if the combination of userId and siteId exists in the table
-      const existingRecentView = await this.recentViewsRepository.findOne({where: { userId, siteId }});
+      const existingRecentView = await this.recentViewsRepository.findOne({
+        where: { userId, siteId },
+      });
 
       if (existingRecentView) {
         // If the combination exists, update the existing record
@@ -37,15 +39,18 @@ export class DashboardService {
         existingRecentView.whenUpdated = recentViewDto.whenUpdated;
 
         // Explicitly update the 'updated' column
-        existingRecentView.updated =  new Date();
-        const result = await this.recentViewsRepository.save(existingRecentView);
+        existingRecentView.updated = new Date();
+        const result =
+          await this.recentViewsRepository.save(existingRecentView);
 
         if (result) {
           return 'Record is updated successfully.';
         }
       } else {
         // If the combination does not exist, insert a new record
-        const existingRecentViewsCount = await this.recentViewsRepository.count({ where: { userId } });
+        const existingRecentViewsCount = await this.recentViewsRepository.count(
+          { where: { userId } },
+        );
 
         if (existingRecentViewsCount >= maxRecentViews) {
           // Delete the oldest recent view if the maximum limit is reached

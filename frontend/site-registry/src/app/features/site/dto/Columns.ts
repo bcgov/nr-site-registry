@@ -1,271 +1,271 @@
-import { FormFieldType } from "../../../components/input-controls/IFormField";
-import { TableColumn , ColumnSize } from "../../../components/table/TableColumn";
+import { FormFieldType } from '../../../components/input-controls/IFormField';
+import { TableColumn, ColumnSize } from '../../../components/table/TableColumn';
 
 const getSiteSearchResultsColumns = () => {
   const columns: TableColumn[] = [
-    
     new TableColumn(
       1,
-      "Site ID",
+      'Site ID',
       true,
-      "id",
+      'id',
       1,
       true,
       true,
       1,
       true,
-      getColumnType("Site ID","id","")    
+      getColumnType('Site ID', 'id', ''),
     ),
     new TableColumn(
       6,
-      "Site Address",
+      'Site Address',
       true,
-      "addrLine_1,addrLine_2,addrLine_3",
+      'addrLine_1,addrLine_2,addrLine_3',
       2,
       true,
       true,
       1,
       true,
-      getColumnType("Site Address","addrLine_1,addrLine_2,addrLine_3","")  ,
-      "site/details/",
+      getColumnType('Site Address', 'addrLine_1,addrLine_2,addrLine_3', ''),
+      'site/details/',
       false,
-      ColumnSize.Triple
-      ,
-      
-      
+      ColumnSize.Triple,
     ),
     new TableColumn(
       7,
-      "City",
+      'City',
       true,
-      "city",
+      'city',
       2,
       false,
       true,
       1,
       true,
-      getColumnType("City","city","")  
+      getColumnType('City', 'city', ''),
     ),
     new TableColumn(
       2,
-      "Site Remediation Status",
+      'Site Remediation Status',
       true,
-      "srStatus",
+      'srStatus',
       1,
       false,
       true,
       1,
       false,
-      getColumnType("Site Remediation Status","srStatus","")  
+      getColumnType('Site Remediation Status', 'srStatus', ''),
     ),
     new TableColumn(
       3,
-      "Site Risk code",
+      'Site Risk code',
       true,
-      "siteRiskCode",
+      'siteRiskCode',
       1,
       false,
       true,
       1,
       false,
-      getColumnType("Site Risk code","siteRiskCode","")  
+      getColumnType('Site Risk code', 'siteRiskCode', ''),
     ),
     new TableColumn(
       4,
-      "General Description",
+      'General Description',
       true,
-      "generalDescription",
+      'generalDescription',
       1,
       false,
       true,
       1,
       false,
-      getColumnType("General Description","generalDescription","")  
+      getColumnType('General Description', 'generalDescription', ''),
     ),
     new TableColumn(
       5,
-      "Common Name",
+      'Common Name',
       true,
-      "commonName",
+      'commonName',
       2,
       false,
       true,
       1,
       false,
-      getColumnType("Common Name","commonName","")  
+      getColumnType('Common Name', 'commonName', ''),
     ),
     new TableColumn(
       8,
-      "Latitude",
+      'Latitude',
       true,
-      "latdeg",
+      'latdeg',
       2,
       false,
       true,
       1,
       false,
-      getColumnType("Latitude","latdeg","")  
+      getColumnType('Latitude', 'latdeg', ''),
     ),
     new TableColumn(
       9,
-      "Latitude(D,M,S)",
+      'Latitude(D,M,S)',
       true,
-      "latDegrees,latMinutes,latSeconds",
+      'latDegrees,latMinutes,latSeconds',
       3,
       false,
       true,
       1,
       false,
-      getColumnType("Latitude(D,M,S)","latDegrees,latMinutes,latSeconds","")  
+      getColumnType('Latitude(D,M,S)', 'latDegrees,latMinutes,latSeconds', ''),
     ),
     new TableColumn(
       10,
-      "Longitude",
+      'Longitude',
       true,
-      "longdeg",
+      'longdeg',
       3,
       false,
       true,
       1,
       false,
-      getColumnType("Longitude","longdeg","")  
+      getColumnType('Longitude', 'longdeg', ''),
     ),
     new TableColumn(
       11,
-      "Longitude(D,M,S)",
+      'Longitude(D,M,S)',
       true,
-      "longDegrees,longMinutes,longSeconds",
+      'longDegrees,longMinutes,longSeconds',
       3,
       false,
       true,
       1,
       false,
-      getColumnType("Longitude(D,M,S)","longDegrees,longMinutes,longSeconds","") 
+      getColumnType(
+        'Longitude(D,M,S)',
+        'longDegrees,longMinutes,longSeconds',
+        '',
+      ),
     ),
     new TableColumn(
       12,
-      "Lat/Long Reliability",
+      'Lat/Long Reliability',
       true,
-      "latlongReliabilityFlag",
+      'latlongReliabilityFlag',
       3,
       false,
       true,
       1,
       false,
-      getColumnType("Lat/Long Reliability","latlongReliabilityFlag","") 
+      getColumnType('Lat/Long Reliability', 'latlongReliabilityFlag', ''),
     ),
     new TableColumn(
       13,
-      "Created By",
+      'Created By',
       true,
-      "whoCreated",
+      'whoCreated',
       4,
       false,
       true,
       1,
       false,
-      getColumnType("Created By","whoCreated","") 
+      getColumnType('Created By', 'whoCreated', ''),
     ),
     new TableColumn(
       14,
-      "Date Created",
+      'Date Created',
       true,
-      "whenCreated",
+      'whenCreated',
       4,
       false,
       true,
       1,
       false,
-      getColumnType("Date Created","whenCreated","") 
+      getColumnType('Date Created', 'whenCreated', ''),
     ),
     new TableColumn(
       15,
-      "Last Updated",
+      'Last Updated',
       true,
-      "whenCreated",
+      'whenCreated',
       4,
       false,
       true,
       1,
       false,
-      getColumnType("Last Updated","whenCreated","") 
+      getColumnType('Last Updated', 'whenCreated', ''),
     ),
     new TableColumn(
       16,
-      "Consultant Submitted",
+      'Consultant Submitted',
       true,
-      "consultantSubmitted",
+      'consultantSubmitted',
       4,
       false,
       true,
       1,
       false,
-      getColumnType("Consultant Submitted","consultantSubmitted","") 
+      getColumnType('Consultant Submitted', 'consultantSubmitted', ''),
     ),
     new TableColumn(
       17,
-      "View",
+      'View',
       true,
-      "id",
+      'id',
       4,
       true,
       true,
       1,
       true,
-      getLinkColumnType("Map","id","","site/map/") ,
-      "site/map/",
-      true
+      getLinkColumnType('Map', 'id', '', 'site/map/'),
+      'site/map/',
+      true,
     ),
     new TableColumn(
       18,
-      "Details",
+      'Details',
       true,
-      "id",
+      'id',
       4,
       true,
       true,
       1,
       true,
-      getLinkColumnType("Details","id","","site/details/"),
-      "site/details/",
-    
-      true,      
+      getLinkColumnType('Details', 'id', '', 'site/details/'),
+      'site/details/',
+
+      true,
     ),
   ];
 
   return columns;
 };
 
-
-const getColumnType = (label:string, propertyName:string, value:string) =>
-{
-  return   {
+const getColumnType = (label: string, propertyName: string, value: string) => {
+  return {
     type: FormFieldType.Label,
-    label: label,       
+    label: label,
     graphQLPropertyName: propertyName,
-    value:value,      
-    customLabelCss: "custom-lbl-text",
-    customInputTextCss: "custom-input-text",
+    value: value,
+    customLabelCss: 'custom-lbl-text',
+    customInputTextCss: 'custom-input-text',
     tableMode: true,
-  }
-}
+  };
+};
 
-const getLinkColumnType = (label:string, propertyName:string, value:string, href:string) =>
-  {
-    return   {
-      type: FormFieldType.Link,
-      label: label,       
-      graphQLPropertyName: propertyName,
-      value:value,      
-      customLabelCss: "link-for-table",
-      customInputTextCss: "link-for-table",
-      tableMode: true,
-      href: href
-    }
-  }
+const getLinkColumnType = (
+  label: string,
+  propertyName: string,
+  value: string,
+  href: string,
+) => {
+  return {
+    type: FormFieldType.Link,
+    label: label,
+    graphQLPropertyName: propertyName,
+    value: value,
+    customLabelCss: 'link-for-table',
+    customInputTextCss: 'link-for-table',
+    tableMode: true,
+    href: href,
+  };
+};
 
 export { getSiteSearchResultsColumns };
 
-export const B: any =1 ;
-
-
+export const B: any = 1;

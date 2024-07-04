@@ -3,7 +3,6 @@ import { IsNotEmpty, IsString, IsOptional, IsDate } from 'class-validator';
 
 @InputType()
 export class RecentViewDto {
-
   @Field()
   @IsNotEmpty()
   @IsString()
@@ -24,13 +23,13 @@ export class RecentViewDto {
   @IsString()
   city: string;
 
-  @Field({nullable:true})
+  @Field({ nullable: true })
   @IsOptional()
   @IsString()
   generalDescription: string | null;
 
-  @Field({nullable:true})
+  @Field({ nullable: true })
   @IsOptional()
   @IsDate()
   whenUpdated: Date | null;
-} 
+}

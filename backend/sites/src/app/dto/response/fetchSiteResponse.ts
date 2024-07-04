@@ -9,8 +9,8 @@ import { Snapshots } from '../../entities/snapshots.entity';
  */
 @ObjectType()
 export class FetchSiteResponse extends BaseHttpResponse {
-    @Field(() => [Sites])
-    data: Sites[];
+  @Field(() => [Sites])
+  data: Sites[];
 }
 
 /**
@@ -18,8 +18,8 @@ export class FetchSiteResponse extends BaseHttpResponse {
  */
 @ObjectType()
 export class FetchSiteDetail extends BaseHttpResponse {
-    @Field(() => Sites)
-    data: Sites;
+  @Field(() => Sites)
+  data: Sites;
 }
 
 /**
@@ -27,35 +27,33 @@ export class FetchSiteDetail extends BaseHttpResponse {
  */
 @ObjectType()
 export class SearchSiteResponse {
-    @Field(() => [Sites])
-    sites: Sites[];
+  @Field(() => [Sites])
+  sites: Sites[];
 
-    @Field()
-    count: number;
+  @Field()
+  count: number;
 
-    @Field()
-    page: number;
+  @Field()
+  page: number;
 
-    @Field()
-    pageSize: number;
-
+  @Field()
+  pageSize: number;
 }
 
-
 @ObjectType()
-export class DashboardResponse extends BaseHttpResponse{
-    @Field({nullable:true})
-    message: string;
+export class DashboardResponse extends BaseHttpResponse {
+  @Field({ nullable: true })
+  message: string;
 
-    @Field(() => [RecentViews],  { nullable: true })
-    data: RecentViews[] | null;
+  @Field(() => [RecentViews], { nullable: true })
+  data: RecentViews[] | null;
 }
 
 @ObjectType()
 export class SnapshotResponse extends BaseHttpResponse {
-    @Field({nullable:true})
-    message: string;
+  @Field({ nullable: true })
+  message: string;
 
-    @Field(() => [Snapshots],  { nullable: true })
-    data: Snapshots[] | null;
+  @Field(() => [Snapshots], { nullable: true })
+  data: Snapshots[] | null;
 }

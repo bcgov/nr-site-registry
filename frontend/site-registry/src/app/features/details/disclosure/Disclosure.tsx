@@ -87,7 +87,6 @@ const Disclosure = () => {
     graphQLPropertyName: any,
     value: String | [Date, Date],
   ) => {
-    debugger;
     if (viewMode === SiteDetailsMode.SRMode) {
       console.log({ [graphQLPropertyName]: value, id });
     } else {
@@ -198,9 +197,6 @@ const Disclosure = () => {
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
-  useEffect(() => {
-    console.log('Disclosure formdata ', formData);
-  }, [formData]);
   const handleRemoveDisclosureSchedule = (disclosureId: any) => {
     // Remove selected rows from formData state
     setFormData((prevData) => {

@@ -1,7 +1,7 @@
 import { SnapshotsService } from '../../services/snapshot/snapshot.service';
 import { SnapshotsResolver } from './snapshot.resolver';
 import { Test, TestingModule } from '@nestjs/testing';
-import { SnapshotResponse } from '../../dto/response/fetchSiteResponse';
+import { SnapshotResponse } from '../../dto/response/genericResponse';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { sampleSites } from '../../mockData/site.mockData';
 import { SnapshotDto } from '../../dto/snapshot.dto';

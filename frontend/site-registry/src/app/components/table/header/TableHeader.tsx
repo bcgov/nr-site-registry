@@ -22,7 +22,10 @@ const TableHeader: FC<TableHeaderProps> = ({
   return (
     <tr className="table-header">
       {allowRowsSelect && (
-        <th scope="col" className="table-header-th checkbox-column">
+        <th
+          scope="col"
+          className={`table-header-th checkbox-column positionSticky`}
+        >
           <input type="checkbox" className="checkbox-color" />
         </th>
       )}

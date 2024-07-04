@@ -61,7 +61,7 @@ const SearchInput: React.FC<ISearchInput> = ({
               searchTerm.length > 0 ? 'ps-2' : 'ps-5'
             }`}
           />
-          {!createMode && searchTerm.length <= 0 ? (
+          {!createMode && searchTerm.trim().length < 1 ? (
             <span
               id="search-icon"
               className="search-icon custom-icon position-absolute px-2"

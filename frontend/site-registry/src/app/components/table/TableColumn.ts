@@ -30,6 +30,7 @@ export class TableColumn {
     public linkRedirectionURL?: string,
     public dynamicColumn?: boolean,
     public columnSize?: ColumnSize,
+    public stickyCol?: boolean,
   ) {
     this.dynamicColumn = dynamicColumn ?? false;
   }

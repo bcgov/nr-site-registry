@@ -19,13 +19,6 @@ const Column: React.FC<ColumnProps> = ({
   console.log('child updated ', columns);
 
   const filterColumnsByGroup = (groupId: number) => {
-    console.log(
-      'filterColumnsByGroup',
-      2,
-      columns.filter(
-        (item) => item.groupId === groupId && item.dynamicColumn === false,
-      ),
-    );
     return columns.filter(
       (item) => item.groupId === groupId && item.dynamicColumn === false,
     );

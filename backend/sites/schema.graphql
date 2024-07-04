@@ -65,6 +65,22 @@ type SiteDocs {
   rwmNoteFlag: Float!
 }
 
+type ParticRoleCd {
+  code: String!
+  description: String!
+}
+
+type SiteParticRoles {
+  prCode: String!
+  spId: String!
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  prCode2: ParticRoleCd!
+}
+
 type LandHistories {
   siteId: String!
   lutCode: String!
@@ -132,14 +148,15 @@ type SitePartics {
   siteId: String!
   psnorgId: String!
   effectiveDate: DateTime!
-  endDate: DateTime!
-  note: String!
+  endDate: DateTime
+  note: String
   whoCreated: String!
-  whoUpdated: String!
+  whoUpdated: String
   whenCreated: DateTime!
-  whenUpdated: DateTime!
+  whenUpdated: DateTime
   rwmFlag: Float!
   rwmNoteFlag: Float!
+  siteParticRoles: [SiteParticRoles!]!
   psnorg: PeopleOrgs!
 }
 
@@ -156,7 +173,7 @@ type SiteCrownLandContaminated {
 
 type PeopleOrgs {
   id: String!
-  organizationName: String!
+  organizationName: String
   displayName: String!
   entityType: String!
   location: String!
@@ -345,12 +362,18 @@ type Sites {
 }
 
 type FetchSiteResponse {
-  httpStatusCode: Int!
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
   data: [Sites!]!
 }
 
 type FetchSiteDetail {
-  httpStatusCode: Int!
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
   data: Sites!
 }
 
@@ -361,30 +384,70 @@ type SearchSiteResponse {
   pageSize: Float!
 }
 
-type DashboardResponse {
-  httpStatusCode: Int!
+type RecentViewResponse {
   message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
   data: [RecentViews!]
 }
 
 type SnapshotResponse {
-  httpStatusCode: Int!
   message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
   data: [Snapshots!]
+}
+
+type SiteParticsResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [SiteParticsDto!]
+}
+
+type SiteParticsDto {
+  guid: String!
+  id: String!
+  psnorgId: String!
+  effectiveDate: DateTime!
+  endDate: DateTime
+  note: String
+  displayName: String!
+  prCode: String!
+  description: String!
+}
+
+type DropdownResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [DropdownDto!]
+}
+
+type DropdownDto {
+  key: String!
+  value: String!
 }
 
 type Query {
   sites: FetchSiteResponse!
   searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
   findSiteBySiteId(siteId: String!): FetchSiteDetail!
-  getRecentViewsByUserId(userId: String!): DashboardResponse!
+  getRecentViewsByUserId(userId: String!): RecentViewResponse!
   getSnapshots: SnapshotResponse!
   getSnapshotsByUserId(userId: String!): SnapshotResponse!
   getSnapshotsById(id: Int!): SnapshotResponse!
+  getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
+  getParticipantRoleCd: DropdownResponse!
+  getPeopleOrgsCd: DropdownResponse!
 }
 
 type Mutation {
-  addRecentView(recentView: RecentViewDto!): DashboardResponse!
+  addRecentView(recentView: RecentViewDto!): RecentViewResponse!
   createSnapshot(snapshot: SnapshotDto!): SnapshotResponse!
 }
 

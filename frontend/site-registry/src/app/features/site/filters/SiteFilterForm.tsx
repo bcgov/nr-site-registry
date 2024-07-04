@@ -48,7 +48,7 @@ const SiteFilterForm: React.FC<childProps> = ({ cancelSearchFilter }) => {
         flattedArr && flattedArr.find((row) => row.graphQLPropertyName === key);
       if (key === 'whenCreated' || key === 'whenUpdated') {
         let dateRangeValue = formatDateRange(value);
-        filteredFormData[key] = dateRangeValue;
+        filteredFormData[key] = value;
         filters.push({
           key,
           value: dateRangeValue,

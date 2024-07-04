@@ -23,12 +23,7 @@ const Widget: React.FC<IWidget> = ({
   handleCheckBoxChange,
   sortHandler,
 }) => {
-  let widgetSortHandler =
-    sortHandler ??
-    ((row, ascSort) => {
-      console.log('Widget Handle Sort Event', row, ascSort);
-    });
-
+  let widgetSortHandler = sortHandler ?? (() => {});
   return (
     <div className={`d-flex flex-column widget-container`}>
       {!hideTitle && title && (
@@ -41,26 +36,29 @@ const Widget: React.FC<IWidget> = ({
               onChange={handleCheckBoxChange ?? (() => {})}
             />
           )}
-          <div className="w-100">
+          <div className="w-100 me-1">
             <h4 className={`${customLabelCss ?? `widget-lbl`}`}>{title}</h4>
           </div>
         </div>
       )}
       {children && <div>{children}</div>}
       {!hideTable && (
-        <div>
-          <Table
-            label={title ?? ''}
-            isLoading={tableIsLoading ?? RequestStatus.idle}
-            columns={tableColumns ?? []}
-            data={tableData}
-            showPageOptions={false}
-            allowRowsSelect={allowRowsSelect}
-            changeHandler={changeHandler ?? (() => {})}
-            editMode={editMode ?? false}
-            idColumnName={primaryKeycolumnName ?? ''}
-            sortHandler={widgetSortHandler}
-          />
+        <div className="overflow-auto" style={{ maxHeight: '700px' }}>
+          {/* <div> */}
+          <div className="me-1">
+            <Table
+              label={title ?? ''}
+              isLoading={tableIsLoading ?? RequestStatus.idle}
+              columns={tableColumns ?? []}
+              data={tableData}
+              showPageOptions={false}
+              allowRowsSelect={allowRowsSelect}
+              changeHandler={changeHandler ?? (() => {})}
+              editMode={editMode ?? false}
+              idColumnName={primaryKeycolumnName ?? ''}
+              sortHandler={widgetSortHandler}
+            />
+          </div>
         </div>
       )}
     </div>

@@ -104,3 +104,13 @@
 .dropdown-toggle::after {
   content: none !important;
 }
+.custom-dropdown-menu {
+  /* position: absolute !important; /* Ensure dropdown menu is positioned absolutely */
+  /* z-index: 99999999 !important; Adjust the value as needed to ensure it's above other elements */
+}
+.custom-dropdown:hover {
+  color: var(--typography-color-primary) !important;
+}
+.custom-dropdown {
+  color: var(--typography-color-primary) !important;
+}

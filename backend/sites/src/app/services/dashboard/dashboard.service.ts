@@ -14,7 +14,12 @@ export class DashboardService {
 
   async getRecentViewsByUserId(userId: string): Promise<RecentViews[]> {
     try {
-      return await this.recentViewsRepository.find({ where: { userId } });
+      const result = await this.recentViewsRepository.find({
+        where: { userId },
+      });
+      if (result) {
+        return result;
+      }
     } catch (error) {
       throw error;
     }
@@ -51,7 +56,6 @@ export class DashboardService {
         const existingRecentViewsCount = await this.recentViewsRepository.count(
           { where: { userId } },
         );
-
         if (existingRecentViewsCount >= maxRecentViews) {
           // Delete the oldest recent view if the maximum limit is reached
           const oldestRecentView = await this.recentViewsRepository.findOne({

@@ -3,18 +3,32 @@ import { TableColumn, ColumnSize } from '../../../components/table/TableColumn';
 
 const getSiteSearchResultsColumns = () => {
   const columns: TableColumn[] = [
-    new TableColumn(
-      1,
-      'Site ID',
-      true,
-      'id',
-      1,
-      true,
-      true,
-      1,
-      true,
-      getColumnType('Site ID', 'id', ''),
-    ),
+    // new TableColumn(
+    //   1,
+    //   "Site ID",
+    //   true,
+    //   "id",
+    //   1,
+    //   true,
+    //   true,
+    //   1,
+    //   true,
+    //   getColumnType("Site ID","id",""),
+
+    // ),
+    {
+      id: 1,
+      displayName: 'Site ID',
+      active: true,
+      graphQLPropertyName: 'id',
+      groupId: 1,
+      disabled: true,
+      isDefault: true,
+      sortOrder: 1,
+      isChecked: true,
+      displayType: getColumnTypeWithSticky('Site ID', 'id', ''),
+      stickyCol: true,
+    },
     new TableColumn(
       6,
       'Site Address',
@@ -202,38 +216,70 @@ const getSiteSearchResultsColumns = () => {
       false,
       getColumnType('Consultant Submitted', 'consultantSubmitted', ''),
     ),
-    new TableColumn(
-      17,
-      'View',
-      true,
-      'id',
-      4,
-      true,
-      true,
-      1,
-      true,
-      getLinkColumnType('Map', 'id', '', 'site/map/'),
-      'site/map/',
-      true,
-    ),
-    new TableColumn(
-      18,
-      'Details',
-      true,
-      'id',
-      4,
-      true,
-      true,
-      1,
-      true,
-      getLinkColumnType('Details', 'id', '', 'site/details/'),
-      'site/details/',
-
-      true,
-    ),
+    // new TableColumn(
+    //   17,
+    //   "View",
+    //   true,
+    //   "id",
+    //   4,
+    //   true,
+    //   true,
+    //   1,
+    //   true,
+    //   getLinkColumnType("Map","id","","site/map/") ,
+    //   "site/map/",
+    //   true
+    // ),
+    {
+      id: 17,
+      displayName: 'View',
+      active: true,
+      graphQLPropertyName: 'id',
+      groupId: 4,
+      disabled: true,
+      isDefault: true,
+      sortOrder: 1,
+      isChecked: true,
+      displayType: getLinkColumnType('Map', 'id', '', 'site/map/'),
+      linkRedirectionURL: 'site/map/',
+      dynamicColumn: true,
+      stickyCol: true,
+    },
+    {
+      id: 18,
+      displayName: 'Details',
+      active: true,
+      graphQLPropertyName: 'id',
+      groupId: 4,
+      disabled: true,
+      isDefault: true,
+      sortOrder: 1,
+      isChecked: true,
+      displayType: getLinkColumnType('Details', 'id', '', 'site/details/'),
+      linkRedirectionURL: 'site/details/',
+      dynamicColumn: true,
+      stickyCol: true,
+    },
   ];
 
   return columns;
+};
+
+const getColumnTypeWithSticky = (
+  label: string,
+  propertyName: string,
+  value: string,
+) => {
+  return {
+    type: FormFieldType.Label,
+    label: label,
+    graphQLPropertyName: propertyName,
+    value: value,
+    customLabelCss: 'custom-lbl-text',
+    customInputTextCss: 'custom-input-text',
+    tableMode: true,
+    stickyCol: true,
+  };
 };
 
 const getColumnType = (label: string, propertyName: string, value: string) => {
@@ -245,6 +291,7 @@ const getColumnType = (label: string, propertyName: string, value: string) => {
     customLabelCss: 'custom-lbl-text',
     customInputTextCss: 'custom-input-text',
     tableMode: true,
+    stickyCol: false,
   };
 };
 
@@ -262,6 +309,7 @@ const getLinkColumnType = (
     customLabelCss: 'link-for-table',
     customInputTextCss: 'link-for-table',
     tableMode: true,
+    stickyCol: true,
     href: href,
   };
 };

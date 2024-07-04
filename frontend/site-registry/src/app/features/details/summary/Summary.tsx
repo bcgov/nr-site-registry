@@ -101,7 +101,6 @@ const Summary = () => {
         'Site Location Details SR Mode For ' + trackerLabel,
       );
       dispatch(trackChanges(tracker.toPlainObject()));
-      console.log({ [graphQLPropertyName]: value });
     } else {
       const tracker = new ChangeTracker(
         IChangeType.Modified,
@@ -416,7 +415,6 @@ const Summary = () => {
                     SetParcelSearchTeam('');
                   }}
                   handleSearchChange={(e) => {
-                    console.log('eeee', e);
                     if (e.target) {
                       SetParcelSearchTeam(e.target.value);
                     } else {
@@ -478,9 +476,7 @@ const Summary = () => {
             totalResults={activityData.length}
             allowRowsSelect={false}
             showPageOptions={false}
-            changeHandler={(eventRecord) => {
-              console.log(eventRecord);
-            }}
+            changeHandler={() => {}}
             editMode={false}
             idColumnName="id"
           />

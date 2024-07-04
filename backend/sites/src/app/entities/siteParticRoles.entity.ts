@@ -22,7 +22,7 @@ export class SiteParticRoles {
   @Column('character varying', { name: 'who_created', length: 30 })
   whoCreated: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'who_updated',
     nullable: true,
@@ -34,7 +34,7 @@ export class SiteParticRoles {
   @Column('timestamp without time zone', { name: 'when_created' })
   whenCreated: Date;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'when_updated',
     nullable: true,
@@ -45,7 +45,12 @@ export class SiteParticRoles {
   @Column('smallint', { name: 'rwm_flag' })
   rwmFlag: number;
 
-  @ManyToOne(() => ParticRoleCd, (particRoleCd) => particRoleCd.siteParticRoles)
+  @Field(() => ParticRoleCd)
+  @ManyToOne(
+    () => ParticRoleCd,
+    (particRoleCd) => particRoleCd.siteParticRoles,
+    { eager: true },
+  )
   @JoinColumn([{ name: 'pr_code', referencedColumnName: 'code' }])
   prCode2: ParticRoleCd;
 

@@ -148,7 +148,8 @@
   padding: var(--layout-padding-small) var(--layout-padding-medium)
     var(--layout-padding-small) var(--layout-padding-medium);
   gap: 8px;
-  border-radius: var(--layout-border-medium) var(--layout-border-medium) 0 0;
+  border-radius: var(--surface-border-radius-medium)
+    var(--surface-border-radius-medium) 0 0;
   border: 0px 0px 1px 0px;
   align-items: center;
   display: flex;
@@ -164,7 +165,8 @@
 .table-actions-items:hover {
   background: var(--surface-primary-hover);
   color: white;
-  border-radius: var(--layout-border-medium) var(--layout-border-medium) 0 0;
+  border-radius: var(--surface-border-radius-medium)
+    var(--surface-border-radius-medium) 0 0;
   border: 0px 0px 1px 0px;
 }
 

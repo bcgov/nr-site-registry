@@ -50,6 +50,11 @@ import { SiteResolver } from './resolvers/site/site.resolver';
 import { Snapshots } from './entities/snapshots.entity';
 import { SnapshotsResolver } from './resolvers/snapshot/snapshot.resolver';
 import { SnapshotsService } from './services/snapshot/snapshot.service';
+import { ParticipantResolver } from './resolvers/participant/participant.resolver';
+import { ParticipantService } from './services/participant/participant.service';
+import { GenericResponseProvider } from './dto/response/genericResponseProvider';
+import { DropdownResolver } from './resolvers/dropdown/dropdown.resolver';
+import { DropdownService } from './services/dropdown/dropdown.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -114,6 +119,11 @@ import { SnapshotsService } from './services/snapshot/snapshot.service';
     DashboardService,
     SnapshotsResolver,
     SnapshotsService,
+    ParticipantResolver,
+    ParticipantService,
+    DropdownResolver,
+    DropdownService,
+    GenericResponseProvider,
   ],
   controllers: [SiteController],
 })

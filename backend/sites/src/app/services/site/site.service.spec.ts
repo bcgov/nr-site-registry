@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { SiteService } from './site.service';
 import { Sites } from '../../entities/sites.entity';
-import { FetchSiteDetail } from '../../dto/response/fetchSiteResponse';
+import { FetchSiteDetail } from '../../dto/response/genericResponse';
 import { sampleSites } from '../../mockData/site.mockData';
 
 describe('SiteService', () => {

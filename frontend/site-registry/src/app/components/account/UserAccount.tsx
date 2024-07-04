@@ -91,7 +91,6 @@ const UserAccount = (props: any) => {
                 tabIndex={0} // Make focusable with keyboard
                 className="account-custom-item-mobile"
                 onClick={() => {
-                  console.log('removed', authRedirectUri);
                   auth.removeUser().then(() => {
                     window.location.href = authRedirectUri;
                   });
@@ -172,7 +171,6 @@ const UserAccount = (props: any) => {
                 className="account-custom-item"
                 aria-label="Log Out"
                 onClick={() => {
-                  console.log('removed', authRedirectUri);
                   auth.removeUser().then(() => {
                     window.location.href = authRedirectUri;
                   });

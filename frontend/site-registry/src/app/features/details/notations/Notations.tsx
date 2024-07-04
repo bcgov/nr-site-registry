@@ -198,8 +198,8 @@ const Notations: React.FC<INotations> = ({ user }) => {
     if (viewMode === SiteDetailsMode.SRMode) {
       console.log({ [graphQLPropertyName]: value, id });
     } else {
-      setFormData((prevData) => {
-        return prevData.map((notation) => {
+      setFormData((prevData: any) => {
+        return prevData.map((notation: any) => {
           if (notation.notationId === id) {
             return { ...notation, [graphQLPropertyName]: value };
           }
@@ -231,7 +231,6 @@ const Notations: React.FC<INotations> = ({ user }) => {
 
   const handleRemoveParticipant = (notationId: any) => {
     // Remove selected rows from formData state
-    debugger;
     setFormData((prevData) => {
       return prevData.map((notation) => {
         if (notation.notationId === notationId) {
@@ -265,10 +264,6 @@ const Notations: React.FC<INotations> = ({ user }) => {
     );
     setSelectedRows(updateSelectedRows);
   };
-
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
 
   const handleTableChange = (notationId: any, event: any) => {
     const isExist = formData.some(
@@ -394,6 +389,7 @@ const Notations: React.FC<INotations> = ({ user }) => {
       IChangeType.Added,
       'Notation Participant Added',
     );
+    dispatch(trackChanges(tracker.toPlainObject()));
   };
 
   const isAnyParticipantSelected = (notationId: any) => {
@@ -401,9 +397,7 @@ const Notations: React.FC<INotations> = ({ user }) => {
   };
 
   const handleTableSort = (row: any, ascDir: any, notationId: any) => {
-    console.log('table sort handler', row, ascDir);
     let property = row['graphQLPropertyName'];
-    // let notationId =notation.notationId;
     setFormData((prevData) => {
       return prevData.map((tempNotation) => {
         if (notationId === tempNotation.notationId) {
@@ -423,7 +417,6 @@ const Notations: React.FC<INotations> = ({ user }) => {
                     ? -1
                     : 0;
             });
-          console.log('updatedNotationParticipant', updatedNotationParticipant);
           return {
             ...tempNotation,
             notationParticipant: updatedNotationParticipant,
@@ -472,7 +465,7 @@ const Notations: React.FC<INotations> = ({ user }) => {
         <div
           className={`${userType === UserType.Internal && (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode) ? `col-lg-6 col-md-12` : `col-lg-12`}`}
         >
-          <div className="row align-items-center justify-content-between p-0">
+          <div className="row justify-content-between p-0">
             <div
               className={`mb-3 ${userType === UserType.Internal ? (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode ? `col` : `col-lg-8 col-md-12`) : `col-xxl-8 col-xl-8 col-lg-8 col-md-12 col-sm-12 col-xs-12`}`}
             >
@@ -577,7 +570,7 @@ const Notations: React.FC<INotations> = ({ user }) => {
                       }
                       tableData={notation.notationParticipant}
                       tableIsLoading={
-                        notation.notationParticipant.Length > 0
+                        notation.notationParticipant.length > 0
                           ? loading
                           : RequestStatus.idle
                       }

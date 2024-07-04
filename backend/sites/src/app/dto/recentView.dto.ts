@@ -1,5 +1,13 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsNotEmpty, IsString, IsOptional, IsDate } from 'class-validator';
+import { ResponseDto } from './response/response.dto';
+import { RecentViews } from '../entities/recentViews.entity';
+
+@ObjectType()
+export class RecentViewResponse extends ResponseDto {
+  @Field(() => [RecentViews], { nullable: true })
+  data: RecentViews[] | null;
+}
 
 @InputType()
 export class RecentViewDto {

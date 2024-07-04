@@ -22,7 +22,7 @@ function App() {
             <AppRoutes />
           </div>
         </div>
-        <Footer />
+        {/* <Footer/>  */}
       </Router>
       <ToastContainer />
     </div>

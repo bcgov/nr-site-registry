@@ -5,7 +5,7 @@ import {
   FetchSiteDetail,
   FetchSiteResponse,
   SearchSiteResponse,
-} from '../../dto/response/fetchSiteResponse';
+} from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteUtil } from '../../utils/site.util';
 import { RecentViews } from 'src/app/entities/recentViews.entity';
@@ -189,7 +189,6 @@ export class SiteService {
         whenUpdated: whenUpdated,
       });
     }
-
     const result = await query
       .skip((page - 1) * pageSize)
       .take(pageSize)

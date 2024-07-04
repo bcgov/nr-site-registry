@@ -7,6 +7,8 @@ import commonDataReducer from './features/common/CommonDataSlice';
 import siteReducer from './features/site/dto/SiteSlice';
 import thunk from 'redux-thunk';
 import dashboardReducer from './features/dashboard/DashboardSlice';
+import siteParticipantReducer from './features/details/participants/ParticipantSlice';
+import DropdownReducer from './features/details/dropdowns/DropdownSlice';
 
 const persistedStore: any = loadFromLocalStorage();
 
@@ -15,6 +17,8 @@ export const store = configureStore({
     commonData: commonDataReducer,
     sites: siteReducer,
     dashboard: dashboardReducer,
+    siteParticipant: siteParticipantReducer,
+    dropdown: DropdownReducer,
   },
 });
 

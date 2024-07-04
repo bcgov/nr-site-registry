@@ -4,7 +4,7 @@ import { SiteService } from '../../services/site/site.service';
 import {
   FetchSiteResponse,
   SearchSiteResponse,
-} from '../../dto/response/fetchSiteResponse';
+} from '../../dto/response/genericResponse';
 import { sampleSites } from '../../mockData/site.mockData';
 
 describe('SiteResolver', () => {

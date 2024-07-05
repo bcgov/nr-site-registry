@@ -13,7 +13,7 @@ import Actions from "../../../components/action/Actions";
 import './Participants.css';
 import SearchInput from "../../../components/search/SearchInput";
 import Sort from "../../../components/sort/Sort";
-import { fetchSiteParticipants, siteParticipants } from "./ParticipantSlice";
+import { siteParticipants, updateSiteParticipants } from "./ParticipantSlice";
 import { useParams } from "react-router-dom";
 import GetConfig from "./ParticipantsConfig";
 import { IParticipant } from "./IParticipantState";
@@ -41,32 +41,18 @@ const Participants = () => {
     useEffect(()=>{
       if(resetDetails)
       {
-        setFormData(siteParticipant.map(participant => ({
-          ...participant,
-          effectiveDate: new Date(participant.effectiveDate),
-          endDate: participant.endDate ? new Date(participant.endDate) : null
-      })));
-      }
+        setFormData(siteParticipant);
+       }
     },[resetDetails]);
 
     useEffect(() => {
-     
-      setFormData(siteParticipant.map(participant => ({
-        ...participant,
-        effectiveDate: new Date(participant.effectiveDate),
-        endDate: participant.endDate ? new Date(participant.endDate) : null
-    })));
+      setFormData(siteParticipant);
     }, [id]);
     
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const searchTerm = event.target.value;
         setSearchTerm(searchTerm);
-        const searchData = siteParticipant.map(participant => ({
-                              ...participant,
-                              effectiveDate: new Date(participant.effectiveDate),
-                              endDate: participant.endDate ? new Date(participant.endDate) : null
-                          }));
-        const filteredData = searchData.filter((paticipant: any) => {
+        const filteredData = siteParticipant.filter((paticipant: any) => {
             return deepSearch(paticipant, searchTerm.toLowerCase().trim());
         });
         setFormData(filteredData);
@@ -102,11 +88,7 @@ const Participants = () => {
 
     const clearSearch = () => {
       setSearchTerm('');
-      setFormData(siteParticipant.map(participant => ({
-        ...participant,
-        effectiveDate: new Date(participant.effectiveDate),
-        endDate: participant.endDate ? new Date(participant.endDate) : null
-      })));
+      setFormData(siteParticipant);
     };
 
    
@@ -150,17 +132,15 @@ const Participants = () => {
         }
         else
         {
-          setFormData((prevData) => {
-           const updatedParticipant = prevData.map(participant => {
-              if(participant.guid === event.row.guid)
-                {
-                  return { ...participant, [event.property]: event.value };
-                }
-                return participant;
-            })
-            return updatedParticipant;
-          });
-
+          const updatedParticipant = formData.map(participant => {
+            if(participant.guid === event.row.guid)
+              {
+                return { ...participant, [event.property]: event.value };
+              }
+              return participant;
+          })
+          setFormData(updatedParticipant);
+          dispatch(updateSiteParticipants(updatedParticipant));
           const IsExist = selectedRows.some(row => row.guid === event.row.guid);
           if(IsExist)
           {
@@ -196,10 +176,10 @@ const Participants = () => {
         let sorted = [...data];
         switch (sortBy) {
           case 'newToOld':
-            sorted.sort((a, b) => b.effectiveDate - a.effectiveDate); // Sorting by date from new to old
+            sorted.sort((a, b) => new Date(b.effectiveDate).getTime() - new Date(a.effectiveDate).getTime()); // Sorting by date from new to old
             break;
           case 'oldTonew':
-            sorted.sort((a, b) => a.effectiveDate - b.effectiveDate); // Sorting by date from new to old
+            sorted.sort((a, b) => new Date(a.effectiveDate).getTime() - new Date(b.effectiveDate).getTime()); // Sorting by date from new to old
             break;
           // Add more cases for additional sorting options
           default:

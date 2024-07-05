@@ -13,6 +13,7 @@ import {
   DateInput,
   TextAreaInput,
   DropdownSearchInput,
+  DeleteIcon,
 } from '../../input-controls/InputControls';
 import { ChangeTracker } from '../../common/IChangeType';
 interface TableBodyProps {
@@ -23,6 +24,7 @@ interface TableBodyProps {
   changeHandler: (data: any) => void;
   editMode: boolean;
   idColumnName: string;
+  rowDeleteHandler: (data: any) => void;
 }
 
 const TableBody: FC<TableBodyProps> = ({
@@ -33,6 +35,7 @@ const TableBody: FC<TableBodyProps> = ({
   changeHandler,
   editMode,
   idColumnName,
+  rowDeleteHandler,
 }) => {
   const [selectedRowIds, SetSelectedRowsId] = useState(['']);
 
@@ -71,13 +74,16 @@ const TableBody: FC<TableBodyProps> = ({
     rowKey: number,
     propertyName: any,
     value: any,
+    isDeleteRow?: boolean,
   ) => {
     const changeRecord = {
       row: getDataRow(rowKey),
       property: propertyName,
       value: value,
     };
-    changeHandler(changeRecord);
+
+    if (isDeleteRow) rowDeleteHandler(changeRecord);
+    else changeHandler(changeRecord);
   };
 
   const getTableCellHtml = (

@@ -23,6 +23,7 @@ interface TableProps {
   editMode: boolean;
   idColumnName: string;
   sortHandler?: (row: any, ascSort: boolean) => void;
+  delteHandler?: (eventRecord: any) => void;
 }
 
 const Table: FC<TableProps> = ({
@@ -41,8 +42,18 @@ const Table: FC<TableProps> = ({
   editMode,
   idColumnName,
   sortHandler,
+  delteHandler,
 }) => {
-  let tableSortHandler = sortHandler ?? ((row, ascSort) => {});
+  let tableSortHandler =
+    sortHandler ??
+    ((row, ascSort) => {
+      console.log('Handle Sort Event', row, ascSort);
+    });
+  let rowDelteHandler =
+    delteHandler ??
+    ((row) => {
+      console.log('Handle Delete Event', row);
+    });
 
   return (
     <React.Fragment>
@@ -63,6 +74,7 @@ const Table: FC<TableProps> = ({
             changeHandler={changeHandler}
             editMode={editMode}
             idColumnName={idColumnName}
+            rowDeleteHandler={rowDelteHandler}
           />
         </table>
       </div>

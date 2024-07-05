@@ -8,6 +8,21 @@ interface HeaderCellProps {
   sortHandler: (row: any, ascSort: boolean) => void;
 }
 
+const getColumnSize = (columnSize: ColumnSize | undefined) => {
+  switch (columnSize) {
+    case ColumnSize.Triple:
+      return 'triple';
+    case ColumnSize.Double:
+      return 'double';
+    case ColumnSize.Small:
+      return 'small';
+    case ColumnSize.XtraSmall:
+      return 'xtraSmall';
+    default:
+      return '';
+  }
+};
+
 const HeaderCell: FC<HeaderCellProps> = ({ item, index, sortHandler }) => {
   const [ascendingSort, setSortDirection] = useState(false);
 
@@ -15,12 +30,9 @@ const HeaderCell: FC<HeaderCellProps> = ({ item, index, sortHandler }) => {
     <th
       key={index}
       scope="col"
-      className={`table-header-th ${
-        item.displayName === 'Region' ||
-        item.displayName === 'Last Updated Date'
-          ? 'hide-custom'
-          : ''
-      } ${item.columnSize === ColumnSize.Triple ? 'triple' : ''}  ${item.stickyCol ? 'positionSticky' : ''} `}
+      className={`table-header-th ${getColumnSize(
+        item.columnSize,
+      )}  ${item.stickyCol ? 'positionSticky' : ''} `}
     >
       {item.displayName}
       <SortIcon

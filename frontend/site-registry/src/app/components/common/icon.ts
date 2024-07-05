@@ -32,6 +32,7 @@ import {
   FaUserPlus,
   FaPlus,
   FaMinus,
+  FaTrashCan,
 } from 'react-icons/fa6';
 
 import { BsFillPinMapFill, BsEyeFill } from 'react-icons/bs';
@@ -71,3 +72,4 @@ export const Plus = FaPlus;
 export const Minus = FaMinus;
 export const FillPinMapFill = BsFillPinMapFill;
 export const FillEye = BsEyeFill;
+export const TrashCanIcon = FaTrashCan;

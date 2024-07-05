@@ -9,6 +9,12 @@ import {
   BookIcon,
   ShoppingCartIcon,
 } from '../../common/icon';
+import { useSelector } from 'react-redux';
+import {
+  cartItems,
+  deleteRequestStatus,
+  addCartItemRequestStatus,
+} from '../../../features/cart/CartSlice';
 
 export class SideNav {
   constructor(
@@ -62,7 +68,7 @@ const getSideBarNavList = () => {
       ],
       false,
     ),
-    new SideNav(5, 'Cart', false, cartIcon, '/cart', [], true),
+    new SideNav(5, 'Cart', false, cartIcon, '/site/cart', [], true),
   ];
 
   return sideNavList;

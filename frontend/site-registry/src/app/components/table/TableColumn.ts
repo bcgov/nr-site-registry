@@ -11,6 +11,8 @@ import { IFormField } from '../input-controls/IFormField';
 
 export enum ColumnSize {
   Default,
+  Small,
+  XtraSmall,
   Double,
   Triple,
 }

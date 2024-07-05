@@ -172,3 +172,15 @@ div.tableWidth::-webkit-scrollbar-track {
 .triple {
   width: 60%;
 }
+
+.small {
+  width: 10%;
+}
+
+.xtraSmall {
+  width: 5%;
+}
+
+.double {
+  width: 40%;
+}

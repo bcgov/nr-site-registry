@@ -5,6 +5,7 @@ import Search from '../features/site/Search';
 import MapSearch from '../features/map/MapSearch';
 import SiteDetails from '../features/details/SiteDetails';
 import Dashboard from '../features/dashboard/Dashboard';
+import Cart from '../features/cart/Cart';
 
 const AppRoutes = () => {
   return (
@@ -18,6 +19,7 @@ const AppRoutes = () => {
       ></Route>
       <Route path="/search/site/details/:id" element={<SiteDetails />}></Route>
       <Route path="/site/map/:id" element={<MapSearch />}></Route>
+      <Route path="/site/cart" element={<Cart />}></Route>
       <Route path="*" element={<h1>Page not found</h1>}></Route>
     </Routes>
   );

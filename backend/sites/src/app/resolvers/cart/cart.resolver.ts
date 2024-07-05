@@ -1,14 +1,12 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
-import { RecentViews } from '../../entities/recentViews.entity';
-import { DashboardService } from '../../services/dashboard/dashboard.service';
-import { RecentViewDto, RecentViewResponse } from '../../dto/recentView.dto';
-import { GenericResponseProvider } from 'src/app/dto/response/genericResponseProvider';
-import { GenericValidationPipe } from 'src/app/utils/validations/genericValidationPipe';
-import { Cart } from 'src/app/entities/cart.entity';
-import { CartService } from 'src/app/services/cart/cart.service';
-import { CartDTO, CartResponse } from 'src/app/dto/cart.dto';
+import {  } from '../../dto/recentView.dto';
+import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
+import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
+import { Cart } from '../../entities/cart.entity';
+import { CartService } from '../../services/cart/cart.service';
+import { CartDTO, CartResponse } from '../../dto/cart.dto';
 
 @Resolver(() => Cart)
 export class CartResolver {
@@ -34,7 +32,7 @@ export class CartResolver {
   }
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
-  @Mutation(() => RecentViewResponse, { name: 'addCartItem' })
+  @Mutation(() => CartResponse, { name: 'addCartItem' })
   async addCartItem(
     @Args('cartDTO', { type: () => CartDTO }, new ValidationPipe())
     cartDTO: CartDTO,
@@ -51,7 +49,7 @@ export class CartResolver {
   }
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
-  @Mutation(() => RecentViewResponse, { name: 'deleteCartItem' })
+  @Mutation(() => CartResponse, { name: 'deleteCartItem' })
   async deleteCartItem(
     @Args('cartId', new ValidationPipe())
     cartId: string,

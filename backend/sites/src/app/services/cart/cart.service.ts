@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
-import { Cart } from 'src/app/entities/cart.entity';
-import { CartDTO } from 'src/app/dto/cart.dto';
+import { Cart } from '../../entities/cart.entity';
+import { CartDTO } from '../../dto/cart.dto';
 
 @Injectable()
 export class CartService {

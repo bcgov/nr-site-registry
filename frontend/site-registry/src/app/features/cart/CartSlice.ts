@@ -25,6 +25,7 @@ export const fetchCartItems = createAsyncThunk(
                 userId:userId
             }
         })
+        console.log("response from cart",response)
         return response.data.data.getCartItemsForUser.data;
       }
       catch(error)

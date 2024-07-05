@@ -55,6 +55,9 @@ import { ParticipantService } from './services/participant/participant.service';
 import { GenericResponseProvider } from './dto/response/genericResponseProvider';
 import { DropdownResolver } from './resolvers/dropdown/dropdown.resolver';
 import { DropdownService } from './services/dropdown/dropdown.service';
+import { CartResolver } from './resolvers/cart/cart.resolver';
+import { CartService } from './services/cart/cart.service';
+import { Cart } from './entities/cart.entity';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -66,7 +69,7 @@ import { DropdownService } from './services/dropdown/dropdown.service';
     ProfileAnswers, ProfileSubmissions, SiteProfileLandUses, SiteProfileOwners, ProfileQuestions, ProfileCategories, SubmissionCd,
     SiteDocPartics, PeopleOrgs, SiteParticRoles, ParticRoleCd, EventParticRoleCd, CityRegions, SiteContaminationClassXref,
     ContaminationClassCd, SiteCrownLandStatusCd, SisAddresses, SiteStaffs, DocParticRoleCd, LtoDownload, LtoPrevDownload,
-    PlanTable, SiteCrownLandContaminated, RecentViews, Snapshots, ])],
+    PlanTable, SiteCrownLandContaminated, RecentViews, Snapshots, Cart ])],
   providers: [
     SiteResolver,
     SiteService,
@@ -78,7 +81,9 @@ import { DropdownService } from './services/dropdown/dropdown.service';
     ParticipantService,
     DropdownResolver,
     DropdownService,
-    GenericResponseProvider
+    GenericResponseProvider,
+    CartResolver,
+    CartService
   ],
   controllers: [SiteController],
 })

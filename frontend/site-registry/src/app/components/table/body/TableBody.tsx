@@ -266,6 +266,26 @@ const TableBody: FC<TableBodyProps> = ({
                   tableMode={field.tableMode ?? false}
                   stickyCol = {field.stickyCol}
               />);
+                  }
+              else if(field.type === FormFieldType.DeleteIcon)
+                {
+           
+                  return (
+                  <DeleteIcon
+                  label={field.label}
+                  customLabelCss = {field.customLabelCss}
+                  customInputTextCss={field.customInputTextCss}
+                  customEditLabelCss = {field.customEditLabelCss}
+                  customEditInputTextCss={field.customEditInputTextCss}
+                  placeholder={field.placeholder}
+                  options={field.options || []}
+                  value={value}
+                  onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value, true)}
+                  type={field.type}
+                  isEditing={editMode ?? true}
+                  tableMode={field.tableMode ?? false}
+                  stickyCol = {field.stickyCol}
+              />);
                 }
   };
 

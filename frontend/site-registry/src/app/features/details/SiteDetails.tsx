@@ -57,6 +57,7 @@ import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
 import { useAuth } from "react-oidc-context";
 
 const SiteDetails = () => {
+
  
   console.log(getUser())
 
@@ -185,8 +186,8 @@ const SiteDetails = () => {
     {
       console.log(loggedInUser)
 
-      dispatch(addCartItem({ userId: loggedInUser.profile.sub , siteId:"1",whoUpdated:"midhun", whenUpdated:"2024-06-01", 
-        whoCreated: "midun", whenCreated:"2024-06-01", price:200.11})).unwrap()
+      dispatch(addCartItem({ userId: loggedInUser.profile.sub , siteId:details.id, 
+        whoCreated: loggedInUser.profile.given_name ?? "", price:200.11})).unwrap()
     }
    
 

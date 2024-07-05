@@ -53,9 +53,15 @@ import { getUser } from "../../helpers/utility";
 import { addRecentView } from "../dashboard/DashboardSlice";
 import { fetchParticipantRoleCd, fetchPeopleOrgsCd } from "./dropdowns/DropdownSlice";
 import { fetchSiteParticipants } from "./participants/ParticipantSlice";
+import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
+import { useAuth } from "react-oidc-context";
 
 const SiteDetails = () => {
  
+  console.log(getUser())
+
+  const auth = useAuth();
+
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
@@ -165,6 +171,28 @@ const SiteDetails = () => {
         throw error;
     }
   };
+  const handleAddToCart = ()=>{
+    console.log("add clicked")
+    dispatch(resetCartItemAddedStatus);
+    const loggedInUser = getUser();
+    if(loggedInUser === null)
+    {
+     
+      auth.signinRedirect(
+         {extraQueryParams:{'kc_idp_hint':'bceid'}})
+    }
+    else
+    {
+      console.log(loggedInUser)
+
+      dispatch(addCartItem({ userId: loggedInUser.profile.sub , siteId:"1",whoUpdated:"midhun", whenUpdated:"2024-06-01", 
+        whoCreated: "midun", whenCreated:"2024-06-01", price:200.11})).unwrap()
+    }
+   
+
+  }
+
+
 
   return (
     <PageContainer role="details">
@@ -246,7 +274,7 @@ const SiteDetails = () => {
           {/* For Cart /Folio Controls*/}
           { (!edit && viewMode === SiteDetailsMode.ViewOnlyMode && userType === UserType.External) &&
             <>
-              <button className="d-flex btn-cart align-items-center">
+              <button className="d-flex btn-cart align-items-center" onClick={()=>handleAddToCart()}>
                 <ShoppingCartIcon className="btn-icon" />
                 <span className="btn-cart-lbl"> Add to Cart</span>
               </button>
@@ -265,7 +293,7 @@ const SiteDetails = () => {
           <CustomLabel label="1" labelType="r-h5" />
         </div>
         <div>
-          <CustomLabel label="2929 Fort" labelType="b-h1" />
+          <CustomLabel label="2929 Quadra" labelType="b-h1" />
         </div>
       </div>
       <NavigationPills items={navItems} components={navComponents} dropdownItems={dropDownNavItems}/>

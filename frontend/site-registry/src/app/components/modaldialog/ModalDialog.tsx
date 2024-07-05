@@ -5,11 +5,13 @@ import { CancelButton, SaveButton } from "../simple/CustomButtons";
 
 interface ModalDialogCloseHandlerProps {
   closeHandler: (save:boolean)=> void;
-  children: ReactNode;
+  children?: ReactNode;
+  label?: string;
 }
 
-const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({closeHandler,children}) => {
+const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({closeHandler,children,label}) => {
   const [open, setOpen] = useState<boolean>(true);
+  const displayLabel = label ?? "Are you sure you want to commit changes to this site?"
 
   const handleClose = () => {
     setOpen(false);
@@ -29,16 +31,16 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({closeHandler,child
           <div className="custom-modal-content">
             <div className="custom-modal-header">
               <span className="custom-modal-header-text">
-                Are you sure you want to commit changes to this site?
+                {displayLabel}
               </span>
               <XmarkIcon
                 className="custom-modal-header-close"
                 onClick={handleClose}
               ></XmarkIcon>
             </div>
-            <div className="custom-modal-data">
+           {children &&  <div className="custom-modal-data">
               {children}
-            </div>
+            </div>}
             <div className="custom-modal-actions-footer">
              
              <CancelButton clickHandler={handleClose}/>

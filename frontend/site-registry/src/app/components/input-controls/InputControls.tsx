@@ -4,13 +4,14 @@ import avatar from "../../images/avatar.png";
 import infoIcon from '../../images/info-icon.png';
 import { formatDate, formatDateRange } from "../../helpers/utility";
 import { DatePicker, DateRangePicker } from "rsuite";
-import { CalendarIcon } from "../common/icon";
+import { CalendarIcon, TrashCanIcon } from "../common/icon";
 import { Link as RouterLink } from "react-router-dom";
 import { v4 } from "uuid";
 import Dropdown from 'react-bootstrap/Dropdown';
-import Form from 'react-bootstrap/Form';
+
 import SearchInput from "../search/SearchInput";
 import { table } from "console";
+
 
 interface InputProps extends IFormField {
   children?: InputProps[];
@@ -60,6 +61,33 @@ export const Link: React.FC<InputProps> = ({
        {customIcon && customIcon} <span className="ps-1">{customLinkValue ?? value}</span>
       </RouterLink>,
       stickyCol
+    )
+  );
+};
+
+export const DeleteIcon: React.FC<InputProps> = ({
+  label,
+  placeholder,
+  type,
+  value,
+  validation,
+  allowNumbersOnly,
+  isEditing,
+  customLabelCss,
+  customInputTextCss,
+  customEditLabelCss,
+  customEditInputTextCss,
+  onChange,
+  tableMode,
+  href,
+}) => {
+  return (
+    renderTableCell(
+      <div onClick={onChange}>
+            <TrashCanIcon  title="Remove"/> 
+            <span>&nbsp;Remove</span>  
+      </div>
+   
     )
   );
 };

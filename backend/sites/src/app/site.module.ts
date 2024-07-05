@@ -55,6 +55,8 @@ import { ParticipantService } from './services/participant/participant.service';
 import { GenericResponseProvider } from './dto/response/genericResponseProvider';
 import { DropdownResolver } from './resolvers/dropdown/dropdown.resolver';
 import { DropdownService } from './services/dropdown/dropdown.service';
+import { DisclosureService } from './services/disclosure/disclosure.service';
+import { DisclosureResolver } from './resolvers/disclosure/disclosure.resolver';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -78,6 +80,8 @@ import { DropdownService } from './services/dropdown/dropdown.service';
     ParticipantService,
     DropdownResolver,
     DropdownService,
+    DisclosureResolver,
+    DisclosureService,
     GenericResponseProvider
   ],
   controllers: [SiteController],

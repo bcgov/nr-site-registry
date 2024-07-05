@@ -11,6 +11,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
 import SearchInput from "../search/SearchInput";
 import { table } from "console";
+import { id } from "date-fns/locale";
 
 interface InputProps extends IFormField {
   children?: InputProps[];
@@ -496,14 +497,15 @@ export const DateInput: React.FC<InputProps> = ({
   tableMode,
   onChange,
 }) => {
- 
   const ContainerElement = tableMode ? 'td' : 'div';
   let dateValue;
-  value = tableMode ? value != '' ? new Date(value) : null : value
-  if (value) {
-    dateValue = formatDate(value);
-  }
 
+  value = tableMode ? value != ''  ? new Date(value) : null : value
+  value = (!tableMode && isEditing && value != null) ? new Date(value)  : value  
+
+  if (value) {
+    dateValue = formatDate(new Date(value));
+  }
   const handleCheckBoxChange = (isChecked: boolean) => {
     onChange(isChecked);
   };
@@ -541,7 +543,7 @@ export const DateInput: React.FC<InputProps> = ({
         placeholder={placeholder}
         format="MMMM d, yyyy"
         caretAs={CalendarIcon}
-        value={value}
+        value={value ?? null}
         onChange={(value) => onChange(value)}
         oneTap
       />

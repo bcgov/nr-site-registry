@@ -98,49 +98,49 @@ type LandHistories {
 type SiteProfiles {
   siteId: String!
   dateCompleted: DateTime!
-  localAuthDateRecd: DateTime!
-  localAuthName: String!
-  localAuthAgency: String!
-  localAuthAddress1: String!
-  localAuthAddress2: String!
-  localAuthPhoneAreaCode: String!
-  localAuthPhoneNo: String!
-  localAuthFaxAreaCode: String!
-  localAuthFaxNo: String!
-  localAuthDateSubmitted: DateTime!
-  localAuthDateForwarded: DateTime!
-  rwmDateReceived: DateTime!
-  rwmParticId: String!
-  rwmPhoneAreaCode: String!
-  rwmPhoneNo: String!
-  rwmFaxAreaCode: String!
-  rwmFaxNo: String!
-  investigationRequired: String!
-  rwmDateDecision: DateTime!
-  siteRegDateRecd: DateTime!
-  siteRegDateEntered: DateTime!
-  siteRegParticId: String!
-  ownerParticId: String!
-  siteAddress: String!
-  siteCity: String!
-  sitePostalCode: String!
-  numberOfPids: Float!
-  numberOfPins: Float!
-  latDegrees: Float!
-  latMinutes: Float!
-  latSeconds: String!
-  longDegrees: Float!
-  longMinutes: Float!
-  longSeconds: String!
-  comments: String!
+  localAuthDateRecd: DateTime
+  localAuthName: String
+  localAuthAgency: String
+  localAuthAddress1: String
+  localAuthAddress2: String
+  localAuthPhoneAreaCode: String
+  localAuthPhoneNo: String
+  localAuthFaxAreaCode: String
+  localAuthFaxNo: String
+  localAuthDateSubmitted: DateTime
+  localAuthDateForwarded: DateTime
+  rwmDateReceived: DateTime
+  rwmParticId: String
+  rwmPhoneAreaCode: String
+  rwmPhoneNo: String
+  rwmFaxAreaCode: String
+  rwmFaxNo: String
+  investigationRequired: String
+  rwmDateDecision: DateTime
+  siteRegDateRecd: DateTime
+  siteRegDateEntered: DateTime
+  siteRegParticId: String
+  ownerParticId: String
+  siteAddress: String
+  siteCity: String
+  sitePostalCode: String
+  numberOfPids: Float
+  numberOfPins: Float
+  latDegrees: Float
+  latMinutes: Float
+  latSeconds: String
+  longDegrees: Float
+  longMinutes: Float
+  longSeconds: String
+  comments: String
   whoCreated: String!
-  whoUpdated: String!
+  whoUpdated: String
   whenCreated: DateTime!
-  whenUpdated: DateTime!
-  localAuthEmail: String!
-  plannedActivityComment: String!
-  siteDisclosureComment: String!
-  govDocumentsComment: String!
+  whenUpdated: DateTime
+  localAuthEmail: String
+  plannedActivityComment: String
+  siteDisclosureComment: String
+  govDocumentsComment: String
 }
 
 type SitePartics {
@@ -433,6 +433,14 @@ type DropdownDto {
   value: String!
 }
 
+type DisclosureResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [SiteProfiles!]
+}
+
 type Query {
   sites: FetchSiteResponse!
   searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
@@ -444,6 +452,7 @@ type Query {
   getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
   getParticipantRoleCd: DropdownResponse!
   getPeopleOrgsCd: DropdownResponse!
+  getSiteDisclosureBySiteId(siteId: String!): DisclosureResponse!
 }
 
 type Mutation {

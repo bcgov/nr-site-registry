@@ -53,6 +53,7 @@ import { getUser } from "../../helpers/utility";
 import { addRecentView } from "../dashboard/DashboardSlice";
 import { fetchParticipantRoleCd, fetchPeopleOrgsCd } from "./dropdowns/DropdownSlice";
 import { fetchSiteParticipants } from "./participants/ParticipantSlice";
+import { fetchSiteDisclosure } from "./disclosure/DisclosureSlice";
 
 const SiteDetails = () => {
  
@@ -104,6 +105,7 @@ const SiteDetails = () => {
     dispatch(fetchPeopleOrgsCd());
     dispatch(fetchParticipantRoleCd());
     dispatch(fetchSiteParticipants(id ?? ''));
+    dispatch(fetchSiteDisclosure(id ?? ''));
   }, [id]);
 
   useEffect(() => {

@@ -411,7 +411,7 @@ const Summary = () => {
     {
       console.log(loggedInUser)
 
-      dispatch(addCartItem({ userId: loggedInUser.profile.sub , siteId:"1691",whoCreated:"midhun", price:200.11})).unwrap()
+      dispatch(addCartItem({ userId: loggedInUser.profile.sub , siteId:editSiteDetailsObject.id,whoCreated:loggedInUser?.profile.given_name ?? "", price:200.11})).unwrap()
     }
    
 

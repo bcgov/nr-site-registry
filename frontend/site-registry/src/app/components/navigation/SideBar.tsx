@@ -51,7 +51,7 @@ function SideBar() {
           {item.displayText}
         </Link>
         )}
-        {item.linkTo.indexOf("cart") !== -1 &&  userCartItems.length === 0 && item.icon && (
+        {item.linkTo.indexOf("cart") !== -1 && userCartItems &&  userCartItems.length === 0 && item.icon && (
           <Link
           to={item.linkTo}
           className={`sideBarDisplayText nav-section-bold-label nav-color-primary-default`}
@@ -61,7 +61,7 @@ function SideBar() {
           {userCartItems.length}
         </Link>
         )}
-        {item.linkTo.indexOf("cart") !== -1 && userCartItems.length > 0 && item.icon && (
+        {item.linkTo.indexOf("cart") !== -1 && userCartItems &&  userCartItems.length > 0 && item.icon && (
           <Link
           to={item.linkTo}
           className={`sideBarDisplayText cart-items-number nav-section-bold-label nav-color-primary-default`}

@@ -10,12 +10,12 @@ import { SRVisibility } from "../../../helpers/requests/srVisibility";
 import Widget from "../../../components/widget/Widget";
 import { UserMinus, UserPlus } from "../../../components/common/icon";
 import Actions from "../../../components/action/Actions";
-import './Participants.css';
+import './Participant.css';
 import SearchInput from "../../../components/search/SearchInput";
 import Sort from "../../../components/sort/Sort";
 import { siteParticipants, updateSiteParticipants } from "./ParticipantSlice";
 import { useParams } from "react-router-dom";
-import GetConfig from "./ParticipantsConfig";
+import GetConfig from "./ParticipantConfig";
 import { IParticipant } from "./IParticipantState";
 import { v4 } from "uuid";
 

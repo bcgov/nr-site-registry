@@ -65,6 +65,7 @@ function SideBar() {
             </Link>
           )}
         {item.linkTo.indexOf('cart') !== -1 &&
+          userCartItems &&
           userCartItems.length === 0 &&
           item.icon && (
             <Link
@@ -77,6 +78,7 @@ function SideBar() {
             </Link>
           )}
         {item.linkTo.indexOf('cart') !== -1 &&
+          userCartItems &&
           userCartItems.length > 0 &&
           item.icon && (
             <Link

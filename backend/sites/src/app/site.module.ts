@@ -55,6 +55,9 @@ import { ParticipantService } from './services/participant/participant.service';
 import { GenericResponseProvider } from './dto/response/genericResponseProvider';
 import { DropdownResolver } from './resolvers/dropdown/dropdown.resolver';
 import { DropdownService } from './services/dropdown/dropdown.service';
+import { CartResolver } from './resolvers/cart/cart.resolver';
+import { CartService } from './services/cart/cart.service';
+import { Cart } from './entities/cart.entity';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -110,6 +113,7 @@ import { DropdownService } from './services/dropdown/dropdown.service';
       SiteCrownLandContaminated,
       RecentViews,
       Snapshots,
+      Cart,
     ]),
   ],
   providers: [
@@ -124,6 +128,8 @@ import { DropdownService } from './services/dropdown/dropdown.service';
     DropdownResolver,
     DropdownService,
     GenericResponseProvider,
+    CartResolver,
+    CartService,
   ],
   controllers: [SiteController],
 })

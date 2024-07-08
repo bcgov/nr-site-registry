@@ -9,6 +9,7 @@ const getLinkColumnType = (
   propertyName: string,
   value: string,
   href: string,
+  customLabel: string,
 ): IFormField => {
   return {
     type: FormFieldType.Link,
@@ -19,6 +20,7 @@ const getLinkColumnType = (
     customInputTextCss: 'link-for-table',
     tableMode: true,
     href: href,
+    customLinkValue: customLabel,
   };
 };
 
@@ -81,7 +83,7 @@ export const CartTableColumns: TableColumn[] = [
     true,
     1,
     true,
-    getLinkColumnType('Map', 'id', '', 'site/map/'),
+    getLinkColumnType('Map', 'id', '', 'site/map/', 'View'),
     'site/map/',
     true,
   ),
@@ -95,7 +97,7 @@ export const CartTableColumns: TableColumn[] = [
     true,
     1,
     true,
-    getLinkColumnType('Details', 'id', '', 'site/details/'),
+    getLinkColumnType('Details', 'id', '', 'site/details/', 'View'),
     'site/details/',
     true,
   ),

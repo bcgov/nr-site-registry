@@ -407,11 +407,8 @@ const Summary = () => {
       dispatch(
         addCartItem({
           userId: loggedInUser.profile.sub,
-          siteId: '1',
-          whoUpdated: 'midhun',
-          whenUpdated: '2024-06-01',
-          whoCreated: 'midun',
-          whenCreated: '2024-06-01',
+          siteId: editSiteDetailsObject.id,
+          whoCreated: loggedInUser?.profile.given_name ?? '',
           price: 200.11,
         }),
       ).unwrap();

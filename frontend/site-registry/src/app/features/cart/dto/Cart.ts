@@ -5,9 +5,6 @@ export class Cart {
   siteId: string = '';
   price: number = 0;
   whoCreated: string = '';
-  whenCreated: string = '';
-  whoUpdated: string = '';
-  whenUpdated: string = '';
 }
 
 export interface CartState {

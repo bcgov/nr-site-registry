@@ -38,6 +38,7 @@
     "@types/graphql-type-json": "^0.3.5",
     "apollo-server-express": "^3.10.2",
     "class-transformer": "^0.5.1",
+    "date-fns": "^3.6.0",
     "graphql": "^16.6.0",
     "graphql-type-json": "^0.3.2",
     "keycloak-connect": "^24.0.3",

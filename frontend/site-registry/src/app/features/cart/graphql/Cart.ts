@@ -5,6 +5,7 @@ export const getCartItemsForUserQL = () => {
     query getCartItemsForUser($userId: String!) {
       getCartItemsForUser(userId: $userId) {
         httpStatusCode
+        message
         data {
           id
           userId
@@ -26,8 +27,9 @@ export const getCartItemsForUserQL = () => {
 export const addCartItemQL = () => gql`
   mutation addCartItem($cartDTO: CartDTO!) {
     addCartItem(cartDTO: $cartDTO) {
-      result
       message
+      httpStatusCode
+      success
     }
   }
 `;
@@ -35,8 +37,9 @@ export const addCartItemQL = () => gql`
 export const deleteCartItemQL = () => gql`
   mutation deleteCartItem($cartId: String!) {
     deleteCartItem(cartId: $cartId) {
-      result
       message
+      httpStatusCode
+      success
     }
   }
 `;

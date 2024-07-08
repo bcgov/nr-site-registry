@@ -433,6 +433,22 @@ type DropdownDto {
   value: String!
 }
 
+type Cart {
+  id: String!
+  userId: String!
+  siteId: String!
+  price: Float!
+  site: Sites!
+}
+
+type CartResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [Cart!]
+}
+
 type Query {
   sites: FetchSiteResponse!
   searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
@@ -444,11 +460,14 @@ type Query {
   getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
   getParticipantRoleCd: DropdownResponse!
   getPeopleOrgsCd: DropdownResponse!
+  getCartItemsForUser(userId: String!): CartResponse!
 }
 
 type Mutation {
   addRecentView(recentView: RecentViewDto!): RecentViewResponse!
   createSnapshot(snapshot: SnapshotDto!): SnapshotResponse!
+  addCartItem(cartDTO: CartDTO!): RecentViewResponse!
+  deleteCartItem(cartId: String!): RecentViewResponse!
 }
 
 input RecentViewDto {
@@ -465,4 +484,11 @@ input SnapshotDto {
   siteId: String!
   transactionId: String!
   snapshotData: JSON!
+}
+
+input CartDTO {
+  userId: String!
+  siteId: String!
+  price: Float!
+  whoCreated: String!
 }

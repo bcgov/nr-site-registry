@@ -466,8 +466,8 @@ type Query {
 type Mutation {
   addRecentView(recentView: RecentViewDto!): RecentViewResponse!
   createSnapshot(snapshot: SnapshotDto!): SnapshotResponse!
-  addCartItem(cartDTO: CartDTO!): RecentViewResponse!
-  deleteCartItem(cartId: String!): RecentViewResponse!
+  addCartItem(cartDTO: CartDTO!): CartResponse!
+  deleteCartItem(cartId: String!): CartResponse!
 }
 
 input RecentViewDto {

@@ -219,3 +219,14 @@ div.tableWidth::-webkit-scrollbar-track {
 {
     width: 40%
 }
+
+
+table td 
+{
+    white-space: nowrap; /* Prevent text from wrapping initially */
+    overflow: auto; /* Hide overflowed text */
+    text-overflow: ellipsis; /* Display ellipsis for overflowed text */
+    word-wrap: break-word; /* Allow word breaks */
+    overflow-wrap: break-word; /* Alternative for newer browsers */
+    word-break: break-all; /* Allow breaks within words */
+}

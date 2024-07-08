@@ -79,7 +79,8 @@ const cartSlice = createSlice({
         const newState = {
           ...state,
         };
-        newState.deleteRequestStatus = RequestStatus.idle;      
+        console.log("new",newState)
+        newState.deleteRequestStatus = RequestStatus.pending;      
         return newState;
       },
     },

@@ -23,9 +23,9 @@ function SideBar() {
   const delteStatus = useSelector(deleteRequestStatus);
 
   useEffect(()=>{
-    console.log("change in request status")
+    console.log("change in add/delete status",cartItemDeleted,cartItemAdded)
     dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ""));
-  },[cartItemAdded,cartItemDeleted])
+  },[cartItemDeleted])
 
   const navList = getSideBarNavList();
   const location = useLocation();

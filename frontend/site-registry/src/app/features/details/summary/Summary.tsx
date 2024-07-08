@@ -410,7 +410,7 @@ const Summary = () => {
     else
     {
       console.log(loggedInUser)
-
+      dispatch(resetCartItemAddedStatus(null));
       dispatch(addCartItem({ userId: loggedInUser.profile.sub , siteId:editSiteDetailsObject.id,whoCreated:loggedInUser?.profile.given_name ?? "", price:200.11})).unwrap()
     }
    

@@ -16,10 +16,7 @@ export class DisclosureService {
   async getSiteDisclosureBySiteId(siteId: string): Promise<SiteProfiles[]> {
     try {
       const result =  await this.disclosureRepository.find({ where: { siteId } });
-      if(result)
-      {
-          return result;
-      }
+      return result;
     } 
     catch (error) 
     {

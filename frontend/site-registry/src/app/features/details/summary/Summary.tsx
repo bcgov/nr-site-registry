@@ -18,10 +18,22 @@ import Table from "../../../components/table/Table";
 import "./Summary.css";
 import { SiteDetailsMode } from "../dto/SiteDetailsMode";
 import SearchInput from "../../../components/search/SearchInput";
+import { DropdownIcon, FolderPlusIcon, ShoppingCartIcon } from "../../../components/common/icon";
+import { addCartItem, addCartItemRequestStatus, fetchCartItems, resetCartItemAddedStatus } from "../../cart/CartSlice";
+import { getUser } from "../../../helpers/utility";
+import { useAuth } from "react-oidc-context";
 
 const Summary = () => {
 
-  
+  const auth = useAuth();
+
+  const user = getUser();
+  const addCartItemStatus = useSelector(addCartItemRequestStatus);
+
+  useEffect(()=>{
+    dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ""));
+  },[addCartItemStatus])
+
 
   const [parcelSearchTerm, SetParcelSearchTeam] = useState("");
 
@@ -385,6 +397,28 @@ const Summary = () => {
     },
   ];
 
+  const handleAddToCart = ()=>{
+    console.log("add clicked")
+    dispatch(resetCartItemAddedStatus);
+    const loggedInUser = getUser();
+    if(loggedInUser === null)
+    {
+     
+      auth.signinRedirect(
+         {extraQueryParams:{'kc_idp_hint':'bceid'}})
+    }
+    else
+    {
+      console.log(loggedInUser)
+
+      dispatch(addCartItem({ userId: loggedInUser.profile.sub , siteId:editSiteDetailsObject.id,whoCreated:loggedInUser?.profile.given_name ?? "", price:200.11})).unwrap()
+    }
+   
+
+  }
+
+
+
   return (
     <div className="summary-section-details">
       <PanelWithUpDown
@@ -469,7 +503,7 @@ const Summary = () => {
         </div>
       </div>
 
-      <div className="summary-details-border">
+      { false && <div className="summary-details-border">
         <span className="summary-details-header">Activity Log</span>
         <div className="col-12">
           <Table
@@ -484,6 +518,23 @@ const Summary = () => {
             editMode={false}
             idColumnName="id"
           />
+        </div>
+      </div> }
+
+      <div className="external-purchase-section">
+        <div className="external-purchase-info">
+          <span>In order to view this site’s details, please purchase access using the button below.</span>
+        </div>
+        <div className="external-purchase-buttons">
+        <button className="d-flex btn-cart align-items-center">
+                <ShoppingCartIcon className="btn-icon" />
+                <span className="btn-cart-lbl" onClick={()=>handleAddToCart()}> Add to Cart</span>
+              </button>
+              <button className="d-flex btn-folio align-items-center">
+                <FolderPlusIcon className="btn-folio-icon" />
+                <span className="btn-folio-lbl"> Add to Folio</span>
+                <DropdownIcon className="btn-folio-icon" />
+              </button>
         </div>
       </div>
     </div>

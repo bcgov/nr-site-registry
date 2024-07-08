@@ -1,6 +1,37 @@
 import { FillEye, FillPinMapFill } from "../../components/common/icon";
-import { FormFieldType } from "../../components/input-controls/IFormField";
+import { FormFieldType, IFormField } from "../../components/input-controls/IFormField";
 import { ColumnSize,  TableColumn } from "../../components/table/TableColumn";
+
+
+
+const getColumnType = (label:string, propertyName:string, value:string) : IFormField =>
+  {
+    return   {
+      type: FormFieldType.Label,
+      label: label,       
+      graphQLPropertyName: propertyName,
+      value:value,      
+      customLabelCss: "custom-lbl-text",
+      customInputTextCss: "custom-input-text",
+      tableMode: true,
+    }
+  }
+  
+  const getLinkColumnType = (label:string, propertyName:string, value:string, href:string) : IFormField =>
+    {
+      return   {
+        type: FormFieldType.Link,
+        label: label,       
+        graphQLPropertyName: propertyName,
+        value:value,      
+        customLabelCss: "custom-lbl-text",
+        customInputTextCss: "custom-input-text",
+        tableMode: true,
+        href: href
+      }
+    }
+  
+
 
 export const recentViewedColumns: TableColumn[] = [
   {

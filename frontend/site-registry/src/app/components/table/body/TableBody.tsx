@@ -4,7 +4,7 @@ import { RequestStatus } from "../../../helpers/requests/status";
 import { TableColumn } from "../TableColumn";
 
 import { FormFieldType, IFormField } from "../../input-controls/IFormField";
-import { Label, TextInput , Link, CheckBoxInput, DropdownInput, DateInput, TextAreaInput, DropdownSearchInput } from "../../input-controls/InputControls";
+import { Label, TextInput , Link, CheckBoxInput, DropdownInput, DateInput, TextAreaInput, DropdownSearchInput, DeleteIcon } from "../../input-controls/InputControls";
 import { ChangeTracker } from "../../common/IChangeType";
 interface TableBodyProps {
   isLoading: RequestStatus;
@@ -16,6 +16,7 @@ interface TableBodyProps {
   ) => void;
   editMode: boolean;
   idColumnName:string;
+  rowDeleteHandler:(data:any)=>void;
 }
 
 const TableBody: FC<TableBodyProps> = ({
@@ -26,6 +27,7 @@ const TableBody: FC<TableBodyProps> = ({
   changeHandler,
   editMode,
   idColumnName,
+  rowDeleteHandler
 }) => {
   
   const [selectedRowIds,SetSelectedRowsId] = useState([""]);
@@ -66,13 +68,19 @@ const TableBody: FC<TableBodyProps> = ({
     );
   };
 
-  const tableRecordChangeHandler= (rowKey:number,propertyName:any,value:any )=>
+  const tableRecordChangeHandler= (rowKey:number,propertyName:any,value:any, isDeleteRow?:boolean )=>
     {
+      
         const changeRecord = {
           "row": getDataRow(rowKey),
           "property":propertyName,
           "value":value
         }
+      
+
+        if(isDeleteRow)
+          rowDeleteHandler(changeRecord)
+        else
         changeHandler(changeRecord);
     }
 
@@ -253,6 +261,26 @@ const TableBody: FC<TableBodyProps> = ({
                   options={field.options || []}
                   value={value}
                   onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
+                  type={field.type}
+                  isEditing={editMode ?? true}
+                  tableMode={field.tableMode ?? false}
+                  stickyCol = {field.stickyCol}
+              />);
+                  }
+              else if(field.type === FormFieldType.DeleteIcon)
+                {
+           
+                  return (
+                  <DeleteIcon
+                  label={field.label}
+                  customLabelCss = {field.customLabelCss}
+                  customInputTextCss={field.customInputTextCss}
+                  customEditLabelCss = {field.customEditLabelCss}
+                  customEditInputTextCss={field.customEditInputTextCss}
+                  placeholder={field.placeholder}
+                  options={field.options || []}
+                  value={value}
+                  onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value, true)}
                   type={field.type}
                   isEditing={editMode ?? true}
                   tableMode={field.tableMode ?? false}

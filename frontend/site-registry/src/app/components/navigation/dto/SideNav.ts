@@ -9,8 +9,11 @@ import {
   BookIcon,
   ShoppingCartIcon
 } from "../../common/icon";
+import { useSelector } from "react-redux";
+import { cartItems , deleteRequestStatus , addCartItemRequestStatus } from "../../../features/cart/CartSlice";
 
 export class SideNav {
+  
   constructor(
     public id: number,
     public displayText: string,
@@ -32,6 +35,8 @@ const getSideBarNavList = () => {
   const referenceIcon = BookIcon;
   const cartIcon = ShoppingCartIcon;
 
+  
+
   const sideNavList: SideNav[] = [
     new SideNav(1,"Dashboard", true, dashboardIcon, "/dashboard"),
     new SideNav(2,"Search", true, null, "/", [
@@ -46,7 +51,7 @@ const getSideBarNavList = () => {
       new SideNav(1,"Folios", false, foliosIcon, "/folios"),
       new SideNav(2,"Purchases", false, purchasesIcon, "/purchases"),
     ],false),
-    new SideNav(5,"Cart", false, cartIcon, "/cart", [], true),
+    new SideNav(5,"Cart", false, cartIcon, "/site/cart", [], true),
     
   ];
 

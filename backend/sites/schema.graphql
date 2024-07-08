@@ -433,6 +433,22 @@ type DropdownDto {
   value: String!
 }
 
+type Cart {
+  id: String!
+  userId: String!
+  siteId: String!
+  price: Float!
+  site: Sites!
+}
+
+type CartResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [Cart!]
+}
+
 type DisclosureResponse {
   message: String
   httpStatusCode: Int
@@ -453,11 +469,14 @@ type Query {
   getParticipantRoleCd: DropdownResponse!
   getPeopleOrgsCd: DropdownResponse!
   getSiteDisclosureBySiteId(siteId: String!): DisclosureResponse!
+  getCartItemsForUser(userId: String!): CartResponse!
 }
 
 type Mutation {
   addRecentView(recentView: RecentViewDto!): RecentViewResponse!
   createSnapshot(snapshot: SnapshotDto!): SnapshotResponse!
+  addCartItem(cartDTO: CartDTO!): RecentViewResponse!
+  deleteCartItem(cartId: String!): RecentViewResponse!
 }
 
 input RecentViewDto {
@@ -474,4 +493,11 @@ input SnapshotDto {
   siteId: String!
   transactionId: String!
   snapshotData: JSON!
+}
+
+input CartDTO {
+  userId: String!
+  siteId: String!
+  price: Float!
+  whoCreated: String!
 }

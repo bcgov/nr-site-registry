@@ -22,7 +22,8 @@ interface TableProps {
   changeHandler:(eventRecord:any)=>void,
   editMode: boolean,
   idColumnName:string;
-  sortHandler?:(row:any,ascSort:boolean)=>void
+  sortHandler?:(row:any,ascSort:boolean)=>void,
+  delteHandler?:(eventRecord:any)=>void,
 }
 
 const Table: FC<TableProps> = ({
@@ -40,10 +41,13 @@ const Table: FC<TableProps> = ({
   changeHandler,
   editMode,
   idColumnName,
-  sortHandler
+  sortHandler,
+  delteHandler
 }) => {
   
-  let  tableSortHandler = sortHandler ?? ((row,ascSort)=>{});
+  let  tableSortHandler = sortHandler ?? ((row,ascSort)=>{console.log("Handle Sort Event", row, ascSort)});
+  let  rowDelteHandler = delteHandler ?? ((row)=>{console.log("Handle Delete Event", row)});
+
 
   return (
     <React.Fragment>
@@ -52,7 +56,7 @@ const Table: FC<TableProps> = ({
           <thead aria-label={`${label} Header`}>
             <TableHeader columns={columns} allowRowsSelect={allowRowsSelect ?? false} sortHandler={tableSortHandler} />
           </thead>
-            <TableBody isLoading={isLoading} columns={columns} data={data} allowRowsSelect={allowRowsSelect ?? false} changeHandler={changeHandler} editMode={editMode} idColumnName={idColumnName} />
+            <TableBody isLoading={isLoading} columns={columns} data={data} allowRowsSelect={allowRowsSelect ?? false} changeHandler={changeHandler} editMode={editMode} idColumnName={idColumnName} rowDeleteHandler={rowDelteHandler} />
         </table>
       </div>
       <div>

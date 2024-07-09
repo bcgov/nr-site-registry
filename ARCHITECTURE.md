@@ -47,6 +47,7 @@ flowchart TB
       FrontEnd("Front End<br /><br />REACT")
       SiteDb[("Database<br /><br />PostgreSQL")]
       Etl("ETL<br /><br />Unused two-way sync")
+      Ora2Pg("ora2pg<br /><br />Database Importer")
 
       FrontEnd <--"Queries (GraphQL)"--> Site
       Site <--"Queries (SQL/TypeORM)"-->SiteDb
@@ -56,7 +57,7 @@ flowchart TB
     Legacy("Legacy SITE<br /><br />Oracle Forms Application")
     IntUser(["Internal User<br /><br />A government worker who needs<br />access to site information"])
     
-    Legacy --"One-time data import"--> SiteDb
+    Legacy --"One-time data import"--> Ora2Pg --> SiteDb
 
   end
 

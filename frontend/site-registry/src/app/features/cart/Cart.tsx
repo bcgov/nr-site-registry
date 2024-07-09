@@ -35,14 +35,12 @@ const Cart = () => {
 
   const delteStatus = useSelector(deleteRequestStatus);
 
-  useEffect(() => {
-    console.log("delete status - component")
+  useEffect(() => {   
     dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ""));
   }, [delteStatus]);
 
   useEffect(() => {
     setCartIdToDelete("");
-    //console.log("cart", cartItemsArr);
   }, [cartItemsArr]);
 
   const handleCartItemDelete = (cartId: string) => {
@@ -110,8 +108,7 @@ const Cart = () => {
         <ModalDialog
           label="Are you sure to delete from cart ?"
           closeHandler={(response) => {
-            if (response) {
-              console.log("modal response", response)
+            if (response) {            
               dispatch(resetCartItemDeleteStatus(null));
               dispatch(deleteCartItem(cartIdToDelte)).unwrap();
             }

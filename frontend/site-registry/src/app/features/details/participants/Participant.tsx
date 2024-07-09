@@ -18,10 +18,11 @@ import { useParams } from "react-router-dom";
 import GetConfig from "./ParticipantConfig";
 import { IParticipant } from "./IParticipantState";
 import { v4 } from "uuid";
+import { getUser } from "../../../helpers/utility";
 
 const Participants = () => {
     const { participantColumnInternal, participantColumnExternal, srVisibilityParcticConfig } = GetConfig();
-    const [userType, setUserType] = useState<UserType>(UserType.Internal);
+    const [userType, setUserType] = useState<UserType>(UserType.External);
     const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
     const [formData, setFormData] =  useState<{ [key: string]: any | [Date, Date] }[]>([]);
     const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
@@ -34,6 +35,24 @@ const Participants = () => {
     const siteParticipant: IParticipant[] = useSelector(siteParticipants)
     const { id } = useParams();
 
+    const loggedInUser = getUser();
+    useEffect(()=>{
+      if(loggedInUser?.profile.preferred_username?.indexOf("bceid") !== -1)
+        {
+          setUserType(UserType.External);
+        }
+        else if (loggedInUser?.profile.preferred_username?.indexOf("idir") !== -1)
+        {
+          setUserType(UserType.Internal);
+        }
+        else
+        {
+          // not logged in 
+          setUserType(UserType.External);
+    
+        }
+    }, [])
+   
     useEffect(()=> {
         setViewMode(mode);
     }, [mode]);

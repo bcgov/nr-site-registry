@@ -13,7 +13,7 @@ import { INotations } from "./INotations";
 // import { SiteDetailsMode } from "../../../helpers/requests/SiteDetailsMode";
 import { ChangeTracker, IChangeType } from "../../../components/common/IChangeType";
 import { resetSiteDetails, selectSiteDetails, siteDetailsMode, trackChanges } from "../../site/dto/SiteSlice";
-import { flattenFormRows, formatDate, formatDateRange } from "../../../helpers/utility";
+import { flattenFormRows, formatDate, formatDateRange, getUser } from "../../../helpers/utility";
 import Search from "../../site/Search";
 import SearchInput from "../../../components/search/SearchInput";
 import Sort from "../../../components/sort/Sort"; 
@@ -111,7 +111,7 @@ const Notations: React.FC<INotations> = ({
 
     const details = useSelector(selectSiteDetails);
 
-    const [userType, setUserType] = useState<UserType>(UserType.Internal);
+    const [userType, setUserType] = useState<UserType>(UserType.External);
     const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
     const [formData, setFormData] =  useState<{ [key: string]: any | [Date, Date] }[]>(details.events);
     const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
@@ -119,6 +119,25 @@ const Notations: React.FC<INotations> = ({
     const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
     const [searchTerm, setSearchTerm] = useState('');
 
+    const loggedInUser = getUser();
+    useEffect(()=>{
+      if(loggedInUser?.profile.preferred_username?.indexOf("bceid") !== -1)
+        {
+          setUserType(UserType.External);
+        }
+        else if (loggedInUser?.profile.preferred_username?.indexOf("idir") !== -1)
+        {
+          setUserType(UserType.Internal);
+        }
+        else
+        {
+          // not logged in 
+          setUserType(UserType.External);
+    
+        }
+        setFormData(details.events)
+    }, [])
+   
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const searchTerm = event.target.value;
       setSearchTerm(searchTerm);
@@ -169,10 +188,6 @@ const Notations: React.FC<INotations> = ({
           // setData(dummyData);
         }
     },[resetDetails]);
-
-    useEffect(() => {
-      setFormData(details.events)
-    }, []);
 
     const handleInputChange = (id: number, graphQLPropertyName: any, value: String | [Date, Date]) => {
       if(viewMode === SiteDetailsMode.SRMode)

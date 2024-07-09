@@ -1,11 +1,10 @@
 import { UsePipes } from "@nestjs/common";
 import { Args, Query, Resolver } from "@nestjs/graphql";
 import { RoleMatchingMode, Roles } from "nest-keycloak-connect";
-import { GenericResponseProvider } from "src/app/dto/response/genericResponseProvider";
-import { SiteParticsDto, SiteParticsResponse } from "src/app/dto/sitePartics.dto";
-import { SitePartics } from "src/app/entities/sitePartics.entity";
-import { ParticipantService } from "src/app/services/participant/participant.service";
-import { GenericValidationPipe } from "src/app/utils/validations/genericValidationPipe";
+import { GenericResponseProvider } from "../../dto/response/genericResponseProvider";
+import { SiteParticsDto, SiteParticsResponse } from "../../dto/sitePartics.dto";
+import { ParticipantService } from "../../services/participant/participant.service";
+import { GenericValidationPipe } from "../../utils/validations/genericValidationPipe";
 
 @Resolver(() => SiteParticsDto)
 export class ParticipantResolver {

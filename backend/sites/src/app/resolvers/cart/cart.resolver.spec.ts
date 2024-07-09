@@ -73,7 +73,7 @@ describe('CartResolver', () => {
       
 
       const result = await resolver.getCartItemsForUser(userId);
-      console.log(result);
+     
       expect(result.data.length).toEqual(1);
       expect(service.getCartItemsForUser).toHaveBeenCalledWith(userId);
     });

@@ -22,8 +22,7 @@ function SideBar() {
 
   const delteStatus = useSelector(deleteRequestStatus);
 
-  useEffect(()=>{
-    console.log("change in request status")
+  useEffect(()=>{ 
     dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ""));
   },[cartItemAdded,cartItemDeleted])
 

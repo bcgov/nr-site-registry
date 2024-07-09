@@ -12,7 +12,6 @@ interface ColumnProps {
 
 const Column:React.FC<ColumnProps> = ({toggleColumnSelectionForDisplay,columns,reset, close}) => {
 
-  console.log('child updated ',columns)
 
   const filterColumnsByGroup = (groupId:number) =>
   {

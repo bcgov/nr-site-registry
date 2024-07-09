@@ -3,5 +3,6 @@ export enum RequestStatus
     loading = "loading",
     idle = "idle",
     success = "success",
-    failed = "failed"
+    failed = "failed",
+    pending = "pending"
 }

@@ -241,7 +241,7 @@ export class Sites {
 
     @Field(()=>[Cart], {nullable : true})
     @OneToMany(() => Cart, (cart) => cart.site,)
-    carts: Cart[];
+    cart: Cart[];
 
     @OneToMany(() => Snapshots, (snapshots) => snapshots.site,)
     snapshots: Snapshots[];

@@ -59,7 +59,7 @@ import { useAuth } from "react-oidc-context";
 const SiteDetails = () => {
 
  
-  console.log(getUser())
+
 
   const auth = useAuth();
 
@@ -173,7 +173,7 @@ const SiteDetails = () => {
     }
   };
   const handleAddToCart = ()=>{
-    console.log("add clicked")
+
     dispatch(resetCartItemAddedStatus);
     const loggedInUser = getUser();
     if(loggedInUser === null)
@@ -184,8 +184,8 @@ const SiteDetails = () => {
     }
     else
     {
-      console.log(loggedInUser)
-
+    
+      dispatch(resetCartItemAddedStatus(null));
       dispatch(addCartItem({ userId: loggedInUser.profile.sub , siteId:details.id, 
         whoCreated: loggedInUser.profile.given_name ?? "", price:200.11})).unwrap()
     }

@@ -313,7 +313,7 @@ type Cart {
   userId: String!
   siteId: String!
   price: Float!
-  site: [Sites!]!
+  site: Sites
 }
 
 type Sites {

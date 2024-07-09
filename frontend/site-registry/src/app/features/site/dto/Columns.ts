@@ -27,7 +27,7 @@ const getSiteSearchResultsColumns = () => {
       isDefault:true,
       sortOrder:1,
       isChecked:true,
-      displayType: getColumnTypeWithSticky("Site ID","id",""),
+      displayType: getLinkColumnType("Site ID","id","","site/details/"),
       stickyCol:true,
 
     },
@@ -295,19 +295,20 @@ const getColumnType = (label:string, propertyName:string, value:string) =>
   }
 }
 
-const getLinkColumnType = (label:string, propertyName:string, value:string, href:string) =>
+const getLinkColumnType = (label:string, propertyName:string, value:string, href:string,customLabel?:string) =>
   {
-    return   {
+    return {
       type: FormFieldType.Link,
-      label: label,       
+      label: label,
       graphQLPropertyName: propertyName,
-      value:value,      
+      value: value,
       customLabelCss: "link-for-table",
       customInputTextCss: "link-for-table",
       tableMode: true,
       stickyCol: true,
-      href: href
-    }
+      href: href,
+      customLinkValue: customLabel ?? null
+    };  
   }
 
 export { getSiteSearchResultsColumns };

@@ -30,8 +30,8 @@ export class Cart extends BaseAuditEntity {
   @Column("double precision", { name: "price" })
   price: number;
 
-  @Field(()=>[Sites])
-  @ManyToOne(() => Sites, (site) => site.carts, {eager:true})
+  @Field(()=>Sites,{nullable:true})
+  @ManyToOne(() => Sites, (site) => site.cart, {eager:true})
   @JoinColumn({ name: 'site_id', referencedColumnName: 'id' })
   site: Sites;
 }

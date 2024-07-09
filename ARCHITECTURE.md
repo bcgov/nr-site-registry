@@ -3,8 +3,7 @@
 ## Context
 
 The SITE rebuild aims to provide a new interface for the Site Registry by
-creating a new application that performs a two way sync between its data store
-and the data store of the legacy SITE.
+creating a new application usable by both internal and external users.
 
 ```mermaid
 ---

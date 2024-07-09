@@ -9,11 +9,12 @@ import {
   } from 'typeorm';
 import { Sites } from './sites.entity';
 import { BaseAuditEntity } from './baseAuditEntity';
+import { FolioContents } from './folioContents.entity';
 
 @ObjectType()
-@Entity('cart')
+@Entity('folio')
 @Index('idx_cart_user_id', ['userId'])
-export class Cart extends BaseAuditEntity {
+export class Folio extends BaseAuditEntity {
   @Field()
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -22,16 +23,15 @@ export class Cart extends BaseAuditEntity {
   @Column('character varying', { name: 'user_id', length: 100 })
   userId: string;
 
-  @Field()
-  @Column('character varying', { name: 'site_id' })
-  siteId: string;
+
 
   @Field()
-  @Column("double precision", { name: "price" })
-  price: number;
+  @Column("character varying", { name: "description", length: 500 })
+  description: number;
 
-  @Field(()=>[Sites])
-  @ManyToOne(() => Sites, (site) => site.carts, {eager:true})
+
+  @Field(()=>[FolioContents], {nullable:true})
   @JoinColumn({ name: 'site_id', referencedColumnName: 'id' })
-  site: Sites;
+  folioContents: FolioContents
+  
 }

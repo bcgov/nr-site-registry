@@ -281,7 +281,7 @@ export const DropdownInput: React.FC<InputProps> = ({
             value={value.trim() ?? ""}
             onChange={handleSelectChange}
             aria-label={label}
-            placeholder={placeholder}
+            // placeholder={placeholder}
           >
             <option value="" className="custom-disabled-option">
               {placeholder}

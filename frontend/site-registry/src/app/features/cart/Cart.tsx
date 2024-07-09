@@ -60,7 +60,7 @@ const Cart = () => {
       </div>
       <div className="col-12">
         <Table
-          label="Search Results"
+          label="Cart"
           isLoading={RequestStatus.success}
           columns={CartTableColumns}
           data={cartItemsArr.map((x: any) => {

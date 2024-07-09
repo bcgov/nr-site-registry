@@ -6,12 +6,16 @@ import MapSearch from "../features/map/MapSearch";
 import SiteDetails from "../features/details/SiteDetails";
 import Dashboard from "../features/dashboard/Dashboard";
 import Cart from "../features/cart/Cart";
+import Folios from "../features/folios/Folios";
+import FolioContents from "../features/folios/FolioContent";
 
 const AppRoutes = () => {
   return (
     <Routes> 
       <Route path="/" element={<Dashboard />}></Route>      
       <Route path="/search" element={<Search />}></Route>  
+      <Route path="/folios" element={<Folios/>}></Route>
+      <Route path="/folios/details/:id" element={<FolioContents/>}></Route>
       <Route path="/dashboard" element={<Dashboard />}></Route>  
       <Route path="/dashboard/site/details/:id" element={<SiteDetails/>}></Route>
       <Route path="/search/site/details/:id" element={<SiteDetails/>}></Route>

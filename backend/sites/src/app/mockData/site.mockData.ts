@@ -68,7 +68,8 @@ export const sampleSites: Sites[] = [
         sstCode2: sstCode,
         siteCrownLandContaminated: siteCrownLandContaminated,
         recentViewedSites: recentViewedSites,
-        snapshots:snapshots
+        snapshots:snapshots,
+        carts: []
     },
     {
         id: '222',
@@ -121,5 +122,6 @@ export const sampleSites: Sites[] = [
         sstCode2: sstCode,
         siteCrownLandContaminated: siteCrownLandContaminated,
         recentViewedSites: recentViewedSites,
-        snapshots:snapshots
+        snapshots:snapshots,
+        carts:[]
     }];

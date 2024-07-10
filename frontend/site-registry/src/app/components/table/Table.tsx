@@ -42,11 +42,11 @@ const Table: FC<TableProps> = ({
   editMode,
   idColumnName,
   sortHandler,
-  deleteHandler: delteHandler
+  deleteHandler: deleteHandler
 }) => {
   
   let  tableSortHandler = sortHandler ?? ((row,ascSort)=>{console.log("Handle Sort Event", row, ascSort)});
-  let  rowDeleteHandler = delteHandler ?? ((row)=>{console.log("Handle Delete Event", row)});
+  let  rowDeleteHandler = deleteHandler ?? ((row)=>{console.log("Handle Delete Event", row)});
 
 
   return (

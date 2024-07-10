@@ -6,7 +6,18 @@ import { getClientSettings } from "../auth/UserManagerSetting";
 import { format } from "date-fns";
 import { FormFieldType, IFormField } from "../components/input-controls/IFormField";
 
+export const serializeDate = (data: any) => {
+  const serializedData: any = { ...data };
+  
+  // Example: Serialize all Date objects to ISO string
+  Object.keys(serializedData).forEach(key => {
+    if (serializedData[key] instanceof Date) {
+      serializedData[key] = serializedData[key].toISOString();
+    }
+  });
 
+  return serializedData;
+};
   
 export const formatDateRange = (range: [Date, Date]) => {
     const [startDate, endDate] = range;

@@ -3,10 +3,14 @@ import { DashboardResolver } from './dashboard.resolver';
 import { sampleSites } from '../../mockData/site.mockData';
 import { RecentViewDto } from '../../dto/recentView.dto';
 import { DashboardService } from '../../services/dashboard/dashboard.service';
+import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
+import { GenericResponse } from '../../dto/response/genericResponse';
+import { RecentViews } from '../../entities/recentViews.entity';
 
 describe('DashboardResolver', () => {
   let resolver: DashboardResolver;
   let service: DashboardService;
+  let genericResponseProvider: GenericResponseProvider<RecentViews[]>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,12 +22,25 @@ describe('DashboardResolver', () => {
             getRecentViewsByUserId: jest.fn(),
             addRecentView: jest.fn(),
           },
+          
+        },
+        {
+          provide: GenericResponseProvider,
+          useValue: {
+              createResponse: jest.fn((message: string, httpStatusCode: number, success: boolean, data: RecentViews[]) => ({
+                  message,
+                  httpStatusCode,
+                  success,
+                  data,
+              })),
+          },
         },
       ],
     }).compile();
 
     resolver = module.get<DashboardResolver>(DashboardResolver);
     service = module.get<DashboardService>(DashboardService);
+    genericResponseProvider = module.get<GenericResponseProvider<RecentViews[]>>(GenericResponseProvider);
   });
 
   
@@ -44,7 +61,8 @@ describe('DashboardResolver', () => {
       const userId = '1';
       const expectedResult = {
         httpStatusCode: 200,
-        message: 'Success',
+        success:true,
+        message: 'Recent views fetched successfully',
         data: res,
       };
       jest.spyOn(service, 'getRecentViewsByUserId').mockResolvedValueOnce(expectedResult.data);
@@ -57,9 +75,9 @@ describe('DashboardResolver', () => {
 
     it('should handle data not found for user id', async () => {
       const userId = '1';
-      jest.spyOn(service, 'getRecentViewsByUserId').mockResolvedValueOnce(null);
+      jest.spyOn(service, 'getRecentViewsByUserId').mockResolvedValueOnce([]);
 
-      const result = await resolver.getRecentViewsByUserId(userId);
+      const result =  await resolver.getRecentViewsByUserId(userId);
 
       expect(result.httpStatusCode).toEqual(404);
       expect(result.message).toContain(userId);
@@ -95,7 +113,7 @@ describe('DashboardResolver', () => {
       const result = await resolver.addRecentView(recentView);
 
       expect(result.httpStatusCode).toEqual(400);
-      expect(result.message).toEqual('Bad Request.');
+      expect(result.message).toEqual('Recent views failed to insert or update recent view. ');
     });
   });
 });

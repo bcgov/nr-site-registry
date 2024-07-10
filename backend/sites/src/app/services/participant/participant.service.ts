@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { plainToInstance } from "class-transformer";
-import { SiteParticsDto } from "src/app/dto/sitePartics.dto";
-import { SitePartics } from "src/app/entities/sitePartics.entity";
+import { SiteParticsDto } from "../../dto/sitePartics.dto";
+import { SitePartics } from "../../entities/sitePartics.entity";
 import { Repository } from "typeorm";
 import { v4 } from 'uuid';
 @Injectable()

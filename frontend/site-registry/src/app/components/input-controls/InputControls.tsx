@@ -11,6 +11,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 
 import SearchInput from "../search/SearchInput";
 import { table } from "console";
+import { id } from "date-fns/locale";
 
 
 interface InputProps extends IFormField {
@@ -85,7 +86,7 @@ export const DeleteIcon: React.FC<InputProps> = ({
     renderTableCell(
       <div onClick={onChange}>
             <TrashCanIcon  title="Remove"/> 
-            <span>&nbsp;Remove</span>  
+          <span aria-label={label}>&nbsp;Remove</span>  
       </div>
    
     )
@@ -110,7 +111,7 @@ export const Label: React.FC<InputProps> = ({
 }) => {
   return (
     renderTableCell(
-      <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{value}</span>,
+    <span aria-label={label} className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{value}</span>,
       stickyCol
     )
   );
@@ -203,9 +204,9 @@ export const TextInput: React.FC<InputProps> = ({
             required={error ? true : false}
           />
         ) : (
-          <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{value}</span>
+        <span aria-label={label} className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{value}</span>
         )}
-        {error && <div className="text-danger p-1 small">{error}</div>}
+        {error && <div aria-label={label} className="text-danger p-1 small">{error}</div>}
       </ContainerElement>
     );
   // }
@@ -308,12 +309,12 @@ export const DropdownInput: React.FC<InputProps> = ({
               role="img"
               aria-label="User image"
             />
-            <p className={`m-0 p-0 ${customInputTextCss ?? ""}`}>
+            <p aria-label={label} className={`m-0 p-0 ${customInputTextCss ?? ""}`}>
               {options?.find((opt) => opt.key === value)?.value}
             </p>
           </div>
         ) : (
-          <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>
+        <span aria-label={label} className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>
             {options?.find((opt) => opt.key === value)?.value}
           </span>
         )}
@@ -433,13 +434,13 @@ export const GroupInput: React.FC<InputProps> = ({
                 </div>
             ))
         ) : (
-          <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>
+        <span aria-label={label} className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>
             {currentConcatenatedValue != undefined
               ? currentConcatenatedValue
               : ""}
           </span>
         )}
-        {error && <div className="text-danger p-1 mx-2 small">{error}</div>}
+        {error && <div aria-label={label} className="text-danger p-1 mx-2 small">{error}</div>}
       </div>
     </div>
   );
@@ -505,7 +506,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
           onChange={(value) => onChange(value)}
         />
       ) : (
-        <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{dateRangeValue ?? ""}</span>
+      <span aria-label={label} className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{dateRangeValue ?? ""}</span>
       )}
     </ContainerElement>
   );
@@ -524,14 +525,15 @@ export const DateInput: React.FC<InputProps> = ({
   tableMode,
   onChange,
 }) => {
- 
   const ContainerElement = tableMode ? 'td' : 'div';
   let dateValue;
-  value = tableMode ? value != '' ? new Date(value) : null : value
-  if (value) {
-    dateValue = formatDate(value);
-  }
 
+  value = tableMode ? value != ''  ? new Date(value) : null : value
+  value = (!tableMode && isEditing && value != null) ? new Date(value)  : value  
+
+  if (value) {
+    dateValue = formatDate(new Date(value));
+  }
   const handleCheckBoxChange = (isChecked: boolean) => {
     onChange(isChecked);
   };
@@ -569,12 +571,12 @@ export const DateInput: React.FC<InputProps> = ({
         placeholder={placeholder}
         format="MMMM d, yyyy"
         caretAs={CalendarIcon}
-        value={value}
+        value={value ?? null}
         onChange={(value) => onChange(value)}
         oneTap
       />
       ) : (
-        <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{dateValue ?? ""}</span>
+      <span aria-label={label} className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{dateValue ?? ""}</span>
       )}
     </ContainerElement>
   );
@@ -692,7 +694,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
           cols={cols}
         />
       ) : (
-        <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{value}</span>
+      <span aria-label={label} className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{value}</span>
       )}
     </ContainerElement>
   );
@@ -771,7 +773,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
                filteredOptions?.length === 0 &&
                <div className="py-2">
                 <img src={infoIcon} alt="info"  aria-hidden="true" role="img" aria-label="User image"/>
-                <span className="px-2 custom-not-found">No results found.</span>
+            <span aria-label={label} className="px-2 custom-not-found">No results found.</span>
                </div>
               }
             </div>
@@ -789,7 +791,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
           </Dropdown.Menu>
         </Dropdown>
       ) : (
-        <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>
+    <span aria-label={label}  className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>
           {options?.find((opt) => opt.key === value)?.value}
         </span>
       )}

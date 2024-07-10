@@ -55,6 +55,7 @@ import { fetchParticipantRoleCd, fetchPeopleOrgsCd } from "./dropdowns/DropdownS
 import { fetchSiteParticipants } from "./participants/ParticipantSlice";
 import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
 import { useAuth } from "react-oidc-context";
+import { fetchSiteDisclosure } from "./disclosure/DisclosureSlice";
 
 const SiteDetails = () => {
 
@@ -111,6 +112,7 @@ const SiteDetails = () => {
     dispatch(fetchPeopleOrgsCd());
     dispatch(fetchParticipantRoleCd());
     dispatch(fetchSiteParticipants(id ?? ''));
+    dispatch(fetchSiteDisclosure(id ?? ''));
   }, [id]);
 
   useEffect(() => {

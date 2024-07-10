@@ -101,8 +101,8 @@ describe('SnapshotService', () => {
 
             jest
             .spyOn(snapshotRepository, 'find')
-            .mockRejectedValueOnce(new Error('Database connection error'));
-             await expect(service.getSnapshots()).rejects.toThrow('Database connection error');
+            .mockRejectedValueOnce(new Error('Failed to retrieve snapshots.'));
+             await expect(service.getSnapshots()).rejects.toThrow('Failed to retrieve snapshots.');
         });
     });
 
@@ -179,9 +179,9 @@ describe('SnapshotService', () => {
 
             jest
               .spyOn(snapshotRepository, 'find')
-              .mockRejectedValueOnce(new Error('Database connection error'));
+              .mockRejectedValueOnce(new Error('Failed to retrieve snapshots by userId.'));
         
-            await expect(service.getSnapshotsByUserId(userId)).rejects.toThrow('Database connection error');
+            await expect(service.getSnapshotsByUserId(userId)).rejects.toThrow('Failed to retrieve snapshots by userId.');
             expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
         });
     });

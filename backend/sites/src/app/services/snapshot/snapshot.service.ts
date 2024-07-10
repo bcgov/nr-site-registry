@@ -17,10 +17,8 @@ export class SnapshotsService {
         try
         {
             const result = await this.snapshotRepository.find();
-            if (result)
-            {
-                return result;
-            }
+            return result;
+          
         }
         catch(error)
         {
@@ -32,9 +30,7 @@ export class SnapshotsService {
         try
         {
             const result = await this.snapshotRepository.find({where: { userId }});
-            if (result) {
-                return result;
-            }
+            return result;
         }
         catch(error)
         {
@@ -46,11 +42,8 @@ export class SnapshotsService {
         try
         {
             const result = await this.snapshotRepository.find({where: { id }});
-            if(result)
-            {
-                return result;
+            return result;
             }
-        }
         catch(error) 
         {
             throw error;

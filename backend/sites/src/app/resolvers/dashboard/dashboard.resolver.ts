@@ -4,8 +4,8 @@ import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { RecentViews } from '../../entities/recentViews.entity';
 import { DashboardService } from '../../services/dashboard/dashboard.service';
 import { RecentViewDto, RecentViewResponse } from '../../dto/recentView.dto';
-import { GenericResponseProvider } from 'src/app/dto/response/genericResponseProvider';
-import { GenericValidationPipe } from 'src/app/utils/validations/genericValidationPipe';
+import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
+import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 
 @Resolver(() => RecentViews)
 export class DashboardResolver {
@@ -26,7 +26,7 @@ export class DashboardResolver {
     }
     else
     {
-      return this.genericResponseProvider.createResponse(`Recent views data not found for site id: ${userId}`, 404, false);
+      return this.genericResponseProvider.createResponse(`Recent views data not found for site id: ${userId}`, 404, false, null);
     }
   }
 
@@ -43,7 +43,7 @@ export class DashboardResolver {
     }
     else
     {
-      return this.genericResponseProvider.createResponse(`Recent views failed to insert or update recent view. `, 400, false);
+      return this.genericResponseProvider.createResponse(`Recent views failed to insert or update recent view. `, 400, false, null);
     }
   }
 }

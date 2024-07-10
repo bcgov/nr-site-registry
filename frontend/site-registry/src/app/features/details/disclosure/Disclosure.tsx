@@ -11,7 +11,7 @@ import './Disclosure.css';
 import { RequestStatus } from "../../../helpers/requests/status";
 import { Minus, Plus, UserMinus, UserPlus } from "../../../components/common/icon";
 import { ChangeTracker, IChangeType } from "../../../components/common/IChangeType";
-import { flattenFormRows, formatDate, serializeDate } from "../../../helpers/utility";
+import { flattenFormRows, formatDate, getUser, serializeDate } from "../../../helpers/utility";
 import Actions from "../../../components/action/Actions";
 import { SRVisibility } from "../../../helpers/requests/srVisibility";
 import { siteDisclosure, updateSiteDisclosure } from "./DisclosureSlice";
@@ -48,14 +48,29 @@ import { siteDisclosure, updateSiteDisclosure } from "./DisclosureSlice";
 const Disclosure = () => {
     const [formData, setFormData] =  useState<{ [key: string]: any | [Date, Date] }>({});
     const [selectedRows, setSelectedRows] = useState<{disclosureId: any, scheduleId: any}[]>([]);
-    const [userType, setUserType] = useState<UserType>(UserType.Internal);
+    const [userType, setUserType] = useState<UserType>(UserType.External);
     const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
     const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
     const [srTimeStamp, setSRTimeStamp] = useState('Sent to SR on June 2nd, 2013');
     const dispatch = useDispatch<AppDispatch>();
     const mode = useSelector(siteDetailsMode);
     const disclosureData = useSelector(siteDisclosure)
+    const loggedInUser = getUser();
     useEffect(() => {
+        if(loggedInUser?.profile.preferred_username?.indexOf("bceid") !== -1)
+            {
+              setUserType(UserType.External);
+            }
+            else if (loggedInUser?.profile.preferred_username?.indexOf("idir") !== -1)
+            {
+              setUserType(UserType.Internal);
+            }
+            else
+            {
+              // not logged in 
+              setUserType(UserType.External);
+        
+            }
         setFormData(disclosureData ?? {})  
     }, []);
 

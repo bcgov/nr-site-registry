@@ -14,7 +14,7 @@ export class CartService {
 
   async getCartItemsForUser(userId: string): Promise<Cart[]> {
     try {
-      const cartItems = await this.cartRepository.find({ where: { userId } });
+      const cartItems = await this.cartRepository.find({ relations: {site:true},   where: { userId }  });
       return cartItems;
     } catch (error) {
       throw error;

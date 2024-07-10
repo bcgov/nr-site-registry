@@ -1,8 +1,8 @@
 import { Resolver,Query } from "@nestjs/graphql";
 import { RoleMatchingMode, Roles } from "nest-keycloak-connect";
-import { DropdownDto, DropdownResponse } from "src/app/dto/dropdown.dto";
-import { GenericResponseProvider } from "src/app/dto/response/genericResponseProvider";
-import { DropdownService } from "src/app/services/dropdown/dropdown.service";
+import { DropdownDto, DropdownResponse } from "../../dto/dropdown.dto";
+import { GenericResponseProvider } from "../../dto/response/genericResponseProvider";
+import { DropdownService } from "../../services/dropdown/dropdown.service";
 
 
 @Resolver(() => DropdownDto)
@@ -22,7 +22,7 @@ export class DropdownResolver {
         }
         else
         {
-          return this.genericResponseProvider.createResponse(`Participants role code not found`, 404, false);
+          return this.genericResponseProvider.createResponse(`Participants role code not found`, 404, false, null);
         }
     }
 

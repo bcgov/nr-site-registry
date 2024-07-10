@@ -13,7 +13,6 @@ import siteDisclosureReducer from "./features/details/disclosure/DisclosureSlice
 import cartReducer from "./features/cart/CartSlice";
 
 
-
 const persistedStore: any = loadFromLocalStorage();
 
 export const store = configureStore({

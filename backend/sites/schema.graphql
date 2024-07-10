@@ -442,6 +442,22 @@ type DropdownDto {
   value: String!
 }
 
+type DisclosureResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [SiteProfiles!]
+}
+
+type Cart {
+  id: String!
+  userId: String!
+  siteId: String!
+  price: Float!
+  site: Sites!
+}
+
 type CartResponse {
   message: String
   httpStatusCode: Int

@@ -53,9 +53,9 @@ import { getUser } from "../../helpers/utility";
 import { addRecentView } from "../dashboard/DashboardSlice";
 import { fetchParticipantRoleCd, fetchPeopleOrgsCd } from "./dropdowns/DropdownSlice";
 import { fetchSiteParticipants } from "./participants/ParticipantSlice";
+import { fetchSiteDisclosure } from "./disclosure/DisclosureSlice";
 import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
 import { useAuth } from "react-oidc-context";
-import { fetchSiteDisclosure } from "./disclosure/DisclosureSlice";
 
 const SiteDetails = () => {
 

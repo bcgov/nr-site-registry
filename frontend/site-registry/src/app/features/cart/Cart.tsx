@@ -80,7 +80,7 @@ const Cart = () => {
           }}
           editMode={false}
           idColumnName="id"
-          delteHandler={(event) => {
+          deleteHandler={(event) => {
             handleCartItemDelete(event.row.id);
           }}
         />

@@ -26,7 +26,7 @@ const getSiteSearchResultsColumns = () => {
       isDefault: true,
       sortOrder: 1,
       isChecked: true,
-      displayType: getColumnTypeWithSticky('Site ID', 'id', ''),
+      displayType: getLinkColumnType('Site ID', 'id', '', 'site/details/'),
       stickyCol: true,
     },
     new TableColumn(
@@ -300,6 +300,7 @@ const getLinkColumnType = (
   propertyName: string,
   value: string,
   href: string,
+  customLabel?: string,
 ) => {
   return {
     type: FormFieldType.Link,
@@ -311,6 +312,7 @@ const getLinkColumnType = (
     tableMode: true,
     stickyCol: true,
     href: href,
+    customLinkValue: customLabel ?? null,
   };
 };
 

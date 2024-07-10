@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { plainToInstance } from 'class-transformer';
-import { ParticRoleCd } from 'src/app/entities/particRoleCd.entity';
-import { PeopleOrgs } from 'src/app/entities/peopleOrgs.entity';
+import { ParticRoleCd } from '../../entities/particRoleCd.entity';
+import { PeopleOrgs } from '../../entities/peopleOrgs.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()

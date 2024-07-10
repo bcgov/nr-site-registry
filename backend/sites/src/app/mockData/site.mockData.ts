@@ -1,4 +1,5 @@
 import { BceRegionCd } from '../entities/bceRegionCd.entity';
+import { Cart } from '../entities/cart.entity';
 import { ClassificationCd } from '../entities/classificationCd.entity';
 import { RecentViews } from '../entities/recentViews.entity';
 import { SiteCrownLandContaminated } from '../entities/siteCrownLandContaminated.entity';
@@ -26,6 +27,7 @@ const bceRegionCd: BceRegionCd = {
 };
 const classCd: ClassificationCd = { code: '1', description: 'test', sites: [] };
 const snapshots = [new Snapshots()];
+const cart = [new Cart()];
 
 export const sampleSites: Sites[] = [
   {
@@ -80,6 +82,7 @@ export const sampleSites: Sites[] = [
     siteCrownLandContaminated: siteCrownLandContaminated,
     recentViewedSites: recentViewedSites,
     snapshots: snapshots,
+    cart: cart,
   },
   {
     id: '222',
@@ -133,5 +136,6 @@ export const sampleSites: Sites[] = [
     siteCrownLandContaminated: siteCrownLandContaminated,
     recentViewedSites: recentViewedSites,
     snapshots: snapshots,
+    cart: cart,
   },
 ];

@@ -18,6 +18,7 @@ import {
 import { useAuth } from 'react-oidc-context';
 import { getUser } from '../../helpers/utility';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
+import { AngleRight } from '../../components/common/icon';
 
 const Cart = () => {
   const auth = useAuth();
@@ -40,7 +41,6 @@ const Cart = () => {
 
   useEffect(() => {
     setCartIdToDelete('');
-    //console.log("cart", cartItemsArr);
   }, [cartItemsArr]);
 
   const handleCartItemDelete = (cartId: string) => {
@@ -88,7 +88,10 @@ const Cart = () => {
       {cartItemsArr.length > 0 && (
         <div className="cart-actions">
           <div className="continue-payment">
-            <span className="payment-text">Continue to Payment</span>
+            <span className="payment-text">
+              Continue to Payment
+              <AngleRight />
+            </span>
           </div>
           <div className="cart-total">
             <span className="cart-total-text">Subtotal</span>
@@ -107,7 +110,7 @@ const Cart = () => {
           label="Are you sure to delete from cart ?"
           closeHandler={(response) => {
             if (response) {
-              dispatch(resetCartItemDeleteStatus);
+              dispatch(resetCartItemDeleteStatus(null));
               dispatch(deleteCartItem(cartIdToDelte)).unwrap();
             }
             setDeleteConfirm(false);

@@ -396,14 +396,12 @@ const Summary = () => {
   ];
 
   const handleAddToCart = () => {
-    console.log('add clicked');
     dispatch(resetCartItemAddedStatus);
     const loggedInUser = getUser();
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
-      console.log(loggedInUser);
-
+      dispatch(resetCartItemAddedStatus(null));
       dispatch(
         addCartItem({
           userId: loggedInUser.profile.sub,

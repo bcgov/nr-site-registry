@@ -27,7 +27,6 @@ export const fetchCartItems = createAsyncThunk(
           userId: userId,
         },
       });
-      console.log('response from cart', response);
       return response.data.data.getCartItemsForUser.data;
     } catch (error) {
       throw error;
@@ -77,7 +76,7 @@ const cartSlice = createSlice({
       const newState = {
         ...state,
       };
-      newState.deleteRequestStatus = RequestStatus.idle;
+      newState.deleteRequestStatus = RequestStatus.pending;
       return newState;
     },
   },

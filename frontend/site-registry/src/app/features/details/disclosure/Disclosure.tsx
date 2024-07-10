@@ -25,47 +25,52 @@ import {
   ChangeTracker,
   IChangeType,
 } from '../../../components/common/IChangeType';
-import { flattenFormRows, formatDate } from '../../../helpers/utility';
+import {
+  flattenFormRows,
+  formatDate,
+  getUser,
+  serializeDate,
+} from '../../../helpers/utility';
 import Actions from '../../../components/action/Actions';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
+import { siteDisclosure, updateSiteDisclosure } from './DisclosureSlice';
 
-const disclosureData = {
-  disclosureId: 1,
-  siteId: 1,
-  dateReceived: new Date('2013-05-31'),
-  dateComplete: new Date('2013-05-31'),
-  localAuthorityReceived: new Date('2013-05-31'),
-  dateRegistrar: new Date('2013-05-31'),
-  dateEntered: new Date('2013-05-31'),
-  disclosureSchedule: [
-    {
-      scheduleId: 1,
-      reference: 'F1',
-      discription: 'PETROLEUM OR NATURAL GAS DRILLING',
-      sr: true,
-    },
-    {
-      scheduleId: 2,
-      reference: 'F2',
-      discription: 'PETROLEUM OR NATURAL GAS PRODUCTION FACILITIES',
-      sr: false,
-    },
-  ],
-  summary:
-    'PLANNED ACTIVITIES INCLUDE MEETING THE OBLIGATIONS OF THE ENVIRONMENTAL MANAGEMENT ACT AND CONTAMINATED SITES REGULATION TO OBTAIN A CERTIFICATE OF RESTORATION FOR THE PROPERTY. THE END LAND USE OF THE PROPERTY IS WILDLANDS - REVERTED.',
-  statement: `SITE DISCLOSURE WAS COMPLETED AND SUMMARIZED USING AVAILABLE SITE INFORMATION OBTAINED VIA A FILE REVIEW OF WELLSITE DOCUMENTS OBTAINED FROM ENERPLUS CORPORATION'S CALGARY OFFICE. ADDITIONAL SITE BACKGROUND INFORMATION OBTAINED FROM USING A REVIEW OF AVAILABLE HISTORICAL AERIAL PHOTOGRAPHS AND A SEARCH OF ON-LINE DATABASES MAINTAINED AND/OR DEVELOPED BY REGULATORY AGENCIES (OIL AND GAS COMMISSION AND MINISTRY OF THE ENVIRONMENT).`,
-  governmentOrder: 'NONE.',
-  srTimeStamp: `Sent to SR on ${formatDate(new Date())}`,
-};
+// const disclosureData = {
+//         disclosureId:1,
+//         siteId:1,
+//         dateReceived:new Date('2013-05-31'),
+//         dateComplete:new Date('2013-05-31'),
+//         localAuthorityReceived:new Date('2013-05-31'),
+//         dateRegistrar:new Date('2013-05-31'),
+//         dateEntered:new Date('2013-05-31'),
+//         disclosureSchedule:[
+//             {
+//                 scheduleId:1,
+//                 reference:'F1',
+//                 discription:'PETROLEUM OR NATURAL GAS DRILLING',
+//                 sr:true
+//             },
+//             {
+//                 scheduleId:2,
+//                 reference:'F2',
+//                 discription:'PETROLEUM OR NATURAL GAS PRODUCTION FACILITIES',
+//                 sr:false,
+//             },
+//         ],
+//         summary: 'PLANNED ACTIVITIES INCLUDE MEETING THE OBLIGATIONS OF THE ENVIRONMENTAL MANAGEMENT ACT AND CONTAMINATED SITES REGULATION TO OBTAIN A CERTIFICATE OF RESTORATION FOR THE PROPERTY. THE END LAND USE OF THE PROPERTY IS WILDLANDS - REVERTED.',
+//         statement:`SITE DISCLOSURE WAS COMPLETED AND SUMMARIZED USING AVAILABLE SITE INFORMATION OBTAINED VIA A FILE REVIEW OF WELLSITE DOCUMENTS OBTAINED FROM ENERPLUS CORPORATION'S CALGARY OFFICE. ADDITIONAL SITE BACKGROUND INFORMATION OBTAINED FROM USING A REVIEW OF AVAILABLE HISTORICAL AERIAL PHOTOGRAPHS AND A SEARCH OF ON-LINE DATABASES MAINTAINED AND/OR DEVELOPED BY REGULATORY AGENCIES (OIL AND GAS COMMISSION AND MINISTRY OF THE ENVIRONMENT).`,
+//         governmentOrder:'NONE.',
+//         srTimeStamp: `Sent to SR on ${formatDate(new Date())}`,
+// };
 
 const Disclosure = () => {
   const [formData, setFormData] = useState<{
     [key: string]: any | [Date, Date];
-  }>(disclosureData);
+  }>({});
   const [selectedRows, setSelectedRows] = useState<
     { disclosureId: any; scheduleId: any }[]
   >([]);
-  const [userType, setUserType] = useState<UserType>(UserType.Internal);
+  const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
   const [srTimeStamp, setSRTimeStamp] = useState(
@@ -73,9 +78,20 @@ const Disclosure = () => {
   );
   const dispatch = useDispatch<AppDispatch>();
   const mode = useSelector(siteDetailsMode);
-
+  const disclosureData = useSelector(siteDisclosure);
+  const loggedInUser = getUser();
   useEffect(() => {
-    setFormData(disclosureData);
+    if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
+      setUserType(UserType.External);
+    } else if (
+      loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
+    ) {
+      setUserType(UserType.Internal);
+    } else {
+      // not logged in
+      setUserType(UserType.External);
+    }
+    setFormData(disclosureData ?? {});
   }, []);
 
   useEffect(() => {
@@ -93,6 +109,15 @@ const Disclosure = () => {
       setFormData((preData) => {
         return { ...preData, [graphQLPropertyName]: value };
       });
+      //dispatch the updated site disclosure
+      dispatch(
+        updateSiteDisclosure(
+          serializeDate({
+            ...formData,
+            [graphQLPropertyName]: value,
+          }),
+        ),
+      );
     }
     const flattedArr = flattenFormRows(disclosureStatementConfig);
     const currLabel =
@@ -105,6 +130,7 @@ const Disclosure = () => {
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
+  /// not working yet as the actual source of table data is unknown.
   const handleTableChange = (disclosureId: any, event: any) => {
     const isExist = formData.disclosureSchedule.some(
       (item: any) => item.scheduleId === event.row.scheduleId,
@@ -294,100 +320,104 @@ const Disclosure = () => {
           </div>
         </Widget>
       </div>
+      {/*  Not working yet as the actual source of table data is unknown.*/}
       <div
         className={`mb-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-5' : 'px-3'}`}
       >
         <div
           className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : 'p-0'}`}
         >
-          <Widget
-            changeHandler={(event) =>
-              handleTableChange(formData.disclosureId, event)
-            }
-            handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
-            title={
-              'III Commercial and Industrial Purposes or Activities on Site'
-            }
-            tableColumns={
-              userType === UserType.Internal
-                ? disclosureScheduleInternalConfig
-                : disclosureScheduleExternalConfig
-            }
-            tableData={formData.disclosureSchedule ?? []}
-            tableIsLoading={
-              formData.disclosureSchedule.Length > 0
-                ? loading
-                : RequestStatus.idle
-            }
-            allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
-            aria-label="Site Disclosure Schedule"
-            hideTable={false}
-            hideTitle={false}
-            editMode={
-              viewMode === SiteDetailsMode.EditMode &&
-              userType === UserType.Internal
-            }
-            srMode={
-              viewMode === SiteDetailsMode.SRMode &&
-              userType === UserType.Internal
-            }
-            primaryKeycolumnName="scheduleId"
-            sortHandler={(row, ascDir) => {
-              handleTableSort(row, ascDir, formData.disclosureId);
-            }}
-          >
-            {viewMode === SiteDetailsMode.EditMode &&
-              userType === UserType.Internal && (
-                <div className="d-flex gap-2" key={formData.disclosureId}>
-                  <button
-                    id="add-schedule-btn"
-                    className=" d-flex align-items-center disclosure-add-btn"
-                    type="button"
-                    onClick={() =>
-                      handleAddDisclosureSchedule(formData.disclosureId)
-                    }
-                    aria-label={'Add'}
-                  >
-                    <Plus className="btn-user-icon" />
-                    <span className="disclosure-btn-lbl">{'Add'}</span>
-                  </button>
-
-                  <button
-                    id="delete-schedule-btn"
-                    className={`d-flex align-items-center ${isAnyDisclosureScheduleSelected(formData.disclosureId) ? `disclosure-add-btn` : `disclosure-btn-disable`}`}
-                    disabled={
-                      !isAnyDisclosureScheduleSelected(formData.disclosureId)
-                    }
-                    type="button"
-                    onClick={() =>
-                      handleRemoveDisclosureSchedule(formData.disclosureId)
-                    }
-                    aria-label={'Remove Disclosure Schedule'}
-                  >
-                    <Minus
-                      className={`${isAnyDisclosureScheduleSelected(formData.disclosureId) ? `btn-user-icon` : `btn-user-icon-disabled`}`}
-                    />
-                    <span
-                      className={`${isAnyDisclosureScheduleSelected(formData.disclosureId) ? `disclosure-btn-lbl` : `disclosure-btn-lbl-disabled`}`}
+          {formData && (
+            <Widget
+              changeHandler={(event) =>
+                handleTableChange(formData.disclosureId, event)
+              }
+              handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
+              title={
+                'III Commercial and Industrial Purposes or Activities on Site'
+              }
+              tableColumns={
+                userType === UserType.Internal
+                  ? disclosureScheduleInternalConfig
+                  : disclosureScheduleExternalConfig
+              }
+              tableData={formData.disclosureSchedule ?? []}
+              tableIsLoading={
+                formData.disclosureSchedule &&
+                formData.disclosureSchedule.length > 0
+                  ? loading
+                  : RequestStatus.idle
+              }
+              allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
+              aria-label="Site Disclosure Schedule"
+              hideTable={false}
+              hideTitle={false}
+              editMode={
+                viewMode === SiteDetailsMode.EditMode &&
+                userType === UserType.Internal
+              }
+              srMode={
+                viewMode === SiteDetailsMode.SRMode &&
+                userType === UserType.Internal
+              }
+              primaryKeycolumnName="scheduleId"
+              sortHandler={(row, ascDir) => {
+                handleTableSort(row, ascDir, formData.disclosureId);
+              }}
+            >
+              {viewMode === SiteDetailsMode.EditMode &&
+                userType === UserType.Internal && (
+                  <div className="d-flex gap-2" key={formData.disclosureId}>
+                    <button
+                      id="add-schedule-btn"
+                      className=" d-flex align-items-center disclosure-add-btn"
+                      type="button"
+                      onClick={() =>
+                        handleAddDisclosureSchedule(formData.disclosureId)
+                      }
+                      aria-label={'Add'}
                     >
-                      {'Remove'}
-                    </span>
-                  </button>
-                </div>
-              )}
-            {viewMode === SiteDetailsMode.SRMode &&
-              userType === UserType.Internal && (
-                <Actions
-                  label="Set SR Visibility"
-                  items={srVisibilityConfig}
-                  onItemClick={handleItemClick}
-                  customCssToggleBtn={
-                    true ? `disclosure-sr-btn` : `disclosure-sr-btn-disable`
-                  }
-                  disable={viewMode !== SiteDetailsMode.SRMode}
-                />
-              )}
-          </Widget>
+                      <Plus className="btn-user-icon" />
+                      <span className="disclosure-btn-lbl">{'Add'}</span>
+                    </button>
+
+                    <button
+                      id="delete-schedule-btn"
+                      className={`d-flex align-items-center ${isAnyDisclosureScheduleSelected(formData.disclosureId) ? `disclosure-add-btn` : `disclosure-btn-disable`}`}
+                      disabled={
+                        !isAnyDisclosureScheduleSelected(formData.disclosureId)
+                      }
+                      type="button"
+                      onClick={() =>
+                        handleRemoveDisclosureSchedule(formData.disclosureId)
+                      }
+                      aria-label={'Remove Disclosure Schedule'}
+                    >
+                      <Minus
+                        className={`${isAnyDisclosureScheduleSelected(formData.disclosureId) ? `btn-user-icon` : `btn-user-icon-disabled`}`}
+                      />
+                      <span
+                        className={`${isAnyDisclosureScheduleSelected(formData.disclosureId) ? `disclosure-btn-lbl` : `disclosure-btn-lbl-disabled`}`}
+                      >
+                        {'Remove'}
+                      </span>
+                    </button>
+                  </div>
+                )}
+              {viewMode === SiteDetailsMode.SRMode &&
+                userType === UserType.Internal && (
+                  <Actions
+                    label="Set SR Visibility"
+                    items={srVisibilityConfig}
+                    onItemClick={handleItemClick}
+                    customCssToggleBtn={
+                      true ? `disclosure-sr-btn` : `disclosure-sr-btn-disable`
+                    }
+                    disable={viewMode !== SiteDetailsMode.SRMode}
+                  />
+                )}
+            </Widget>
+          )}
         </div>
       </div>
       <div
@@ -396,44 +426,48 @@ const Disclosure = () => {
         <div
           className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : 'p-0'}`}
         >
-          <Widget
-            title={'IV Additional Comments and Explanations'}
-            hideTable={true}
-            hideTitle={false}
-            editMode={
-              viewMode === SiteDetailsMode.EditMode &&
-              userType === UserType.Internal
-            }
-            srMode={
-              viewMode === SiteDetailsMode.SRMode &&
-              userType === UserType.Internal
-            }
-            handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
-            aria-label="Disclosure Widget"
-          >
-            <div className="mt-3">
-              {formData && (
-                <Form
-                  formRows={disclosureCommentsConfig}
-                  formData={formData}
-                  editMode={viewMode === SiteDetailsMode.EditMode}
-                  srMode={viewMode === SiteDetailsMode.SRMode}
-                  handleInputChange={(graphQLPropertyName, value) =>
-                    handleInputChange(
-                      formData.disclosureId,
-                      graphQLPropertyName,
-                      value,
-                    )
-                  }
-                  aria-label="Site Disclosure Statement"
-                />
-              )}
-            </div>
-          </Widget>
+          {formData && (
+            <Widget
+              title={'IV Additional Comments and Explanations'}
+              hideTable={true}
+              hideTitle={false}
+              editMode={
+                viewMode === SiteDetailsMode.EditMode &&
+                userType === UserType.Internal
+              }
+              srMode={
+                viewMode === SiteDetailsMode.SRMode &&
+                userType === UserType.Internal
+              }
+              handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
+              aria-label="Disclosure Widget"
+            >
+              <div className="mt-3">
+                {formData && (
+                  <Form
+                    formRows={disclosureCommentsConfig}
+                    formData={formData}
+                    editMode={viewMode === SiteDetailsMode.EditMode}
+                    srMode={viewMode === SiteDetailsMode.SRMode}
+                    handleInputChange={(graphQLPropertyName, value) =>
+                      handleInputChange(
+                        formData.disclosureId,
+                        graphQLPropertyName,
+                        value,
+                      )
+                    }
+                    aria-label="Site Disclosure Statement"
+                  />
+                )}
+              </div>
+            </Widget>
+          )}
         </div>
       </div>
       {userType === UserType.Internal && (
-        <p className="sr-time-stamp">{formData.srTimeStamp}</p>
+        <p className="sr-time-stamp">
+          {formData.srTimeStamp ?? 'Hard Code Value'}
+        </p>
       )}
     </div>
   );

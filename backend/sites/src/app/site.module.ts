@@ -55,6 +55,8 @@ import { ParticipantService } from './services/participant/participant.service';
 import { GenericResponseProvider } from './dto/response/genericResponseProvider';
 import { DropdownResolver } from './resolvers/dropdown/dropdown.resolver';
 import { DropdownService } from './services/dropdown/dropdown.service';
+import { DisclosureService } from './services/disclosure/disclosure.service';
+import { DisclosureResolver } from './resolvers/disclosure/disclosure.resolver';
 import { CartResolver } from './resolvers/cart/cart.resolver';
 import { CartService } from './services/cart/cart.service';
 import { Cart } from './entities/cart.entity';
@@ -127,6 +129,8 @@ import { Cart } from './entities/cart.entity';
     ParticipantService,
     DropdownResolver,
     DropdownService,
+    DisclosureResolver,
+    DisclosureService,
     GenericResponseProvider,
     CartResolver,
     CartService,

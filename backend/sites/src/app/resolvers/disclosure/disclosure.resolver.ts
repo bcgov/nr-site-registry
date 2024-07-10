@@ -1,40 +1,42 @@
-import { UsePipes } from '@nestjs/common';
 import { Args, Query, Resolver } from '@nestjs/graphql';
+import { UsePipes } from '@nestjs/common';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { SiteParticsDto, SiteParticsResponse } from '../../dto/sitePartics.dto';
-import { ParticipantService } from '../../services/participant/participant.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
+import { SiteProfiles } from '../../entities/siteProfiles.entity';
+import { DisclosureResponse } from '../../dto/disclosure.dto';
+import { DisclosureService } from '../../services/disclosure/disclosure.service';
 
-@Resolver(() => SiteParticsDto)
-export class ParticipantResolver {
+@Resolver(() => SiteProfiles)
+export class DisclosureResolver {
   constructor(
-    private readonly participantService: ParticipantService,
+    private readonly dsiclosureService: DisclosureService,
     private readonly genericResponseProvider: GenericResponseProvider<
-      SiteParticsDto[]
+      SiteProfiles[]
     >,
   ) {}
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
-  @Query(() => SiteParticsResponse, { name: 'getSiteParticipantBySiteId' })
+  @Query(() => DisclosureResponse, { name: 'getSiteDisclosureBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
-  async getSiteParticipantsBySiteId(
+  async getSiteDisclosureBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
   ) {
     const result =
-      await this.participantService.getSiteParticipantsBySiteId(siteId);
+      await this.dsiclosureService.getSiteDisclosureBySiteId(siteId);
     if (result.length > 0) {
       return this.genericResponseProvider.createResponse(
-        'Participants fetched successfully',
+        'Site Disclosure fetched successfully',
         200,
         true,
         result,
       );
     } else {
       return this.genericResponseProvider.createResponse(
-        `Participants data not found for site id: ${siteId}`,
+        `Site Disclosure data not found for site id: ${siteId}`,
         404,
         false,
+        null,
       );
     }
   }

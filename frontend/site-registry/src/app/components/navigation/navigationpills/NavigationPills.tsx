@@ -1,9 +1,8 @@
-import React, { ReactNode, useState } from 'react';
+import React, { useState } from 'react';
 import './NavigationPills.css';
 import { INavigationPills } from './INavigationPills';
 import { Link } from 'react-router-dom';
 import Actions from '../../action/Actions';
-import { Carousel } from 'react-bootstrap';
 
 const NavigationPills: React.FC<INavigationPills> = ({
   items,

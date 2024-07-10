@@ -39,6 +39,7 @@ import {
   flattenFormRows,
   formatDate,
   formatDateRange,
+  getUser,
 } from '../../../helpers/utility';
 import Search from '../../site/Search';
 import SearchInput from '../../../components/search/SearchInput';
@@ -126,7 +127,7 @@ const notationParticipantData3 = [
 const Notations: React.FC<INotations> = ({ user }) => {
   const details = useSelector(selectSiteDetails);
 
-  const [userType, setUserType] = useState<UserType>(UserType.Internal);
+  const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [formData, setFormData] = useState<
     { [key: string]: any | [Date, Date] }[]
@@ -137,6 +138,21 @@ const Notations: React.FC<INotations> = ({ user }) => {
   );
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
   const [searchTerm, setSearchTerm] = useState('');
+
+  const loggedInUser = getUser();
+  useEffect(() => {
+    if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
+      setUserType(UserType.External);
+    } else if (
+      loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
+    ) {
+      setUserType(UserType.Internal);
+    } else {
+      // not logged in
+      setUserType(UserType.External);
+    }
+    setFormData(details.events);
+  }, []);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value;
@@ -185,10 +201,6 @@ const Notations: React.FC<INotations> = ({ user }) => {
       // setData(dummyData);
     }
   }, [resetDetails]);
-
-  useEffect(() => {
-    setFormData(details.events);
-  }, []);
 
   const handleInputChange = (
     id: number,

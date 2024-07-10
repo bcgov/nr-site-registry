@@ -23,6 +23,7 @@ import { SiteStatusCd } from './siteStatusCd.entity';
 import { SiteCrownLandContaminated } from './siteCrownLandContaminated.entity';
 import { RecentViews } from './recentViews.entity';
 import { Snapshots } from './snapshots.entity';
+import { Cart } from './cart.entity';
 // import { loggerMiddleware } from '../resolvers/site/site.resolver';
 
 @ObjectType()
@@ -315,6 +316,10 @@ export class Sites {
   @Field(() => [RecentViews], { nullable: true })
   @OneToMany(() => RecentViews, (recentViews) => recentViews.site)
   recentViewedSites: RecentViews[];
+
+  @Field(() => [Cart], { nullable: true })
+  @OneToMany(() => Cart, (cart) => cart.site)
+  cart: Cart[];
 
   @OneToMany(() => Snapshots, (snapshots) => snapshots.site)
   snapshots: Snapshots[];

@@ -60,12 +60,11 @@ import {
   fetchPeopleOrgsCd,
 } from './dropdowns/DropdownSlice';
 import { fetchSiteParticipants } from './participants/ParticipantSlice';
+import { fetchSiteDisclosure } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
 
 const SiteDetails = () => {
-  console.log(getUser());
-
   const auth = useAuth();
 
   const [edit, setEdit] = useState(false);
@@ -110,6 +109,7 @@ const SiteDetails = () => {
     dispatch(fetchPeopleOrgsCd());
     dispatch(fetchParticipantRoleCd());
     dispatch(fetchSiteParticipants(id ?? ''));
+    dispatch(fetchSiteDisclosure(id ?? ''));
   }, [id]);
 
   useEffect(() => {
@@ -166,14 +166,12 @@ const SiteDetails = () => {
     }
   };
   const handleAddToCart = () => {
-    console.log('add clicked');
     dispatch(resetCartItemAddedStatus);
     const loggedInUser = getUser();
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
-      console.log(loggedInUser);
-
+      dispatch(resetCartItemAddedStatus(null));
       dispatch(
         addCartItem({
           userId: loggedInUser.profile.sub,

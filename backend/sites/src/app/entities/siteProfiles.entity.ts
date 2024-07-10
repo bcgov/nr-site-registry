@@ -31,14 +31,14 @@ export class SiteProfiles {
   })
   dateCompleted: Date;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'local_auth_date_recd',
     nullable: true,
   })
   localAuthDateRecd: Date | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'local_auth_name',
     nullable: true,
@@ -46,7 +46,7 @@ export class SiteProfiles {
   })
   localAuthName: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'local_auth_agency',
     nullable: true,
@@ -54,7 +54,7 @@ export class SiteProfiles {
   })
   localAuthAgency: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'local_auth_address1',
     nullable: true,
@@ -62,7 +62,7 @@ export class SiteProfiles {
   })
   localAuthAddress1: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'local_auth_address2',
     nullable: true,
@@ -70,7 +70,7 @@ export class SiteProfiles {
   })
   localAuthAddress2: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'local_auth_phone_area_code',
     nullable: true,
@@ -78,7 +78,7 @@ export class SiteProfiles {
   })
   localAuthPhoneAreaCode: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'local_auth_phone_no',
     nullable: true,
@@ -86,7 +86,7 @@ export class SiteProfiles {
   })
   localAuthPhoneNo: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'local_auth_fax_area_code',
     nullable: true,
@@ -94,7 +94,7 @@ export class SiteProfiles {
   })
   localAuthFaxAreaCode: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'local_auth_fax_no',
     nullable: true,
@@ -102,32 +102,32 @@ export class SiteProfiles {
   })
   localAuthFaxNo: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'local_auth_date_submitted',
     nullable: true,
   })
   localAuthDateSubmitted: Date | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'local_auth_date_forwarded',
     nullable: true,
   })
   localAuthDateForwarded: Date | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'rwm_date_received',
     nullable: true,
   })
   rwmDateReceived: Date | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('bigint', { name: 'rwm_partic_id', nullable: true })
   rwmParticId: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'rwm_phone_area_code',
     nullable: true,
@@ -135,7 +135,7 @@ export class SiteProfiles {
   })
   rwmPhoneAreaCode: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'rwm_phone_no',
     nullable: true,
@@ -143,7 +143,7 @@ export class SiteProfiles {
   })
   rwmPhoneNo: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'rwm_fax_area_code',
     nullable: true,
@@ -151,7 +151,7 @@ export class SiteProfiles {
   })
   rwmFaxAreaCode: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'rwm_fax_no',
     nullable: true,
@@ -159,7 +159,7 @@ export class SiteProfiles {
   })
   rwmFaxNo: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character', {
     name: 'investigation_required',
     nullable: true,
@@ -167,36 +167,36 @@ export class SiteProfiles {
   })
   investigationRequired: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'rwm_date_decision',
     nullable: true,
   })
   rwmDateDecision: Date | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'site_reg_date_recd',
     nullable: true,
   })
   siteRegDateRecd: Date | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'site_reg_date_entered',
     nullable: true,
   })
   siteRegDateEntered: Date | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('bigint', { name: 'site_reg_partic_id', nullable: true })
   siteRegParticId: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('bigint', { name: 'owner_partic_id', nullable: true })
   ownerParticId: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'site_address',
     nullable: true,
@@ -204,7 +204,7 @@ export class SiteProfiles {
   })
   siteAddress: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'site_city',
     nullable: true,
@@ -212,7 +212,7 @@ export class SiteProfiles {
   })
   siteCity: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'site_postal_code',
     nullable: true,
@@ -220,23 +220,23 @@ export class SiteProfiles {
   })
   sitePostalCode: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('smallint', { name: 'number_of_pids', nullable: true })
   numberOfPids: number | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('smallint', { name: 'number_of_pins', nullable: true })
   numberOfPins: number | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('smallint', { name: 'lat_degrees', nullable: true })
   latDegrees: number | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('smallint', { name: 'lat_minutes', nullable: true })
   latMinutes: number | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('numeric', {
     name: 'lat_seconds',
     nullable: true,
@@ -245,15 +245,15 @@ export class SiteProfiles {
   })
   latSeconds: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('smallint', { name: 'long_degrees', nullable: true })
   longDegrees: number | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('smallint', { name: 'long_minutes', nullable: true })
   longMinutes: number | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('numeric', {
     name: 'long_seconds',
     nullable: true,
@@ -262,7 +262,7 @@ export class SiteProfiles {
   })
   longSeconds: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'comments',
     nullable: true,
@@ -274,7 +274,7 @@ export class SiteProfiles {
   @Column('character varying', { name: 'who_created', length: 30 })
   whoCreated: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'who_updated',
     nullable: true,
@@ -286,14 +286,14 @@ export class SiteProfiles {
   @Column('timestamp without time zone', { name: 'when_created' })
   whenCreated: Date;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'when_updated',
     nullable: true,
   })
   whenUpdated: Date | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'local_auth_email',
     nullable: true,
@@ -301,7 +301,7 @@ export class SiteProfiles {
   })
   localAuthEmail: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'planned_activity_comment',
     nullable: true,
@@ -309,7 +309,7 @@ export class SiteProfiles {
   })
   plannedActivityComment: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'site_disclosure_comment',
     nullable: true,
@@ -317,7 +317,7 @@ export class SiteProfiles {
   })
   siteDisclosureComment: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'gov_documents_comment',
     nullable: true,

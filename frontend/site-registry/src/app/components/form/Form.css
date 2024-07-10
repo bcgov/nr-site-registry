@@ -20,6 +20,9 @@
   line-height: 24px !important;
   text-align: left;
   color: var(--typography-color-secondary) !important;
+  text-wrap: wrap;
+  word-wrap: break-word;
+  text-overflow: ellipsis;
 }
 
 .custom-input::placeholder {

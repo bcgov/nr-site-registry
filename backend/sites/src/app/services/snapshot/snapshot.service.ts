@@ -16,9 +16,7 @@ export class SnapshotsService {
   async getSnapshots() {
     try {
       const result = await this.snapshotRepository.find();
-      if (result) {
-        return result;
-      }
+      return result;
     } catch (error) {
       throw new Error('Failed to retrieve snapshots.');
     }
@@ -27,9 +25,7 @@ export class SnapshotsService {
   async getSnapshotsByUserId(userId: string) {
     try {
       const result = await this.snapshotRepository.find({ where: { userId } });
-      if (result) {
-        return result;
-      }
+      return result;
     } catch (error) {
       throw new Error('Failed to retrieve snapshots by userId.');
     }
@@ -38,9 +34,7 @@ export class SnapshotsService {
   async getSnapshotsById(id: number) {
     try {
       const result = await this.snapshotRepository.find({ where: { id } });
-      if (result) {
-        return result;
-      }
+      return result;
     } catch (error) {
       throw error;
     }

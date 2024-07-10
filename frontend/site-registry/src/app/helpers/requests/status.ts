@@ -3,4 +3,5 @@ export enum RequestStatus {
   idle = 'idle',
   success = 'success',
   failed = 'failed',
+  pending = 'pending',
 }

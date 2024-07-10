@@ -9,7 +9,7 @@ const getLinkColumnType = (
   propertyName: string,
   value: string,
   href: string,
-  customLabel: string,
+  customLabel?: string,
 ): IFormField => {
   return {
     type: FormFieldType.Link,
@@ -20,7 +20,7 @@ const getLinkColumnType = (
     customInputTextCss: 'link-for-table',
     tableMode: true,
     href: href,
-    customLinkValue: customLabel,
+    customLinkValue: customLabel ?? null,
   };
 };
 
@@ -46,7 +46,7 @@ export const CartTableColumns: TableColumn[] = [
     displayName: 'Site ID',
     active: true,
     graphQLPropertyName: 'siteId',
-    displayType: getColumnType('Site ID', 'siteId', ''),
+    displayType: getLinkColumnType('', 'id', '', 'site/details/'),
   },
   {
     id: 2,
@@ -77,7 +77,7 @@ export const CartTableColumns: TableColumn[] = [
     17,
     'View',
     true,
-    'id',
+    'siteId',
     4,
     true,
     true,
@@ -91,7 +91,7 @@ export const CartTableColumns: TableColumn[] = [
     18,
     'Details',
     true,
-    'id',
+    'siteId',
     4,
     true,
     true,

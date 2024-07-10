@@ -37,7 +37,14 @@ export const fetchSiteParticipants = createAsyncThunk(
 const siteParticipantSlice = createSlice({
   name: 'siteParticipant',
   initialState,
-  reducers: {},
+  reducers: {
+    updateSiteParticipants: (state, action) => {
+      state.siteParticipants = action.payload;
+      state.status = RequestStatus.success;
+      console.log('updated data locally --> ', state.siteParticipants);
+      console.log('updated data locally action.payload --> ', action.payload);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchSiteParticipants.pending, (state) => {
@@ -57,5 +64,6 @@ const siteParticipantSlice = createSlice({
 export const siteParticipants = (state: {
   siteParticipant: IParticipantState;
 }) => state.siteParticipant.siteParticipants;
+export const { updateSiteParticipants } = siteParticipantSlice.actions;
 
 export default siteParticipantSlice.reducer;

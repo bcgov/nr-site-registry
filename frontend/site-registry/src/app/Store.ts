@@ -9,6 +9,7 @@ import thunk from 'redux-thunk';
 import dashboardReducer from './features/dashboard/DashboardSlice';
 import siteParticipantReducer from './features/details/participants/ParticipantSlice';
 import DropdownReducer from './features/details/dropdowns/DropdownSlice';
+import siteDisclosureReducer from './features/details/disclosure/DisclosureSlice';
 import cartReducer from './features/cart/CartSlice';
 
 const persistedStore: any = loadFromLocalStorage();
@@ -19,9 +20,14 @@ export const store = configureStore({
     sites: siteReducer,
     dashboard: dashboardReducer,
     siteParticipant: siteParticipantReducer,
+    siteDisclosure: siteDisclosureReducer,
     dropdown: DropdownReducer,
     cart: cartReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 store.subscribe(() => {

@@ -6,13 +6,11 @@
   text-align: left;
 }
 
-
-
-
 .dashboard-btn {
   border: 1px solid var(--surface-border-dark, #353433);
   border-radius: var(--surface-border-radius-medium);
-  padding: var(--layout-padding-small) var(--layout-padding-medium) var(--layout-padding-small) var(--layout-padding-medium);
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium);
   gap: var(--layout-margin-small);
 }
 
@@ -23,7 +21,6 @@
   text-align: center;
   color: var(--typography-color-primary, #2d2d2d);
 }
-
 
 .custom-dashboard-input-txt {
   font-size: 12px;

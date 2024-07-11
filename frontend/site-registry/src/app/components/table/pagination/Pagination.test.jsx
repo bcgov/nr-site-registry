@@ -1,10 +1,10 @@
 import React from 'react';
-import { render, fireEvent,screen } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import Pagination from './Pagination';
 import { text } from 'stream/consumers';
 
 describe('Pagination Component', () => {
-  const selectPageMock = jest.fn(()=>{});
+  const selectPageMock = jest.fn(() => {});
   const changeResultsPerPageMock = jest.fn();
 
   afterEach(() => {
@@ -19,11 +19,15 @@ describe('Pagination Component', () => {
         resultsPerPage={10}
         totalResults={1000}
         changeResultsPerPage={changeResultsPerPageMock}
-      />
+      />,
     );
 
-    expect(screen.getByText('1', { selector: '.pagination-page-active' })).toBeInTheDocument();
-    expect(screen.getByText('100', { selector: '.pagination-page' })).toBeInTheDocument();
+    expect(
+      screen.getByText('1', { selector: '.pagination-page-active' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('100', { selector: '.pagination-page' }),
+    ).toBeInTheDocument();
     // Add more assertions based on your component's logic
   });
 
@@ -35,10 +39,12 @@ describe('Pagination Component', () => {
         resultsPerPage={10}
         totalResults={100}
         changeResultsPerPage={changeResultsPerPageMock}
-      />
+      />,
     );
 
-    expect(screen.getByText('1', { selector: '.pagination-page-active' })).toBeInTheDocument();
+    expect(
+      screen.getByText('1', { selector: '.pagination-page-active' }),
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByText('2', { selector: '.pagination-page' }));
     expect(selectPageMock).toHaveBeenCalledWith(2);
   });
@@ -51,10 +57,12 @@ describe('Pagination Component', () => {
         resultsPerPage={10}
         totalResults={100}
         changeResultsPerPage={changeResultsPerPageMock}
-      />
+      />,
     );
 
-    fireEvent.change(screen.getByText('Results per page'), { target: { text: '25' } });
+    fireEvent.change(screen.getByText('Results per page'), {
+      target: { text: '25' },
+    });
     //expect(changeResultsPerPageMock).tobe
   });
 

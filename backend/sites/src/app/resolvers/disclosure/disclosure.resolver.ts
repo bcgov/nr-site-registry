@@ -1,5 +1,5 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { UsePipes} from '@nestjs/common';
+import { UsePipes } from '@nestjs/common';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
@@ -10,9 +10,11 @@ import { DisclosureService } from '../../services/disclosure/disclosure.service'
 @Resolver(() => SiteProfiles)
 export class DisclosureResolver {
   constructor(
-    private readonly dsiclosureService: DisclosureService, 
-    private readonly genericResponseProvider: GenericResponseProvider<SiteProfiles[]>,
-  ) { }
+    private readonly dsiclosureService: DisclosureService,
+    private readonly genericResponseProvider: GenericResponseProvider<
+      SiteProfiles[]
+    >,
+  ) {}
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
   @Query(() => DisclosureResponse, { name: 'getSiteDisclosureBySiteId' })
@@ -20,13 +22,22 @@ export class DisclosureResolver {
   async getSiteDisclosureBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
   ) {
-    const result = await this.dsiclosureService.getSiteDisclosureBySiteId(siteId);
+    const result =
+      await this.dsiclosureService.getSiteDisclosureBySiteId(siteId);
     if (result.length > 0) {
-      return this.genericResponseProvider.createResponse('Site Disclosure fetched successfully', 200, true, result);
-    }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Site Disclosure data not found for site id: ${siteId}`, 404, false, null);
+      return this.genericResponseProvider.createResponse(
+        'Site Disclosure fetched successfully',
+        200,
+        true,
+        result,
+      );
+    } else {
+      return this.genericResponseProvider.createResponse(
+        `Site Disclosure data not found for site id: ${siteId}`,
+        404,
+        false,
+        null,
+      );
     }
   }
 }

@@ -1,5 +1,5 @@
- // TODO : Manage Environment Configurations
- 
- const TODO = '';
+// TODO : Manage Environment Configurations
 
- export default TODO;
+const TODO = '';
+
+export default TODO;

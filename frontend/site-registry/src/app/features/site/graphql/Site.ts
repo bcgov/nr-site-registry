@@ -1,20 +1,22 @@
-import gql from 'graphql-tag'
+import gql from 'graphql-tag';
 
-export const graphQlSiteQuery = (filter: {}) => { 
+export const graphQlSiteQuery = (filter: {}) => {
   const filterConditions = filter && Object.keys(filter);
   let fieldsString = '';
   let fieldsArgString = '';
   let selectedInput = '';
 
   // Dynamically generate the fields part of the query
-  if(filterConditions)
-  {
-    fieldsString = filterConditions.map(field => `${field}: $${field}`).join(", ");
-    fieldsArgString = filterConditions.map(field => `$${field}: String`).join(", ");
+  if (filterConditions) {
+    fieldsString = filterConditions
+      .map((field) => `${field}: $${field}`)
+      .join(', ');
+    fieldsArgString = filterConditions
+      .map((field) => `$${field}: String`)
+      .join(', ');
   }
-  
 
-  return (gql`
+  return gql`
 query searchSites($searchParam: String!,  $page: String!, $pageSize: String!, ${fieldsArgString}){ 
     searchSites(searchParam: $searchParam, , page: $page, pageSize: $pageSize, ${fieldsString}) {
        sites
@@ -47,17 +49,16 @@ query searchSites($searchParam: String!,  $page: String!, $pageSize: String!, ${
        pageSize
     }
   }
-`);
-}
-
+`;
+};
 
 // export const graphqlSiteDetailsQuery = () => {
 //   return (gql`
-//   query findSiteBySiteId($siteId: String!){ 
+//   query findSiteBySiteId($siteId: String!){
 //         findSiteBySiteId(siteId: $siteId) {
 //          data
 //          {
-//           id,     
+//           id,
 //           commonName,
 //           addrLine_1,
 //           addrLine_2,
@@ -145,30 +146,29 @@ query searchSites($searchParam: String!,  $page: String!, $pageSize: String!, ${
 // }
 
 export const graphqlSiteDetailsQuery = () => {
-  return (gql`
-  query findSiteBySiteId($siteId: String!){ 
-        findSiteBySiteId(siteId: $siteId) {
-         data
-         {
-          id,     
-          commonName,
-          addrLine_1,
-          addrLine_2,
-          addrLine_3,
-          addrLine_4,
-          longDegrees,
-          longMinutes,
-          longMinutes,
-          latDegrees,
-          latMinutes,
-          latSeconds,
-          city,
-          generalDescription,
+  return gql`
+    query findSiteBySiteId($siteId: String!) {
+      findSiteBySiteId(siteId: $siteId) {
+        data {
+          id
+          commonName
+          addrLine_1
+          addrLine_2
+          addrLine_3
+          addrLine_4
+          longDegrees
+          longMinutes
+          longMinutes
+          latDegrees
+          latMinutes
+          latSeconds
+          city
+          generalDescription
           siteRiskCode
           whenUpdated
-         }
-         httpStatusCode
+        }
+        httpStatusCode
       }
     }
-  `);
-}
+  `;
+};

@@ -1,6 +1,5 @@
-export enum SiteDetailsMode
-{
-   EditMode ="edit",
-   SRMode = "sr",
-   ViewOnlyMode = "normal"
+export enum SiteDetailsMode {
+  EditMode = 'edit',
+  SRMode = 'sr',
+  ViewOnlyMode = 'normal',
 }

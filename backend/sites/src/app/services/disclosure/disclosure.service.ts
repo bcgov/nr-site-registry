@@ -12,11 +12,11 @@ export class DisclosureService {
 
   async getSiteDisclosureBySiteId(siteId: string): Promise<SiteProfiles[]> {
     try {
-      const result =  await this.disclosureRepository.find({ where: { siteId } });
+      const result = await this.disclosureRepository.find({
+        where: { siteId },
+      });
       return result;
-    } 
-    catch (error) 
-    {
+    } catch (error) {
       throw error;
     }
   }

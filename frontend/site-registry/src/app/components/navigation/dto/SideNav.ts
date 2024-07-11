@@ -1,4 +1,4 @@
-import { IconType } from "react-icons/lib";
+import { IconType } from 'react-icons/lib';
 import {
   HouseIcon,
   MagnifyingGlassIcon,
@@ -7,13 +7,16 @@ import {
   FolderIcon,
   FileExportIcon,
   BookIcon,
-  ShoppingCartIcon
-} from "../../common/icon";
-import { useSelector } from "react-redux";
-import { cartItems , deleteRequestStatus , addCartItemRequestStatus } from "../../../features/cart/CartSlice";
+  ShoppingCartIcon,
+} from '../../common/icon';
+import { useSelector } from 'react-redux';
+import {
+  cartItems,
+  deleteRequestStatus,
+  addCartItemRequestStatus,
+} from '../../../features/cart/CartSlice';
 
 export class SideNav {
-  
   constructor(
     public id: number,
     public displayText: string,
@@ -21,7 +24,7 @@ export class SideNav {
     public icon: IconType | null,
     public linkTo: string,
     public children: SideNav[] = [],
-    public lowerSection:boolean = false
+    public lowerSection: boolean = false,
   ) {}
 }
 
@@ -35,24 +38,37 @@ const getSideBarNavList = () => {
   const referenceIcon = BookIcon;
   const cartIcon = ShoppingCartIcon;
 
-  
-
   const sideNavList: SideNav[] = [
-    new SideNav(1,"Dashboard", true, dashboardIcon, "/dashboard"),
-    new SideNav(2,"Search", true, null, "/", [
-      new SideNav(1,"Text Search", false, textSearchIcon, "/search"),
-      new SideNav(2,"Map Search", false, mapLocationIcon, "/map"),
+    new SideNav(1, 'Dashboard', true, dashboardIcon, '/dashboard'),
+    new SideNav(2, 'Search', true, null, '/', [
+      new SideNav(1, 'Text Search', false, textSearchIcon, '/search'),
+      new SideNav(2, 'Map Search', false, mapLocationIcon, '/map'),
     ]),
-    new SideNav(3,"Resources", true, null, "/", [
-      new SideNav(1,"Tools", false, toolsIcon, "/tools"),
-      new SideNav(2,"Reference", false, referenceIcon, "/ref"),
-    ],false),
-    new SideNav(4,"Account", true, null, "/", [
-      new SideNav(1,"Folios", false, foliosIcon, "/folios"),
-      new SideNav(2,"Purchases", false, purchasesIcon, "/purchases"),
-    ],false),
-    new SideNav(5,"Cart", false, cartIcon, "/site/cart", [], true),
-    
+    new SideNav(
+      3,
+      'Resources',
+      true,
+      null,
+      '/',
+      [
+        new SideNav(1, 'Tools', false, toolsIcon, '/tools'),
+        new SideNav(2, 'Reference', false, referenceIcon, '/ref'),
+      ],
+      false,
+    ),
+    new SideNav(
+      4,
+      'Account',
+      true,
+      null,
+      '/',
+      [
+        new SideNav(1, 'Folios', false, foliosIcon, '/folios'),
+        new SideNav(2, 'Purchases', false, purchasesIcon, '/purchases'),
+      ],
+      false,
+    ),
+    new SideNav(5, 'Cart', false, cartIcon, '/site/cart', [], true),
   ];
 
   return sideNavList;

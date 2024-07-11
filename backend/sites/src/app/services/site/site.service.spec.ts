@@ -21,7 +21,7 @@ describe('SiteService', () => {
               return [
                 { id: '123', commonName: 'victoria' },
                 { id: '121', commonName: 'duncan' },
-                { id: '222', commonName: 'vancouver'}
+                { id: '222', commonName: 'vancouver' },
               ];
             }),
             createQueryBuilder: jest.fn(() => ({
@@ -30,7 +30,8 @@ describe('SiteService', () => {
               getMany: jest.fn().mockResolvedValue([
                 { id: '123', commonName: 'victoria' },
                 { id: '121', commonName: 'duncan' },
-                { id: '222', commonName: 'vancouver' }]),
+                { id: '222', commonName: 'vancouver' },
+              ]),
             })),
             findOneOrFail: jest.fn(() => {
               return { id: '123', region_name: 'victoria' };
@@ -39,7 +40,6 @@ describe('SiteService', () => {
         },
       ],
     }).compile();
-
 
     siteService = module.get<SiteService>(SiteService);
     siteRepository = module.get<Repository<Sites>>(getRepositoryToken(Sites));
@@ -110,13 +110,20 @@ describe('SiteService', () => {
     it('should call findOneOrFail method of the repository with the provided siteId', async () => {
       const siteId = '123';
       await siteService.findSiteBySiteId(siteId);
-      expect(siteRepository.findOneOrFail).toHaveBeenCalledWith({ where: { id: siteId } });
+      expect(siteRepository.findOneOrFail).toHaveBeenCalledWith({
+        where: { id: siteId },
+      });
     });
 
     it('should return the site when findOneOrFail method of the repository resolves', async () => {
       const siteId = '123';
-      const expectedResult: FetchSiteDetail = { httpStatusCode: 200, data: sampleSites[0] };
-      (siteRepository.findOneOrFail as jest.Mock).mockResolvedValue(expectedResult);
+      const expectedResult: FetchSiteDetail = {
+        httpStatusCode: 200,
+        data: sampleSites[0],
+      };
+      (siteRepository.findOneOrFail as jest.Mock).mockResolvedValue(
+        expectedResult,
+      );
 
       const result = await siteService.findSiteBySiteId(siteId);
 
@@ -129,7 +136,9 @@ describe('SiteService', () => {
       const siteId = '111';
       const error = new Error('Site not found');
       (siteRepository.findOneOrFail as jest.Mock).mockRejectedValue(error);
-      await expect(siteService.findSiteBySiteId(siteId)).rejects.toThrowError(error);
+      await expect(siteService.findSiteBySiteId(siteId)).rejects.toThrowError(
+        error,
+      );
     });
   });
 });

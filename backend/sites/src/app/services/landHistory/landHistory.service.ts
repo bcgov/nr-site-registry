@@ -10,7 +10,8 @@ export class LandHistoryService {
 
     async getLandHistoriesForSite(siteId: string): Promise<LandHistories[]> {
         try {
-            return this.landHistoryRepository.find({ where: { siteId } });
+            const result = await this.landHistoryRepository.find({ where: { siteId } });
+            return result
         } catch (error) {
             throw error;
         }

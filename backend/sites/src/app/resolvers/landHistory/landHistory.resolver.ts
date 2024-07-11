@@ -21,6 +21,11 @@ export class LandHistoryResolver {
         @Args('siteId', { type: () => String }) siteId: string,
     ) {
         const result = await this.landHistoryService.getLandHistoriesForSite(siteId);
-        return this.genericResponseProvider.createResponse('Land history items fetched successfully', 200, true, result);
+        if (result.length > 0) {
+            return this.genericResponseProvider.createResponse('Land uses fetched successfully', 200, true, result);
+        }
+        else {
+            return this.genericResponseProvider.createResponse(`Land uses data not found for site id: ${siteId}`, 404, false);
+        }
     }
 }

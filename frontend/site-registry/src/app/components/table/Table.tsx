@@ -23,7 +23,7 @@ interface TableProps {
   editMode: boolean;
   idColumnName: string;
   sortHandler?: (row: any, ascSort: boolean) => void;
-  delteHandler?: (eventRecord: any) => void;
+  deleteHandler?: (eventRecord: any) => void;
 }
 
 const Table: FC<TableProps> = ({
@@ -42,15 +42,15 @@ const Table: FC<TableProps> = ({
   editMode,
   idColumnName,
   sortHandler,
-  delteHandler,
+  deleteHandler: deleteHandler,
 }) => {
   let tableSortHandler =
     sortHandler ??
     ((row, ascSort) => {
       console.log('Handle Sort Event', row, ascSort);
     });
-  let rowDelteHandler =
-    delteHandler ??
+  let rowDeleteHandler =
+    deleteHandler ??
     ((row) => {
       console.log('Handle Delete Event', row);
     });
@@ -74,7 +74,7 @@ const Table: FC<TableProps> = ({
             changeHandler={changeHandler}
             editMode={editMode}
             idColumnName={idColumnName}
-            rowDeleteHandler={rowDelteHandler}
+            rowDeleteHandler={rowDeleteHandler}
           />
         </table>
       </div>

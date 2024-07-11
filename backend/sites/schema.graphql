@@ -84,15 +84,21 @@ type SiteParticRoles {
 type LandHistories {
   siteId: String!
   lutCode: String!
-  note: String!
+  note: String
   whoCreated: String!
-  whoUpdated: String!
+  whoUpdated: String
   whenCreated: DateTime!
-  whenUpdated: DateTime!
+  whenUpdated: DateTime
   rwmFlag: Float!
   rwmNoteFlag: Float!
-  siteProfile: String!
-  profileDateReceived: DateTime!
+  siteProfile: String
+  profileDateReceived: DateTime
+  landUse: LandUseCd!
+}
+
+type LandUseCd {
+  code: String!
+  description: String!
 }
 
 type SiteProfiles {
@@ -450,14 +456,6 @@ type DisclosureResponse {
   data: [SiteProfiles!]
 }
 
-type Cart {
-  id: String!
-  userId: String!
-  siteId: String!
-  price: Float!
-  site: Sites!
-}
-
 type CartResponse {
   message: String
   httpStatusCode: Int
@@ -466,12 +464,12 @@ type CartResponse {
   data: [Cart!]
 }
 
-type DisclosureResponse {
+type LandHistoryResponse {
   message: String
   httpStatusCode: Int
   success: Boolean
   timestamp: String
-  data: [SiteProfiles!]
+  data: [LandHistories!]!
 }
 
 type Query {
@@ -487,6 +485,7 @@ type Query {
   getPeopleOrgsCd: DropdownResponse!
   getSiteDisclosureBySiteId(siteId: String!): DisclosureResponse!
   getCartItemsForUser(userId: String!): CartResponse!
+  getLandHistoriesForSite(siteId: String!): LandHistoryResponse!
 }
 
 type Mutation {

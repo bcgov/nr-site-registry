@@ -60,6 +60,8 @@ import { DisclosureResolver } from './resolvers/disclosure/disclosure.resolver';
 import { CartResolver } from './resolvers/cart/cart.resolver';
 import { CartService } from './services/cart/cart.service';
 import { Cart } from './entities/cart.entity';
+import { LandHistoryResolver } from './resolvers/landHistory/landHistory.resolver';
+import { LandHistoryService } from './services/landHistory/landHistory.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -87,7 +89,9 @@ import { Cart } from './entities/cart.entity';
     DisclosureService,
     GenericResponseProvider,
     CartResolver,
-    CartService
+    CartService,
+    LandHistoryResolver,
+    LandHistoryService,
   ],
   controllers: [SiteController],
 })

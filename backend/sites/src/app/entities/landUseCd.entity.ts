@@ -16,7 +16,7 @@ export class LandUseCd {
   @Column("character varying", { name: "description", length: 60 })
   description: string;
 
-  @OneToMany(() => LandHistories, (landHistories) => landHistories.lutCode2)
+  @OneToMany(() => LandHistories, (landHistories) => landHistories.landUse)
   landHistories: LandHistories[];
 
   @OneToMany(

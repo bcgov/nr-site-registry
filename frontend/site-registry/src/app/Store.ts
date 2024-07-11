@@ -11,6 +11,7 @@ import siteParticipantReducer from "./features/details/participants/ParticipantS
 import DropdownReducer from "./features/details/dropdowns/DropdownSlice";
 import siteDisclosureReducer from "./features/details/disclosure/DisclosureSlice";
 import cartReducer from "./features/cart/CartSlice";
+import landUsesReducer from "./features/details/landUses/LandUsesSlice";
 
 
 const persistedStore: any = loadFromLocalStorage();
@@ -23,7 +24,8 @@ export const store = configureStore({
     siteParticipant: siteParticipantReducer,
     siteDisclosure: siteDisclosureReducer,
     dropdown: DropdownReducer,
-    cart: cartReducer
+    cart: cartReducer,
+    landUses: landUsesReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

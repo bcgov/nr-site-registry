@@ -9,23 +9,34 @@ import { LandHistoryService } from 'src/app/services/landHistory/landHistory.ser
 
 @Resolver(() => LandHistories)
 export class LandHistoryResolver {
-    constructor(
-        private readonly landHistoryService: LandHistoryService,
-        private readonly genericResponseProvider: GenericResponseProvider<LandHistories[]>,
-    ) { }
+  constructor(
+    private readonly landHistoryService: LandHistoryService,
+    private readonly genericResponseProvider: GenericResponseProvider<
+      LandHistories[]
+    >,
+  ) {}
 
-    @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
-    @Query(() => LandHistoryResponse, { name: 'getLandHistoriesForSite' })
-    @UsePipes(new GenericValidationPipe())
-    async getLandHistoriesForSite(
-        @Args('siteId', { type: () => String }) siteId: string,
-    ) {
-        const result = await this.landHistoryService.getLandHistoriesForSite(siteId);
-        if (result.length > 0) {
-            return this.genericResponseProvider.createResponse('Land uses fetched successfully', 200, true, result);
-        }
-        else {
-            return this.genericResponseProvider.createResponse(`Land uses data not found for site id: ${siteId}`, 404, false);
-        }
+  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Query(() => LandHistoryResponse, { name: 'getLandHistoriesForSite' })
+  @UsePipes(new GenericValidationPipe())
+  async getLandHistoriesForSite(
+    @Args('siteId', { type: () => String }) siteId: string,
+  ) {
+    const result =
+      await this.landHistoryService.getLandHistoriesForSite(siteId);
+    if (result.length > 0) {
+      return this.genericResponseProvider.createResponse(
+        'Land uses fetched successfully',
+        200,
+        true,
+        result,
+      );
+    } else {
+      return this.genericResponseProvider.createResponse(
+        `Land uses data not found for site id: ${siteId}`,
+        404,
+        false,
+      );
     }
+  }
 }

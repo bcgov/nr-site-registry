@@ -1,8 +1,6 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { UsePipes } from '@nestjs/common';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { LandHistories } from 'src/app/entities/landHistories.entity';
 import { LandHistoryResponse } from 'src/app/dto/landHistory.dto';
 import { LandHistoryService } from 'src/app/services/landHistory/landHistory.service';
@@ -18,12 +16,20 @@ export class LandHistoryResolver {
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
   @Query(() => LandHistoryResponse, { name: 'getLandHistoriesForSite' })
-  @UsePipes(new GenericValidationPipe())
+  // TODO: figure out how this works and if we need GenericValidationPipe here
+  // Passing an empty string to a nullable field throws a validation error
+  // @UsePipes(new GenericValidationPipe())
   async getLandHistoriesForSite(
-    @Args('siteId', { type: () => String }) siteId: string,
+    @Args('siteId', { type: () => String })
+    siteId: string,
+
+    @Args('searchTerm', { type: () => String, nullable: true })
+    searchTerm: string,
   ) {
-    const result =
-      await this.landHistoryService.getLandHistoriesForSite(siteId);
+    const result = await this.landHistoryService.getLandHistoriesForSite(
+      siteId,
+      searchTerm,
+    );
     if (result.length > 0) {
       return this.genericResponseProvider.createResponse(
         'Land uses fetched successfully',

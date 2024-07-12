@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
+import get from 'lodash/get';
 import { SpinnerIcon } from '../../common/icon';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { TableColumn } from '../TableColumn';
@@ -299,7 +300,7 @@ const TableBody: FC<TableBodyProps> = ({
   };
 
   const getValue = (rowIndex: number, propertyName: string) => {
-    return data[rowIndex][propertyName];
+    return get(data[rowIndex], propertyName);
   };
 
   const getDataRow = (rowIndex: number) => {

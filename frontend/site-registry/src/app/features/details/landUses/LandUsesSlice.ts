@@ -12,11 +12,11 @@ const initialState = {
 
 export const fetchLandUses = createAsyncThunk(
   'landUses/fetchLandUses',
-  async (siteId: string) => {
+  async ({ siteId, searchTerm }: { siteId: string; searchTerm: string }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(getLandHistoriesForSiteQuery),
-        variables: { siteId },
+        variables: { siteId, searchTerm },
       });
 
       return response.data.data.getLandHistoriesForSite.data;

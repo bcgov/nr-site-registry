@@ -1,11 +1,11 @@
-import React, { FC } from "react";
-import { SpinnerIcon, SortIcon } from "../common/icon";
-import { RequestStatus } from "../../helpers/requests/status";
-import { TableColumn } from "./TableColumn";
-import "./Table.css";
-import Pagination from "./pagination/Pagination";
-import TableHeader from "./header/TableHeader";
-import TableBody from "./body/TableBody";
+import React, { FC } from 'react';
+import { SpinnerIcon, SortIcon } from '../common/icon';
+import { RequestStatus } from '../../helpers/requests/status';
+import { TableColumn } from './TableColumn';
+import './Table.css';
+import Pagination from './pagination/Pagination';
+import TableHeader from './header/TableHeader';
+import TableBody from './body/TableBody';
 
 interface TableProps {
   label: string;
@@ -17,13 +17,13 @@ interface TableProps {
   changeResultsPerPage?: (pageNumber: number) => void;
   currentPage?: number;
   resultsPerPage?: number;
-  showPageOptions? : boolean;
-  allowRowsSelect? : boolean;
-  changeHandler:(eventRecord:any)=>void,
-  editMode: boolean,
-  idColumnName:string;
-  sortHandler?:(row:any,ascSort:boolean)=>void,
-  delteHandler?:(eventRecord:any)=>void,
+  showPageOptions?: boolean;
+  allowRowsSelect?: boolean;
+  changeHandler: (eventRecord: any) => void;
+  editMode: boolean;
+  idColumnName: string;
+  sortHandler?: (row: any, ascSort: boolean) => void;
+  deleteHandler?: (eventRecord: any) => void;
 }
 
 const Table: FC<TableProps> = ({
@@ -42,21 +42,40 @@ const Table: FC<TableProps> = ({
   editMode,
   idColumnName,
   sortHandler,
-  delteHandler
+  deleteHandler: deleteHandler,
 }) => {
-  
-  let  tableSortHandler = sortHandler ?? ((row,ascSort)=>{console.log("Handle Sort Event", row, ascSort)});
-  let  rowDelteHandler = delteHandler ?? ((row)=>{console.log("Handle Delete Event", row)});
-
+  let tableSortHandler =
+    sortHandler ??
+    ((row, ascSort) => {
+      console.log('Handle Sort Event', row, ascSort);
+    });
+  let rowDeleteHandler =
+    deleteHandler ??
+    ((row) => {
+      console.log('Handle Delete Event', row);
+    });
 
   return (
     <React.Fragment>
       <div className="tableWidth table-border-radius">
         <table className="table" aria-label={label}>
           <thead aria-label={`${label} Header`}>
-            <TableHeader columns={columns} allowRowsSelect={allowRowsSelect ?? false} sortHandler={tableSortHandler} />
+            <TableHeader
+              columns={columns}
+              allowRowsSelect={allowRowsSelect ?? false}
+              sortHandler={tableSortHandler}
+            />
           </thead>
-            <TableBody isLoading={isLoading} columns={columns} data={data} allowRowsSelect={allowRowsSelect ?? false} changeHandler={changeHandler} editMode={editMode} idColumnName={idColumnName} rowDeleteHandler={rowDelteHandler} />
+          <TableBody
+            isLoading={isLoading}
+            columns={columns}
+            data={data}
+            allowRowsSelect={allowRowsSelect ?? false}
+            changeHandler={changeHandler}
+            editMode={editMode}
+            idColumnName={idColumnName}
+            rowDeleteHandler={rowDeleteHandler}
+          />
         </table>
       </div>
       <div>

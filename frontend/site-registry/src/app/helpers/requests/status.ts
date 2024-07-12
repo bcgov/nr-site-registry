@@ -1,8 +1,7 @@
-export enum RequestStatus
-{
-    loading = "loading",
-    idle = "idle",
-    success = "success",
-    failed = "failed",
-    pending = "pending"
+export enum RequestStatus {
+  loading = 'loading',
+  idle = 'idle',
+  success = 'success',
+  failed = 'failed',
+  pending = 'pending',
 }

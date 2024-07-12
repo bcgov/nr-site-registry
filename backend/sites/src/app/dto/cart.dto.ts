@@ -5,14 +5,12 @@ import { Cart } from '../entities/cart.entity';
 
 @ObjectType()
 export class CartResponse extends ResponseDto {
-    @Field(() => [Cart],  { nullable: true })
-    data: Cart[] | null;
+  @Field(() => [Cart], { nullable: true })
+  data: Cart[] | null;
 }
-
 
 @InputType()
 export class CartDTO {
-
   @Field()
   @IsNotEmpty()
   @IsString()
@@ -30,4 +28,4 @@ export class CartDTO {
   @IsOptional()
   @IsString()
   whoCreated: string;
-} 
+}

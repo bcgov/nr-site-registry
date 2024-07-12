@@ -1,6 +1,6 @@
-import React from "react";
-import { FloppyDisk, XmarkIcon } from "../common/icon";
-import "./CustomButtons.css";
+import React from 'react';
+import { FloppyDisk, XmarkIcon } from '../common/icon';
+import './CustomButtons.css';
 
 interface ButtonProps {
   clickHandler: (event: React.MouseEvent<HTMLDivElement>) => void;

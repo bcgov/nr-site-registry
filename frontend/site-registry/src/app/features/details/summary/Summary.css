@@ -1,50 +1,43 @@
-.summary-section-details
-{
-    gap: var(--layout-margin-xxlarge);
-    display: flex;
-    flex-direction: column;
+.summary-section-details {
+  gap: var(--layout-margin-xxlarge);
+  display: flex;
+  flex-direction: column;
 }
 
-
-.leaflet-container
-{
-    height: 500px !important;
+.leaflet-container {
+  height: 500px !important;
 }
 
-
-
-.parcel-container
-{
-    padding: var(--layout-margin-medium) var(--layout-margin-xxlarge) var(--layout-margin-large) var(--layout-margin-xxlarge);
-    gap: var(--layout-margin-medium);
-    border-radius: var(--layout-border-radius-medium);
-    display: flex;
-    flex-direction: column;
+.parcel-container {
+  padding: var(--layout-margin-medium) var(--layout-margin-xxlarge)
+    var(--layout-margin-large) var(--layout-margin-xxlarge);
+  gap: var(--layout-margin-medium);
+  border-radius: var(--layout-border-radius-medium);
+  display: flex;
+  flex-direction: column;
 }
 
-.external-purchase-section
-{
-    padding: var(--layout-margin-huge) var(--layout-margin-xxlarge) var(--layout-margin-huge) var(--layout-margin-xxlarge);
-    gap: var(--layout-margin-xlarge);
-    border-radius: var(--layout-border-radius-medium);
-    display: flex;
-    flex-direction: column;
-    background: var(--surface-brand-blue-10);
-    border: 1px solid var(--surface-border-medium, #898785);
+.external-purchase-section {
+  padding: var(--layout-margin-huge) var(--layout-margin-xxlarge)
+    var(--layout-margin-huge) var(--layout-margin-xxlarge);
+  gap: var(--layout-margin-xlarge);
+  border-radius: var(--layout-border-radius-medium);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-brand-blue-10);
+  border: 1px solid var(--surface-border-medium, #898785);
 }
 
-.external-purchase-info
-{
-    font-size: 18px;
-    font-style: italic;
-    font-weight: 400;
-    line-height: 30.61px;
-    text-align: center;
+.external-purchase-info {
+  font-size: 18px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 30.61px;
+  text-align: center;
 }
 
-.external-purchase-buttons
-{
-    display: flex;
-    gap: var(--layout-margin-small);
-    justify-content: center;
+.external-purchase-buttons {
+  display: flex;
+  gap: var(--layout-margin-small);
+  justify-content: center;
 }

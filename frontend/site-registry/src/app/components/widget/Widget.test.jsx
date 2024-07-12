@@ -8,13 +8,13 @@ import thunk from 'redux-thunk';
 const mockStore = configureStore([thunk]);
 
 describe('Widget component', () => {
-    let store;
+  let store;
 
-    beforeEach(() => {
-        store = mockStore({
-        dashboard: {},
-        });
+  beforeEach(() => {
+    store = mockStore({
+      dashboard: {},
     });
+  });
   const tableColumns = []; // Define sample tableColumns array
   const tableData = []; // Define sample tableData array
 
@@ -25,7 +25,7 @@ describe('Widget component', () => {
         tableColumns={tableColumns}
         tableIsLoading={false}
         tableData={tableData}
-      />
+      />,
     );
   });
 
@@ -36,7 +36,7 @@ describe('Widget component', () => {
         tableColumns={tableColumns}
         tableIsLoading={false}
         tableData={tableData}
-      />
+      />,
     );
     expect(getByText('Test Widget')).toBeInTheDocument();
   });
@@ -48,9 +48,8 @@ describe('Widget component', () => {
         tableColumns={tableColumns}
         tableIsLoading={false}
         tableData={tableData}
-      />
+      />,
     );
     expect(queryByText('Test Widget')).toBeNull();
   });
-
 });

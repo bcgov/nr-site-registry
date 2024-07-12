@@ -82,4 +82,4 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

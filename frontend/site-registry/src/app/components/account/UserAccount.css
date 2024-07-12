@@ -4,7 +4,7 @@
 }
 
 .account-custom-toggle {
-    color: var(--typography-color-primary-invert) !important;
+  color: var(--typography-color-primary-invert) !important;
 }
 
 .account-custom-toggle-mobile {
@@ -27,7 +27,7 @@
 
 .account-custom-item-first {
   padding: 0px var(--layout-margin-medium) 16px var(--layout-margin-medium) !important;
-  border-bottom: 1px solid var(--surface-color-border-light, #D8D8D8) !important;
+  border-bottom: 1px solid var(--surface-color-border-light, #d8d8d8) !important;
 }
 
 .account-custom-label {
@@ -48,8 +48,9 @@
 
 .account-custom-item {
   display: flex !important;
-  padding: var(--layout-padding-small) var(--layout-padding-medium) var(--layout-padding-small) var(--layout-padding-medium) !important;
-  gap: var(--layout-margin-medium) ;
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium) !important;
+  gap: var(--layout-margin-medium);
   color: var(--typography-color-primary) !important;
 }
 
@@ -61,8 +62,8 @@
   color: var(--typography-color-secondary) !important;
 }
 
-@media screen and (max-width: 767px){
-  .user-dropdown{
+@media screen and (max-width: 767px) {
+  .user-dropdown {
     display: none;
   }
 }

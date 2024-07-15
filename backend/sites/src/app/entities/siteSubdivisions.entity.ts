@@ -1,12 +1,13 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { Sites } from './sites.entity';
+import { Subdivisions } from './subdivisions.entity';
 
 @ObjectType()
 @Index(
   'site_subdivisions_site_id_subdiv_id_sprof_date_completed_key',
   ['siteId', 'sprofDateCompleted', 'subdivId'],
-  { unique: true },
+  {},
 )
 @Index('sitesub_part_or_all_of_frgn', ['siteId'], {})
 @Index('site_subdivisions_pkey', ['siteSubdivId'], { unique: true })
@@ -15,11 +16,11 @@ import { Sites } from './sites.entity';
 @Entity('site_subdivisions')
 export class SiteSubdivisions {
   @Field()
-  @Column('bigint', { name: 'site_id', unique: true })
+  @Column('bigint', { name: 'site_id' })
   siteId: string;
 
   @Field()
-  @Column('bigint', { name: 'subdiv_id', unique: true })
+  @Column('bigint', { name: 'subdiv_id' })
   subdivId: string;
 
   @Field()
@@ -57,7 +58,6 @@ export class SiteSubdivisions {
   @Column('timestamp without time zone', {
     name: 'sprof_date_completed',
     nullable: true,
-    unique: true,
   })
   sprofDateCompleted: Date | null;
 
@@ -74,4 +74,10 @@ export class SiteSubdivisions {
   })
   @JoinColumn([{ name: 'site_id', referencedColumnName: 'id' }])
   site: Sites;
+
+  @ManyToOne(() => Subdivisions, (subdivisions) => subdivisions.siteSubdivisions, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn([{ name: 'subdiv_id', referencedColumnName: 'id' }])
+  subdivision: Subdivisions;
 }

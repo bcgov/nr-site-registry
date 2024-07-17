@@ -1,9 +1,12 @@
-import { useSelector } from "react-redux";
-import { DropdownItem } from "../../../components/action/IActions";
-import { FormFieldType } from "../../../components/input-controls/IFormField";
-import { ColumnSize, TableColumn } from "../../../components/table/TableColumn";
-import { SRVisibility } from "../../../helpers/requests/srVisibility";
-import { participantNameDrpdown, participantRoleDrpdown } from "../dropdowns/DropdownSlice";
+import { useSelector } from 'react-redux';
+import { DropdownItem } from '../../../components/action/IActions';
+import { FormFieldType } from '../../../components/input-controls/IFormField';
+import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
+import { SRVisibility } from '../../../helpers/requests/srVisibility';
+import {
+  participantNameDrpdown,
+  participantRoleDrpdown,
+} from '../dropdowns/DropdownSlice';
 
 export const GetConfig = () => {
     const particNameDropdwn = useSelector(participantNameDrpdown);

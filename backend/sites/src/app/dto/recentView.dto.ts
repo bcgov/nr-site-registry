@@ -5,14 +5,12 @@ import { RecentViews } from '../entities/recentViews.entity';
 
 @ObjectType()
 export class RecentViewResponse extends ResponseDto {
-    @Field(() => [RecentViews],  { nullable: true })
-    data: RecentViews[] | null;
+  @Field(() => [RecentViews], { nullable: true })
+  data: RecentViews[] | null;
 }
-
 
 @InputType()
 export class RecentViewDto {
-
   @Field()
   @IsNotEmpty()
   @IsString()
@@ -33,13 +31,13 @@ export class RecentViewDto {
   @IsString()
   city: string;
 
-  @Field({nullable:true})
+  @Field({ nullable: true })
   @IsOptional()
   @IsString()
   generalDescription: string | null;
 
-  @Field({nullable:true})
+  @Field({ nullable: true })
   @IsOptional()
   @IsDate()
   whenUpdated: Date | null;
-} 
+}

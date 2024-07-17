@@ -110,20 +110,20 @@ const notationFormRowsInternal: IFormField[][] = [
         },
     ],
 
-    [
-        {
-            type: FormFieldType.Text,
-            label: 'Note',
-            placeholder: 'Note',
-            graphQLPropertyName:'note',
-            value: '',
-            colSize: 'col-lg-12 col-md-12 col-sm-12',
-            customLabelCss:'custom-notation-lbl-text',
-            customInputTextCss:'custom-notation-input-text',
-            customEditLabelCss:'custom-notation-edit-label',
-            customEditInputTextCss:'custom-notation-edit-input',
-        },
-    ],
+  [
+    {
+      type: FormFieldType.Text,
+      label: 'Note',
+      placeholder: 'Note',
+      graphQLPropertyName: 'note',
+      value: '',
+      colSize: 'col-lg-12 col-md-12 col-sm-12',
+      customLabelCss: 'custom-notation-lbl-text',
+      customInputTextCss: 'custom-notation-input-text',
+      customEditLabelCss: 'custom-notation-edit-label',
+      customEditInputTextCss: 'custom-notation-edit-input',
+    },
+  ],
 ];
 
 const notationFormRowEditMode: IFormField[][] = [
@@ -330,20 +330,20 @@ const notationFormRowExternal: IFormField[][] = [
         },
     ],
 
-    [
-        {
-            type: FormFieldType.Text,
-            label: 'Note',
-            placeholder: 'Note',
-            graphQLPropertyName:'note',
-            value: '',
-            colSize: 'col-lg-12 col-md-12 col-sm-12',
-            customLabelCss:'custom-notation-lbl-text',
-            customInputTextCss:'custom-notation-input-text',
-            customEditLabelCss:'custom-notation-edit-label',
-            customEditInputTextCss:'custom-notation-edit-input',
-        },
-    ],
+  [
+    {
+      type: FormFieldType.Text,
+      label: 'Note',
+      placeholder: 'Note',
+      graphQLPropertyName: 'note',
+      value: '',
+      colSize: 'col-lg-12 col-md-12 col-sm-12',
+      customLabelCss: 'custom-notation-lbl-text',
+      customInputTextCss: 'custom-notation-input-text',
+      customEditLabelCss: 'custom-notation-edit-label',
+      customEditInputTextCss: 'custom-notation-edit-input',
+    },
+  ],
 
     [
         {

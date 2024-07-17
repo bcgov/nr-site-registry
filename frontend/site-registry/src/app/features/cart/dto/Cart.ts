@@ -1,16 +1,15 @@
-import { RequestStatus } from "../../../helpers/requests/status";
+import { RequestStatus } from '../../../helpers/requests/status';
 
 export class Cart {
-  userId: string = "";
-  siteId: string = "";
+  userId: string = '';
+  siteId: string = '';
   price: number = 0;
-  whoCreated: string = "";
+  whoCreated: string = '';
 }
 
 export interface CartState {
   cartItems: Cart[];
   fetchRequestStatus: RequestStatus;
-  addRequestStatus : RequestStatus;
-  deleteRequestStatus : RequestStatus
+  addRequestStatus: RequestStatus;
+  deleteRequestStatus: RequestStatus;
 }
-

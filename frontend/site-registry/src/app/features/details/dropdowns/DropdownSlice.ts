@@ -39,21 +39,16 @@ export const fetchPeopleOrgsCd = createAsyncThunk(
     }
   );
 
-  export const fetchParticipantRoleCd = createAsyncThunk(
-    'dropdowns/getParticipantRoleCd',
-    async () => {
-      try
-      {
-        const response = await getAxiosInstance().post( GRAPHQL, {
-            query: print(graphQLParticipantRoleCd())
-        })
-        return response.data.data;
-      }
-      catch(error)
-      {
-        throw error
-      }
-      
+export const fetchParticipantRoleCd = createAsyncThunk(
+  'dropdowns/getParticipantRoleCd',
+  async () => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(graphQLParticipantRoleCd()),
+      });
+      return response.data.data;
+    } catch (error) {
+      throw error;
     }
   );
 
@@ -117,7 +112,7 @@ export const fetchPeopleOrgsCd = createAsyncThunk(
   );
 
 
-   // Define the recent views slice
+// Define the recent views slice
 const dropdowns = createSlice({
     name: 'dropdowns',
     initialState,

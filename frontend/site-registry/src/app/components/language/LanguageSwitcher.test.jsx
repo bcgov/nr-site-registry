@@ -7,28 +7,43 @@ import thunk from 'redux-thunk';
 
 const mockStore = configureStore([thunk]);
 describe('Language Switcher Component', () => {
-    let store;
+  let store;
 
-    beforeEach(() => {
-        store = mockStore({
-        LanguageSwitcher: {},
-        });
+  beforeEach(() => {
+    store = mockStore({
+      LanguageSwitcher: {},
     });
+  });
 
-    it('renders without crashing', () => {
-        render(<Provider store={store}> <LanguageSwitcher /></Provider>);
-        const languageSelector = screen.getByLabelText('Language Selector');
-        expect(languageSelector).toBeInTheDocument();
-      });
+  it('renders without crashing', () => {
+    render(
+      <Provider store={store}>
+        {' '}
+        <LanguageSwitcher />
+      </Provider>,
+    );
+    const languageSelector = screen.getByLabelText('Language Selector');
+    expect(languageSelector).toBeInTheDocument();
+  });
 
   it('displays the correct current language', () => {
-    render( <Provider store={store}> <LanguageSwitcher /></Provider>);
+    render(
+      <Provider store={store}>
+        {' '}
+        <LanguageSwitcher />
+      </Provider>,
+    );
     const currentLanguageElement = screen.getByLabelText('Language Menu');
     expect(currentLanguageElement.textContent).toBe('EN'); // Assuming 'en' is the default language
   });
 
   it('changes the language when an option is selected', () => {
-    render( <Provider store={store}> <LanguageSwitcher /></Provider>);
+    render(
+      <Provider store={store}>
+        {' '}
+        <LanguageSwitcher />
+      </Provider>,
+    );
     const dropdownToggleButton = screen.getByLabelText('Language Menu');
     fireEvent.click(dropdownToggleButton);
     const spanishOption = screen.getByLabelText('Español (Spanish)');
@@ -38,13 +53,18 @@ describe('Language Switcher Component', () => {
   });
 
   it('toggles the dropdown menu when the toggle button is clicked', () => {
-    render( <Provider store={store}> <LanguageSwitcher /></Provider>);
+    render(
+      <Provider store={store}>
+        {' '}
+        <LanguageSwitcher />
+      </Provider>,
+    );
     const dropdownToggleButton = screen.getByLabelText('Language Menu');
     fireEvent.click(dropdownToggleButton); // Open dropdown
     let dropdownMenu = screen.queryByRole('menu');
     expect(dropdownMenu).toBeInTheDocument();
     fireEvent.click(dropdownToggleButton); // Close dropdown
     dropdownMenu = screen.queryByRole('menu');
-    expect(dropdownMenu).not.toBeInTheDocument(); 
+    expect(dropdownMenu).not.toBeInTheDocument();
   });
 });

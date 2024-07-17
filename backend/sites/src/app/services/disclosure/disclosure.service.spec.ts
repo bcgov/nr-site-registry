@@ -22,7 +22,9 @@ describe('DisclosureService', () => {
     }).compile();
 
     service = module.get<DisclosureService>(DisclosureService);
-    repository = module.get<Repository<SiteProfiles>>(getRepositoryToken(SiteProfiles));
+    repository = module.get<Repository<SiteProfiles>>(
+      getRepositoryToken(SiteProfiles),
+    );
   });
 
   afterEach(() => {
@@ -32,10 +34,10 @@ describe('DisclosureService', () => {
   // Test case for getSiteDisclosureBySiteId method
   describe('getSiteDisclosureBySiteId', () => {
     it('should return site profiles for a given siteId', async () => {
-    const siteId = '1';
-    const dateCompleted = new Date();
+      const siteId = '1';
+      const dateCompleted = new Date();
 
-    const mockSiteProfile = generateMockSiteProfile(siteId, dateCompleted);
+      const mockSiteProfile = generateMockSiteProfile(siteId, dateCompleted);
       jest.spyOn(repository, 'find').mockResolvedValueOnce(mockSiteProfile);
 
       const result = await service.getSiteDisclosureBySiteId(siteId);
@@ -49,19 +51,21 @@ describe('DisclosureService', () => {
       const error = new Error('Database connection error');
       jest.spyOn(repository, 'find').mockRejectedValueOnce(error);
 
-      await expect(service.getSiteDisclosureBySiteId(siteId)).rejects.toThrow(error);
+      await expect(service.getSiteDisclosureBySiteId(siteId)).rejects.toThrow(
+        error,
+      );
     });
   });
 });
 
 export function generateMockSiteProfile(siteId: string, dateCompleted: Date) {
-    const mockSiteProfile = new SiteProfiles();
-    
-    mockSiteProfile.siteId = siteId;
-    mockSiteProfile.dateCompleted = dateCompleted;
-    mockSiteProfile.localAuthDateRecd = new Date(); // Example of setting a default value
-    mockSiteProfile.localAuthName = 'Local Auth Name';
-    mockSiteProfile.localAuthAgency = 'Local Auth Agency';
-    mockSiteProfile.whoCreated = 'Test User'; // Example of required field
-    return [mockSiteProfile];
+  const mockSiteProfile = new SiteProfiles();
+
+  mockSiteProfile.siteId = siteId;
+  mockSiteProfile.dateCompleted = dateCompleted;
+  mockSiteProfile.localAuthDateRecd = new Date(); // Example of setting a default value
+  mockSiteProfile.localAuthName = 'Local Auth Name';
+  mockSiteProfile.localAuthAgency = 'Local Auth Agency';
+  mockSiteProfile.whoCreated = 'Test User'; // Example of required field
+  return [mockSiteProfile];
 }

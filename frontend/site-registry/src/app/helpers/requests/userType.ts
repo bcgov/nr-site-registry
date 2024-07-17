@@ -1,4 +1,4 @@
 export enum UserType {
-    External = 'External',
-    Internal = 'Internal'
+  External = 'External',
+  Internal = 'Internal',
 }

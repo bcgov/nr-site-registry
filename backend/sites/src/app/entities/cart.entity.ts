@@ -6,7 +6,7 @@ import {
   Index,
   ManyToOne,
   JoinColumn,
-  } from 'typeorm';
+} from 'typeorm';
 import { Sites } from './sites.entity';
 import { BaseAuditEntity } from './baseAuditEntity';
 
@@ -27,11 +27,11 @@ export class Cart extends BaseAuditEntity {
   siteId: string;
 
   @Field()
-  @Column("double precision", { name: "price" })
+  @Column('double precision', { name: 'price' })
   price: number;
 
-  @Field(()=>Sites,{nullable:true})
-  @ManyToOne(() => Sites, (site) => site.cart, {eager:true})
+  @Field(() => Sites, { nullable: true })
+  @ManyToOne(() => Sites, (site) => site.cart, { eager: true })
   @JoinColumn({ name: 'site_id', referencedColumnName: 'id' })
   site: Sites;
 }

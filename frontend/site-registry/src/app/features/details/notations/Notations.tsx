@@ -74,7 +74,7 @@ const Notations = () => {
       });
       setFormData(filteredData);
   };
-  
+
   const deepSearch = (obj: any, searchTerm: string): boolean => {
     for (const key in obj) {
         const value = obj[key];
@@ -105,9 +105,9 @@ const Notations = () => {
 
 
 
-    useEffect(()=> {
-        setViewMode(mode);
-    }, [mode]);
+  useEffect(() => {
+    setViewMode(mode);
+  }, [mode]);
 
     const clearSearch = () => {
       setSearchTerm('');
@@ -156,21 +156,23 @@ const Notations = () => {
         setFormData(updatedNotation);
         dispatch(updateSiteNotation(updatedNotation))
     }
-      const flattedArr = flattenFormRows(notationFormRowsInternal)
-      const currLabel = flattedArr && flattedArr.find(row => row.graphQLPropertyName === graphQLPropertyName);
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        "Notations: " + currLabel?.label ?? ''
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+    const flattedArr = flattenFormRows(notationFormRowsInternal);
+    const currLabel =
+      flattedArr &&
+      flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
+    const tracker = new ChangeTracker(
+      IChangeType.Modified,
+      'Notations: ' + currLabel?.label ?? '',
+    );
+    dispatch(trackChanges(tracker.toPlainObject()));
   };
 
   const handleWidgetCheckBox = (event: any) => {
-    alert(event)
-  }
+    alert(event);
+  };
   const handleParentChekBoxChange = (id: any, value: any) => {
-    alert(`${value}, ${id}`)
-  }
+    alert(`${value}, ${id}`);
+  };
 
     const [selectedRows, setSelectedRows] = useState<{id: any, participantId: any}[]>([]);
 
@@ -190,15 +192,14 @@ const Notations = () => {
     });
     const tracker = new ChangeTracker(
       IChangeType.Deleted,
-      'Notation Participant Delete'
+      'Notation Participant Delete',
     );
     dispatch(trackChanges(tracker.toPlainObject()));
     // Clear selectedRows state
 
     const updateSelectedRows =  selectedRows.filter(row => row.id !== id);
     setSelectedRows(updateSelectedRows);
-    
-    };
+  };
 
     const handleTableChange = (id: any, event: any) => {
       const isExist = formData.some(item => item.id === id && item.notationParticipant.some((participant: any) => participant.guid === event.row.guid));
@@ -229,13 +230,16 @@ const Notations = () => {
       }
   };
 
-  const handleSortChange = (graphQLPropertyName: any, value: String | [Date, Date] ) => {
-      setSortByValue((prevData) => ({
-        ...prevData,
-        [graphQLPropertyName]:value 
-      }));
-      sortItems (value, formData);
-  }
+  const handleSortChange = (
+    graphQLPropertyName: any,
+    value: String | [Date, Date],
+  ) => {
+    setSortByValue((prevData) => ({
+      ...prevData,
+      [graphQLPropertyName]: value,
+    }));
+    sortItems(value, formData);
+  };
 
     const sortItems = (sortBy:any, data:any) => {
       let sorted = [...data];
@@ -304,7 +308,7 @@ const Notations = () => {
     });
     const tracker = new ChangeTracker(
       IChangeType.Added,
-      'Notation Participant Added'
+      'Notation Participant Added',
     );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
@@ -331,19 +335,18 @@ const Notations = () => {
             return tempNotation;
         });
     });
-  }
+  };
 
   const handleItemClick = (value: string) => {
-    switch(value)
-    {
+    switch (value) {
       case SRVisibility.ShowSR:
-        alert('show')
-       break;
+        alert('show');
+        break;
       case SRVisibility.HideSR:
-        alert('hide')
-       break;
+        alert('hide');
+        break;
       default:
-       break;
+        break;
     }
  };
 
@@ -398,10 +401,14 @@ return (
           <div className="row pe-2" id="notations-component" data-testid="notations-component">
           { userType === UserType.Internal && (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode) &&
             <div className="col-lg-6 col-md-12 py-4">
-              <button className={`d-flex align-items-center ${viewMode === SiteDetailsMode.EditMode ? `btn-add-notation` : `btn-add-notation-disable`} `} disabled= { viewMode === SiteDetailsMode.SRMode } onClick={handleOnAddNotation}
-               aria-label="Add Notation">
-                  <Plus className="btn-notation-icon"/>
-                  <span>Add Notation</span>
+              <button
+                className={`d-flex align-items-center ${viewMode === SiteDetailsMode.EditMode ? `btn-add-notation` : `btn-add-notation-disable`} `}
+                disabled={viewMode === SiteDetailsMode.SRMode}
+                onClick={handleOnAddNotation}
+                aria-label="Add Notation"
+              >
+                <Plus className="btn-notation-icon" />
+                <span>Add Notation</span>
               </button>
             </div>
           }

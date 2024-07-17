@@ -66,11 +66,18 @@ describe('DropdownService', () => {
         { code: 'role1', description: 'Role 1' },
         { code: 'role2', description: 'Role 2' },
       ];
-      jest.spyOn(particRoleRepository, 'find').mockResolvedValueOnce(expectedRoles as ParticRoleCd[]);
+      jest
+        .spyOn(particRoleRepository, 'find')
+        .mockResolvedValueOnce(expectedRoles as ParticRoleCd[]);
 
       const result = await service.getParticipantRoleCd();
 
-      expect(result).toEqual(expectedRoles.map(role => ({ key: role.code, value: role.description })));
+      expect(result).toEqual(
+        expectedRoles.map((role) => ({
+          key: role.code,
+          value: role.description,
+        })),
+      );
       expect(particRoleRepository.find).toHaveBeenCalled();
     });
 
@@ -78,7 +85,9 @@ describe('DropdownService', () => {
       const error = new Error('Database connection error');
       jest.spyOn(particRoleRepository, 'find').mockRejectedValueOnce(error);
 
-      await expect(service.getParticipantRoleCd()).rejects.toThrowError('Failed to retrieve participants role code.');
+      await expect(service.getParticipantRoleCd()).rejects.toThrowError(
+        'Failed to retrieve participants role code.',
+      );
     });
   });
 
@@ -89,7 +98,9 @@ describe('DropdownService', () => {
         { id: 'org1', displayName: 'Organization 1' },
         { id: 'org2', displayName: 'Organization 2' },
       ];
-      jest.spyOn(peopleOrgsRepository, 'find').mockResolvedValueOnce(expectedOrgs as PeopleOrgs[]);
+      jest
+        .spyOn(peopleOrgsRepository, 'find')
+        .mockResolvedValueOnce(expectedOrgs as PeopleOrgs[]);
 
       const result = await service.getPeopleOrgsCd();
 
@@ -101,7 +112,9 @@ describe('DropdownService', () => {
       const error = new Error('Database connection error');
       jest.spyOn(peopleOrgsRepository, 'find').mockRejectedValueOnce(error);
 
-      await expect(service.getPeopleOrgsCd()).rejects.toThrowError('Failed to retrieve people orgs.');
+      await expect(service.getPeopleOrgsCd()).rejects.toThrowError(
+        'Failed to retrieve people orgs.',
+      );
     });
   });
 });

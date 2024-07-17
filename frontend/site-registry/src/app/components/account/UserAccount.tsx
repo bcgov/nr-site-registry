@@ -114,19 +114,25 @@ const UserAccount = ( props : any) =>{
                       {/* Account settings */}
                       <Dropdown.Item role="menuitem" className="account-custom-item" aria-label="Account Settings">Account Settings</Dropdown.Item>
 
-                      {/* Logout */}
-                      <Dropdown.Item role="menuitem" className="account-custom-item" aria-label="Log Out" onClick={() => {
-                    auth.removeUser().then(() => {
-                      window.location.href = authRedirectUri
-                    });
-                  }}>Log Out</Dropdown.Item>
-                    </div>
-                </Dropdown.Menu>
-              </Dropdown>
-            </>
-            )
-      }
-}
-
+              {/* Logout */}
+              <Dropdown.Item
+                role="menuitem"
+                className="account-custom-item"
+                aria-label="Log Out"
+                onClick={() => {
+                  auth.removeUser().then(() => {
+                    window.location.href = authRedirectUri;
+                  });
+                }}
+              >
+                Log Out
+              </Dropdown.Item>
+            </div>
+          </Dropdown.Menu>
+        </Dropdown>
+      </>
+    );
+  }
+};
 
 export default UserAccount;

@@ -27,7 +27,9 @@ describe('ParticipantService', () => {
     }).compile();
 
     service = module.get<ParticipantService>(ParticipantService);
-    siteParticsRepository = module.get<Repository<SitePartics>>(getRepositoryToken(SitePartics));
+    siteParticsRepository = module.get<Repository<SitePartics>>(
+      getRepositoryToken(SitePartics),
+    );
   });
 
   afterEach(() => {
@@ -61,28 +63,34 @@ describe('ParticipantService', () => {
         },
       ];
 
-      jest.spyOn(siteParticsRepository, 'find').mockResolvedValueOnce(mockSitePartics as SitePartics[]);
+      jest
+        .spyOn(siteParticsRepository, 'find')
+        .mockResolvedValueOnce(mockSitePartics as SitePartics[]);
 
       const result = await service.getSiteParticipantsBySiteId(siteId);
 
-      const expectedTransformedObjects = mockSitePartics
-        .flatMap(item =>
-          item.siteParticRoles.map(role => ({
-            guid: v4(),
-            id: item.id,
-            psnorgId: item.psnorgId,
-            effectiveDate: item.effectiveDate,
-            endDate: null,
-            note: item.note?.trim() || null,
-            displayName: item.psnorg.displayName,
-            prCode: role.prCode,
-            description: role.prCode2.description,
-          }))
-        );
-        const sitePartics =plainToInstance(SiteParticsDto, expectedTransformedObjects);
+      const expectedTransformedObjects = mockSitePartics.flatMap((item) =>
+        item.siteParticRoles.map((role) => ({
+          guid: v4(),
+          id: item.id,
+          psnorgId: item.psnorgId,
+          effectiveDate: item.effectiveDate,
+          endDate: null,
+          note: item.note?.trim() || null,
+          displayName: item.psnorg.displayName,
+          prCode: role.prCode,
+          description: role.prCode2.description,
+        })),
+      );
+      const sitePartics = plainToInstance(
+        SiteParticsDto,
+        expectedTransformedObjects,
+      );
 
       expect(result[0].displayName).toEqual(sitePartics[0].displayName);
-      expect(siteParticsRepository.find).toHaveBeenCalledWith({ where: { siteId } });
+      expect(siteParticsRepository.find).toHaveBeenCalledWith({
+        where: { siteId },
+      });
     });
 
     it('should throw an error when repository find fails', async () => {
@@ -90,9 +98,9 @@ describe('ParticipantService', () => {
       const error = new Error('Database connection error');
       jest.spyOn(siteParticsRepository, 'find').mockRejectedValueOnce(error);
 
-      await expect(service.getSiteParticipantsBySiteId(siteId)).rejects.toThrowError(
-        'Failed to retrieve site participants by siteId.'
-      );
+      await expect(
+        service.getSiteParticipantsBySiteId(siteId),
+      ).rejects.toThrowError('Failed to retrieve site participants by siteId.');
     });
   });
 });

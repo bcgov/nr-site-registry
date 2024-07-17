@@ -6,22 +6,22 @@ import { format } from 'date-fns';
  */
 @ObjectType()
 export class BaseHttpResponse {
-    @Field(() => String, { nullable: true })
-    message?: string;
+  @Field(() => String, { nullable: true })
+  message?: string;
 
-    @Field(() => Int, { nullable: true })
-    httpStatusCode?: number;
+  @Field(() => Int, { nullable: true })
+  httpStatusCode?: number;
 
-    @Field(() => Boolean, { nullable: true })
-    success?: boolean;
+  @Field(() => Boolean, { nullable: true })
+  success?: boolean;
 
-    @Field(() => String, { nullable: true })
-    timestamp?: String; 
+  @Field(() => String, { nullable: true })
+  timestamp?: String;
 
-    constructor(message?: string, httpStatusCode?: number, success?: boolean) {
-        this.message = message;
-        this.httpStatusCode = httpStatusCode;
-        this.success = success;
-        this.timestamp = format(new Date(), 'MMMM do, yyyy');
-    }
+  constructor(message?: string, httpStatusCode?: number, success?: boolean) {
+    this.message = message;
+    this.httpStatusCode = httpStatusCode;
+    this.success = success;
+    this.timestamp = format(new Date(), 'MMMM do, yyyy');
+  }
 }

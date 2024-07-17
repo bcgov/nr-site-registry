@@ -1,9 +1,9 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 export interface INavigationPills {
-    items: string[];
-    dropdownItems?:any;
-    components?: JSX.Element[];
+  items: string[];
+  dropdownItems?: any;
+  components?: JSX.Element[];
 }
 
 // export interface INavDropdownItem {

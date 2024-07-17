@@ -1,19 +1,18 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, Index, OneToMany } from "typeorm";
-import { LandHistories } from "./landHistories.entity";
-import { SiteProfileLandUses } from "./siteProfileLandUses.entity";
-
+import { Column, Entity, Index, OneToMany } from 'typeorm';
+import { LandHistories } from './landHistories.entity';
+import { SiteProfileLandUses } from './siteProfileLandUses.entity';
 
 @ObjectType()
-@Index("land_use_cd_pkey", ["code"], { unique: true })
-@Entity("land_use_cd")
+@Index('land_use_cd_pkey', ['code'], { unique: true })
+@Entity('land_use_cd')
 export class LandUseCd {
   @Field()
-  @Column("character varying", { primary: true, name: "code", length: 6 })
+  @Column('character varying', { primary: true, name: 'code', length: 6 })
   code: string;
 
   @Field()
-  @Column("character varying", { name: "description", length: 60 })
+  @Column('character varying', { name: 'description', length: 60 })
   description: string;
 
   @OneToMany(() => LandHistories, (landHistories) => landHistories.lutCode2)
@@ -21,7 +20,7 @@ export class LandUseCd {
 
   @OneToMany(
     () => SiteProfileLandUses,
-    (siteProfileLandUses) => siteProfileLandUses.lutCode2
+    (siteProfileLandUses) => siteProfileLandUses.lutCode2,
   )
   siteProfileLandUses: SiteProfileLandUses[];
 }

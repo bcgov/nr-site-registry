@@ -1,24 +1,24 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getAxiosInstance } from "../../../helpers/utility";
-import { print } from "graphql";
-import { graphQlSiteQuery, graphqlSiteDetailsQuery } from "../graphql/Site";
-import { SiteState } from "./SiteState";
-import { RequestStatus } from "../../../helpers/requests/status";
-import { SiteResultDto } from "./Site";
-import { GRAPHQL } from "../../../helpers/endpoints";
-import { act } from "react-dom/test-utils";
-import { useActionData } from "react-router-dom";
-import { SiteDetailsMode } from "../../details/dto/SiteDetailsMode";
-import { UserType } from "../../../helpers/requests/userType";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { getAxiosInstance } from '../../../helpers/utility';
+import { print } from 'graphql';
+import { graphQlSiteQuery, graphqlSiteDetailsQuery } from '../graphql/Site';
+import { SiteState } from './SiteState';
+import { RequestStatus } from '../../../helpers/requests/status';
+import { SiteResultDto } from './Site';
+import { GRAPHQL } from '../../../helpers/endpoints';
+import { act } from 'react-dom/test-utils';
+import { useActionData } from 'react-router-dom';
+import { SiteDetailsMode } from '../../details/dto/SiteDetailsMode';
+import { UserType } from '../../../helpers/requests/userType';
 
 const initialState: SiteState = {
   sites: [],
-  error: "",
+  error: '',
   fetchStatus: RequestStatus.idle,
   deleteStatus: RequestStatus.idle,
   addedStatus: RequestStatus.idle,
   updateStatus: RequestStatus.idle,
-  searchQuery: "",
+  searchQuery: '',
   currentPage: 1,
   pageSize: 10,
   resultsCount: 0,
@@ -30,11 +30,11 @@ const initialState: SiteState = {
   changeTracker: [],
   siteDetailsMode: SiteDetailsMode.ViewOnlyMode,
   resetSiteDetails: false,
-  userType: UserType.External
+  userType: UserType.External,
 };
 
 export const fetchSitesDetails = createAsyncThunk(
-  "sites/fetchSitesDetails",
+  'sites/fetchSitesDetails',
   async (args: { siteId: string }) => {
     try {
       const { siteId } = args;
@@ -49,11 +49,11 @@ export const fetchSitesDetails = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 export const fetchSites = createAsyncThunk(
-  "sites/fetchSites",
+  'sites/fetchSites',
   async (
     args: {
       searchParam?: string;
@@ -61,13 +61,13 @@ export const fetchSites = createAsyncThunk(
       pageSize?: string;
       filter?: {};
     },
-    { getState }
+    { getState },
   ) => {
     try {
       const {
-        searchParam = "",
-        page = "1",
-        pageSize = "10",
+        searchParam = '',
+        page = '1',
+        pageSize = '10',
         filter = {},
       } = args;
       const state: any = getState();
@@ -75,8 +75,8 @@ export const fetchSites = createAsyncThunk(
         query: print(graphQlSiteQuery(filter)),
         variables: {
           searchParam: searchParam,
-          page: "" + state.sites.currentPage,
-          pageSize: "" + state.sites.pageSize,
+          page: '' + state.sites.currentPage,
+          pageSize: '' + state.sites.pageSize,
           ...filter,
         },
       });
@@ -84,11 +84,11 @@ export const fetchSites = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  }
+  },
 );
 
 const siteSlice = createSlice({
-  name: "sites",
+  name: 'sites',
   initialState,
 
   reducers: {
@@ -166,10 +166,12 @@ const siteSlice = createSlice({
       return newState;
     },
     trackChanges: (state, action) => {
-
-     let recordExists =   state.changeTracker.filter((tracked)=>{
-         return tracked.changeType === action.payload.changeType && tracked.label === action.payload.label
-      })
+      let recordExists = state.changeTracker.filter((tracked) => {
+        return (
+          tracked.changeType === action.payload.changeType &&
+          tracked.label === action.payload.label
+        );
+      });
 
       if (recordExists.length === 0) {
         const newState = {
@@ -192,7 +194,6 @@ const siteSlice = createSlice({
         resetSiteDetails: true,
       };
 
-
       return newState;
     },
     updateSiteDetailsMode: (state, action) => {
@@ -202,14 +203,13 @@ const siteSlice = createSlice({
       };
       return newState;
     },
-    updateUserType:(state, action) =>
-    {
+    updateUserType: (state, action) => {
       const newState = {
-        ...state       
+        ...state,
       };
       newState.userType = action.payload;
       return newState;
-    }
+    },
   },
   extraReducers(builder) {
     builder
@@ -269,7 +269,7 @@ export const {
   trackChanges,
   clearTrackChanges,
   updateSiteDetailsMode,
-  updateUserType
+  updateUserType,
 } = siteSlice.actions;
 
 export default siteSlice.reducer;

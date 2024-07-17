@@ -9,10 +9,9 @@ import { EventParticRoleCd } from "../../entities/eventParticRoleCd.entity";
 
 @Injectable()
 export class DropdownService {
-    
-    constructor(
-        @InjectRepository(ParticRoleCd)
-        private particRoleRepository: Repository<ParticRoleCd>,
+  constructor(
+    @InjectRepository(ParticRoleCd)
+    private particRoleRepository: Repository<ParticRoleCd>,
 
         @InjectRepository(PeopleOrgs)
         private peopleOrgsRepository: Repository<PeopleOrgs>,
@@ -28,21 +27,19 @@ export class DropdownService {
     ){}
 
 
-    async getParticipantRoleCd() {
-        try
-        {
-            const result = await this.particRoleRepository.find()
-            if(result)
-            {
-                return result.map((obj: any) => ({key: obj.code, value: obj.description}));
-            }
-
-        }
-        catch (error)
-        {
-            throw new Error('Failed to retrieve participants role code.');
-        }
+  async getParticipantRoleCd() {
+    try {
+      const result = await this.particRoleRepository.find();
+      if (result) {
+        return result.map((obj: any) => ({
+          key: obj.code,
+          value: obj.description,
+        }));
+      }
+    } catch (error) {
+      throw new Error('Failed to retrieve participants role code.');
     }
+  }
 
     async getPeopleOrgsCd() {
         try

@@ -231,7 +231,8 @@ const Participants = () => {
     const handleTableSort = (row:any, ascDir:any) => {
       let property = row["graphQLPropertyName"];
       setFormData(prevData =>{
-        const updatedNotationParticipant = prevData.sort(
+        let updatedParticipant = [...prevData]; 
+        updatedParticipant.sort(
             function(a:any, b:any) {
               if (ascDir) 
                 return (a[property] > b[property]) ? 1 : ((a[property] < b[property]) ? -1 : 0);
@@ -239,7 +240,7 @@ const Participants = () => {
                 return (b[property] > a[property]) ? 1 : ((b[property] < a[property]) ? -1 : 0);
             }
           );
-        return [...updatedNotationParticipant];
+        return [...updatedParticipant];
       });
     }
 

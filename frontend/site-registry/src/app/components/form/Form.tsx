@@ -157,6 +157,7 @@ const Form: React.FC<IFormRendererProps>  = ({ formRows, formData, editMode, srM
                                     isEditing={editMode ?? true}
                                     isChecked ={formData[field.graphQLPropertyName ?? ''] || false}
                                     onChange={(value) => handleInputChange(field.graphQLPropertyName, value)}
+                                    srMode = {srMode ?? false}
                                 />
                             )}
                         </div>

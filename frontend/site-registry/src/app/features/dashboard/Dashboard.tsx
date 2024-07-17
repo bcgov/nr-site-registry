@@ -6,9 +6,7 @@ import {
   recentFoliosColumns,
   recentViewedColumns,
 } from "./DashboardConfig";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../Store";
-import { fetchRecentViews } from "./DashboardSlice";
+import { useSelector } from "react-redux";
 import { UserType } from "../../helpers/requests/userType";
 import "./Dashboard.css";
 import PageContainer from "../../components/simple/PageContainer";
@@ -50,13 +48,15 @@ const DashboardTableWidget: React.FC<DashboardWidgetProps> = ({
 );
 
 const Dashboard = () => {
-  const [name, setName] = useState("");
+
+  const sites = useSelector((state: any) => state.dashboard);
+  const loggedInUser = getUser();
+
+  const [name, setName] = useState('');
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
   const [data, setData] = useState<any[]>([]);
   const [userType, setUserType] = useState<UserType>(UserType.External);
-  const dispatch = useDispatch<AppDispatch>();
-  const sites = useSelector((state: any) => state.dashboard);
-  const loggedInUser = getUser();
+
   useEffect(()=>{
  
     if(loggedInUser?.profile.preferred_username?.indexOf("bceid") !== -1)
@@ -66,7 +66,7 @@ const Dashboard = () => {
       else if (loggedInUser?.profile.preferred_username?.indexOf("idir") !== -1)
       {
         setUserType(UserType.Internal);
-        dispatch(fetchRecentViews(loggedInUser?.profile.preferred_username ?? ''));
+       
       }
       else
       {
@@ -74,9 +74,9 @@ const Dashboard = () => {
         setUserType(UserType.External);
       }
 
-      setName(loggedInUser?.profile.given_name ?? '');
+      setName(loggedInUser?.profile.given_name  + ' '  + loggedInUser?.profile.family_name ?? '');
      
-  }, [])
+  }, [loggedInUser])
 
   useEffect(() => {
     if (sites.status === RequestStatus.success) {

@@ -8,7 +8,6 @@ import { participantNameDrpdown, participantRoleDrpdown } from "../dropdowns/Dro
 export const GetConfig = () => {
     const particNameDropdwn = useSelector(participantNameDrpdown);
     const particRoleDropdwn = useSelector(participantRoleDrpdown);
-
     const participantColumnInternal: TableColumn[] = [
         {
             id: 1,
@@ -23,7 +22,7 @@ export const GetConfig = () => {
                 graphQLPropertyName:'psnorgId',
                 placeholder:'Please enter participant name.',
                 value:"",
-                options: particNameDropdwn.data,
+                options: particNameDropdwn.data.flatMap((item: any) => item.dropdownDto),
                 colSize: "col-lg-6 col-md-6 col-sm-12",
                 customLabelCss:'custom-participant-lbl-text',
                 customInputTextCss:'custom-participant-input-text',
@@ -145,7 +144,7 @@ export const GetConfig = () => {
                 graphQLPropertyName:'psnorgId',
                 placeholder:'Please enter participant name.',
                 value:'',
-                options: particNameDropdwn.data,
+                options: particNameDropdwn.data.flatMap((item: any) => item.dropdownDto),
                 colSize: "col-lg-6 col-md-6 col-sm-12",
                 customLabelCss:'custom-participant-lbl-text',
                 customInputTextCss:'custom-participant-input-text',

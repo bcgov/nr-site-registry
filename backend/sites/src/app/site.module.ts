@@ -60,6 +60,8 @@ import { DisclosureResolver } from './resolvers/disclosure/disclosure.resolver';
 import { CartResolver } from './resolvers/cart/cart.resolver';
 import { CartService } from './services/cart/cart.service';
 import { Cart } from './entities/cart.entity';
+import { NotationResolver } from './resolvers/notation/notation.resolver';
+import { NotationService } from './services/notation/notation.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -87,7 +89,9 @@ import { Cart } from './entities/cart.entity';
     DisclosureService,
     GenericResponseProvider,
     CartResolver,
-    CartService
+    CartService,
+    NotationResolver,
+    NotationService
   ],
   controllers: [SiteController],
 })

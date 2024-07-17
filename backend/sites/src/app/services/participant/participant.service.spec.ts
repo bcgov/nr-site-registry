@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { SitePartics } from '../../entities/sitePartics.entity';
 import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { plainToInstance } from 'class-transformer';
-import { v4 as uuidv4, v4 } from 'uuid';
+import { v4 } from 'uuid';
 
 // Mock SitePartics entity and its Repository
 jest.mock('../../entities/sitePartics.entity');

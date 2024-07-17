@@ -211,7 +211,7 @@ type SiteStatusCd {
 type EventTypeCd {
   code: String!
   eclsCode: String!
-  sstCode: String!
+  sstCode: String
   description: String!
   reqCompletionDate: String!
   reqRegionalApproval: String!
@@ -225,24 +225,25 @@ type Events {
   id: String!
   siteId: String!
   eventDate: DateTime!
-  completionDate: DateTime!
+  completionDate: DateTime
   etypCode: String!
   psnorgId: String!
   spId: String!
-  note: String!
-  regionAppFlag: String!
-  regionUserid: String!
-  regionDate: DateTime!
+  requiredAction: String
+  note: String
+  regionAppFlag: String
+  regionUserid: String
+  regionDate: DateTime
   whoCreated: String!
-  whoUpdated: String!
+  whoUpdated: String
   whenCreated: DateTime!
-  whenUpdated: DateTime!
+  whenUpdated: DateTime
   rwmFlag: Float!
   rwmNoteFlag: Float!
-  rwmApprovalDate: DateTime!
+  rwmApprovalDate: DateTime
   eclsCode: String!
-  requirementDueDate: DateTime!
-  requirementReceivedDate: DateTime!
+  requirementDueDate: DateTime
+  requirementReceivedDate: DateTime
   conditionsTexts: [ConditionsText!]
   eventPartics: [EventPartics!]
   eventTypeCd: EventTypeCd!
@@ -437,9 +438,22 @@ type DropdownResponse {
   data: [DropdownDto!]
 }
 
+type DropdownResponseWithMetaData {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [NotationDropdownDto!]
+}
+
 type DropdownDto {
   key: String!
   value: String!
+}
+
+type NotationDropdownDto {
+  metaData: String!
+  dropdownDto: [DropdownDto!]!
 }
 
 type DisclosureResponse {
@@ -448,14 +462,6 @@ type DisclosureResponse {
   success: Boolean
   timestamp: String
   data: [SiteProfiles!]
-}
-
-type Cart {
-  id: String!
-  userId: String!
-  siteId: String!
-  price: Float!
-  site: Sites!
 }
 
 type CartResponse {
@@ -466,12 +472,33 @@ type CartResponse {
   data: [Cart!]
 }
 
-type DisclosureResponse {
+type NotationResponse {
   message: String
   httpStatusCode: Int
   success: Boolean
   timestamp: String
-  data: [SiteProfiles!]
+  data: [NotationDto!]
+}
+
+type NotationDto {
+  id: String!
+  psnorgId: String!
+  siteId: String!
+  completionDate: DateTime
+  etypCode: String!
+  eclsCode: String!
+  requiredAction: String
+  note: String
+  requirementDueDate: DateTime
+  requirementReceivedDate: DateTime
+  notationParticipant: [NotationParticipantDto!]
+}
+
+type NotationParticipantDto {
+  guid: String!
+  eprCode: String!
+  psnorgId: String!
+  displayName: String!
 }
 
 type Query {
@@ -484,9 +511,13 @@ type Query {
   getSnapshotsById(id: Int!): SnapshotResponse!
   getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
   getParticipantRoleCd: DropdownResponse!
-  getPeopleOrgsCd: DropdownResponse!
+  getPeopleOrgsCd: DropdownResponseWithMetaData!
+  getNotationTypeCd: DropdownResponseWithMetaData!
+  getNotationClassCd: DropdownResponse!
+  getNotationParticipantRoleCd: DropdownResponse!
   getSiteDisclosureBySiteId(siteId: String!): DisclosureResponse!
   getCartItemsForUser(userId: String!): CartResponse!
+  getSiteNotationBySiteId(siteId: String!): NotationResponse!
 }
 
 type Mutation {

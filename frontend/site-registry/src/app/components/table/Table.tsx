@@ -21,6 +21,7 @@ interface TableProps {
   allowRowsSelect? : boolean;
   changeHandler:(eventRecord:any)=>void,
   editMode: boolean,
+  srMode?: boolean,
   idColumnName:string;
   sortHandler?:(row:any,ascSort:boolean)=>void,
   delteHandler?:(eventRecord:any)=>void,
@@ -40,6 +41,7 @@ const Table: FC<TableProps> = ({
   allowRowsSelect,
   changeHandler,
   editMode,
+  srMode,
   idColumnName,
   sortHandler,
   delteHandler
@@ -56,7 +58,7 @@ const Table: FC<TableProps> = ({
           <thead aria-label={`${label} Header`}>
             <TableHeader columns={columns} allowRowsSelect={allowRowsSelect ?? false} sortHandler={tableSortHandler} />
           </thead>
-            <TableBody isLoading={isLoading} columns={columns} data={data} allowRowsSelect={allowRowsSelect ?? false} changeHandler={changeHandler} editMode={editMode} idColumnName={idColumnName} rowDeleteHandler={rowDelteHandler} />
+            <TableBody isLoading={isLoading} columns={columns} data={data} allowRowsSelect={allowRowsSelect ?? false} changeHandler={changeHandler} editMode={editMode} srMode = {srMode}idColumnName={idColumnName} rowDeleteHandler={rowDelteHandler} />
         </table>
       </div>
       <div>

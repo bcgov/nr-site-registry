@@ -15,6 +15,7 @@ interface TableBodyProps {
     data:any
   ) => void;
   editMode: boolean;
+  srMode?: boolean;
   idColumnName:string;
   rowDeleteHandler:(data:any)=>void;
 }
@@ -26,6 +27,7 @@ const TableBody: FC<TableBodyProps> = ({
   allowRowsSelect,
   changeHandler,
   editMode,
+  srMode,
   idColumnName,
   rowDeleteHandler
 }) => {
@@ -200,6 +202,7 @@ const TableBody: FC<TableBodyProps> = ({
                   validation={field.validation}
                   allowNumbersOnly={field.allowNumbersOnly}
                   isEditing={editMode ?? true}
+                  srMode = {srMode ?? true}
                   tableMode={field.tableMode ?? false}
                   stickyCol = {field.stickyCol}
                   href={field.href}

@@ -50,7 +50,7 @@ export const fetchParticipantRoleCd = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  );
+  });
 
   
   export const fetchNotationParticipantRoleCd = createAsyncThunk(

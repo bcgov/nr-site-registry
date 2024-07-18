@@ -61,7 +61,7 @@ const Widget: React.FC<IWidget> = ({
               />
             </div>
           </div>
-        }
+        )}
       </div>
     );
 }

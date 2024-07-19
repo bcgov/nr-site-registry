@@ -3,7 +3,6 @@
 }  
 
 .status-banner-message {
-  padding: var(--layoutpaddingxsmall) var(--layoutpaddingmedium) var(--layoutpaddingxsmall) var(--layoutpaddingmedium);
   border-radius: var(--layout-border-width-large); 
   opacity: 0px; 
   margin-right: var(--layout-margin-large);
@@ -29,21 +28,17 @@
 
 .detail-message-1 {
   margin: var(--layout-margin-large) var(--layout-margin-small) var(--layout-margin-large) var(--layout-margin-medium);
-  /*padding: var(--layout-padding-large) var(--layout-padding-small) var(--layout-padding-large) var(--layout-padding-medium);*/
 }
 
 .detail-message-wrapper {
-  /*margin: var(--layout-margin-small) var(--layout-margin-small) var(--layout-margin-large) var(--layout-margin-medium);*/
   padding: var(--layout-padding-small) var(--layout-padding-small) var(--layout-padding-large) var(--layout-padding-medium);
 }
 
 .detail-message-2 {
   margin: var(--layout-margin-medium) var(--layout-margin-large) var(--layout-margin-small) var(--layout-margin-small);
-  /*padding-top: var(--layout-margin-small);*/
 }
 
 .detail-message-3 {
-  /*margin: var(--layout-margin-large) var(--layout-margin-large) var(--layout-margin-large) var(--layout-margin-large);*/
   font-weight: bold;
   color: var(--typography-color-link);
 }
@@ -86,6 +81,3 @@
 .hidden {
   display: none;
 }
-  
-  
-  

@@ -1,12 +1,6 @@
 import React from "react";
 import "./banner.css";
-import { Icon, backdropClasses } from "@mui/material";
-import checkIcon from "../../images/tick.png";
 import {TickIcon, ExclamationCircle, ExclamationTriangle} from "../common/icon";
-import { Dispatch } from "react";
-import { useDispatch } from "react-redux";
-
-const imagePath = "/Users/ndixit/Documents/nr-site-registry/frontend/site-registry/src/app";
 
 interface BannerProps {
   type: string;

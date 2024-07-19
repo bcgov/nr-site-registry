@@ -38,7 +38,7 @@ import {
   FaArrowsRotate,
 } from 'react-icons/fa6';
 
-import { BsFillPinMapFill, BsEyeFill } from 'react-icons/bs';
+import { BsFillPinMapFill, BsEyeFill, BsExclamationCircle, BsExclamationTriangle } from 'react-icons/bs';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
 export const ShoppingCartIcon = FaCartShopping;
@@ -81,3 +81,6 @@ export const UploadFileIcon = FaUpload;
 export const ViewOnlyIcon = FaEye;
 export const DownloadPdfIcon = BiSolidFilePdf;
 export const ReplaceIcon = FaArrowsRotate;
+export const ExclamationCircle = BsExclamationCircle;
+export const ExclamationTriangle = BsExclamationTriangle;
+

@@ -139,37 +139,41 @@ const Documents = () => {
     };
 
     const handleOnUploadDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(event);
-        // const file = event.target.files[0];
-        // if (file && file.type === 'application/pdf') {
-        //   console.log({...file});
-        //   // You can perform additional actions here with the selected file
-        //   // For example, upload it to a server or process it further
-        // } else {
-        //   alert('Please select a valid PDF file.');
-        // }
+        if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0] ?? null;
+            if (file && file.type === 'application/pdf') {
+                console.log(file);
 
-        // alert('Upload file click');
+                // You can perform additional actions here with the selected file
+                // For example, upload it to a server or process it further
 
-        const newDocument = {
-            id: Date.now(), // Generate a unique ID for the new participant
-            siteId:id,
-            psnorgId:'',
-            submissionDate: new Date(),
-            documentDate: null,
-            title:'',
-            displayName:'',
-            sr: false,
-        };
-    
-        const addDoc = [newDocument, ...formData];
-        setFormData(addDoc);
-        // dispatch(updateSiteDocument(addDoc));
-        const tracker = new ChangeTracker(
-            IChangeType.Added,
-            'New Site Document'
-        );
-        dispatch(trackChanges(tracker.toPlainObject()));
+                const newDocument = {
+                    id: Date.now(), // Generate a unique ID for the new participant
+                    siteId:id,
+                    psnorgId:'',
+                    submissionDate: new Date(),
+                    documentDate: null,
+                    title:'',
+                    displayName:'',
+                    sr: false,
+                };
+        
+                const addDoc = [newDocument, ...formData];
+                setFormData(addDoc);
+                
+                // dispatch(updateSiteDocument(addDoc));
+                const tracker = new ChangeTracker(
+                    IChangeType.Added,
+                    'New Site Document'
+                );
+                dispatch(trackChanges(tracker.toPlainObject()));
+            } 
+            else 
+            {
+                alert('Please select a valid PDF file.');
+            }
+
+        }
     };
 
     const handleViewOnline = () => {
@@ -179,8 +183,28 @@ const Documents = () => {
     const handleDownload = () => {
         alert('Download click');
     };
-    const handleFileReplace = (event: any) => {
-        // alert('File replace click');
+    const handleFileReplace = (event: any, document: any) => {
+        if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0] ?? null;
+            if (file && file.type === 'application/pdf') {
+                console.log(file);
+                console.log(document);
+                // You can perform additional actions here with the selected file
+                // For example, upload it to a server or process it further
+                // dispatch(updateSiteDocument(addDoc));
+                const tracker = new ChangeTracker(
+                    IChangeType.Added,
+                    'Replace Site Document'
+                );
+                dispatch(trackChanges(tracker.toPlainObject()));
+            } 
+            else 
+            {
+                alert('Please select a valid PDF file.');
+            }
+
+        }
+
     };
     const handleFileDelete = (document: any) => {
         alert(document.id);
@@ -241,7 +265,7 @@ const Documents = () => {
                                 <UploadFileIcon className="btn-document-icon cursor-pointer" />
                                 <span className="cursor-pointer">Upload Document</span>
                             </label>
-                            <input type="file" id="input-file" accept=".pdf" style={{ display: 'none' }}  onChange={(e) => handleOnUploadDocument} />
+                            <input type="file" id="input-file" accept=".pdf" style={{ display: 'none' }}  onChange={(e) => handleOnUploadDocument(e)} />
                     </button>
                 </div>
             }
@@ -315,14 +339,13 @@ const Documents = () => {
                                                     id="download-pdf"
                                                     className=" d-flex align-items-center document-btn "
                                                     type="button"
-                                                    onClick={handleFileReplace}
                                                     aria-label={'File replace'}
                                                     >
                                                     <label htmlFor="replace-file" className="d-flex align-items-center gap-2">
                                                         <ReplaceIcon className="btn-document-icon cursor-pointer" />
                                                         <span className="cursor-pointer">Replace File</span>
                                                     </label>
-                                                    <input type="file" id="replace-file" accept=".pdf" style={{ display: 'none' }} />
+                                                    <input type="file" id="replace-file" accept=".pdf" style={{ display: 'none' }}  onChange={(e) => handleFileReplace(e, document)} />
                                                 </button>
                                                 <button
                                                     id="download-pdf"

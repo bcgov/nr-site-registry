@@ -5,7 +5,6 @@ import { fetchLandUses, landUses } from './LandUsesSlice';
 import { useParams } from 'react-router-dom';
 import Table from '../../../components/table/Table';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
-import { RequestStatus } from '../../../helpers/requests/status';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
 import useDebouncedValue from '../../../helpers/useDebouncedValue';
@@ -41,7 +40,7 @@ const LandUses: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { id: siteId } = useParams();
 
-  const { landUses: landUsesData } = useSelector(landUses);
+  const { landUses: landUsesData, fetchRequestStatus } = useSelector(landUses);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
 
@@ -86,7 +85,7 @@ const LandUses: FC = () => {
       </div>
       <Table
         label="Search Results"
-        isLoading={RequestStatus.loading}
+        isLoading={fetchRequestStatus}
         columns={columns}
         data={landUsesData}
         totalResults={landUsesData.length}

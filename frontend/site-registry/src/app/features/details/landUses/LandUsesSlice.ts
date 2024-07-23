@@ -53,7 +53,6 @@ const landUsesSlice = createSlice({
   },
 });
 
-// @ts-expect-error TODO: define state type
-export const landUses = (state) => state.landUses;
+export const landUses = (state: any) => state.landUses;
 
 export default landUsesSlice.reducer;

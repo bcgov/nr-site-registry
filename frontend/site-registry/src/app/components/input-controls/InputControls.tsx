@@ -65,6 +65,36 @@ export const Link: React.FC<InputProps> = ({
   );
 };
 
+
+export const IconButton: React.FC<InputProps> = ({
+  label,
+  placeholder,
+  type,
+  value,
+  validation,
+  allowNumbersOnly,
+  isEditing,
+  customLabelCss,
+  customInputTextCss,
+  customEditLabelCss,
+  customEditInputTextCss,
+  customLinkValue,
+  customIcon,
+  onChange,
+  tableMode,
+  stickyCol,
+  href,
+}) => {
+  return (
+    renderTableCell(
+      <div onClick={onChange}  className={`${customInputTextCss ?? ""}`}>
+      
+           {customIcon && customIcon} <span className="ps-1">{customLinkValue ?? value}</span>
+      </div>   
+    )
+  );
+};
+
 export const DeleteIcon: React.FC<InputProps> = ({
   label,
   placeholder,

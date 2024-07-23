@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RequestStatus } from "../../helpers/requests/status";
-import { Cart, CartState } from "./dto/Cart";
+import { Cart, CartDeleteDTO, CartDeleteDTOWithSiteId, CartState } from "./dto/Cart";
 import { getAxiosInstance } from "../../helpers/utility";
 import { GRAPHQL } from "../../helpers/endpoints";
-import { addCartItemQL, deleteCartItemQL, getCartItemsForUserQL } from "./graphql/Cart";
+import { addCartItemQL, deleteCartItemQL, deleteCartWithSiteIdItemQL, getCartItemsForUserQL } from "./graphql/Cart";
 import { print } from "graphql";
 
 const initialState: CartState = {
@@ -37,7 +37,7 @@ export const fetchCartItems = createAsyncThunk(
 
   export const addCartItem = createAsyncThunk(
     "addCartItem",
-    async (cartInputDTO: Cart) => {
+    async (cartInputDTO: Cart[]) => {
       const request = await getAxiosInstance().post(GRAPHQL, {
         query: print(addCartItemQL()),
         variables: {
@@ -50,11 +50,25 @@ export const fetchCartItems = createAsyncThunk(
 
   export const deleteCartItem = createAsyncThunk(
     "deleteCartItem",
-    async (cartId: string) => {
+    async (cartDeleteDTO: CartDeleteDTO[]) => {
       const request = await getAxiosInstance().post(GRAPHQL, {
         query: print(deleteCartItemQL()),
         variables: {
-          cartId: cartId,
+          cartDeleteDTO: cartDeleteDTO,
+        },
+      });
+      return request.data;
+    }
+  );
+
+
+  export const deleteCartItemWithSiteId = createAsyncThunk(
+    "deleteCartItemWithSiteId",
+    async (cartDeleteDTO: CartDeleteDTOWithSiteId[]) => {
+      const request = await getAxiosInstance().post(GRAPHQL, {
+        query: print(deleteCartWithSiteIdItemQL()),
+        variables: {
+          cartDeleteDTO: cartDeleteDTO,
         },
       });
       return request.data;
@@ -98,6 +112,9 @@ const cartSlice = createSlice({
             state.addRequestStatus = RequestStatus.success;
           })
           .addCase(deleteCartItem.fulfilled, (state, action) => {
+            state.deleteRequestStatus = RequestStatus.success;
+          })
+          .addCase(deleteCartItemWithSiteId.fulfilled,(state, action) => {
             state.deleteRequestStatus = RequestStatus.success;
           })
       },

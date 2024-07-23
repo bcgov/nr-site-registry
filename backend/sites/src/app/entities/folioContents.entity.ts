@@ -13,7 +13,7 @@ import { Folio } from './folio.entity';
 
 @ObjectType()
 @Entity('folio_contents')
-@Index('idx_cart_user_id', ['userId'])
+@Index('idx_folio_id', ['folioId'])
 export class FolioContents extends BaseAuditEntity {
 
     @Field()
@@ -21,23 +21,20 @@ export class FolioContents extends BaseAuditEntity {
     id: string;
   
     @Field()
-    @Column('character varying', { name: 'user_id', length: 100 })
-    userId: string;
-  
-    @Field()
     @Column('character varying', { name: 'site_id' })
     siteId: string;
 
     @Field()
-    @Column('character varying', { name: 'folio_id' })
+    @Column('bigint', { name: 'folio_id' })
     folioId: string;
 
-    @Field()
+    @Field(()=>Folio, { nullable : false})
     @ManyToOne(() => Folio, (folio) => folio.folioContents, {eager:true})
-    @JoinColumn({ name: 'site_id', referencedColumnName: 'id' })
+    @JoinColumn({ name: 'folio_id', referencedColumnName: 'id' })
     folio: Folio;
   
-    @Field()    
+    @Field(()=>Sites)    
+    @ManyToOne(() => Sites, (site) => site.cart, {eager:true})
     @JoinColumn({ name: 'site_id', referencedColumnName: 'id' })
     site: Sites;
 

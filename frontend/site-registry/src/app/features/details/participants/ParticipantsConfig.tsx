@@ -25,7 +25,7 @@ export const GetConfig = () => {
                 value:"",
                 options: particNameDropdwn.data,
                 colSize: "col-lg-6 col-md-6 col-sm-12",
-                customLabelCss:'custom-participant-lbl-text',
+                customLabelCss:'custom-participant     -lbl-text',
                 customInputTextCss:'custom-participant-input-text',
                 customEditLabelCss:'custom-participant-edit-label',
                 customEditInputTextCss:'custom-participant-edit-input',

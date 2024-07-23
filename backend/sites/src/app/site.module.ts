@@ -58,6 +58,11 @@ import { DropdownService } from './services/dropdown/dropdown.service';
 import { CartResolver } from './resolvers/cart/cart.resolver';
 import { CartService } from './services/cart/cart.service';
 import { Cart } from './entities/cart.entity';
+import { Folio } from './entities/folio.entity';
+import { FolioContents } from './entities/folioContents.entity';
+import { FolioResolver } from './resolvers/folio/folio.resolver';
+import { FolioService } from './services/folio/folio.service';
+import { FolioContentsService } from './services/folio/folioContents.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -69,7 +74,7 @@ import { Cart } from './entities/cart.entity';
     ProfileAnswers, ProfileSubmissions, SiteProfileLandUses, SiteProfileOwners, ProfileQuestions, ProfileCategories, SubmissionCd,
     SiteDocPartics, PeopleOrgs, SiteParticRoles, ParticRoleCd, EventParticRoleCd, CityRegions, SiteContaminationClassXref,
     ContaminationClassCd, SiteCrownLandStatusCd, SisAddresses, SiteStaffs, DocParticRoleCd, LtoDownload, LtoPrevDownload,
-    PlanTable, SiteCrownLandContaminated, RecentViews, Snapshots, Cart ])],
+    PlanTable, SiteCrownLandContaminated, RecentViews, Snapshots, Cart, Folio, FolioContents ])],
   providers: [
     SiteResolver,
     SiteService,
@@ -83,7 +88,10 @@ import { Cart } from './entities/cart.entity';
     DropdownService,
     GenericResponseProvider,
     CartResolver,
-    CartService
+    CartService,
+    FolioResolver,
+    FolioService,
+    FolioContentsService
   ],
   controllers: [SiteController],
 })

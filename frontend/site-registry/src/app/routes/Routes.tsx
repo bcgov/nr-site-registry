@@ -15,7 +15,7 @@ const AppRoutes = () => {
       <Route path="/" element={<Dashboard />}></Route>      
       <Route path="/search" element={<Search />}></Route>  
       <Route path="/folios" element={<Folios/>}></Route>
-      <Route path="/folios/details/:id" element={<FolioContents/>}></Route>
+      <Route path="/folios/:id" element={<FolioContents/>}></Route>
       <Route path="/dashboard" element={<Dashboard />}></Route>  
       <Route path="/dashboard/site/details/:id" element={<SiteDetails/>}></Route>
       <Route path="/search/site/details/:id" element={<SiteDetails/>}></Route>

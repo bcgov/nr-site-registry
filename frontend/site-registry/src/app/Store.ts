@@ -10,6 +10,7 @@ import dashboardReducer from "./features/dashboard/DashboardSlice";
 import siteParticipantReducer from "./features/details/participants/ParticipantSlice";
 import DropdownReducer from "./features/details/dropdowns/DropdownSlice";
 import cartReducer from "./features/cart/CartSlice";
+import folioReducer from "./features/folios/FolioSlice"
 
 
 const persistedStore: any = loadFromLocalStorage();
@@ -21,7 +22,8 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     siteParticipant: siteParticipantReducer,
     dropdown: DropdownReducer,  
-    cart: cartReducer
+    cart: cartReducer,
+    folio: folioReducer
   },
 });
 

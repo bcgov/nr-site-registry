@@ -30,7 +30,11 @@ import {
 import { AppDispatch } from "../../Store";
 import Notations from "./notations/Notations";
 import NavigationPills from "../../components/navigation/navigationpills/NavigationPills";
-import { dropDownNavItems, navComponents, navItems } from "./NavigationPillsConfig";
+import {
+  dropDownNavItems,
+  navComponents,
+  navItems,
+} from "./NavigationPillsConfig";
 import ModalDialog from "../../components/modaldialog/ModalDialog";
 import {
   CancelButton,
@@ -43,7 +47,10 @@ import {
 } from "../../components/common/IChangeType";
 
 import "./SiteDetails.css"; // Ensure this import is correct
-import { FormFieldType } from "../../components/input-controls/IFormField";
+import {
+  FormFieldType,
+  IFormField,
+} from "../../components/input-controls/IFormField";
 import { SiteDetailsMode } from "./dto/SiteDetailsMode";
 import { UserType } from "../../helpers/requests/userType";
 import { UserMode } from "../../helpers/requests/userMode";
@@ -51,17 +58,73 @@ import Actions from "../../components/action/Actions";
 import { ActionItems } from "../../components/action/ActionsConfig";
 import { getUser } from "../../helpers/utility";
 import { addRecentView } from "../dashboard/DashboardSlice";
-import { fetchParticipantRoleCd, fetchPeopleOrgsCd } from "./dropdowns/DropdownSlice";
+import {
+  fetchParticipantRoleCd,
+  fetchPeopleOrgsCd,
+} from "./dropdowns/DropdownSlice";
 import { fetchSiteParticipants } from "./participants/ParticipantSlice";
 import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
 import { useAuth } from "react-oidc-context";
+import { DropdownSearchInput } from "../../components/input-controls/InputControls";
+import Form from "../../components/form/Form";
+import SearchInput from "../../components/search/SearchInput";
+import {
+  addSiteToFolio,
+  fetchFolioItems,
+  folioItems,
+} from "../folios/FolioSlice";
+import { Folio, FolioContentDTO } from "../folios/dto/Folio";
 
 const SiteDetails = () => {
 
- 
+  const [folioSearchTerm, SetFolioSearchTeam] = useState("");
 
+  const folioDetails = useSelector(folioItems);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const loggedInUser = getUser();
+
+  const details = useSelector(selectSiteDetails);
+
+  const handleFolioSelect = (folioId: string) => {
+    let selectedFolio = folioDetails.filter(
+      (x: any) => x.folioId === folioId
+    )[0];
+    console.log("selectedFolio", selectedFolio);
+    let dto: FolioContentDTO = {
+      siteId: details.id,
+      folioId: selectedFolio.id + "",
+      id: parseInt(selectedFolio.id),
+      whoCreated: loggedInUser?.profile.given_name ?? "",
+      userId: loggedInUser?.profile.sub ?? "",
+    };
+    dispatch(addSiteToFolio(dto)).unwrap();
+  };
+
+  const folioDropdown: IFormField = {
+    type: FormFieldType.DropDownWithSearch,
+    label: "",
+    isLabel: false,
+    graphQLPropertyName: "folioId",
+    placeholder: "Please enter folio .",
+    value: "",
+    options: [],
+    colSize: "col-lg-6 col-md-6 col-sm-12",
+    customLabelCss: "custom-participant-lbl-text",
+    customInputTextCss: "custom-participant-input-text",
+    customEditLabelCss: "custom-participant-edit-label",
+    customEditInputTextCss: "custom-participant-edit-input",
+    tableMode: true,
+  };
+
+  const arr: IFormField[] = [folioDropdown];
+
+  const arr2: IFormField[][] = [arr];
 
   const auth = useAuth();
+
+  const [addToFolioVisible, SetAddToFolioVisible] = useState(false);
 
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
@@ -70,8 +133,6 @@ const SiteDetails = () => {
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
 
-  const dispatch = useDispatch<AppDispatch>();
-    
   const navigate = useNavigate();
   const onClickBackButton = () => {
     navigate(-1);
@@ -79,30 +140,24 @@ const SiteDetails = () => {
 
   const { id } = useParams();
 
-  const details = useSelector(selectSiteDetails);
-  const loggedInUser = getUser();
-  useEffect(()=>{
-    if(loggedInUser?.profile.preferred_username?.indexOf("bceid") !== -1)
-      {
-        setUserType(UserType.External);
-      }
-      else if (loggedInUser?.profile.preferred_username?.indexOf("idir") !== -1)
-      {
-        setUserType(UserType.Internal);
-      }
-      else
-      {
-        // not logged in 
-        setUserType(UserType.External);
-  
-      }
-  }, [])
- 
+  useEffect(() => {
+    if (loggedInUser?.profile.preferred_username?.indexOf("bceid") !== -1) {
+      setUserType(UserType.External);
+    } else if (
+      loggedInUser?.profile.preferred_username?.indexOf("idir") !== -1
+    ) {
+      setUserType(UserType.Internal);
+    } else {
+      // not logged in
+      setUserType(UserType.External);
+    }
 
- 
+    dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ""));
+  }, []);
+
   const savedChanges = useSelector(trackedChanges);
   const mode = useSelector(siteDetailsMode);
-  useEffect(()=> {
+  useEffect(() => {
     setViewMode(mode);
   }, [mode]);
 
@@ -110,54 +165,50 @@ const SiteDetails = () => {
     dispatch(fetchSitesDetails({ siteId: id ?? "" }));
     dispatch(fetchPeopleOrgsCd());
     dispatch(fetchParticipantRoleCd());
-    dispatch(fetchSiteParticipants(id ?? ''));
+    dispatch(fetchSiteParticipants(id ?? ""));
   }, [id]);
 
   useEffect(() => {
-    if(details && details.id === id)
-    {
+    if (details && details.id === id) {
       handleAddRecentView(details);
     }
   }, [details]);
 
-  
   const handleItemClick = (value: string) => {
-    switch(value)
-    {
-      case SiteDetailsMode.EditMode :
-       setEdit(true);
-       setViewMode(SiteDetailsMode.EditMode);
-       dispatch(updateSiteDetailsMode(SiteDetailsMode.EditMode));
-       break;
-      case SiteDetailsMode.SRMode :
-       setEdit(true);
-       setViewMode(SiteDetailsMode.SRMode);
-       dispatch(updateSiteDetailsMode(SiteDetailsMode.SRMode));
-       break;
-      case SiteDetailsMode.ViewOnlyMode :
-       setEdit(false);
-       setViewMode(SiteDetailsMode.ViewOnlyMode);
-       dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
-       break;
+    switch (value) {
+      case SiteDetailsMode.EditMode:
+        setEdit(true);
+        setViewMode(SiteDetailsMode.EditMode);
+        dispatch(updateSiteDetailsMode(SiteDetailsMode.EditMode));
+        break;
+      case SiteDetailsMode.SRMode:
+        setEdit(true);
+        setViewMode(SiteDetailsMode.SRMode);
+        dispatch(updateSiteDetailsMode(SiteDetailsMode.SRMode));
+        break;
+      case SiteDetailsMode.ViewOnlyMode:
+        setEdit(false);
+        setViewMode(SiteDetailsMode.ViewOnlyMode);
+        dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+        break;
       default:
-       break;
+        break;
     }
- };
+  };
 
   const handleCancelButton = () => {
     dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
     dispatch(clearTrackChanges({}));
     setSave(false);
     setEdit(false);
-  }
+  };
 
   const handleAddRecentView = async (details: any) => {
     try {
-      if(details)
-      {
+      if (details) {
         await dispatch(
           addRecentView({
-            userId: loggedInUser?.profile.preferred_username ?? '',
+            userId: loggedInUser?.profile.preferred_username ?? "",
             siteId: details.id,
             address: details.addrLine_1,
             city: details.city,
@@ -166,47 +217,38 @@ const SiteDetails = () => {
           })
         );
       }
-    } 
-    catch (error) 
-    {
-        throw error;
+    } catch (error) {
+      throw error;
     }
   };
-  const handleAddToCart = ()=>{
-
+  const handleAddToCart = () => {
     dispatch(resetCartItemAddedStatus);
     const loggedInUser = getUser();
-    if(loggedInUser === null)
-    {
-     
-      auth.signinRedirect(
-         {extraQueryParams:{'kc_idp_hint':'bceid'}})
-    }
-    else
-    {
-    
+    if (loggedInUser === null) {
+      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: "bceid" } });
+    } else {
       dispatch(resetCartItemAddedStatus(null));
-      dispatch(addCartItem({ userId: loggedInUser.profile.sub , siteId:details.id, 
-        whoCreated: loggedInUser.profile.given_name ?? "", price:200.11})).unwrap()
+      dispatch(
+        addCartItem([{
+          userId: loggedInUser.profile.sub,
+          siteId: details.id,
+          whoCreated: loggedInUser.profile.given_name ?? "",
+          price: 200.11,
+        }])
+      ).unwrap();
     }
-   
-
-  }
-
-
+  };
 
   return (
     <PageContainer role="details">
       {save && (
         <ModalDialog
           closeHandler={(response) => {
-           
             setSave(false);
-            if(response)
-              {
-                dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
-                setEdit(false);
-              }
+            if (response) {
+              dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+              setEdit(false);
+            }
           }}
         >
           {savedChanges.length > 0 ? (
@@ -239,13 +281,15 @@ const SiteDetails = () => {
       )}
 
       <div className="d-flex justify-content-between">
-        <button className="d-flex btn-back align-items-center" onClick={onClickBackButton}>
+        <button
+          className="d-flex btn-back align-items-center"
+          onClick={onClickBackButton}
+        >
           <AngleLeft className="btn-icon" />
           <span className="btn-back-lbl">Back to</span>
         </button>
-        <div className="d-flex gap-2 justify-align-center pe-2">
-
-         {/* { <Actions label="User" items={ [
+        <div className="d-flex gap-2 justify-align-center pe-2 pos-relative">
+          {/* { <Actions label="User" items={ [
                 { 
                     label:'External User',
                     value: UserType.External
@@ -258,48 +302,103 @@ const SiteDetails = () => {
             ]} 
             onItemClick={handleUserClick} /> } */}
           {/* For Action Dropdown*/}
-          {(!edit && viewMode === SiteDetailsMode.ViewOnlyMode && userType === UserType.Internal) && <Actions label="Action" items={ActionItems} onItemClick={handleItemClick} /> }
-           
-           
+          {!edit &&
+            viewMode === SiteDetailsMode.ViewOnlyMode &&
+            userType === UserType.Internal && (
+              <Actions
+                label="Action"
+                items={ActionItems}
+                onItemClick={handleItemClick}
+              />
+            )}
+
           {/* For Edit / SR Dropdown*/}
-            <div className="d-flex gap-3 align-items-center">
-            {edit && userType === UserType.Internal &&
+          <div className="d-flex gap-3 align-items-center">
+            {edit && userType === UserType.Internal && (
               <>
-                <CustomLabel labelType="c-b" label={`${ viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`} />
+                <CustomLabel
+                  labelType="c-b"
+                  label={`${
+                    viewMode === SiteDetailsMode.SRMode
+                      ? "SR Mode"
+                      : "Edit Mode"
+                  }`}
+                />
                 <SaveButton clickHandler={() => setSave(true)} />
                 <CancelButton clickHandler={handleCancelButton} />
               </>
-            }
+            )}
           </div>
-          
+
           {/* For Cart /Folio Controls*/}
-          { (!edit && viewMode === SiteDetailsMode.ViewOnlyMode && userType === UserType.External) &&
-            <>
-              <button className="d-flex btn-cart align-items-center" onClick={()=>handleAddToCart()}>
-                <ShoppingCartIcon className="btn-icon" />
-                <span className="btn-cart-lbl"> Add to Cart</span>
-              </button>
-              <button className="d-flex btn-folio align-items-center">
-                <FolderPlusIcon className="btn-folio-icon" />
-                <span className="btn-folio-lbl"> Add to Folio</span>
-                <DropdownIcon className="btn-folio-icon" />
-              </button>
-            </>
-          }
+          {!edit &&
+            viewMode === SiteDetailsMode.ViewOnlyMode &&
+            userType === UserType.External && (
+              <>
+                <div
+                  className="d-flex btn-cart align-items-center"
+                  onClick={() => handleAddToCart()}
+                >
+                  <ShoppingCartIcon className="btn-icon" />
+                  <span className="btn-cart-lbl"> Add to Cart</span>
+                </div>
+                <div
+                  className="d-flex btn-folio align-items-center"
+                  onClick={() => {
+                    SetAddToFolioVisible(!addToFolioVisible);
+                  }}
+                >
+                  <FolderPlusIcon className="btn-folio-icon" />
+                  <span className="btn-folio-lbl"> Add to Folio</span>
+                  <DropdownIcon className="btn-folio-icon" />
+                  
+                </div>
+                {addToFolioVisible && (
+                    <div className="pos-absolute">
+                      <SearchInput
+                        label={"Search Folios"}
+                        placeHolderText={"Search Folios"}
+                        searchTerm={folioSearchTerm}
+                        clearSearch={() => {
+                          SetFolioSearchTeam("");
+                          //SetAddToFolioVisible(false);
+                        }}
+                        handleSearchChange={(e) => {
+                          if (e.target) {
+                            SetFolioSearchTeam(e.target.value);
+                          } else {
+                            SetFolioSearchTeam(e);
+                          }
+                        }}
+                        options={folioDetails.filter((y:any)=> y.folioId.toLowerCase().indexOf(folioSearchTerm.toLowerCase()) !== -1).map((x: any) => x.folioId)}
+                        optionSelectHandler={(value) => {
+                          handleFolioSelect(value);
+                          SetAddToFolioVisible(false);
+                        }}
+                      />
+                    </div>
+                  )}
+              </>
+            )}
         </div>
       </div>
       <div className="section-details-header row">
         <div>
           <CustomLabel label="Site ID: " labelType="b-h5" />
-          <CustomLabel label="1" labelType="r-h5" />
+          <CustomLabel label={details?.id} labelType="r-h5" />
         </div>
         <div>
-          <CustomLabel label="2929 Quadra" labelType="b-h1" />
+          <CustomLabel label={details?.addrLine_1} labelType="b-h1" />
         </div>
       </div>
-      <NavigationPills items={navItems} components={navComponents} dropdownItems={dropDownNavItems}/>
+      <NavigationPills
+        items={navItems}
+        components={navComponents}
+        dropdownItems={dropDownNavItems}
+      />
     </PageContainer>
   );
+
 };
 
 export default SiteDetails;

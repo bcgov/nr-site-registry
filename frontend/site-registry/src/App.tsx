@@ -2,9 +2,13 @@ import './App.css';
 import Header from './app/components/navigation/Header'
 import Footer from './app/components/navigation/Footer';
 import {
+  RouteObject,
   BrowserRouter as Router
 } from "react-router-dom";
 import AppRoutes from './app/routes/Routes';
+
+// import { createBrowserRouter } from 'react-router-dom';
+
 import '@bcgov/bc-sans/css/BCSans.css'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,6 +17,11 @@ import "@bcgov/bc-sans/css/BCSans.css";
 
 
 function App() {
+
+  // const routes:RouteObject[] = [
+  
+  // ]; 
+  // const bBrowser = createBrowserRouter(routes)
   return (
     <div  className="container-fluid p-0">    
       <Router >    

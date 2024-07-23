@@ -31,8 +31,13 @@ import { TableColumn } from "../../components/table/TableColumn";
 import { getSiteSearchResultsColumns } from "./dto/Columns";
 import SiteFilterForm from "./filters/SiteFilterForm";
 import PageContainer from "../../components/simple/PageContainer";
+import { getUser } from "../../helpers/utility";
+import { useAuth } from "react-oidc-context";
+import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
+import AddToFolio from "../folios/AddToFolio";
 
 const Search = () => {
+  const auth = useAuth();
   const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch<AppDispatch>();
   const sites = useSelector(selectAllSites);
@@ -141,6 +146,54 @@ const Search = () => {
     color: "grey",
     margin: "4px",
   };
+
+  
+  const handleAddToShoppingCart = () =>{
+   
+    const loggedInUser = getUser();
+    console.log(selectedRows)
+    if (loggedInUser === null) {
+      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: "bceid" } });
+    } else {
+
+      const cartItems = selectedRows.map(row => {
+        return {
+         userId: loggedInUser.profile.sub,
+         siteId: row.id,
+         whoCreated: loggedInUser.profile.given_name ?? "",
+         price: 200.11,
+       }
+     })
+
+    dispatch(resetCartItemAddedStatus(null));
+      dispatch(
+        addCartItem(cartItems)
+      ).unwrap();
+    }
+
+
+  }
+  
+  const [selectedRows,SetSelectedRows] = useState<any[]>([]);
+
+  const changeHandler = (event:any) =>{
+      console.log("handle",event);
+      if(event && event.property === "select_row")
+        {      
+          const index = selectedRows.findIndex((r:any) => r.id === event.row.id);
+          if (index > -1 && !event.value) {
+            // If row is already selected, remove it
+            SetSelectedRows(selectedRows.filter((r:any) => r.id !== event.row.id));
+          } else {
+            // If row is not selected, add it
+            SetSelectedRows([...selectedRows, event.row]);
+          }
+        }   
+
+        console.log("selectedRows",selectedRows);
+  }
+
+  const [showAddToFolio,SetShowAddToFolio] = useState(false);
 
   return (
     <PageContainer role="Search" >
@@ -300,14 +353,17 @@ const Search = () => {
               </div>
             ) : null}
             <div className="search-result-actions">
-              <div className="search-result-actions-btn">
+              <div className="search-result-actions-btn" onClick={()=>handleAddToShoppingCart()}>
                 <ShoppingCartIcon />
                 <span>Add Selected To Cart</span>
               </div>
-              <div className="search-result-actions-btn">
+              <div className="search-result-actions-btn" onClick={()=>{ SetShowAddToFolio(!showAddToFolio) }}>
                 <FolderPlusIcon />
                 <span>Add Selected To Folio</span>
+              
               </div>
+              {showAddToFolio && <AddToFolio className="pos-absolute-search" selectedRows={selectedRows} />}
+             
               <div className="search-result-actions-btn">
                 <FileExportIcon />
                 <span>Export Results As File</span>
@@ -320,7 +376,8 @@ const Search = () => {
                 pageChange={pageChange}
                 data={search(searchText)}
                 columns={columnsToDisplay.filter((x) => x.isChecked === true)}
-                totalRecords={totalRecords}                
+                totalRecords={totalRecords} 
+                changeHandler={changeHandler}       
             />
             </div>
           </div>

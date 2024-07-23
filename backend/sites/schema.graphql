@@ -309,11 +309,39 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 scalar JSON
 
 type Cart {
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
   id: String!
   userId: String!
   siteId: String!
   price: Float!
   site: Sites
+}
+
+type Folio {
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  id: Float!
+  userId: String!
+  folioId: String!
+  description: String!
+  folioContents: [FolioContents!]
+}
+
+type FolioContents {
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  id: String!
+  siteId: String!
+  folioId: String!
+  folio: Folio!
+  site: Sites!
 }
 
 type Sites {
@@ -367,7 +395,8 @@ type Sites {
   sstCode2: SiteStatusCd!
   siteCrownLandContaminated: SiteCrownLandContaminated!
   recentViewedSites: [RecentViews!]
-  carts: [Cart!]
+  cart: [Cart!]
+  folioContents: [FolioContents!]
 }
 
 type FetchSiteResponse {
@@ -450,6 +479,22 @@ type CartResponse {
   data: [Cart!]
 }
 
+type FolioResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [Folio!]
+}
+
+type FolioContentResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [FolioContents!]
+}
+
 type Query {
   sites: FetchSiteResponse!
   searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
@@ -462,13 +507,26 @@ type Query {
   getParticipantRoleCd: DropdownResponse!
   getPeopleOrgsCd: DropdownResponse!
   getCartItemsForUser(userId: String!): CartResponse!
+  getFolioItemsForUser(userId: String!): FolioResponse!
+  getSitesForFolio(folioDTO: FolioMinDTO!): FolioContentResponse!
+}
+
+input FolioMinDTO {
+  id: Float!
+  userId: String!
 }
 
 type Mutation {
   addRecentView(recentView: RecentViewDto!): RecentViewResponse!
   createSnapshot(snapshot: SnapshotDto!): SnapshotResponse!
-  addCartItem(cartDTO: CartDTO!): CartResponse!
-  deleteCartItem(cartId: String!): CartResponse!
+  addCartItem(cartDTO: [CartDTO!]!): CartResponse!
+  deleteCartItem(cartDeleteDTO: [CartDeleteDTO!]!): CartResponse!
+  deleteCartItemWithSiteId(cartDeleteDTO: [CartDeleteDTOWithSiteID!]!): CartResponse!
+  addFolioItem(folioDTO: FolioDTO!): FolioResponse!
+  addSiteToFolio(folioDTO: [FolioContentDTO!]!): FolioResponse!
+  updateFolioItem(folioDTO: [FolioDTO!]!): FolioResponse!
+  deleteFolioItem(FolioId: Float!): FolioResponse!
+  deleteSitesInFolio(folioDTO: [FolioContentDTO!]!): FolioResponse!
 }
 
 input RecentViewDto {
@@ -491,5 +549,32 @@ input CartDTO {
   userId: String!
   siteId: String!
   price: Float!
+  whoCreated: String!
+}
+
+input CartDeleteDTO {
+  userId: String!
+  cartId: String!
+}
+
+input CartDeleteDTOWithSiteID {
+  userId: String!
+  siteId: String!
+}
+
+input FolioDTO {
+  id: Float!
+  userId: String!
+  description: String!
+  folioId: String!
+  whoCreated: String!
+  whenUpdated: String!
+}
+
+input FolioContentDTO {
+  siteId: String!
+  id: Float!
+  folioId: String!
+  userId: String!
   whoCreated: String!
 }

@@ -31,3 +31,37 @@ export class CartDTO {
   @IsString()
   whoCreated: string;
 } 
+
+
+@InputType()
+export class CartDeleteDTO
+{
+  
+  @Field()
+  @IsNotEmpty()
+  @IsString()
+  userId: string;
+
+  @Field()
+  @IsNotEmpty()
+  @IsString()
+  cartId: string;
+
+}
+
+
+@InputType()
+export class CartDeleteDTOWithSiteID
+{
+  
+  @Field()
+  @IsNotEmpty()
+  @IsString()
+  userId: string;
+
+  @Field()
+  @IsNotEmpty()
+  @IsString()
+  siteId: string;
+
+}

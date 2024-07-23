@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Cart } from '../../entities/cart.entity';
-import { CartDTO } from '../../dto/cart.dto';
+import { CartDeleteDTO, CartDeleteDTOWithSiteID, CartDTO } from '../../dto/cart.dto';
 
 @Injectable()
 export class CartService {
@@ -14,31 +14,30 @@ export class CartService {
 
   async getCartItemsForUser(userId: string): Promise<Cart[]> {
     try {
-      const cartItems = await this.cartRepository.find({ relations: {site:true},   where: { userId }  });
+      const cartItems = await this.cartRepository.find({
+        relations: { site: true },
+        where: { userId },
+      });
       return cartItems;
     } catch (error) {
       throw error;
     }
   }
 
-  async addCartItem(cartDTO: CartDTO) {
-    const { userId, siteId } = cartDTO;
-
+  async addCartItem(list: CartDTO[]) {
     try {
-      // Check if the combination of userId and siteId exists in the table
-      const recordExists = await this.cartRepository.findOne({
-        where: { userId, siteId },
-      });
+      for (const cartDTO of list) {
+        const { userId, siteId } = cartDTO;
 
-      if (recordExists) {
-        return 'Cart Item Already Exists';
-      } else {
-        // Convert the DTO to entity
-        const cartItem = plainToInstance(Cart, cartDTO);
-        const result = await this.cartRepository.save(cartItem);
+        // Check if the combination of userId and siteId exists in the table
+        const existingRecord = await this.cartRepository.findOne({
+          where: { userId, siteId },
+        });
 
-        if (result) {
-          return 'Cart Item Added.';
+        if (!existingRecord) {       
+          // Convert the DTO to entity
+          const cartItem = plainToInstance(Cart, cartDTO);
+          const result = await this.cartRepository.save(cartItem);
         }
       }
     } catch (error) {
@@ -46,17 +45,42 @@ export class CartService {
     }
   }
 
-  async deleteCartItem(cartId: string): Promise<boolean> {
+  async deleteCartItem(cartDeleteList: CartDeleteDTO[]): Promise<boolean> {
     try {
-      if (cartId != '') {
-        const result = await this.cartRepository.delete({ id: cartId });
-        if (result.affected > 0) return true;
-        else return false;
+      for (const item of cartDeleteList) {
+        const { cartId, userId } = item;
+        if (cartId != '') {
+          const result = await this.cartRepository.delete({
+            id: cartId,
+            userId: userId,
+          });        
+        }
       }
-
-      return false;
     } catch (e) {
       return false;
     }
   }
+
+
+  async deleteCartWithSiteId(cartDeleteList: CartDeleteDTOWithSiteID[]): Promise<boolean> {
+    try {
+      for (const item of cartDeleteList) {
+        const { siteId, userId } = item;
+
+        const existingCart = await this.cartRepository.findOne({
+          where: { userId, siteId },
+        });
+
+        if (existingCart) {
+          const result = await this.cartRepository.delete({
+            id: existingCart.id,
+            userId: existingCart.userId,
+          });        
+        }
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
 }

@@ -30,7 +30,7 @@ export const getCartItemsForUserQL = () => {
 
 
 export const addCartItemQL = () => gql`
-mutation addCartItem($cartDTO:CartDTO!){
+mutation addCartItem($cartDTO: [CartDTO!]!){
   addCartItem(cartDTO:$cartDTO){
     message
     httpStatusCode
@@ -40,9 +40,22 @@ mutation addCartItem($cartDTO:CartDTO!){
 
 
 export const deleteCartItemQL = () => gql`
-mutation deleteCartItem($cartId:String!)
+mutation deleteCartItem($cartDeleteDTO:[CartDeleteDTO!]!)
 {
-    deleteCartItem(cartId: $cartId)
+    deleteCartItem(cartDeleteDTO: $cartDeleteDTO)
+    {
+         message
+         httpStatusCode
+         success
+    }
+}
+`
+
+
+export const deleteCartWithSiteIdItemQL = () => gql`
+mutation deleteCartItemWithSiteId($cartDeleteDTO:[CartDeleteDTOWithSiteID!]!)
+{
+    deleteCartItemWithSiteId(cartDeleteDTO: $cartDeleteDTO)
     {
          message
          httpStatusCode

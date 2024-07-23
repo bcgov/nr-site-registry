@@ -78,3 +78,32 @@ export const getAxiosInstance = () => {
 
   return instance;
 };
+
+
+export const deepSearch = (obj: any, searchTerm: string): boolean => {
+  for (const key in obj) {
+      const value = obj[key];
+      if (typeof value === 'object') {
+          if (deepSearch(value, searchTerm)) {
+              return true;
+          }
+      }
+
+      const stringValue = typeof value === 'string' ? value.toLowerCase() : String(value).toLowerCase();
+      
+      if (key === 'effectiveDate' || key === 'endDate') {
+          const date = new Date(value);
+          const formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).toLowerCase();
+          const ordinalSuffixPattern = /\b(\d+)(st|nd|rd|th)\b/g;
+          searchTerm = searchTerm.replace(ordinalSuffixPattern, '$1')
+          if (formattedDate.includes(searchTerm)) {
+              return true;
+          }
+      }
+
+      if (stringValue.includes(searchTerm)) {
+          return true;
+      }
+  }
+  return false;
+};

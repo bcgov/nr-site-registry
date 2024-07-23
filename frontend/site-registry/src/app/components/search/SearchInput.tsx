@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CircleXMarkIcon, MagnifyingGlassIcon } from "../common/icon";
 import { ISearchInput } from "./ISearchInput";
 import "./SearchInput.css";
+import React from "react";
 
 const SearchInput: React.FC<ISearchInput> = ({
   label,
@@ -12,6 +13,7 @@ const SearchInput: React.FC<ISearchInput> = ({
   optionSelectHandler,
   createNewLabel,
   createNewHandler,
+  placeHolderText
 }) => {
   const handler =
     optionSelectHandler ??
@@ -54,6 +56,7 @@ const SearchInput: React.FC<ISearchInput> = ({
           onChange={(event) => {
             handleSearchChange(event);
           }}
+          placeholder={placeHolderText}
           value={searchTerm}
           type="text"
           className={`form-control custom-search ${
@@ -85,6 +88,7 @@ const SearchInput: React.FC<ISearchInput> = ({
                 </div>
               );
             })}
+             {createNewLabel &&
             <div
               className="search-create-new-section"
               onClick={(e) => {
@@ -92,8 +96,8 @@ const SearchInput: React.FC<ISearchInput> = ({
                
               }}
             >
-              <span>+</span> <span>Create New {createNewLabel}</span>
-            </div>
+            <span>+</span> <span>Create New {createNewLabel}</span>
+            </div>}
           </div>
         )}
       </div>

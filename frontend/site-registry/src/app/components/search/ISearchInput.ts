@@ -7,4 +7,5 @@ export interface ISearchInput {
     optionSelectHandler?:(event:any)=>void;
     createNewLabel?:string;
     createNewHandler?:(event:any)=>void;
+    placeHolderText?: string;
 }

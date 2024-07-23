@@ -71,7 +71,8 @@ export const sampleSites: Sites[] = [
         siteCrownLandContaminated: siteCrownLandContaminated,
         recentViewedSites: recentViewedSites,
         snapshots:snapshots,
-        cart:cart
+        cart:cart,
+        folioContents:[]
     },
     {
         id: '222',
@@ -125,5 +126,6 @@ export const sampleSites: Sites[] = [
         siteCrownLandContaminated: siteCrownLandContaminated,
         recentViewedSites: recentViewedSites,
         snapshots:snapshots,
-        cart:cart
+        cart:cart,
+        folioContents:[]
     }];

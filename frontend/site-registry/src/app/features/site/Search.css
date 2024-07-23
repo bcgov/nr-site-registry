@@ -99,6 +99,7 @@
     gap: var(--layout-margin-small);
     flex-direction: row;
     flex-wrap: wrap;
+    position: relative;
 }
 
 
@@ -302,4 +303,23 @@ div.search-parent
     text-align: left;
     color: var(--surface-primary-default);
     text-decoration: none;
+}
+
+
+.pos-absolute-search
+{
+   
+    position: absolute;
+    z-index: 1000;
+    top: 45px;
+    left: 232px !important;
+    width: 15%;
+    background: var(--surface-background-white, #FFFFFF);
+    gap: 8px;
+    border-radius: var(--layout-border-medium);
+    opacity: 0px;
+    display: flex;
+    box-shadow: 0px 6.4px 14.4px 0px #00000021;
+    box-shadow: 0px 1.2px 3.6px 0px #0000001A;
+    padding: var(--layout-padding-medium) var(--layout-padding-small) var(--layout-padding-medium) var(--layout-padding-small);
 }

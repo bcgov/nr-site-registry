@@ -252,50 +252,42 @@ const Participants = () => {
     setFormData(sorted);
   };
 
-  const handleAddParticipant = () => {
-    const newParticipant = {
-      guid: v4(),
-      id: '',
-      psnorgId: '',
-      prCode: '',
-      displayName: '',
-      effectiveDate: new Date('2024-05-05'),
-      endDate: new Date('2024-05-05'),
-      note: '',
-      sr: true,
+    const handleAddParticipant = () => {
+        const newParticipant = {
+          guid: v4(),
+          id: '',
+          psnorgId: '',
+          prCode: "",
+          displayName: "",
+          effectiveDate: new Date('2024-05-05'),
+          endDate: new Date('2024-05-05'),
+          note: '',
+          sr: true,
+      };
+      setFormData(prevData => [newParticipant, ...prevData])
+      const tracker = new ChangeTracker(
+        IChangeType.Added,
+        'New Site Participant'
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
     };
-    setFormData((prevData) => [newParticipant, ...prevData]);
-    const tracker = new ChangeTracker(
-      IChangeType.Added,
-      'New Site Participant',
-    );
-    dispatch(trackChanges(tracker.toPlainObject()));
-  };
-
-  // need to do this tomorrow??
-  const handleTableSort = (row: any, ascDir: any) => {
-    let property = row['graphQLPropertyName'];
-    setFormData((prevData) => {
-      const updatedNotationParticipant = prevData.sort(function (
-        a: any,
-        b: any,
-      ) {
-        if (ascDir)
-          return a[property] > b[property]
-            ? 1
-            : a[property] < b[property]
-              ? -1
-              : 0;
-        else
-          return b[property] > a[property]
-            ? 1
-            : b[property] < a[property]
-              ? -1
-              : 0;
+  
+    // need to do this tomorrow??
+    const handleTableSort = (row:any, ascDir:any) => {
+      let property = row["graphQLPropertyName"];
+      setFormData(prevData =>{
+        let updatedParticipant = [...prevData]; 
+        updatedParticipant.sort(
+            function(a:any, b:any) {
+              if (ascDir) 
+                return (a[property] > b[property]) ? 1 : ((a[property] < b[property]) ? -1 : 0);
+              else 
+                return (b[property] > a[property]) ? 1 : ((b[property] < a[property]) ? -1 : 0);
+            }
+          );
+        return [...updatedParticipant];
       });
-      return [...updatedNotationParticipant];
-    });
-  };
+    }
 
   const handleItemClick = (value: string) => {
     switch (value) {

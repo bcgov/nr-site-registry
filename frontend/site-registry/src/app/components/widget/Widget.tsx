@@ -45,24 +45,25 @@ const Widget: React.FC<IWidget> = ({
       {!hideTable && (
         <div className="overflow-auto" style={{ maxHeight: '700px' }}>
           {/* <div> */}
-          <div className="me-1">
-            <Table
-              label={title ?? ''}
-              isLoading={tableIsLoading ?? RequestStatus.idle}
-              columns={tableColumns ?? []}
-              data={tableData}
-              showPageOptions={false}
-              allowRowsSelect={allowRowsSelect}
-              changeHandler={changeHandler ?? (() => {})}
-              editMode={editMode ?? false}
-              idColumnName={primaryKeycolumnName ?? ''}
-              sortHandler={widgetSortHandler}
-            />
+            <div className='me-1'>
+              <Table
+                label={title ?? ""}
+                isLoading={tableIsLoading ?? RequestStatus.idle}
+                columns={tableColumns ?? []}
+                data={tableData}
+                showPageOptions={false}
+                allowRowsSelect={allowRowsSelect}
+                changeHandler={changeHandler ?? (() => {})}
+                editMode={editMode ?? false}
+                srMode = {srMode ?? false}
+                idColumnName={primaryKeycolumnName ?? ''}
+                sortHandler={widgetSortHandler}
+              />
+            </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
-};
+        )}
+      </div>
+    );
+}
 
 export default Widget;

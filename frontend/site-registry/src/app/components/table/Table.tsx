@@ -17,13 +17,14 @@ interface TableProps {
   changeResultsPerPage?: (pageNumber: number) => void;
   currentPage?: number;
   resultsPerPage?: number;
-  showPageOptions?: boolean;
-  allowRowsSelect?: boolean;
-  changeHandler: (eventRecord: any) => void;
-  editMode: boolean;
-  idColumnName: string;
-  sortHandler?: (row: any, ascSort: boolean) => void;
-  deleteHandler?: (eventRecord: any) => void;
+  showPageOptions? : boolean;
+  allowRowsSelect? : boolean;
+  changeHandler:(eventRecord:any)=>void,
+  editMode: boolean,
+  srMode?: boolean,
+  idColumnName:string;
+  sortHandler?:(row:any,ascSort:boolean)=>void,
+  deleteHandler?:(eventRecord:any)=>void,
 }
 
 const Table: FC<TableProps> = ({
@@ -40,6 +41,7 @@ const Table: FC<TableProps> = ({
   allowRowsSelect,
   changeHandler,
   editMode,
+  srMode,
   idColumnName,
   sortHandler,
   deleteHandler: deleteHandler,
@@ -51,7 +53,7 @@ const Table: FC<TableProps> = ({
     });
   let rowDeleteHandler =
     deleteHandler ??
-    ((row) => {
+    ((row: any) => {
       console.log('Handle Delete Event', row);
     });
 
@@ -66,16 +68,7 @@ const Table: FC<TableProps> = ({
               sortHandler={tableSortHandler}
             />
           </thead>
-          <TableBody
-            isLoading={isLoading}
-            columns={columns}
-            data={data}
-            allowRowsSelect={allowRowsSelect ?? false}
-            changeHandler={changeHandler}
-            editMode={editMode}
-            idColumnName={idColumnName}
-            rowDeleteHandler={rowDeleteHandler}
-          />
+            <TableBody isLoading={isLoading} columns={columns} data={data} allowRowsSelect={allowRowsSelect ?? false} changeHandler={changeHandler} editMode={editMode} srMode = {srMode}idColumnName={idColumnName} rowDeleteHandler={rowDeleteHandler} />
         </table>
       </div>
       <div>

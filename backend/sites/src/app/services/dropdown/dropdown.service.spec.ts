@@ -4,6 +4,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ParticRoleCd } from '../../entities/particRoleCd.entity';
 import { PeopleOrgs } from '../../entities/peopleOrgs.entity';
+import { EventClassCd } from '../../entities/eventClassCd.entity';
+import { EventTypeCd } from '../../entities/eventTypeCd.entity';
+import { EventParticRoleCd } from '../../entities/eventParticRoleCd.entity';
 
 // Mock particRoleCd and peopleOrgs entities and their methods
 jest.mock('../../entities/particRoleCd.entity');
@@ -13,6 +16,9 @@ describe('DropdownService', () => {
   let service: DropdownService;
   let particRoleRepository: Repository<ParticRoleCd>;
   let peopleOrgsRepository: Repository<PeopleOrgs>;
+  let eventClassCdRepository: Repository<EventClassCd>;
+  let eventTypeCdRepository: Repository<EventTypeCd>;
+  let eventParticRoleCdRepository: Repository<EventParticRoleCd>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -26,16 +32,27 @@ describe('DropdownService', () => {
           provide: getRepositoryToken(PeopleOrgs),
           useClass: Repository,
         },
+        {
+          provide: getRepositoryToken(EventClassCd),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(EventTypeCd),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(EventParticRoleCd),
+          useClass: Repository,
+        },
       ],
     }).compile();
 
     service = module.get<DropdownService>(DropdownService);
-    particRoleRepository = module.get<Repository<ParticRoleCd>>(
-      getRepositoryToken(ParticRoleCd),
-    );
-    peopleOrgsRepository = module.get<Repository<PeopleOrgs>>(
-      getRepositoryToken(PeopleOrgs),
-    );
+    particRoleRepository = module.get<Repository<ParticRoleCd>>(getRepositoryToken(ParticRoleCd));
+    peopleOrgsRepository = module.get<Repository<PeopleOrgs>>(getRepositoryToken(PeopleOrgs));
+    eventClassCdRepository = module.get<Repository<EventClassCd>>(getRepositoryToken(EventClassCd));
+    eventTypeCdRepository = module.get<Repository<EventTypeCd>>(getRepositoryToken(EventTypeCd));
+    eventParticRoleCdRepository = module.get<Repository<EventParticRoleCd>>(getRepositoryToken(EventParticRoleCd));
   });
 
   afterEach(() => {
@@ -87,9 +104,7 @@ describe('DropdownService', () => {
 
       const result = await service.getPeopleOrgsCd();
 
-      expect(result).toEqual(
-        expectedOrgs.map((org) => ({ key: org.id, value: org.displayName })),
-      );
+      expect(result[0].dropdownDto).toEqual(expectedOrgs.map(org => ({ key: org.id, value: org.displayName })));
       expect(peopleOrgsRepository.find).toHaveBeenCalled();
     });
 

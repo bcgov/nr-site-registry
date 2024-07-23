@@ -46,23 +46,21 @@ import {
   IChangeType,
 } from '../../components/common/IChangeType';
 
-import './SiteDetails.css'; // Ensure this import is correct
-import { FormFieldType } from '../../components/input-controls/IFormField';
-import { SiteDetailsMode } from './dto/SiteDetailsMode';
-import { UserType } from '../../helpers/requests/userType';
-import { UserMode } from '../../helpers/requests/userMode';
-import Actions from '../../components/action/Actions';
-import { ActionItems } from '../../components/action/ActionsConfig';
-import { getUser } from '../../helpers/utility';
-import { addRecentView } from '../dashboard/DashboardSlice';
-import {
-  fetchParticipantRoleCd,
-  fetchPeopleOrgsCd,
-} from './dropdowns/DropdownSlice';
-import { fetchSiteParticipants } from './participants/ParticipantSlice';
-import { fetchSiteDisclosure } from './disclosure/DisclosureSlice';
-import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
-import { useAuth } from 'react-oidc-context';
+import "./SiteDetails.css"; // Ensure this import is correct
+import { FormFieldType } from "../../components/input-controls/IFormField";
+import { SiteDetailsMode } from "./dto/SiteDetailsMode";
+import { UserType } from "../../helpers/requests/userType";
+import { UserMode } from "../../helpers/requests/userMode";
+import Actions from "../../components/action/Actions";
+import { ActionItems } from "../../components/action/ActionsConfig";
+import { getUser } from "../../helpers/utility";
+import { addRecentView } from "../dashboard/DashboardSlice";
+import { fetchNotationClassCd, fetchNotationParticipantRoleCd, fetchNotationTypeCd, fetchParticipantRoleCd, fetchPeopleOrgsCd } from "./dropdowns/DropdownSlice";
+import { fetchSiteParticipants } from "./participants/ParticipantSlice";
+import { fetchSiteDisclosure } from "./disclosure/DisclosureSlice";
+import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
+import { useAuth } from "react-oidc-context";
+import { fetchNotationParticipants } from "./notations/NotationSlice";
 
 const SiteDetails = () => {
   const auth = useAuth();
@@ -105,9 +103,13 @@ const SiteDetails = () => {
   }, [mode]);
 
   useEffect(() => {
-    dispatch(fetchSitesDetails({ siteId: id ?? '' }));
     dispatch(fetchPeopleOrgsCd());
     dispatch(fetchParticipantRoleCd());
+    dispatch(fetchNotationClassCd());
+    dispatch(fetchNotationTypeCd());
+    dispatch(fetchNotationParticipantRoleCd());
+    dispatch(fetchSitesDetails({ siteId: id ?? "" }));
+    dispatch(fetchNotationParticipants(id ?? ''));
     dispatch(fetchSiteParticipants(id ?? ''));
     dispatch(fetchSiteDisclosure(id ?? ''));
   }, [id]);

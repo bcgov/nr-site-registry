@@ -35,31 +35,29 @@ export const fetchSiteParticipants = createAsyncThunk(
 
 // Define the recent views slice
 const siteParticipantSlice = createSlice({
-  name: 'siteParticipant',
-  initialState,
-  reducers: {
-    updateSiteParticipants: (state, action) => {
-      state.siteParticipants = action.payload;
-      state.status = RequestStatus.success;
-      console.log('updated data locally --> ', state.siteParticipants);
-      console.log('updated data locally action.payload --> ', action.payload);
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchSiteParticipants.pending, (state) => {
-        state.status = RequestStatus.loading;
-      })
-      .addCase(fetchSiteParticipants.fulfilled, (state, action) => {
-        state.status = RequestStatus.success;
+    name: 'siteParticipant',
+    initialState,
+    reducers: {
+      updateSiteParticipants: (state, action) => {
         state.siteParticipants = action.payload;
-      })
-      .addCase(fetchSiteParticipants.rejected, (state, action) => {
-        state.status = RequestStatus.failed;
-        state.error = action.error.message;
-      });
-  },
-});
+        state.status = RequestStatus.success;
+      }
+    },
+    extraReducers: (builder) => {
+        builder
+          .addCase(fetchSiteParticipants.pending, (state) => {
+            state.status = RequestStatus.loading;
+          })
+          .addCase(fetchSiteParticipants.fulfilled, (state, action) => {
+            state.status = RequestStatus.success;
+            state.siteParticipants = action.payload;
+          })
+          .addCase(fetchSiteParticipants.rejected, (state, action) => {
+            state.status = RequestStatus.failed;
+            state.error = action.error.message;
+          });
+      },
+  });
 
 export const siteParticipants = (state: {
   siteParticipant: IParticipantState;

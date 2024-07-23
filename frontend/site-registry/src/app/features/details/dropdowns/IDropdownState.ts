@@ -1,8 +1,11 @@
 import { RequestStatus } from '../../../helpers/requests/status';
 
 interface IDropdowns {
-  participantNames: [];
-  participantRoles: [];
+    participantNames: [];
+    participantRoles: [];
+    notationClass:[];
+    notationParticipantRole:[];
+    notationType:[];
 }
 
 export interface IDropdownsState {

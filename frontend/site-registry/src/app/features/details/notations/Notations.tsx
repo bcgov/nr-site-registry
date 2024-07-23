@@ -423,7 +423,7 @@ return (
               </div>
             </div>
           </div>
-          <div data-testid="notation-rows" className={`col-lg-12 overflow-auto p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`} style={{ maxHeight: '1000px'}}>
+          <div data-testid="notation-rows" className={`col-lg-12 overflow-auto p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`} style={{ maxHeight: '800px'}}>
             {
               formData && formData.map((notation, index) =>
               (<div key={index} >
@@ -434,6 +434,7 @@ return (
                       label={''}
                       isLabel={false}
                       onChange={(value) => handleParentChekBoxChange(notation.id, value)}
+                      srMode = {(viewMode === SiteDetailsMode.SRMode)}
                     />
                   }
                   <PanelWithUpDown 

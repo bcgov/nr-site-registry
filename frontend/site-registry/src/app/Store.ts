@@ -12,7 +12,7 @@ import notationParticipantReducer from "./features/details/notations/NotationSli
 import DropdownReducer from "./features/details/dropdowns/DropdownSlice";
 import siteDisclosureReducer from "./features/details/disclosure/DisclosureSlice";
 import cartReducer from "./features/cart/CartSlice";
-
+import documentsReducer from './features/details/documents/DocumentsSlice'
 
 const persistedStore: any = loadFromLocalStorage();
 
@@ -26,6 +26,7 @@ export const store = configureStore({
     siteDisclosure: siteDisclosureReducer,
     dropdown: DropdownReducer,
     cart: cartReducer,
+    documents: documentsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

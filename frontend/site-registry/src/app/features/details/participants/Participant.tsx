@@ -360,18 +360,18 @@ const Participants = () => {
               <div className="d-flex gap-2 flex-wrap ">
                 <button
                   id="add-participant-btn"
-                  className=" d-flex align-items-center notation-btn"
+                  className=" d-flex align-items-center participant-btn"
                   type="button"
                   onClick={handleAddParticipant}
                   aria-label={'Add Participant'}
                 >
                   <UserPlus className="btn-user-icon" />
-                  <span className="notation-btn-lbl">{'Add Participant'}</span>
+                  <span className="participant-btn-lbl">{'Add Participant'}</span>
                 </button>
 
                 <button
                   id="delete-participant-btn"
-                  className={`d-flex align-items-center ${selectedRows.length > 0 ? `notation-btn` : `notation-btn-disable`}`}
+                  className={`d-flex align-items-center ${selectedRows.length > 0 ? `participant-btn` : `participant-btn-disable`}`}
                   disabled={selectedRows.length <= 0}
                   type="button"
                   onClick={handleRemoveParticipant}
@@ -381,7 +381,7 @@ const Participants = () => {
                     className={`${selectedRows.length > 0 ? `btn-user-icon` : `btn-user-icon-disabled`}`}
                   />
                   <span
-                    className={`${selectedRows.length > 0 ? `notation-btn-lbl` : `notation-btn-lbl-disabled`}`}
+                    className={`${selectedRows.length > 0 ? `participant-btn-lbl` : `participant-btn-lbl-disabled`}`}
                   >
                     {'Remove Participant'}
                   </span>
@@ -395,7 +395,7 @@ const Participants = () => {
                 items={srVisibilityParcticConfig}
                 onItemClick={handleItemClick}
                 customCssToggleBtn={
-                  false ? `notation-sr-btn` : `notation-sr-btn-disable`
+                  false ? `participant-sr-btn` : `participant-sr-btn-disable`
                 }
                 disable={viewMode === SiteDetailsMode.SRMode}
               />

@@ -50,19 +50,25 @@ type Mailout {
   whenUpdated: DateTime!
 }
 
+type DocParticRoleCd {
+  code: String!
+  description: String!
+}
+
 type SiteDocs {
   id: String!
   siteId: String!
   submissionDate: DateTime!
-  documentDate: DateTime!
+  documentDate: DateTime
   title: String!
-  note: String!
+  note: String
   whoCreated: String!
-  whoUpdated: String!
+  whoUpdated: String
   whenCreated: DateTime!
-  whenUpdated: DateTime!
+  whenUpdated: DateTime
   rwmFlag: Float!
-  rwmNoteFlag: Float!
+  rwmNoteFlag: Float
+  siteDocPartics: [SiteDocPartics!]!
 }
 
 type ParticRoleCd {
@@ -157,6 +163,21 @@ type SitePartics {
   rwmFlag: Float!
   rwmNoteFlag: Float!
   siteParticRoles: [SiteParticRoles!]!
+  psnorg: PeopleOrgs!
+}
+
+type SiteDocPartics {
+  id: String!
+  dprCode: String!
+  sdocId: String!
+  spId: String!
+  psnorgId: String!
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  dprCode2: DocParticRoleCd!
   psnorg: PeopleOrgs!
 }
 
@@ -501,6 +522,24 @@ type NotationParticipantDto {
   displayName: String!
 }
 
+type DocumentResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [DocumentDto!]
+}
+
+type DocumentDto {
+  id: String!
+  psnorgId: String!
+  displayName: String!
+  siteId: String!
+  submissionDate: String!
+  documentDate: String
+  title: String!
+}
+
 type Query {
   sites: FetchSiteResponse!
   searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
@@ -518,6 +557,7 @@ type Query {
   getSiteDisclosureBySiteId(siteId: String!): DisclosureResponse!
   getCartItemsForUser(userId: String!): CartResponse!
   getSiteNotationBySiteId(siteId: String!): NotationResponse!
+  getSiteDocumentsBySiteId(siteId: String!): DocumentResponse!
 }
 
 type Mutation {

@@ -33,9 +33,13 @@ import {
   FaPlus,
   FaMinus,
   FaTrashCan,
+  FaUpload,
+  FaEye,
+  FaArrowsRotate,
 } from 'react-icons/fa6';
 
 import { BsFillPinMapFill, BsEyeFill } from 'react-icons/bs';
+import { BiSolidFilePdf } from 'react-icons/bi';
 
 export const ShoppingCartIcon = FaCartShopping;
 export const FolderPlusIcon = FaFolderPlus;
@@ -73,3 +77,7 @@ export const Minus = FaMinus;
 export const FillPinMapFill = BsFillPinMapFill;
 export const FillEye = BsEyeFill;
 export const TrashCanIcon = FaTrashCan;
+export const UploadFileIcon = FaUpload;
+export const ViewOnlyIcon = FaEye;
+export const DownloadPdfIcon = BiSolidFilePdf;
+export const ReplaceIcon = FaArrowsRotate;

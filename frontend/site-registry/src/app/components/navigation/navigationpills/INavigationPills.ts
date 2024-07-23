@@ -5,9 +5,3 @@ export interface INavigationPills {
   dropdownItems?: any;
   components?: JSX.Element[];
 }
-
-// export interface INavDropdownItem {
-//   index:any;
-//   label: string;
-//   value: any;
-// }

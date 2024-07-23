@@ -142,7 +142,6 @@ const Documents = () => {
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0] ?? null;
             if (file && file.type === 'application/pdf') {
-                console.log(file);
 
                 // You can perform additional actions here with the selected file
                 // For example, upload it to a server or process it further
@@ -187,8 +186,6 @@ const Documents = () => {
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0] ?? null;
             if (file && file.type === 'application/pdf') {
-                console.log(file);
-                console.log(document);
                 // You can perform additional actions here with the selected file
                 // For example, upload it to a server or process it further
                 // dispatch(updateSiteDocument(addDoc));

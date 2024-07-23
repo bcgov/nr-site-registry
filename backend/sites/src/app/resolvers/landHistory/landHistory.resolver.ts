@@ -5,6 +5,8 @@ import { LandHistories } from 'src/app/entities/landHistories.entity';
 import { LandHistoryResponse } from 'src/app/dto/landHistory.dto';
 import { LandHistoryService } from 'src/app/services/landHistory/landHistory.service';
 
+type SortDirection = 'ASC' | 'DESC';
+
 @Resolver(() => LandHistories)
 export class LandHistoryResolver {
   constructor(
@@ -25,10 +27,14 @@ export class LandHistoryResolver {
 
     @Args('searchTerm', { type: () => String, nullable: true })
     searchTerm: string,
+
+    @Args('sortDirection', { nullable: true })
+    sortDirection: SortDirection,
   ) {
     const result = await this.landHistoryService.getLandHistoriesForSite(
       siteId,
       searchTerm,
+      sortDirection,
     );
     if (result.length > 0) {
       return this.genericResponseProvider.createResponse(

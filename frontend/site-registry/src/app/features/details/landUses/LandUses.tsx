@@ -7,6 +7,7 @@ import Table from '../../../components/table/Table';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { RequestStatus } from '../../../helpers/requests/status';
 import SearchInput from '../../../components/search/SearchInput';
+import Sort from '../../../components/sort/Sort';
 
 const columns = [
   {
@@ -41,13 +42,18 @@ const LandUses: FC = () => {
 
   const { landUses: landUsesData } = useSelector(landUses);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortByValue, setSortByValue] = useState<{
+    [key: string]: any;
+  }>({});
 
   useEffect(() => {
     if (siteId) {
       // TODO: debounce searchTerm
-      dispatch(fetchLandUses({ siteId, searchTerm }));
+      let sortDirection = sortByValue.sortBy === 'newToOld' ? 'DESC' : 'ASC';
+
+      dispatch(fetchLandUses({ siteId, searchTerm, sortDirection }));
     }
-  }, [dispatch, searchTerm, siteId]);
+  }, [dispatch, searchTerm, siteId, sortByValue]);
 
   return (
     <div>
@@ -61,12 +67,13 @@ const LandUses: FC = () => {
           />
         </div>
         <div className={`col-lg-4`}>
-          sort will go here
-          {/* <Sort
+          <Sort
             formData={sortByValue}
             editMode={true}
-            handleSortChange={handleSortChange}
-          /> */}
+            handleSortChange={(key, value) => {
+              setSortByValue({ [key]: value });
+            }}
+          />
         </div>
       </div>
       <Table

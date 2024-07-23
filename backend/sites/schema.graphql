@@ -485,7 +485,7 @@ type Query {
   getPeopleOrgsCd: DropdownResponse!
   getSiteDisclosureBySiteId(siteId: String!): DisclosureResponse!
   getCartItemsForUser(userId: String!): CartResponse!
-  getLandHistoriesForSite(siteId: String!, searchTerm: String): LandHistoryResponse!
+  getLandHistoriesForSite(siteId: String!, searchTerm: String, sortDirection: String): LandHistoryResponse!
 }
 
 type Mutation {

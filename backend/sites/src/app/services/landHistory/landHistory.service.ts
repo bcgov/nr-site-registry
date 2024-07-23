@@ -11,6 +11,7 @@ export class LandHistoryService {
   async getLandHistoriesForSite(
     siteId: string,
     searchTerm: string,
+    sortDirection: 'ASC' | 'DESC',
   ): Promise<LandHistories[]> {
     try {
       const query = this.landHistoryRepository
@@ -32,6 +33,10 @@ export class LandHistoryService {
             });
           }),
         );
+      }
+
+      if (sortDirection) {
+        query.orderBy('when_created', sortDirection);
       }
 
       const result = await query.getMany();

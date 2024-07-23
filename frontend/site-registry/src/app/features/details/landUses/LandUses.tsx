@@ -8,6 +8,7 @@ import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { RequestStatus } from '../../../helpers/requests/status';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
+import useDebouncedValue from '../../../helpers/useDebouncedValue';
 
 const columns = [
   {
@@ -42,18 +43,25 @@ const LandUses: FC = () => {
 
   const { landUses: landUsesData } = useSelector(landUses);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
+
   const [sortByValue, setSortByValue] = useState<{
     [key: string]: any;
   }>({});
 
   useEffect(() => {
     if (siteId) {
-      // TODO: debounce searchTerm
       let sortDirection = sortByValue.sortBy === 'newToOld' ? 'DESC' : 'ASC';
 
-      dispatch(fetchLandUses({ siteId, searchTerm, sortDirection }));
+      dispatch(
+        fetchLandUses({
+          siteId,
+          searchTerm: debouncedSearchTerm,
+          sortDirection,
+        }),
+      );
     }
-  }, [dispatch, searchTerm, siteId, sortByValue]);
+  }, [dispatch, debouncedSearchTerm, siteId, sortByValue]);
 
   return (
     <div>

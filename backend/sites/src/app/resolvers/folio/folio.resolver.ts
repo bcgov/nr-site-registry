@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import { AuthenticatedUser, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { Folio } from 'src/app/entities/folio.entity';
@@ -8,6 +8,7 @@ import { FolioService } from '../../services/folio/folio.service';
 import { FolioDTO, FolioMinDTO, FolioResponse } from 'src/app/dto/Folio';
 import { FolioContentDTO, FolioContentResponse } from 'src/app/dto/folioContent';
 import { FolioContents } from 'src/app/entities/folioContents.entity';
+
 
 
 @Resolver(() => Folio)
@@ -79,7 +80,11 @@ export class FolioResolver {
   async addSiteToFolio(
     @Args('folioDTO', { type: () => [FolioContentDTO] }, new ValidationPipe())
     folioContentDTO: [FolioContentDTO],
+    @AuthenticatedUser()
+    user: any
   ){
+  
+     console.log(user);
     const message = await this.FolioService.addSiteToFolio(folioContentDTO);
 
     if (message) {

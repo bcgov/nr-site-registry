@@ -78,7 +78,7 @@ export const fetchFolioItems = createAsyncThunk(
 
   export const addSiteToFolio = createAsyncThunk(
     "addSiteToFolio",
-    async (FolioInputDTO: FolioContentDTO) => {
+    async (FolioInputDTO: FolioContentDTO[]) => {
       const request = await getAxiosInstance().post(GRAPHQL, {
         query: print(addSiteToFolioQL()),
         variables: {
@@ -122,7 +122,7 @@ export const fetchFolioItems = createAsyncThunk(
       const request = await getAxiosInstance().post(GRAPHQL, {
         query: print(deleteFolioItemQL()),
         variables: {
-          FolioId: FolioId,
+          FolioId: parseInt(FolioId),
         },
       });
       return request.data;
@@ -154,6 +154,13 @@ const folioSlice = createSlice({
           ...state,
         };       
         newState.deleteSiteInFolioRequest = RequestStatus.pending;      
+        return newState;
+      },
+      resetFolioSiteUpdateStatus: (state, action) => {
+        const newState = {
+          ...state,
+        };       
+        newState.updateRequestStatus = RequestStatus.pending;      
         return newState;
       },
     },
@@ -210,13 +217,15 @@ export const folioItems = (state: any) => state.folio.folioItems;
 export const addFolioItemRequestStatus = (state: any) => state.folio.addRequestStatus;
 export const deleteRequestStatus = (state: any) => state.folio.deleteRequestStatus;
 export const deleteSiteInFolioStatus = (state: any) => state.folio.deleteSiteInFolioRequest;
+export const updateRequestStatus =  (state: any) => state.folio.updateRequestStatus;
 export const sitesInFolio = (state: any) => state.folio.sitesArray;
 
 export const {
 
   resetFolioItemAddedStatus,
   resetFolioItemDeleteStatus,
-  resetFolioSiteDeleteStatus
+  resetFolioSiteDeleteStatus,
+  resetFolioSiteUpdateStatus
   
 } = folioSlice.actions;
 

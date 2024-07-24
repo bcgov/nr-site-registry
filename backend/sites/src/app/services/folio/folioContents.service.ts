@@ -83,4 +83,21 @@ export class FolioContentsService {
       return false;
     }
   }
+
+  async deleteAllSitesInFolio(folioId: string): Promise<boolean> {
+    try {
+      
+      if (folioId) {
+        const result = await this.folioContentRepository.delete({
+          folioId: folioId,         
+        });
+        if (result.affected > 0) return true;
+        else return false;
+      }
+
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
 }

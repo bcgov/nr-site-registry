@@ -82,7 +82,7 @@ mutation updateFolioItem($FolioDTO:[FolioDTO!]!){
 
 
 export const deleteFolioItemQL = () => gql`
-mutation deleteFolioItem($FolioId:String!)
+mutation deleteFolioItem($FolioId: Float!)
 {
     deleteFolioItem(FolioId: $FolioId)
     {

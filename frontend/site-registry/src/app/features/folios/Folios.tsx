@@ -3,9 +3,9 @@ import CustomLabel from '../../components/simple/CustomLabel'
 import PageContainer from '../../components/simple/PageContainer'
 import Table from '../../components/table/Table'
 import { RequestStatus } from '../../helpers/requests/status'
-import { FolioTableColumns } from './FolioTableConfig'
+import { FolioTableColumns, getFolioTableColumnsBasedOnMode } from './FolioTableConfig'
 import { useDispatch, useSelector } from 'react-redux'
-import { addFolioItem, addFolioItemRequestStatus, fetchFolioItems, folioItems, resetFolioItemAddedStatus, updateFolioItem } from './FolioSlice'
+import { addFolioItem, addFolioItemRequestStatus, deleteFolioItem, deleteRequestStatus, fetchFolioItems, folioItems, resetFolioItemAddedStatus, resetFolioItemDeleteStatus, resetFolioSiteUpdateStatus, updateFolioItem, updateRequestStatus } from './FolioSlice'
 import { Folio } from './dto/Folio'
 import { v4 } from 'uuid'
 import { deepSearch, getUser } from '../../helpers/utility'
@@ -15,6 +15,7 @@ import { CircleXMarkIcon, FolderPlusIcon, PencilIcon, RegFloppyDisk } from '../.
 import SearchInput from '../../components/search/SearchInput'
 import ModalDialog from '../../components/modaldialog/ModalDialog'
 import { useBlocker } from 'react-router-dom'
+import { useAuth } from 'react-oidc-context'
 
 const Folios = () => {
 
@@ -37,13 +38,30 @@ const Folios = () => {
 
    const [showUpdatesConfirmModal, SetShowUpdatesConfirmModal] = useState(false);
 
+   const [showDeleteConfirmModal,SetShowDeleteConfirmModal] = useState(false);
+
    const addStatus = useSelector(addFolioItemRequestStatus);
+
+   const folioDeleteStatus = useSelector(deleteRequestStatus);
+
+   const updateStatus = useSelector(updateRequestStatus);
+
+   const [deleteRow,SetDeleteRow] = useState<any>(null);
+
+   const auth = useAuth();
+
+    
 
 
 
    const user = getUser();
 
    useEffect(()=>{
+
+    if (user === null) {
+      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: "bceid" } });
+    }
+
     dispatch(fetchFolioItems(user?.profile.sub ? user.profile.sub :""))
 
    },[])
@@ -53,6 +71,25 @@ const Folios = () => {
     dispatch(fetchFolioItems(user?.profile.sub ? user.profile.sub :""))
 
    },[addStatus])
+
+
+   useEffect(()=>{
+    dispatch(fetchFolioItems(user?.profile.sub ? user.profile.sub :""))
+
+   },[folioDeleteStatus])
+
+
+   useEffect(()=>{
+    console.log("updateStatus",updateStatus)
+    SetEditMode(false);
+
+    setTimeout(()=>{dispatch(fetchFolioItems(user?.profile.sub ? user.profile.sub :""))},1000)
+    
+
+   },[updateStatus])
+
+
+
 
 
    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,24 +119,29 @@ const Folios = () => {
 
     console.log("fc");
 
-    if(event.property === 'save')
-    {
-        dispatch(updateFolioItem(event.row));
-    }
-    else
-    {
-      setTempArr((prevData) => {
-        const folioToUpdate = prevData.map(folio => {
-           if(folio.id === event.row.id)
-             {
-               return { ...folio, [event.property]: event.value , ...{dirty: true} };
-             }
-             return folio;
-         })
-         return folioToUpdate;
-       });
-    }
- 
+
+    // const updatedArr = tempArr.map(folio => {
+    //   if(folio.id === event.row.id)
+    //     {
+    //       return { ...folio, [event.property]: event.value , dirty: true} ;
+    //     }
+    //     return folio;  
+    // })
+
+    // setTempArr(updatedArr);
+
+
+    setTempArr((prevData) => {
+
+      const folioToUpdate = prevData.map(folio => {
+         if(folio.id === event.row.id)
+           {
+             return { ...folio, [event.property]: event.value , dirty: true} ;
+           }
+           return folio;  
+       })
+       return folioToUpdate;
+     });
   
   
       };
@@ -113,6 +155,9 @@ const Folios = () => {
       const handleSaveChanges = () => {
         SetShowUpdatesConfirmModal(true);
       }
+
+
+    
    
 
   return (
@@ -152,7 +197,7 @@ const Folios = () => {
     <Table
           label="Folios"
           isLoading={RequestStatus.success}
-          columns={FolioTableColumns}
+          columns={getFolioTableColumnsBasedOnMode(editMode)}
           data={tempArr}
           totalResults={tempArr.length}
           allowRowsSelect={false}
@@ -162,7 +207,11 @@ const Folios = () => {
           }}
           editMode={editMode}
           idColumnName="id"
-          delteHandler={()=>{}}
+        
+          delteHandler={(event)=>{
+            SetShowDeleteConfirmModal(true);
+            SetDeleteRow(event.row);
+          }}
           
         />
       </div>  
@@ -206,7 +255,7 @@ const Folios = () => {
                     })
 
                     console.log("rowsToBeUpdated",rowsToBeUpdated)
-
+                    dispatch(resetFolioSiteUpdateStatus(null));
                     dispatch(updateFolioItem(rowsToBeUpdated));
                     //dispatch(resetFolioItemAddedStatus(null));                 
                   }
@@ -215,6 +264,28 @@ const Folios = () => {
               >
 
             <span> Please confirm changes before proceeding.</span>
+              </ModalDialog>
+            )}
+
+    {showDeleteConfirmModal && (
+              <ModalDialog
+                label="Are you sure you to delete the folio?"
+                closeHandler={(response) => {
+                  console.log("response",response)
+                  if (response) {      
+                    console.log("response",deleteRow?.id);
+                    dispatch(resetFolioItemDeleteStatus(null));
+                    dispatch(deleteFolioItem(deleteRow?.id));
+                  }
+                  else
+                  {
+                    SetDeleteRow(null);
+                  }
+                  SetShowDeleteConfirmModal(false);
+                }}
+              >
+
+            <span> Please confirm before proceeding.</span>
               </ModalDialog>
             )}
 

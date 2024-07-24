@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FormFieldType, IFormField } from "./IFormField";
 import avatar from "../../images/avatar.png";
 import infoIcon from '../../images/info-icon.png';
@@ -166,6 +166,13 @@ export const TextInput: React.FC<InputProps> = ({
   const ContainerElement = tableMode ? 'td' : 'div';
   const [error, setError] = useState<string | null>(null);
 
+  const [localValue,SetLocalValue] = useState(value);
+  const inputTxtId = label.replace(/\s+/g, "_");
+  let timeOutId:any = null;
+
+
+
+
   const validateInput = (inputValue: string) => {
     if (validation) {
       if (validation.pattern && !validation.pattern.test(inputValue)) {
@@ -180,6 +187,12 @@ export const TextInput: React.FC<InputProps> = ({
 
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
+
+    validateInput(inputValue);
+    SetLocalValue(inputValue);
+
+
+   
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
         onChange(inputValue); // Update parent component state only if validation passes
@@ -189,12 +202,13 @@ export const TextInput: React.FC<InputProps> = ({
     }
   };
 
+
   const handleCheckBoxChange = (isChecked: boolean) => {
     onChange(isChecked);
   };
 
   // Replace any spaces in the label with underscores to create a valid id
-  const inputTxtId = label.replace(/\s+/g, "_");
+ 
     return (
       <ContainerElement className={`${tableMode ? "table-border-light" : "mb-3"} ${tableMode && stickyCol ? 'positionSticky': ''} `}>
         {!tableMode && (
@@ -227,10 +241,11 @@ export const TextInput: React.FC<InputProps> = ({
               customEditInputTextCss ?? "custom-input-text"
             }  ${error && "error"}`}
             placeholder={placeholder}
-            value={value ?? ""}
+            value={localValue ?? ""}
             onChange={handleTextInputChange}
             aria-label={label} // Accessibility
             required={error ? true : false}
+           
           />
         ) : (
           <span className={`d-flex pt-1 ${customInputTextCss ?? ""}`}>{value}</span>

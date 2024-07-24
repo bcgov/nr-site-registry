@@ -99,7 +99,7 @@ const SiteDetails = () => {
       whoCreated: loggedInUser?.profile.given_name ?? "",
       userId: loggedInUser?.profile.sub ?? "",
     };
-    dispatch(addSiteToFolio(dto)).unwrap();
+    dispatch(addSiteToFolio([dto])).unwrap();
   };
 
   const folioDropdown: IFormField = {

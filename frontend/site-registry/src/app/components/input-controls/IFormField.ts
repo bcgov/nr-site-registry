@@ -50,4 +50,5 @@ export interface IFormField {
     href?:string
     textAreaRow?:number;
     textAreaColoum?:number;
+    textInputChangeHandleRef?: any;
 }

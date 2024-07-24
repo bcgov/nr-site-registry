@@ -107,11 +107,19 @@ export class FolioService {
   async deleteFolio(id: number): Promise<boolean> {
     try {
       if (id > 0) {
-        const result = await this.folioRepository.delete({
-          id: id,
-        });
-        if (result.affected > 0) return true;
-        else return false;
+        
+        await this.folioContentService
+          .deleteAllSitesInFolio(id.toString())
+          .then((x) => {
+            this.folioRepository
+              .delete({
+                id: id,
+              })
+              .then((result) => {
+                if (result.affected > 0) return true;
+                else return false;
+              });
+          });
       }
 
       return false;
@@ -155,7 +163,10 @@ export class FolioService {
               .then((folio) => {
                 if (folio) {
                   item.folioId = folio.id.toString();
-                  this.folioContentService.deleteSitesInFolio(item.folioId,item.siteId);
+                  this.folioContentService.deleteSitesInFolio(
+                    item.folioId,
+                    item.siteId,
+                  );
                 }
               });
           }

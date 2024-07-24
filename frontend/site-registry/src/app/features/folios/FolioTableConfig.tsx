@@ -43,13 +43,14 @@ export const FolioTableColumns: TableColumn[] = [
     graphQLPropertyName: "folioId",
     displayType: {
       type: FormFieldType.Text,
-      label: 'View',       
+      label: '1',       
       graphQLPropertyName: 'folioId',
       value:'',      
-     
-      // customInputTextCss: "custom-dashboard-link",
-      tableMode: true,
-      href: '',       
+      tableMode: true,      
+      // customLabelCss:'custom-participant-lbl-text',
+      // customInputTextCss:'custom-participant-input-text',
+      // customEditLabelCss:'custom-participant-edit-label',
+      // customEditInputTextCss:'custom-participant-edit-input',      
     },
     columnSize: ColumnSize.Small
   },
@@ -62,20 +63,28 @@ export const FolioTableColumns: TableColumn[] = [
       label: "",
       type: FormFieldType.Text,
       tableMode:true,
-       graphQLPropertyName: "description"
+       graphQLPropertyName: "description",
+      //  customLabelCss:'custom-participant-lbl-text',
+      //  customInputTextCss:'custom-participant-input-text',
+      //  customEditLabelCss:'custom-participant-edit-label',
+      //  customEditInputTextCss:'custom-participant-edit-input',      
   },
     columnSize: ColumnSize.Triple
   },
   {
-    id: 2,
+    id: 3,
     displayName: "Last Updated",
     active: true,
     graphQLPropertyName: "whenUpdated",
     displayType: {
       label: "",
-      type: FormFieldType.Text,
+      type: FormFieldType.Label,
       tableMode:true,
-      graphQLPropertyName: "whenUpdated"
+      graphQLPropertyName: "whenUpdated",
+      // customLabelCss:'custom-participant-lbl-text',
+      // customInputTextCss:'custom-participant-input-text',
+      // customEditLabelCss:'custom-participant-edit-label',
+      // customEditInputTextCss:'custom-participant-edit-input',      
   },
   columnSize: ColumnSize.Small
   }, 
@@ -89,7 +98,7 @@ export const FolioTableColumns: TableColumn[] = [
   // },
   {
     id: 6,
-    displayName: "Actions",
+    displayName: "View",
     active: true,
     graphQLPropertyName: "id",
     displayType: {
@@ -105,6 +114,7 @@ export const FolioTableColumns: TableColumn[] = [
     },
     linkRedirectionURL: '',
   },
+ 
   // {
   //   id: 6,
   //   displayName: "Actions",
@@ -124,3 +134,37 @@ export const FolioTableColumns: TableColumn[] = [
   //   linkRedirectionURL: '',
   // },
 ];
+
+
+export const getFolioTableColumnsBasedOnMode = (editMode:boolean) => {
+
+  if(editMode)
+
+    return FolioTableColumns;
+
+  else
+   
+   return [...FolioTableColumns,  new TableColumn(
+    18,
+    "Actions",
+    true,
+    "id",
+    4,
+    true,
+    true,
+    1,
+    true,
+    {
+      type : FormFieldType.DeleteIcon,
+      label: "",
+      graphQLPropertyName: "id",
+      value: "",
+      customLabelCss: "link-for-table",
+      customInputTextCss: "link-for-table",
+      tableMode: true,    
+    },
+    "site/details/",
+    true
+  )]
+
+}

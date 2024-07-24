@@ -51,14 +51,20 @@ const AddToFolio: FC<ColumnProps> = ({className,selectedRows}) => {
     //   userId: loggedInUser?.profile.sub ?? "",
     // };
 
-    let dto: FolioContentDTO = {
-        siteId: selectedRows[0].id,
-        folioId: selectedFolio.id + "",
-        id: parseInt(selectedFolio.id),
-        whoCreated: loggedInUser?.profile.given_name ?? "",
-        userId: loggedInUser?.profile.sub ?? "",
-      };
-      dispatch(addSiteToFolio(dto)).unwrap();
+   let rows =  selectedRows.map(row=>{
+        return {
+            siteId: row.id,
+            folioId:  selectedFolio.id + "",
+            id: parseInt(selectedFolio.id),
+            whoCreated: loggedInUser?.profile.given_name ?? "",
+            userId: loggedInUser?.profile.sub ?? "",
+        }
+    })
+
+    // let dto: FolioContentDTO = {
+       
+    //   };
+      dispatch(addSiteToFolio(rows)).unwrap();
 
     // dispatch(addSiteToFolio(sitesToAdd[0])).unwrap();
   };

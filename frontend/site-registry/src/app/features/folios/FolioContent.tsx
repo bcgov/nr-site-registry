@@ -234,7 +234,7 @@ const FolioContents = () => {
           }}
           editMode={false}
           idColumnName="id"
-          delteHandler={() => {}}
+          deleteHandler={()=>{}}
         />
       </div>
 

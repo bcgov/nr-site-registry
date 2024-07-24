@@ -208,7 +208,7 @@ const Folios = () => {
           editMode={editMode}
           idColumnName="id"
         
-          delteHandler={(event)=>{
+          deleteHandler={(event)=>{
             SetShowDeleteConfirmModal(true);
             SetDeleteRow(event.row);
           }}

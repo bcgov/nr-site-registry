@@ -81,6 +81,8 @@ import { AssociatedSiteService } from './services/associatedSite/associatedSite.
 import { LandUseCodeResolver } from './resolvers/landUseCode/landUseCode.resolver';
 import { LandUseCodeService } from './services/landUseCode/landUseCode.service';
 import { HistoryLog } from './entities/siteHistoryLog.entity';
+import { ParcelDescriptionResolver } from './resolvers/parcelDescription/parcelDescription.resolver';
+import { ParcelDescriptionsService } from './services/parcelDescriptions/parcelDescriptions.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -151,6 +153,8 @@ import { HistoryLog } from './entities/siteHistoryLog.entity';
     DashboardService,
     SnapshotsResolver,
     SnapshotsService,
+    ParcelDescriptionResolver,
+    ParcelDescriptionsService,
     ParticipantResolver,
     ParticipantService,
     DropdownResolver,

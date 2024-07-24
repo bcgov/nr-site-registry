@@ -1,9 +1,12 @@
-import { Type } from '@nestjs/common';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { GraphQLScalarType } from 'graphql';
+import { format } from 'date-fns';
 
 @ObjectType()
 export class ResponseDto {
+  constructor() {
+    this.timestamp = format(new Date(), 'MMMM do, yyyy');
+  }
+
   @Field(() => String, { nullable: true })
   message?: string;
 

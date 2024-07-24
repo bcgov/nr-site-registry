@@ -7,13 +7,18 @@ import { BaseHttpResponse } from './baseHttpResponse';
  */
 @ObjectType()
 export class FetchSiteResponse extends BaseHttpResponse {
-    @Field(() => [Sites])
-    data: Sites[];
+  @Field(() => [Sites])
+  data: Sites[];
 
-    constructor(message?: string, httpStatusCode?: number, success?: boolean, data?: Sites[] | null) {
-        super(message, httpStatusCode, success);
-        this.data = data;
-    }
+  constructor(
+    message?: string,
+    httpStatusCode?: number,
+    success?: boolean,
+    data?: Sites[] | null,
+  ) {
+    super(message, httpStatusCode, success);
+    this.data = data;
+  }
 }
 
 /**
@@ -21,13 +26,18 @@ export class FetchSiteResponse extends BaseHttpResponse {
  */
 @ObjectType()
 export class FetchSiteDetail extends BaseHttpResponse {
-    @Field(() => Sites)
-    data: Sites;
+  @Field(() => Sites)
+  data: Sites;
 
-    constructor(message?: string, httpStatusCode?: number, success?: boolean, data?: Sites | null) {
-        super(message, httpStatusCode, success);
-        this.data = data;
-    }
+  constructor(
+    message?: string,
+    httpStatusCode?: number,
+    success?: boolean,
+    data?: Sites | null,
+  ) {
+    super(message, httpStatusCode, success);
+    this.data = data;
+  }
 }
 
 /**
@@ -35,24 +45,28 @@ export class FetchSiteDetail extends BaseHttpResponse {
  */
 @ObjectType()
 export class SearchSiteResponse {
-    @Field(() => [Sites])
-    sites: Sites[];
+  @Field(() => [Sites])
+  sites: Sites[];
 
-    @Field()
-    count: number;
+  @Field()
+  count: number;
 
-    @Field()
-    page: number;
+  @Field()
+  page: number;
 
-    @Field()
-    pageSize: number;
-
+  @Field()
+  pageSize: number;
 }
 
-export class GenericResponse<T> extends BaseHttpResponse{
-    data?: T;
-    constructor(message?: string, httpStatusCode?: number, success?: boolean, data?: T | null) {
-        super(message, httpStatusCode, success);
-        this.data = data;
-    }
+export class GenericResponse<T> extends BaseHttpResponse {
+  data?: T;
+  constructor(
+    message?: string,
+    httpStatusCode?: number,
+    success?: boolean,
+    data?: T | null,
+  ) {
+    super(message, httpStatusCode, success);
+    this.data = data;
+  }
 }

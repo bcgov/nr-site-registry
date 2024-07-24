@@ -4,15 +4,17 @@ import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { RecentViews } from '../../entities/recentViews.entity';
 import { DashboardService } from '../../services/dashboard/dashboard.service';
 import { RecentViewDto, RecentViewResponse } from '../../dto/recentView.dto';
-import { GenericResponseProvider } from 'src/app/dto/response/genericResponseProvider';
-import { GenericValidationPipe } from 'src/app/utils/validations/genericValidationPipe';
+import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
+import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 
 @Resolver(() => RecentViews)
 export class DashboardResolver {
   constructor(
-    private readonly dashboardService: DashboardService, 
-    private readonly genericResponseProvider: GenericResponseProvider<RecentViews[]>,
-  ) { }
+    private readonly dashboardService: DashboardService,
+    private readonly genericResponseProvider: GenericResponseProvider<
+      RecentViews[]
+    >,
+  ) {}
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
   @Query(() => RecentViewResponse, { name: 'getRecentViewsByUserId' })
@@ -22,11 +24,19 @@ export class DashboardResolver {
   ) {
     const result = await this.dashboardService.getRecentViewsByUserId(userId);
     if (result.length > 0) {
-      return this.genericResponseProvider.createResponse('Recent views fetched successfully', 200, true, result);
-    }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Recent views data not found for site id: ${userId}`, 404, false);
+      return this.genericResponseProvider.createResponse(
+        'Recent views fetched successfully',
+        200,
+        true,
+        result,
+      );
+    } else {
+      return this.genericResponseProvider.createResponse(
+        `Recent views data not found for site id: ${userId}`,
+        404,
+        false,
+        null,
+      );
     }
   }
 
@@ -35,15 +45,18 @@ export class DashboardResolver {
   async addRecentView(
     @Args('recentView', { type: () => RecentViewDto }, new ValidationPipe())
     recentView: RecentViewDto,
-  ){
+  ) {
     const message = await this.dashboardService.addRecentView(recentView);
 
     if (message) {
       return this.genericResponseProvider.createResponse(message, 201, true);
-    }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Recent views failed to insert or update recent view. `, 400, false);
+    } else {
+      return this.genericResponseProvider.createResponse(
+        `Recent views failed to insert or update recent view. `,
+        400,
+        false,
+        null,
+      );
     }
   }
 }

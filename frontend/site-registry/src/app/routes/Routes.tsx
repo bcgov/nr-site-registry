@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 // import Landing from "../features/landing/Landing"
 import { Routes, Route } from "react-router-dom";
 import Search from "../features/site/Search";

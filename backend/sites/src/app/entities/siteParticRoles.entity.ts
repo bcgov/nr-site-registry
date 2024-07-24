@@ -1,59 +1,62 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { ParticRoleCd } from "./particRoleCd.entity";
-import { SitePartics } from "./sitePartics.entity";
+import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import { ParticRoleCd } from './particRoleCd.entity';
+import { SitePartics } from './sitePartics.entity';
 
 @ObjectType()
-@Index("spr_classified_by_frgn", ["prCode"], {})
-@Index("site_partic_roles_pkey", ["prCode", "spId"], { unique: true })
-@Index("spr_rwm_flag", ["rwmFlag"], {})
-@Index("spr_classifying_frgn", ["spId"], {})
-@Entity("site_partic_roles")
+@Index('spr_classified_by_frgn', ['prCode'], {})
+@Index('site_partic_roles_pkey', ['prCode', 'spId'], { unique: true })
+@Index('spr_rwm_flag', ['rwmFlag'], {})
+@Index('spr_classifying_frgn', ['spId'], {})
+@Entity('site_partic_roles')
 export class SiteParticRoles {
-  
   @Field()
-  @Column("character varying", { primary: true, name: "pr_code", length: 6 })
+  @Column('character varying', { primary: true, name: 'pr_code', length: 6 })
   prCode: string;
-  
+
   @Field()
-  @Column("bigint", { primary: true, name: "sp_id" })
+  @Column('bigint', { primary: true, name: 'sp_id' })
   spId: string;
-  
+
   @Field()
-  @Column("character varying", { name: "who_created", length: 30 })
+  @Column('character varying', { name: 'who_created', length: 30 })
   whoCreated: string;
-  
-  @Field({nullable: true})
-  @Column("character varying", {
-    name: "who_updated",
+
+  @Field({ nullable: true })
+  @Column('character varying', {
+    name: 'who_updated',
     nullable: true,
     length: 30,
   })
   whoUpdated: string | null;
-  
+
   @Field()
-  @Column("timestamp without time zone", { name: "when_created" })
+  @Column('timestamp without time zone', { name: 'when_created' })
   whenCreated: Date;
-  
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "when_updated",
+
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'when_updated',
     nullable: true,
   })
   whenUpdated: Date | null;
-  
+
   @Field()
-  @Column("smallint", { name: "rwm_flag" })
+  @Column('smallint', { name: 'rwm_flag' })
   rwmFlag: number;
 
-  @Field(()=> ParticRoleCd)
-  @ManyToOne(() => ParticRoleCd, (particRoleCd) => particRoleCd.siteParticRoles, {eager: true})
-  @JoinColumn([{ name: "pr_code", referencedColumnName: "code" }])
+  @Field(() => ParticRoleCd)
+  @ManyToOne(
+    () => ParticRoleCd,
+    (particRoleCd) => particRoleCd.siteParticRoles,
+    { eager: true },
+  )
+  @JoinColumn([{ name: 'pr_code', referencedColumnName: 'code' }])
   prCode2: ParticRoleCd;
 
   @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteParticRoles, {
-    onDelete: "CASCADE",
+    onDelete: 'CASCADE',
   })
-  @JoinColumn([{ name: "sp_id", referencedColumnName: "id" }])
+  @JoinColumn([{ name: 'sp_id', referencedColumnName: 'id' }])
   sp: SitePartics;
 }

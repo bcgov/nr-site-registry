@@ -1,47 +1,48 @@
-import { IParticipant, IParticipantState } from "./IParticipantState";
-import { graphQLSiteParticipantsBySiteId } from "../../site/graphql/Participant";
-import { RequestStatus } from "../../../helpers/requests/status";
+import { IParticipant, IParticipantState } from './IParticipantState';
+import { graphQLSiteParticipantsBySiteId } from '../../site/graphql/Participant';
+import { RequestStatus } from '../../../helpers/requests/status';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getAxiosInstance } from "../../../helpers/utility";
-import { GRAPHQL } from "../../../helpers/endpoints";
-import { print } from "graphql";
+import { getAxiosInstance } from '../../../helpers/utility';
+import { GRAPHQL } from '../../../helpers/endpoints';
+import { print } from 'graphql';
 
 // Define the initial state
-const initialState : IParticipantState = {
-    siteParticipants: [],
-    status: RequestStatus.idle,
-    error: '',
-  };
-  
+const initialState: IParticipantState = {
+  siteParticipants: [],
+  status: RequestStatus.idle,
+  error: '',
+};
+
 // Define the asynchronous thunk to fetch site participants from the backend
 export const fetchSiteParticipants = createAsyncThunk(
-    'siteParticipants/fetchSiteParticipants',
-    async (siteId: string) => {
-      try
-      {
-        const response = await getAxiosInstance().post( GRAPHQL, {
-            query: print(graphQLSiteParticipantsBySiteId()),
-            variables: {
-                siteId:siteId
-            }
-        })
-        const participants: IParticipant[] = response.data.data.getSiteParticipantBySiteId.data;
-        return participants;
-      }
-      catch(error)
-      {
-        throw error
-      }
-      
+  'siteParticipants/fetchSiteParticipants',
+  async (siteId: string) => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(graphQLSiteParticipantsBySiteId()),
+        variables: {
+          siteId: siteId,
+        },
+      });
+      const participants: IParticipant[] =
+        response.data.data.getSiteParticipantBySiteId.data;
+      return participants;
+    } catch (error) {
+      throw error;
     }
-  );
-
+  },
+);
 
 // Define the recent views slice
 const siteParticipantSlice = createSlice({
     name: 'siteParticipant',
     initialState,
-    reducers: {},
+    reducers: {
+      updateSiteParticipants: (state, action) => {
+        state.siteParticipants = action.payload;
+        state.status = RequestStatus.success;
+      }
+    },
     extraReducers: (builder) => {
         builder
           .addCase(fetchSiteParticipants.pending, (state) => {
@@ -58,7 +59,9 @@ const siteParticipantSlice = createSlice({
       },
   });
 
-  
-export const siteParticipants = (state: { siteParticipant: IParticipantState }) => state.siteParticipant.siteParticipants;
+export const siteParticipants = (state: {
+  siteParticipant: IParticipantState;
+}) => state.siteParticipant.siteParticipants;
+export const { updateSiteParticipants } = siteParticipantSlice.actions;
 
 export default siteParticipantSlice.reducer;

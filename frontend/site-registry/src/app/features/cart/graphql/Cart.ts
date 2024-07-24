@@ -1,33 +1,28 @@
-import gql from 'graphql-tag'
+import gql from 'graphql-tag';
 
 export const getCartItemsForUserQL = () => {
-    return(
-        gql
-        `query getCartItemsForUser($userId: String!)
-        {
-            getCartItemsForUser(userId: $userId)
-            {
-                httpStatusCode
-                message             
-                data {
-                    id
-                    userId
-                    siteId
-                    price
-                    site
-                    {
-                        id,
-                        addrLine_1,
-                        addrLine_2,
-                        addrLine_3,
-                        city
-                    }
-                }
-            }
-        }`
-    )
-}
-
+  return gql`
+    query getCartItemsForUser($userId: String!) {
+      getCartItemsForUser(userId: $userId) {
+        httpStatusCode
+        message
+        data {
+          id
+          userId
+          siteId
+          price
+          site {
+            id
+            addrLine_1
+            addrLine_2
+            addrLine_3
+            city
+          }
+        }
+      }
+    }
+  `;
+};
 
 export const addCartItemQL = () => gql`
 mutation addCartItem($cartDTO: [CartDTO!]!){
@@ -61,5 +56,5 @@ mutation deleteCartItemWithSiteId($cartDeleteDTO:[CartDeleteDTOWithSiteID!]!)
          httpStatusCode
          success
     }
-}
-`
+  }
+`;

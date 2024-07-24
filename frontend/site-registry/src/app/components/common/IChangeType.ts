@@ -2,12 +2,12 @@ export enum IChangeType {
   Added,
   Modified,
   Deleted,
-  None, 
+  None,
 }
 
 export class ChangeTracker {
   changeType: IChangeType = IChangeType.None;
-  label: string = "";
+  label: string = '';
 
   constructor(changeType: IChangeType, label: string) {
     this.changeType = changeType;

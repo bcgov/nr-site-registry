@@ -1,6 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import {} from '../../dto/recentView.dto';
 
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
@@ -11,9 +12,9 @@ import { CartDeleteDTO, CartDeleteDTOWithSiteID, CartDTO, CartResponse } from '.
 @Resolver(() => Cart)
 export class CartResolver {
   constructor(
-    private readonly cartService: CartService, 
+    private readonly cartService: CartService,
     private readonly genericResponseProvider: GenericResponseProvider<Cart[]>,
-  ) { }
+  ) {}
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
   @Query(() => CartResponse, { name: 'getCartItemsForUser' })
@@ -23,11 +24,19 @@ export class CartResolver {
   ) {
     const result = await this.cartService.getCartItemsForUser(userId);
     if (result.length > 0) {
-      return this.genericResponseProvider.createResponse('Cart items fetched successfully', 200, true, result);
-    }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Cart items not found for user id: ${userId}`, 200, true, []);
+      return this.genericResponseProvider.createResponse(
+        'Cart items fetched successfully',
+        200,
+        true,
+        result,
+      );
+    } else {
+      return this.genericResponseProvider.createResponse(
+        `Cart items not found for user id: ${userId}`,
+        200,
+        true,
+        [],
+      );
     }
   }
 
@@ -69,11 +78,13 @@ export class CartResolver {
     const message = await this.cartService.deleteCartWithSiteId(cartDeleteDTO);
 
     if (message) {
-      return this.genericResponseProvider.createResponse("Deleted", 200, true);
-    }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Failed delete item. `, 400, false);
+      return this.genericResponseProvider.createResponse('Deleted', 200, true);
+    } else {
+      return this.genericResponseProvider.createResponse(
+        `Failed delete item. `,
+        400,
+        false,
+      );
     }
   }
 

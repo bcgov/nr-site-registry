@@ -8,32 +8,27 @@ import { print } from "graphql";
 
 const initialState: CartState = {
   fetchRequestStatus: RequestStatus.idle,
-  addRequestStatus : RequestStatus.idle,
+  addRequestStatus: RequestStatus.idle,
   deleteRequestStatus: RequestStatus.idle,
   cartItems: [],
 };
 
-
 export const fetchCartItems = createAsyncThunk(
-    'cart/fetchCartItems',
-    async (userId: string) => {
-      try
-      {
-        const response = await getAxiosInstance().post( GRAPHQL, {
-            query: print(getCartItemsForUserQL()),
-            variables: {
-                userId:userId
-            }
-        })     
-        return response.data.data.getCartItemsForUser.data;
-      }
-      catch(error)
-      {
-        throw error
-      }      
+  'cart/fetchCartItems',
+  async (userId: string) => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(getCartItemsForUserQL()),
+        variables: {
+          userId: userId,
+        },
+      });
+      return response.data.data.getCartItemsForUser.data;
+    } catch (error) {
+      throw error;
     }
-  );
-
+  },
+);
 
   export const addCartItem = createAsyncThunk(
     "addCartItem",
@@ -74,7 +69,6 @@ export const fetchCartItems = createAsyncThunk(
       return request.data;
     }
   );
-
 
 const cartSlice = createSlice({
     name: 'cart',
@@ -120,16 +114,13 @@ const cartSlice = createSlice({
       },
   });
 
-
 export const cartItems = (state: any) => state.cart.cartItems;
-export const addCartItemRequestStatus = (state: any) => state.cart.addRequestStatus;
-export const deleteRequestStatus = (state: any) => state.cart.deleteRequestStatus;
+export const addCartItemRequestStatus = (state: any) =>
+  state.cart.addRequestStatus;
+export const deleteRequestStatus = (state: any) =>
+  state.cart.deleteRequestStatus;
 
-export const {
-
-  resetCartItemAddedStatus,
-  resetCartItemDeleteStatus
-  
-} = cartSlice.actions;
+export const { resetCartItemAddedStatus, resetCartItemDeleteStatus } =
+  cartSlice.actions;
 
 export default cartSlice.reducer;

@@ -1,12 +1,11 @@
-
 interface IDashboard {
-    recentView: []
-    recentFolios: []
-    recentAssigned: []
+  recentView: [];
+  recentFolios: [];
+  recentAssigned: [];
 }
 
 export interface IDashboardState {
-    dashboard: IDashboard;
-    error?: string;
-    status: string;
+  dashboard: IDashboard;
+  error?: string;
+  status: string;
 }

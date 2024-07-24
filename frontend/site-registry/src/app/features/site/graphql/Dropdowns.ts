@@ -1,11 +1,52 @@
-import gql from 'graphql-tag'
+import gql from 'graphql-tag';
 
 export const graphQLParticipantRoleCd = () => {
+  return gql`
+    query getParticipantRoleCd {
+      getParticipantRoleCd {
+        httpStatusCode
+        success
+        message
+        timestamp
+        data {
+          key
+          value
+        }
+      }
+    }
+  `;
+};
+
+export const graphQLPeopleOrgsCd = () => {
     return(
         gql
-        `query getParticipantRoleCd
+        `query getPeopleOrgsCd
         {
-            getParticipantRoleCd
+            getPeopleOrgsCd
+            {
+                httpStatusCode,
+                success,
+                message,
+                timestamp,
+                data {
+                    metaData
+                    dropdownDto 
+                    {
+                        key
+                        value
+                    }
+                }
+            }
+        }`
+    )
+}
+
+export const graphQLNotationClassCd = () => {
+    return(
+        gql
+        `query getNotationClassCd
+        {
+            getNotationClassCd
             {
                 httpStatusCode,
                 success,
@@ -20,12 +61,12 @@ export const graphQLParticipantRoleCd = () => {
     )
 }
 
-export const graphQLPeopleOrgsCd = () => {
+export const graphQLNotationParticipantRoleCd = () => {
     return(
         gql
-        `query getPeopleOrgsCd
+        `query getNotationParticipantRoleCd
         {
-            getPeopleOrgsCd
+            getNotationParticipantRoleCd
             {
                 httpStatusCode,
                 success,
@@ -34,6 +75,31 @@ export const graphQLPeopleOrgsCd = () => {
                 data {
                     key
                     value
+                }
+            }
+        }`
+    )
+}
+
+export const graphQLNotationTypeCd = () => {
+    return(
+        gql
+        `query getNotationTypeCd
+        {
+            getNotationTypeCd
+            {
+                httpStatusCode,
+                success,
+                message,
+                timestamp,
+                data 
+                {
+                    metaData
+                    dropdownDto 
+                    {
+                        key
+                        value
+                    }
                 }
             }
         }`

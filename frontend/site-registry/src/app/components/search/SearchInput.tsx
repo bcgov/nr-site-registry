@@ -18,16 +18,14 @@ const SearchInput: React.FC<ISearchInput> = ({
   const handler =
     optionSelectHandler ??
     ((e) => {
-      console.log("handle option select");
+      console.log('handle option select');
     });
 
-  const addNewHandler = 
-  createNewHandler ??
+  const addNewHandler =
+    createNewHandler ??
     ((e) => {
-      console.log("Handle create new from search");
+      console.log('Handle create new from search');
     });
-
- 
 
   const [createMode, SetCreateMode] = useState(false);
 
@@ -40,11 +38,16 @@ const SearchInput: React.FC<ISearchInput> = ({
     }
   };
 
-  
   return (
-    <div >
+    <div>
       {label && (
-        <label  htmlFor={label} className="form-label custom-search-label" aria-labelledby={label}>{label}</label>
+        <label
+          htmlFor={label}
+          className="form-label custom-search-label"
+          aria-labelledby={label}
+        >
+          {label}
+        </label>
       )}
       <div className="search-box-container">
 

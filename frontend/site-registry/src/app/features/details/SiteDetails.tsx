@@ -1,10 +1,10 @@
-import React, { Fragment, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import React, { Fragment, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
-import CustomLabel from "../../components/simple/CustomLabel";
-import PageContainer from "../../components/simple/PageContainer";
-import LabelComponent from "./LabelComponent";
+import CustomLabel from '../../components/simple/CustomLabel';
+import PageContainer from '../../components/simple/PageContainer';
+import LabelComponent from './LabelComponent';
 import {
   ChevronDown,
   ChevronUp,
@@ -12,12 +12,12 @@ import {
   DropdownIcon,
   FolderPlusIcon,
   ShoppingCartIcon,
-} from "../../components/common/icon";
-import { TableColumn } from "../../components/table/TableColumn";
-import Table from "../../components/table/Table";
-import { RequestStatus } from "../../helpers/requests/status";
-import SummaryForm from "./SummaryForm";
-import PanelWithUpDown from "../../components/simple/PanelWithUpDown";
+} from '../../components/common/icon';
+import { TableColumn } from '../../components/table/TableColumn';
+import Table from '../../components/table/Table';
+import { RequestStatus } from '../../helpers/requests/status';
+import SummaryForm from './SummaryForm';
+import PanelWithUpDown from '../../components/simple/PanelWithUpDown';
 import {
   fetchSitesDetails,
   selectSiteDetails,
@@ -40,11 +40,11 @@ import {
   CancelButton,
   CustomPillButton,
   SaveButton,
-} from "../../components/simple/CustomButtons";
+} from '../../components/simple/CustomButtons';
 import {
   ChangeTracker,
   IChangeType,
-} from "../../components/common/IChangeType";
+} from '../../components/common/IChangeType';
 
 import "./SiteDetails.css"; // Ensure this import is correct
 import {
@@ -58,13 +58,15 @@ import Actions from "../../components/action/Actions";
 import { ActionItems } from "../../components/action/ActionsConfig";
 import { getUser } from "../../helpers/utility";
 import { addRecentView } from "../dashboard/DashboardSlice";
-import {
+import { fetchNotationClassCd, fetchNotationParticipantRoleCd, fetchNotationTypeCd,
   fetchParticipantRoleCd,
   fetchPeopleOrgsCd,
 } from "./dropdowns/DropdownSlice";
 import { fetchSiteParticipants } from "./participants/ParticipantSlice";
+import { fetchSiteDisclosure } from "./disclosure/DisclosureSlice";
 import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
 import { useAuth } from "react-oidc-context";
+import { fetchNotationParticipants } from "./notations/NotationSlice";
 import { DropdownSearchInput } from "../../components/input-controls/InputControls";
 import Form from "../../components/form/Form";
 import SearchInput from "../../components/search/SearchInput";
@@ -133,6 +135,8 @@ const SiteDetails = () => {
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
 
+
+    
   const navigate = useNavigate();
   const onClickBackButton = () => {
     navigate(-1);
@@ -140,21 +144,26 @@ const SiteDetails = () => {
 
   const { id } = useParams();
 
-  useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.indexOf("bceid") !== -1) {
-      setUserType(UserType.External);
-    } else if (
-      loggedInUser?.profile.preferred_username?.indexOf("idir") !== -1
-    ) {
-      setUserType(UserType.Internal);
-    } else {
-      // not logged in
-      setUserType(UserType.External);
-    }
+   useEffect(()=>{
+    if(loggedInUser?.profile.preferred_username?.indexOf("bceid") !== -1)
+      {
+        setUserType(UserType.External);
+      }
+      else if (loggedInUser?.profile.preferred_username?.indexOf("idir") !== -1)
+      {
+        setUserType(UserType.Internal);
+      }
+      else
+      {
+        // not logged in 
+        setUserType(UserType.External);
+  
+      }
+      dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ""));
+  }, [])
+ 
 
-    dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ""));
-  }, []);
-
+ 
   const savedChanges = useSelector(trackedChanges);
   const mode = useSelector(siteDetailsMode);
   useEffect(() => {
@@ -162,10 +171,15 @@ const SiteDetails = () => {
   }, [mode]);
 
   useEffect(() => {
-    dispatch(fetchSitesDetails({ siteId: id ?? "" }));
     dispatch(fetchPeopleOrgsCd());
     dispatch(fetchParticipantRoleCd());
-    dispatch(fetchSiteParticipants(id ?? ""));
+    dispatch(fetchNotationClassCd());
+    dispatch(fetchNotationTypeCd());
+    dispatch(fetchNotationParticipantRoleCd());
+    dispatch(fetchSitesDetails({ siteId: id ?? "" }));
+    dispatch(fetchNotationParticipants(id ?? ''));
+    dispatch(fetchSiteParticipants(id ?? ''));
+    dispatch(fetchSiteDisclosure(id ?? ''));
   }, [id]);
 
   useEffect(() => {
@@ -214,7 +228,7 @@ const SiteDetails = () => {
             city: details.city,
             generalDescription: details.generalDescription,
             whenUpdated: new Date(details.whenUpdated),
-          })
+          }),
         );
       }
     } catch (error) {
@@ -318,11 +332,7 @@ const SiteDetails = () => {
               <>
                 <CustomLabel
                   labelType="c-b"
-                  label={`${
-                    viewMode === SiteDetailsMode.SRMode
-                      ? "SR Mode"
-                      : "Edit Mode"
-                  }`}
+                  label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
                 />
                 <SaveButton clickHandler={() => setSave(true)} />
                 <CancelButton clickHandler={handleCancelButton} />

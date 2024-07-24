@@ -1,19 +1,28 @@
-import React from "react";
+import React from 'react';
 import './Form.css';
 import 'rsuite/DateRangePicker/styles/index.css';
-import { FormFieldType, IFormField } from "../input-controls/IFormField";
-import { CheckBoxInput, DateInput, DateRangeInput, DropdownInput,DropdownSearchInput,GroupInput,TextAreaInput,TextInput, } from "../input-controls/InputControls";
- 
+import { FormFieldType, IFormField } from '../input-controls/IFormField';
+import {
+  CheckBoxInput,
+  DateInput,
+  DateRangeInput,
+  DropdownInput,
+  DropdownSearchInput,
+  GroupInput,
+  TextAreaInput,
+  TextInput,
+} from '../input-controls/InputControls';
 
 interface IFormRendererProps {
-    formRows: IFormField[][]; // Define the type of formRows according to your application
-    formData: { [key: string]: any | [Date, Date] };
-    editMode?: boolean;
-    srMode?: boolean;
-    handleInputChange:  (graphQLPropertyName: any, value: string | [Date, Date]) => void;
+  formRows: IFormField[][]; // Define the type of formRows according to your application
+  formData: { [key: string]: any | [Date, Date] };
+  editMode?: boolean;
+  srMode?: boolean;
+  handleInputChange: (
+    graphQLPropertyName: any,
+    value: string | [Date, Date],
+  ) => void;
 }
-
-
 
 const Form: React.FC<IFormRendererProps>  = ({ formRows, formData, editMode, srMode, handleInputChange }) => {
     return(<>
@@ -157,6 +166,7 @@ const Form: React.FC<IFormRendererProps>  = ({ formRows, formData, editMode, srM
                                     isEditing={editMode ?? true}
                                     isChecked ={formData[field.graphQLPropertyName ?? ''] || false}
                                     onChange={(value) => handleInputChange(field.graphQLPropertyName, value)}
+                                    srMode = {srMode ?? false}
                                 />
                             )}
                         </div>

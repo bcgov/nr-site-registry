@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from "react";
-import "./Search.css";
-import "@bcgov/design-tokens/css/variables.css";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useEffect } from 'react';
+import './Search.css';
+import '@bcgov/design-tokens/css/variables.css';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   fetchSites,
   resetSites,
   setFetchLoadingState,
-  updateSearchQuery,  
-  
+  updateSearchQuery,
   updatePageSizeSetting,
-  resultsCount
-} from "./dto/SiteSlice";
+  resultsCount,
+} from './dto/SiteSlice';
 
-import { AppDispatch } from "../../Store";
-import { selectAllSites,currentPageSelection } from "./dto/SiteSlice";
-import SearchResults from "./SearchResults";
+import { AppDispatch } from '../../Store';
+import { selectAllSites, currentPageSelection } from './dto/SiteSlice';
+import SearchResults from './SearchResults';
 import {
   ShoppingCartIcon,
   FolderPlusIcon,
@@ -41,16 +40,16 @@ const Search = () => {
   const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch<AppDispatch>();
   const sites = useSelector(selectAllSites);
-  const currSearchVal = useSelector((state:any) => state.sites);
-  const currentPageInState  = useSelector(currentPageSelection);
+  const currSearchVal = useSelector((state: any) => state.sites);
+  const currentPageInState = useSelector(currentPageSelection);
   const totalRecords = useSelector(resultsCount);
   const [noUserAction, setUserAction] = useState(true);
   const [displayColumn, SetDisplayColumns] = useState(false);
   const [displayFilters, SetDisplayFilters] = useState(false);
 
-   const columns = getSiteSearchResultsColumns();
-   const [columnsToDisplay, setColumnsToDisplay] = useState<TableColumn[]>([
-     ...columns,
+  const columns = getSiteSearchResultsColumns();
+  const [columnsToDisplay, setColumnsToDisplay] = useState<TableColumn[]>([
+    ...columns,
   ]);
   const [showMobileTableMenu, SetShowMobileTableMenu] = useState(false);
 
@@ -67,9 +66,11 @@ const Search = () => {
     }
   };
 
-  useEffect(()=>{
-    dispatch(fetchSites({searchParam: currSearchVal.searchQuery ?? searchText}));
-  },[currentPageInState]);
+  useEffect(() => {
+    dispatch(
+      fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
+    );
+  }, [currentPageInState]);
 
   const hideColumns = () => {
     SetDisplayColumns(false);
@@ -94,33 +95,32 @@ const Search = () => {
     left: `${left}px`,
   });
 
-  const pageChange = (pageRequested:number,resultsCount:number) => {
-    dispatch(updatePageSizeSetting({
-      "currentPage": pageRequested,
-      "pageSize": resultsCount
-    }));
-  }
+  const pageChange = (pageRequested: number, resultsCount: number) => {
+    dispatch(
+      updatePageSizeSetting({
+        currentPage: pageRequested,
+        pageSize: resultsCount,
+      }),
+    );
+  };
 
   useEffect(() => {
-    if(currSearchVal.searchQuery)
-    {
-        setUserAction(false);
-        setSearchText(currSearchVal.searchQuery);
-        dispatch(fetchSites({searchParam: currSearchVal.searchQuery}));
+    if (currSearchVal.searchQuery) {
+      setUserAction(false);
+      setSearchText(currSearchVal.searchQuery);
+      dispatch(fetchSites({ searchParam: currSearchVal.searchQuery }));
     }
   }, []);
 
-
-
-  // useEffect(() => {    
+  // useEffect(() => {
   //   fetchSites(searchText);
   // }, [dispatch,  searchText]);
 
   const handleClearSearch = () => {
-    setSearchText("");
+    setSearchText('');
     setUserAction(true);
     dispatch(resetSites(null));
-    dispatch(updateSearchQuery(""))
+    dispatch(updateSearchQuery(''));
   };
 
   const handleTextChange = (event: any) => {
@@ -129,7 +129,7 @@ const Search = () => {
     if (event.target.value.length >= 3) {
       dispatch(setFetchLoadingState(null));
       dispatch(fetchSites({ searchParam: event.target.value }));
-      dispatch(updateSearchQuery(event.target.value))
+      dispatch(updateSearchQuery(event.target.value));
     } else {
       dispatch(resetSites(null));
     }
@@ -138,10 +138,10 @@ const Search = () => {
   const customStyle: React.CSSProperties = {
     left:
       document
-        .getElementsByClassName("form-control textSearch")[0]
+        .getElementsByClassName('form-control textSearch')[0]
         ?.getBoundingClientRect().x +
       2 +
-      "px",
+     'px',
     position: "absolute",
     color: "grey",
     margin: "4px",
@@ -196,8 +196,8 @@ const Search = () => {
   const [showAddToFolio,SetShowAddToFolio] = useState(false);
 
   return (
-    <PageContainer role="Search" >
-<div className="row search-container">
+    <PageContainer role="Search">
+      <div className="row search-container">
         <h1 className="search-text-label">Search Site Registry</h1>
         <div className="">
           <div className="d-flex align-items-center">
@@ -270,7 +270,7 @@ const Search = () => {
               <div className="table-actions hide-custom">
                 <div
                   className={`table-actions-items ${
-                    displayColumn ? "active" : ""
+                    displayColumn ? 'active' : ''
                   } `}
                   onClick={() => {
                     SetDisplayColumns(!displayColumn);
@@ -282,7 +282,7 @@ const Search = () => {
                 </div>
                 <div
                   className={`table-actions-items ${
-                    displayFilters ? "active" : ""
+                    displayFilters ? 'active' : ''
                   }`}
                   onClick={() => {
                     SetDisplayFilters(!displayFilters);
@@ -306,7 +306,7 @@ const Search = () => {
                 <BarsIcon className="bars-button-table-options" />
                 <div
                   className={`${
-                    showMobileTableMenu ? "mobileTableColumnOptions" : "d-none"
+                    showMobileTableMenu ? 'mobileTableColumnOptions' : 'd-none'
                   }`}
                 >
                   <div>
@@ -322,7 +322,7 @@ const Search = () => {
                     </div>
                     <div
                       className={`table-actions-items ${
-                        displayFilters ? "active" : ""
+                        displayFilters ? 'active' : ''
                       }`}
                       onClick={() => {
                         SetDisplayFilters(!displayFilters);
@@ -341,7 +341,7 @@ const Search = () => {
             )}
             {displayColumn ? (
               <div>
-                {" "}
+                {' '}
                 <Column
                   toggleColumnSelectionForDisplay={
                     toggleColumnSelectionForDisplay
@@ -384,9 +384,9 @@ const Search = () => {
         </div>
       )}
     </PageContainer>
-    
+
     // <div className="siteSearchContainer" role="search">
-      
+
     // </div>
   );
 };

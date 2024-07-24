@@ -1,43 +1,43 @@
-import { useEffect, useRef, useState } from "react";
-import Dropdown from "react-bootstrap/Dropdown";
-import "./LanguageSwitcher.css";
-import { DropdownIcon, TickIcon } from "../common/icon";
+import { useEffect, useRef, useState } from 'react';
+import Dropdown from 'react-bootstrap/Dropdown';
+import './LanguageSwitcher.css';
+import { DropdownIcon, TickIcon } from '../common/icon';
 
 const LanguageSwitcher = () => {
   // Define available languages
   const LANGUAGE = [
     {
-      key: "ar",
-      value: "العربية (Arabic)",
+      key: 'ar',
+      value: 'العربية (Arabic)',
     },
     {
-      key: "zh-CN",
-      value: "简体字 (Chinese - Simplified)",
+      key: 'zh-CN',
+      value: '简体字 (Chinese - Simplified)',
     },
     {
-      key: "en",
-      value: "English",
+      key: 'en',
+      value: 'English',
     },
     {
-      key: "es",
-      value: "Español (Spanish)",
+      key: 'es',
+      value: 'Español (Spanish)',
     },
     {
-      key: "fr",
-      value: "Français (French)",
+      key: 'fr',
+      value: 'Français (French)',
     },
     {
-      key: "it",
-      value: "Italiano (Italian)",
+      key: 'it',
+      value: 'Italiano (Italian)',
     },
     {
-      key: "ru",
-      value: "Pусский (Russian)",
+      key: 'ru',
+      value: 'Pусский (Russian)',
     },
   ];
 
   // Initialize current language state with English as default
-  const [currentLanguage, setCurrentLanguage] = useState("en");
+  const [currentLanguage, setCurrentLanguage] = useState('en');
   const [isOpen, setIsOpen] = useState(false);
   const divRef = useRef<HTMLDivElement>(null);
 
@@ -46,30 +46,27 @@ const LanguageSwitcher = () => {
     setCurrentLanguage(lng);
   };
 
-  const toggleBtn = (event : any) => {
+  const toggleBtn = (event: any) => {
     // event.preventDefault();
     setIsOpen(!isOpen);
-  }
+  };
 
-   
   // Function to handle clicks outside the div element
   const handleClickOutside = (event: MouseEvent) => {
-      if(divRef.current != null)
-      {
-          // Check if the clicked target is outside the div element
-          if (divRef.current && !divRef.current.contains(event.target as Node)) {
-                setIsOpen(false); // Close the div
-          }
+    if (divRef.current != null) {
+      // Check if the clicked target is outside the div element
+      if (divRef.current && !divRef.current.contains(event.target as Node)) {
+        setIsOpen(false); // Close the div
       }
-    
-};
+    }
+  };
 
   // Add and remove event listener for clicks on the document
   useEffect(() => {
-      document.addEventListener('click', handleClickOutside);
-      return () => {
-          document.removeEventListener('click', handleClickOutside);
-      };
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
   }, []);
 
   return (
@@ -77,16 +74,20 @@ const LanguageSwitcher = () => {
       {/* Dropdown component for language selection */}
       <div id="language-selector" aria-label="Language Selector" ref={divRef}>
         {/* Dropdown toggle button */}
-        <div id="language-dropdown" className="custom-toggle"
-         aria-label="Language Menu" onClick={toggleBtn} >
+        <div
+          id="language-dropdown"
+          className="custom-toggle"
+          aria-label="Language Menu"
+          onClick={toggleBtn}
+        >
           {/* Display current selected language */}
-          {currentLanguage.toUpperCase() }
-          <DropdownIcon className="pb-1 ps-1"/>
+          {currentLanguage.toUpperCase()}
+          <DropdownIcon className="pb-1 ps-1" />
         </div>
-        
       </div>
-        {/* Dropdown menu */}
-        { isOpen && <div
+      {/* Dropdown menu */}
+      {isOpen && (
+        <div
           id="menu"
           className="custom-menu mt-4"
           role="menu"
@@ -102,7 +103,9 @@ const LanguageSwitcher = () => {
               aria-disabled="true"
               tabIndex={-1} // Prevent tab focus on disabled items
             >
-              <div className="custom-item-label pb-2">Please select a language:</div>
+              <div className="custom-item-label pb-2">
+                Please select a language:
+              </div>
             </div>
           </div>
 
@@ -111,11 +114,14 @@ const LanguageSwitcher = () => {
             LANGUAGE.map((lang) => (
               <div
                 id="menu-item"
-                onClick={() => {changeLanguage(lang.key); setIsOpen(!isOpen)}}
+                onClick={() => {
+                  changeLanguage(lang.key);
+                  setIsOpen(!isOpen);
+                }}
                 className="custom-item d-flex w-100 align-items-center"
                 role="menuitem"
                 aria-label={lang.value}
-                aria-current={currentLanguage === lang.key ? "true" : undefined}
+                aria-current={currentLanguage === lang.key ? 'true' : undefined}
                 tabIndex={0} // Allow keyboard focus
                 key={lang.key}
               >
@@ -129,8 +135,7 @@ const LanguageSwitcher = () => {
               </div>
             ))}
         </div>
-        }
-     
+      )}
     </>
   );
 };

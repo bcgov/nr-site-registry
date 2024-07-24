@@ -8,13 +8,23 @@ describe('LandHistoryService', () => {
   let landHistoryService: LandHistoryService;
   let landHistoryRepository: Repository<LandHistories>;
 
+  const whereMock = jest.fn().mockReturnThis();
+
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         LandHistoryService,
         {
           provide: getRepositoryToken(LandHistories),
-          useClass: Repository,
+          useValue: {
+            createQueryBuilder: jest.fn(() => ({
+              innerJoinAndSelect: jest.fn().mockReturnThis(),
+              where: whereMock,
+              orderBy: jest.fn().mockReturnThis(),
+              getMany: jest.fn().mockReturnThis(),
+              andWhere: jest.fn().mockReturnThis(),
+            })),
+          },
         },
       ],
     }).compile();
@@ -33,28 +43,14 @@ describe('LandHistoryService', () => {
     expect(landHistoryService).toBeDefined();
   });
 
-  //   describe('LandHistoryService', () => {
-  //     it('should return something', async () => {
-  //       //   landHistoryService.getLandHistoriesForSite;
-  //       const siteId = 'site123';
-  //       const mockLandHistories: any[] = [
-  //         {
-  //           siteId: '1',
-  //           lutCode: 'land-use-code',
-  //           note: 'mock note',
-  //           landUse: {
-  //             code: 'land-use-code',
-  //             description: 'CONSTRUCTION DEMOLITION MATERIAL LANDFILLING',
-  //           },
-  //         },
-  //       ];
-  //       const result = await landHistoryService.getLandHistoriesForSite(
-  //         siteId,
-  //         '',
-  //         'ASC',
-  //       );
-  //       console.log('FFFFF', result);
-  //       expect(1 + 1).toBe(2);
-  //     });
-  //   });
+  describe('getLandHistoriesForSite', () => {
+    it('should call LandHistories repository with correct data', async () => {
+      const siteId = 'site123';
+      await landHistoryService.getLandHistoriesForSite(siteId, '', 'ASC');
+
+      expect(whereMock).toHaveBeenCalledWith('site_id = :siteId', {
+        siteId,
+      });
+    });
+  });
 });

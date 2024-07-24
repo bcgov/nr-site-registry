@@ -48,6 +48,7 @@ export class LandHistoryResolver {
         `Land uses data not found for site id: ${siteId}`,
         404,
         false,
+        null,
       );
     }
   }

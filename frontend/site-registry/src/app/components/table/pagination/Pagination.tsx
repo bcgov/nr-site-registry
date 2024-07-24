@@ -1,6 +1,6 @@
-import React, { ReactNode } from "react";
-import "./Pagination.css";
-import { AngleLeft, AngleRight } from "../../common/icon";
+import React, { ReactNode } from 'react';
+import './Pagination.css';
+import { AngleLeft, AngleRight } from '../../common/icon';
 
 interface PaginationProps {
   selectPage?: (pageNumber: number) => void;
@@ -9,8 +9,6 @@ interface PaginationProps {
   totalResults?: number;
   changeResultsPerPage?: (resultsCount: number) => void;
 }
-
-
 
 const Pagination: React.FC<PaginationProps> = ({
   selectPage,
@@ -31,24 +29,26 @@ const Pagination: React.FC<PaginationProps> = ({
   function getCurrentBreakpoint() {
     const width = window.innerWidth;
     if (width < breakpoints.small) {
-      return "small";
+      return 'small';
     } else if (width < breakpoints.medium) {
-      return "medium";
+      return 'medium';
     } else if (width < breakpoints.large) {
-      return "large";
+      return 'large';
     } else {
-      return "extraLarge";
+      return 'extraLarge';
     }
   }
 
   // Pages To Display
   let pagesToDisplay = 4;
 
-  if (getCurrentBreakpoint() === "small") {
+  if (getCurrentBreakpoint() === 'small') {
     pagesToDisplay = 2;
   }
 
-  const totalPagesRequired = Math.ceil((totalResults ?? 0) / (resultsPerPage ?? 1));
+  const totalPagesRequired = Math.ceil(
+    (totalResults ?? 0) / (resultsPerPage ?? 1),
+  );
 
   // More Pages Required
   const morePagesToDisplay = totalPagesRequired > pagesToDisplay;
@@ -72,7 +72,7 @@ const Pagination: React.FC<PaginationProps> = ({
       <div
         onClick={() => selectPage?.(pageNumber)}
         className={`pagination-page ${
-          currentPage === pageNumber ? "pagination-page-active" : ""
+          currentPage === pageNumber ? 'pagination-page-active' : ''
         }`}
       >
         {pageNumber}
@@ -177,7 +177,7 @@ const Pagination: React.FC<PaginationProps> = ({
       pages.push(
         <div key={i} className="pagination-section">
           {page(i)}
-        </div>
+        </div>,
       );
     }
 

@@ -1,19 +1,16 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { RequestStatus } from "../../helpers/requests/status";
-
+import { createSlice } from '@reduxjs/toolkit';
+import { RequestStatus } from '../../helpers/requests/status';
 
 const initialState = {
-  error: "",
+  error: '',
   fetchStatus: RequestStatus.idle,
-  lookUpValues: {   
-  },
+  lookUpValues: {},
 };
 
 const commonDataSlice = createSlice({
-  name: "common",
+  name: 'common',
   initialState,
-  reducers: {} 
+  reducers: {},
 });
-
 
 export default commonDataSlice.reducer;

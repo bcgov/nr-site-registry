@@ -55,21 +55,71 @@ import { ParticipantService } from './services/participant/participant.service';
 import { GenericResponseProvider } from './dto/response/genericResponseProvider';
 import { DropdownResolver } from './resolvers/dropdown/dropdown.resolver';
 import { DropdownService } from './services/dropdown/dropdown.service';
+import { DisclosureService } from './services/disclosure/disclosure.service';
+import { DisclosureResolver } from './resolvers/disclosure/disclosure.resolver';
 import { CartResolver } from './resolvers/cart/cart.resolver';
 import { CartService } from './services/cart/cart.service';
 import { Cart } from './entities/cart.entity';
+import { NotationResolver } from './resolvers/notation/notation.resolver';
+import { NotationService } from './services/notation/notation.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
  */
 @Module({
-  imports: [TypeOrmModule.forFeature([Sites, Events, LandHistories, Mailout, SiteAssocs, SiteDocs, SitePartics, SiteProfiles,
-    SiteSubdivisions, BceRegionCd, ClassificationCd, SiteRiskCd, SiteStatusCd, EventTypeCd,
-    EventClassCd, SiteStatusCd, Events, ConditionsText, EventPartics, EventTypeCd, LandUseCd, LandHistories, SiteProfileLandUses,
-    ProfileAnswers, ProfileSubmissions, SiteProfileLandUses, SiteProfileOwners, ProfileQuestions, ProfileCategories, SubmissionCd,
-    SiteDocPartics, PeopleOrgs, SiteParticRoles, ParticRoleCd, EventParticRoleCd, CityRegions, SiteContaminationClassXref,
-    ContaminationClassCd, SiteCrownLandStatusCd, SisAddresses, SiteStaffs, DocParticRoleCd, LtoDownload, LtoPrevDownload,
-    PlanTable, SiteCrownLandContaminated, RecentViews, Snapshots, Cart ])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Sites,
+      Events,
+      LandHistories,
+      Mailout,
+      SiteAssocs,
+      SiteDocs,
+      SitePartics,
+      SiteProfiles,
+      SiteSubdivisions,
+      BceRegionCd,
+      ClassificationCd,
+      SiteRiskCd,
+      SiteStatusCd,
+      EventTypeCd,
+      EventClassCd,
+      SiteStatusCd,
+      Events,
+      ConditionsText,
+      EventPartics,
+      EventTypeCd,
+      LandUseCd,
+      LandHistories,
+      SiteProfileLandUses,
+      ProfileAnswers,
+      ProfileSubmissions,
+      SiteProfileLandUses,
+      SiteProfileOwners,
+      ProfileQuestions,
+      ProfileCategories,
+      SubmissionCd,
+      SiteDocPartics,
+      PeopleOrgs,
+      SiteParticRoles,
+      ParticRoleCd,
+      EventParticRoleCd,
+      CityRegions,
+      SiteContaminationClassXref,
+      ContaminationClassCd,
+      SiteCrownLandStatusCd,
+      SisAddresses,
+      SiteStaffs,
+      DocParticRoleCd,
+      LtoDownload,
+      LtoPrevDownload,
+      PlanTable,
+      SiteCrownLandContaminated,
+      RecentViews,
+      Snapshots,
+      Cart,
+    ]),
+  ],
   providers: [
     SiteResolver,
     SiteService,
@@ -81,10 +131,14 @@ import { Cart } from './entities/cart.entity';
     ParticipantService,
     DropdownResolver,
     DropdownService,
+    DisclosureResolver,
+    DisclosureService,
     GenericResponseProvider,
     CartResolver,
-    CartService
+    CartService,
+    NotationResolver,
+    NotationService
   ],
   controllers: [SiteController],
 })
-export class SiteModule { }
+export class SiteModule {}

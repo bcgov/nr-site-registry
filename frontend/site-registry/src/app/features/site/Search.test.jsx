@@ -17,7 +17,7 @@ describe('Search Component', () => {
       fetchStatus: RequestStatus.idle,
       deleteStatus: RequestStatus.idle,
       addedStatus: RequestStatus.idle,
-      updateStatus: RequestStatus.idle
+      updateStatus: RequestStatus.idle,
     });
   });
 
@@ -25,11 +25,9 @@ describe('Search Component', () => {
     const { getByPlaceholderText } = render(
       <Provider store={store}>
         <Search />
-      </Provider>
+      </Provider>,
     );
-    const searchInput = screen.getByPlaceholderText('Search'); 
+    const searchInput = screen.getByPlaceholderText('Search');
     expect(searchInput).toBeInTheDocument();
   });
-
-  
 });

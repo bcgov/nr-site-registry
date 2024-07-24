@@ -1,4 +1,4 @@
 export enum SRVisibility {
-    ShowSR = 'show',
-    HideSR = 'hide'
+  ShowSR = 'show',
+  HideSR = 'hide',
 }

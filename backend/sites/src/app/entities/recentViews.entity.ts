@@ -15,7 +15,7 @@ import { Sites } from './sites.entity';
 @ObjectType()
 @Entity('recent_views')
 @Index('idx_user_id', ['userId'])
-@Index('idx_user_id_site_id', ['userId', 'siteId'], {unique: true})
+@Index('idx_user_id_site_id', ['userId', 'siteId'], { unique: true })
 export class RecentViews {
   @PrimaryGeneratedColumn()
   id: number;

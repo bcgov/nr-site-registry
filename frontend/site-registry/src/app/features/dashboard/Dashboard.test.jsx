@@ -9,21 +9,29 @@ import thunk from 'redux-thunk';
 const mockStore = configureStore([thunk]);
 
 describe('Dashboard Component', () => {
-    let store;
+  let store;
 
-    beforeEach(() => {
-        store = mockStore({
-        dashboard: {},
-        });
+  beforeEach(() => {
+    store = mockStore({
+      dashboard: {},
     });
+  });
 
   test('renders Recently Viewed table', () => {
-    const { getByText } = render(<Provider store={store}><Dashboard /></Provider>);
+    const { getByText } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
     expect(getByText('Recently Viewed')).toBeInTheDocument();
   });
 
   test('renders Recently Modified Folios table', () => {
-    const { getByText } = render(<Provider store={store}><Dashboard /></Provider>);
+    const { getByText } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
     expect(getByText('Recently Modified Folios')).toBeInTheDocument();
   });
 });

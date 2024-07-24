@@ -1,14 +1,16 @@
-import { useSelector } from "react-redux";
-import { DropdownItem } from "../../../components/action/IActions";
-import { FormFieldType } from "../../../components/input-controls/IFormField";
-import { ColumnSize, TableColumn } from "../../../components/table/TableColumn";
-import { SRVisibility } from "../../../helpers/requests/srVisibility";
-import { participantNameDrpdown, participantRoleDrpdown } from "../dropdowns/DropdownSlice";
+import { useSelector } from 'react-redux';
+import { DropdownItem } from '../../../components/action/IActions';
+import { FormFieldType } from '../../../components/input-controls/IFormField';
+import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
+import { SRVisibility } from '../../../helpers/requests/srVisibility';
+import {
+  participantNameDrpdown,
+  participantRoleDrpdown,
+} from '../dropdowns/DropdownSlice';
 
 export const GetConfig = () => {
     const particNameDropdwn = useSelector(participantNameDrpdown);
     const particRoleDropdwn = useSelector(participantRoleDrpdown);
-
     const participantColumnInternal: TableColumn[] = [
         {
             id: 1,
@@ -23,7 +25,7 @@ export const GetConfig = () => {
                 graphQLPropertyName:'psnorgId',
                 placeholder:'Please enter participant name.',
                 value:"",
-                options: particNameDropdwn.data,
+                options: particNameDropdwn.data.flatMap((item: any) => item.dropdownDto),
                 colSize: "col-lg-6 col-md-6 col-sm-12",
                 customLabelCss:'custom-participant-lbl-text',
                 customInputTextCss:'custom-participant-input-text',
@@ -145,7 +147,7 @@ export const GetConfig = () => {
                 graphQLPropertyName:'psnorgId',
                 placeholder:'Please enter participant name.',
                 value:'',
-                options: particNameDropdwn.data,
+                options: particNameDropdwn.data.flatMap((item: any) => item.dropdownDto),
                 colSize: "col-lg-6 col-md-6 col-sm-12",
                 customLabelCss:'custom-participant-lbl-text',
                 customInputTextCss:'custom-participant-input-text',

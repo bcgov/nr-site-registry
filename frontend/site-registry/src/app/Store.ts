@@ -1,32 +1,40 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore } from '@reduxjs/toolkit';
 import {
   loadFromLocalStorage,
   saveToLocalStorage,
-} from "./helpers/sessionManager";
-import commonDataReducer from "./features/common/CommonDataSlice";
-import siteReducer from "./features/site/dto/SiteSlice";
+} from './helpers/sessionManager';
+import commonDataReducer from './features/common/CommonDataSlice';
+import siteReducer from './features/site/dto/SiteSlice';
 import thunk from 'redux-thunk';
 import dashboardReducer from "./features/dashboard/DashboardSlice";
 import siteParticipantReducer from "./features/details/participants/ParticipantSlice";
+import notationParticipantReducer from "./features/details/notations/NotationSlice";
 import DropdownReducer from "./features/details/dropdowns/DropdownSlice";
+import siteDisclosureReducer from "./features/details/disclosure/DisclosureSlice";
 import cartReducer from "./features/cart/CartSlice";
 
 
 const persistedStore: any = loadFromLocalStorage();
 
 export const store = configureStore({
-  reducer: {  
+  reducer: {
     commonData: commonDataReducer,
-    sites:siteReducer,
+    sites: siteReducer,
     dashboard: dashboardReducer,
     siteParticipant: siteParticipantReducer,
-    dropdown: DropdownReducer,  
-    cart: cartReducer
+    notationParticipant: notationParticipantReducer,
+    siteDisclosure: siteDisclosureReducer,
+    dropdown: DropdownReducer,
+    cart: cartReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 store.subscribe(() => {
-// TODO
+  // TODO
 });
 
 export type AppDispatch = typeof store.dispatch;

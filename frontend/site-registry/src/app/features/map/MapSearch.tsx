@@ -1,9 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 const MapSearch = () => {
-  return (
-    <h1>Maps</h1>
-  )
-}
+  return <h1>Maps</h1>;
+};
 
-export default MapSearch
+export default MapSearch;

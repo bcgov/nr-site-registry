@@ -1,13 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SiteResolver } from './site.resolver';
 import { SiteService } from '../../services/site/site.service';
-import { FetchSiteResponse, SearchSiteResponse } from '../../dto/response/genericResponse';
+import {
+  FetchSiteResponse,
+  SearchSiteResponse,
+} from '../../dto/response/genericResponse';
 import { sampleSites } from '../../mockData/site.mockData';
 
 describe('SiteResolver', () => {
   let siteResolver: SiteResolver;
   let siteService: SiteService;
-
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -59,7 +61,29 @@ describe('SiteResolver', () => {
       const page = 1;
       const pageSize = 1;
       siteResolver.searchSites(searchParam, page, pageSize);
-      expect(siteService.searchSites).toHaveBeenCalledWith(searchParam, page, pageSize, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+      expect(siteService.searchSites).toHaveBeenCalledWith(
+        searchParam,
+        page,
+        pageSize,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
     });
 
     it('site search matches a search parameter and no filter conditions', async () => {
@@ -73,11 +97,39 @@ describe('SiteResolver', () => {
       expectedFilteredSites.pageSize = 1;
       expectedFilteredSites.count = 1;
 
-      (siteService.searchSites as jest.Mock).mockResolvedValue(expectedFilteredSites);
+      (siteService.searchSites as jest.Mock).mockResolvedValue(
+        expectedFilteredSites,
+      );
 
-      const result: SearchSiteResponse = await siteResolver.searchSites(searchParam, page, pageSize);
+      const result: SearchSiteResponse = await siteResolver.searchSites(
+        searchParam,
+        page,
+        pageSize,
+      );
 
-      expect(siteService.searchSites).toHaveBeenCalledWith(searchParam, page, pageSize, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+      expect(siteService.searchSites).toHaveBeenCalledWith(
+        searchParam,
+        page,
+        pageSize,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
       expect(result).toEqual(expectedFilteredSites);
     });
 
@@ -109,11 +161,39 @@ describe('SiteResolver', () => {
       expectedFilteredSites.page = 1;
       expectedFilteredSites.pageSize = 1;
       expectedFilteredSites.count = 0;
-      (siteService.searchSites as jest.Mock).mockResolvedValue(expectedFilteredSites);
+      (siteService.searchSites as jest.Mock).mockResolvedValue(
+        expectedFilteredSites,
+      );
 
-      const result: SearchSiteResponse = await siteResolver.searchSites(searchParam, page, pageSize);
+      const result: SearchSiteResponse = await siteResolver.searchSites(
+        searchParam,
+        page,
+        pageSize,
+      );
 
-      expect(siteService.searchSites).toHaveBeenCalledWith(searchParam, page, pageSize, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
+      expect(siteService.searchSites).toHaveBeenCalledWith(
+        searchParam,
+        page,
+        pageSize,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
       expect(result).toEqual(expectedFilteredSites);
     });
   });
@@ -129,16 +209,20 @@ describe('SiteResolver', () => {
       const expectedResult = [sampleSites[0]];
       const siteId = '123';
 
-      (siteService.findSiteBySiteId as jest.Mock).mockResolvedValue(expectedResult);
+      (siteService.findSiteBySiteId as jest.Mock).mockResolvedValue(
+        expectedResult,
+      );
       const result = await siteResolver.findSiteBySiteId(siteId);
       expect(result).toEqual(expectedResult);
     });
 
     it('has no matches with the site Id parameter', async () => {
-      const expectedResult = undefined
+      const expectedResult = undefined;
       const siteId = '111';
 
-      (siteService.findSiteBySiteId as jest.Mock).mockResolvedValue(expectedResult);
+      (siteService.findSiteBySiteId as jest.Mock).mockResolvedValue(
+        expectedResult,
+      );
       const result = await siteResolver.findSiteBySiteId(siteId);
       expect(result).toEqual(expectedResult);
     });

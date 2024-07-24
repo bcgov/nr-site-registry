@@ -1,9 +1,9 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { LandHistories } from 'src/app/entities/landHistories.entity';
-import { LandHistoryResponse } from 'src/app/dto/landHistory.dto';
-import { LandHistoryService } from 'src/app/services/landHistory/landHistory.service';
+import { LandHistories } from '../../entities/landHistories.entity';
+import { LandHistoryResponse } from '../../dto/landHistory.dto';
+import { LandHistoryService } from '../../services/landHistory/landHistory.service';
 
 type SortDirection = 'ASC' | 'DESC';
 

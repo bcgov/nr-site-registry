@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets } from 'typeorm';
-import { LandHistories } from 'src/app/entities/landHistories.entity';
+import { LandHistories } from '../../entities/landHistories.entity';
 
 export class LandHistoryService {
   constructor(

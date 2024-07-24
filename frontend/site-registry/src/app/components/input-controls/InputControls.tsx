@@ -682,6 +682,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
   textAreaRow,
   textAreaColoum,
 }) => {
+  
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
   };
@@ -690,6 +691,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
   const ContainerElement = tableMode ? 'td' : 'div';
   const cols = textAreaColoum ?? undefined;
   const rows = textAreaRow ?? undefined;
+  
   return (
     <ContainerElement className={tableMode ? 'table-border-light' : 'mb-3'}>
       {!tableMode && (

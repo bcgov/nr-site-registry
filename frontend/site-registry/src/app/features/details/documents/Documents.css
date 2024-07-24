@@ -70,3 +70,13 @@
   .cursor-pointer{
     cursor: pointer;
   }
+
+  .custom-second-child {
+    margin-top: 0;
+  }
+
+  @media (max-width: 576px) { 
+    .custom-second-child {
+      margin-top: 60px;
+    }
+   }

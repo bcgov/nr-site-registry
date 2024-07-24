@@ -138,7 +138,7 @@ const Documents = () => {
         alert(`${value}, ${id}`);
     };
 
-    const handleOnUploadDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleOnUploadDocument = (event: any) => {
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0] ?? null;
             if (file && file.type === 'application/pdf') {
@@ -151,15 +151,14 @@ const Documents = () => {
                     siteId:id,
                     psnorgId:'',
                     submissionDate: new Date(),
-                    documentDate: null,
-                    title:'',
+                    documentDate: file.lastModified,
+                    title: file.name.split('.pdf')[0].trim(),
                     displayName:'',
                     sr: false,
                 };
         
                 const addDoc = [newDocument, ...formData];
                 setFormData(addDoc);
-                
                 // dispatch(updateSiteDocument(addDoc));
                 const tracker = new ChangeTracker(
                     IChangeType.Added,
@@ -167,12 +166,12 @@ const Documents = () => {
                 );
                 dispatch(trackChanges(tracker.toPlainObject()));
             } 
-            else 
-            {
-                alert('Please select a valid PDF file.');
-            }
-
         }
+        else 
+        {
+            alert('Please select a valid PDF file.');
+        }
+
     };
 
     const handleViewOnline = () => {
@@ -182,29 +181,40 @@ const Documents = () => {
     const handleDownload = () => {
         alert('Download click');
     };
-    const handleFileReplace = (event: any, document: any) => {
+    const handleFileReplace = (event: any, doc: any) => {
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0] ?? null;
             if (file && file.type === 'application/pdf') {
                 // You can perform additional actions here with the selected file
                 // For example, upload it to a server or process it further
-                // dispatch(updateSiteDocument(addDoc));
+                const updatedDoc = formData.map((document) => {
+                    if (document.id === doc.id) {
+                      const replacedDoc = {
+                        ...doc,
+                        submissionDate: new Date(),
+                        documentDate: file.lastModified,
+                        title: file.name.split('.pdf')[0].trim(),
+                      }
+                      return { ...document, ...replacedDoc};
+                    }
+                    return document;
+                  });
+                  setFormData(updatedDoc);
+                //   dispatch(updateSiteDocument(updatedDoc));
                 const tracker = new ChangeTracker(
                     IChangeType.Added,
                     'Replace Site Document'
                 );
                 dispatch(trackChanges(tracker.toPlainObject()));
             } 
-            else 
-            {
-                alert('Please select a valid PDF file.');
-            }
 
         }
-
+        else 
+        {
+            alert('Please select a valid PDF file.');
+        }
     };
     const handleFileDelete = (document: any) => {
-        alert(document.id);
         const nonDeletedDoc = formData.filter(doc => {
             if(doc.id !== document.id)
             {
@@ -306,11 +316,11 @@ const Documents = () => {
                                 </div>
                             }
                             secondChild = {
-                                <div className="w-100">
-                                     <div className="d-flex py-2 mb-3 gap-2  flex-wrap flex-column flex-sm-row">
+                                <div className="w-100 custom-second-child" key={index}>
+                                     <div className="d-flex py-2 mb-3 gap-2 flex-wrap flex-column flex-sm-row" key={index}>
                                         <button
                                             id="view-online"
-                                            className={`d-flex align-items-center ${viewMode === SiteDetailsMode.SRMode ? 'document-btn-disable' : 'btn-upload-document'} `}
+                                            className={`d-flex align-items-center justify-content-center ${viewMode === SiteDetailsMode.SRMode ? 'document-btn-disable' : 'btn-upload-document'} `}
                                             disabled={viewMode === SiteDetailsMode.SRMode}
                                             onClick={handleViewOnline}
                                             aria-label="View Online">
@@ -321,7 +331,7 @@ const Documents = () => {
                                         </button>
                                         <button
                                             id="download-pdf"
-                                            className={`d-flex align-items-center  ${viewMode === SiteDetailsMode.SRMode ? 'document-btn-disable': 'document-btn '} `}
+                                            className={`d-flex align-items-center justify-content-center  ${viewMode === SiteDetailsMode.SRMode ? 'document-btn-disable': 'document-btn '} `}
                                             disabled={viewMode === SiteDetailsMode.SRMode}
                                             type="button"
                                             onClick={handleDownload}
@@ -334,19 +344,19 @@ const Documents = () => {
                                             <>
                                                 <button
                                                     id="download-pdf"
-                                                    className=" d-flex align-items-center document-btn "
+                                                    className=" d-flex align-items-center justify-content-center document-btn "
                                                     type="button"
                                                     aria-label={'File replace'}
                                                     >
-                                                    <label htmlFor="replace-file" className="d-flex align-items-center gap-2">
+                                                    <label htmlFor={`replace-file_${index}`} className="d-flex align-items-center gap-2">
                                                         <ReplaceIcon className="btn-document-icon cursor-pointer" />
                                                         <span className="cursor-pointer">Replace File</span>
                                                     </label>
-                                                    <input type="file" id="replace-file" accept=".pdf" style={{ display: 'none' }}  onChange={(e) => handleFileReplace(e, document)} />
+                                                    <input type="file" id={`replace-file_${index}`} accept=".pdf" style={{ display: 'none' }}  onChange={(e) => handleFileReplace(e, document)} key={index}/>
                                                 </button>
                                                 <button
                                                     id="download-pdf"
-                                                    className=" d-flex align-items-center document-btn "
+                                                    className=" d-flex align-items-center justify-content-center document-btn "
                                                     type="button"
                                                     onClick={() => handleFileDelete(document)}
                                                     aria-label={'File delete'}

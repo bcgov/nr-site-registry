@@ -21,7 +21,7 @@ export class DocumentResolver {
     async getSiteDocumentsBySiteId( @Args('siteId', { type: () => String }) siteId: string,)
     {
         const response = await this.documentService.getSiteDocumentsBySiteId(siteId);
-        if(response.length > 0)
+        if(response && response.length > 0)
         {
             return this.genericResponseProvider.createResponse('Documents fetched successfully.', 200, true, response);
         }

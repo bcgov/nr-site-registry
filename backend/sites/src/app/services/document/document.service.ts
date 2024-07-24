@@ -17,37 +17,32 @@ export class DocumentService {
         try
         {
             const result = await this.siteDocsRepository.find({where : { siteId }})
-            if(result.length > 0)
+            if(result)
             {
                 const response = result.map( res => {
-                    const document = {
-                        id: res.id,
-                        siteId: res.siteId,
-                        title: res.title,
-                        submissionDate: res.submissionDate.toISOString(),
-                        documentDate: res.documentDate.toISOString(),
+                        const document = {
+                            id: res.id,
+                            siteId: res.siteId,
+                            title: res.title,
+                            submissionDate: res.submissionDate.toISOString(),
+                            documentDate: res.documentDate.toISOString(),
+                        }
+                    let obj = [{psnorgId: '', displayName: ''}];
+                    if(res.siteDocPartics.length > 0)
+                    {
+                        obj = res.siteDocPartics.map( sdp => ({
+                            psnorgId: sdp.psnorgId,
+                            displayName: sdp.psnorg.displayName,
+                        }));
                     }
-                let obj = [{psnorgId: '', displayName: ''}];
-                if(res.siteDocPartics.length > 0)
-                {
-                    obj = res.siteDocPartics.map( sdp => ({
-                        psnorgId: sdp.psnorgId,
-                        displayName: sdp.psnorg.displayName,
-                    }));
-                }
-
-                const doc = obj.map( item => ({...document, ...item}))
+    
+                    const doc = obj.map( item => ({...document, ...item}))
                     return doc;
                 }).flat();     
                 
                 const document = plainToInstance(DocumentDto, response);
                 return document;
             }
-            else
-            {
-                return [];
-            }
-       
         }
         catch (error)
         {

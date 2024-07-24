@@ -17,6 +17,8 @@ import { ChangeTracker, IChangeType } from "../../../components/common/IChangeTy
 import { DownloadPdfIcon, ReplaceIcon, TrashCanIcon, UploadFileIcon, ViewOnlyIcon } from "../../../components/common/icon";
 import './Documents.css';
 import { useParams } from "react-router-dom";
+import ModalDialog from "../../../components/modaldialog/ModalDialog";
+import { v4 } from "uuid";
 
 const Documents = () => {
     const {documentFirstChildFormRowsForExternal, documentFirstChildFormRows, documentFormRows} = GetDocumentsConfig();
@@ -30,6 +32,11 @@ const Documents = () => {
     const [srTimeStamp, setSRTimeStamp] = useState('Sent to SR on June 2nd, 2013');
     const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
     const [searchTerm, setSearchTerm] = useState('');
+    const [isDelete, setIsDelete] = useState(false);
+    const [isReplace, setIsReplace] = useState(false);
+    const [currentDocument, setCurrentDocument] = useState({});
+    const [currentFile, setCurrentFile] = useState({});
+    const [key, setKey] = useState(Date.now()); // Key for input type="file" element
     const loggedInUser = getUser();
     const { id } = useParams();
 
@@ -181,53 +188,82 @@ const Documents = () => {
     const handleDownload = () => {
         alert('Download click');
     };
-    const handleFileReplace = (event: any, doc: any) => {
-        if (event.target.files && event.target.files.length > 0) {
-            const file = event.target.files[0] ?? null;
-            if (file && file.type === 'application/pdf') {
-                // You can perform additional actions here with the selected file
-                // For example, upload it to a server or process it further
-                const updatedDoc = formData.map((document) => {
-                    if (document.id === doc.id) {
-                      const replacedDoc = {
-                        ...doc,
-                        submissionDate: new Date(),
-                        documentDate: file.lastModified,
-                        title: file.name.split('.pdf')[0].trim(),
-                      }
-                      return { ...document, ...replacedDoc};
-                    }
-                    return document;
-                  });
-                  setFormData(updatedDoc);
-                //   dispatch(updateSiteDocument(updatedDoc));
-                const tracker = new ChangeTracker(
-                    IChangeType.Added,
-                    'Replace Site Document'
-                );
-                dispatch(trackChanges(tracker.toPlainObject()));
-            } 
-
-        }
-        else 
+    const handleFileReplace = (event: any, doc: any, docIsReplace: boolean = false) => {
+        debugger;
+        if(docIsReplace)
         {
-            alert('Please select a valid PDF file.');
-        }
-    };
-    const handleFileDelete = (document: any) => {
-        const nonDeletedDoc = formData.filter(doc => {
-            if(doc.id !== document.id)
-            {
-                return doc;
+      
+            if (event.target.files && event.target.files.length > 0) {
+                const file = event.target.files[0] ?? null;
+                if (file && file.type === 'application/pdf') {
+                    // You can perform additional actions here with the selected file
+                    // For example, upload it to a server or process it further
+                    const updatedDoc = formData.map((document) => {
+                        if (document.id === doc.id) {
+                          const replacedDoc = {
+                            ...doc,
+                            submissionDate: new Date(),
+                            documentDate: file.lastModified,
+                            title: file.name.split('.pdf')[0].trim(),
+                          }
+                          return { ...document, ...replacedDoc};
+                        }
+                        return document;
+                      });
+                      setFormData(updatedDoc);
+                    //   dispatch(updateSiteDocument(updatedDoc));
+                    const tracker = new ChangeTracker(
+                        IChangeType.Added,
+                        'Replace Site Document'
+                    );
+                    dispatch(trackChanges(tracker.toPlainObject()));
+                    setCurrentDocument({});
+                    setCurrentFile({});
+                    setIsReplace(false);
+                } 
+    
             }
-        });
-        setFormData(nonDeletedDoc);
-        // dispatch(updateSiteDocument(nonDeletedDoc));
-        const tracker = new ChangeTracker(
-            IChangeType.Deleted,
-            'Document Delete',
-          );
-          dispatch(trackChanges(tracker.toPlainObject()));
+            else 
+            {
+                alert('Please select a valid PDF file.');
+            }
+        }
+        else
+        {
+            setCurrentFile(event);
+            setCurrentDocument(doc);
+            setIsReplace(true);
+            
+            // Reset input type="file" element by changing key prop
+            setKey(Date.now()); // Force input type="file" to reset
+        }
+        
+    };
+    const handleFileDelete = (document: any, docIsDelete: boolean = false) => {
+        if(docIsDelete)
+        {
+            const nonDeletedDoc = formData.filter(doc => {
+                if(doc.id !== document.id)
+                {
+                    return doc;
+                }
+            });
+            setFormData(nonDeletedDoc);
+            // dispatch(updateSiteDocument(nonDeletedDoc));
+            const tracker = new ChangeTracker(
+                IChangeType.Deleted,
+                'Document Delete',
+              );
+              dispatch(trackChanges(tracker.toPlainObject()));
+              setCurrentDocument({});
+              setIsDelete(false);
+        }
+        else
+        {
+            setCurrentDocument(document);
+            setIsDelete(true);
+        }
+  
     };
 
     const handleInputChange = (id: number, graphQLPropertyName: any, value: String | [Date, Date]) => {
@@ -352,7 +388,7 @@ const Documents = () => {
                                                         <ReplaceIcon className="btn-document-icon cursor-pointer" />
                                                         <span className="cursor-pointer">Replace File</span>
                                                     </label>
-                                                    <input type="file" id={`replace-file_${index}`} accept=".pdf" style={{ display: 'none' }}  onChange={(e) => handleFileReplace(e, document)} key={index}/>
+                                                    <input type="file" id={`replace-file_${index}`} accept=".pdf" style={{ display: 'none' }}  onChange={(e) => handleFileReplace(e, document)} key={key}/>
                                                 </button>
                                                 <button
                                                     id="download-pdf"
@@ -381,6 +417,29 @@ const Documents = () => {
                 ))
             }
         </div>
+        {
+           ( isDelete || isReplace ) &&
+            <ModalDialog 
+                key={v4()}
+                label={`Are you sure to ${isDelete ? 'delete' : 'replace' } document ?`}
+                closeHandler={(response) => { 
+                    if(response){
+                        if(isReplace)
+                        {
+                            handleFileReplace( currentFile ,currentDocument, response);
+                        }
+
+                        if(isDelete)
+                        {
+                            handleFileDelete(currentDocument, response);
+                        }
+                    }
+                    setCurrentDocument({});
+                    setCurrentFile({});
+                    setIsDelete(false);
+                    setIsReplace(false);
+                }}/>
+        }
      </div>
     )
 }

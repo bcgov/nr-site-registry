@@ -62,6 +62,8 @@ import { CartService } from './services/cart/cart.service';
 import { Cart } from './entities/cart.entity';
 import { LandHistoryResolver } from './resolvers/landHistory/landHistory.resolver';
 import { LandHistoryService } from './services/landHistory/landHistory.service';
+import { NotationResolver } from './resolvers/notation/notation.resolver';
+import { NotationService } from './services/notation/notation.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -138,6 +140,8 @@ import { LandHistoryService } from './services/landHistory/landHistory.service';
     CartService,
     LandHistoryResolver,
     LandHistoryService,
+    NotationResolver,
+    NotationService,
   ],
   controllers: [SiteController],
 })

@@ -35,12 +35,6 @@
   color: var(--typography-color-secondary);
 }
 
-.account-image {
-  border-radius: 100px;
-  height: 44px;
-  width: 44px;
-}
-
 .account-username span {
   color: var(--typography-color-primary);
   font: var(--typography-bold-body);

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { FormFieldType, IFormField } from './IFormField';
-import avatar from '../../images/avatar.png';
 import infoIcon from '../../images/info-icon.png';
 import { formatDate, formatDateRange } from '../../helpers/utility';
 import { DatePicker, DateRangePicker } from 'rsuite';
@@ -10,8 +9,7 @@ import { v4 } from 'uuid';
 import Dropdown from 'react-bootstrap/Dropdown';
 
 import SearchInput from '../search/SearchInput';
-import { table } from 'console';
-import { id } from 'date-fns/locale';
+import Avatar from '../avatar/Avatar';
 
 interface InputProps extends IFormField {
   children?: InputProps[];
@@ -241,7 +239,6 @@ export const DropdownInput: React.FC<InputProps> = ({
   // Replace any spaces in the label with underscores to create a valid id
   const drdownId = label.replace(/\s+/g, '_');
   const [selected, setSelected] = useState<boolean>(false);
-  const imgUrl = avatar;
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOption = event.target.value.trim();
@@ -254,9 +251,7 @@ export const DropdownInput: React.FC<InputProps> = ({
   };
   const isFirstOptionGrey = value === '';
   return (
-    <ContainerElement
-      className={tableMode ? 'table-border-light' : 'd-inline  mb-3'}
-    >
+    <ContainerElement className={tableMode ? 'table-border-light' : 'mb-3'}>
       {srMode && (
         <CheckBoxInput
           type={FormFieldType.Checkbox}
@@ -295,7 +290,6 @@ export const DropdownInput: React.FC<InputProps> = ({
           value={value.trim() ?? ''}
           onChange={handleSelectChange}
           aria-label={label}
-          // placeholder={placeholder}
         >
           <option value="" className="custom-disabled-option">
             {placeholder}
@@ -312,12 +306,18 @@ export const DropdownInput: React.FC<InputProps> = ({
         </select>
       ) : isImage ? (
         <div className="d-flex align-items-center gap-2">
-          <img
-            src={options?.find((opt) => opt.key === value)?.imageUrl ?? imgUrl}
-            alt="User image."
-            className="custom-form-image"
+          <Avatar
+            firstName={options
+              ?.find((opt) => opt.key === value)
+              ?.value.split(',')[0]
+              .trim()}
+            lastName={options
+              ?.find((opt) => opt.key === value)
+              ?.value.split(',')[1]
+              .trim()}
+            customImageCss="custom-form-image"
+            customTextCss="custom-form-image-txt"
             aria-hidden="true"
-            role="img"
             aria-label="User image"
           />
           <p
@@ -632,12 +632,15 @@ export const CheckBoxInput: React.FC<InputProps> = ({
   value,
   onChange,
   tableMode,
+  srMode,
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
   const inputTxtId = label.replace(/\s+/g, '_') + v4();
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.checked); // Toggle the checked state and pass it to the parent component
   };
+
+  const disableCheckBox = isEditing || srMode ? false : true;
 
   return (
     <ContainerElement
@@ -650,6 +653,7 @@ export const CheckBoxInput: React.FC<InputProps> = ({
           className={`form-check-input custom-checkbox ${
             customEditInputTextCss ?? 'custom-input-text'
           }`}
+          disabled={disableCheckBox}
           checked={isChecked}
           aria-label={label} // Accessibility
           onChange={handleCheckboxChange}
@@ -806,7 +810,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
       )}
 
       {isEditing ? (
-        <Dropdown>
+        <Dropdown className="custom-dropdown-search">
           <Dropdown.Toggle
             id={drdownId}
             className={`form-control d-flex align-items-center justify-content-between 

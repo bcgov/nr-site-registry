@@ -189,6 +189,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   onChange={(value) =>
                     handleInputChange(field.graphQLPropertyName, value)
                   }
+                  srMode={srMode ?? false}
                 />
               )}
             </div>

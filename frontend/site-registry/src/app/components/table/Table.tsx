@@ -21,6 +21,7 @@ interface TableProps {
   allowRowsSelect?: boolean;
   changeHandler: (eventRecord: any) => void;
   editMode: boolean;
+  srMode?: boolean;
   idColumnName: string;
   sortHandler?: (row: any, ascSort: boolean) => void;
   deleteHandler?: (eventRecord: any) => void;
@@ -40,6 +41,7 @@ const Table: FC<TableProps> = ({
   allowRowsSelect,
   changeHandler,
   editMode,
+  srMode,
   idColumnName,
   sortHandler,
   deleteHandler: deleteHandler,
@@ -51,7 +53,7 @@ const Table: FC<TableProps> = ({
     });
   let rowDeleteHandler =
     deleteHandler ??
-    ((row) => {
+    ((row: any) => {
       console.log('Handle Delete Event', row);
     });
 
@@ -73,6 +75,7 @@ const Table: FC<TableProps> = ({
             allowRowsSelect={allowRowsSelect ?? false}
             changeHandler={changeHandler}
             editMode={editMode}
+            srMode={srMode}
             idColumnName={idColumnName}
             rowDeleteHandler={rowDeleteHandler}
           />

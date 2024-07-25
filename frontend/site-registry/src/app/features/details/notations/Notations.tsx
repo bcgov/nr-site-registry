@@ -1,30 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import PanelWithUpDown from '../../../components/simple/PanelWithUpDown';
 import Form from '../../../components/form/Form';
-import {
-  notationColumnInternal,
-  notationFormRowsInternal,
-  notationFormRowExternal,
-  notationFormRowsFirstChild,
-  notationColumnExternal,
-  notationFormRowEditMode,
-  srVisibilityConfig,
-} from './NotationsConfig';
+import GetNotationConfig from './NotationsConfig';
 import './Notations.css';
 import Widget from '../../../components/widget/Widget';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { UserType } from '../../../helpers/requests/userType';
 import { AppDispatch } from '../../../Store';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  CircleXMarkIcon,
-  MagnifyingGlassIcon,
-  Plus,
-  UserMinus,
-  UserPlus,
-} from '../../../components/common/icon';
-import { INotations } from './INotations';
-// import { SiteDetailsMode } from "../../../helpers/requests/SiteDetailsMode";
+import { Plus, UserMinus, UserPlus } from '../../../components/common/icon';
 import {
   ChangeTracker,
   IChangeType,
@@ -35,103 +19,39 @@ import {
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
-import {
-  flattenFormRows,
-  formatDate,
-  formatDateRange,
-  getUser,
-} from '../../../helpers/utility';
-import Search from '../../site/Search';
+import { flattenFormRows, getUser } from '../../../helpers/utility';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
-import SiteDetails from '../SiteDetails';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
-import { setDate } from 'date-fns';
 import { CheckBoxInput } from '../../../components/input-controls/InputControls';
-import { FormFieldType } from '../../../components/input-controls/IFormField';
+import {
+  FormFieldType,
+  IFormField,
+} from '../../../components/input-controls/IFormField';
 import Actions from '../../../components/action/Actions';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
+import { notationTypeDrpdown } from '../dropdowns/DropdownSlice';
+import { notationParticipants, updateSiteNotation } from './NotationSlice';
 
-const notationParticipantData1 = [
-  {
-    id: 1,
-    role: 'CSAP',
-    participantName: 'Jane Smith',
-    sr: false,
-    date: new Date('2024-05-05'),
-  },
-  {
-    id: 2,
-    role: 'SDM',
-    participantName: 'John',
-    sr: true,
-    date: new Date('2024-05-03'),
-  },
-  {
-    id: 3,
-    role: 'CSSATEAM',
-    participantName: 'Chris Lee',
-    sr: false,
-    date: new Date('2024-05-03'),
-  },
-];
-
-const notationParticipantData2 = [
-  {
-    id: 1,
-    role: 'CSAP',
-    participantName: 'Jane Smith',
-    sr: false,
-    date: new Date('2024-05-05'),
-  },
-  {
-    id: 2,
-    role: 'SDM',
-    participantName: 'Johnson',
-    sr: true,
-    date: new Date('2024-05-03'),
-  },
-  {
-    id: 3,
-    role: 'CSSATEAM',
-    participantName: 'Chris',
-    sr: false,
-    date: new Date('2024-05-03'),
-  },
-];
-
-const notationParticipantData3 = [
-  {
-    id: 1,
-    role: 'CSAP',
-    participantName: 'Smith',
-    sr: false,
-    date: new Date('2024-05-05'),
-  },
-  {
-    id: 2,
-    role: 'SDM',
-    participantName: 'Johnson',
-    sr: true,
-    date: new Date('2024-05-03'),
-  },
-  {
-    id: 3,
-    role: 'CSSATEAM',
-    participantName: 'Lee',
-    sr: false,
-    date: new Date('2024-05-03'),
-  },
-];
-
-const Notations: React.FC<INotations> = ({ user }) => {
-  const details = useSelector(selectSiteDetails);
-
+const Notations = () => {
+  const {
+    notationColumnInternal,
+    notationFormRowsInternal,
+    notationFormRowExternal,
+    notationFormRowsFirstChild,
+    notationColumnExternal,
+    notationFormRowEditMode,
+    srVisibilityConfig,
+    notationFormRowsFirstChildIsRequired,
+  } = GetNotationConfig();
+  const notations = useSelector(notationParticipants);
+  const dispatch = useDispatch<AppDispatch>();
+  const mode = useSelector(siteDetailsMode);
+  const notationType = useSelector(notationTypeDrpdown);
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
-  const [formData, setFormData] = useState<
-    { [key: string]: any | [Date, Date] }[]
-  >(details.events);
+  const [formData, setFormData] =
+    useState<{ [key: string]: any | [Date, Date] }[]>(notations);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
   const [srTimeStamp, setSRTimeStamp] = useState(
     'Sent to SR on June 2nd, 2013',
@@ -151,14 +71,14 @@ const Notations: React.FC<INotations> = ({ user }) => {
       // not logged in
       setUserType(UserType.External);
     }
-    setFormData(details.events);
+    setFormData(notations);
   }, []);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value;
     setSearchTerm(searchTerm);
 
-    const filteredData = formData.filter((notation) => {
+    const filteredData = notations.filter((notation: any) => {
       // Check if any property of the notation object contains the searchTerm
       return deepSearch(notation, searchTerm.toLowerCase().trim());
     });
@@ -169,21 +89,42 @@ const Notations: React.FC<INotations> = ({ user }) => {
     for (const key in obj) {
       const value = obj[key];
       if (typeof value === 'object') {
-        if (deepSearch(obj[key], searchTerm)) {
+        if (deepSearch(value, searchTerm)) {
           return true;
         }
       }
-      // } else if (typeof value === 'string' || typeof value === 'number' || value instanceof Date) {
-      if (String(value).toLowerCase().includes(searchTerm)) {
+
+      const stringValue =
+        typeof value === 'string'
+          ? value.toLowerCase()
+          : String(value).toLowerCase();
+
+      if (
+        key === 'completionDate' ||
+        key === 'requirementDueDate' ||
+        key === 'requirementReceivedDate'
+      ) {
+        const date = new Date(value);
+        const formattedDate = date
+          .toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+          .toLowerCase();
+        const ordinalSuffixPattern = /\b(\d+)(st|nd|rd|th)\b/g;
+        searchTerm = searchTerm.replace(ordinalSuffixPattern, '$1');
+        if (formattedDate.includes(searchTerm)) {
+          return true;
+        }
+      }
+
+      if (stringValue.includes(searchTerm)) {
         return true;
       }
-      // }
     }
     return false;
   };
-
-  const dispatch = useDispatch<AppDispatch>();
-  const mode = useSelector(siteDetailsMode);
 
   useEffect(() => {
     setViewMode(mode);
@@ -191,17 +132,19 @@ const Notations: React.FC<INotations> = ({ user }) => {
 
   const clearSearch = () => {
     setSearchTerm('');
-    setFormData(details.events);
+    setFormData(notations);
   };
 
   const resetDetails = useSelector(resetSiteDetails);
   useEffect(() => {
     if (resetDetails) {
-      setFormData(details.events);
-      // setData(dummyData);
+      setFormData(notations);
     }
   }, [resetDetails]);
 
+  const [isUpdated, setIsUpdated] = useState(false);
+  const [updatedNotationFormRowEditMode, setUpdatedNotationFormRowEditMode] =
+    useState<IFormField[][]>([]);
   const handleInputChange = (
     id: number,
     graphQLPropertyName: any,
@@ -210,14 +153,31 @@ const Notations: React.FC<INotations> = ({ user }) => {
     if (viewMode === SiteDetailsMode.SRMode) {
       console.log({ [graphQLPropertyName]: value, id });
     } else {
-      setFormData((prevData: any) => {
-        return prevData.map((notation: any) => {
-          if (notation.notationId === id) {
-            return { ...notation, [graphQLPropertyName]: value };
+      const updatedNotation = formData.map((notation) => {
+        if (notation.id === id) {
+          if (graphQLPropertyName === 'eclsCode') {
+            setIsUpdated(true);
+            const updatedRow = [...notationFormRowEditMode].map((items) => {
+              return items.map((row) => ({
+                ...row,
+                options: notationType.data.find(
+                  (items: any) => items.metaData === value,
+                ).dropdownDto,
+              }));
+            });
+            setUpdatedNotationFormRowEditMode(updatedRow);
+            return {
+              ...notation,
+              [graphQLPropertyName]: value,
+              ['etypCode']: '',
+            };
           }
-          return notation;
-        });
+          return { ...notation, [graphQLPropertyName]: value };
+        }
+        return notation;
       });
+      setFormData(updatedNotation);
+      dispatch(updateSiteNotation(updatedNotation));
     }
     const flattedArr = flattenFormRows(notationFormRowsInternal);
     const currLabel =
@@ -238,22 +198,22 @@ const Notations: React.FC<INotations> = ({ user }) => {
   };
 
   const [selectedRows, setSelectedRows] = useState<
-    { notationId: any; participantId: any }[]
+    { id: any; participantId: any }[]
   >([]);
 
-  const handleRemoveParticipant = (notationId: any) => {
+  const handleRemoveParticipant = (id: any) => {
     // Remove selected rows from formData state
     setFormData((prevData) => {
       return prevData.map((notation) => {
-        if (notation.notationId === notationId) {
+        if (notation.id === id) {
           // Filter out selected rows from notationParticipant array
           const updatedNotationParticipant =
             notation.notationParticipant.filter(
               (participant: any) =>
                 !selectedRows.some(
                   (row) =>
-                    row.notationId === notation.notationId &&
-                    row.participantId === participant.id,
+                    row.id === notation.id &&
+                    row.participantId === participant.guid,
                 ),
             );
           return {
@@ -271,18 +231,16 @@ const Notations: React.FC<INotations> = ({ user }) => {
     dispatch(trackChanges(tracker.toPlainObject()));
     // Clear selectedRows state
 
-    const updateSelectedRows = selectedRows.filter(
-      (row) => row.notationId !== notationId,
-    );
+    const updateSelectedRows = selectedRows.filter((row) => row.id !== id);
     setSelectedRows(updateSelectedRows);
   };
 
-  const handleTableChange = (notationId: any, event: any) => {
+  const handleTableChange = (id: any, event: any) => {
     const isExist = formData.some(
       (item) =>
-        item.notationId === notationId &&
+        item.id === id &&
         item.notationParticipant.some(
-          (participant: any) => participant.id === event.row.id,
+          (participant: any) => participant.guid === event.row.guid,
         ),
     );
     if (isExist && event.property.includes('select_row')) {
@@ -290,39 +248,35 @@ const Notations: React.FC<INotations> = ({ user }) => {
       if (event.value) {
         setSelectedRows((prevSelectedRows) => [
           ...prevSelectedRows,
-          { notationId, participantId: event.row.id },
+          { id, participantId: event.row.guid },
         ]);
       } else {
         setSelectedRows((prevSelectedRows) =>
           prevSelectedRows.filter(
-            (row) =>
-              !(
-                row.notationId === notationId &&
-                row.participantId === event.row.id
-              ),
+            (row) => !(row.id === id && row.participantId === event.row.guid),
           ),
         );
       }
     } else {
-      setFormData((prevData) => {
-        return prevData.map((notation) => {
-          if (notation.notationId === notationId) {
-            const updatedNotationParticipant = notation.notationParticipant.map(
-              (participant: any) => {
-                if (participant.id === event.row.id) {
-                  return { ...participant, [event.property]: event.value };
-                }
-                return participant;
-              },
-            );
-            return {
-              ...notation,
-              notationParticipant: updatedNotationParticipant,
-            };
-          }
-          return notation;
-        });
+      const updateNotationParticipant = formData.map((notation) => {
+        if (notation.id === id) {
+          const updatedNotationParticipant = notation.notationParticipant.map(
+            (participant: any) => {
+              if (participant.guid === event.row.guid) {
+                return { ...participant, [event.property]: event.value };
+              }
+              return participant;
+            },
+          );
+          return {
+            ...notation,
+            notationParticipant: updatedNotationParticipant,
+          };
+        }
+        return notation;
       });
+      setFormData(updateNotationParticipant);
+      dispatch(updateSiteNotation(updateNotationParticipant));
     }
   };
 
@@ -341,10 +295,18 @@ const Notations: React.FC<INotations> = ({ user }) => {
     let sorted = [...data];
     switch (sortBy) {
       case 'newToOld':
-        sorted.sort((a, b) => b.initialDate - a.initialDate); // Sorting by date from new to old
+        sorted.sort(
+          (a, b) =>
+            new Date(b.requirementReceivedDate).getTime() -
+            new Date(a.requirementReceivedDate).getTime(),
+        ); // Sorting by date from new to old
         break;
       case 'oldTonew':
-        sorted.sort((a, b) => a.initialDate - b.initialDate); // Sorting by date from new to old
+        sorted.sort(
+          (a, b) =>
+            new Date(a.requirementReceivedDate).getTime() -
+            new Date(b.requirementReceivedDate).getTime(),
+        ); // Sorting by date from new to old
         break;
       // Add more cases for additional sorting options
       default:
@@ -355,25 +317,32 @@ const Notations: React.FC<INotations> = ({ user }) => {
 
   const handleOnAddNotation = () => {
     const newNotation = {
-      notationId: formData.length + 1, // Generate a unique ID for the new notation
-      notationType: '', // Default values for other properties
-      initialDate: new Date(),
-      completedDate: new Date(),
-      notationClass: '',
-      requiredDate: new Date(),
+      id: formData.length + 1, // Generate a unique ID for the new notation
+      etypCode: '', // Default values for other properties
+      requirementReceivedDate: new Date(),
+      completionDate: new Date(),
+      eclsCode: '',
+      requirementDueDate: new Date(),
       ministryContact: '',
-      requiredActions: '',
+      requiredAction: '',
       note: '',
-      notationParticipant: [],
+      notationParticipant: [
+        {
+          displayName: '',
+          eprCode: '',
+          psnorgId: '',
+          guid: '',
+        },
+      ],
     };
 
     // Add the new notation to formData
-    setFormData((prevData) => [...prevData, newNotation]);
+    setFormData((prevData) => [newNotation, ...prevData]);
     const tracker = new ChangeTracker(IChangeType.Added, 'New Notation Added');
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
-  const handleAddParticipant = (notationId: any) => {
+  const handleAddParticipant = (id: any) => {
     const newParticipant = {
       id: Date.now(), // Generate a unique ID for the new participant
       role: '',
@@ -384,13 +353,13 @@ const Notations: React.FC<INotations> = ({ user }) => {
 
     setFormData((prevFormData) => {
       return prevFormData.map((notation) => {
-        if (notation.notationId === notationId) {
+        if (notation.id === id) {
           // Create a new array with the updated notation object
           return {
             ...notation,
             notationParticipant: [
-              ...notation.notationParticipant,
               newParticipant,
+              ...notation.notationParticipant,
             ],
           };
         }
@@ -404,31 +373,33 @@ const Notations: React.FC<INotations> = ({ user }) => {
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
-  const isAnyParticipantSelected = (notationId: any) => {
-    return selectedRows.some((row) => row.notationId === notationId);
+  const isAnyParticipantSelected = (id: any) => {
+    return selectedRows.some((row) => row.id === id);
   };
 
-  const handleTableSort = (row: any, ascDir: any, notationId: any) => {
+  const handleTableSort = (row: any, ascDir: any, id: any) => {
     let property = row['graphQLPropertyName'];
     setFormData((prevData) => {
       return prevData.map((tempNotation) => {
-        if (notationId === tempNotation.notationId) {
+        if (id === tempNotation.id) {
           // Filter out selected rows from notationParticipant array
-          const updatedNotationParticipant =
-            tempNotation.notationParticipant.sort(function (a: any, b: any) {
-              if (ascDir)
-                return a[property] > b[property]
-                  ? 1
-                  : a[property] < b[property]
-                    ? -1
-                    : 0;
-              else
-                return b[property] > a[property]
-                  ? 1
-                  : b[property] < a[property]
-                    ? -1
-                    : 0;
-            });
+          let updatedNotationParticipant = [
+            ...tempNotation.notationParticipant,
+          ];
+          updatedNotationParticipant.sort(function (a: any, b: any) {
+            if (ascDir)
+              return a[property] > b[property]
+                ? 1
+                : a[property] < b[property]
+                  ? -1
+                  : 0;
+            else
+              return b[property] > a[property]
+                ? 1
+                : b[property] < a[property]
+                  ? -1
+                  : 0;
+          });
           return {
             ...tempNotation,
             notationParticipant: updatedNotationParticipant,
@@ -450,6 +421,73 @@ const Notations: React.FC<INotations> = ({ user }) => {
       default:
         break;
     }
+  };
+
+  const updateOptionsBasedOnMetaData = (
+    rows: IFormField[][],
+    metaData: any,
+    fallbackMetaDataKey: string,
+  ) => {
+    return rows.map((items) =>
+      items.map((row) => {
+        if (row.graphQLPropertyName === 'etypCode') {
+          const metaKey = metaData ? metaData[fallbackMetaDataKey] : null;
+          const dropdownDto = notationType.data.find(
+            (item: any) => item.metaData === metaKey,
+          )?.dropdownDto;
+          return {
+            ...row,
+            options: dropdownDto || row.options, // Fallback to existing options if dropdownDto is not found
+          };
+        }
+        return row;
+      }),
+    );
+  };
+
+  const handleChangeNotationFormRow = (metaData?: any) => {
+    if (isUpdated) {
+      setIsUpdated(false);
+      return updatedNotationFormRowEditMode;
+    } else {
+      return updateOptionsBasedOnMetaData(
+        notationFormRowEditMode,
+        metaData,
+        'eclsCode',
+      );
+    }
+  };
+
+  const handleNotationFormRowFirstChild = (metaData?: any) => {
+    if (metaData && metaData.requiredDate) {
+      return updateOptionsBasedOnMetaData(
+        notationFormRowsFirstChildIsRequired,
+        metaData,
+        'eclsCode',
+      );
+    } else {
+      return updateOptionsBasedOnMetaData(
+        notationFormRowsFirstChild,
+        metaData,
+        'eclsCode',
+      );
+    }
+  };
+
+  const handleNotationFormRowExternal = (metaData?: any) => {
+    return updateOptionsBasedOnMetaData(
+      notationFormRowExternal,
+      metaData,
+      'eclsCode',
+    );
+  };
+
+  const handleNotationFormRowsInternal = (metaData?: any) => {
+    return updateOptionsBasedOnMetaData(
+      notationFormRowsInternal,
+      metaData,
+      'eclsCode',
+    );
   };
 
   return (
@@ -515,21 +553,21 @@ const Notations: React.FC<INotations> = ({ user }) => {
                     label={''}
                     isLabel={false}
                     onChange={(value) =>
-                      handleParentChekBoxChange(notation.notationId, value)
+                      handleParentChekBoxChange(notation.id, value)
                     }
                   />
                 )}
               <PanelWithUpDown
                 firstChild={
-                  <div className="w-100">
+                  <div className="w-100" key={index}>
                     <Form
-                      formRows={notationFormRowsFirstChild}
+                      formRows={handleNotationFormRowFirstChild(notation)}
                       formData={notation}
                       editMode={viewMode === SiteDetailsMode.EditMode}
                       srMode={viewMode === SiteDetailsMode.SRMode}
                       handleInputChange={(graphQLPropertyName, value) =>
                         handleInputChange(
-                          notation.notationId,
+                          notation.id,
                           graphQLPropertyName,
                           value,
                         )
@@ -548,19 +586,19 @@ const Notations: React.FC<INotations> = ({ user }) => {
                     <Form
                       formRows={
                         userType === UserType.External
-                          ? notationFormRowExternal
+                          ? handleNotationFormRowExternal(notation)
                           : viewMode === SiteDetailsMode.EditMode
-                            ? notationFormRowEditMode
+                            ? handleChangeNotationFormRow(notation)
                             : viewMode === SiteDetailsMode.SRMode
-                              ? notationFormRowExternal
-                              : notationFormRowsInternal
+                              ? handleNotationFormRowExternal(notation)
+                              : handleNotationFormRowsInternal(notation)
                       }
                       formData={notation}
                       editMode={viewMode === SiteDetailsMode.EditMode}
                       srMode={viewMode === SiteDetailsMode.SRMode}
                       handleInputChange={(graphQLPropertyName, value) =>
                         handleInputChange(
-                          notation.notationId,
+                          notation.id,
                           graphQLPropertyName,
                           value,
                         )
@@ -569,7 +607,7 @@ const Notations: React.FC<INotations> = ({ user }) => {
                     />
                     <Widget
                       changeHandler={(event) =>
-                        handleTableChange(notation.notationId, event)
+                        handleTableChange(notation.id, event)
                       }
                       handleCheckBoxChange={(event) =>
                         handleWidgetCheckBox(event)
@@ -598,24 +636,22 @@ const Notations: React.FC<INotations> = ({ user }) => {
                         viewMode === SiteDetailsMode.SRMode &&
                         userType === UserType.Internal
                       }
-                      primaryKeycolumnName="id"
+                      primaryKeycolumnName="guid"
                       sortHandler={(row, ascDir) => {
-                        handleTableSort(row, ascDir, notation.notationId);
+                        handleTableSort(row, ascDir, notation.id);
                       }}
                     >
                       {viewMode === SiteDetailsMode.EditMode &&
                         userType === UserType.Internal && (
                           <div
                             className="d-flex gap-2 flex-wrap "
-                            key={notation.notationId}
+                            key={notation.id}
                           >
                             <button
                               id="add-participant-btn"
                               className=" d-flex align-items-center notation-btn"
                               type="button"
-                              onClick={() =>
-                                handleAddParticipant(notation.notationId)
-                              }
+                              onClick={() => handleAddParticipant(notation.id)}
                               aria-label={'Add Participant'}
                             >
                               <UserPlus className="btn-user-icon" />
@@ -626,21 +662,19 @@ const Notations: React.FC<INotations> = ({ user }) => {
 
                             <button
                               id="delete-participant-btn"
-                              className={`d-flex align-items-center ${isAnyParticipantSelected(notation.notationId) ? `notation-btn` : `notation-btn-disable`}`}
-                              disabled={
-                                !isAnyParticipantSelected(notation.notationId)
-                              }
+                              className={`d-flex align-items-center ${isAnyParticipantSelected(notation.id) ? `notation-btn` : `notation-btn-disable`}`}
+                              disabled={!isAnyParticipantSelected(notation.id)}
                               type="button"
                               onClick={() =>
-                                handleRemoveParticipant(notation.notationId)
+                                handleRemoveParticipant(notation.id)
                               }
                               aria-label={'Remove Participant'}
                             >
                               <UserMinus
-                                className={`${isAnyParticipantSelected(notation.notationId) ? `btn-user-icon` : `btn-user-icon-disabled`}`}
+                                className={`${isAnyParticipantSelected(notation.id) ? `btn-user-icon` : `btn-user-icon-disabled`}`}
                               />
                               <span
-                                className={`${isAnyParticipantSelected(notation.notationId) ? `notation-btn-lbl` : `notation-btn-lbl-disabled`}`}
+                                className={`${isAnyParticipantSelected(notation.id) ? `notation-btn-lbl` : `notation-btn-lbl-disabled`}`}
                               >
                                 {'Remove Participant'}
                               </span>

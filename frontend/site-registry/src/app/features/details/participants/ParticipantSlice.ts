@@ -41,8 +41,6 @@ const siteParticipantSlice = createSlice({
     updateSiteParticipants: (state, action) => {
       state.siteParticipants = action.payload;
       state.status = RequestStatus.success;
-      console.log('updated data locally --> ', state.siteParticipants);
-      console.log('updated data locally action.payload --> ', action.payload);
     },
   },
   extraReducers: (builder) => {

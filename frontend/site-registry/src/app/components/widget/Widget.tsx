@@ -55,6 +55,7 @@ const Widget: React.FC<IWidget> = ({
               allowRowsSelect={allowRowsSelect}
               changeHandler={changeHandler ?? (() => {})}
               editMode={editMode ?? false}
+              srMode={srMode ?? false}
               idColumnName={primaryKeycolumnName ?? ''}
               sortHandler={widgetSortHandler}
             />

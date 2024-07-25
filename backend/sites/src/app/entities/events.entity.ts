@@ -34,7 +34,7 @@ export class Events {
   @Column('timestamp without time zone', { name: 'event_date' })
   eventDate: Date;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'completion_date',
     nullable: true,
@@ -53,11 +53,19 @@ export class Events {
   @Column('bigint', { name: 'sp_id' })
   spId: string;
 
-  @Field()
+  @Field({ nullable: true })
+  @Column('character varying', {
+    name: 'required_action',
+    nullable: true,
+    length: 500,
+  })
+  requiredAction: string | null;
+
+  @Field({ nullable: true })
   @Column('character varying', { name: 'note', nullable: true, length: 500 })
   note: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'region_app_flag',
     nullable: true,
@@ -65,7 +73,7 @@ export class Events {
   })
   regionAppFlag: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'region_userid',
     nullable: true,
@@ -73,7 +81,7 @@ export class Events {
   })
   regionUserid: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'region_date',
     nullable: true,
@@ -84,7 +92,7 @@ export class Events {
   @Column('character varying', { name: 'who_created', length: 30 })
   whoCreated: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'who_updated',
     nullable: true,
@@ -96,7 +104,7 @@ export class Events {
   @Column('timestamp without time zone', { name: 'when_created' })
   whenCreated: Date;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'when_updated',
     nullable: true,
@@ -111,7 +119,7 @@ export class Events {
   @Column('smallint', { name: 'rwm_note_flag' })
   rwmNoteFlag: number;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'rwm_approval_date',
     nullable: true,
@@ -122,14 +130,14 @@ export class Events {
   @Column('character varying', { name: 'ecls_code', length: 6 })
   eclsCode: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'requirement_due_date',
     nullable: true,
   })
   requirementDueDate: Date | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'requirement_received_date',
     nullable: true,

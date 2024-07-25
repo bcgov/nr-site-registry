@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import './UserAccount.css';
 import avatar from '../../images/avatar.png';
 import { DropdownIcon, DropdownUpIcon } from '../common/icon';
 import { useAuth } from 'react-oidc-context';
 import { getUser } from '../../helpers/utility';
+import Avatar from '../avatar/Avatar';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../Store';
+import { fetchRecentViews } from '../../features/dashboard/DashboardSlice';
 
 const UserAccount = (props: any) => {
+  const dispatch = useDispatch<AppDispatch>();
   const authRedirectUri =
     ((window as any)._env_ &&
       (window as any)._env_.REACT_APP_AUTH_LOGOUT_REDIRECT_URI) ||
@@ -16,8 +21,8 @@ const UserAccount = (props: any) => {
   const loggedInUser = getUser();
   // Sample user data
   const userObj = {
-    name: loggedInUser?.profile.given_name,
-    profileImage: avatar, // URL to the profile image
+    firstname: loggedInUser?.profile.given_name,
+    lastName: loggedInUser?.profile.family_name,
   };
 
   const [user, setUser] = useState(userObj);
@@ -26,6 +31,14 @@ const UserAccount = (props: any) => {
     event.stopPropagation();
     setDropdownArrow(!dropdownArrow);
   };
+
+  useEffect(() => {
+    dispatch(fetchRecentViews(loggedInUser?.profile.preferred_username ?? ''));
+    setUser({
+      firstname: loggedInUser?.profile.given_name,
+      lastName: loggedInUser?.profile.family_name,
+    });
+  }, []);
 
   if (props.mobileView) {
     return (
@@ -47,17 +60,10 @@ const UserAccount = (props: any) => {
               onClick={toggleButton}
             >
               {/* Profile image */}
-              <img
-                src={user.profileImage}
-                alt="User profile image."
-                className="account-image"
-                aria-hidden="true"
-                role="img"
-                aria-label="User profile image"
-              />
+              <Avatar firstName={user.firstname} lastName={user.lastName} />
               {/* User name */}
               <div id="user-name" className="p-3">
-                {user.name}
+                {user.firstname + ' ' + user.lastName}
               </div>
               <div
                 id="account-dropdown"
@@ -116,15 +122,23 @@ const UserAccount = (props: any) => {
             <Dropdown.Toggle
               id="account-dropdown"
               variant=""
-              className="account-custom-toggle p-0 pe-2"
+              className="account-custom-toggle p-0"
               aria-label="Account Menu"
             >
               {/* Profile image */}
-              <img
-                src={user.profileImage}
-                alt="User profile image."
-                className="account-image"
-              />
+              <div
+                className="d-flex align-items-center "
+                onClick={() => setDropdownArrow(!dropdownArrow)}
+              >
+                <Avatar firstName={user.firstname} lastName={user.lastName} />
+                <div
+                  id="account-dropdown"
+                  className="ps-2"
+                  aria-label="Account Menu Button"
+                >
+                  {dropdownArrow ? <DropdownUpIcon /> : <DropdownIcon />}
+                </div>
+              </div>
             </Dropdown.Toggle>
           </div>
           {/* Dropdown menu */}
@@ -141,18 +155,13 @@ const UserAccount = (props: any) => {
               aria-disabled="true"
             >
               <div className="account-custom-label">Logged in as:</div>
-              <div className="account-username py-3">
+              <div className="d-flex align-items-center account-username py-3 ">
                 {/* Profile image */}
-                <img
-                  src={user.profileImage}
-                  alt="User profile image."
-                  className="account-image me-3"
-                  role="img"
-                  aria-label="User profile image"
-                />
-
+                <Avatar firstName={user.firstname} lastName={user.lastName} />
                 {/* User name */}
-                <span>{user.name}</span>
+                <span className="px-2">
+                  {user.firstname + ' ' + user.lastName}
+                </span>
               </div>
             </Dropdown.Item>
             <div className="pt-3">

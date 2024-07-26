@@ -4,7 +4,7 @@ import { AuthenticatedUser, RoleMatchingMode, Roles } from 'nest-keycloak-connec
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { Folio } from 'src/app/entities/folio.entity';
-import { FolioService } from '../../services/folio/folio.service';
+ import { FolioService } from '../../services/folio/folio.service';
 import { FolioDTO, FolioMinDTO, FolioResponse } from 'src/app/dto/Folio';
 import { FolioContentDTO, FolioContentResponse } from 'src/app/dto/folioContent';
 import { FolioContents } from 'src/app/entities/folioContents.entity';
@@ -14,7 +14,7 @@ import { FolioContents } from 'src/app/entities/folioContents.entity';
 @Resolver(() => Folio)
 export class FolioResolver {
   constructor(
-    private readonly FolioService: FolioService, 
+    private readonly folioService: FolioService, 
     private readonly genericResponseProvider: GenericResponseProvider<Folio[]>,
     private readonly genericResponseProviderForFolioContent: GenericResponseProvider<FolioContents[]>,
   ) { }
@@ -24,9 +24,11 @@ export class FolioResolver {
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getFolioItemsForUser(
     @Args('userId', { type: () => String }) userId: string,
+    @AuthenticatedUser()
+    user: any
   ) {
 
-    const result = await this.FolioService.getFoliosForUser(userId);
+    const result = await this.folioService.getFoliosForUser(user);
 
     if (result.length > 0) {
       return this.genericResponseProvider.createResponse('Folio fetched successfully', 200, true, result);
@@ -44,9 +46,11 @@ export class FolioResolver {
   async getSitesForFolio(
     @Args('folioDTO', { type: () => FolioMinDTO }, new ValidationPipe())
     folioDTO: FolioMinDTO,
+    @AuthenticatedUser()
+    user: any
   ) {
 
-    const result = await this.FolioService.getSitesForFolio(folioDTO);
+    const result = await this.folioService.getSitesForFolio(folioDTO,user);
 
     if (result.length > 0) {
       return this.genericResponseProviderForFolioContent.createResponse('Folio fetched successfully', 200, true, result);
@@ -63,8 +67,10 @@ export class FolioResolver {
   async addFolioItem(
     @Args('folioDTO', { type: () => FolioDTO }, new ValidationPipe())
     folioDTO: FolioDTO,
+    @AuthenticatedUser()
+    user: any
   ){
-    const message = await this.FolioService.addFolio(folioDTO);
+    const message = await this.folioService.addFolio(folioDTO, user);
 
     if (message) {
       return this.genericResponseProvider.createResponse("Success", 201, true);
@@ -85,7 +91,7 @@ export class FolioResolver {
   ){
   
      console.log(user);
-    const message = await this.FolioService.addSiteToFolio(folioContentDTO);
+    const message = await this.folioService.addSiteToFolio(folioContentDTO,user);
 
     if (message) {
       return this.genericResponseProvider.createResponse("Success", 201, true);
@@ -101,8 +107,10 @@ export class FolioResolver {
   async updateFolioItem(
     @Args('folioDTO', { type: () => [FolioDTO] }, new ValidationPipe())
     folioDTO: [FolioDTO],
+    @AuthenticatedUser()
+    user: any
   ){
-    const message = await this.FolioService.updateFolio(folioDTO);
+    const message = await this.folioService.updateFolio(folioDTO, user);
 
     if (message) {
       return this.genericResponseProvider.createResponse("Success", 201, true);
@@ -118,10 +126,12 @@ export class FolioResolver {
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
   @Mutation(() => FolioResponse, { name: 'deleteFolioItem' })
   async deleteFolio(
-    @Args('FolioId', new ValidationPipe())
+    @Args('folioId', new ValidationPipe())
     folioId: number,
+    @AuthenticatedUser()
+    user: any
   ){
-    const message = await this.FolioService.deleteFolio(folioId);
+    const message = await this.folioService.deleteFolio(folioId, user);
 
     if (message) {
       return this.genericResponseProvider.createResponse("Deleted", 200, true);
@@ -136,9 +146,11 @@ export class FolioResolver {
   @Mutation(() => FolioResponse, { name: 'deleteSitesInFolio' })
   async deleteSitesInFolio(
     @Args('folioDTO', { type: () => [FolioContentDTO] }, new ValidationPipe())
-    folioContentDTO: [FolioContentDTO]
+    folioContentDTO: [FolioContentDTO],
+    @AuthenticatedUser()
+    user: any
   ){
-    const message = await this.FolioService.deleteSitesInFolio(folioContentDTO);
+    const message = await this.folioService.deleteSitesInFolio(folioContentDTO, user);
 
     if (message) {
       return this.genericResponseProvider.createResponse("Deleted", 200, true);

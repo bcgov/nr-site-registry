@@ -9,6 +9,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from 'react-oidc-context';
 import { UserManagerSettings } from 'oidc-client-ts';
 import { getClientSettings } from './app/auth/UserManagerSetting';
+import { RouterProvider } from 'react-router-dom';
+import siteRouter from './app/routes/Routes';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLDivElement,
@@ -19,7 +21,7 @@ root.render(
   <React.StrictMode>
     <AuthProvider {...authOptions}>
       <Provider store={store}>
-        <App />
+      <RouterProvider router={siteRouter}/>
       </Provider>
     </AuthProvider>
   </React.StrictMode>,

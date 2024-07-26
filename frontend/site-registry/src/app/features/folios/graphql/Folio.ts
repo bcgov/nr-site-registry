@@ -82,9 +82,9 @@ mutation updateFolioItem($FolioDTO:[FolioDTO!]!){
 
 
 export const deleteFolioItemQL = () => gql`
-mutation deleteFolioItem($FolioId: Float!)
+mutation deleteFolioItem($folioId: Float!)
 {
-    deleteFolioItem(FolioId: $FolioId)
+    deleteFolioItem(folioId: $folioId)
     {
          message
          httpStatusCode

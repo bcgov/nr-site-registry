@@ -122,7 +122,7 @@ export const fetchFolioItems = createAsyncThunk(
       const request = await getAxiosInstance().post(GRAPHQL, {
         query: print(deleteFolioItemQL()),
         variables: {
-          FolioId: parseInt(FolioId),
+          folioId: parseInt(FolioId),
         },
       });
       return request.data;

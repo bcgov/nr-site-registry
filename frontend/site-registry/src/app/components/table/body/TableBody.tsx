@@ -349,7 +349,7 @@ const TableBody: FC<TableBodyProps> = ({
 
     return (
       <React.Fragment >
-        <tr key={rowIndex + new Date().getTime()}>
+        <tr>
           {allowRowsSelect && (
             <td className="table-border-light content-text positionSticky">
               <input

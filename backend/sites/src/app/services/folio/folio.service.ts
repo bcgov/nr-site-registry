@@ -17,21 +17,28 @@ export class FolioService {
     private folioContentService: FolioContentsService,
   ) {}
 
-  async getFoliosForUser(userId: string): Promise<Folio[]> {
+  async getFoliosForUser(userInfo: any): Promise<Folio[]> {
     try {
+      const userId = userInfo.sub;
       const folio = await this.folioRepository.find({
         relations: { folioContents: true },
         where: { userId },
-      });
+        order: { id: 'ASC'}
+      })
       return folio;
     } catch (error) {
+      console.error('Error', error);
       throw error;
     }
   }
 
-  async getSitesForFolio(input: FolioMinDTO): Promise<FolioContents[]> {
+  async getSitesForFolio(
+    input: FolioMinDTO,
+    userInfo: any,
+  ): Promise<FolioContents[] | null> {
     try {
-      const { id, userId } = input;
+      const userId = userInfo.sub;
+      const { id } = input;
       const folio = await this.folioRepository.findOne({
         where: { id, userId },
       });
@@ -42,15 +49,19 @@ export class FolioService {
 
       return null;
     } catch (error) {
+      console.error('Error', error);
       throw error;
     }
   }
 
-  async addFolio(inputDTO: FolioDTO): Promise<boolean> {
-    const { userId, id, folioId } = inputDTO;
+  async addFolio(inputDTO: FolioDTO, userInfo: any): Promise<boolean> {
     try {
+      const { folioId } = inputDTO;
+
+      const userId = userInfo.sub;
+
       const existingRecord = await this.folioRepository.findOne({
-        where: { userId, id },
+        where: { userId, folioId },
       });
 
       if (existingRecord) {
@@ -61,79 +72,81 @@ export class FolioService {
         folio.whenUpdated = new Date();
         const result = await this.folioRepository.save(folio);
 
-        if (result) {
-          // inputDTO.folioContent.map((folioContent)=> {
-          //   folioContent.folioId = folio.id.toString();
-          //   this.folioContentService.addFolioContent(folioContent);
-          // });
-          return true;
-        }
+        if (result) return true;
+
+        return false;
       }
     } catch (error) {
+      console.error('Error', error);
       throw new Error('Failed to add folio content');
     }
   }
 
-  async updateFolio(inputArr: [FolioDTO]): Promise<boolean> {
+  async updateFolio(inputArr: FolioDTO[], userInfo: any): Promise<boolean> {
     try {
-      await inputArr.map((inputDTO) => {
-        const { userId, id, folioId } = inputDTO;
+      const userId = userInfo.sub;
+      for (const inputDTO of inputArr) {
+        const { id } = inputDTO;
 
-        this.folioRepository
-          .findOne({
-            where: { id, userId },
-          })
-          .then((existingRecord) => {
-            if (existingRecord) {
-              existingRecord.description = inputDTO.description;
-              existingRecord.folioId = inputDTO.folioId;
-              existingRecord.whenUpdated = new Date();
-              this.folioRepository.save(existingRecord).then((result) => {
-                if (result) {
-                  return true;
-                } else {
-                  return false;
-                }
-              });
-            }
-          });
-      });
+        const existingRecord = await this.folioRepository.findOne({
+          where: { id, userId },
+        });
+
+        if (existingRecord) {
+          existingRecord.description = inputDTO.description;
+          existingRecord.folioId = inputDTO.folioId;
+          existingRecord.whenUpdated = new Date();
+
+          const result = await this.folioRepository.save(existingRecord);
+
+          if (!result) {
+            // Handle the case where save did not return the expected result
+            console.error(`Failed to save record with id ${id}`);
+          }
+        }
+      }
     } catch (error) {
+      console.error('Error', error);
       throw new Error('Failed to update folio content');
     }
     return true;
   }
 
-  async deleteFolio(id: number): Promise<boolean> {
+  async deleteFolio(id: number, userInfo: any): Promise<boolean> {
     try {
-      if (id > 0) {
-        
-        await this.folioContentService
-          .deleteAllSitesInFolio(id.toString())
-          .then((x) => {
-            this.folioRepository
-              .delete({
-                id: id,
-              })
-              .then((result) => {
-                if (result.affected > 0) return true;
-                else return false;
-              });
-          });
+      if (id <= 0) {
+        return false;
+      }
+
+      const userId = userInfo.sub;
+
+      const savedFolio = this.folioRepository.findOne({
+        where: { id, userId },
+      });
+
+      if (savedFolio != null) {
+        await this.folioContentService.deleteAllSitesInFolio(id.toString());
+        const result = await this.folioRepository.delete({ id });
+        return result.affected > 0;
       }
 
       return false;
-    } catch (e) {
+    } catch (error) {
+      console.error('Error in deleteFolio:', error);
       return false;
     }
   }
 
-  async addSiteToFolio(inputDTO: [FolioContentDTO]): Promise<boolean> {
+  async addSiteToFolio(
+    inputDTO: [FolioContentDTO],
+    userInfo: any,
+  ): Promise<boolean> {
     try {
       if (inputDTO.length > 0) {
         inputDTO.forEach((item) => {
           if (item != null) {
-            const { userId, id } = item;
+            const userId = userInfo.sub;
+            const { id } = item;
             this.folioRepository
               .findOne({ where: { id, userId } })
               .then((folio) => {
@@ -147,17 +160,22 @@ export class FolioService {
       }
 
       return true;
-    } catch (e) {
-      throw e;
+    } catch (error) {
+      console.error('Error', error);
+      throw error;
     }
   }
 
-  async deleteSitesInFolio(inputDTO: [FolioContentDTO]): Promise<boolean> {
+  async deleteSitesInFolio(
+    inputDTO: [FolioContentDTO],
+    userInfo: any,
+  ): Promise<boolean> {
     try {
       if (inputDTO.length > 0) {
         inputDTO.forEach((item) => {
           if (item != null) {
-            const { userId, id } = item;
+            const userId = userInfo.sub;
+            const { id } = item;
             this.folioRepository
               .findOne({ where: { id, userId } })
               .then((folio) => {
@@ -174,8 +192,9 @@ export class FolioService {
       }
 
       return true;
-    } catch (e) {
-      throw e;
+    } catch (error) {
+      console.error('Error', error);
+      throw error;
     }
   }
 }

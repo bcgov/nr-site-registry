@@ -162,7 +162,7 @@ const Notations = () => {
       flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
     const tracker = new ChangeTracker(
       IChangeType.Modified,
-      'Notations: ' + currLabel?.label ?? '',
+      'Notations: ' + currLabel?.label,
     );
     dispatch(trackChanges(tracker.toPlainObject()));
   };

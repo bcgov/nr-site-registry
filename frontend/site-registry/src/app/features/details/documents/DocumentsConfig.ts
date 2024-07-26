@@ -3,7 +3,7 @@ import { FormFieldType, IFormField } from "../../../components/input-controls/IF
 import { participantNameDrpdown } from "../dropdowns/DropdownSlice";
 
 
-const GetDocumentsConfig = () => {
+export const GetDocumentsConfig = () => {
     const participantName = useSelector(participantNameDrpdown);
     const documentFirstChildFormRows: IFormField[][] = [
         [
@@ -142,6 +142,3 @@ const GetDocumentsConfig = () => {
         documentFormRows
     }
 }
-
-
-export default GetDocumentsConfig;

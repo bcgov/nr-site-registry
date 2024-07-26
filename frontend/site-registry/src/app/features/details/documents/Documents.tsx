@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import GetDocumentsConfig from "./DocumentsConfig";
+import {GetDocumentsConfig} from "./DocumentsConfig";
 import { AppDispatch } from "../../../Store";
 import { documents, updateSiteDocument } from "./DocumentsSlice";
 import { resetSiteDetails, siteDetailsMode, trackChanges } from "../../site/dto/SiteSlice";
@@ -21,7 +21,7 @@ import ModalDialog from "../../../components/modaldialog/ModalDialog";
 import { v4 } from "uuid";
 
 const Documents = () => {
-    const {documentFirstChildFormRowsForExternal, documentFirstChildFormRows, documentFormRows} = GetDocumentsConfig();
+    const {documentFirstChildFormRowsForExternal, documentFirstChildFormRows, documentFormRows} = GetDocumentsConfig() || {};
     const siteDocuments = useSelector(documents);
     const mode = useSelector(siteDetailsMode);
     const resetDetails = useSelector(resetSiteDetails); 
@@ -72,8 +72,8 @@ const Documents = () => {
       const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const searchTerm = event.target.value;
         setSearchTerm(searchTerm);
-    
-        const filteredData = siteDocuments.filter((document: any) => {
+  
+        const filteredData = (siteDocuments || []).filter((document: any) => {
             // Check if any property of the notation object contains the searchTerm
             return deepSearch(document, searchTerm.toLowerCase().trim());
         });
@@ -91,7 +91,7 @@ const Documents = () => {
     
             const stringValue = typeof value === 'string' ? value.toLowerCase() : String(value).toLowerCase();
             
-            if (key === 'completionDate' || key === 'requirementDueDate' || key === 'requirementReceivedDate') {
+            if (key === 'submissionDate' || key === 'documentDate') {
                 const date = new Date(value);
                 const formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).toLowerCase();
                 const ordinalSuffixPattern = /\b(\d+)(st|nd|rd|th)\b/g;
@@ -288,7 +288,7 @@ const Documents = () => {
           flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
         const tracker = new ChangeTracker(
             IChangeType.Modified,
-            'Document: ' + currLabel?.label ?? '',
+            'Document: ' + currLabel?.label,
           );
           dispatch(trackChanges(tracker.toPlainObject()));
     }
@@ -302,13 +302,13 @@ const Documents = () => {
                 <div className="col-lg-6 col-md-12 py-4 d-flex flex-column flex-sm-row ">
                     <button
                         className={`d-flex align-items-center btn-upload-document justify-content-center`}
-                       
+                        data-testid = "Upload Document"
                         aria-label="Upload Document">
                             <label htmlFor="input-file" className="d-flex align-items-center gap-2">
                                 <UploadFileIcon className="btn-document-icon cursor-pointer" />
                                 <span className="cursor-pointer">Upload Document</span>
                             </label>
-                            <input type="file" id="input-file" accept=".pdf" style={{ display: 'none' }}  onChange={(e) => handleOnUploadDocument(e)} />
+                            <input aria-label="input-file"  type="file" id="input-file" accept=".pdf" style={{ display: 'none' }}  onChange={(e) => handleOnUploadDocument(e)} />
                     </button>
                 </div>
             }
@@ -327,7 +327,7 @@ const Documents = () => {
         <div data-testid = "document-rows" className={`col-lg-12 overflow-auto p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`} style={{ maxHeight: '800px'}}>
             {
                 formData && formData.map((document, index) => (
-                    <div key={index}>
+                    <div key={index}  data-testid={`document-row-${index}`}>
                          {
                             (viewMode === SiteDetailsMode.SRMode) && userType === UserType.Internal && 
                             <CheckBoxInput
@@ -379,10 +379,11 @@ const Documents = () => {
                                         { (viewMode === SiteDetailsMode.EditMode) && userType === UserType.Internal && 
                                             <>
                                                 <button
-                                                    id="download-pdf"
+                                                    id="replace-pdf"
                                                     className=" d-flex align-items-center justify-content-center document-btn "
                                                     type="button"
                                                     aria-label={'File replace'}
+                                                    data-testid = "replace-file"
                                                     >
                                                     <label htmlFor={`replace-file_${index}`} className="d-flex align-items-center gap-2">
                                                         <ReplaceIcon className="btn-document-icon cursor-pointer" />
@@ -391,11 +392,12 @@ const Documents = () => {
                                                     <input type="file" id={`replace-file_${index}`} accept=".pdf" style={{ display: 'none' }}  onChange={(e) => handleFileReplace(e, document)} key={key}/>
                                                 </button>
                                                 <button
-                                                    id="download-pdf"
+                                                    id="delete-pdf"
                                                     className=" d-flex align-items-center justify-content-center document-btn "
                                                     type="button"
                                                     onClick={() => handleFileDelete(document)}
                                                     aria-label={'File delete'}
+                                                     data-testid = "delete-file"
                                                     >
                                                     <TrashCanIcon className="btn-document-icon" />
                                                     <span>Delete</span>

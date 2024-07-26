@@ -24,7 +24,7 @@ interface IFormRendererProps {
   ) => void;
 }
 
-const Form: React.FC<IFormRendererProps>  = ({ formRows, formData, editMode, srMode, handleInputChange }) => {
+const Form: React.FC<IFormRendererProps>  = ({ formRows = [], formData, editMode, srMode, handleInputChange }) => {
     return(<>
      {formRows.map((row, rowIndex) => (
                 <div key={rowIndex} className="row">

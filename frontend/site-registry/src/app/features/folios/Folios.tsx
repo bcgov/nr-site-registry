@@ -3,8 +3,7 @@ import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
 import Table from '../../components/table/Table';
 import { RequestStatus } from '../../helpers/requests/status';
-import {
-  FolioTableColumns,
+import {  
   getFolioTableColumnsBasedOnMode,
 } from './FolioTableConfig';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,7 +21,6 @@ import {
   updateRequestStatus,
 } from './FolioSlice';
 import { Folio } from './dto/Folio';
-import { v4 } from 'uuid';
 import { deepSearch, getUser } from '../../helpers/utility';
 import { AppDispatch } from '../../Store';
 import './Folios.css';
@@ -34,7 +32,7 @@ import {
 } from '../../components/common/icon';
 import SearchInput from '../../components/search/SearchInput';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
-import { Outlet, useBlocker } from 'react-router-dom';
+import { useBlocker } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
 
 const Folios = () => {
@@ -109,24 +107,12 @@ const Folios = () => {
     console.log('folioItemsArr', folioItemsArr);
   }, [folioItemsArr]);
 
-  const handleAddNewFolio = () => {
-    //setTempArr([...tempArr, { userId: "", description: "", folioId : "new" , id: v4(), whoCreated: "" } ])
+  const handleAddNewFolio = () => {   
     SetAddFolioConfirm(true);
   };
 
   const handleChange = (event: any) => {
-    console.log('fc');
-
-    // const updatedArr = tempArr.map(folio => {
-    //   if(folio.id === event.row.id)
-    //     {
-    //       return { ...folio, [event.property]: event.value , dirty: true} ;
-    //     }
-    //     return folio;
-    // })
-
-    // setTempArr(updatedArr);
-
+   
     setTempArr((prevData) => {
       const folioToUpdate = prevData.map((folio) => {
         if (folio.id === event.row.id) {
@@ -259,8 +245,7 @@ const Folios = () => {
 
               console.log('rowsToBeUpdated', rowsToBeUpdated);
               dispatch(resetFolioSiteUpdateStatus(null));
-              dispatch(updateFolioItem(rowsToBeUpdated));
-              //dispatch(resetFolioItemAddedStatus(null));
+              dispatch(updateFolioItem(rowsToBeUpdated));             
             }
             SetShowUpdatesConfirmModal(false);
           }}

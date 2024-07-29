@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Folio } from 'src/app/entities/folio.entity';
+import { Folio } from '../../entities/folio.entity';
 import { Repository } from 'typeorm';
 import { FolioDTO, FolioMinDTO } from '../../dto/Folio';
 import { plainToInstance } from 'class-transformer';
 import { FolioContentsService } from './folioContents.service';
-import { FolioContentDTO } from 'src/app/dto/folioContent';
-import { FolioContents } from 'src/app/entities/folioContents.entity';
+import { FolioContentDTO } from '../../dto/folioContent';
+import { FolioContents } from '../../entities/folioContents.entity';
 
 @Injectable()
 export class FolioService {

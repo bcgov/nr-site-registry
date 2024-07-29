@@ -51,6 +51,11 @@ export const fetchFolioItems = createAsyncThunk(
             }
         })     
         console.log("folion items response", response)
+        if(response=== undefined)
+        {
+          return [];
+        }
+        else
         return response.data.data.getSitesForFolio.data;
       }
       catch(error)

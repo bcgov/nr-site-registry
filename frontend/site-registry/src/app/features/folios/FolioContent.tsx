@@ -20,13 +20,12 @@ import {
 } from "./FolioSlice";
 import { Folio, FolioContentDTO } from "./dto/Folio";
 import {
-  AngleLeft,
-  FolderPlusIcon,
+  AngleLeft,  
   ShoppingCartIcon,
   TrashCanIcon,
 } from "../../components/common/icon";
 import "./FolioContent.css";
-import { addCartItem, deleteCartItem, deleteCartItemWithSiteId, resetCartItemAddedStatus, resetCartItemDeleteStatus } from "../cart/CartSlice";
+import { addCartItem, deleteCartItemWithSiteId, resetCartItemAddedStatus, resetCartItemDeleteStatus } from "../cart/CartSlice";
 import { useAuth } from "react-oidc-context";
 import ModalDialog from "../../components/modaldialog/ModalDialog";
 
@@ -93,11 +92,9 @@ const FolioContents = () => {
     if(event && event.property === "select_row")
     {      
       const index = selectedRows.findIndex((r:any) => r.id === event.row.id);
-      if (index > -1 && !event.value) {
-        // If row is already selected, remove it
+      if (index > -1 && !event.value) {      
         SetSelectedRows(selectedRows.filter((r:any) => r.id !== event.row.id));
-      } else {
-        // If row is not selected, add it
+      } else {       
         SetSelectedRows([...selectedRows, event.row]);
       }
     }    

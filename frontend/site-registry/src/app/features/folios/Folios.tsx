@@ -175,14 +175,14 @@ const Folios = () => {
             </>
           )}
         </div>
-        <div>
+      
           <SearchInput
             placeHolderText={'Search Folios'}
             searchTerm={searchText}
             clearSearch={clearSearch}
             handleSearchChange={handleSearchChange}
           />
-        </div>
+        
       </div>
       <div className="col-12">
         <Table

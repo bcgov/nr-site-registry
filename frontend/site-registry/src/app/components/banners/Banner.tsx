@@ -2,11 +2,17 @@ import React from "react";
 import "./banner.css";
 import { Icon, backdropClasses } from "@mui/material";
 import checkIcon from "../../images/tick.png";
-import {TickIcon, ExclamationCircle, ExclamationTriangle} from "../../components/common/icon";
+import {TickIcon, ExclamationCircle, ExclamationTriangle} from "../common/icon";
+import { Dispatch } from "react";
+import { useDispatch } from "react-redux";
 
 const imagePath = "/Users/ndixit/Documents/nr-site-registry/frontend/site-registry/src/app";
 
-const Banner = ({ type }) => {
+interface BannerProps {
+  type: string;
+}
+
+const Banner: React.FC<BannerProps> = ({ type }) => {
   let message = '';
   let detailMessage1 = '';
   let detailMessage2 = '';
@@ -32,6 +38,7 @@ const Banner = ({ type }) => {
       break;
   }
 
+  
   return (
     <div>
       <div className="d-flex status-banner-container ">
@@ -46,10 +53,6 @@ const Banner = ({ type }) => {
                 {message}
             </span> 
         
-        </div>
-
-        <div className="d-flex snapshot-banner-message align-items-center">
-          <span className="snapshot-message"> Snapshot Taken: dgdgrdsgregeyeryeryeyrereureuy </span>
         </div>
         
     </div>

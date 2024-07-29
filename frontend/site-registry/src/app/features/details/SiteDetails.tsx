@@ -6,8 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import CustomLabel from "../../components/simple/CustomLabel";
 import PageContainer from "../../components/simple/PageContainer";
 import LabelComponent from "./LabelComponent";
-import Banner from "../../helpers/banners/Banner";
-
+import Banner from "../../components/banners/Banner";
+import { BannerStatus } from '../../helpers/requests/bannerStatus';
 
 import {
   ChevronDown,
@@ -298,7 +298,7 @@ const SiteDetails = () => {
         </div>
       </div>
       <div className="section-details-header row">
-        <Banner type="pending"/>
+        <Banner type={BannerStatus.current}/>
         <div>
           <CustomLabel label="Site ID: " labelType="b-h5" />
           <CustomLabel label="1" labelType="r-h5" />

@@ -2,20 +2,6 @@
   margin-bottom: var(--layout-margin-medium);
 }  
 
-.snapshot-banner-message {
-  gap: var(--layoutmarginsmall);
-}
-
-.snapshot-message {
-  font-family: BC Sans;
-  font-size: 15px;
-  font-style: italic;
-  font-weight: 400;
-  line-height: 21px;
-  text-align: left;
-  color: var(--typography-color-disabled);
-}
-
 .status-banner-message {
   padding: var(--layoutpaddingxsmall) var(--layoutpaddingmedium) var(--layoutpaddingxsmall) var(--layoutpaddingmedium);
   border-radius: var(--layout-border-width-large); 

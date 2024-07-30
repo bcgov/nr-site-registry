@@ -12,7 +12,8 @@ import notationParticipantReducer from "./features/details/notations/NotationSli
 import DropdownReducer from "./features/details/dropdowns/DropdownSlice";
 import siteDisclosureReducer from "./features/details/disclosure/DisclosureSlice";
 import cartReducer from "./features/cart/CartSlice";
-import documentsReducer from './features/details/documents/DocumentsSlice'
+import documentsReducer from './features/details/documents/DocumentsSlice';
+import snapshotsReducer from './features/details/snapshot/SnapshotSlice';
 
 const persistedStore: any = loadFromLocalStorage();
 
@@ -27,6 +28,7 @@ export const store = configureStore({
     dropdown: DropdownReducer,
     cart: cartReducer,
     documents: documentsReducer,
+    snapshots: snapshotsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

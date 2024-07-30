@@ -1,56 +1,42 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
-import LabelComponent from './LabelComponent';
 import {
-  ChevronDown,
-  ChevronUp,
   AngleLeft,
   DropdownIcon,
   FolderPlusIcon,
   ShoppingCartIcon,
 } from '../../components/common/icon';
-import { TableColumn } from '../../components/table/TableColumn';
-import Table from '../../components/table/Table';
-import { RequestStatus } from '../../helpers/requests/status';
-import SummaryForm from './SummaryForm';
-import PanelWithUpDown from '../../components/simple/PanelWithUpDown';
 import {
   fetchSitesDetails,
   selectSiteDetails,
-  trackChanges,
   trackedChanges,
   clearTrackChanges,
   siteDetailsMode,
   updateSiteDetailsMode,
 } from '../site/dto/SiteSlice';
 import { AppDispatch } from '../../Store';
-import Notations from './notations/Notations';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
 import {
   dropDownNavItems,
   navComponents,
   navItems,
-} from './NavigationPillsConfig';
+} from './navigation/NavigationPillsConfig';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import {
   CancelButton,
-  CustomPillButton,
   SaveButton,
 } from '../../components/simple/CustomButtons';
 import {
-  ChangeTracker,
   IChangeType,
 } from '../../components/common/IChangeType';
 
 import "./SiteDetails.css"; // Ensure this import is correct
-import { FormFieldType } from "../../components/input-controls/IFormField";
 import { SiteDetailsMode } from "./dto/SiteDetailsMode";
 import { UserType } from "../../helpers/requests/userType";
-import { UserMode } from "../../helpers/requests/userMode";
 import Actions from "../../components/action/Actions";
 import { ActionItems } from "../../components/action/ActionsConfig";
 import { getUser } from "../../helpers/utility";
@@ -62,17 +48,19 @@ import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
 import { useAuth } from "react-oidc-context";
 import { fetchNotationParticipants } from "./notations/NotationSlice";
 import { fetchDocuments } from './documents/DocumentsSlice';
+import { fetchSnapshots, snapshots } from './snapshot/SnapshotSlice';
+import { RequestStatus } from '../../helpers/requests/status';
 
 const SiteDetails = () => {
   const auth = useAuth();
-
+  
+  const snapshot = useSelector(snapshots);
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
   const [save, setSave] = useState(false);
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
-
   const dispatch = useDispatch<AppDispatch>();
 
   const navigate = useNavigate();
@@ -83,7 +71,9 @@ const SiteDetails = () => {
   const { id } = useParams();
 
   const details = useSelector(selectSiteDetails);
+
   const loggedInUser = getUser();
+
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
       setUserType(UserType.External);
@@ -95,6 +85,7 @@ const SiteDetails = () => {
       // not logged in
       setUserType(UserType.External);
     }
+
   }, []);
 
   const savedChanges = useSelector(trackedChanges);
@@ -109,18 +100,25 @@ const SiteDetails = () => {
     dispatch(fetchNotationClassCd());
     dispatch(fetchNotationTypeCd());
     dispatch(fetchNotationParticipantRoleCd());
+       
+    // Calling snapshot for the implementation of snapshot string on top
+    // This will change in future based on condition of User type.
+    dispatch(fetchSnapshots({siteId: id ?? '', userId: loggedInUser?.profile.preferred_username ?? ''}))
+
+    // should be based on condition for External and Internal User.
     dispatch(fetchSitesDetails({ siteId: id ?? "" }));
     dispatch(fetchNotationParticipants(id ?? ''));
     dispatch(fetchSiteParticipants(id ?? ''));
     dispatch(fetchDocuments(id ?? ''));
     dispatch(fetchSiteDisclosure(id ?? ''));
-  }, [id]);
+  }, [dispatch, id]);
 
   useEffect(() => {
     if (details && details.id === id) {
       handleAddRecentView(details);
     }
   }, [details]);
+  
 
   const handleItemClick = (value: string) => {
     switch (value) {
@@ -187,6 +185,9 @@ const SiteDetails = () => {
     }
   };
 
+  if (snapshot.status === RequestStatus.loading) return <div>Loading...</div>;
+  if (snapshot.status === RequestStatus.failed) return <div>Error: {snapshot.error}</div>;
+ 
   return (
     <PageContainer role="details">
       {save && (
@@ -296,6 +297,12 @@ const SiteDetails = () => {
         </div>
       </div>
       <div className="section-details-header row">
+        {
+          UserType.External === userType && (snapshot.status === RequestStatus.success && snapshot.snapshot.data !== null) &&
+          <div className='py-2 snapshot'>
+            <span>{`Snapshot Taken: ${new Date(snapshot.snapshot.data[0].created)}`}</span>
+          </div>
+        }
         <div>
           <CustomLabel label="Site ID: " labelType="b-h5" />
           <CustomLabel label="1" labelType="r-h5" />
@@ -308,6 +315,7 @@ const SiteDetails = () => {
         items={navItems}
         components={navComponents}
         dropdownItems={dropDownNavItems}
+        isDisable = { UserType.External === userType && (snapshot.snapshot.data === null)}
       />
     </PageContainer>
   );

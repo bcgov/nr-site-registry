@@ -62,6 +62,31 @@ export class SnapshotsResolver {
   }
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Query(() => SnapshotResponse, { name: 'getSnapshotsByUserIdAndSiteId' })
+  @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
+  async getSnapshotsByUserIdAndSiteId(
+    @Args('siteId', { type: () => String }) siteId: string,
+    @Args('userId', { type: () => String }) userId: string,
+  ) {
+    const result = await this.snapshotsService.getSnapshotsByUserIdAndSiteId(siteId, userId);
+    if (result && result.length > 0) {
+      return this.genericResponseProvider.createResponse(
+        'Snapshot fetched successfully.',
+        200,
+        true,
+        result,
+      );
+    } else {
+      return this.genericResponseProvider.createResponse(
+        `Snapshot not found for user id: ${userId} and site id ${siteId}`,
+        404,
+        false,
+        null,
+      );
+    }
+  }
+
+  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
   @Query(() => SnapshotResponse, { name: 'getSnapshotsById' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSnapshotsById(@Args('id', { type: () => Int }) id: number) {

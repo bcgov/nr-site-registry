@@ -3,7 +3,6 @@
 }  
 
 .status-banner-message {
-  padding: var(--layoutpaddingxsmall) var(--layoutpaddingmedium) var(--layoutpaddingxsmall) var(--layoutpaddingmedium);
   border-radius: var(--layout-border-width-large); 
   opacity: 0px; 
   margin-right: var(--layout-margin-large);
@@ -13,7 +12,6 @@
 .status-message {
   font-weight: normal;
   color: var(--typography-color-secondary);
-  font-family: BC Sans;
   font-size: 14px;
   font-weight: 400;
   line-height: 21px;
@@ -25,32 +23,30 @@
   border-radius: var(--layout-border-width-large);
   flex-direction: column;
   margin-bottom: var(--layout-margin-medium);
+  padding: var(--layout-padding-medium);
+  flex-wrap: wrap;
 }
 
 .detail-message-1 {
   margin: var(--layout-margin-large) var(--layout-margin-small) var(--layout-margin-large) var(--layout-margin-medium);
-  /*padding: var(--layout-padding-large) var(--layout-padding-small) var(--layout-padding-large) var(--layout-padding-medium);*/
 }
 
 .detail-message-wrapper {
-  /*margin: var(--layout-margin-small) var(--layout-margin-small) var(--layout-margin-large) var(--layout-margin-medium);*/
   padding: var(--layout-padding-small) var(--layout-padding-small) var(--layout-padding-large) var(--layout-padding-medium);
 }
 
 .detail-message-2 {
   margin: var(--layout-margin-medium) var(--layout-margin-large) var(--layout-margin-small) var(--layout-margin-small);
-  /*padding-top: var(--layout-margin-small);*/
 }
 
 .detail-message-3 {
-  /*margin: var(--layout-margin-large) var(--layout-margin-large) var(--layout-margin-large) var(--layout-margin-large);*/
   font-weight: bold;
   color: var(--typography-color-link);
 }
 
-.status-message-details span {
+/*.status-message-details span {
   flex-direction: column;
-}
+}*/
 
 .message-current  {
   background-color: var(--support-support-surface-color-success);
@@ -69,6 +65,8 @@
 
 .icon {
   font-size: 18px;
+  padding-left: var(--layout-padding-small);
+  margin-left: var(--layout-margin-medium);
 }
 
 .icon-current {
@@ -87,5 +85,8 @@
   display: none;
 }
   
+.inline-block {
+  display: inline-block;
+}
   
   

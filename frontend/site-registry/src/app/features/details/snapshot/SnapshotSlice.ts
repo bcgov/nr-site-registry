@@ -6,7 +6,6 @@ import { GRAPHQL } from "../../../helpers/endpoints";
 import { graphQLSnapshotByUserIdAndSiteId } from "../../site/graphql/Snapshot";
 import { print } from "graphql";
 
-
 // Define the initial state
 const initialState : ISnapshotState = {
     snapshot: [],

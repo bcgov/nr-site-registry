@@ -4,6 +4,7 @@ import Disclosure from '../disclosure/Disclosure';
 import Documents from '../documents/Documents';
 import LandUses from '../landUses/LandUses';
 import Notations from '../notations/Notations';
+import ParcelDescriptions from '../parcelDescriptions/parcelDescriptions';
 import Participants from '../participants/Participant';
 
 import Summary from '../summary/Summary';
@@ -19,16 +20,18 @@ export const navItems: string[] = [
   'Site Disclosure',
 ];
 
-export const navComponents: JSX.Element[] = [
-  <Summary />,
-  <Notations />,
-  <Participants />,
-  <Documents />,
-  <Associate />,
-  <LandUses />,
-  <></>,
-  <Disclosure />,
-];
+export function navComponents(siteId: number): JSX.Element[] {
+  return [
+    <Summary />,
+    <Notations />,
+    <Participants />,
+    <Documents />,
+    <Associate />,
+    <LandUses />,
+    <ParcelDescriptions siteId={siteId} />,
+    <Disclosure />,
+  ];
+}
 
 export const dropDownNavItems: DropdownItem[] = [
   {

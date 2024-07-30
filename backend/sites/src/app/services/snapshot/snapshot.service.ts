@@ -38,7 +38,7 @@ export class SnapshotsService {
         order: { created: 'DESC' }, });
       return result;
     } catch (error) {
-      throw new Error('Failed to retrieve snapshots by userId.');
+      throw new Error('Failed to retrieve snapshots by userId and siteId.');
     }
   }
 

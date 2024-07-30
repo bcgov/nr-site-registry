@@ -21,6 +21,7 @@ describe('SnapshotResolver', () => {
           useValue: {
             getSnapshots: jest.fn(),
             getSnapshotsByUserId: jest.fn(),
+            getSnapshotsByUserIdAndSiteId: jest.fn(),
             getSnapshotsById: jest.fn(),
             createSnapshot: jest.fn(),
           },
@@ -234,6 +235,96 @@ describe('SnapshotResolver', () => {
     });
   });
 
+  describe('getSnapshotsByUserIdAndSiteId', () => {
+    const res: Snapshots[] = [
+      {
+        id: 1,
+        userId: '1',
+        siteId: '1',
+        transactionId: '1',
+        created: new Date(),
+        updated: new Date(),
+        snapshotData: {
+          city: 'Surrey',
+          siteId: '5',
+          userId: '1',
+          address: '123 ABC',
+          participants: [
+            {
+              name: 'Brandon',
+              department: 'EPD',
+            },
+            {
+              name: 'Jackie',
+              department: 'EPD',
+            },
+          ],
+          generalDescription: 'Testing new api',
+        },
+        site: sampleSites[0],
+      },
+      {
+        id: 1,
+        userId: '1',
+        siteId: '1',
+        transactionId: '2',
+        created: new Date(),
+        updated: new Date(),
+        snapshotData: {
+          city: 'Surrey',
+          siteId: '5',
+          userId: '1',
+          address: '123 ABC',
+          participants: [
+            {
+              name: 'Brandon',
+              department: 'EPD',
+            },
+            {
+              name: 'Jackie',
+              department: 'EPD',
+            },
+          ],
+          generalDescription: 'Testing new api',
+        },
+        site: sampleSites[0],
+      },
+    ];
+
+    it('should return a success response with HTTP status 200', async () => {
+      const userId = '1';
+      const siteId = '1';
+      const mockResponse: SnapshotResponse = {
+        httpStatusCode: 200,
+        success: true,
+        message: 'Snapshot fetched successfully.',
+        data: res,
+      };
+      jest
+        .spyOn(service, 'getSnapshotsByUserIdAndSiteId')
+        .mockResolvedValueOnce(mockResponse.data);
+
+      const result = await resolver.getSnapshotsByUserIdAndSiteId(siteId, userId);
+
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should return a not found response with HTTP status 404', async () => {
+      const userId = '1';
+      const siteId = '1';
+      const mockResponse: SnapshotResponse = {
+        httpStatusCode: 404,
+        success: false,
+        message: `Snapshot not found for user id: ${userId} and site id ${siteId}`,
+        data: null,
+      };
+      jest.spyOn(service, 'getSnapshotsByUserIdAndSiteId').mockResolvedValueOnce(null);
+
+      const result = await resolver.getSnapshotsByUserIdAndSiteId(siteId, userId);
+
+      expect(result).toEqual(mockResponse);
+    });
+  });
   describe('getSnapshotsById', () => {
     const res: Snapshots[] = [
       {
@@ -329,6 +420,7 @@ describe('SnapshotResolver', () => {
         userId: '1',
         siteId: '1',
         transactionId: '3',
+        created: new Date(),
         snapshotData: {
           userId: '1',
           siteId: '5',
@@ -357,6 +449,7 @@ describe('SnapshotResolver', () => {
         userId: '1',
         siteId: '1',
         transactionId: '3',
+        created: new Date(),
         snapshotData: {
           userId: '1',
           siteId: '5',

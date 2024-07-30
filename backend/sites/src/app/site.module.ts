@@ -62,6 +62,8 @@ import { CartService } from './services/cart/cart.service';
 import { Cart } from './entities/cart.entity';
 import { NotationResolver } from './resolvers/notation/notation.resolver';
 import { NotationService } from './services/notation/notation.service';
+import { DocumentResolver } from './resolvers/document/document.resolver';
+import { DocumentService } from './services/document/document.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -137,7 +139,9 @@ import { NotationService } from './services/notation/notation.service';
     CartResolver,
     CartService,
     NotationResolver,
-    NotationService
+    NotationService,
+    DocumentResolver,
+    DocumentService
   ],
   controllers: [SiteController],
 })

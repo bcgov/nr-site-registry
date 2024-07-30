@@ -29,7 +29,7 @@ export class SiteDocs {
   @Column('timestamp without time zone', { name: 'submission_date' })
   submissionDate: Date;
 
-  @Field()
+  @Field({nullable: true})
   @Column('timestamp without time zone', {
     name: 'document_date',
     nullable: true,
@@ -40,7 +40,7 @@ export class SiteDocs {
   @Column('character varying', { name: 'title', length: 150 })
   title: string;
 
-  @Field()
+  @Field({nullable: true})
   @Column('character varying', { name: 'note', nullable: true, length: 255 })
   note: string | null;
 
@@ -48,7 +48,7 @@ export class SiteDocs {
   @Column('character varying', { name: 'who_created', length: 30 })
   whoCreated: string;
 
-  @Field()
+  @Field({nullable: true})
   @Column('character varying', {
     name: 'who_updated',
     nullable: true,
@@ -60,7 +60,7 @@ export class SiteDocs {
   @Column('timestamp without time zone', { name: 'when_created' })
   whenCreated: Date;
 
-  @Field()
+  @Field({nullable: true})
   @Column('timestamp without time zone', {
     name: 'when_updated',
     nullable: true,
@@ -71,11 +71,12 @@ export class SiteDocs {
   @Column('smallint', { name: 'rwm_flag' })
   rwmFlag: number;
 
-  @Field()
+  @Field({nullable: true})
   @Column('smallint', { name: 'rwm_note_flag', nullable: true })
   rwmNoteFlag: number | null;
 
-  @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sdoc)
+  @Field(() => [SiteDocPartics])
+  @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sdoc, {eager: true})
   siteDocPartics: SiteDocPartics[];
 
   @ManyToOne(() => Sites, (sites) => sites.siteDocs, { onDelete: 'CASCADE' })

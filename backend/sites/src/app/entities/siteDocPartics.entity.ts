@@ -43,7 +43,7 @@ export class SiteDocPartics {
   @Column('character varying', { name: 'who_created', length: 30 })
   whoCreated: string;
 
-  @Field()
+  @Field({nullable: true})
   @Column('character varying', {
     name: 'who_updated',
     nullable: true,
@@ -55,7 +55,7 @@ export class SiteDocPartics {
   @Column('timestamp without time zone', { name: 'when_created' })
   whenCreated: Date;
 
-  @Field()
+  @Field({nullable: true})
   @Column('timestamp without time zone', {
     name: 'when_updated',
     nullable: true,
@@ -66,14 +66,17 @@ export class SiteDocPartics {
   @Column('smallint', { name: 'rwm_flag' })
   rwmFlag: number;
 
+  @Field(() => DocParticRoleCd)
   @ManyToOne(
     () => DocParticRoleCd,
     (docParticRoleCd) => docParticRoleCd.siteDocPartics,
+    {eager: true}
   )
   @JoinColumn([{ name: 'dpr_code', referencedColumnName: 'code' }])
   dprCode2: DocParticRoleCd;
 
-  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.siteDocPartics)
+  @Field(() => PeopleOrgs)
+  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.siteDocPartics, {eager: true})
   @JoinColumn([{ name: 'psnorg_id', referencedColumnName: 'id' }])
   psnorg: PeopleOrgs;
 

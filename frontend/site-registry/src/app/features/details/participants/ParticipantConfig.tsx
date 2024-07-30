@@ -101,7 +101,7 @@ export const GetConfig = () => {
             displayName: 'Note',
             active:true,
             graphQLPropertyName:'note',
-            columnSize: ColumnSize.Default,
+            columnSize: ColumnSize.Triple,
             displayType: {
                 type: FormFieldType.Text,
                 label: '',
@@ -223,7 +223,7 @@ export const GetConfig = () => {
             displayName: 'Note',
             active:true,
             graphQLPropertyName:'note',
-            columnSize: ColumnSize.Default,
+            columnSize: ColumnSize.Triple,
             displayType: {
                 type: FormFieldType.TextArea,
                 label: '',

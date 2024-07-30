@@ -39,3 +39,73 @@
   text-align: left;
   color: var(--typography-color-secondary, #474543) !important;
 }
+
+
+.participant-btn {
+  border: 1px solid var(--surface-border-dark, #353433) !important;
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium) !important;
+  border-radius: var(--surface-border-radius-medium) !important;
+  gap: var(--layout-margin-small);
+  background: var(--surface-background-white, #ffffff);
+}
+
+.participant-btn-lbl {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: center;
+  color: var(--typography-color-primary, #2d2d2d);
+}
+
+.participant-btn-disable {
+  border: none;
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium);
+  border-radius: var(--surface-border-radius-medium);
+  gap: var(--layout-margin-small);
+  background: var(--surface-primary-disabled, #edebe9);
+}
+
+
+.participant-btn-lbl-disabled {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: center;
+  color: var(--typography-color-disabled, #9f9d9c);
+}
+
+.participant-sr-btn {
+  display: flex !important;
+  align-items: center;
+  gap: var(--layout-margin-small) !important;
+  border: 1px solid var(--surface-border-dark, #353433) !important;
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium) !important;
+  border-radius: var(--surface-border-radius-medium) !important;
+  gap: var(--layout-margin-small);
+  background: var(--surface-background-white, #ffffff);
+}
+
+.participant-sr-btn:hover {
+  display: flex !important;
+  align-items: center;
+  gap: var(--layout-margin-small) !important;
+  border: 3px solid var(--surface-primary-active, #2e5dd7) !important;
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium) !important;
+  border-radius: var(--surface-border-radius-medium, 4px) !important;
+  background: var(--surface-secondary-hover, #edebe9) !important;
+}
+
+.participant-sr-btn-disable {
+  border: none !important;
+  display: flex !important;
+  align-items: center;
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium) !important;
+  border-radius: var(--surface-border-radius-medium) !important;
+  gap: var(--layout-margin-small) !important;
+  background: var(--surface-primary-disabled, #edebe9) !important;
+}

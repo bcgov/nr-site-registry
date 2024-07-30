@@ -1,25 +1,11 @@
-import React from 'react';
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
+import { render, screen} from '@testing-library/react';
 import Disclosure from './Disclosure';
 import { Provider, useSelector } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
-import {
-  disclosureCommentsConfig,
-  disclosureScheduleExternalConfig,
-  disclosureScheduleInternalConfig,
-  disclosureStatementConfig,
-  srVisibilityConfig,
-} from './DisclosureConfig';
-import { siteDisclosure, updateSiteDisclosure } from './DisclosureSlice';
 import { RequestStatus } from '../../../helpers/requests/status';
-import { Minus, Plus } from '../../../components/common/icon';
-import {
-  ChangeTracker,
-  IChangeType,
-} from '../../../components/common/IChangeType';
 
 // Mocking the useSelector hook with the correct state structure
 jest.mock('react-redux', () => ({
@@ -119,7 +105,7 @@ describe('Disclosure Component', () => {
     expect(screen.getByText('No Results Found')).toBeInTheDocument();
   });
 
-  test('displays disclosure data when available', async () => {
+  it('displays disclosure data when available', async () => {
     store = mockStore({
       ...store.getState().disclosure,
       status: RequestStatus.loading,

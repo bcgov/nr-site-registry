@@ -2,8 +2,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { plainToInstance } from 'class-transformer';
-import { v4 } from 'uuid';
 import { NotationService } from './notation.service';
 import { Events } from '../../entities/events.entity';
 

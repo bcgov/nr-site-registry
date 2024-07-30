@@ -56,7 +56,7 @@ import { UserType } from "../../helpers/requests/userType";
 import { UserMode } from "../../helpers/requests/userMode";
 import Actions from "../../components/action/Actions";
 import { ActionItems } from "../../components/action/ActionsConfig";
-import { getUser } from "../../helpers/utility";
+import { getUser, showNotification } from "../../helpers/utility";
 import { addRecentView } from "../dashboard/DashboardSlice";
 import { fetchNotationClassCd, fetchNotationParticipantRoleCd, fetchNotationTypeCd,
   fetchParticipantRoleCd,
@@ -72,6 +72,7 @@ import Form from "../../components/form/Form";
 import SearchInput from "../../components/search/SearchInput";
 import {
   addSiteToFolio,
+  addSiteToFolioRequest,
   fetchFolioItems,
   folioItems,
 } from "../folios/FolioSlice";
@@ -82,6 +83,8 @@ const SiteDetails = () => {
   const [folioSearchTerm, SetFolioSearchTeam] = useState("");
 
   const folioDetails = useSelector(folioItems);
+
+  const addSiteToFolioRequestStatus = useSelector(addSiteToFolioRequest)
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -103,6 +106,11 @@ const SiteDetails = () => {
     };
     dispatch(addSiteToFolio([dto])).unwrap();
   };
+
+
+  useEffect(()=>{
+    showNotification(addSiteToFolioRequestStatus,"Successfully added site to folio", "Unable to add to folio");
+  },[addSiteToFolioRequestStatus])
 
   const folioDropdown: IFormField = {
     type: FormFieldType.DropDownWithSearch,

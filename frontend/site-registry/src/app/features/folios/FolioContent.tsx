@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
-import PageContainer from "../../components/simple/PageContainer";
-import CustomLabel from "../../components/simple/CustomLabel";
-import Table from "../../components/table/Table";
-import { RequestStatus } from "../../helpers/requests/status";
-import { FolioContentTableColumns } from "./FolioContentTableConfig";
-import { useNavigate, useParams } from "react-router-dom";
-import { getUser } from "../../helpers/utility";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../Store";
+import React, { useEffect, useState } from 'react';
+import PageContainer from '../../components/simple/PageContainer';
+import CustomLabel from '../../components/simple/CustomLabel';
+import Table from '../../components/table/Table';
+import { RequestStatus } from '../../helpers/requests/status';
+import { FolioContentTableColumns } from './FolioContentTableConfig';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getUser, showNotification } from '../../helpers/utility';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../Store';
 import {
-  
   deleteSiteInFolioStatus,
   deleteSitesInFolio,
   fetchFolioItems,
@@ -17,17 +16,22 @@ import {
   getSiteForFolio,
   resetFolioSiteDeleteStatus,
   sitesInFolio,
-} from "./FolioSlice";
-import { Folio, FolioContentDTO } from "./dto/Folio";
+} from './FolioSlice';
+import { Folio, FolioContentDTO } from './dto/Folio';
 import {
-  AngleLeft,  
+  AngleLeft,
   ShoppingCartIcon,
   TrashCanIcon,
-} from "../../components/common/icon";
-import "./FolioContent.css";
-import { addCartItem, deleteCartItemWithSiteId, resetCartItemAddedStatus, resetCartItemDeleteStatus } from "../cart/CartSlice";
-import { useAuth } from "react-oidc-context";
-import ModalDialog from "../../components/modaldialog/ModalDialog";
+} from '../../components/common/icon';
+import './FolioContent.css';
+import {
+  addCartItem,
+  deleteCartItemWithSiteId,
+  resetCartItemAddedStatus,
+  resetCartItemDeleteStatus,
+} from '../cart/CartSlice';
+import { useAuth } from 'react-oidc-context';
+import ModalDialog from '../../components/modaldialog/ModalDialog';
 
 const FolioContents = () => {
   const { id } = useParams();
@@ -38,7 +42,7 @@ const FolioContents = () => {
   const user = getUser();
 
   useEffect(() => {
-    dispatch(fetchFolioItems(user?.profile.sub ? user.profile.sub : ""));
+    dispatch(fetchFolioItems(user?.profile.sub ? user.profile.sub : ''));
   }, []);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -53,26 +57,30 @@ const FolioContents = () => {
 
   const sitesDeleteStatus = useSelector(deleteSiteInFolioStatus);
 
-  const [showDeleteConfirmModal, SetShowDeleteConfirmModal] = useState( false);
-
+  const [showDeleteConfirmModal, SetShowDeleteConfirmModal] = useState(false);
 
   useEffect(() => {
-    const dto = { id: parseInt(id ?? "0"), userId: user?.profile.sub ?? "" };
+    const dto = { id: parseInt(id ?? '0'), userId: user?.profile.sub ?? '' };
 
     dispatch(getSiteForFolio(dto)).unwrap();
   }, []);
 
   useEffect(() => {
-    const dto = { id: parseInt(id ?? "0"), userId: user?.profile.sub ?? "" };
+    const dto = { id: parseInt(id ?? '0'), userId: user?.profile.sub ?? '' };
 
     dispatch(getSiteForFolio(dto)).unwrap();
+    showNotification(
+      sitesDeleteStatus,
+      'Successfully deleted site from Folio',
+      'Unable delete site from folio',
+    );
   }, [sitesDeleteStatus]);
 
   useEffect(() => {
     let folioDetails = folioItemsArr.find(
-      (x: any) => x.id === parseInt(id ?? "")
+      (x: any) => x.id === parseInt(id ?? ''),
     );
-    console.log("folioItemsArr", folioDetails);
+    console.log('folioItemsArr', folioDetails);
     SetSelectedFolio(folioDetails);
   }, [folioItemsArr]);
 
@@ -85,94 +93,76 @@ const FolioContents = () => {
     navigate(-1);
   };
 
-
-  const handleChangeEventFromTable = (event:any) =>{
-
+  const handleChangeEventFromTable = (event: any) => {
     console.log(event);
-    if(event && event.property === "select_row")
-    {      
-      const index = selectedRows.findIndex((r:any) => r.id === event.row.id);
-      if (index > -1 && !event.value) {      
-        SetSelectedRows(selectedRows.filter((r:any) => r.id !== event.row.id));
-      } else {       
+    if (event && event.property === 'select_row') {
+      const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
+      if (index > -1 && !event.value) {
+        SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
+      } else {
         SetSelectedRows([...selectedRows, event.row]);
       }
-    }    
-  }
-
-
-  const handleAddToShoppingCart = () =>{
-
-    const loggedInUser = getUser();
-    console.log(selectedRows)
-    if (loggedInUser === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: "bceid" } });
-    } else {
-
-      const foliosToAdd = selectedRows.map(folio => {
-        return {
-         userId: loggedInUser.profile.sub,
-         siteId: folio.siteId,
-         whoCreated: loggedInUser.profile.given_name ?? "",
-         price: 200.11,
-       }
-     })
-
-    dispatch(resetCartItemAddedStatus(null));
-      dispatch(
-        addCartItem(foliosToAdd)
-      ).unwrap();
     }
+  };
 
+  const handleAddToShoppingCart = () => {
+    const loggedInUser = getUser();
+    console.log(selectedRows);
+    if (loggedInUser === null) {
+      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+    } else {
+      const foliosToAdd = selectedRows.map((folio) => {
+        return {
+          userId: loggedInUser.profile.sub,
+          siteId: folio.siteId,
+          whoCreated: loggedInUser.profile.given_name ?? '',
+          price: 200.11,
+        };
+      });
 
-  }
-
+      dispatch(resetCartItemAddedStatus(null));
+      dispatch(addCartItem(foliosToAdd)).unwrap();
+    }
+  };
 
   const handleDeleteFromFolio = () => {
-
     const loggedInUser = getUser();
-    console.log(selectedRows)
+    console.log(selectedRows);
     if (loggedInUser === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: "bceid" } });
+      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
-
-      const sitesinFolio = selectedRows.map(folio => {
+      const sitesinFolio = selectedRows.map((folio) => {
         return {
-          id: parseInt(id??""),
-         userId: loggedInUser.profile.sub,
-         siteId: folio.siteId,   
-         folioId: id ,
-         whoCreated : ""     
-       }
-     });
+          id: parseInt(id ?? ''),
+          userId: loggedInUser.profile.sub,
+          siteId: folio.siteId,
+          folioId: id,
+          whoCreated: '',
+        };
+      });
 
-     dispatch(resetFolioSiteDeleteStatus(null));
-     dispatch(deleteSitesInFolio(sitesinFolio)).unwrap();
+      dispatch(resetFolioSiteDeleteStatus(null));
+      dispatch(deleteSitesInFolio(sitesinFolio)).unwrap();
     }
+  };
 
-  }
-
-  
   const handleDeleteFromShoppingCart = () => {
-
     const loggedInUser = getUser();
-    console.log(selectedRows)
+    console.log(selectedRows);
     if (loggedInUser === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: "bceid" } });
+      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
-
-      const cartItemsToDelete = selectedRows.map(folio => {
+      const cartItemsToDelete = selectedRows.map((folio) => {
         return {
-         userId: loggedInUser.profile.sub,
-         siteId: folio.siteId         
-       }
-     })
+          userId: loggedInUser.profile.sub,
+          siteId: folio.siteId,
+        };
+      });
 
-     dispatch(resetCartItemDeleteStatus(null));
-     dispatch(deleteCartItemWithSiteId(cartItemsToDelete)).unwrap();
+      dispatch(resetCartItemDeleteStatus(null));
+      dispatch(deleteCartItemWithSiteId(cartItemsToDelete)).unwrap();
     }
-
-  }
+  };
 
   return (
     <PageContainer role="Folio Contents">
@@ -186,7 +176,7 @@ const FolioContents = () => {
         </button>
         <div className="folio-description">
           <div>
-            <span className="folio-details-bold">Folio ID: </span>{" "}
+            <span className="folio-details-bold">Folio ID: </span>{' '}
             <span className="folio-details-default">{selectedFolio?.id}</span>
           </div>
           <div>
@@ -202,11 +192,21 @@ const FolioContents = () => {
           <CustomLabel label="Folio Contents" labelType="b-h1" />
         </div>
         <div className="search-result-actions">
-          <div className="search-result-actions-btn" onClick={()=>{handleAddToShoppingCart()}}>
+          <div
+            className="search-result-actions-btn"
+            onClick={() => {
+              handleAddToShoppingCart();
+            }}
+          >
             <ShoppingCartIcon />
             <span>Add Selected To Cart</span>
           </div>
-          <div className="search-result-actions-btn" onClick={()=>{SetShowDeleteConfirmModal(true)}}>
+          <div
+            className="search-result-actions-btn"
+            onClick={() => {
+              SetShowDeleteConfirmModal(true);
+            }}
+          >
             <TrashCanIcon />
             <span>Remove Selected From Folio</span>
           </div>
@@ -231,25 +231,24 @@ const FolioContents = () => {
           }}
           editMode={false}
           idColumnName="id"
-          deleteHandler={()=>{}}
+          deleteHandler={() => {}}
         />
       </div>
 
       {showDeleteConfirmModal && (
-              <ModalDialog
-                label="Are you sure to delete the selected sites from folio?"
-                closeHandler={(response) => {
-                  console.log("response",response)
-                  if (response) {      
-                    handleDeleteFromFolio();      
-                  }
-                  SetShowDeleteConfirmModal(false);
-                }}
-              >
-
-            <span> Please confirm before proceeding.</span>
-              </ModalDialog>
-            )}
+        <ModalDialog
+          label="Are you sure to delete the selected sites from folio?"
+          closeHandler={(response) => {
+            console.log('response', response);
+            if (response) {
+              handleDeleteFromFolio();
+            }
+            SetShowDeleteConfirmModal(false);
+          }}
+        >
+          <span> Please confirm before proceeding.</span>
+        </ModalDialog>
+      )}
     </PageContainer>
   );
 };

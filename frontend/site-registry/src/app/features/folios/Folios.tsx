@@ -3,9 +3,7 @@ import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
 import Table from '../../components/table/Table';
 import { RequestStatus } from '../../helpers/requests/status';
-import {  
-  getFolioTableColumnsBasedOnMode,
-} from './FolioTableConfig';
+import { getFolioTableColumnsBasedOnMode } from './FolioTableConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addFolioItem,
@@ -21,7 +19,7 @@ import {
   updateRequestStatus,
 } from './FolioSlice';
 import { Folio } from './dto/Folio';
-import { deepSearch, getUser } from '../../helpers/utility';
+import { deepSearch, getUser, showNotification } from '../../helpers/utility';
 import { AppDispatch } from '../../Store';
 import './Folios.css';
 import {
@@ -34,6 +32,8 @@ import SearchInput from '../../components/search/SearchInput';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import { useBlocker } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
+
+import { notifyError, notifySuccess } from '../../components/alert/Alert';
 
 const Folios = () => {
   let blocker = useBlocker(
@@ -68,20 +68,36 @@ const Folios = () => {
 
   const user = getUser();
 
+
   useEffect(() => {
     if (user === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     }
-
     dispatch(fetchFolioItems(user?.profile.sub ? user.profile.sub : ''));
   }, []);
 
   useEffect(() => {
     dispatch(fetchFolioItems(user?.profile.sub ? user.profile.sub : ''));
+    showNotification(
+      addStatus,
+      'Successfully added new folio.',
+      'Unable to add new folio',
+    );
   }, [addStatus]);
 
   useEffect(() => {
     dispatch(fetchFolioItems(user?.profile.sub ? user.profile.sub : ''));
+    showNotification(
+      folioDeleteStatus,
+      'Successfully deleted folio.',
+      'Unable to delete folio',
+    );
+
+    if (folioDeleteStatus === RequestStatus.success) {
+      notifySuccess();
+    } else if (folioDeleteStatus === RequestStatus.failed) {
+      notifyError();
+    }
   }, [folioDeleteStatus]);
 
   useEffect(() => {
@@ -91,6 +107,11 @@ const Folios = () => {
     setTimeout(() => {
       dispatch(fetchFolioItems(user?.profile.sub ? user.profile.sub : ''));
     }, 1000);
+
+    showNotification(updateStatus);
+
+
+
   }, [updateStatus]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,16 +124,14 @@ const Folios = () => {
   };
 
   useEffect(() => {
-    setTempArr(folioItemsArr);
-    console.log('folioItemsArr', folioItemsArr);
+    setTempArr(folioItemsArr);   
   }, [folioItemsArr]);
 
-  const handleAddNewFolio = () => {   
+  const handleAddNewFolio = () => {
     SetAddFolioConfirm(true);
   };
 
   const handleChange = (event: any) => {
-   
     setTempArr((prevData) => {
       const folioToUpdate = prevData.map((folio) => {
         if (folio.id === event.row.id) {
@@ -175,14 +194,13 @@ const Folios = () => {
             </>
           )}
         </div>
-      
-          <SearchInput
-            placeHolderText={'Search Folios'}
-            searchTerm={searchText}
-            clearSearch={clearSearch}
-            handleSearchChange={handleSearchChange}
-          />
-        
+
+        <SearchInput
+          placeHolderText={'Search Folios'}
+          searchTerm={searchText}
+          clearSearch={clearSearch}
+          handleSearchChange={handleSearchChange}
+        />
       </div>
       <div className="col-12">
         <Table
@@ -245,7 +263,7 @@ const Folios = () => {
 
               console.log('rowsToBeUpdated', rowsToBeUpdated);
               dispatch(resetFolioSiteUpdateStatus(null));
-              dispatch(updateFolioItem(rowsToBeUpdated));             
+              dispatch(updateFolioItem(rowsToBeUpdated));
             }
             SetShowUpdatesConfirmModal(false);
           }}
@@ -281,11 +299,11 @@ const Folios = () => {
             if (response) {
               if (blocker) {
                 blocker?.proceed?.();
-              }           
+              }
             } else {
               if (blocker) {
                 blocker?.reset?.();
-              }              
+              }
             }
             SetShowDeleteConfirmModal(false);
           }}

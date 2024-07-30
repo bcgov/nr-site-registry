@@ -76,6 +76,7 @@ export const fetchFolioItems = createAsyncThunk(
           FolioDTO: FolioInputDTO,
         },
       });
+      //console.log("request.data",request.data.data.httpStatusCode)
       return request.data;
     }
   );
@@ -182,6 +183,9 @@ const folioSlice = createSlice({
             state.fetchRequestStatus = RequestStatus.failed;           
           })
           .addCase(addFolioItem.fulfilled, (state, action) => {
+            if(action.payload.data.addFolioItem.httpStatusCode === 400)
+              state.addRequestStatus = RequestStatus.failed;
+            else
             state.addRequestStatus = RequestStatus.success;
           })
           .addCase(addFolioItem.rejected, (state, action) => {
@@ -224,6 +228,7 @@ export const deleteRequestStatus = (state: any) => state.folio.deleteRequestStat
 export const deleteSiteInFolioStatus = (state: any) => state.folio.deleteSiteInFolioRequest;
 export const updateRequestStatus =  (state: any) => state.folio.updateRequestStatus;
 export const sitesInFolio = (state: any) => state.folio.sitesArray;
+export const addSiteToFolioRequest = ( state: any) => state.folio.addSiteToFolioRequest;
 
 export const {
 

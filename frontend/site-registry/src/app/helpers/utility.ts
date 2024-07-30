@@ -8,6 +8,8 @@ import {
   FormFieldType,
   IFormField,
 } from '../components/input-controls/IFormField';
+import { RequestStatus } from './requests/status';
+import { notifyError, notifySuccess } from '../components/alert/Alert';
 
 export const serializeDate = (data: any) => {
   const serializedData: any = { ...data };
@@ -120,4 +122,18 @@ export const deepSearch = (obj: any, searchTerm: string): boolean => {
       }
   }
   return false;
+};
+
+
+
+export const showNotification = (
+  currentStatus: RequestStatus,
+  successMessage?: string,
+  errorMessage?: string,
+) => {
+  if (currentStatus === RequestStatus.success) {
+    notifySuccess(successMessage);
+  } else if (currentStatus === RequestStatus.failed) {
+    notifyError(errorMessage);
+  }
 };

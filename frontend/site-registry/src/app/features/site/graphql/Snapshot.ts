@@ -1,17 +1,14 @@
 import gql from 'graphql-tag';
 
-export const graphQLSnapshotByUserIdAndSiteId = () => {
+export const graphQLSnapshotBySiteId = () => {
   return gql`
-    query getSnapshotsByUserIdAndSiteId($siteId: String!, $userId: String!) {
-      getSnapshotsByUserIdAndSiteId(siteId: $siteId, userId: $userId) {
+    query getSnapshotsBySiteId($siteId: String!) {
+      getSnapshotsBySiteId(siteId: $siteId) {
         httpStatusCode
         message
         data {
-           userId
-           siteId
-           transactionId
-           snapshotData
-           created
+          siteId
+          created
         }
       }
     }

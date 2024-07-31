@@ -9,6 +9,7 @@ import {
   DropdownIcon,
   FolderPlusIcon,
   ShoppingCartIcon,
+  SpinnerIcon,
 } from '../../components/common/icon';
 import {
   fetchSitesDetails,
@@ -55,6 +56,7 @@ const SiteDetails = () => {
   const auth = useAuth();
   
   const snapshot = useSelector(snapshots);
+  console.log('Snapshot - > ', snapshot)
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
@@ -90,6 +92,7 @@ const SiteDetails = () => {
 
   const savedChanges = useSelector(trackedChanges);
   const mode = useSelector(siteDetailsMode);
+  
   useEffect(() => {
     setViewMode(mode);
   }, [mode]);
@@ -100,10 +103,10 @@ const SiteDetails = () => {
     dispatch(fetchNotationClassCd());
     dispatch(fetchNotationTypeCd());
     dispatch(fetchNotationParticipantRoleCd());
-       
+    
     // Calling snapshot for the implementation of snapshot string on top
     // This will change in future based on condition of User type.
-    dispatch(fetchSnapshots({siteId: id ?? '', userId: loggedInUser?.profile.preferred_username ?? ''}))
+    dispatch(fetchSnapshots(id ?? ''))
 
     // should be based on condition for External and Internal User.
     dispatch(fetchSitesDetails({ siteId: id ?? "" }));
@@ -118,7 +121,6 @@ const SiteDetails = () => {
       handleAddRecentView(details);
     }
   }, [details]);
-  
 
   const handleItemClick = (value: string) => {
     switch (value) {
@@ -185,7 +187,16 @@ const SiteDetails = () => {
     }
   };
 
-  if (snapshot.status === RequestStatus.loading) return <div>Loading...</div>;
+  if (snapshot.status === RequestStatus.loading)
+  {
+    return (
+         <div className="loading-overlay">
+               <div className="spinner-container">
+                 <SpinnerIcon data-testid="loading-spinner" className="site-fa-spin" />
+                 </div>
+         </div>
+     );
+  }
   if (snapshot.status === RequestStatus.failed) return <div>Error: {snapshot.error}</div>;
  
   return (

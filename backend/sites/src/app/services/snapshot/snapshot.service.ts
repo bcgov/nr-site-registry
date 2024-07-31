@@ -32,7 +32,7 @@ export class SnapshotsService {
     }
   }
 
-  async getSnapshotsByUserIdAndSiteId(siteId: string, userId: string) {
+  async getSnapshotsBySiteId(siteId: string, userId: string) {
     try {
       const result = await this.snapshotRepository.find({ where: {siteId, userId },
         order: { created: 'DESC' }, });

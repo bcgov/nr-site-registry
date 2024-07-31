@@ -3,7 +3,7 @@ import { RequestStatus } from "../../../helpers/requests/status";
 import { ISnapshotState } from "./ISnapshotState";
 import { getAxiosInstance } from "../../../helpers/utility";
 import { GRAPHQL } from "../../../helpers/endpoints";
-import { graphQLSnapshotByUserIdAndSiteId } from "../../site/graphql/Snapshot";
+import { graphQLSnapshotBySiteId } from "../../site/graphql/Snapshot";
 import { print } from "graphql";
 
 // Define the initial state
@@ -16,18 +16,17 @@ const initialState : ISnapshotState = {
 // Define the asynchronous thunk to fetch site participants from the backend
 export const fetchSnapshots = createAsyncThunk(
     'snapshots/fetchSnapshots',
-    async (args: {siteId: string, userId: string}) => {
+    async (siteId: string) => {
       try
       {
         const response = await getAxiosInstance().post( GRAPHQL, {
-            query: print(graphQLSnapshotByUserIdAndSiteId()),
+            query: print(graphQLSnapshotBySiteId()),
             variables: {
-                siteId: args.siteId,
-                userId: args.userId,
-            }
+                siteId:siteId
+              }
         });
       
-        return response.data.data.getSnapshotsByUserIdAndSiteId;
+        return response.data.data.getSnapshotsBySiteId;
       }
       catch(error)
       {
@@ -45,10 +44,13 @@ const snapshotsSlice = createSlice({
         builder
           .addCase(fetchSnapshots.pending, (state) => {
             state.status = RequestStatus.loading;
+            state.snapshot = [];
+            state.error = '';
           })
           .addCase(fetchSnapshots.fulfilled, (state, action) => {
             state.status = RequestStatus.success;
             state.snapshot = action.payload;
+            state.error = '';
           })
           .addCase(fetchSnapshots.rejected, (state, action) => {
             state.status = RequestStatus.failed;

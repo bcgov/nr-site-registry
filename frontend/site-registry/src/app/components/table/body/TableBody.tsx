@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useState } from 'react';
-import get from 'lodash/get';
 import { SpinnerIcon } from '../../common/icon';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { TableColumn } from '../TableColumn';
@@ -17,6 +16,8 @@ import {
   DeleteIcon,
 } from '../../input-controls/InputControls';
 import { ChangeTracker } from '../../common/IChangeType';
+import { get } from '../utils';
+
 interface TableBodyProps {
   isLoading: RequestStatus;
   columns: TableColumn[];

@@ -22,7 +22,6 @@
     "graphql-tag": "^2.12.6",
     "keycloak-js": "^19.0.2",
     "leaflet": "^1.9.3",
-    "lodash": "^4.17.21",
     "oidc-client-ts": "^2.1.0",
     "react": "^18.2.0",
     "react-bootstrap": "2.10.2",
@@ -45,7 +44,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!@react-parcelmap-bc)/\"  ",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:cov": "npm test -- --coverage"
   },

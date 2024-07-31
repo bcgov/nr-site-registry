@@ -34,6 +34,7 @@ const Widget: React.FC<IWidget> = ({
               label={''}
               isLabel={false}
               onChange={handleCheckBoxChange ?? (() => {})}
+              srMode={srMode}
             />
           )}
           <div className="w-100 me-1">

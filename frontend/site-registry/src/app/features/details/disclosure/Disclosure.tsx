@@ -125,7 +125,7 @@ const Disclosure = () => {
       flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
     const tracker = new ChangeTracker(
       IChangeType.Modified,
-      'Site Disclosure: ' + currLabel?.label ?? '',
+      'Site Disclosure: ' + currLabel?.label,
     );
     dispatch(trackChanges(tracker.toPlainObject()));
   };

@@ -25,7 +25,7 @@ interface IFormRendererProps {
 }
 
 const Form: React.FC<IFormRendererProps> = ({
-  formRows,
+  formRows = [],
   formData,
   editMode,
   srMode,
@@ -146,6 +146,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   type={field.type}
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
+                  isDisabled={field.isDisabled ?? false}
                 />
               )}
               {field.type === FormFieldType.Group && (
@@ -189,7 +190,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   onChange={(value) =>
                     handleInputChange(field.graphQLPropertyName, value)
                   }
-                  srMode={srMode ?? false}
+                  srMode={srMode}
                 />
               )}
             </div>

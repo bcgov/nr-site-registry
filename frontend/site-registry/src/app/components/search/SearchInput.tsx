@@ -70,6 +70,7 @@ const SearchInput: React.FC<ISearchInput> = ({
             </span>
           ) : (
             <span
+              data-testid="clear-icon"
               id="clear-icon"
               className="clear-icon custom-icon position-absolute px-2"
               onClick={handleClose}

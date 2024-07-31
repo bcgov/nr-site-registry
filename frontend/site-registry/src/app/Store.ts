@@ -13,6 +13,7 @@ import DropdownReducer from './features/details/dropdowns/DropdownSlice';
 import siteDisclosureReducer from './features/details/disclosure/DisclosureSlice';
 import cartReducer from './features/cart/CartSlice';
 import landUsesReducer from './features/details/landUses/LandUsesSlice';
+import documentsReducer from './features/details/documents/DocumentsSlice';
 
 const persistedStore: any = loadFromLocalStorage();
 
@@ -27,6 +28,7 @@ export const store = configureStore({
     dropdown: DropdownReducer,
     cart: cartReducer,
     landUses: landUsesReducer,
+    documents: documentsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

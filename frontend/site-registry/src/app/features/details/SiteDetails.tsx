@@ -67,6 +67,7 @@ import { fetchSiteDisclosure } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
 import { fetchNotationParticipants } from './notations/NotationSlice';
+import { fetchDocuments } from './documents/DocumentsSlice';
 
 const SiteDetails = () => {
   const auth = useAuth();
@@ -117,6 +118,7 @@ const SiteDetails = () => {
     dispatch(fetchSitesDetails({ siteId: id ?? '' }));
     dispatch(fetchNotationParticipants(id ?? ''));
     dispatch(fetchSiteParticipants(id ?? ''));
+    dispatch(fetchDocuments(id ?? ''));
     dispatch(fetchSiteDisclosure(id ?? ''));
   }, [id]);
 

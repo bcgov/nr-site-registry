@@ -45,6 +45,7 @@ export interface IFormField {
   isDateRange?: boolean;
   children?: IFormField[];
   isChildLabel?: boolean;
+  isDisabled?: boolean;
   suffix?: string;
   isImage?: boolean;
   validation?: {

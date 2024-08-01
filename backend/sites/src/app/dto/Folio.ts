@@ -40,6 +40,8 @@ export class FolioDTO {
   whenUpdated?: string;
 }
 
+
+// Minified version of Folio DTO
 @InputType()
 export class FolioMinDTO {
   @Field()

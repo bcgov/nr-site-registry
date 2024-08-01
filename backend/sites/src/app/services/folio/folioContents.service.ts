@@ -36,8 +36,13 @@ export class FolioContentsService {
       if (existingRecord) {
         return false;
       } else {
-        delete inputDTO.id;
-        const folioContent = plainToInstance(FolioContents, inputDTO); 
+      
+        const folioContent = {
+          siteId: inputDTO.siteId,
+          folioId : inputDTO.folioId,
+          whoCreated: inputDTO.whoCreated,
+          userId: inputDTO.userId
+        }
          
         const result = await this.folioContentRepository.save(folioContent);
 

@@ -95,7 +95,7 @@ export const getAxiosInstance = () => {
   return instance;
 };
 
-
+//Searches for a specific search term in a object properties.
 export const deepSearch = (obj: any, searchTerm: string): boolean => {
   for (const key in obj) {
       const value = obj[key];

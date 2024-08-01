@@ -46,7 +46,7 @@ export class FolioContentsService {
         }
       }
     } catch (error) {
-      throw new Error('Failed to folio content');
+      throw new Error('Failed to add folio content');
     }
   }
 

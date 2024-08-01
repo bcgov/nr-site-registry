@@ -1,13 +1,22 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import {
+  AuthenticatedUser,
+  RoleMatchingMode,
+  Roles,
+} from 'nest-keycloak-connect';
 import {} from '../../dto/recentView.dto';
 
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { Cart } from '../../entities/cart.entity';
 import { CartService } from '../../services/cart/cart.service';
-import { CartDeleteDTO, CartDeleteDTOWithSiteID, CartDTO, CartResponse } from '../../dto/cart.dto';
+import {
+  CartDeleteDTO,
+  CartDeleteDTOWithSiteID,
+  CartDTO,
+  CartResponse,
+} from '../../dto/cart.dto';
 
 @Resolver(() => Cart)
 export class CartResolver {
@@ -21,22 +30,28 @@ export class CartResolver {
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getCartItemsForUser(
     @Args('userId', { type: () => String }) userId: string,
+    @AuthenticatedUser() user: any
   ) {
-    const result = await this.cartService.getCartItemsForUser(userId);
-    if (result.length > 0) {
-      return this.genericResponseProvider.createResponse(
-        'Cart items fetched successfully',
-        200,
-        true,
-        result,
-      );
-    } else {
-      return this.genericResponseProvider.createResponse(
-        `Cart items not found for user id: ${userId}`,
-        200,
-        true,
-        [],
-      );
+    try {
+      const result = await this.cartService.getCartItemsForUser(user?.sub);
+      if (result.length > 0) {
+        return this.genericResponseProvider.createResponse(
+          'Cart items fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        return this.genericResponseProvider.createResponse(
+          `Cart items not found for user id: ${userId}`,
+          200,
+          true,
+          [],
+        );
+      }
+    } catch (error) {
+      console.log('Error', error);
+      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -45,49 +60,95 @@ export class CartResolver {
   async addCartItem(
     @Args('cartDTO', { type: () => [CartDTO] }, new ValidationPipe())
     cartDTO: CartDTO[],
-  ){
-    const message = await this.cartService.addCartItem(cartDTO);
-    return this.genericResponseProvider.createResponse("Add to cart", 201, true);    
+    @AuthenticatedUser() user: any,
+  ) {
+    try {
+      const result = await this.cartService.addCartItem(cartDTO, user?.sub);
+      if (result)
+        return this.genericResponseProvider.createResponse(
+          'Items added to cart',
+          201,
+          true,
+        );
+      else
+        return this.genericResponseProvider.createResponse(
+          'Unable to add items to cart',
+          200,
+          true,
+        );
+    } catch (error) {
+      console.log('Error', error);
+      throw new Error('System Error, Please try again.');
+    }
   }
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
   @Mutation(() => CartResponse, { name: 'deleteCartItem' })
   async deleteCartItem(
-    @Args('cartDeleteDTO',{ type: () => [CartDeleteDTO] }, new ValidationPipe())
+    @Args(
+      'cartDeleteDTO',
+      { type: () => [CartDeleteDTO] },
+      new ValidationPipe(),
+    )
     cartDeleteDTO: CartDeleteDTO[],
-  ){
-    const message = await this.cartService.deleteCartItem(cartDeleteDTO);
+    @AuthenticatedUser() user: any,
+  ) {
+    try {
+      const message = await this.cartService.deleteCartItem(
+        cartDeleteDTO,
+        user?.sub,
+      );
 
-    if (message) {
-      return this.genericResponseProvider.createResponse("Deleted", 200, true);
-    }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Failed delete item. `, 400, false);
+      if (message) {
+        return this.genericResponseProvider.createResponse(
+          'Succefully deleted cart items.',
+          200,
+          true,
+        );
+      } else {
+        return this.genericResponseProvider.createResponse(
+          `Unable to delete cart items. `,
+          400,
+          false,
+        );
+      }
+    } catch (error) {
+      console.log('Error', error);
+      throw new Error('System Error, Please try again.');
     }
   }
 
-
-  
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
   @Mutation(() => CartResponse, { name: 'deleteCartItemWithSiteId' })
   async deleteCartItemWithSiteId(
-    @Args('cartDeleteDTO',{ type: () => [CartDeleteDTOWithSiteID] }, new ValidationPipe())
+    @Args(
+      'cartDeleteDTO',
+      { type: () => [CartDeleteDTOWithSiteID] },
+      new ValidationPipe(),
+    )
     cartDeleteDTO: CartDeleteDTOWithSiteID[],
-  ){
-    const message = await this.cartService.deleteCartWithSiteId(cartDeleteDTO);
+    @AuthenticatedUser() user: any,
+  ) {
+    try {
+      const message =
+        await this.cartService.deleteCartWithSiteId(cartDeleteDTO,user?.sub);
 
-    if (message) {
-      return this.genericResponseProvider.createResponse('Deleted', 200, true);
-    } else {
-      return this.genericResponseProvider.createResponse(
-        `Failed delete item. `,
-        400,
-        false,
-      );
+      if (message) {
+        return this.genericResponseProvider.createResponse(
+          'Deleted cart items.',
+          200,
+          true,
+        );
+      } else {
+        return this.genericResponseProvider.createResponse(
+          `Unable to delete cart item. `,
+          400,
+          false,
+        );
+      }
+    } catch (error) {
+      console.log('Error', error);
+      throw new Error('System Error, Please try again.');
     }
   }
-
-
-
 }

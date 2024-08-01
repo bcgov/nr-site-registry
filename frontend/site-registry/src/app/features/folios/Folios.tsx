@@ -229,8 +229,8 @@ const Folios = () => {
           closeHandler={(response) => {
             if (response) {
               const folio: Folio = {
-                folioId: 'New',
-                description: 'Please update description',
+                folioId: 'New'+ Math.ceil(Math.random()*1000),
+                description: 'Please update description & folio name as desired',
                 userId: user?.profile.sub ? user.profile.sub : '',
                 whoCreated: user?.profile.given_name
                   ? user.profile.given_name

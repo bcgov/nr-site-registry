@@ -23,8 +23,8 @@ export class FolioService {
       const folio = await this.folioRepository.find({
         relations: { folioContents: true },
         where: { userId },
-        order: { id: 'ASC'}
-      })
+        order: { id: 'ASC' },
+      });
       return folio;
     } catch (error) {
       console.error('Error', error);
@@ -85,30 +85,32 @@ export class FolioService {
   async updateFolio(inputArr: FolioDTO[], userInfo: any): Promise<boolean> {
     try {
       const userId = userInfo.sub;
-      for (const inputDTO of inputArr) {
-        const { id } = inputDTO;
+      const updatePromises = inputArr.map(async (inputDTO) => {
+        const { id, description, folioId } = inputDTO;
 
         const existingRecord = await this.folioRepository.findOne({
           where: { id, userId },
         });
 
         if (existingRecord) {
-          existingRecord.description = inputDTO.description;
-          existingRecord.folioId = inputDTO.folioId;
+          existingRecord.description = description;
+          existingRecord.folioId = folioId;
           existingRecord.whenUpdated = new Date();
 
           const result = await this.folioRepository.save(existingRecord);
 
           if (!result) {
-            // Handle the case where save did not return the expected result
             console.error(`Failed to save record with id ${id}`);
           }
         }
-      }
+      });
+
+      await Promise.all(updatePromises);
     } catch (error) {
       console.error('Error', error);
       throw new Error('Failed to update folio content');
     }
+
     return true;
   }
 

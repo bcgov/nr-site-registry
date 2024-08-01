@@ -28,15 +28,24 @@ export class FolioResolver {
     user: any
   ) {
 
-    const result = await this.folioService.getFoliosForUser(user);
+    try {
 
-    if (result.length > 0) {
-      return this.genericResponseProvider.createResponse('Folio fetched successfully', 200, true, result);
+      const result = await this.folioService.getFoliosForUser(user);
+
+      if (result.length > 0) {
+        return this.genericResponseProvider.createResponse('Folio fetched successfully', 200, true, result);
+      }
+      else
+      {
+        return this.genericResponseProvider.createResponse(`Folio not found for user id: ${userId}`, 200, true, []);
+      }
+
+    } catch (error) {
+      console.log('Error', error);
+      throw new Error('System Error, Please try again.');
     }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Folio not found for user id: ${userId}`, 200, true, []);
-    }
+
+   
   }
 
 
@@ -50,15 +59,24 @@ export class FolioResolver {
     user: any
   ) {
 
-    const result = await this.folioService.getSitesForFolio(folioDTO,user);
+    try {
 
-    if (result.length > 0) {
-      return this.genericResponseProviderForFolioContent.createResponse('Folio fetched successfully', 200, true, result);
+      const result = await this.folioService.getSitesForFolio(folioDTO,user);
+
+      if (result.length > 0) {
+        return this.genericResponseProviderForFolioContent.createResponse('Sites fetched successfully for folio', 200, true, result);
+      }
+      else
+      {
+        return this.genericResponseProviderForFolioContent.createResponse(`Unable to fetch sites for folio`, 200, true, []);
+      }
+      
+    } catch (error) {
+      console.log('Error', error);
+      throw new Error('System Error, Please try again.');
     }
-    else
-    {
-      return this.genericResponseProviderForFolioContent.createResponse(`Folio not found for user id: ${folioDTO.userId}`, 200, true, []);
-    }
+
+ 
   }
 
 
@@ -70,15 +88,25 @@ export class FolioResolver {
     @AuthenticatedUser()
     user: any
   ){
-    const message = await this.folioService.addFolio(folioDTO, user);
 
-    if (message) {
-      return this.genericResponseProvider.createResponse("Success", 201, true);
+    try {
+
+      const message = await this.folioService.addFolio(folioDTO, user);
+
+      if (message) {
+        return this.genericResponseProvider.createResponse("Success", 201, true);
+      }
+      else
+      {
+        return this.genericResponseProvider.createResponse(`Failed to add Folio. `, 400, false);
+      }
+
+    } catch (error) {
+      console.log('Error', error);
+      throw new Error('System Error, Please try again.');
     }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Failed to add Folio. `, 400, false);
-    }
+
+   
   }
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
@@ -89,17 +117,26 @@ export class FolioResolver {
     @AuthenticatedUser()
     user: any
   ){
-  
-     console.log(user);
-    const message = await this.folioService.addSiteToFolio(folioContentDTO,user);
 
-    if (message) {
-      return this.genericResponseProvider.createResponse("Success", 201, true);
+    try {
+
+      const message = await this.folioService.addSiteToFolio(folioContentDTO,user);
+
+      if (message) {
+        return this.genericResponseProvider.createResponse("Success", 201, true);
+      }
+      else
+      {
+        return this.genericResponseProvider.createResponse(`Failed to add Folio. `, 400, false);
+      }
+
+    } catch (error) {
+      console.log('Error', error);
+      throw new Error('System Error, Please try again.');
     }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Failed to add Folio. `, 400, false);
-    }
+  
+    
+
   }
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
@@ -110,15 +147,25 @@ export class FolioResolver {
     @AuthenticatedUser()
     user: any
   ){
-    const message = await this.folioService.updateFolio(folioDTO, user);
 
-    if (message) {
-      return this.genericResponseProvider.createResponse("Success", 201, true);
+    try {
+
+      const message = await this.folioService.updateFolio(folioDTO, user);
+
+      if (message) {
+        return this.genericResponseProvider.createResponse("Success", 201, true);
+      }
+      else
+      {
+        return this.genericResponseProvider.createResponse(`Failed to add Folio. `, 400, false);
+      }
+
+    } catch (error) {
+      console.log('Error', error);
+      throw new Error('System Error, Please try again.');
     }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Failed to add Folio. `, 400, false);
-    }
+
+   
   }
 
 
@@ -131,15 +178,24 @@ export class FolioResolver {
     @AuthenticatedUser()
     user: any
   ){
-    const message = await this.folioService.deleteFolio(folioId, user);
 
-    if (message) {
-      return this.genericResponseProvider.createResponse("Deleted", 200, true);
+    try {
+
+      const message = await this.folioService.deleteFolio(folioId, user);
+
+      if (message) {
+        return this.genericResponseProvider.createResponse("Deleted", 200, true);
+      }
+      else
+      {
+        return this.genericResponseProvider.createResponse(`Failed delete item. `, 400, false);
+      }
+
+    } catch (error) {
+      console.log('Error', error);
+      throw new Error('System Error, Please try again.');
     }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Failed delete item. `, 400, false);
-    }
+  
   }
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
@@ -150,15 +206,25 @@ export class FolioResolver {
     @AuthenticatedUser()
     user: any
   ){
-    const message = await this.folioService.deleteSitesInFolio(folioContentDTO, user);
 
-    if (message) {
-      return this.genericResponseProvider.createResponse("Deleted", 200, true);
+    try {
+
+      const message = await this.folioService.deleteSitesInFolio(folioContentDTO, user);
+
+      if (message) {
+        return this.genericResponseProvider.createResponse("Deleted", 200, true);
+      }
+      else
+      {
+        return this.genericResponseProvider.createResponse(`Failed delete item. `, 400, false);
+      }
+
+    } catch (error) {
+      console.log('Error', error);
+      throw new Error('System Error, Please try again.');
     }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Failed delete item. `, 400, false);
-    }
+
+    
   }
 
 

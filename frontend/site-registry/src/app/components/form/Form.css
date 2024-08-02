@@ -137,3 +137,7 @@
 .custom-dropdown {
   color: var(--typography-color-primary) !important;
 }
+
+.custom-textarea {
+  min-height: calc(1.5em + .75rem + 5px) !important;
+}

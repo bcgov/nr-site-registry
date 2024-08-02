@@ -174,6 +174,7 @@ export const TextInput: React.FC<InputProps> = ({
               label={inputTxtId}
               isLabel={false}
               onChange={handleCheckBoxChange}
+              srMode={srMode}
             />
           )}
           {!tableMode && (
@@ -259,6 +260,7 @@ export const DropdownInput: React.FC<InputProps> = ({
             label={drdownId}
             isLabel={false}
             onChange={handleCheckBoxChange}
+            srMode={srMode}
           />
         )}
         {/* Create a label for the dropdown using the form-label class */}
@@ -403,6 +405,7 @@ export const GroupInput: React.FC<InputProps> = ({
           label={''}
           isLabel={false}
           onChange={handleCheckBoxChange}
+          srMode={srMode}
         />
       )}
       {/* Label for the group input */}
@@ -492,6 +495,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
           label={dateRangeId}
           isLabel={false}
           onChange={handleCheckBoxChange}
+          srMode={srMode}
         />
       )}
       {!tableMode && (
@@ -544,6 +548,7 @@ export const DateInput: React.FC<InputProps> = ({
   customEditInputTextCss,
   tableMode,
   onChange,
+  isDisabled,
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
   let dateValue;
@@ -568,6 +573,7 @@ export const DateInput: React.FC<InputProps> = ({
           label={dateRangeId}
           isLabel={false}
           onChange={handleCheckBoxChange}
+          srMode={srMode}
         />
       )}
       {!tableMode && (
@@ -594,6 +600,7 @@ export const DateInput: React.FC<InputProps> = ({
           value={value ?? null}
           onChange={(value) => onChange(value)}
           oneTap
+          readOnly = {isDisabled}
         />
       ) : (
         <span
@@ -675,6 +682,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
   textAreaRow,
   textAreaColoum,
 }) => {
+  
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
   };
@@ -683,6 +691,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
   const ContainerElement = tableMode ? 'td' : 'div';
   const cols = textAreaColoum ?? undefined;
   const rows = textAreaRow ?? undefined;
+  
   return (
     <ContainerElement className={tableMode ? 'table-border-light' : 'mb-3'}>
       {!tableMode && (
@@ -693,6 +702,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
               label={textAreaId}
               isLabel={false}
               onChange={(isChecked) => onChange(isChecked)}
+              srMode={srMode}
             />
           )}
           {!tableMode && (

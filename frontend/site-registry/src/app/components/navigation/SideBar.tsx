@@ -103,7 +103,7 @@ function SideBar() {
   };
 
   return (
-    <div className="side-bar">
+    <div className="side-bar position-sticky ">
       <div className="sideBar-Nav" role="menu">
         {navList
           .filter((item) => {

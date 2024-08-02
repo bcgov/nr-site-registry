@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import Table from '../../components/table/Table';
 import { RequestStatus } from '../../helpers/requests/status';
 import {
   recentAssignedColumn,
@@ -13,7 +12,6 @@ import PageContainer from "../../components/simple/PageContainer";
 import Widget from "../../components/widget/Widget";
 import { getUser } from "../../helpers/utility";
 import { AppDispatch } from '../../Store';
-import { fetchSnapshots } from '../details/snapshot/SnapshotSlice';
 
 interface DashboardWidgetProps {
   title?: string;
@@ -69,7 +67,6 @@ const Dashboard = () => {
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
   const [data, setData] = useState<any[]>([]);
   const [userType, setUserType] = useState<UserType>(UserType.External);
-  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(()=>{
  
@@ -90,9 +87,7 @@ const Dashboard = () => {
 
       setName(loggedInUser?.profile.given_name  + ' '  + loggedInUser?.profile.family_name);
      
-    // Calling snapshot for the implementation of snapshot string on top
-    // This will change in future based on condition of User type.
-    // dispatch(fetchSnapshots({siteId: id ?? '', userId: loggedInUser?.profile.preferred_username ?? ''}))
+  
   }, [loggedInUser])
 
   useEffect(() => {

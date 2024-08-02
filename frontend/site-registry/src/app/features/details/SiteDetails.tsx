@@ -42,7 +42,6 @@ import Actions from "../../components/action/Actions";
 import { ActionItems } from "../../components/action/ActionsConfig";
 import { getUser } from "../../helpers/utility";
 import { addRecentView } from "../dashboard/DashboardSlice";
-import { fetchNotationClassCd, fetchNotationParticipantRoleCd, fetchNotationTypeCd, fetchParticipantRoleCd, fetchPeopleOrgsCd } from "./dropdowns/DropdownSlice";
 import { fetchSiteParticipants } from "./participants/ParticipantSlice";
 import { fetchSiteDisclosure } from "./disclosure/DisclosureSlice";
 import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
@@ -51,18 +50,19 @@ import { fetchNotationParticipants } from "./notations/NotationSlice";
 import { fetchDocuments } from './documents/DocumentsSlice';
 import { fetchSnapshots, snapshots } from './snapshot/SnapshotSlice';
 import { RequestStatus } from '../../helpers/requests/status';
+import { fetchNotationClassCd, fetchNotationParticipantRoleCd, fetchNotationTypeCd, fetchParticipantRoleCd, fetchPeopleOrgsCd } from './dropdowns/DropdownSlice';
 
 const SiteDetails = () => {
   const auth = useAuth();
-  
+  const [isVisible, setIsVisible] = useState(false);
   const snapshot = useSelector(snapshots);
-  console.log('Snapshot - > ', snapshot)
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
   const [save, setSave] = useState(false);
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
+  const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
 
   const navigate = useNavigate();
@@ -77,6 +77,23 @@ const SiteDetails = () => {
   const loggedInUser = getUser();
 
   useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) { // Adjust the scroll position as needed
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
       setUserType(UserType.External);
     } else if (
@@ -88,7 +105,7 @@ const SiteDetails = () => {
       setUserType(UserType.External);
     }
 
-  }, []);
+  }, [dispatch, loggedInUser]);
 
   const savedChanges = useSelector(trackedChanges);
   const mode = useSelector(siteDetailsMode);
@@ -98,23 +115,32 @@ const SiteDetails = () => {
   }, [mode]);
 
   useEffect(() => {
-    dispatch(fetchPeopleOrgsCd());
-    dispatch(fetchParticipantRoleCd());
-    dispatch(fetchNotationClassCd());
-    dispatch(fetchNotationTypeCd());
-    dispatch(fetchNotationParticipantRoleCd());
-    
-    // Calling snapshot for the implementation of snapshot string on top
-    // This will change in future based on condition of User type.
-    dispatch(fetchSnapshots(id ?? ''))
-
-    // should be based on condition for External and Internal User.
-    dispatch(fetchSitesDetails({ siteId: id ?? "" }));
-    dispatch(fetchNotationParticipants(id ?? ''));
-    dispatch(fetchSiteParticipants(id ?? ''));
-    dispatch(fetchDocuments(id ?? ''));
-    dispatch(fetchSiteDisclosure(id ?? ''));
-  }, [dispatch, id]);
+    setIsLoading(true); // Set loading state to true before starting API calls
+    if (id) {
+      Promise.all([
+        dispatch(fetchPeopleOrgsCd()),
+        dispatch(fetchParticipantRoleCd()),
+        dispatch(fetchNotationClassCd()),
+        dispatch(fetchNotationTypeCd()),
+        dispatch(fetchNotationParticipantRoleCd()),
+        // Calling snapshot for the implementation of snapshot string on top
+        // This will change in future based on condition of User type.
+        dispatch(fetchSnapshots(id ?? '')),
+        // should be based on condition for External and Internal User.
+        dispatch(fetchSitesDetails({ siteId: id ?? "" })),
+        dispatch(fetchNotationParticipants(id ?? '')),
+        dispatch(fetchSiteParticipants(id ?? '')),
+        dispatch(fetchDocuments(id ?? '')),
+        dispatch(fetchSiteDisclosure(id ?? '')),
+      ])
+      .then(() => {
+        setIsLoading(false); // Set loading state to false after all API calls are resolved
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+}
+  }, [id, dispatch]);
 
   useEffect(() => {
     if (details && details.id === id) {
@@ -187,7 +213,7 @@ const SiteDetails = () => {
     }
   };
 
-  if (snapshot.status === RequestStatus.loading)
+  if (isLoading || snapshot.status === RequestStatus.loading)
   {
     return (
          <div className="loading-overlay">
@@ -197,138 +223,202 @@ const SiteDetails = () => {
          </div>
      );
   }
-  if (snapshot.status === RequestStatus.failed) return <div>Error: {snapshot.error}</div>;
+  if (snapshot.status === RequestStatus.failed) return <div>Error: {snapshot.error || 'Failed to load data'}</div>;;
  
   return (
-    <PageContainer role="details">
-      {save && (
-        <ModalDialog
-          closeHandler={(response) => {
-            setSave(false);
-            if (response) {
-              dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
-              setEdit(false);
-            }
-          }}
-        >
-          {savedChanges.length > 0 ? (
-            <React.Fragment>
-              <div>
-                <span className="custom-modal-data-text">
-                  The following fields will be updated:
-                </span>
-              </div>
-              <div>
-                <ul className="custom-modal-data-text">
-                  {savedChanges.map((item: any) => (
-                    <li key={item.label}>
-                      {IChangeType[item.changeType]} {item.label}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              <div>
-                <span className="custom-modal-data-text">
-                  No changes to save
-                </span>
-              </div>
-            </React.Fragment>
-          )}
-        </ModalDialog>
-      )}
-
-      <div className="d-flex justify-content-between">
-        <button
-          className="d-flex btn-back align-items-center"
-          onClick={onClickBackButton}
-        >
-          <AngleLeft className="btn-icon" />
-          <span className="btn-back-lbl">Back to</span>
-        </button>
-        <div className="d-flex gap-2 justify-align-center pe-2">
-          {/* { <Actions label="User" items={ [
-                { 
-                    label:'External User',
-                    value: UserType.External
-                },
-                {
-                    label:'Internal User',
-                    value: UserType.Internal
-                },
-                
-            ]} 
-            onItemClick={handleUserClick} /> } */}
-          {/* For Action Dropdown*/}
-          {!edit &&
-            viewMode === SiteDetailsMode.ViewOnlyMode &&
-            userType === UserType.Internal && (
-              <Actions
-                label="Action"
-                items={ActionItems}
-                onItemClick={handleItemClick}
-              />
-            )}
-
-          {/* For Edit / SR Dropdown*/}
-          <div className="d-flex gap-3 align-items-center">
-            {edit && userType === UserType.Internal && (
-              <>
-                <CustomLabel
-                  labelType="c-b"
-                  label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
-                />
-                <SaveButton clickHandler={() => setSave(true)} />
-                <CancelButton clickHandler={handleCancelButton} />
-              </>
-            )}
-          </div>
-
-          {/* For Cart /Folio Controls*/}
-          {!edit &&
-            viewMode === SiteDetailsMode.ViewOnlyMode &&
-            userType === UserType.External && (
-              <>
-                <button
-                  className="d-flex btn-cart align-items-center"
-                  onClick={() => handleAddToCart()}
-                >
-                  <ShoppingCartIcon className="btn-icon" />
-                  <span className="btn-cart-lbl"> Add to Cart</span>
+    <>
+      { 
+        isVisible &&
+        <div className="d-flex justify-content-between custom-sticky-header w-100">
+              <div className='d-flex gap-2 flex-wrap align-items-center'>
+                <button className="d-flex btn-back align-items-center me-3"  onClick={onClickBackButton}>
+                  <AngleLeft className="btn-icon" />
+                  <span className="btn-back-lbl">Back </span>
                 </button>
-                <button className="d-flex btn-folio align-items-center">
-                  <FolderPlusIcon className="btn-folio-icon" />
-                  <span className="btn-folio-lbl"> Add to Folio</span>
-                  <DropdownIcon className="btn-folio-icon" />
-                </button>
-              </>
-            )}
+                <div className='d-flex  flex-wrap  align-items-center gap-2 pe-3 custom-sticky-header-lbl'>
+                  Site ID: <span className='custom-sticky-header-txt'>{id ?? ''}</span>
+                  <span className='d-flex align-items-center justify-content-center px-2 custom-dot'>.</span>
+                  <div className='custom-sticky-header-lbl'>
+                    <span>{details && details.addrLine_1}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="d-flex gap-2 justify-align-center pe-2">
+                {/* For Action Dropdown*/}
+                {!edit &&
+                  viewMode === SiteDetailsMode.ViewOnlyMode &&
+                  userType === UserType.Internal && (
+                    <Actions
+                      label="Action"
+                      items={ActionItems}
+                      onItemClick={handleItemClick}
+                    />
+                  )}
+
+                {/* For Edit / SR Dropdown*/}
+                <div className="d-flex gap-3 align-items-center">
+                  {edit && userType === UserType.Internal && (
+                    <>
+                      <CustomLabel
+                        labelType="c-b"
+                        label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
+                      />
+                      <SaveButton clickHandler={() => setSave(true)} />
+                      <CancelButton clickHandler={handleCancelButton} />
+                    </>
+                  )}
+                </div>
+
+                {/* For Cart /Folio Controls*/}
+                {!edit &&
+                  viewMode === SiteDetailsMode.ViewOnlyMode &&
+                  userType === UserType.External && (
+                    <>
+                      <button
+                        className="d-flex btn-cart align-items-center"
+                        onClick={() => handleAddToCart()}
+                      >
+                        <ShoppingCartIcon className="btn-icon" />
+                        <span className="btn-cart-lbl"> Add to Cart</span>
+                      </button>
+                      <button className="d-flex btn-folio align-items-center">
+                        <FolderPlusIcon className="btn-folio-icon" />
+                        <span className="btn-folio-lbl"> Add to Folio</span>
+                        <DropdownIcon className="btn-folio-icon" />
+                      </button>
+                    </>
+                  )}
+              </div>
         </div>
-      </div>
-      <div className="section-details-header row">
+      }
+      <PageContainer role="details">
+        {save && (
+          <ModalDialog
+            closeHandler={(response) => {
+              setSave(false);
+              if (response) {
+                dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+                setEdit(false);
+              }
+            }}
+          >
+            {savedChanges.length > 0 ? (
+              <React.Fragment>
+                <div>
+                  <span className="custom-modal-data-text">
+                    The following fields will be updated:
+                  </span>
+                </div>
+                <div>
+                  <ul className="custom-modal-data-text">
+                    {savedChanges.map((item: any) => (
+                      <li key={item.label}>
+                        {IChangeType[item.changeType]} {item.label}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <div>
+                  <span className="custom-modal-data-text">
+                    No changes to save
+                  </span>
+                </div>
+              </React.Fragment>
+            )}
+          </ModalDialog>
+        )}
+
         {
-          UserType.External === userType && (snapshot.status === RequestStatus.success && snapshot.snapshot.data !== null) &&
-          <div className='py-2 snapshot'>
-            <span>{`Snapshot Taken: ${new Date(snapshot.snapshot.data[0].created)}`}</span>
+          !isVisible &&
+          <div className="d-flex justify-content-between">
+          <button
+            className="d-flex btn-back align-items-center"
+            onClick={onClickBackButton}
+          >
+            <AngleLeft className="btn-icon" />
+            <span className="btn-back-lbl">Back </span>
+          </button>
+          <div className="d-flex gap-2 justify-align-center pe-2">
+          
+            {/* For Action Dropdown*/}
+            {!edit &&
+              viewMode === SiteDetailsMode.ViewOnlyMode &&
+              userType === UserType.Internal && (
+                <Actions
+                  label="Action"
+                  items={ActionItems}
+                  onItemClick={handleItemClick}
+                />
+              )}
+
+            {/* For Edit / SR Dropdown*/}
+            <div className="d-flex gap-3 align-items-center">
+              {edit && userType === UserType.Internal && (
+                <>
+                  <CustomLabel
+                    labelType="c-b"
+                    label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
+                  />
+                  <SaveButton clickHandler={() => setSave(true)} />
+                  <CancelButton clickHandler={handleCancelButton} />
+                </>
+              )}
+            </div>
+
+            {/* For Cart /Folio Controls*/}
+            {!edit &&
+              viewMode === SiteDetailsMode.ViewOnlyMode &&
+              userType === UserType.External && (
+                <>
+                  <button
+                    className="d-flex btn-cart align-items-center"
+                    onClick={() => handleAddToCart()}
+                  >
+                    <ShoppingCartIcon className="btn-icon" />
+                    <span className="btn-cart-lbl"> Add to Cart</span>
+                  </button>
+                  <button className="d-flex btn-folio align-items-center">
+                    <FolderPlusIcon className="btn-folio-icon" />
+                    <span className="btn-folio-lbl"> Add to Folio</span>
+                    <DropdownIcon className="btn-folio-icon" />
+                  </button>
+                </>
+              )}
+          </div>
           </div>
         }
-        <div>
-          <CustomLabel label="Site ID: " labelType="b-h5" />
-          <CustomLabel label="1" labelType="r-h5" />
+
+
+        <div className="section-details-header row">
+          {
+            UserType.External === userType && (snapshot.status === RequestStatus.success && snapshot.snapshot.data !== null) &&
+            <div className='py-2 snapshot'>
+              <span>{`Snapshot Taken: ${new Date(snapshot.snapshot.data[0].created)}`}</span>
+            </div>
+          }
+          { !isVisible &&
+            <>
+              <div>
+                <CustomLabel label="Site ID: " labelType="b-h5" />
+                <CustomLabel label={id ?? ''} labelType="r-h5" />
+              </div>
+              <div>
+                <CustomLabel label={details && details.addrLine_1} labelType="b-h1" />
+              </div>
+            </>
+          }
         </div>
-        <div>
-          <CustomLabel label="2929 Quadra" labelType="b-h1" />
-        </div>
-      </div>
-      <NavigationPills
-        items={navItems}
-        components={navComponents}
-        dropdownItems={dropDownNavItems}
-        isDisable = { UserType.External === userType && (snapshot.snapshot.data === null)}
-      />
-    </PageContainer>
+        <NavigationPills
+          items={navItems}
+          components={navComponents}
+          dropdownItems={dropDownNavItems}
+          isDisable = { UserType.External === userType && (snapshot.snapshot.data === null)}
+        />
+      </PageContainer>
+    </>
   );
 };
 

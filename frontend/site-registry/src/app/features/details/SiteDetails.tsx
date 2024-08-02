@@ -67,6 +67,7 @@ import { fetchSiteDisclosure } from "./disclosure/DisclosureSlice";
 import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
 import { useAuth } from "react-oidc-context";
 import { fetchNotationParticipants } from "./notations/NotationSlice";
+import { fetchDocuments } from './documents/DocumentsSlice';
 import { DropdownSearchInput } from "../../components/input-controls/InputControls";
 import Form from "../../components/form/Form";
 import SearchInput from "../../components/search/SearchInput";
@@ -187,6 +188,7 @@ const SiteDetails = () => {
     dispatch(fetchSitesDetails({ siteId: id ?? "" }));
     dispatch(fetchNotationParticipants(id ?? ''));
     dispatch(fetchSiteParticipants(id ?? ''));
+    dispatch(fetchDocuments(id ?? ''));
     dispatch(fetchSiteDisclosure(id ?? ''));
   }, [id]);
 

@@ -60,6 +60,10 @@ import { DisclosureResolver } from './resolvers/disclosure/disclosure.resolver';
 import { CartResolver } from './resolvers/cart/cart.resolver';
 import { CartService } from './services/cart/cart.service';
 import { Cart } from './entities/cart.entity';
+import { NotationResolver } from './resolvers/notation/notation.resolver';
+import { NotationService } from './services/notation/notation.service';
+import { DocumentResolver } from './resolvers/document/document.resolver';
+import { DocumentService } from './services/document/document.service';
 import { Folio } from './entities/folio.entity';
 import { FolioContents } from './entities/folioContents.entity';
 import { FolioResolver } from './resolvers/folio/folio.resolver';
@@ -93,6 +97,10 @@ import { FolioContentsService } from './services/folio/folioContents.service';
     GenericResponseProvider,
     CartResolver,
     CartService,
+    NotationResolver,
+    NotationService,
+    DocumentResolver,
+    DocumentService,
     FolioResolver,
     FolioService,
     FolioContentsService

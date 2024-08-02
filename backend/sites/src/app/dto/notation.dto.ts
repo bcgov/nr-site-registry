@@ -1,7 +1,6 @@
 import { Field, ObjectType } from "@nestjs/graphql";
 import { ResponseDto } from "./response/response.dto";
 import { IsString } from "class-validator";
-import { SiteParticsDto } from "./sitePartics.dto";
 
 @ObjectType()
 export class NotationResponse extends ResponseDto {

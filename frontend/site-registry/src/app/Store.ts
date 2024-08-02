@@ -12,6 +12,7 @@ import notationParticipantReducer from "./features/details/notations/NotationSli
 import DropdownReducer from "./features/details/dropdowns/DropdownSlice";
 import siteDisclosureReducer from "./features/details/disclosure/DisclosureSlice";
 import cartReducer from "./features/cart/CartSlice";
+import documentsReducer from './features/details/documents/DocumentsSlice'
 import folioReducer from "./features/folios/FolioSlice"
 
 
@@ -27,6 +28,7 @@ export const store = configureStore({
     siteDisclosure: siteDisclosureReducer,
     dropdown: DropdownReducer,
     cart: cartReducer,
+    documents: documentsReducer,
     folio: folioReducer
   },
   middleware: (getDefaultMiddleware) =>

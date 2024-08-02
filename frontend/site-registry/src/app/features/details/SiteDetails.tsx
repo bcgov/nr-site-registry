@@ -65,9 +65,7 @@ import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
 import { useAuth } from "react-oidc-context";
 import { fetchNotationParticipants } from "./notations/NotationSlice";
 import { fetchDocuments } from './documents/DocumentsSlice';
-import BannerMessage from '../../components/banners/BannerMessage';
-import { BannerStatus } from '../../helpers/requests/bannerStatus';
-import Banner from '../../components/banners/Banner';
+import BannerDetails from '../../components/banners/BannerDetails';
 
 const SiteDetails = () => {
   const auth = useAuth();
@@ -192,57 +190,7 @@ const SiteDetails = () => {
       ).unwrap();
     }
   };
-
-  interface DetailMessage {
-    message: string;
-    cssClass?: string;
-  }
   
-  let type = '';
-  let bannerLabel = '';
-  let iconType = <></>;
-  let customClassForBanner = '';
-  let customClassForIcon = '';
-  let detailMessageNode = <></>;
-
-  type = BannerStatus.current; //Business Logic to decide what status needs to be sent is pending, hardcoding for UI purpose
-  switch (type) {
-    case BannerStatus.outdated:
-      bannerLabel = BannerStatus.outdatedLabel;
-      iconType = <ExclamationCircle/>;
-      customClassForBanner = "message-outdated";
-      customClassForIcon = "icon-outdated";
-      detailMessageNode = <div className="d-flex justify-content-between status-message-details p-4 message-outdated">
-                                {BannerStatus.outdatedMessage}
-                          </div>;
-      break;
-    case BannerStatus.pending:
-      bannerLabel = BannerStatus.pendingLabel;
-      iconType=<ExclamationTriangle/>;
-      customClassForBanner = "message-pending";
-      customClassForIcon = "icon-pending";
-      detailMessageNode = <div className='d-flex justify-content-between status-message-details message-pending'>
-                              <div className="d-flex m-1 m-2">{BannerStatus.pendingMessage1}</div>
-                              <div className='m-2'>
-                                  <span>{BannerStatus.pendingMessage2}</span>
-                                  <span className="detail-message-3"><a href={`mailto:${BannerStatus.pendingMessage3}`} style={{ textDecoration: 'none' }} target="_blank" rel="noopener noreferrer">
-                                    {BannerStatus.pendingMessage3}
-                                    </a>
-                                  </span>
-                              </div>
-                          </div>;
-      break;
-    case BannerStatus.current:
-      bannerLabel = BannerStatus.currentLabel;
-      customClassForBanner = "message-current";
-      customClassForIcon = "icon-current";
-      iconType=<TickIcon/>;
-      break;
-    default:
-      bannerLabel = BannerStatus.blankMessage;
-      break;
-  }
-
   return (
     <PageContainer role="details">
       {save && (
@@ -352,12 +300,7 @@ const SiteDetails = () => {
         </div>
       </div>
       <div className="section-details-header row">
-
-        <div>
-          <Banner bannerLabel={bannerLabel} iconType={iconType} customClassForBanner={customClassForBanner}
-          customClassForIcon={customClassForIcon} detailMessageNode={detailMessageNode} />
-        </div>
- 
+        <BannerDetails />
         <div>
           <CustomLabel label="Site ID: " labelType="b-h5" />
           <CustomLabel label="1" labelType="r-h5" />

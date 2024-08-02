@@ -1,11 +1,6 @@
 import React, { ReactNode } from "react";
 import "./banner.css"; 
 
-interface DetailMessage {
-  message: string;
-  cssClass?: string;
-}
-
 interface BannerProps {
   bannerLabel: string,
   iconType: ReactNode,

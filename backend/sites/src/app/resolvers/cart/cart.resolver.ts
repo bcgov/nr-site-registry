@@ -44,7 +44,7 @@ export class CartResolver {
       } else {
         return this.genericResponseProvider.createResponse(
           `Cart items not found for user id: ${userId}`,
-          200,
+          422,
           true,
           [],
         );
@@ -73,7 +73,7 @@ export class CartResolver {
       else
         return this.genericResponseProvider.createResponse(
           'Unable to add items to cart',
-          200,
+          422,
           true,
         );
     } catch (error) {
@@ -101,14 +101,14 @@ export class CartResolver {
 
       if (message) {
         return this.genericResponseProvider.createResponse(
-          'Succefully deleted cart items.',
+          'Successfully deleted cart items.',
           200,
           true,
         );
       } else {
         return this.genericResponseProvider.createResponse(
           `Unable to delete cart items. `,
-          400,
+          422,
           false,
         );
       }
@@ -142,7 +142,7 @@ export class CartResolver {
       } else {
         return this.genericResponseProvider.createResponse(
           `Unable to delete cart item. `,
-          400,
+          422,
           false,
         );
       }

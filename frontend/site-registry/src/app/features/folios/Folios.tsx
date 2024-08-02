@@ -83,6 +83,7 @@ const Folios = () => {
       'Successfully added new folio.',
       'Unable to add new folio',
     );
+    dispatch(resetFolioItemAddedStatus(null));
   }, [addStatus]);
 
   useEffect(() => {
@@ -93,11 +94,8 @@ const Folios = () => {
       'Unable to delete folio',
     );
 
-    if (folioDeleteStatus === RequestStatus.success) {
-      notifySuccess();
-    } else if (folioDeleteStatus === RequestStatus.failed) {
-      notifyError();
-    }
+    dispatch(resetFolioItemDeleteStatus(null));
+   
   }, [folioDeleteStatus]);
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { FolioContentDTO } from './folioContent';
+import { FolioContentDTO } from './folioContent.dto';
 import { ResponseDto } from './response/response.dto';
 import { Folio } from '../entities/folio.entity';
 

@@ -46,11 +46,7 @@ export const FolioTableColumns: TableColumn[] = [
       label: '1',       
       graphQLPropertyName: 'folioId',
       value:'',      
-      tableMode: true,      
-      // customLabelCss:'custom-participant-lbl-text',
-      // customInputTextCss:'custom-participant-input-text',
-      // customEditLabelCss:'custom-participant-edit-label',
-      // customEditInputTextCss:'custom-participant-edit-input',      
+      tableMode: true,              
     },
     columnSize: ColumnSize.Small
   },
@@ -63,11 +59,7 @@ export const FolioTableColumns: TableColumn[] = [
       label: "",
       type: FormFieldType.Text,
       tableMode:true,
-       graphQLPropertyName: "description",
-      //  customLabelCss:'custom-participant-lbl-text',
-      //  customInputTextCss:'custom-participant-input-text',
-      //  customEditLabelCss:'custom-participant-edit-label',
-      //  customEditInputTextCss:'custom-participant-edit-input',      
+       graphQLPropertyName: "description",     
   },
     columnSize: ColumnSize.Triple
   },
@@ -80,22 +72,10 @@ export const FolioTableColumns: TableColumn[] = [
       label: "",
       type: FormFieldType.Label,
       tableMode:true,
-      graphQLPropertyName: "whenUpdated",
-      // customLabelCss:'custom-participant-lbl-text',
-      // customInputTextCss:'custom-participant-input-text',
-      // customEditLabelCss:'custom-participant-edit-label',
-      // customEditInputTextCss:'custom-participant-edit-input',      
+      graphQLPropertyName: "whenUpdated",      
   },
   columnSize: ColumnSize.Small
   }, 
-  // {
-  //   id: 1,
-  //   displayName: "",
-  //   active: true,
-  //   graphQLPropertyName: "id",
-  //   displayType: getLinkColumnType("Details","","","","View"),
-  //   columnSize: ColumnSize.Small
-  // },
   {
     id: 6,
     displayName: "View",
@@ -114,25 +94,6 @@ export const FolioTableColumns: TableColumn[] = [
     },
     linkRedirectionURL: '',
   },
- 
-  // {
-  //   id: 6,
-  //   displayName: "Actions",
-  //   active: true,
-  //   graphQLPropertyName: "id",
-  //   displayType: {
-  //     type: FormFieldType.IconButton,
-  //     label: 'Save',       
-  //     graphQLPropertyName: 'save',
-  //     value:'',      
-  //     customLinkValue:'Save',      
-  //     customInputTextCss: "custom-dashboard-link",
-  //     tableMode: true,
-  //     href: '',
-  //     customIcon: <FolderIcon/> ,      
-  //   },
-  //   linkRedirectionURL: '',
-  // },
 ];
 
 

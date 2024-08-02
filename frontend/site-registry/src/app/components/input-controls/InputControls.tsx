@@ -167,7 +167,7 @@ export const TextInput: React.FC<InputProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const [localValue,SetLocalValue] = useState(value);
-  const inputTxtId = label.replace(/\s+/g, "_");
+  //const inputTxtId = label.replace(/\s+/g, "_");
   let timeOutId:any = null;
 
 
@@ -234,7 +234,7 @@ export const TextInput: React.FC<InputProps> = ({
               }`}
             >
               {label}
-            </label>}
+            </label>)}
           </>
         )}
         {isEditing ? (
@@ -258,7 +258,7 @@ export const TextInput: React.FC<InputProps> = ({
       </ContainerElement>
     );
   // }
-};
+}
 
 export const DropdownInput: React.FC<InputProps> = ({
   label,

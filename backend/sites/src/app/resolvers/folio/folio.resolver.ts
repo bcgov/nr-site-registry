@@ -5,8 +5,8 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { Folio } from 'src/app/entities/folio.entity';
  import { FolioService } from '../../services/folio/folio.service';
-import { FolioDTO, FolioMinDTO, FolioResponse } from 'src/app/dto/Folio';
-import { FolioContentDTO, FolioContentResponse } from 'src/app/dto/folioContent';
+import { FolioDTO, FolioMinDTO, FolioResponse } from 'src/app/dto/folio.dto';
+import { FolioContentDTO, FolioContentResponse } from 'src/app/dto/folioContent.dto';
 import { FolioContents } from 'src/app/entities/folioContents.entity';
 
 
@@ -32,7 +32,7 @@ export class FolioResolver {
 
       const result = await this.folioService.getFoliosForUser(user);
 
-      if (result.length > 0) {
+      if (result && result.length > 0) {
         return this.genericResponseProvider.createResponse('Folio fetched successfully', 200, true, result);
       }
       else
@@ -63,7 +63,7 @@ export class FolioResolver {
 
       const result = await this.folioService.getSitesForFolio(folioDTO,user);
 
-      if (result.length > 0) {
+      if ( result && result.length > 0) {
         return this.genericResponseProviderForFolioContent.createResponse('Sites fetched successfully for folio', 200, true, result);
       }
       else
@@ -98,7 +98,7 @@ export class FolioResolver {
       }
       else
       {
-        return this.genericResponseProvider.createResponse(`Failed to add Folio. `, 400, false);
+        return this.genericResponseProvider.createResponse(`Failed to add Folio. `, 422, false);
       }
 
     } catch (error) {
@@ -127,7 +127,7 @@ export class FolioResolver {
       }
       else
       {
-        return this.genericResponseProvider.createResponse(`Failed to add Folio. `, 400, false);
+        return this.genericResponseProvider.createResponse(`Failed to add Folio. `, 422, false);
       }
 
     } catch (error) {
@@ -157,7 +157,7 @@ export class FolioResolver {
       }
       else
       {
-        return this.genericResponseProvider.createResponse(`Failed to add Folio. `, 400, false);
+        return this.genericResponseProvider.createResponse(`Failed to add Folio. `, 422, false);
       }
 
     } catch (error) {
@@ -188,7 +188,7 @@ export class FolioResolver {
       }
       else
       {
-        return this.genericResponseProvider.createResponse(`Failed delete item. `, 400, false);
+        return this.genericResponseProvider.createResponse(`Failed delete item. `, 422, false);
       }
 
     } catch (error) {
@@ -216,7 +216,7 @@ export class FolioResolver {
       }
       else
       {
-        return this.genericResponseProvider.createResponse(`Failed delete item. `, 400, false);
+        return this.genericResponseProvider.createResponse(`Failed delete item. `, 422, false);
       }
 
     } catch (error) {

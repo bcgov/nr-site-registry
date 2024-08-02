@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Folio } from '../../entities/folio.entity';
 import { Repository } from 'typeorm';
-import { FolioDTO, FolioMinDTO } from '../../dto/Folio';
+import { FolioDTO, FolioMinDTO } from '../../dto/folio.dto';
 import { plainToInstance } from 'class-transformer';
 import { FolioContentsService } from './folioContents.service';
-import { FolioContentDTO } from '../../dto/folioContent';
+import { FolioContentDTO } from '../../dto/folioContent.dto';
 import { FolioContents } from '../../entities/folioContents.entity';
 
 @Injectable()
@@ -46,8 +46,10 @@ export class FolioService {
       if (folio) {
         return this.folioContentService.getSiteForFolio(folio.id.toString());
       }
-
-      return null;
+      else
+      {
+        return null;
+      }
     } catch (error) {
       console.error('Error', error);
       throw error;
@@ -64,21 +66,19 @@ export class FolioService {
         where: { userId, folioId },
       });
 
-      if (existingRecord) {
-        return false;
-      } else {
+      if (!existingRecord) 
+      {
         const folio = plainToInstance(Folio, inputDTO);
         folio.whenCreated = new Date();
         folio.whenUpdated = new Date();
         const result = await this.folioRepository.save(folio);
 
         if (result) return true;
-
-        return false;
       }
+      return false;
     } catch (error) {
       console.error('Error', error);
-      throw new Error('Failed to add folio content');
+      throw error;
     }
   }
 
@@ -103,12 +103,16 @@ export class FolioService {
             console.error(`Failed to save record with id ${id}`);
           }
         }
+        else
+        {
+          console.error(`Unable to find existing record for ${id} `);
+        }
       });
 
       await Promise.all(updatePromises);
     } catch (error) {
       console.error('Error', error);
-      throw new Error('Failed to update folio content');
+      throw error;
     }
 
     return true;
@@ -131,11 +135,15 @@ export class FolioService {
         const result = await this.folioRepository.delete({ id });
         return result.affected > 0;
       }
+      else
+      {
+        console.log(`unable to find saved folio for ${id}`)
+      }
 
       return false;
     } catch (error) {
       console.error('Error in deleteFolio:', error);
-      return false;
+      throw error;
     }
   }
 

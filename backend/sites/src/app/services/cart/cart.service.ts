@@ -61,7 +61,7 @@ export class CartService {
         return false;
       }
     } catch (error) {
-      throw new Error('Unable to add items to cart.');
+      throw error;
     }
   }
 

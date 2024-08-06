@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
-import Table from '../../components/table/Table';
 import { RequestStatus } from '../../helpers/requests/status';
 import {
   recentAssignedColumn,
   recentFoliosColumns,
   recentViewedColumns,
 } from "./DashboardConfig";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { UserType } from "../../helpers/requests/userType";
 import "./Dashboard.css";
 import PageContainer from "../../components/simple/PageContainer";
 import Widget from "../../components/widget/Widget";
 import { getUser } from "../../helpers/utility";
+import { AppDispatch } from '../../Store';
 
 interface DashboardWidgetProps {
   title?: string;
@@ -85,8 +85,9 @@ const Dashboard = () => {
         setUserType(UserType.External);
       }
 
-      setName(loggedInUser?.profile.given_name  + ' '  + loggedInUser?.profile.family_name ?? '');
+      setName(loggedInUser?.profile.given_name  + ' '  + loggedInUser?.profile.family_name);
      
+  
   }, [loggedInUser])
 
   useEffect(() => {

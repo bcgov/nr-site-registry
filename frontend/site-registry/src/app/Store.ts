@@ -14,7 +14,7 @@ import siteDisclosureReducer from "./features/details/disclosure/DisclosureSlice
 import cartReducer from "./features/cart/CartSlice";
 import documentsReducer from './features/details/documents/DocumentsSlice'
 import folioReducer from "./features/folios/FolioSlice"
-
+import snapshotsReducer from './features/details/snapshot/SnapshotSlice';
 
 const persistedStore: any = loadFromLocalStorage();
 
@@ -29,6 +29,7 @@ export const store = configureStore({
     dropdown: DropdownReducer,
     cart: cartReducer,
     documents: documentsReducer,
+    snapshots: snapshotsReducer,
     folio: folioReducer
   },
   middleware: (getDefaultMiddleware) =>

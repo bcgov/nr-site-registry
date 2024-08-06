@@ -1,10 +1,10 @@
-import { DropdownItem } from '../../components/action/IActions';
-import Disclosure from './disclosure/Disclosure';
-import Documents from './documents/Documents';
-import Notations from './notations/Notations';
-import Participants from './participants/Participant';
+import { DropdownItem } from '../../../components/action/IActions';
+import Disclosure from '../disclosure/Disclosure';
+import Documents from '../documents/Documents';
+import Notations from '../notations/Notations';
+import Participants from '../participants/Participant';
 
-import Summary from './summary/Summary';
+import Summary from '../summary/Summary';
 
 export const navItems: string[] = [
   'Summary',

@@ -3,19 +3,9 @@ import { SpinnerIcon } from '../../common/icon';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { TableColumn } from '../TableColumn';
 
-import { FormFieldType, IFormField } from '../../input-controls/IFormField';
-import {
-  Label,
-  TextInput,
-  Link,
-  CheckBoxInput,
-  DropdownInput,
-  DateInput,
-  TextAreaInput,
-  DropdownSearchInput,
-  DeleteIcon,
-} from '../../input-controls/InputControls';
-import { ChangeTracker } from '../../common/IChangeType';
+import { FormFieldType, IFormField } from "../../input-controls/IFormField";
+import { Label, TextInput , Link, CheckBoxInput, DropdownInput, DateInput, TextAreaInput, DropdownSearchInput, DeleteIcon, IconButton } from "../../input-controls/InputControls";
+import { ChangeTracker } from "../../common/IChangeType";
 interface TableBodyProps {
   isLoading: RequestStatus;
   columns: TableColumn[];
@@ -292,6 +282,28 @@ const TableBody: FC<TableBodyProps> = ({
                   stickyCol = {field.stickyCol}
               />);
                 }
+                else if(field.type === FormFieldType.IconButton)
+                  {
+             
+                    return (
+                    <IconButton
+                    label={field.label}
+                    customLabelCss = {field.customLabelCss}
+                    customInputTextCss={field.customInputTextCss}
+                    customEditLabelCss = {field.customEditLabelCss}
+                    customEditInputTextCss={field.customEditInputTextCss}
+                    placeholder={field.placeholder}
+                    options={field.options || []}
+                    value={value}
+                    onChange={(value) => tableRecordChangeHandler(rowKey,field.graphQLPropertyName, value)}
+                    type={field.type}
+                    isEditing={editMode ?? true}
+                    tableMode={field.tableMode ?? false}
+                    stickyCol = {field.stickyCol}
+                    customLinkValue={field.customLinkValue}
+                    customIcon={field.customIcon}
+                />);
+                  }
   };
 
   const getValue = (rowIndex: number, propertyName: string) => {
@@ -336,7 +348,7 @@ const TableBody: FC<TableBodyProps> = ({
     const rowChecked = isChecked(checkboxId);
 
     return (
-      <React.Fragment key={rowIndex}>
+      <React.Fragment >
         <tr>
           {allowRowsSelect && (
             <td className="table-border-light content-text positionSticky">

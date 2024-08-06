@@ -1,17 +1,18 @@
 import { ReactNode } from 'react';
 
 export enum FormFieldType {
-  Text = 'text',
-  TextArea = 'textarea',
-  DropDown = 'dropdown',
-  DropDownWithSearch = 'dropdownWithSearch',
-  Date = 'date',
-  DateRange = 'daterange',
-  Group = 'group',
-  Label = 'label',
-  Link = 'link',
-  Checkbox = 'checkbox',
-  DeleteIcon = 'deleteIcon',
+    Text = 'text',
+    TextArea = 'textarea',
+    DropDown = 'dropdown',
+    DropDownWithSearch = 'dropdownWithSearch',
+    Date =  'date',
+    DateRange =  'daterange',
+    Group = 'group',
+    Label = 'label',
+    Link = 'link',
+    Checkbox = 'checkbox',
+    DeleteIcon = 'deleteIcon',
+    IconButton = 'iconbutton'
 }
 
 export interface IFormField {
@@ -26,7 +27,8 @@ export interface IFormField {
     | FormFieldType.DateRange
     | FormFieldType.TextArea
     | FormFieldType.DropDownWithSearch
-    | FormFieldType.DeleteIcon;
+    | FormFieldType.DeleteIcon
+    | FormFieldType.IconButton;
   label: string;
   isLabel?: boolean;
   placeholder?: string;

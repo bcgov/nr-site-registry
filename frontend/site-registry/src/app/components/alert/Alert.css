@@ -1,0 +1,57 @@
+.toast-error
+{
+    width: 500px;    
+
+}
+
+
+.toast-success
+{   
+    width: 100%;
+  
+}
+
+.Toastify__toast-container--bottom-right
+{
+    right: 5em;
+}
+
+
+
+.custom
+{
+    display: flex;
+    gap: var(--layout-margin-medium);
+    flex-direction: column;
+
+}
+
+.custom-border
+{
+
+    border-bottom: 1px solid var(--support-support-border-color-danger, #CE3E39);
+}
+
+
+.error-heading
+{
+
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 36px;
+    color: var(--typography-color-primary, #2D2D2D);
+
+
+}
+
+
+.error-text
+{
+
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 27.01px;
+    text-align: left;
+    color: var(--typography-color-primary, #2D2D2D);
+
+}

@@ -12,7 +12,7 @@ import {
   fetchCartItems,
 } from '../../features/cart/CartSlice';
 import { AppDispatch } from '../../Store';
-import { getUser } from '../../helpers/utility';
+import { getUser, showNotification } from '../../helpers/utility';
 
 function SideBar() {
   let userCartItems = useSelector(cartItems);
@@ -30,6 +30,14 @@ function SideBar() {
   useEffect(() => {
     dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
   }, [cartItemAdded, cartItemDeleted]);
+
+  useEffect(()=>{
+    showNotification(cartItemAdded, "Successfully added site to cart", "Failed to add site to cart.");
+  },[cartItemAdded])
+
+  useEffect(()=>{
+    showNotification(cartItemDeleted, "Successfully deleted site from cart", "Failed to delete site from cart.");
+  },[cartItemDeleted])
 
   const navList = getSideBarNavList();
   const location = useLocation();

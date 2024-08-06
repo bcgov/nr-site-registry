@@ -13,3 +13,15 @@ export interface CartState {
   addRequestStatus: RequestStatus;
   deleteRequestStatus: RequestStatus;
 }
+
+export class CartDeleteDTO {
+  userId: string = "";
+
+  cartId: string = "";
+}
+
+export class CartDeleteDTOWithSiteId {
+  userId: string = "";
+
+  siteId: string = "";
+}

@@ -21,20 +21,13 @@ export class SiteCrownLandContaminated {
   @Column('bigint', { primary: true, name: 'id' })
   id: string;
 
-  @Field()
-  @Column('double precision', {
-    name: 'estimated_cost_of_remediations',
-    precision: 53,
-  })
-  estimatedCostOfRemediations: number;
+    @Field()
+    @Column("double precision", { name: "estimated_cost_of_remediations" })
+    estimatedCostOfRemediations: number;
 
-  @Field()
-  @Column('double precision', {
-    name: 'actual_cost_of_remediations',
-    nullable: true,
-    precision: 53,
-  })
-  actualCostOfRemediations: number | null;
+    @Field()
+    @Column("double precision", { name: "actual_cost_of_remediations", nullable: true })
+    actualCostOfRemediations: number | null;
 
   @Field()
   @Column('character varying', {

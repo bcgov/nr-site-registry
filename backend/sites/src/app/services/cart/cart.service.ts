@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Cart } from '../../entities/cart.entity';
-import { CartDTO } from '../../dto/cart.dto';
+import {
+  CartDeleteDTO,
+  CartDeleteDTOWithSiteID,
+  CartDTO,
+} from '../../dto/cart.dto';
 
 @Injectable()
 export class CartService {
@@ -24,42 +28,106 @@ export class CartService {
     }
   }
 
-  async addCartItem(cartDTO: CartDTO) {
-    const { userId, siteId } = cartDTO;
-
+  async addCartItem(list: CartDTO[],userId: string,): Promise<boolean> {
     try {
-      // Check if the combination of userId and siteId exists in the table
-      const recordExists = await this.cartRepository.findOne({
-        where: { userId, siteId },
+      const cartItemsToInsert = [];
+      const existingRecords = await this.cartRepository.find({
+        where: list.map((cartDTO) => ({
+          userId: userId,
+          siteId: cartDTO.siteId,
+        })),
       });
 
-      if (recordExists) {
-        return 'Cart Item Already Exists';
-      } else {
-        // Convert the DTO to entity
-        const cartItem = plainToInstance(Cart, cartDTO);
-        const result = await this.cartRepository.save(cartItem);
+      const existingRecordSet = new Set(
+        existingRecords.map((record) => `${record.userId}-${record.siteId}`),
+      );
 
-        if (result) {
-          return 'Cart Item Added.';
+      for (const cartDTO of list) {
+        const { userId, siteId } = cartDTO;
+
+        const recordKey = `${userId}-${siteId}`;
+        if (!existingRecordSet.has(recordKey)) {
+          const cartItem = plainToInstance(Cart, cartDTO);
+          cartItemsToInsert.push(cartItem);
         }
       }
+
+      let insertedRecords: Cart[] = [];
+      if (cartItemsToInsert && cartItemsToInsert.length > 0) {
+        insertedRecords = await this.cartRepository.save(cartItemsToInsert);
+
+        if (insertedRecords.length > 0) 
+          return true
+        else
+          return false;
+      }
+
+      return false;
     } catch (error) {
-      throw new Error('Failed to Add Cart Item.');
+      throw error;
     }
   }
 
-  async deleteCartItem(cartId: string): Promise<boolean> {
+  async deleteCartItem(
+    cartDeleteList: CartDeleteDTO[],
+    userId: string,
+  ): Promise<boolean> {
     try {
-      if (cartId != '') {
-        const result = await this.cartRepository.delete({ id: cartId });
-        if (result.affected > 0) return true;
-        else return false;
-      }
+     
+      const cartIds = cartDeleteList
+        .filter((item) => item.cartId !== '') 
+        .map((item) => item.cartId);
 
+      let deleteResult:DeleteResult = null;
+      if (cartIds.length > 0) {
+        deleteResult =  await this.cartRepository
+          .createQueryBuilder()
+          .delete()
+          .from(Cart) 
+          .where('id IN (:...cartIds)', { cartIds })
+          .andWhere('userId = :userId', { userId: userId }) 
+          .execute();
+        
+        if(deleteResult.affected > 0) 
+          return true;
+        else
+          return false;
+
+        return false;
+      }
       return false;
-    } catch (e) {
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteCartWithSiteId(
+    cartDeleteList: CartDeleteDTOWithSiteID[],
+    userId: string
+  ): Promise<boolean> {
+    try {
+     
+      const siteIds = cartDeleteList
+        .filter((item) => item.siteId !== '') 
+        .map((item) => item.siteId);
+
+      let deleteResult:DeleteResult = null;
+      if (siteIds.length > 0) {
+        deleteResult =  await this.cartRepository
+          .createQueryBuilder()
+          .delete()
+          .from(Cart) 
+          .where('siteId IN (:...cartIds)', { siteIds })
+          .andWhere('userId = :userId', { userId: userId }) 
+          .execute();
+        
+        if(deleteResult.affected > 0) return true;
+
+        return false;
+      }
       return false;
+    } catch (error) {
+      throw error;
     }
   }
 }

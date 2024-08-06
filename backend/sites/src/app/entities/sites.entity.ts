@@ -24,6 +24,7 @@ import { SiteCrownLandContaminated } from './siteCrownLandContaminated.entity';
 import { RecentViews } from './recentViews.entity';
 import { Snapshots } from './snapshots.entity';
 import { Cart } from './cart.entity';
+import { FolioContents } from './folioContents.entity';
 // import { loggerMiddleware } from '../resolvers/site/site.resolver';
 
 @ObjectType()
@@ -102,17 +103,13 @@ export class Sites {
   })
   postalCode: string | null;
 
-  @Field({ nullable: true })
-  @Column('double precision', { name: 'latdeg', nullable: true, precision: 53 })
-  latdeg: number | null;
+    @Field({nullable: true})
+    @Column("double precision", { name: "latdeg", nullable: true})
+    latdeg: number | null;
 
-  @Field({ nullable: true })
-  @Column('double precision', {
-    name: 'longdeg',
-    nullable: true,
-    precision: 53,
-  })
-  longdeg: number | null;
+    @Field({nullable: true})
+    @Column("double precision", { name: "longdeg", nullable: true})
+    longdeg: number | null;
 
   @Field({ nullable: true })
   @Column('character varying', {
@@ -313,13 +310,17 @@ export class Sites {
   )
   siteCrownLandContaminated: SiteCrownLandContaminated;
 
-  @Field(() => [RecentViews], { nullable: true })
-  @OneToMany(() => RecentViews, (recentViews) => recentViews.site)
-  recentViewedSites: RecentViews[];
+    @Field(()=>[RecentViews], {nullable : true})
+    @OneToMany(() => RecentViews, (recentViews) => recentViews.site)
+    recentViewedSites: RecentViews[];
 
-  @Field(() => [Cart], { nullable: true })
-  @OneToMany(() => Cart, (cart) => cart.site)
-  cart: Cart[];
+    @Field(()=>[Cart], {nullable : true})
+    @OneToMany(() => Cart, (cart) => cart.site)
+    cart: Cart[];
+
+    @Field(()=>[FolioContents], {nullable : true})
+    @OneToMany(() => FolioContents, (folio) => folio.site)
+    folioContents: FolioContents[];
 
   @OneToMany(() => Snapshots, (snapshots) => snapshots.site)
   snapshots: Snapshots[];

@@ -36,6 +36,8 @@ import {
   FaUpload,
   FaEye,
   FaArrowsRotate,
+  FaRegFloppyDisk,
+  FaPencil
 } from 'react-icons/fa6';
 
 import { BsFillPinMapFill, BsEyeFill } from 'react-icons/bs';
@@ -81,3 +83,5 @@ export const UploadFileIcon = FaUpload;
 export const ViewOnlyIcon = FaEye;
 export const DownloadPdfIcon = BiSolidFilePdf;
 export const ReplaceIcon = FaArrowsRotate;
+export const RegFloppyDisk = FaRegFloppyDisk;
+export const PencilIcon = FaPencil;

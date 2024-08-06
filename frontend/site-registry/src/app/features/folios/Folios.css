@@ -1,0 +1,49 @@
+.folio-actions
+{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap:10px;
+}
+
+.folio-add-new
+{
+    display: flex;
+    gap: var(--layout-margin-small);
+  
+}
+
+
+
+.folio-add-new-btn
+{    
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    text-align: center;
+    color:white;
+    padding: var(--layout-padding-small) var(--layout-padding-medium) var(--layout-padding-small) var(--layout-padding-medium);
+    gap: var(--layout-margin-small);
+    border-radius: var(--layout-border-width-medium);
+    opacity: 0px;
+    background: var(--surface-primary-default, #053662);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.folio-edit-btn
+{
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    text-align: center;    
+    padding: var(--layout-padding-small) var(--layout-padding-medium) var(--layout-padding-small) var(--layout-padding-medium);
+    gap: var(--layout-margin-small);
+    border-radius: var(--layout-border-width-medium);
+    opacity: 0px;   
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--surface-border-dark, #353433)
+}

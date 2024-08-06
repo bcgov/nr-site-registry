@@ -402,14 +402,7 @@ const Summary = () => {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
       dispatch(resetCartItemAddedStatus(null));
-      dispatch(
-        addCartItem({
-          userId: loggedInUser.profile.sub,
-          siteId: editSiteDetailsObject.id,
-          whoCreated: loggedInUser?.profile.given_name ?? '',
-          price: 200.11,
-        }),
-      ).unwrap();
+      dispatch(addCartItem([{ userId: loggedInUser.profile.sub , siteId:editSiteDetailsObject.id,whoCreated:loggedInUser?.profile.given_name ?? "", price:200.11}])).unwrap()
     }
   };
 

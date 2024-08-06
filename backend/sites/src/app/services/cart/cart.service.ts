@@ -53,13 +53,16 @@ export class CartService {
       }
 
       let insertedRecords: Cart[] = [];
-      if (cartItemsToInsert.length > 0) {
+      if (cartItemsToInsert && cartItemsToInsert.length > 0) {
         insertedRecords = await this.cartRepository.save(cartItemsToInsert);
 
-        if (insertedRecords.length > 0) return true;
-
-        return false;
+        if (insertedRecords.length > 0) 
+          return true
+        else
+          return false;
       }
+
+      return false;
     } catch (error) {
       throw error;
     }
@@ -85,7 +88,10 @@ export class CartService {
           .andWhere('userId = :userId', { userId: userId }) 
           .execute();
         
-        if(deleteResult.affected > 0) return true;
+        if(deleteResult.affected > 0) 
+          return true;
+        else
+          return false;
 
         return false;
       }

@@ -73,7 +73,11 @@ export class FolioService {
         folio.whenUpdated = new Date();
         const result = await this.folioRepository.save(folio);
 
-        if (result) return true;
+        if (result) 
+          return true;
+        else
+          return false;
+
       }
       return false;
     } catch (error) {

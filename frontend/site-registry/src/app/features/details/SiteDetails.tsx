@@ -21,60 +21,111 @@ import {
 } from '../site/dto/SiteSlice';
 import { AppDispatch } from '../../Store';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
-import Notations from "./notations/Notations";
 import {
   dropDownNavItems,
   navComponents,
   navItems,
 } from './navigation/NavigationPillsConfig';
-
-import ModalDialog from "../../components/modaldialog/ModalDialog";
+import ModalDialog from '../../components/modaldialog/ModalDialog';
 import {
   CancelButton,
   SaveButton,
 } from '../../components/simple/CustomButtons';
-import {
-  IChangeType,
-} from '../../components/common/IChangeType';
+import { IChangeType } from '../../components/common/IChangeType';
 
-import "./SiteDetails.css"; // Ensure this import is correct
-import {
-  FormFieldType,
-  IFormField,
-} from "../../components/input-controls/IFormField";
-import { SiteDetailsMode } from "./dto/SiteDetailsMode";
-import { UserType } from "../../helpers/requests/userType";
-import Actions from "../../components/action/Actions";
-import { ActionItems } from "../../components/action/ActionsConfig";
-import { getUser } from "../../helpers/utility";
-import { addRecentView } from "../dashboard/DashboardSlice";
-import { fetchSiteParticipants } from "./participants/ParticipantSlice";
-import { fetchSiteDisclosure } from "./disclosure/DisclosureSlice";
-import { addCartItem, resetCartItemAddedStatus } from "../cart/CartSlice";
-import { useAuth } from "react-oidc-context";
-import { fetchNotationParticipants } from "./notations/NotationSlice";
+import './SiteDetails.css'; // Ensure this import is correct
+import { SiteDetailsMode } from './dto/SiteDetailsMode';
+import { UserType } from '../../helpers/requests/userType';
+import Actions from '../../components/action/Actions';
+import { ActionItems } from '../../components/action/ActionsConfig';
+import { getUser, showNotification } from '../../helpers/utility';
+import { addRecentView } from '../dashboard/DashboardSlice';
+import { fetchSiteParticipants } from './participants/ParticipantSlice';
+import { fetchSiteDisclosure } from './disclosure/DisclosureSlice';
+import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
+import { useAuth } from 'react-oidc-context';
+import { fetchNotationParticipants } from './notations/NotationSlice';
 import { fetchDocuments } from './documents/DocumentsSlice';
-import { fetchSnapshots, snapshots } from './snapshot/SnapshotSlice';
-import { RequestStatus } from '../../helpers/requests/status';
-import { fetchNotationClassCd, fetchNotationParticipantRoleCd, fetchNotationTypeCd, fetchParticipantRoleCd, fetchPeopleOrgsCd } from './dropdowns/DropdownSlice';
-import { DropdownSearchInput } from "../../components/input-controls/InputControls";
-import Form from "../../components/form/Form";
-import SearchInput from "../../components/search/SearchInput";
+import { DropdownSearchInput } from '../../components/input-controls/InputControls';
+import Form from '../../components/form/Form';
+import SearchInput from '../../components/search/SearchInput';
 import {
   addSiteToFolio,
   addSiteToFolioRequest,
   fetchFolioItems,
   folioItems,
-} from "../folios/FolioSlice";
-import { Folio, FolioContentDTO } from "../folios/dto/Folio";
+} from '../folios/FolioSlice';
+import { Folio, FolioContentDTO } from '../folios/dto/Folio';
+import { fetchSnapshots, snapshots } from './snapshot/SnapshotSlice';
+import { RequestStatus } from '../../helpers/requests/status';
+import {
+  fetchNotationClassCd,
+  fetchNotationParticipantRoleCd,
+  fetchNotationTypeCd,
+  fetchParticipantRoleCd,
+  fetchPeopleOrgsCd,
+} from './dropdowns/DropdownSlice';
+import {
+  FormFieldType,
+  IFormField,
+} from '../../components/input-controls/IFormField';
 
 const SiteDetails = () => {
+  const [folioSearchTerm, SetFolioSearchTeam] = useState('');
+
+  const folioDetails = useSelector(folioItems);
+
+  const addSiteToFolioRequestStatus = useSelector(addSiteToFolioRequest);
+
+  const handleFolioSelect = (folioId: string) => {
+    let selectedFolio = folioDetails.filter(
+      (x: any) => x.folioId === folioId,
+    )[0];
+    console.log('selectedFolio', selectedFolio);
+    let dto: FolioContentDTO = {
+      siteId: details.id,
+      folioId: selectedFolio.id + '',
+      id: parseInt(selectedFolio.id),
+      whoCreated: loggedInUser?.profile.given_name ?? '',
+      userId: loggedInUser?.profile.sub ?? '',
+    };
+    dispatch(addSiteToFolio([dto])).unwrap();
+  };
+
+  useEffect(() => {
+    showNotification(
+      addSiteToFolioRequestStatus,
+      'Successfully added site to folio',
+      'Unable to add to folio',
+    );
+  }, [addSiteToFolioRequestStatus]);
+
+  const folioDropdown: IFormField = {
+    type: FormFieldType.DropDownWithSearch,
+    label: '',
+    isLabel: false,
+    graphQLPropertyName: 'folioId',
+    placeholder: 'Please enter folio .',
+    value: '',
+    options: [],
+    colSize: 'col-lg-6 col-md-6 col-sm-12',
+    customLabelCss: 'custom-participant-lbl-text',
+    customInputTextCss: 'custom-participant-input-text',
+    customEditLabelCss: 'custom-participant-edit-label',
+    customEditInputTextCss: 'custom-participant-edit-input',
+    tableMode: true,
+  };
+
+  const arr: IFormField[] = [folioDropdown];
+
+  const arr2: IFormField[][] = [arr];
+
   const auth = useAuth();
-  const [isVisible, setIsVisible] = useState(false);
-  const snapshot = useSelector(snapshots);
 
   const [addToFolioVisible, SetAddToFolioVisible] = useState(false);
 
+  const [isVisible, setIsVisible] = useState(false);
+  const snapshot = useSelector(snapshots);
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
@@ -84,9 +135,6 @@ const SiteDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
 
-
-
-    
   const navigate = useNavigate();
   const onClickBackButton = () => {
     navigate(-1);
@@ -100,7 +148,8 @@ const SiteDetails = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) { // Adjust the scroll position as needed
+      if (window.scrollY > 20) {
+        // Adjust the scroll position as needed
         setIsVisible(true);
       } else {
         setIsVisible(false);
@@ -115,6 +164,20 @@ const SiteDetails = () => {
     };
   }, []);
 
+  // useEffect(() => {
+  //   if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
+  //     setUserType(UserType.External);
+  //   } else if (
+  //     loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
+  //   ) {
+  //     setUserType(UserType.Internal);
+  //   } else {
+  //     // not logged in
+  //     setUserType(UserType.External);
+  //   }
+  //   dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ""));
+  // }, [loggedInUser]);
+
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
       setUserType(UserType.External);
@@ -126,12 +189,12 @@ const SiteDetails = () => {
       // not logged in
       setUserType(UserType.External);
     }
-       dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ""));
-  }, [loggedInUser]);
+    dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
+  }, []);
 
   const savedChanges = useSelector(trackedChanges);
   const mode = useSelector(siteDetailsMode);
-  
+
   useEffect(() => {
     setViewMode(mode);
   }, [mode]);
@@ -149,20 +212,20 @@ const SiteDetails = () => {
         // This will change in future based on condition of User type.
         dispatch(fetchSnapshots(id ?? '')),
         // should be based on condition for External and Internal User.
-        dispatch(fetchSitesDetails({ siteId: id ?? "" })),
+        dispatch(fetchSitesDetails({ siteId: id ?? '' })),
         dispatch(fetchNotationParticipants(id ?? '')),
         dispatch(fetchSiteParticipants(id ?? '')),
         dispatch(fetchDocuments(id ?? '')),
         dispatch(fetchSiteDisclosure(id ?? '')),
       ])
-      .then(() => {
-        setIsLoading(false); // Set loading state to false after all API calls are resolved
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-}
-  }, [id, dispatch]);
+        .then(() => {
+          setIsLoading(false); // Set loading state to false after all API calls are resolved
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+        });
+    }
+  }, [id]);
 
   useEffect(() => {
     if (details && details.id === id) {
@@ -225,94 +288,101 @@ const SiteDetails = () => {
     } else {
       dispatch(resetCartItemAddedStatus(null));
       dispatch(
-        addCartItem([{
-          userId: loggedInUser.profile.sub,
-          siteId: details.id,
-          whoCreated: loggedInUser.profile.given_name ?? "",
-          price: 200.11,
-        }]),
+        addCartItem([
+          {
+            userId: loggedInUser.profile.sub,
+            siteId: details.id,
+            whoCreated: loggedInUser.profile.given_name ?? '',
+            price: 200.11,
+          },
+        ]),
       ).unwrap();
     }
   };
 
-  if (isLoading || snapshot.status === RequestStatus.loading)
-  {
+  if (isLoading || snapshot.status === RequestStatus.loading) {
     return (
-         <div className="loading-overlay">
-               <div className="spinner-container">
-                 <SpinnerIcon data-testid="loading-spinner" className="site-fa-spin" />
-                 </div>
-         </div>
-     );
+      <div className="loading-overlay">
+        <div className="spinner-container">
+          <SpinnerIcon data-testid="loading-spinner" className="site-fa-spin" />
+        </div>
+      </div>
+    );
   }
-  if (snapshot.status === RequestStatus.failed) return <div>Error: {snapshot.error || 'Failed to load data'}</div>;;
- 
+  if (snapshot.status === RequestStatus.failed)
+    return <div>Error: {snapshot.error || 'Failed to load data'}</div>;
+
   return (
     <>
-      { 
-        isVisible &&
+      {isVisible && (
         <div className="d-flex justify-content-between custom-sticky-header w-100">
-              <div className='d-flex gap-2 flex-wrap align-items-center'>
-                <button className="d-flex btn-back align-items-center me-3"  onClick={onClickBackButton}>
-                  <AngleLeft className="btn-icon" />
-                  <span className="btn-back-lbl">Back </span>
-                </button>
-                <div className='d-flex  flex-wrap  align-items-center gap-2 pe-3 custom-sticky-header-lbl'>
-                  Site ID: <span className='custom-sticky-header-txt'>{id ?? ''}</span>
-                  <span className='d-flex align-items-center justify-content-center px-2 custom-dot'>.</span>
-                  <div className='custom-sticky-header-lbl'>
-                    <span>{details && details.addrLine_1}</span>
-                  </div>
-                </div>
+          <div className="d-flex gap-2 flex-wrap align-items-center">
+            <button
+              className="d-flex btn-back align-items-center me-3"
+              onClick={onClickBackButton}
+            >
+              <AngleLeft className="btn-icon" />
+              <span className="btn-back-lbl">Back </span>
+            </button>
+            <div className="d-flex  flex-wrap  align-items-center gap-2 pe-3 custom-sticky-header-lbl">
+              Site ID:{' '}
+              <span className="custom-sticky-header-txt">{id ?? ''}</span>
+              <span className="d-flex align-items-center justify-content-center px-2 custom-dot">
+                .
+              </span>
+              <div className="custom-sticky-header-lbl">
+                <span>{details && details.addrLine_1}</span>
               </div>
-              <div className="d-flex gap-2 justify-align-center pe-2">
-                {/* For Action Dropdown*/}
-                {!edit &&
-                  viewMode === SiteDetailsMode.ViewOnlyMode &&
-                  userType === UserType.Internal && (
-                    <Actions
-                      label="Action"
-                      items={ActionItems}
-                      onItemClick={handleItemClick}
-                    />
-                  )}
+            </div>
+          </div>
+          <div className="d-flex gap-2 justify-align-center pe-2">
+            {/* For Action Dropdown*/}
+            {!edit &&
+              viewMode === SiteDetailsMode.ViewOnlyMode &&
+              userType === UserType.Internal && (
+                <Actions
+                  label="Action"
+                  items={ActionItems}
+                  onItemClick={handleItemClick}
+                />
+              )}
 
-                {/* For Edit / SR Dropdown*/}
-                <div className="d-flex gap-3 align-items-center">
-                  {edit && userType === UserType.Internal && (
-                    <>
-                      <CustomLabel
-                        labelType="c-b"
-                        label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
-                      />
-                      <SaveButton clickHandler={() => setSave(true)} />
-                      <CancelButton clickHandler={handleCancelButton} />
-                    </>
-                  )}
-                </div>
+            {/* For Edit / SR Dropdown*/}
+            <div className="d-flex gap-3 align-items-center">
+              {edit && userType === UserType.Internal && (
+                <>
+                  <CustomLabel
+                    labelType="c-b"
+                    label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
+                  />
+                  <SaveButton clickHandler={() => setSave(true)} />
+                  <CancelButton clickHandler={handleCancelButton} />
+                </>
+              )}
+            </div>
 
-                {/* For Cart /Folio Controls*/}
-                {!edit &&
-                  viewMode === SiteDetailsMode.ViewOnlyMode &&
-                  userType === UserType.External && (
-                    <>
-                      <button
-                        className="d-flex btn-cart align-items-center"
-                        onClick={() => handleAddToCart()}
-                      >
-                        <ShoppingCartIcon className="btn-icon" />
-                        <span className="btn-cart-lbl"> Add to Cart</span>
-                      </button>
-                      <button className="d-flex btn-folio align-items-center">
-                        <FolderPlusIcon className="btn-folio-icon" />
-                        <span className="btn-folio-lbl"> Add to Folio</span>
-                        <DropdownIcon className="btn-folio-icon" />
-                      </button>
-                    </>
-                  )}
-              </div>
+            {/* For Cart /Folio Controls*/}
+            {!edit &&
+              viewMode === SiteDetailsMode.ViewOnlyMode &&
+              userType === UserType.External && (
+                <>
+                  <button
+                    className="d-flex btn-cart align-items-center"
+                    onClick={() => handleAddToCart()}
+                  >
+                    <ShoppingCartIcon className="btn-icon" />
+                    <span className="btn-cart-lbl"> Add to Cart</span>
+                  </button>
+                  <button className="d-flex btn-folio align-items-center">
+                    <FolderPlusIcon className="btn-folio-icon" />
+                    <span className="btn-folio-lbl"> Add to Folio</span>
+                    <DropdownIcon className="btn-folio-icon" />
+                  </button>
+                </>
+              )}
+          </div>
         </div>
-      }
+      )}
       <PageContainer role="details">
         {save && (
           <ModalDialog
@@ -353,18 +423,27 @@ const SiteDetails = () => {
           </ModalDialog>
         )}
 
-        {
-          !isVisible &&
-          <div className="d-flex justify-content-between">
+        <div className="d-flex justify-content-between">
           <button
             className="d-flex btn-back align-items-center"
             onClick={onClickBackButton}
           >
             <AngleLeft className="btn-icon" />
-            <span className="btn-back-lbl">Back </span>
+            <span className="btn-back-lbl">Back to</span>
           </button>
           <div className="d-flex gap-2 justify-align-center pe-2 pos-relative">
-          
+            {/* { <Actions label="User" items={ [
+                { 
+                    label:'External User',
+                    value: UserType.External
+                },
+                {
+                    label:'Internal User',
+                    value: UserType.Internal
+                },
+                
+            ]} 
+            onItemClick={handleUserClick} /> } */}
             {/* For Action Dropdown*/}
             {!edit &&
               viewMode === SiteDetailsMode.ViewOnlyMode &&
@@ -396,54 +475,88 @@ const SiteDetails = () => {
               userType === UserType.External && (
                 <>
                   <div
-                  className="d-flex btn-cart align-items-center"
-                  onClick={() => handleAddToCart()}
-                >
-                  <ShoppingCartIcon className="btn-icon" />
-                  <span className="btn-cart-lbl"> Add to Cart</span>
-                </div>
-                <div
-                  className="d-flex btn-folio align-items-center"
-                  onClick={() => {
-                    SetAddToFolioVisible(!addToFolioVisible);
-                  }}
-                >
-                  <FolderPlusIcon className="btn-folio-icon" />
-                  <span className="btn-folio-lbl"> Add to Folio</span>
-                  <DropdownIcon className="btn-folio-icon" />
-                  
-                </div>
+                    className="d-flex btn-cart align-items-center"
+                    onClick={() => handleAddToCart()}
+                  >
+                    <ShoppingCartIcon className="btn-icon" />
+                    <span className="btn-cart-lbl"> Add to Cart</span>
+                  </div>
+                  <div
+                    className="d-flex btn-folio align-items-center"
+                    onClick={() => {
+                      SetAddToFolioVisible(!addToFolioVisible);
+                    }}
+                  >
+                    <FolderPlusIcon className="btn-folio-icon" />
+                    <span className="btn-folio-lbl"> Add to Folio</span>
+                    <DropdownIcon className="btn-folio-icon" />
+                  </div>
+                  {addToFolioVisible && (
+                    <div className="pos-absolute">
+                      <SearchInput
+                        label={'Search Folios'}
+                        placeHolderText={'Search Folios'}
+                        searchTerm={folioSearchTerm}
+                        clearSearch={() => {
+                          SetFolioSearchTeam('');
+                          //SetAddToFolioVisible(false);
+                        }}
+                        handleSearchChange={(e) => {
+                          if (e.target) {
+                            SetFolioSearchTeam(e.target.value);
+                          } else {
+                            SetFolioSearchTeam(e);
+                          }
+                        }}
+                        options={folioDetails
+                          .filter(
+                            (y: any) =>
+                              y.folioId
+                                .toLowerCase()
+                                .indexOf(folioSearchTerm.toLowerCase()) !== -1,
+                          )
+                          .map((x: any) => x.folioId)}
+                        optionSelectHandler={(value) => {
+                          handleFolioSelect(value);
+                          SetAddToFolioVisible(false);
+                        }}
+                      />
+                    </div>
+                  )}
                 </>
               )}
           </div>
-          </div>
-        }
-
-
+        </div>
         <div className="section-details-header row">
-          {
-            UserType.External === userType && (snapshot.status === RequestStatus.success && snapshot.snapshot.data !== null) &&
-            <div className='py-2 snapshot'>
-              <span>{`Snapshot Taken: ${new Date(snapshot.snapshot.data[0].created)}`}</span>
-            </div>
-          }
-          { !isVisible &&
+          {UserType.External === userType &&
+            snapshot.status === RequestStatus.success &&
+            snapshot.snapshot.data !== null && (
+              <div className="py-2 snapshot">
+                <span>{`Snapshot Taken: ${new Date(snapshot.snapshot.data[0].created)}`}</span>
+              </div>
+            )}
+          {!isVisible && (
             <>
               <div>
                 <CustomLabel label="Site ID: " labelType="b-h5" />
                 <CustomLabel label={id ?? ''} labelType="r-h5" />
               </div>
               <div>
-                <CustomLabel label={details && details.addrLine_1} labelType="b-h1" />
+                <CustomLabel
+                  label={details && details.addrLine_1}
+                  labelType="b-h1"
+                />
               </div>
             </>
-          }
+          )}
         </div>
         <NavigationPills
           items={navItems}
           components={navComponents}
           dropdownItems={dropDownNavItems}
-          isDisable = { UserType.External === userType && (snapshot.snapshot.data === null)}
+          isDisable={
+            UserType.External === userType && snapshot.snapshot.data === null
+          }
         />
       </PageContainer>
     </>

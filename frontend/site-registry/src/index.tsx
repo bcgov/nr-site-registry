@@ -21,7 +21,7 @@ root.render(
   <React.StrictMode>
     <AuthProvider {...authOptions}>
       <Provider store={store}>
-      <RouterProvider router={siteRouter}/>
+        <RouterProvider router={siteRouter} />
       </Provider>
     </AuthProvider>
   </React.StrictMode>,

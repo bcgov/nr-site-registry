@@ -45,9 +45,7 @@ export class FolioService {
 
       if (folio) {
         return this.folioContentService.getSiteForFolio(folio.id.toString());
-      }
-      else
-      {
+      } else {
         return null;
       }
     } catch (error) {
@@ -66,18 +64,14 @@ export class FolioService {
         where: { userId, folioId },
       });
 
-      if (!existingRecord) 
-      {
+      if (!existingRecord) {
         const folio = plainToInstance(Folio, inputDTO);
         folio.whenCreated = new Date();
         folio.whenUpdated = new Date();
         const result = await this.folioRepository.save(folio);
 
-        if (result) 
-          return true;
-        else
-          return false;
-
+        if (result) return true;
+        else return false;
       }
       return false;
     } catch (error) {
@@ -106,9 +100,7 @@ export class FolioService {
           if (!result) {
             console.error(`Failed to save record with id ${id}`);
           }
-        }
-        else
-        {
+        } else {
           console.error(`Unable to find existing record for ${id} `);
         }
       });
@@ -138,10 +130,8 @@ export class FolioService {
         await this.folioContentService.deleteAllSitesInFolio(id.toString());
         const result = await this.folioRepository.delete({ id });
         return result.affected > 0;
-      }
-      else
-      {
-        console.log(`unable to find saved folio for ${id}`)
+      } else {
+        console.log(`unable to find saved folio for ${id}`);
       }
 
       return false;

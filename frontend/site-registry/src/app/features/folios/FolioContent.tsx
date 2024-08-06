@@ -74,7 +74,7 @@ const FolioContents = () => {
       'Successfully deleted site from Folio',
       'Unable delete site from folio',
     );
-    dispatch(resetFolioSiteDeleteStatus(null))
+    dispatch(resetFolioSiteDeleteStatus(null));
   }, [sitesDeleteStatus]);
 
   useEffect(() => {

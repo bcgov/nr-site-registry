@@ -50,3 +50,18 @@
 .custom-pill-close-btn {
   font-size: 12px;
 }
+
+.discard-button-border {
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium);
+  gap: var(--layout-margin-small);
+  border-radius: var(--layout-border-width-medium);
+  opacity: 0px;
+  display: flex;
+  background: var(---surface-background-white);
+  color: #2d2d2d;
+
+  justify-content: center;
+  align-items: center;
+  border: 1px solid var(--surface-color-border-dark, #353433);
+}

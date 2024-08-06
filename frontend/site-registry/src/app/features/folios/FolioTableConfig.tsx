@@ -1,36 +1,46 @@
-import { FillEye, FolderIcon, RegFloppyDisk } from "../../components/common/icon";
-import { FormFieldType, IFormField } from "../../components/input-controls/IFormField";
-import { ColumnSize, TableColumn } from "../../components/table/TableColumn";
-
+import {
+  FillEye,
+  FolderIcon,
+  RegFloppyDisk,
+} from '../../components/common/icon';
+import {
+  FormFieldType,
+  IFormField,
+} from '../../components/input-controls/IFormField';
+import { ColumnSize, TableColumn } from '../../components/table/TableColumn';
 
 const getLinkColumnType = (
   label: string,
   propertyName: string,
   value: string,
   href: string,
-  customLabel: string
+  customLabel: string,
 ): IFormField => {
   return {
     type: FormFieldType.Link,
     label: label,
     graphQLPropertyName: propertyName,
     value: value,
-    customLabelCss: "link-for-table",
-    customInputTextCss: "link-for-table",
+    customLabelCss: 'link-for-table',
+    customInputTextCss: 'link-for-table',
     tableMode: true,
     href: href,
-    customLinkValue: customLabel
+    customLinkValue: customLabel,
   };
 };
 
-const getColumnType = (label: string, propertyName: string, value: string) : IFormField => {
+const getColumnType = (
+  label: string,
+  propertyName: string,
+  value: string,
+): IFormField => {
   return {
     type: FormFieldType.Label,
     label: label,
     graphQLPropertyName: propertyName,
     value: value,
-    customLabelCss: "custom-lbl-text",
-    customInputTextCss: "custom-input-text",
+    customLabelCss: 'custom-lbl-text',
+    customInputTextCss: 'custom-input-text',
     tableMode: true,
   };
 };
@@ -38,94 +48,90 @@ const getColumnType = (label: string, propertyName: string, value: string) : IFo
 export const FolioTableColumns: TableColumn[] = [
   {
     id: 1,
-    displayName: "Folio Name",
+    displayName: 'Folio Name',
     active: true,
-    graphQLPropertyName: "folioId",
+    graphQLPropertyName: 'folioId',
     displayType: {
       type: FormFieldType.Text,
-      label: '1',       
+      label: '1',
       graphQLPropertyName: 'folioId',
-      value:'',      
-      tableMode: true,              
+      value: '',
+      tableMode: true,
     },
-    columnSize: ColumnSize.Small
+    columnSize: ColumnSize.Small,
   },
   {
     id: 2,
-    displayName: "Description",
+    displayName: 'Description',
     active: true,
-    graphQLPropertyName: "description",
+    graphQLPropertyName: 'description',
     displayType: {
-      label: "",
+      label: '',
       type: FormFieldType.Text,
-      tableMode:true,
-       graphQLPropertyName: "description",     
-  },
-    columnSize: ColumnSize.Triple
+      tableMode: true,
+      graphQLPropertyName: 'description',
+    },
+    columnSize: ColumnSize.Triple,
   },
   {
     id: 3,
-    displayName: "Last Updated",
+    displayName: 'Last Updated',
     active: true,
-    graphQLPropertyName: "whenUpdated",
+    graphQLPropertyName: 'whenUpdated',
     displayType: {
-      label: "",
+      label: '',
       type: FormFieldType.Label,
-      tableMode:true,
-      graphQLPropertyName: "whenUpdated",      
+      tableMode: true,
+      graphQLPropertyName: 'whenUpdated',
+    },
+    columnSize: ColumnSize.Small,
   },
-  columnSize: ColumnSize.Small
-  }, 
   {
     id: 6,
-    displayName: "View",
+    displayName: 'View',
     active: true,
-    graphQLPropertyName: "id",
+    graphQLPropertyName: 'id',
     displayType: {
       type: FormFieldType.Link,
-      label: 'View',       
+      label: 'View',
       graphQLPropertyName: 'id',
-      value:'',      
-      customLinkValue:'View',      
-      customInputTextCss: "custom-dashboard-link",
+      value: '',
+      customLinkValue: 'View',
+      customInputTextCss: 'custom-dashboard-link',
       tableMode: true,
       href: '',
-      customIcon: <FillEye/> ,      
+      customIcon: <FillEye />,
     },
     linkRedirectionURL: '',
   },
 ];
 
-
-export const getFolioTableColumnsBasedOnMode = (editMode:boolean) => {
-
-  if(editMode)
-
-    return FolioTableColumns;
-
+export const getFolioTableColumnsBasedOnMode = (editMode: boolean) => {
+  if (editMode) return FolioTableColumns;
   else
-   
-   return [...FolioTableColumns,  new TableColumn(
-    18,
-    "Actions",
-    true,
-    "id",
-    4,
-    true,
-    true,
-    1,
-    true,
-    {
-      type : FormFieldType.DeleteIcon,
-      label: "",
-      graphQLPropertyName: "id",
-      value: "",
-      customLabelCss: "link-for-table",
-      customInputTextCss: "link-for-table",
-      tableMode: true,    
-    },
-    "site/details/",
-    true
-  )]
-
-}
+    return [
+      ...FolioTableColumns,
+      new TableColumn(
+        18,
+        'Actions',
+        true,
+        'id',
+        4,
+        true,
+        true,
+        1,
+        true,
+        {
+          type: FormFieldType.DeleteIcon,
+          label: '',
+          graphQLPropertyName: 'id',
+          value: '',
+          customLabelCss: 'link-for-table',
+          customInputTextCss: 'link-for-table',
+          tableMode: true,
+        },
+        'site/details/',
+        true,
+      ),
+    ];
+};

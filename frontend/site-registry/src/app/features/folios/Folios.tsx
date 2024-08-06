@@ -108,7 +108,9 @@ const Folios = () => {
 
     showNotification(updateStatus);
 
+    dispatch(resetFolioSiteUpdateStatus(null));
 
+   
 
   }, [updateStatus]);
 
@@ -292,12 +294,34 @@ const Folios = () => {
       {blocker.state === 'blocked' ? (
         <ModalDialog
           label="Are you sure you proceed?"
+          saveBtnLabel='Save'
+          cancelBtnLabel='Cancel'
+          dicardBtnLabel='Discard Changes'
+          discardOption={true}
           closeHandler={(response) => {
-            console.log('response', response);
-            if (response) {
-              if (blocker) {
-                blocker?.proceed?.();
-              }
+
+            if(response === 'discard')
+              {
+                if (blocker) {
+                  blocker?.proceed?.();
+                }
+              }      
+            else if (response === true) {
+
+              let rowsToBeUpdated = tempArr.filter((x) => x.dirty === true);
+
+              rowsToBeUpdated.map((row) => {
+                delete row.dirty;
+                return row;
+              });
+
+              console.log('rowsToBeUpdated', rowsToBeUpdated);
+              dispatch(resetFolioSiteUpdateStatus(null));
+              dispatch(updateFolioItem(rowsToBeUpdated)).unwrap().finally(()=>{
+                if (blocker) {
+                  blocker?.proceed?.();
+                }
+              })
             } else {
               if (blocker) {
                 blocker?.reset?.();
@@ -306,7 +330,7 @@ const Folios = () => {
             SetShowDeleteConfirmModal(false);
           }}
         >
-          <span> Please confirm before proceeding.</span>
+          <span> Please save or discard your new folio before proceeding.</span>
         </ModalDialog>
       ) : null}
     </PageContainer>

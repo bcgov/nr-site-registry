@@ -64,8 +64,7 @@
   justify-content: space-between;
 }
 
-.btn-back
-{
+.btn-back {
   padding: var(--layout-padding-small) var(--layout-padding-medium)
     var(--layout-padding-small) var(--layout-padding-medium);
   border-radius: var(--surface-border-radius-medium);
@@ -73,7 +72,6 @@
   border: 1px solid var(--surface-border-dark, #353433);
   background-color: transparent;
 }
-
 
 .btn-cart {
   padding: var(--layout-padding-small) var(--layout-padding-medium)
@@ -147,7 +145,7 @@
   font-weight: 400;
   line-height: 27.01px;
   text-align: left;
-  color: var(--typography-color-disabled, #9F9D9C);
+  color: var(--typography-color-disabled, #9f9d9c);
 }
 
 .site-fa-spin {
@@ -187,10 +185,11 @@
   z-index: 9999 !important;
   top: 65px;
   left: 128px;
-  padding: var(--layout-margin-large) var(--layout-margin-xxlarge) var(--layout-margin-large) var(--layout-margin-xxlarge);
+  padding: var(--layout-margin-large) var(--layout-margin-xxlarge)
+    var(--layout-margin-large) var(--layout-margin-xxlarge);
   gap: var(--layout-margin-xxlarge);
-  background: var(--surface-background-white, #FFFFFF);
-  border-bottom: 1px solid var(--surface-border-light, #D8D8D8)
+  background: var(--surface-background-white, #ffffff);
+  border-bottom: 1px solid var(--surface-border-light, #d8d8d8);
 }
 
 .custom-sticky-header-lbl {
@@ -198,7 +197,7 @@
   font-weight: 700;
   line-height: 21.01px;
   text-align: left;
-  color: var(--typography-color-primary, #2D2D2D);
+  color: var(--typography-color-primary, #2d2d2d);
 }
 
 .custom-sticky-header-txt {
@@ -206,7 +205,7 @@
   font-weight: 400;
   line-height: 21.01px;
   text-align: left;
-  color: var(--typography-color-primary, #2D2D2D);
+  color: var(--typography-color-primary, #2d2d2d);
 }
 
 .custom-dot {
@@ -216,5 +215,26 @@
   font-weight: 700;
   line-height: 24px;
   text-align: left;
-  color: var(--typography-color-disabled, #9F9D9C);
+  color: var(--typography-color-disabled, #9f9d9c);
+}
+
+.pos-relative {
+  position: relative;
+}
+
+.pos-absolute {
+  position: absolute;
+  z-index: 1000;
+  top: 45px;
+  left: 156px;
+  /* width: 60%; */
+  background: var(--surface-background-white, #ffffff);
+  gap: 8px;
+  border-radius: var(--layout-border-medium);
+  opacity: 0px;
+  display: flex;
+  box-shadow: 0px 6.4px 14.4px 0px #00000021;
+  box-shadow: 0px 1.2px 3.6px 0px #0000001a;
+  padding: var(--layout-padding-medium) var(--layout-padding-small)
+    var(--layout-padding-medium) var(--layout-padding-small);
 }

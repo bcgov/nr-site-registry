@@ -1,8 +1,9 @@
-import { Field } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { Column } from 'typeorm/decorator/columns/Column';
 import { CreateDateColumn } from 'typeorm/decorator/columns/CreateDateColumn';
 import { UpdateDateColumn } from 'typeorm/decorator/columns/UpdateDateColumn';
 
+@ObjectType()
 export class BaseAuditEntity {
   @Field()
   @Column('character varying', { name: 'who_created', length: 30 })

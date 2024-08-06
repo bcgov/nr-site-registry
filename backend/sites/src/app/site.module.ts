@@ -64,6 +64,11 @@ import { NotationResolver } from './resolvers/notation/notation.resolver';
 import { NotationService } from './services/notation/notation.service';
 import { DocumentResolver } from './resolvers/document/document.resolver';
 import { DocumentService } from './services/document/document.service';
+import { Folio } from './entities/folio.entity';
+import { FolioContents } from './entities/folioContents.entity';
+import { FolioResolver } from './resolvers/folio/folio.resolver';
+import { FolioService } from './services/folio/folio.service';
+import { FolioContentsService } from './services/folio/folioContents.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -120,6 +125,8 @@ import { DocumentService } from './services/document/document.service';
       RecentViews,
       Snapshots,
       Cart,
+      Folio,
+      FolioContents,
     ]),
   ],
   providers: [
@@ -141,7 +148,10 @@ import { DocumentService } from './services/document/document.service';
     NotationResolver,
     NotationService,
     DocumentResolver,
-    DocumentService
+    DocumentService,
+    FolioResolver,
+    FolioService,
+    FolioContentsService,
   ],
   controllers: [SiteController],
 })

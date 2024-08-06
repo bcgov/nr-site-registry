@@ -33,11 +33,11 @@ const Cart = () => {
 
   const cartItemsArr = useSelector(cartItems);
 
-  const delteStatus = useSelector(deleteRequestStatus);
+  const deleteStatus = useSelector(deleteRequestStatus);
 
   useEffect(() => {
     dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
-  }, [delteStatus]);
+  }, [deleteStatus]);
 
   useEffect(() => {
     setCartIdToDelete('');
@@ -60,7 +60,7 @@ const Cart = () => {
       </div>
       <div className="col-12">
         <Table
-          label="Search Results"
+          label="Cart"
           isLoading={RequestStatus.success}
           columns={CartTableColumns}
           data={cartItemsArr.map((x: any) => {
@@ -111,7 +111,11 @@ const Cart = () => {
           closeHandler={(response) => {
             if (response) {
               dispatch(resetCartItemDeleteStatus(null));
-              dispatch(deleteCartItem(cartIdToDelte)).unwrap();
+              dispatch(
+                deleteCartItem([
+                  { cartId: cartIdToDelte, userId: user?.profile.sub ?? '' },
+                ]),
+              ).unwrap();
             }
             setDeleteConfirm(false);
           }}

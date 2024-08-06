@@ -105,7 +105,7 @@ const SiteDetails = () => {
       setUserType(UserType.External);
     }
 
-  }, [dispatch, loggedInUser]);
+  }, [loggedInUser]);
 
   const savedChanges = useSelector(trackedChanges);
   const mode = useSelector(siteDetailsMode);
@@ -140,7 +140,7 @@ const SiteDetails = () => {
         console.error('Error fetching data:', error);
       });
 }
-  }, [id, dispatch]);
+  }, [id]);
 
   useEffect(() => {
     if (details && details.id === id) {

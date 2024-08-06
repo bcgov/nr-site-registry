@@ -189,10 +189,8 @@ const Documents = () => {
         alert('Download click');
     };
     const handleFileReplace = (event: any, doc: any, docIsReplace: boolean = false) => {
-        debugger;
         if(docIsReplace)
         {
-      
             if (event.target.files && event.target.files.length > 0) {
                 const file = event.target.files[0] ?? null;
                 if (file && file.type === 'application/pdf') {
@@ -213,8 +211,8 @@ const Documents = () => {
                       setFormData(updatedDoc);
                     //   dispatch(updateSiteDocument(updatedDoc));
                     const tracker = new ChangeTracker(
-                        IChangeType.Added,
-                        'Replace Site Document'
+                        IChangeType.Modified,
+                        'Site Document'
                     );
                     dispatch(trackChanges(tracker.toPlainObject()));
                     setCurrentDocument({});

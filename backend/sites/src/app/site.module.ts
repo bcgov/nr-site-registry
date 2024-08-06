@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SiteService } from './services/site/site.service';
 import { SiteController } from './controllers/site.controller';
@@ -69,6 +69,10 @@ import { FolioContents } from './entities/folioContents.entity';
 import { FolioResolver } from './resolvers/folio/folio.resolver';
 import { FolioService } from './services/folio/folio.service';
 import { FolioContentsService } from './services/folio/folioContents.service';
+import { UserJWTTokenDecoderMiddleware } from './middleware/userJwtTokenDecoder';
+import { UserService } from './services/user/user.service';
+import { User } from './entities/user.entity';
+import { JwtService } from '@nestjs/jwt';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -80,7 +84,7 @@ import { FolioContentsService } from './services/folio/folioContents.service';
     ProfileAnswers, ProfileSubmissions, SiteProfileLandUses, SiteProfileOwners, ProfileQuestions, ProfileCategories, SubmissionCd,
     SiteDocPartics, PeopleOrgs, SiteParticRoles, ParticRoleCd, EventParticRoleCd, CityRegions, SiteContaminationClassXref,
     ContaminationClassCd, SiteCrownLandStatusCd, SisAddresses, SiteStaffs, DocParticRoleCd, LtoDownload, LtoPrevDownload,
-    PlanTable, SiteCrownLandContaminated, RecentViews, Snapshots, Cart, Folio, FolioContents ])],
+    PlanTable, SiteCrownLandContaminated, RecentViews, Snapshots, Cart, Folio, FolioContents, User ])],
   providers: [
     SiteResolver,
     SiteService,
@@ -103,8 +107,15 @@ import { FolioContentsService } from './services/folio/folioContents.service';
     DocumentService,
     FolioResolver,
     FolioService,
-    FolioContentsService
+    FolioContentsService,
+    UserService,
+    JwtService
   ],
   controllers: [SiteController],
 })
-export class SiteModule {}
+export class SiteModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(UserJWTTokenDecoderMiddleware).forRoutes('*'); // Apply to all routes or specific routes
+  }
+}
+

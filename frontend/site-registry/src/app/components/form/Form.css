@@ -44,22 +44,16 @@
   padding: 0;
 }
 
-.rs-input{
-    font-size: 16px !important;
-    font-weight: 400 !important;
-    line-height: 26px !important;
-    text-align: left;
-}
-.custom-date-range.rs-picker-toggle-wrapper{
-    display: block;
+.custom-date-range.rs-picker-toggle-wrapper {
+  display: block;
 }
 
-.rs-input::placeholder  {
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 26px;
-    text-align: left;
-    color: var(--typography-color-disabled);
+.rs-input::placeholder {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: left;
+  color: var(--typography-color-disabled);
 }
 
 .custom-select {
@@ -93,26 +87,36 @@
 }
 
 .custom-form-image {
-    border-radius: 100px;
-    height: 27px;
-    width: 27px;
-    border: 1px solid var(--surface-border-light, #D8D8D8);
-    background: var(--surface-brand-blue-10, #F1F8FE);
+  border-radius: 100px;
+  height: 27px;
+  width: 27px;
+  border: 1px solid var(--surface-border-light, #d8d8d8);
+  background: var(--surface-brand-blue-10, #f1f8fe);
 }
 
 .custom-form-image-txt {
-    font-size: 10px;
-    font-weight: 400;
-    line-height: 18px;
-    text-align: center;
-    color: var(--typography-color-secondary, #474543);
-}
-.custom-checkbox[type="checkbox"]:checked {
-    background:#313132;
-    border-color: transparent !important;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 18px;
+  text-align: center;
+  color: var(--typography-color-secondary, #474543);
 }
 
-.custom-checkbox[type="checkbox"]:focus {
+.custom-checkbox {
+  border-color: #313132;
+}
+
+.custom-checkbox-viewMode:checked {
+  background-color: #313132;
+  border-color: transparent !important;
+}
+
+.custom-checkbox[type='checkbox']:checked {
+  background-color: #313132;
+  border-color: transparent !important;
+}
+
+.custom-checkbox[type='checkbox']:focus {
   box-shadow: none !important;
 }
 
@@ -129,8 +133,8 @@
   content: none !important;
 }
 .custom-dropdown-search {
-  position:inherit !important;
-} 
+  position: inherit !important;
+}
 .custom-dropdown:hover {
   color: var(--typography-color-primary) !important;
 }
@@ -139,5 +143,5 @@
 }
 
 .custom-textarea {
-  min-height: calc(1.5em + .75rem + 5px) !important;
+  min-height: calc(1.5em + 0.75rem + 5px) !important;
 }

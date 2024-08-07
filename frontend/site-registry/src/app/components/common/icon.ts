@@ -40,7 +40,12 @@ import {
   FaPencil,
 } from 'react-icons/fa6';
 
-import { BsFillPinMapFill, BsEyeFill, BsExclamationCircle, BsExclamationTriangle } from 'react-icons/bs';
+import {
+  BsFillPinMapFill,
+  BsEyeFill,
+  BsExclamationCircle,
+  BsExclamationTriangle,
+} from 'react-icons/bs';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
 export const ShoppingCartIcon = FaCartShopping;

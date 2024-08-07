@@ -369,7 +369,7 @@ const TableBody: FC<TableBodyProps> = ({
       <React.Fragment>
         <tr>
           {allowRowsSelect && (
-            <td className="table-border-light content-text positionSticky">
+            <td className="table-border-light content-text positionSticky align-content-center">
               <input
                 id={getValue(rowIndex, idColumnName)}
                 type="checkbox"

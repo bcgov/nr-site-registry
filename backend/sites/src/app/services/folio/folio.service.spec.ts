@@ -95,21 +95,19 @@ describe('FolioSerivce', () => {
   });
 
   it('Should return folios for current user', async () => {
-    jest
-      .spyOn(folioRepository, 'find')
-      .mockResolvedValue([
-        {
-          folioId: '1',
-          id: 1,
-          userId: '1',
-          description: 'test',
-          whoCreated: 'test',
-          whenCreated: new Date('07-26-2024'),
-          whoUpdated: 'test',
-          whenUpdated: new Date('07-26-2024'),
-          folioContents: null,
-        },
-      ]);
+    jest.spyOn(folioRepository, 'find').mockResolvedValue([
+      {
+        folioId: '1',
+        id: 1,
+        userId: '1',
+        description: 'test',
+        whoCreated: 'test',
+        whenCreated: new Date('07-26-2024'),
+        whoUpdated: 'test',
+        whenUpdated: new Date('07-26-2024'),
+        folioContents: null,
+      },
+    ]);
 
     const result = await folioSerivce.getFoliosForUser(user);
 

@@ -433,18 +433,6 @@ const SiteDetails = () => {
             <span className="btn-back-lbl">Back to</span>
           </button>
           <div className="d-flex gap-2 justify-align-center pe-2 pos-relative">
-            {/* { <Actions label="User" items={ [
-                { 
-                    label:'External User',
-                    value: UserType.External
-                },
-                {
-                    label:'Internal User',
-                    value: UserType.Internal
-                },
-                
-            ]} 
-            onItemClick={handleUserClick} /> } */}
             {/* For Action Dropdown*/}
             {!edit &&
               viewMode === SiteDetailsMode.ViewOnlyMode &&
@@ -529,15 +517,16 @@ const SiteDetails = () => {
           </div>
         </div>
         <div className="section-details-header row">
-          <BannerDetails />
-
-          {UserType.External === userType &&
-            snapshot.status === RequestStatus.success &&
-            snapshot.snapshot.data !== null && (
-              <div className="py-2 snapshot">
-                <span>{`Snapshot Taken: ${new Date(snapshot.snapshot.data[0].created)}`}</span>
-              </div>
-            )}
+          <div className="d-flex">
+            <BannerDetails />
+            {UserType.External === userType &&
+              snapshot.status === RequestStatus.success &&
+              snapshot.snapshot.data !== null && (
+                <div className="py-2 snapshot">
+                  <span>{`Snapshot Taken: ${new Date(snapshot.snapshot.data[0].created)}`}</span>
+                </div>
+              )}
+          </div>
 
           {!isVisible && (
             <>

@@ -2,11 +2,10 @@ import { Field, ObjectType } from "@nestjs/graphql";
 import { BaseAuditEntity } from "./baseAuditEntity";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-@ObjectType()
+
 @Entity('user')
 export class User extends BaseAuditEntity
-{
-    @Field()
+{   
     @PrimaryGeneratedColumn()
     id:number;
 

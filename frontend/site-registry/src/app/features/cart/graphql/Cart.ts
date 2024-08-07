@@ -25,36 +25,33 @@ export const getCartItemsForUserQL = () => {
 };
 
 export const addCartItemQL = () => gql`
-mutation addCartItem($cartDTO: [CartDTO!]!){
-  addCartItem(cartDTO:$cartDTO){
-    message
-    httpStatusCode
-    success
+  mutation addCartItem($cartDTO: [CartDTO!]!) {
+    addCartItem(cartDTO: $cartDTO) {
+      message
+      httpStatusCode
+      success
+    }
   }
-}`
-
+`;
 
 export const deleteCartItemQL = () => gql`
-mutation deleteCartItem($cartDeleteDTO:[CartDeleteDTO!]!)
-{
-    deleteCartItem(cartDeleteDTO: $cartDeleteDTO)
-    {
-         message
-         httpStatusCode
-         success
+  mutation deleteCartItem($cartDeleteDTO: [CartDeleteDTO!]!) {
+    deleteCartItem(cartDeleteDTO: $cartDeleteDTO) {
+      message
+      httpStatusCode
+      success
     }
-}
-`
-
+  }
+`;
 
 export const deleteCartWithSiteIdItemQL = () => gql`
-mutation deleteCartItemWithSiteId($cartDeleteDTO:[CartDeleteDTOWithSiteID!]!)
-{
-    deleteCartItemWithSiteId(cartDeleteDTO: $cartDeleteDTO)
-    {
-         message
-         httpStatusCode
-         success
+  mutation deleteCartItemWithSiteId(
+    $cartDeleteDTO: [CartDeleteDTOWithSiteID!]!
+  ) {
+    deleteCartItemWithSiteId(cartDeleteDTO: $cartDeleteDTO) {
+      message
+      httpStatusCode
+      success
     }
   }
 `;

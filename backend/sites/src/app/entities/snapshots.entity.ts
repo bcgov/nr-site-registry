@@ -22,7 +22,7 @@ export class Snapshots {
   id: number;
 
   @Field()
-  @Column('character varying', { name: 'user_id', length: 30 })
+  @Column('character varying', { name: 'user_id', length: 100 })
   userId: string;
 
   @Field()
@@ -37,9 +37,11 @@ export class Snapshots {
   @Column('jsonb', { name: 'snapshot_data' })
   snapshotData: any;
 
+  @Field()
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created: Date;
 
+  @Field()
   @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updated: Date;
 

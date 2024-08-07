@@ -66,7 +66,7 @@ const AddToFolio: FC<ColumnProps> = ({ className, selectedRows }) => {
         placeHolderText={'Search Folios'}
         searchTerm={folioSearchTerm}
         clearSearch={() => {
-          SetFolioSearchTeam('');        
+          SetFolioSearchTeam('');
         }}
         handleSearchChange={(e) => {
           if (e.target) {
@@ -83,7 +83,7 @@ const AddToFolio: FC<ColumnProps> = ({ className, selectedRows }) => {
           )
           .map((x: any) => x.folioId)}
         optionSelectHandler={(value) => {
-          handleFolioSelect(value);       
+          handleFolioSelect(value);
         }}
       />
     </div>

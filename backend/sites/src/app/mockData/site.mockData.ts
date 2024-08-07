@@ -30,7 +30,7 @@ const bceRegionCd: BceRegionCd = {
 const classCd: ClassificationCd = { code: '1', description: 'test', sites: [] };
 const snapshots = [new Snapshots()];
 const cart = [new Cart()];
-const folio = [new FolioContents()]
+const folio = [new FolioContents()];
 
 export const sampleSites: Sites[] = [
   {
@@ -86,7 +86,7 @@ export const sampleSites: Sites[] = [
     recentViewedSites: recentViewedSites,
     snapshots: snapshots,
     cart: cart,
-    folioContents: folio
+    folioContents: folio,
   },
   {
     id: '222',
@@ -141,6 +141,6 @@ export const sampleSites: Sites[] = [
     recentViewedSites: recentViewedSites,
     snapshots: snapshots,
     cart: cart,
-    folioContents: folio
+    folioContents: folio,
   },
 ];

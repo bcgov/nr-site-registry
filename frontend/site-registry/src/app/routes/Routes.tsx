@@ -21,7 +21,7 @@ const siteRouter = createBrowserRouter([
       },
       {
         path: '/search',
-        element: <Search />,       
+        element: <Search />,
       },
       {
         path: '/search/site/details/:id',
@@ -29,7 +29,7 @@ const siteRouter = createBrowserRouter([
       },
       {
         path: '/folios',
-        element: <Folios />,       
+        element: <Folios />,
       },
       {
         path: '/folios/:id',
@@ -37,7 +37,7 @@ const siteRouter = createBrowserRouter([
       },
       {
         path: '/dashboard',
-        element: <Dashboard />,       
+        element: <Dashboard />,
       },
       {
         path: '/dashboard/site/details/:id',

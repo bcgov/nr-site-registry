@@ -68,7 +68,6 @@ const Folios = () => {
 
   const user = getUser();
 
-
   useEffect(() => {
     if (user === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
@@ -95,7 +94,6 @@ const Folios = () => {
     );
 
     dispatch(resetFolioItemDeleteStatus(null));
-   
   }, [folioDeleteStatus]);
 
   useEffect(() => {
@@ -108,8 +106,7 @@ const Folios = () => {
 
     showNotification(updateStatus);
 
-
-
+    dispatch(resetFolioSiteUpdateStatus(null));
   }, [updateStatus]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,7 +119,7 @@ const Folios = () => {
   };
 
   useEffect(() => {
-    setTempArr(folioItemsArr);   
+    setTempArr(folioItemsArr);
   }, [folioItemsArr]);
 
   const handleAddNewFolio = () => {
@@ -227,8 +224,9 @@ const Folios = () => {
           closeHandler={(response) => {
             if (response) {
               const folio: Folio = {
-                folioId: 'New'+ Math.ceil(Math.random()*1000),
-                description: 'Please update description & folio name as desired',
+                folioId: 'New' + Math.ceil(Math.random() * 1000),
+                description:
+                  'Please update description & folio name as desired',
                 userId: user?.profile.sub ? user.profile.sub : '',
                 whoCreated: user?.profile.given_name
                   ? user.profile.given_name
@@ -292,12 +290,32 @@ const Folios = () => {
       {blocker.state === 'blocked' ? (
         <ModalDialog
           label="Are you sure you proceed?"
+          saveBtnLabel="Save"
+          cancelBtnLabel="Cancel"
+          dicardBtnLabel="Discard Changes"
+          discardOption={true}
           closeHandler={(response) => {
-            console.log('response', response);
-            if (response) {
+            if (response === 'discard') {
               if (blocker) {
                 blocker?.proceed?.();
               }
+            } else if (response === true) {
+              let rowsToBeUpdated = tempArr.filter((x) => x.dirty === true);
+
+              rowsToBeUpdated.map((row) => {
+                delete row.dirty;
+                return row;
+              });
+
+              console.log('rowsToBeUpdated', rowsToBeUpdated);
+              dispatch(resetFolioSiteUpdateStatus(null));
+              dispatch(updateFolioItem(rowsToBeUpdated))
+                .unwrap()
+                .finally(() => {
+                  if (blocker) {
+                    blocker?.proceed?.();
+                  }
+                });
             } else {
               if (blocker) {
                 blocker?.reset?.();
@@ -306,7 +324,7 @@ const Folios = () => {
             SetShowDeleteConfirmModal(false);
           }}
         >
-          <span> Please confirm before proceeding.</span>
+          <span> Please save or discard your new folio before proceeding.</span>
         </ModalDialog>
       ) : null}
     </PageContainer>

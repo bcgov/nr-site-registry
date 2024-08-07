@@ -13,7 +13,7 @@ interface ColumnProps {
   columns: TableColumn[];
   pageChange: (pageRequested: number, resultsCount: number) => void;
   totalRecords: number;
-  changeHandler: (event:any)=> void;
+  changeHandler: (event: any) => void;
 }
 
 const SearchResults: FC<ColumnProps> = ({
@@ -21,7 +21,7 @@ const SearchResults: FC<ColumnProps> = ({
   data,
   columns,
   totalRecords,
-  changeHandler
+  changeHandler,
 }) => {
   const requestStatus = useSelector(loadingState);
   let [currentPage, SetCurrentPage] = useState(1);
@@ -53,7 +53,9 @@ const SearchResults: FC<ColumnProps> = ({
       currentPage={currentPage}
       resultsPerPage={resultsPerPage}
       allowRowsSelect={true}
-      changeHandler={(event)=>{changeHandler(event)}}
+      changeHandler={(event) => {
+        changeHandler(event);
+      }}
       editMode={false}
       idColumnName="id"
     ></Table>

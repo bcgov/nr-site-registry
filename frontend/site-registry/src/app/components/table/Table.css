@@ -76,14 +76,14 @@
   .positionSticky {
     position: sticky !important;
     /* left: 29px; */
-    background-color: white;
+    background-color: var(--surface-background-white) !important;
     z-index: 1;
   }
 
   .table td:first-child {
     /* position: sticky; */
     left: 0;
-    background-color: white;
+    background-color: var(--surface-background-white) !important;
     /* z-index: 1; */
   }
 
@@ -101,7 +101,7 @@
   .table td:nth-child(2) {
     /* position: sticky; */
     left: 29px;
-    background-color: white;
+    background-color: var(--surface-background-white) !important;
   }
 
   .table th:nth-child(2) {
@@ -113,7 +113,7 @@
   .table td:last-child {
     /* position: sticky; */
     right: 0;
-    background-color: white;
+    background-color: var(--surface-background-white) !important;
     /* z-index: 1; */
   }
 
@@ -126,7 +126,7 @@
   .table td:nth-last-child(2) {
     /* position: sticky; */
     right: 100px;
-    background-color: white;
+    background-color: var(--surface-background-white) !important;
     /* z-index: 1; */
   }
 
@@ -192,4 +192,7 @@ table td {
   word-wrap: break-word; /* Allow word breaks */
   overflow-wrap: break-word; /* Alternative for newer browsers */
   word-break: break-all; /* Allow breaks within words */
+  background-color: var(--surface-background-white) !important;
+  border: 1px solid;
+  border-color: var(--surface-border-light);
 }

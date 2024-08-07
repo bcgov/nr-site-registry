@@ -13,11 +13,10 @@ export class FolioContentsService {
     private folioContentRepository: Repository<FolioContents>,
   ) {}
 
-
   async getSiteForFolio(folioId: string): Promise<FolioContents[]> {
     try {
-      const sitesForFolioArr = await this.folioContentRepository.find({  
-        relations: ['site','folio'],
+      const sitesForFolioArr = await this.folioContentRepository.find({
+        relations: ['site', 'folio'],
         where: { folioId },
       });
       return sitesForFolioArr;
@@ -25,7 +24,6 @@ export class FolioContentsService {
       throw error;
     }
   }
-
 
   async addFolioContent(inputDTO: FolioContentDTO): Promise<boolean> {
     const { siteId, folioId } = inputDTO;
@@ -37,21 +35,18 @@ export class FolioContentsService {
       if (existingRecord) {
         return false;
       } else {
-      
         const folioContent = {
           siteId: inputDTO.siteId,
-          folioId : inputDTO.folioId,
+          folioId: inputDTO.folioId,
           whoCreated: inputDTO.whoCreated,
-          userId: inputDTO.userId
-        }
-         
+          userId: inputDTO.userId,
+        };
+
         const result = await this.folioContentRepository.save(folioContent);
 
         if (result) {
           return true;
-        }
-        else
-        {
+        } else {
           return false;
         }
       }
@@ -59,7 +54,6 @@ export class FolioContentsService {
       throw error;
     }
   }
-
 
   async deleteFolioContent(folioContentId: string): Promise<boolean> {
     try {
@@ -69,10 +63,8 @@ export class FolioContentsService {
         });
         if (result.affected > 0) return true;
         else return false;
-      }
-      else
-      {
-        console.log("folioContentId is null or empty")
+      } else {
+        console.log('folioContentId is null or empty');
       }
 
       return false;
@@ -81,19 +73,17 @@ export class FolioContentsService {
     }
   }
 
-  async deleteSitesInFolio(folioId: string, siteId: string ): Promise<boolean> {
+  async deleteSitesInFolio(folioId: string, siteId: string): Promise<boolean> {
     try {
       if (folioId && siteId && folioId !== '' && siteId !== '') {
         const result = await this.folioContentRepository.delete({
           folioId: folioId,
-          siteId: siteId
+          siteId: siteId,
         });
         if (result.affected > 0) return true;
         else return false;
-      }
-      else
-      {
-        console.error("folioId or siteId is null or empty.")
+      } else {
+        console.error('folioId or siteId is null or empty.');
       }
 
       return false;
@@ -104,17 +94,14 @@ export class FolioContentsService {
 
   async deleteAllSitesInFolio(folioId: string): Promise<boolean> {
     try {
-      
       if (folioId && folioId !== '') {
         const result = await this.folioContentRepository.delete({
-          folioId: folioId,         
+          folioId: folioId,
         });
         if (result.affected > 0) return true;
         else return false;
-      }
-      else
-      {
-        console.error("folio id is null or empty");
+      } else {
+        console.error('folio id is null or empty');
       }
 
       return false;

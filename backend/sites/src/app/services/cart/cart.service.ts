@@ -28,7 +28,7 @@ export class CartService {
     }
   }
 
-  async addCartItem(list: CartDTO[],userId: string,): Promise<boolean> {
+  async addCartItem(list: CartDTO[], userId: string): Promise<boolean> {
     try {
       const cartItemsToInsert = [];
       const existingRecords = await this.cartRepository.find({
@@ -53,13 +53,14 @@ export class CartService {
       }
 
       let insertedRecords: Cart[] = [];
-      if (cartItemsToInsert.length > 0) {
+      if (cartItemsToInsert && cartItemsToInsert.length > 0) {
         insertedRecords = await this.cartRepository.save(cartItemsToInsert);
 
         if (insertedRecords.length > 0) return true;
-
-        return false;
+        else return false;
       }
+
+      return false;
     } catch (error) {
       throw error;
     }
@@ -70,22 +71,22 @@ export class CartService {
     userId: string,
   ): Promise<boolean> {
     try {
-     
       const cartIds = cartDeleteList
-        .filter((item) => item.cartId !== '') 
+        .filter((item) => item.cartId !== '')
         .map((item) => item.cartId);
 
-      let deleteResult:DeleteResult = null;
+      let deleteResult: DeleteResult = null;
       if (cartIds.length > 0) {
-        deleteResult =  await this.cartRepository
+        deleteResult = await this.cartRepository
           .createQueryBuilder()
           .delete()
-          .from(Cart) 
+          .from(Cart)
           .where('id IN (:...cartIds)', { cartIds })
-          .andWhere('userId = :userId', { userId: userId }) 
+          .andWhere('userId = :userId', { userId: userId })
           .execute();
-        
-        if(deleteResult.affected > 0) return true;
+
+        if (deleteResult.affected > 0) return true;
+        else return false;
 
         return false;
       }
@@ -97,25 +98,24 @@ export class CartService {
 
   async deleteCartWithSiteId(
     cartDeleteList: CartDeleteDTOWithSiteID[],
-    userId: string
+    userId: string,
   ): Promise<boolean> {
     try {
-     
       const siteIds = cartDeleteList
-        .filter((item) => item.siteId !== '') 
+        .filter((item) => item.siteId !== '')
         .map((item) => item.siteId);
 
-      let deleteResult:DeleteResult = null;
+      let deleteResult: DeleteResult = null;
       if (siteIds.length > 0) {
-        deleteResult =  await this.cartRepository
+        deleteResult = await this.cartRepository
           .createQueryBuilder()
           .delete()
-          .from(Cart) 
+          .from(Cart)
           .where('siteId IN (:...cartIds)', { siteIds })
-          .andWhere('userId = :userId', { userId: userId }) 
+          .andWhere('userId = :userId', { userId: userId })
           .execute();
-        
-        if(deleteResult.affected > 0) return true;
+
+        if (deleteResult.affected > 0) return true;
 
         return false;
       }

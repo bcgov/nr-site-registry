@@ -69,6 +69,7 @@ import {
   FormFieldType,
   IFormField,
 } from '../../components/input-controls/IFormField';
+import BannerDetails from '../../components/banners/BannerDetails';
 
 const SiteDetails = () => {
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
@@ -528,6 +529,8 @@ const SiteDetails = () => {
           </div>
         </div>
         <div className="section-details-header row">
+          <BannerDetails />
+
           {UserType.External === userType &&
             snapshot.status === RequestStatus.success &&
             snapshot.snapshot.data !== null && (
@@ -535,6 +538,7 @@ const SiteDetails = () => {
                 <span>{`Snapshot Taken: ${new Date(snapshot.snapshot.data[0].created)}`}</span>
               </div>
             )}
+
           {!isVisible && (
             <>
               <div>

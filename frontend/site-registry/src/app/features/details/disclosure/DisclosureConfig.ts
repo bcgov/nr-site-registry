@@ -18,7 +18,8 @@ export const disclosureStatementConfig: IFormField[][] = [
       customLabelCss: 'custom-disclosure-lbl-text',
       customInputTextCss: 'custom-disclosure-input-text',
       customEditLabelCss: 'custom-disclosure-edit-label',
-      customEditInputTextCss: 'custom-disclosure-edit-input',
+      customEditInputTextCss:
+        'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
     },
     {
       type: FormFieldType.Date,
@@ -30,7 +31,8 @@ export const disclosureStatementConfig: IFormField[][] = [
       customLabelCss: 'custom-disclosure-lbl-text',
       customInputTextCss: 'custom-disclosure-input-text',
       customEditLabelCss: 'custom-disclosure-edit-label',
-      customEditInputTextCss: 'custom-disclosure-edit-input',
+      customEditInputTextCss:
+        'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
     },
     {
       type: FormFieldType.Date,
@@ -42,7 +44,8 @@ export const disclosureStatementConfig: IFormField[][] = [
       customLabelCss: 'custom-disclosure-lbl-text',
       customInputTextCss: 'custom-disclosure-input-text',
       customEditLabelCss: 'custom-disclosure-edit-label',
-      customEditInputTextCss: 'custom-disclosure-edit-input',
+      customEditInputTextCss:
+        'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
     },
     {
       type: FormFieldType.Date,
@@ -54,7 +57,8 @@ export const disclosureStatementConfig: IFormField[][] = [
       customLabelCss: 'custom-disclosure-lbl-text',
       customInputTextCss: 'custom-disclosure-input-text',
       customEditLabelCss: 'custom-disclosure-edit-label',
-      customEditInputTextCss: 'custom-disclosure-edit-input',
+      customEditInputTextCss:
+        'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
     },
     {
       type: FormFieldType.Date,
@@ -66,7 +70,8 @@ export const disclosureStatementConfig: IFormField[][] = [
       customLabelCss: 'custom-disclosure-lbl-text',
       customInputTextCss: 'custom-disclosure-input-text',
       customEditLabelCss: 'custom-disclosure-edit-label',
-      customEditInputTextCss: 'custom-disclosure-edit-input',
+      customEditInputTextCss:
+        'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
     },
   ],
 ];

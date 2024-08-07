@@ -1,7 +1,5 @@
 import { FillEye, FillPinMapFill } from '../../components/common/icon';
-import {
-  FormFieldType,
-} from '../../components/input-controls/IFormField';
+import { FormFieldType } from '../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../components/table/TableColumn';
 
 export const recentViewedColumns: TableColumn[] = [
@@ -160,7 +158,7 @@ export const recentFoliosColumns: TableColumn[] = [
       placeholder: 'MM/DD/YY',
       value: '',
       colSize: 'col-lg-6 col-md-6 col-sm-12',
-      customInputTextCss: 'custom-participant-input-text',
+      customInputTextCss: 'custom-dashboard-input-txt',
       tableMode: true,
     },
   },
@@ -256,7 +254,7 @@ export const recentAssignedColumn: TableColumn[] = [
       placeholder: 'MM/DD/YY',
       value: '',
       colSize: 'col-lg-6 col-md-6 col-sm-12',
-      customInputTextCss: 'custom-participant-input-text',
+      customInputTextCss: 'custom-dashboard-input-txt',
       tableMode: true,
     },
   },

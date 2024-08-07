@@ -115,3 +115,17 @@
   gap: var(--layout-margin-small) !important;
   background: var(--surface-primary-disabled, #edebe9) !important;
 }
+
+.custom-disclosure-edit-input
+  .rs-input-group.rs-input-group-inside
+  .rs-input-group-addon {
+  top: 0;
+  background: none;
+  border: none;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.custom-disclosure-edit-input .rs-input {
+  padding: 10px 11px !important;
+}

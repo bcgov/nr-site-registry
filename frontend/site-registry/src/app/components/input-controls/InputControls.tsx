@@ -681,11 +681,19 @@ export const CheckBoxInput: React.FC<InputProps> = ({
     <ContainerElement
       className={tableMode ? 'table-border-light' : 'd-inline mb-3'}
     >
-      <div className={tableMode ? '' : 'd-inline form-check p-0'}>
+      <div
+        className={
+          tableMode
+            ? !disableCheckBox
+              ? 'pt-1'
+              : ''
+            : 'd-inline form-check p-0'
+        }
+      >
         <input
           id={inputTxtId}
           type={type}
-          className={`form-check-input custom-checkbox ${
+          className={`form-check-input ${!disableCheckBox ? 'custom-checkbox' : 'custom-checkbox-viewMode'} ${
             customEditInputTextCss ?? 'custom-input-text'
           }`}
           disabled={disableCheckBox}
@@ -831,6 +839,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
           label={label}
           isLabel={false}
           onChange={(isChecked) => onChange(isChecked)}
+          srMode={srMode}
         />
       )}
       {!tableMode && (

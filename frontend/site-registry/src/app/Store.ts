@@ -6,13 +6,15 @@ import {
 import commonDataReducer from './features/common/CommonDataSlice';
 import siteReducer from './features/site/dto/SiteSlice';
 import thunk from 'redux-thunk';
-import dashboardReducer from "./features/dashboard/DashboardSlice";
-import siteParticipantReducer from "./features/details/participants/ParticipantSlice";
-import notationParticipantReducer from "./features/details/notations/NotationSlice";
-import DropdownReducer from "./features/details/dropdowns/DropdownSlice";
-import siteDisclosureReducer from "./features/details/disclosure/DisclosureSlice";
-import cartReducer from "./features/cart/CartSlice";
-import documentsReducer from './features/details/documents/DocumentsSlice'
+import dashboardReducer from './features/dashboard/DashboardSlice';
+import siteParticipantReducer from './features/details/participants/ParticipantSlice';
+import notationParticipantReducer from './features/details/notations/NotationSlice';
+import DropdownReducer from './features/details/dropdowns/DropdownSlice';
+import siteDisclosureReducer from './features/details/disclosure/DisclosureSlice';
+import cartReducer from './features/cart/CartSlice';
+import documentsReducer from './features/details/documents/DocumentsSlice';
+import snapshotsReducer from './features/details/snapshot/SnapshotSlice';
+import folioReducer from './features/folios/FolioSlice';
 
 const persistedStore: any = loadFromLocalStorage();
 
@@ -27,6 +29,8 @@ export const store = configureStore({
     dropdown: DropdownReducer,
     cart: cartReducer,
     documents: documentsReducer,
+    folio: folioReducer,
+    snapshots: snapshotsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -26,7 +26,7 @@ const Actions: React.FC<IActions> = ({
           <Dropdown.Item
             key={index}
             onClick={() => onItemClick(item.value, index)}
-            className={`${customCssMenuItem ?? 'custom-action-item'}`}
+            className={`disable ${customCssMenuItem ?? 'custom-action-item'}`}
           >
             {item.label}
           </Dropdown.Item>

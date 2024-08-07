@@ -36,6 +36,8 @@ import {
   FaUpload,
   FaEye,
   FaArrowsRotate,
+  FaRegFloppyDisk,
+  FaPencil,
 } from 'react-icons/fa6';
 
 import { BsFillPinMapFill, BsEyeFill, BsExclamationCircle, BsExclamationTriangle } from 'react-icons/bs';
@@ -83,3 +85,5 @@ export const DownloadPdfIcon = BiSolidFilePdf;
 export const ReplaceIcon = FaArrowsRotate;
 export const ExclamationCircle = BsExclamationCircle;
 export const ExclamationTriangle = BsExclamationTriangle;
+export const RegFloppyDisk = FaRegFloppyDisk;
+export const PencilIcon = FaPencil;

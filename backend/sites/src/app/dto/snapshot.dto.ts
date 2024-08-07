@@ -29,4 +29,9 @@ export class SnapshotDto {
 
   @Field(() => GraphQLJSON)
   snapshotData: any;
+
+  @Field({nullable: true})
+  created: Date | null;
+
 }
+

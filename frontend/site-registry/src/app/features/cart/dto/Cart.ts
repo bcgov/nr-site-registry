@@ -15,13 +15,13 @@ export interface CartState {
 }
 
 export class CartDeleteDTO {
-  userId: string = "";
+  userId: string = '';
 
-  cartId: string = "";
+  cartId: string = '';
 }
 
 export class CartDeleteDTOWithSiteId {
-  userId: string = "";
+  userId: string = '';
 
-  siteId: string = "";
+  siteId: string = '';
 }

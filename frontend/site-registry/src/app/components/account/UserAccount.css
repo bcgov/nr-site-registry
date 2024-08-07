@@ -23,6 +23,7 @@
   box-shadow: var(--surface-shadow-medium);
   inset: 16px 0px auto auto !important;
   border: none !important;
+  z-index: 99999 !important;
 }
 
 .account-custom-item-first {

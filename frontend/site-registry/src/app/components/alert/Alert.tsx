@@ -57,8 +57,6 @@ const SuccessMsg: React.FC<SuccessMsgProps> = ({ customMessage }: any) => (
   </div>
 );
 
-
-
 export const notifyError = (
   message?: string,
   headerText?: string,

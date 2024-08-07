@@ -28,13 +28,10 @@ export class CartDTO {
   @IsOptional()
   @IsString()
   whoCreated: string;
-} 
-
+}
 
 @InputType()
-export class CartDeleteDTO
-{
-  
+export class CartDeleteDTO {
   @Field()
   @IsNotEmpty()
   @IsString()
@@ -44,14 +41,10 @@ export class CartDeleteDTO
   @IsNotEmpty()
   @IsString()
   cartId: string;
-
 }
 
-
 @InputType()
-export class CartDeleteDTOWithSiteID
-{
-  
+export class CartDeleteDTOWithSiteID {
   @Field()
   @IsNotEmpty()
   @IsString()
@@ -61,5 +54,4 @@ export class CartDeleteDTOWithSiteID
   @IsNotEmpty()
   @IsString()
   siteId: string;
-
 }

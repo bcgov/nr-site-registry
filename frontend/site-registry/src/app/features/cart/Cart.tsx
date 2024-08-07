@@ -35,8 +35,8 @@ const Cart = () => {
 
   const deleteStatus = useSelector(deleteRequestStatus);
 
-  useEffect(() => {   
-    dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ""));
+  useEffect(() => {
+    dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
   }, [deleteStatus]);
 
   useEffect(() => {
@@ -111,7 +111,11 @@ const Cart = () => {
           closeHandler={(response) => {
             if (response) {
               dispatch(resetCartItemDeleteStatus(null));
-              dispatch(deleteCartItem([{ cartId: cartIdToDelte, userId: user?.profile.sub ?? ""}] )).unwrap();
+              dispatch(
+                deleteCartItem([
+                  { cartId: cartIdToDelte, userId: user?.profile.sub ?? '' },
+                ]),
+              ).unwrap();
             }
             setDeleteConfirm(false);
           }}

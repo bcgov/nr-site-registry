@@ -42,29 +42,16 @@ const Header = () => {
   };
 
   return (
-    <header className="navbar">
+    <header className="navbar position-sticky ">
       <div className="banner" tabIndex={1} role="navigation">
         <a href="https://gov.bc.ca">
           <img src={logo} className="logo" alt="BC Government Logo" />
-          {/* <img src={logoVertical} className="logo" alt="BC Government Logo" /> */}
         </a>
         <h1 className="siteName">SITE</h1>
       </div>
       <div className="header-right-corner-section d-flex align-items-center">
         <LanguageSwitcher />
 
-        {/* <Actions label="User" items={ [
-                { 
-                    label:'External User',
-                    value: UserType.External
-                },
-                {
-                    label:'Internal User',
-                    value: UserType.Internal
-                },
-                
-            ]} 
-            onItemClick={handleUserClick} />  */}
         <button
           className="navbar-toggler display-upto-medium no-bg-br-outline"
           type="button"

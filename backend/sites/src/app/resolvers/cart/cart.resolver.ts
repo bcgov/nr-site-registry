@@ -30,7 +30,7 @@ export class CartResolver {
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getCartItemsForUser(
     @Args('userId', { type: () => String }) userId: string,
-    @AuthenticatedUser() user: any
+    @AuthenticatedUser() user: any,
   ) {
     try {
       const result = await this.cartService.getCartItemsForUser(user?.sub);
@@ -130,8 +130,10 @@ export class CartResolver {
     @AuthenticatedUser() user: any,
   ) {
     try {
-      const message =
-        await this.cartService.deleteCartWithSiteId(cartDeleteDTO,user?.sub);
+      const message = await this.cartService.deleteCartWithSiteId(
+        cartDeleteDTO,
+        user?.sub,
+      );
 
       if (message) {
         return this.genericResponseProvider.createResponse(

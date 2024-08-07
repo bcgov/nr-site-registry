@@ -37,7 +37,7 @@ import {
   FaEye,
   FaArrowsRotate,
   FaRegFloppyDisk,
-  FaPencil
+  FaPencil,
 } from 'react-icons/fa6';
 
 import { BsFillPinMapFill, BsEyeFill } from 'react-icons/bs';

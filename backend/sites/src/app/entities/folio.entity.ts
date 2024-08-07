@@ -7,7 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
-  } from 'typeorm';
+} from 'typeorm';
 import { Sites } from './sites.entity';
 import { BaseAuditEntity } from './baseAuditEntity';
 import { FolioContents } from './folioContents.entity';
@@ -29,13 +29,11 @@ export class Folio extends BaseAuditEntity {
   folioId: string;
 
   @Field()
-  @Column("character varying", { name: "description", length: 500 })
-  description: string; 
+  @Column('character varying', { name: 'description', length: 500 })
+  description: string;
 
-
-  @Field(()=>[FolioContents], {nullable:true})
-  @OneToMany(()=>FolioContents, (folio)=> folio.folio)
+  @Field(() => [FolioContents], { nullable: true })
+  @OneToMany(() => FolioContents, (folio) => folio.folio)
   @JoinColumn({ name: 'folio_content_id', referencedColumnName: 'id' })
-  folioContents: FolioContents
-  
+  folioContents: FolioContents;
 }

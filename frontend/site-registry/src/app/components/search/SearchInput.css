@@ -66,23 +66,13 @@
   cursor: pointer;
 }
 
-
-.search-option-item:hover
-{
-    background: var(--surface-secondary-hover, #EDEBE9);
+.search-option-item:hover {
+  background: var(--surface-secondary-hover, #edebe9);
 }
 
-
-
-
-
-.search-option-item:hover
-{
-    background: var(--surface-secondary-hover, #EDEBE9);
+.search-option-item:hover {
+  background: var(--surface-secondary-hover, #edebe9);
 }
-
-
-
 
 .search-create-new-section {
   display: flex;

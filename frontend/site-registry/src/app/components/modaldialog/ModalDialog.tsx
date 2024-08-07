@@ -1,7 +1,11 @@
 import React, { Children, ReactNode, useState } from 'react';
 import './ModalDialog.css';
 import { XmarkIcon, FloppyDisk } from '../common/icon';
-import { CancelButton, DiscardButton, SaveButton } from '../simple/CustomButtons';
+import {
+  CancelButton,
+  DiscardButton,
+  SaveButton,
+} from '../simple/CustomButtons';
 
 interface ModalDialogCloseHandlerProps {
   closeHandler: (save: any) => void;
@@ -20,9 +24,8 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
   saveBtnLabel,
   cancelBtnLabel,
   dicardBtnLabel,
-  discardOption
+  discardOption,
 }) => {
-
   saveBtnLabel = saveBtnLabel ?? '';
   cancelBtnLabel = cancelBtnLabel ?? '';
   dicardBtnLabel = dicardBtnLabel ?? '';
@@ -60,15 +63,29 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
               ></XmarkIcon>
             </div>
             {children && <div className="custom-modal-data">{children}</div>}
-           {!discardOption && <div className="custom-modal-actions-footer">
-              <CancelButton clickHandler={handleClose} label={cancelBtnLabel} />
-              <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
-            </div>}
-            {discardOption && <div className="custom-modal-actions-footer">
-              <CancelButton clickHandler={handleClose} label={cancelBtnLabel} />
-              <DiscardButton clickHandler={handleDiscard} label={dicardBtnLabel} showIcon={false} />
-              <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
-            </div>}
+            {!discardOption && (
+              <div className="custom-modal-actions-footer">
+                <CancelButton
+                  clickHandler={handleClose}
+                  label={cancelBtnLabel}
+                />
+                <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
+              </div>
+            )}
+            {discardOption && (
+              <div className="custom-modal-actions-footer">
+                <CancelButton
+                  clickHandler={handleClose}
+                  label={cancelBtnLabel}
+                />
+                <DiscardButton
+                  clickHandler={handleDiscard}
+                  label={dicardBtnLabel}
+                  showIcon={false}
+                />
+                <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
+              </div>
+            )}
           </div>
         </div>
       )}

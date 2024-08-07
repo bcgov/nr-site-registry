@@ -1,36 +1,30 @@
-.folio-details-bold
-{
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 24px;
-    text-align: left;
+.folio-details-bold {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  text-align: left;
 }
 
-.folio-details-default
-{
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 24px;
-    text-align: left;
+.folio-details-default {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: left;
 }
 
-.folio-actions-gap
-{
-    gap:8px;
+.folio-actions-gap {
+  gap: 8px;
 }
 
-.folio-description
-{
-    display: flex;
-    gap: 8px;
-  
-    align-items: center;
+.folio-description {
+  display: flex;
+  gap: 8px;
+
+  align-items: center;
 }
 
-
-.folio-contents-gap
-{
-    gap: var(--layout-margin-medium);
-    display: flex;
-    flex-direction: column;
+.folio-contents-gap {
+  gap: var(--layout-margin-medium);
+  display: flex;
+  flex-direction: column;
 }

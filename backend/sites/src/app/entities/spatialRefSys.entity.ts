@@ -3,7 +3,7 @@ import { Column, Entity, Index } from 'typeorm';
 
 @ObjectType()
 // @Index("spatial_ref_sys_pkey", ["srid"], { unique: true })
-@Entity("spatial_ref_sys")
+@Entity('spatial_ref_sys')
 export class SpatialRefSys {
   @Field()
   @Column('integer', { primary: true, name: 'srid' })

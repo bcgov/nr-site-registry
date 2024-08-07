@@ -24,10 +24,21 @@ export class SnapshotsService {
 
   async getSnapshotsByUserId(userId: string) {
     try {
-      const result = await this.snapshotRepository.find({ where: { userId } });
+      const result = await this.snapshotRepository.find({ where: { userId },
+        order: { created: 'DESC' }, });
       return result;
     } catch (error) {
       throw new Error('Failed to retrieve snapshots by userId.');
+    }
+  }
+
+  async getSnapshotsBySiteId(siteId: string, userId: string) {
+    try {
+      const result = await this.snapshotRepository.find({ where: {siteId, userId },
+        order: { created: 'DESC' }, });
+      return result;
+    } catch (error) {
+      throw new Error('Failed to retrieve snapshots by userId and siteId.');
     }
   }
 

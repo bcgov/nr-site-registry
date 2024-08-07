@@ -336,103 +336,7 @@ const SiteDetails = () => {
               </div>
             </div>
           </div>
-          <div className="d-flex gap-2 justify-align-center pe-2">
-            {/* For Action Dropdown*/}
-            {!edit &&
-              viewMode === SiteDetailsMode.ViewOnlyMode &&
-              userType === UserType.Internal && (
-                <Actions
-                  label="Action"
-                  items={ActionItems}
-                  onItemClick={handleItemClick}
-                />
-              )}
-
-            {/* For Edit / SR Dropdown*/}
-            <div className="d-flex gap-3 align-items-center">
-              {edit && userType === UserType.Internal && (
-                <>
-                  <CustomLabel
-                    labelType="c-b"
-                    label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
-                  />
-                  <SaveButton clickHandler={() => setSave(true)} />
-                  <CancelButton clickHandler={handleCancelButton} />
-                </>
-              )}
-            </div>
-
-            {/* For Cart /Folio Controls*/}
-            {!edit &&
-              viewMode === SiteDetailsMode.ViewOnlyMode &&
-              userType === UserType.External && (
-                <>
-                  <button
-                    className="d-flex btn-cart align-items-center"
-                    onClick={() => handleAddToCart()}
-                  >
-                    <ShoppingCartIcon className="btn-icon" />
-                    <span className="btn-cart-lbl"> Add to Cart</span>
-                  </button>
-                  <button className="d-flex btn-folio align-items-center">
-                    <FolderPlusIcon className="btn-folio-icon" />
-                    <span className="btn-folio-lbl"> Add to Folio</span>
-                    <DropdownIcon className="btn-folio-icon" />
-                  </button>
-                </>
-              )}
-          </div>
-        </div>
-      )}
-      <PageContainer role="details">
-        {save && (
-          <ModalDialog
-            closeHandler={(response) => {
-              setSave(false);
-              if (response) {
-                dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
-                setEdit(false);
-              }
-            }}
-          >
-            {savedChanges.length > 0 ? (
-              <React.Fragment>
-                <div>
-                  <span className="custom-modal-data-text">
-                    The following fields will be updated:
-                  </span>
-                </div>
-                <div>
-                  <ul className="custom-modal-data-text">
-                    {savedChanges.map((item: any) => (
-                      <li key={item.label}>
-                        {IChangeType[item.changeType]} {item.label}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                <div>
-                  <span className="custom-modal-data-text">
-                    No changes to save
-                  </span>
-                </div>
-              </React.Fragment>
-            )}
-          </ModalDialog>
-        )}
-
-        <div className="d-flex justify-content-between">
-          <button
-            className="d-flex btn-back align-items-center"
-            onClick={onClickBackButton}
-          >
-            <AngleLeft className="btn-icon" />
-            <span className="btn-back-lbl">Back to</span>
-          </button>
-          <div className="d-flex gap-2 justify-align-center pe-2 pos-relative">
+          <div className="d-flex gap-2 justify-align-center pe-2 position-relative">
             {/* For Action Dropdown*/}
             {!edit &&
               viewMode === SiteDetailsMode.ViewOnlyMode &&
@@ -464,7 +368,7 @@ const SiteDetails = () => {
               userType === UserType.External && (
                 <>
                   <div
-                    className="d-flex btn-cart align-items-center"
+                    className="d-flex btn-cart align-items-center "
                     onClick={() => handleAddToCart()}
                   >
                     <ShoppingCartIcon className="btn-icon" />
@@ -516,6 +420,142 @@ const SiteDetails = () => {
               )}
           </div>
         </div>
+      )}
+      <PageContainer role="details">
+        {save && (
+          <ModalDialog
+            closeHandler={(response) => {
+              setSave(false);
+              if (response) {
+                dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+                setEdit(false);
+              }
+            }}
+          >
+            {savedChanges.length > 0 ? (
+              <React.Fragment>
+                <div>
+                  <span className="custom-modal-data-text">
+                    The following fields will be updated:
+                  </span>
+                </div>
+                <div>
+                  <ul className="custom-modal-data-text">
+                    {savedChanges.map((item: any) => (
+                      <li key={item.label}>
+                        {IChangeType[item.changeType]} {item.label}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <div>
+                  <span className="custom-modal-data-text">
+                    No changes to save
+                  </span>
+                </div>
+              </React.Fragment>
+            )}
+          </ModalDialog>
+        )}
+
+        {!isVisible && (
+          <div className="d-flex justify-content-between">
+            <button
+              className="d-flex btn-back align-items-center"
+              onClick={onClickBackButton}
+            >
+              <AngleLeft className="btn-icon" />
+              <span className="btn-back-lbl">Back to</span>
+            </button>
+            <div className="d-flex gap-2 justify-align-center pe-2 pos-relative">
+              {/* For Action Dropdown*/}
+              {!edit &&
+                viewMode === SiteDetailsMode.ViewOnlyMode &&
+                userType === UserType.Internal && (
+                  <Actions
+                    label="Action"
+                    items={ActionItems}
+                    onItemClick={handleItemClick}
+                  />
+                )}
+
+              {/* For Edit / SR Dropdown*/}
+              <div className="d-flex gap-3 align-items-center">
+                {edit && userType === UserType.Internal && (
+                  <>
+                    <CustomLabel
+                      labelType="c-b"
+                      label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
+                    />
+                    <SaveButton clickHandler={() => setSave(true)} />
+                    <CancelButton clickHandler={handleCancelButton} />
+                  </>
+                )}
+              </div>
+
+              {/* For Cart /Folio Controls*/}
+              {!edit &&
+                viewMode === SiteDetailsMode.ViewOnlyMode &&
+                userType === UserType.External && (
+                  <>
+                    <div
+                      className="d-flex btn-cart align-items-center"
+                      onClick={() => handleAddToCart()}
+                    >
+                      <ShoppingCartIcon className="btn-icon" />
+                      <span className="btn-cart-lbl"> Add to Cart</span>
+                    </div>
+                    <div
+                      className="d-flex btn-folio align-items-center"
+                      onClick={() => {
+                        SetAddToFolioVisible(!addToFolioVisible);
+                      }}
+                    >
+                      <FolderPlusIcon className="btn-folio-icon" />
+                      <span className="btn-folio-lbl"> Add to Folio</span>
+                      <DropdownIcon className="btn-folio-icon" />
+                    </div>
+                    {addToFolioVisible && (
+                      <div className="pos-absolute">
+                        <SearchInput
+                          label={'Search Folios'}
+                          placeHolderText={'Search Folios'}
+                          searchTerm={folioSearchTerm}
+                          clearSearch={() => {
+                            SetFolioSearchTeam('');
+                            //SetAddToFolioVisible(false);
+                          }}
+                          handleSearchChange={(e) => {
+                            if (e.target) {
+                              SetFolioSearchTeam(e.target.value);
+                            } else {
+                              SetFolioSearchTeam(e);
+                            }
+                          }}
+                          options={folioDetails
+                            .filter(
+                              (y: any) =>
+                                y.folioId
+                                  .toLowerCase()
+                                  .indexOf(folioSearchTerm.toLowerCase()) !==
+                                -1,
+                            )
+                            .map((x: any) => x.folioId)}
+                          optionSelectHandler={(value) => {
+                            handleFolioSelect(value);
+                            SetAddToFolioVisible(false);
+                          }}
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
+            </div>
+          </div>
+        )}
         <div className="section-details-header row">
           <div className="d-flex">
             <BannerDetails />

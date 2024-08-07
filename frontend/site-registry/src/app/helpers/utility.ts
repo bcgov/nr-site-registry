@@ -83,7 +83,7 @@ export const getAxiosInstance = () => {
 
   const instance = axios.create({
     baseURL: API,
-    timeout: 2000,
+    // timeout: 2000,
     headers: {
       Authorization: 'Bearer ' + user?.access_token,
       requestID: generateRequestId(),

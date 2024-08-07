@@ -2,7 +2,7 @@ import {
   ApolloFederationDriver,
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -16,8 +16,7 @@ import {
 } from 'nest-keycloak-connect';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserJWTTokenDecoderMiddleware } from './app/middleware/userJwtTokenDecoder';
-import { UserService } from './app/services/user/user.service';
+
 
 /**
  * Application Module Wrapping All Functionality For User Micro Service
@@ -84,7 +83,4 @@ import { UserService } from './app/services/user/user.service';
     },
   ],
 })
-export class AppModule
-{
-
-}
+export class AppModule{}

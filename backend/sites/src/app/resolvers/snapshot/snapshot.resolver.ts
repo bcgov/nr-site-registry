@@ -1,6 +1,10 @@
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import {
+  AuthenticatedUser,
+  RoleMatchingMode,
+  Roles,
+} from 'nest-keycloak-connect';
 import { SnapshotDto, SnapshotResponse } from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { SnapshotsService } from '../../services/snapshot/snapshot.service';
@@ -54,6 +58,35 @@ export class SnapshotsResolver {
     } else {
       return this.genericResponseProvider.createResponse(
         `Snapshot not found for user id: ${userId}`,
+        404,
+        false,
+        null,
+      );
+    }
+  }
+
+  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Query(() => SnapshotResponse, { name: 'getSnapshotsBySiteId' })
+  @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
+  async getSnapshotsBySiteId(
+    @Args('siteId', { type: () => String }) siteId: string,
+    @AuthenticatedUser()
+    user: any,
+  ) {
+    const result = await this.snapshotsService.getSnapshotsBySiteId(
+      siteId,
+      user.sub,
+    );
+    if (result && result.length > 0) {
+      return this.genericResponseProvider.createResponse(
+        'Snapshot fetched successfully.',
+        200,
+        true,
+        result,
+      );
+    } else {
+      return this.genericResponseProvider.createResponse(
+        `Snapshot not found for user id: ${user.sub} and site id ${siteId}`,
         404,
         false,
         null,

@@ -175,6 +175,7 @@ describe('SnapshotService', () => {
       expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
       expect(snapshotRepository.find).toHaveBeenCalledWith({
         where: { userId },
+        order: { created: 'DESC' },
       });
     });
 
@@ -190,6 +191,96 @@ describe('SnapshotService', () => {
       await expect(service.getSnapshotsByUserId(userId)).rejects.toThrow(
         'Failed to retrieve snapshots by userId.',
       );
+      expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getSnapshotsByUserIdAndSiteId', () => {
+    it('should return an array of snapshots for a given userId and siteId', async () => {
+      const userId = '1';
+      const siteId = '1';
+      const res: Snapshots[] = [
+        {
+          id: 1,
+          userId: '1',
+          siteId: '1',
+          transactionId: '1',
+          created: new Date(),
+          updated: new Date(),
+          snapshotData: {
+            city: 'Surrey',
+            siteId: '5',
+            userId: '1',
+            address: '123 ABC',
+            participants: [
+              {
+                name: 'Brandon',
+                department: 'EPD',
+              },
+              {
+                name: 'Jackie',
+                department: 'EPD',
+              },
+            ],
+            generalDescription: 'Testing new api',
+          },
+          site: sampleSites[0],
+        },
+        {
+          id: 1,
+          userId: '1',
+          siteId: '1',
+          transactionId: '2',
+          created: new Date(),
+          updated: new Date(),
+          snapshotData: {
+            city: 'Surrey',
+            siteId: '5',
+            userId: '1',
+            address: '123 ABC',
+            participants: [
+              {
+                name: 'Brandon',
+                department: 'EPD',
+              },
+              {
+                name: 'Jackie',
+                department: 'EPD',
+              },
+            ],
+            generalDescription: 'Testing new api',
+          },
+          site: sampleSites[0],
+        },
+      ];
+      jest
+        .spyOn(snapshotRepository, 'find')
+        .mockResolvedValueOnce(res as Snapshots[]);
+      const snapshot = await service.getSnapshotsByUserIdAndSiteId(
+        siteId,
+        userId,
+      );
+
+      expect(snapshot).toEqual(res);
+      expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
+      expect(snapshotRepository.find).toHaveBeenCalledWith({
+        where: { siteId, userId },
+        order: { created: 'DESC' },
+      });
+    });
+
+    it('should throw an error if repository throws an error', async () => {
+      const userId = '1';
+      const siteId = '1';
+      jest
+        .spyOn(snapshotRepository, 'find')
+        .mockRejectedValueOnce(
+          new Error('Failed to retrieve snapshots by userId and siteId.'),
+        );
+
+      await expect(
+        service.getSnapshotsByUserIdAndSiteId(siteId, userId),
+      ).rejects.toThrow('Failed to retrieve snapshots by userId and siteId.');
       expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
     });
   });
@@ -282,6 +373,7 @@ describe('SnapshotService', () => {
         userId: '1',
         siteId: '1',
         transactionId: '3',
+        created: new Date(),
         snapshotData: {
           userId: '1',
           siteId: '5',
@@ -317,6 +409,7 @@ describe('SnapshotService', () => {
         userId: '1',
         siteId: '1',
         transactionId: '3',
+        created: new Date(),
         snapshotData: {
           userId: '1',
           siteId: '5',

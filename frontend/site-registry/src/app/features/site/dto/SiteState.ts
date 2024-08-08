@@ -1,6 +1,5 @@
 import { ChangeTracker } from '../../../components/common/IChangeType';
 import { RequestStatus } from '../../../helpers/requests/status';
-import { UserMode } from '../../../helpers/requests/userMode';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../../details/dto/SiteDetailsMode';
 import { SiteResultDto, Sites } from './Site';

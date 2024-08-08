@@ -212,7 +212,7 @@ const Participants = () => {
       );
     const tracker = new ChangeTracker(
       IChangeType.Modified,
-      'Site Participant: ' + currLabel?.displayName ?? '',
+      'Site Participant: ' + currLabel?.displayName,
     );
     dispatch(trackChanges(tracker.toPlainObject()));
   };

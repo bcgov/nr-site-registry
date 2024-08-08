@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormFieldType, IFormField } from './IFormField';
 import infoIcon from '../../images/info-icon.png';
 import { formatDate, formatDateRange } from '../../helpers/utility';
@@ -58,6 +58,33 @@ export const Link: React.FC<InputProps> = ({
       <span className="ps-1">{customLinkValue ?? value}</span>
     </RouterLink>,
     stickyCol,
+  );
+};
+
+export const IconButton: React.FC<InputProps> = ({
+  label,
+  placeholder,
+  type,
+  value,
+  validation,
+  allowNumbersOnly,
+  isEditing,
+  customLabelCss,
+  customInputTextCss,
+  customEditLabelCss,
+  customEditInputTextCss,
+  customLinkValue,
+  customIcon,
+  onChange,
+  tableMode,
+  stickyCol,
+  href,
+}) => {
+  return renderTableCell(
+    <div onClick={onChange} className={`${customInputTextCss ?? ''}`}>
+      {customIcon && customIcon}{' '}
+      <span className="ps-1">{customLinkValue ?? value}</span>
+    </div>,
   );
 };
 
@@ -132,6 +159,10 @@ export const TextInput: React.FC<InputProps> = ({
   const ContainerElement = tableMode ? 'td' : 'div';
   const [error, setError] = useState<string | null>(null);
 
+  const [localValue, SetLocalValue] = useState(value);
+  //const inputTxtId = label.replace(/\s+/g, "_");
+  let timeOutId: any = null;
+
   const validateInput = (inputValue: string) => {
     if (validation) {
       if (validation.pattern && !validation.pattern.test(inputValue)) {
@@ -146,6 +177,10 @@ export const TextInput: React.FC<InputProps> = ({
 
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
+
+    validateInput(inputValue);
+    SetLocalValue(inputValue);
+
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
         onChange(inputValue); // Update parent component state only if validation passes
@@ -198,24 +233,17 @@ export const TextInput: React.FC<InputProps> = ({
             customEditInputTextCss ?? 'custom-input-text'
           }  ${error && 'error'}`}
           placeholder={placeholder}
-          value={value ?? ''}
+          value={localValue ?? ''}
           onChange={handleTextInputChange}
           aria-label={label} // Accessibility
           required={error ? true : false}
         />
       ) : (
-        <span
-          aria-label={label}
-          className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
-        >
+        <span className={`d-flex pt-1 ${customInputTextCss ?? ''}`}>
           {value}
         </span>
       )}
-      {error && (
-        <div aria-label={label} className="text-danger p-1 small">
-          {error}
-        </div>
-      )}
+      {error && <div className="text-danger p-1 small">{error}</div>}
     </ContainerElement>
   );
   // }
@@ -653,11 +681,19 @@ export const CheckBoxInput: React.FC<InputProps> = ({
     <ContainerElement
       className={tableMode ? 'table-border-light' : 'd-inline mb-3'}
     >
-      <div className={tableMode ? '' : 'd-inline form-check p-0'}>
+      <div
+        className={
+          tableMode
+            ? !disableCheckBox
+              ? 'pt-1'
+              : ''
+            : 'd-inline form-check p-0'
+        }
+      >
         <input
           id={inputTxtId}
           type={type}
-          className={`form-check-input custom-checkbox ${
+          className={`form-check-input ${!disableCheckBox ? 'custom-checkbox' : 'custom-checkbox-viewMode'} ${
             customEditInputTextCss ?? 'custom-input-text'
           }`}
           disabled={disableCheckBox}
@@ -803,6 +839,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
           label={label}
           isLabel={false}
           onChange={(isChecked) => onChange(isChecked)}
+          srMode={srMode}
         />
       )}
       {!tableMode && (

@@ -73,7 +73,8 @@ export const GetConfig = () => {
         customLabelCss: 'custom-participant-lbl-text',
         customInputTextCss: 'custom-participant-input-text',
         customEditLabelCss: 'custom-participant-edit-label',
-        customEditInputTextCss: 'custom-participant-edit-input',
+        customEditInputTextCss:
+          'custom-participant-edit-input .rs.input .rs-input-group-addon',
         tableMode: true,
       },
     },
@@ -93,7 +94,8 @@ export const GetConfig = () => {
         customLabelCss: 'custom-participant-lbl-text',
         customInputTextCss: 'custom-participant-input-text',
         customEditLabelCss: 'custom-participant-edit-label',
-        customEditInputTextCss: 'custom-participant-edit-input',
+        customEditInputTextCss:
+          'custom-participant-edit-input .rs.input .rs-input-group-addon',
         tableMode: true,
       },
     },
@@ -155,7 +157,7 @@ export const GetConfig = () => {
         customLabelCss: 'custom-participant-lbl-text',
         customInputTextCss: 'custom-participant-input-text',
         customEditLabelCss: 'custom-participant-edit-label',
-        customEditInputTextCss: 'custom-participant-edit-input',
+        customEditInputTextCss: 'custom-participant-edit-input ',
         tableMode: true,
       },
     },
@@ -196,7 +198,8 @@ export const GetConfig = () => {
         customLabelCss: 'custom-participant-lbl-text',
         customInputTextCss: 'custom-participant-input-text',
         customEditLabelCss: 'custom-participant-edit-label',
-        customEditInputTextCss: 'custom-participant-edit-input',
+        customEditInputTextCss:
+          'custom-participant-edit-input .rs.input .rs-input-group-addon',
         tableMode: true,
       },
     },
@@ -216,7 +219,8 @@ export const GetConfig = () => {
         customLabelCss: 'custom-participant-lbl-text',
         customInputTextCss: 'custom-participant-input-text',
         customEditLabelCss: 'custom-participant-edit-label',
-        customEditInputTextCss: 'custom-participant-edit-input',
+        customEditInputTextCss:
+          'custom-participant-edit-input .rs.input .rs-input-group-addon',
         tableMode: true,
       },
     },

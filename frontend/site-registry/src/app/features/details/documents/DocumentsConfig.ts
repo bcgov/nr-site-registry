@@ -20,7 +20,7 @@ export const GetDocumentsConfig = () => {
         customLabelCss: 'custom-docuemnt-lbl-text',
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
-        customEditInputTextCss: 'custom-document-edit-input-text',
+        customEditInputTextCss: 'custom-document-edit-input-text ',
       },
       {
         type: FormFieldType.Date,
@@ -33,7 +33,8 @@ export const GetDocumentsConfig = () => {
         customLabelCss: 'custom-docuemnt-lbl-text',
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
-        customEditInputTextCss: 'custom-document-edit-input-text',
+        customEditInputTextCss:
+          'custom-document-edit-input-text .rs-input .rs-input-group-addon',
       },
     ],
   ];
@@ -78,7 +79,8 @@ export const GetDocumentsConfig = () => {
         customLabelCss: 'custom-docuemnt-lbl-text',
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
-        customEditInputTextCss: 'custom-document-edit-input-text',
+        customEditInputTextCss:
+          'custom-document-edit-input-text .rs-input .rs-input-group-addon',
       },
     ],
   ];
@@ -111,7 +113,7 @@ export const GetDocumentsConfig = () => {
         customLabelCss: 'custom-docuemnt-lbl-text',
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
-        customEditInputTextCss: 'custom-document-edit-input-text',
+        customEditInputTextCss: 'custom-document-edit-input-text ',
       },
       {
         type: FormFieldType.Date,
@@ -123,7 +125,8 @@ export const GetDocumentsConfig = () => {
         customLabelCss: 'custom-docuemnt-lbl-text',
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
-        customEditInputTextCss: 'custom-document-edit-input-text',
+        customEditInputTextCss:
+          'custom-document-edit-input-text .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -136,7 +139,8 @@ export const GetDocumentsConfig = () => {
         customLabelCss: 'custom-docuemnt-lbl-text',
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
-        customEditInputTextCss: 'custom-document-edit-input-text',
+        customEditInputTextCss:
+          'custom-document-edit-input-text .rs-input .rs-input-group-addon',
       },
     ],
   ];

@@ -14,6 +14,7 @@ import {
   TextAreaInput,
   DropdownSearchInput,
   DeleteIcon,
+  IconButton,
 } from '../../input-controls/InputControls';
 import { ChangeTracker } from '../../common/IChangeType';
 import { get } from '../utils';
@@ -300,6 +301,28 @@ const TableBody: FC<TableBodyProps> = ({
           stickyCol={field.stickyCol}
         />
       );
+    } else if (field.type === FormFieldType.IconButton) {
+      return (
+        <IconButton
+          label={field.label}
+          customLabelCss={field.customLabelCss}
+          customInputTextCss={field.customInputTextCss}
+          customEditLabelCss={field.customEditLabelCss}
+          customEditInputTextCss={field.customEditInputTextCss}
+          placeholder={field.placeholder}
+          options={field.options || []}
+          value={value}
+          onChange={(value) =>
+            tableRecordChangeHandler(rowKey, field.graphQLPropertyName, value)
+          }
+          type={field.type}
+          isEditing={editMode ?? true}
+          tableMode={field.tableMode ?? false}
+          stickyCol={field.stickyCol}
+          customLinkValue={field.customLinkValue}
+          customIcon={field.customIcon}
+        />
+      );
     }
   };
 
@@ -345,10 +368,10 @@ const TableBody: FC<TableBodyProps> = ({
     const rowChecked = isChecked(checkboxId);
 
     return (
-      <React.Fragment key={rowIndex}>
+      <React.Fragment>
         <tr>
           {allowRowsSelect && (
-            <td className="table-border-light content-text positionSticky">
+            <td className="table-border-light content-text positionSticky align-content-center">
               <input
                 id={getValue(rowIndex, idColumnName)}
                 type="checkbox"

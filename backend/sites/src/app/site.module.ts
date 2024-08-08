@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SiteService } from './services/site/site.service';
 import { SiteController } from './controllers/site.controller';
@@ -66,6 +66,15 @@ import { NotationResolver } from './resolvers/notation/notation.resolver';
 import { NotationService } from './services/notation/notation.service';
 import { DocumentResolver } from './resolvers/document/document.resolver';
 import { DocumentService } from './services/document/document.service';
+import { Folio } from './entities/folio.entity';
+import { FolioContents } from './entities/folioContents.entity';
+import { FolioResolver } from './resolvers/folio/folio.resolver';
+import { FolioService } from './services/folio/folio.service';
+import { FolioContentsService } from './services/folio/folioContents.service';
+import { UserJWTTokenDecoderMiddleware } from './middleware/userJwtTokenDecoder';
+import { UserService } from './services/user/user.service';
+import { User } from './entities/user.entity';
+import { JwtService } from '@nestjs/jwt';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -122,6 +131,9 @@ import { DocumentService } from './services/document/document.service';
       RecentViews,
       Snapshots,
       Cart,
+      Folio,
+      FolioContents,
+      User,
     ]),
   ],
   providers: [
@@ -146,7 +158,16 @@ import { DocumentService } from './services/document/document.service';
     NotationService,
     DocumentResolver,
     DocumentService,
+    FolioResolver,
+    FolioService,
+    FolioContentsService,
+    UserService,
+    JwtService,
   ],
   controllers: [SiteController],
 })
-export class SiteModule {}
+export class SiteModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(UserJWTTokenDecoderMiddleware).forRoutes('*'); // Apply to all routes or specific routes
+  }
+}

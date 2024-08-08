@@ -197,16 +197,115 @@ const Documents = () => {
           displayName: '',
           sr: false,
         };
+      }
 
-        const addDoc = [newDocument, ...formData];
-        setFormData(addDoc);
-        // dispatch(updateSiteDocument(addDoc));
+      const handleViewOnline = () => {
+        alert('View online click');
+      };
+
+      const handleDownload = () => {
+        alert('Download click');
+      };
+      const handleFileReplace = (
+        event: any,
+        doc: any,
+        docIsReplace: boolean = false,
+      ) => {
+        if (docIsReplace) {
+          if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0] ?? null;
+            if (file && file.type === 'application/pdf') {
+              // You can perform additional actions here with the selected file
+              // For example, upload it to a server or process it further
+              const updatedDoc = formData.map((document) => {
+                if (document.id === doc.id) {
+                  const replacedDoc = {
+                    ...doc,
+                    submissionDate: new Date(),
+                    documentDate: file.lastModified,
+                    title: file.name.split('.pdf')[0].trim(),
+                  };
+                  return { ...document, ...replacedDoc };
+                }
+                return document;
+              });
+              setFormData(updatedDoc);
+              //   dispatch(updateSiteDocument(updatedDoc));
+              const tracker = new ChangeTracker(
+                IChangeType.Modified,
+                'Site Document',
+              );
+              dispatch(trackChanges(tracker.toPlainObject()));
+              setCurrentDocument({});
+              setCurrentFile({});
+              setIsReplace(false);
+            }
+          } else {
+            alert('Please select a valid PDF file.');
+          }
+        } else {
+          setCurrentFile(event);
+          setCurrentDocument(doc);
+          setIsReplace(true);
+
+          // Reset input type="file" element by changing key prop
+          setKey(Date.now()); // Force input type="file" to reset
+        }
+      };
+      const handleFileDelete = (
+        document: any,
+        docIsDelete: boolean = false,
+      ) => {
+        if (docIsDelete) {
+          const nonDeletedDoc = formData.filter((doc) => {
+            if (doc.id !== document.id) {
+              return doc;
+            }
+          });
+          setFormData(nonDeletedDoc);
+          // dispatch(updateSiteDocument(nonDeletedDoc));
+          const tracker = new ChangeTracker(
+            IChangeType.Deleted,
+            'Document Delete',
+          );
+          dispatch(trackChanges(tracker.toPlainObject()));
+          setCurrentDocument({});
+          setIsDelete(false);
+        } else {
+          setCurrentDocument(document);
+          setIsDelete(true);
+        }
+      };
+
+      const handleInputChange = (
+        id: number,
+        graphQLPropertyName: any,
+        value: String | [Date, Date],
+      ) => {
+        if (viewMode === SiteDetailsMode.SRMode) {
+          console.log({ [graphQLPropertyName]: value, id });
+        } else {
+          const updatedDoc = formData.map((document) => {
+            if (document.id === id) {
+              return { ...document, [graphQLPropertyName]: value };
+            }
+            return document;
+          });
+          setFormData(updatedDoc);
+          dispatch(updateSiteDocument(updatedDoc));
+        }
+        const flattedArr = flattenFormRows(documentFormRows);
+        const currLabel =
+          flattedArr &&
+          flattedArr.find(
+            (row) => row.graphQLPropertyName === graphQLPropertyName,
+          );
         const tracker = new ChangeTracker(
           IChangeType.Added,
           'New Site Document',
         );
         dispatch(trackChanges(tracker.toPlainObject()));
-      }
+      };
     } else {
       alert('Please select a valid PDF file.');
     }

@@ -80,3 +80,17 @@
     margin-top: 60px;
   }
 }
+
+.custom-document-edit-input-text
+  .rs-input-group.rs-input-group-inside
+  .rs-input-group-addon {
+  top: 0;
+  background: none;
+  border: none;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.custom-document-edit-input-text .rs-input {
+  padding: 10px 11px !important;
+}

@@ -1,11 +1,12 @@
 import React, { FC, useState } from 'react';
 import { ColumnSize, TableColumn } from '../TableColumn';
-import { SortIcon } from '../../common/icon';
+import { SortIcon , DropdownUpIcon, DropdownIcon } from '../../common/icon';
 
 interface HeaderCellProps {
   item: TableColumn;
   index: number;
   sortHandler: (row: any, ascSort: boolean) => void;
+  currentSortColumn?: string;
 }
 
 const getColumnSize = (columnSize: ColumnSize | undefined) => {
@@ -23,8 +24,9 @@ const getColumnSize = (columnSize: ColumnSize | undefined) => {
   }
 };
 
-const HeaderCell: FC<HeaderCellProps> = ({ item, index, sortHandler }) => {
+const HeaderCell: FC<HeaderCellProps> = ({ item, index, sortHandler, currentSortColumn }) => {
   const [ascendingSort, setSortDirection] = useState(false);
+  
 
   return (
     <th
@@ -35,13 +37,21 @@ const HeaderCell: FC<HeaderCellProps> = ({ item, index, sortHandler }) => {
       )}  ${item.stickyCol ? 'positionSticky' : ''} `}
     >
       {item.displayName}
-      <SortIcon
+      {!item.dynamicColumn && currentSortColumn === item.graphQLPropertyName && ascendingSort && <DropdownUpIcon className="column-sort-icon" onClick={() => {
+          sortHandler(item, !ascendingSort);
+          setSortDirection(!ascendingSort);
+        }}/> }
+      {!item.dynamicColumn && currentSortColumn === item.graphQLPropertyName && !ascendingSort &&  <DropdownIcon className="column-sort-icon" onClick={() => {
+          sortHandler(item, !ascendingSort);
+          setSortDirection(!ascendingSort);
+        }}/>}
+      {!item.dynamicColumn && currentSortColumn !== item.graphQLPropertyName && <SortIcon
         className="column-sort-icon"
         onClick={() => {
           sortHandler(item, !ascendingSort);
           setSortDirection(!ascendingSort);
         }}
-      />
+      />}
     </th>
   );
 };

@@ -172,18 +172,61 @@ const Search = () => {
   const changeHandler = (event: any) => {
     console.log('handle', event);
     if (event && event.property === 'select_row') {
-      const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
-      if (index > -1 && !event.value) {
-        // If row is already selected, remove it
-        SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
-      } else {
-        // If row is not selected, add it
-        SetSelectedRows([...selectedRows, event.row]);
+
+      if(event.value)
+      {
+        const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
+        if(index === -1)
+        {
+          SetSelectedRows([...selectedRows, event.row]);
+        }
+        else
+        {
+          // do nothing
+        }
       }
+      else
+      {
+        SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
+      }
+
+
+      //const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
+      // if (index > -1 && !event.value) {
+      //   // If row is already selected, remove it
+      //   SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
+      // } else {
+      //   // If row is not selected, add it
+      //   SetSelectedRows([...selectedRows, event.row]);
+      // }
+    }
+    else if(event && event.property === 'select_all' )
+    {
+        const newRows = event.value;
+        if(event.selected)
+        {
+          SetSelectedRows((prevArray) => {
+            const existingIds = new Set(prevArray.map(obj => obj.id));
+            const uniqueRows = newRows.filter((row:any) => !existingIds.has(row.id));
+            return [...prevArray, ...uniqueRows];
+        });
+        }
+        else
+        {
+          SetSelectedRows((prevArray) => {
+            const idsToRemove = new Set(newRows.map((row:any) => row.id));
+            return prevArray.filter(obj => !idsToRemove.has(obj.id));
+        });
+        }
     }
 
-    console.log('selectedRows', selectedRows);
+   
   };
+
+  useEffect(()=>{
+    console.log('selectedRows', selectedRows);
+
+  },[selectedRows])
 
   const [showAddToFolio, SetShowAddToFolio] = useState(false);
 

@@ -557,16 +557,15 @@ const SiteDetails = () => {
           </div>
         )}
         <div className="section-details-header row">
-          <div className="d-flex">
-            <BannerDetails />
-            {UserType.External === userType &&
-              snapshot.status === RequestStatus.success &&
-              snapshot.snapshot.data !== null && (
-                <div className="py-2 snapshot">
-                  <span>{`Snapshot Taken: ${new Date(snapshot.snapshot.data[0].created)}`}</span>
-                </div>
-              )}
-          </div>
+          {UserType.External === userType &&
+            snapshot.status === RequestStatus.success &&
+            snapshot.snapshot.data !== null && (
+              <div>
+                <BannerDetails
+                  snapshotDate={`Snapshot Taken: ${new Date(snapshot.snapshot.data[0].created).toString().replace(/\s\([^)]+\)$/, '')}`}
+                />
+              </div>
+            )}
 
           {!isVisible && (
             <>

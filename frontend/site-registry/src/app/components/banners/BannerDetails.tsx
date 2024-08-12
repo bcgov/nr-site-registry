@@ -1,3 +1,4 @@
+import React from 'react';
 import { BannerMessages } from '../../helpers/requests/bannerMessages';
 import {
   ExclamationCircle,
@@ -6,7 +7,11 @@ import {
 } from '../common/icon';
 import Banner from './Banner';
 
-const BannerDetails = () => {
+interface BannerDetailsProps {
+  snapshotDate?: string;
+}
+
+const BannerDetails: React.FC<BannerDetailsProps> = ({ snapshotDate }) => {
   let type = '';
   let bannerLabel = '';
   let iconType = <></>;
@@ -14,7 +19,7 @@ const BannerDetails = () => {
   let customClassForIcon = '';
   let detailMessageNode = <></>;
 
-  type = BannerMessages.pending; //Business Logic to decide what status needs to be sent is pending, hardcoding for UI purpose
+  type = BannerMessages.current; //Business Logic to decide what status needs to be sent is pending, hardcoding for UI purpose
   switch (type) {
     case BannerMessages.outdated:
       bannerLabel = BannerMessages.outdatedLabel;
@@ -69,6 +74,7 @@ const BannerDetails = () => {
         customClassForBanner={customClassForBanner}
         customClassForIcon={customClassForIcon}
         detailMessageNode={detailMessageNode}
+        snapshotDate={snapshotDate}
       />
     </div>
   );

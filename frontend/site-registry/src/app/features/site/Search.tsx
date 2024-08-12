@@ -12,7 +12,7 @@ import {
 } from './dto/SiteSlice';
 
 import { AppDispatch } from '../../Store';
-import { selectAllSites, currentPageSelection } from './dto/SiteSlice';
+import { selectAllSites, currentPageSelection ,currentPageSize } from './dto/SiteSlice';
 import SearchResults from './SearchResults';
 import {
   ShoppingCartIcon,
@@ -42,6 +42,7 @@ const Search = () => {
   const sites = useSelector(selectAllSites);
   const currSearchVal = useSelector((state: any) => state.sites);
   const currentPageInState = useSelector(currentPageSelection);
+  const currentPageSizeInState = useSelector(currentPageSize);
   const totalRecords = useSelector(resultsCount);
   const [noUserAction, setUserAction] = useState(true);
   const [displayColumn, SetDisplayColumns] = useState(false);
@@ -72,6 +73,12 @@ const Search = () => {
     );
   }, [currentPageInState]);
 
+  useEffect(() => {
+    dispatch(
+      fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
+    );
+  }, [currentPageSizeInState]);
+
   const hideColumns = () => {
     SetDisplayColumns(false);
   };
@@ -96,6 +103,7 @@ const Search = () => {
   });
 
   const pageChange = (pageRequested: number, resultsCount: number) => {
+    console.log(pageRequested,resultsCount)
     dispatch(
       updatePageSizeSetting({
         currentPage: pageRequested,

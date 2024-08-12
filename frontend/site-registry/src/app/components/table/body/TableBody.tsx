@@ -58,17 +58,14 @@ const TableBody: FC<TableBodyProps> = ({
 }) => {
   const [selectedRowIds, SetSelectedRowsId] = useState<SelectedRowsType>({});
 
-  useEffect(()=>{
-    console.log("table body allRowsSelected", allRowsSelected)
+  useEffect(()=>{   
 
     if(!allRowsSelectedEventFlag)
       return;
 
     const rowsIds:string[] = data.map((item: any, index: number) => {
-      const checkboxId = getValue(index, idColumnName);
-      console.log("at allRowsSelected",checkboxId,index)
-      return checkboxId;
-      //handleSelectTableRow(allRowsSelected,checkboxId,index)
+      const checkboxId = getValue(index, idColumnName);  
+      return checkboxId;    
     })
 
     if(allRowsSelected)
@@ -77,27 +74,17 @@ const TableBody: FC<TableBodyProps> = ({
         ...prevItems,
         [currentPage]: [...(prevItems[currentPage] || []), ...rowsIds],
       }));
-      
-      //SetSelectedRowsId((prevItems) => [...prevItems, ...rowsIds]);
 
     }
     else
     {
-
       SetSelectedRowsId((prevItems) => ({
         ...prevItems,
         [currentPage]: (prevItems[currentPage] || []).filter(item => !rowsIds.includes(item)),
-      }));
-      // SetSelectedRowsId((prevItems) =>
-      //   prevItems.filter(item => !rowsIds.includes(item))
-      // );
+      }));  
     }
 
-    // data.map((item: any, index: number) => {
-    
-    //   //tableRecordChangeHandler(index, 'select_row', allRowsSelected);
-    // })
-
+   
     if(allRowsSelectedEventFlag)
     {
       changeHandler({id:'select_all',property:'select_all',value:data, selected: allRowsSelected})
@@ -112,8 +99,7 @@ const TableBody: FC<TableBodyProps> = ({
         ...prevItems,
         [currentPage]: [...(prevItems[currentPage] || []), id],
       }));
-
-      //SetSelectedRowsId([...selectedRowIds, id]);
+      
     } else {
 
       SetSelectedRowsId((prevItems) => ({
@@ -121,9 +107,8 @@ const TableBody: FC<TableBodyProps> = ({
         [currentPage]: (prevItems[currentPage] || []).filter(item => item !== id),
       }));
 
-      console.log("invoking reset all rows selected")
-      removePageFromAllRowsSelected();
-      //SetSelectedRowsId(selectedRowIds.filter((x) => x !== id));
+     
+      removePageFromAllRowsSelected();      
     }
 
     tableRecordChangeHandler(rowIndex, 'select_row', isChecked);

@@ -23,14 +23,10 @@ const TableHeader: FC<TableHeaderProps> = ({
 
   const [isCurrentPageSelected,SetIsCurrentPageSelected] = useState(currentPageAllRowsSelected);
 
-  useEffect(()=>{
-    console.log("currentPageAllRowsSelected",currentPageAllRowsSelected);
+  useEffect(()=>{    
     SetIsCurrentPageSelected(currentPageAllRowsSelected)
   },[currentPageAllRowsSelected])
  
-  //const [allRowsSelected,SetAllRowsSelected] = useState(currentPageAllRowsSelected);
-
-
   if (!columns || columns.length === 0) {
     return null;
   } 
@@ -41,15 +37,9 @@ const TableHeader: FC<TableHeaderProps> = ({
           scope="col"
           className={`table-header-th checkbox-column positionSticky`}          
         >
-          <input type="checkbox" className="checkbox-color" checked={isCurrentPageSelected}  onClick={(event)=>{
-              console.log("allRowsSelected",currentPageAllRowsSelected);
+          <input type="checkbox" className="checkbox-color" checked={isCurrentPageSelected}  onClick={(event)=>{             
               selectAllRowsHandler(event,!currentPageAllRowsSelected)
-          }}
-            // const newValue = !allRowsSelected;
-            // console.log("newValue",newValue)
-            //SetAllRowsSelected(!newValue);
-            //console.log("newValue",!allRowsSelected)
-            //selectAllRowsHandler(!currentPageAllRowsSelected)}} 
+          }}           
             />
         </th>
       )}

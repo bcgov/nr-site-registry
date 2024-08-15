@@ -35,3 +35,15 @@ export class SnapshotDto {
 
 }
 
+
+
+
+@InputType()
+export class CreateSnapshotDto
+{
+  @Field()
+  @IsNotEmpty()
+  @IsString()
+  siteId: string;
+}
+

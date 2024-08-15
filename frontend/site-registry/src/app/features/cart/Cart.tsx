@@ -16,9 +16,12 @@ import {
   resetCartItemDeleteStatus,
 } from './CartSlice';
 import { useAuth } from 'react-oidc-context';
-import { getUser } from '../../helpers/utility';
+import { getUser, showNotification } from '../../helpers/utility';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import { AngleRight } from '../../components/common/icon';
+import { createSnapshotForSites, createSnapshotForSitesStatus, resetCreateSnapshotForSitesStatus } from '../details/snapshot/SnapshotSlice';
+import { CreateSnapshotInputDto } from '../details/snapshot/ISnapshotState';
+
 
 const Cart = () => {
   const auth = useAuth();
@@ -35,9 +38,23 @@ const Cart = () => {
 
   const deleteStatus = useSelector(deleteRequestStatus);
 
+  const createSnapshotRequestStatus = useSelector(createSnapshotForSitesStatus);
+
+  useEffect(()=>{
+
+    if(createSnapshotRequestStatus === RequestStatus.success)
+    {
+      showNotification(createSnapshotRequestStatus,"Successfully created snapshot")
+      dispatch(resetCreateSnapshotForSitesStatus(null));
+    }
+
+  },[createSnapshotRequestStatus])
+
   useEffect(() => {
     dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
   }, [deleteStatus]);
+
+
 
   useEffect(() => {
     setCartIdToDelete('');
@@ -46,12 +63,21 @@ const Cart = () => {
   const handleCartItemDelete = (cartId: string) => {
     // eslint-disable-next-line no-restricted-globals
     setDeleteConfirm(true);
-    setCartIdToDelete(cartId);
-    // if(confirm("Are you sure to delete ?"))
-    //   {
-
-    //   }
+    setCartIdToDelete(cartId);   
   };
+
+  const handlePayment = () => {
+
+    const inputDto: CreateSnapshotInputDto[] =  cartItemsArr.map((item:any)=>{
+      return {
+        siteId: item.siteId
+      }
+
+    }) 
+
+    dispatch(createSnapshotForSites(inputDto)).unwrap();
+
+  }
 
   return (
     <PageContainer role="cart">
@@ -88,7 +114,7 @@ const Cart = () => {
       {cartItemsArr.length > 0 && (
         <div className="cart-actions">
           <div className="continue-payment">
-            <span className="payment-text">
+            <span className="payment-text" onClick={()=>handlePayment()}>
               Continue to Payment
               <AngleRight />
             </span>

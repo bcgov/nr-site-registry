@@ -161,7 +161,7 @@ export class SnapshotsResolver {
         else
         {
           return this.genericResponseProvider.createResponse(
-            `Failed to create snapshots. `,
+            `Please provide valid input to create snapshots`,
             422,
             false,
           );

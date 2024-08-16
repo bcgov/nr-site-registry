@@ -7,6 +7,7 @@ interface BannerProps {
   customClassForBanner?: string;
   customClassForIcon?: string;
   detailMessageNode?: ReactNode;
+  snapshotDate?: string;
 }
 
 const Banner: React.FC<BannerProps> = ({
@@ -15,6 +16,7 @@ const Banner: React.FC<BannerProps> = ({
   customClassForBanner,
   customClassForIcon,
   detailMessageNode,
+  snapshotDate,
 }) => {
   const bannerClass = `d-flex align-items-center status-banner-message ${customClassForBanner || ''}`;
   const iconClass = `m-1 m-2 icon ${customClassForIcon || ''}`;
@@ -27,6 +29,7 @@ const Banner: React.FC<BannerProps> = ({
           <span className={iconClass}>{iconType}</span>
           <span className="status-message">{bannerLabel}</span>
         </div>
+        {snapshotDate && <span className="snapshot m-2">{snapshotDate}</span>}
       </div>
       {detailMessageNode}
     </div>

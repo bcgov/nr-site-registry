@@ -1,9 +1,12 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { RequestStatus } from '../../../helpers/requests/status';
-import { ISnapshotState } from './ISnapshotState';
+import { RequestStatus, ResponseCode } from '../../../helpers/requests/status';
+import { CreateSnapshotInputDto, ISnapshotState } from './ISnapshotState';
 import { getAxiosInstance } from '../../../helpers/utility';
 import { GRAPHQL } from '../../../helpers/endpoints';
-import { graphQLSnapshotBySiteId } from '../../site/graphql/Snapshot';
+import {
+  createSnapshotForSitesQL,
+  graphQLSnapshotBySiteId,
+} from '../../site/graphql/Snapshot';
 import { print } from 'graphql';
 
 // Define the initial state
@@ -12,6 +15,7 @@ const initialState: ISnapshotState = {
   status: RequestStatus.idle,
   error: '',
   firstSnapshotCreatedDate: null,
+  createSnapshotRequest: RequestStatus.idle,
 };
 
 // Define the asynchronous thunk to fetch site participants from the backend
@@ -33,11 +37,32 @@ export const fetchSnapshots = createAsyncThunk(
   },
 );
 
+export const createSnapshotForSites = createAsyncThunk(
+  'snapshots/createSnapshotForSites',
+  async (inputDto: CreateSnapshotInputDto[]) => {
+    const response = await getAxiosInstance().post(GRAPHQL, {
+      query: print(createSnapshotForSitesQL()),
+      variables: {
+        inputDto: inputDto,
+      },
+    });
+    return response.data;
+  },
+);
+
 // Define the recent views slice
 const snapshotsSlice = createSlice({
   name: 'snapshots',
   initialState,
-  reducers: {},
+  reducers: {
+    resetCreateSnapshotForSitesStatus: (state, action) => {
+      const newState = {
+        ...state,
+      };
+      newState.createSnapshotRequest = RequestStatus.idle;
+      return newState;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchSnapshots.pending, (state) => {
@@ -58,6 +83,20 @@ const snapshotsSlice = createSlice({
       .addCase(fetchSnapshots.rejected, (state, action) => {
         state.status = RequestStatus.failed;
         state.error = action.error.message;
+      })
+      .addCase(createSnapshotForSites.fulfilled, (state, action) => {
+        if (!action.payload) state.createSnapshotRequest = RequestStatus.failed;
+        else if (
+          action.payload.data &&
+          action.payload.data.createSnapshotForSites.httpStatusCode ===
+            ResponseCode.created
+        )
+          state.createSnapshotRequest = RequestStatus.success;
+        else state.createSnapshotRequest = RequestStatus.failed;
+      })
+      .addCase(createSnapshotForSites.rejected, (state, action) => {
+        console.log('error', action);
+        state.createSnapshotRequest = RequestStatus.failed;
       });
   },
 });
@@ -67,5 +106,10 @@ export const snapshots = (state: any) => state.snapshots;
 export const getFirstSnapshotCreatedDate = (state: any) => {
   return state.snapshots.firstSnapshotCreatedDate;
 };
+
+export const createSnapshotForSitesStatus = (state: any) =>
+  state.snapshots.createSnapshotRequest;
+
+export const { resetCreateSnapshotForSitesStatus } = snapshotsSlice.actions;
 
 export default snapshotsSlice.reducer;

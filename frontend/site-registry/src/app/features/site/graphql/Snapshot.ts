@@ -8,9 +8,19 @@ export const graphQLSnapshotBySiteId = () => {
         message
         data {
           siteId
-          created
+          whenCreated
         }
       }
     }
   `;
 };
+
+export const createSnapshotForSitesQL = () => gql`
+  mutation createSnapshotForSites($inputDto: [CreateSnapshotDto!]!) {
+    createSnapshotForSites(inputDto: $inputDto) {
+      message
+      httpStatusCode
+      success
+    }
+  }
+`;

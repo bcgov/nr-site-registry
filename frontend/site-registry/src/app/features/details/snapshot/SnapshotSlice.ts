@@ -77,7 +77,7 @@ const snapshotsSlice = createSlice({
         // Check if there's at least one snapshot and set its createdDate
         if (action.payload && action.payload.length > 0) {
           return (state.firstSnapshotCreatedDate =
-            action.payload[0].createdDate);
+            action.payload[0].whenCreated);
         }
       })
       .addCase(fetchSnapshots.rejected, (state, action) => {

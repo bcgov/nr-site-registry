@@ -36,6 +36,14 @@ export const formatDate = (date: Date) => {
   return `${formattedDate}`;
 };
 
+/*
+Currently new Date() returns date in this format eg Fri Aug 16 2024 09:12:54 GMT-0700 (Pacific Daylight Time)
+In our design we did not wanted to show the timezone name at the end thus this function helps to remove the timezone name present at the end
+*/
+export const formatDateWithNoTimzoneName = (date: Date) => {
+  return date.toString().replace(/\s\([^)]+\)$/, '');
+};
+
 export const flattenFormRows = (arr: IFormField[][]): IFormField[] => {
   const flattened: IFormField[] = [];
 

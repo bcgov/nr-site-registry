@@ -5,7 +5,11 @@ import {
   RoleMatchingMode,
   Roles,
 } from 'nest-keycloak-connect';
-import { SnapshotDto, SnapshotResponse } from '../../dto/snapshot.dto';
+import {
+  CreateSnapshotDto,
+  SnapshotDto,
+  SnapshotResponse,
+} from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { SnapshotsService } from '../../services/snapshot/snapshot.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
@@ -133,6 +137,45 @@ export class SnapshotsResolver {
         false,
         null,
       );
+    }
+  }
+
+  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Mutation(() => SnapshotResponse, { name: 'createSnapshotForSites' })
+  async createSnapshotForSites(
+    @Args('inputDto', { type: () => [CreateSnapshotDto] }, new ValidationPipe())
+    inputDto: CreateSnapshotDto[],
+    @AuthenticatedUser() user: any,
+  ) {
+    try {
+      if (inputDto) {
+        const isSaved = this.snapshotsService.createSnapshotForSites(
+          inputDto,
+          user,
+        );
+        if (isSaved) {
+          return this.genericResponseProvider.createResponse(
+            'Successfully created snapshots.',
+            201,
+            true,
+          );
+        } else {
+          return this.genericResponseProvider.createResponse(
+            `Failed to create snapshots. `,
+            422,
+            false,
+          );
+        }
+      } else {
+        return this.genericResponseProvider.createResponse(
+          `Please provide valid input to create snapshots`,
+          422,
+          false,
+        );
+      }
+    } catch (error) {
+      console.log('Error at createSnapshotForSites', error);
+      throw new Error('System Error, Please try again.');
     }
   }
 }

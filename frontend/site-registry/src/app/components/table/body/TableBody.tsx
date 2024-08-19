@@ -27,6 +27,16 @@ interface TableBodyProps {
   srMode?: boolean;
   idColumnName: string;
   rowDeleteHandler: (data: any) => void;
+  allRowsSelected: boolean;
+  currentPage: number;
+  allRowsSelectedPages: number[];
+  allRowsSelectedEventFlag: boolean;
+  resetAllRowsSelectedEventFlag: () => void;
+  removePageFromAllRowsSelected: () => void;
+}
+
+interface SelectedRowsType {
+  [key: number]: string[]; // or whatever type `rowsIds` is
 }
 
 const TableBody: FC<TableBodyProps> = ({
@@ -39,21 +49,73 @@ const TableBody: FC<TableBodyProps> = ({
   srMode,
   idColumnName,
   rowDeleteHandler,
+  allRowsSelected,
+  currentPage,
+  allRowsSelectedPages,
+  allRowsSelectedEventFlag,
+  resetAllRowsSelectedEventFlag,
+  removePageFromAllRowsSelected,
 }) => {
-  const [selectedRowIds, SetSelectedRowsId] = useState(['']);
+  const [selectedRowIds, SetSelectedRowsId] = useState<SelectedRowsType>({});
 
-  const handleSelectTableRow = (event: any, id: string, rowIndex: any) => {
-    if (event.target.checked) {
-      SetSelectedRowsId([...selectedRowIds, id]);
+  useEffect(() => {
+    if (!allRowsSelectedEventFlag) return;
+
+    const rowsIds: string[] = data.map((item: any, index: number) => {
+      const checkboxId = getValue(index, idColumnName);
+      return checkboxId;
+    });
+
+    if (allRowsSelected) {
+      SetSelectedRowsId((prevItems) => ({
+        ...prevItems,
+        [currentPage]: [...(prevItems[currentPage] || []), ...rowsIds],
+      }));
     } else {
-      SetSelectedRowsId(selectedRowIds.filter((x) => x !== id));
+      SetSelectedRowsId((prevItems) => ({
+        ...prevItems,
+        [currentPage]: (prevItems[currentPage] || []).filter(
+          (item) => !rowsIds.includes(item),
+        ),
+      }));
     }
 
-    tableRecordChangeHandler(rowIndex, 'select_row', event.target.checked);
+    if (allRowsSelectedEventFlag) {
+      changeHandler({
+        id: 'select_all',
+        property: 'select_all',
+        value: data,
+        selected: allRowsSelected,
+      });
+      resetAllRowsSelectedEventFlag();
+    }
+  }, [allRowsSelected]);
+
+  const handleSelectTableRow = (isChecked: any, id: string, rowIndex: any) => {
+    if (isChecked) {
+      SetSelectedRowsId((prevItems) => ({
+        ...prevItems,
+        [currentPage]: [...(prevItems[currentPage] || []), id],
+      }));
+    } else {
+      SetSelectedRowsId((prevItems) => ({
+        ...prevItems,
+        [currentPage]: (prevItems[currentPage] || []).filter(
+          (item) => item !== id,
+        ),
+      }));
+
+      removePageFromAllRowsSelected();
+    }
+
+    tableRecordChangeHandler(rowIndex, 'select_row', isChecked);
   };
 
   const isChecked = (id: string) => {
-    return selectedRowIds.indexOf(id) !== -1;
+    return (
+      selectedRowIds[currentPage] &&
+      selectedRowIds[currentPage].indexOf(id) !== -1
+    );
   };
 
   const renderNoResultsFound = () => {
@@ -376,7 +438,11 @@ const TableBody: FC<TableBodyProps> = ({
                 className="checkbox-color"
                 aria-label="Select Row"
                 onChange={(event) => {
-                  handleSelectTableRow(event, checkboxId, rowIndex);
+                  handleSelectTableRow(
+                    event.target.checked,
+                    checkboxId,
+                    rowIndex,
+                  );
                 }}
                 checked={rowChecked}
               />

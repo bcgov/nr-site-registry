@@ -22,7 +22,7 @@ export const SaveButton: React.FC<ButtonProps> = ({
   return (
     <div className="custom-save-btn" onClick={clickHandler}>
       {showIcon && <FloppyDisk />}
-      {label !== '' ? label : 'Save'}
+      {label && label !== '' ? label : 'Save'}
     </div>
   );
 };
@@ -36,7 +36,7 @@ export const CancelButton: React.FC<ButtonProps> = ({
   return (
     <div className="custom-cancel-btn" onClick={(e) => clickHandler(e)}>
       {showIcon && <XmarkIcon />}
-      {label !== '' ? label : 'Cancel'}
+      {label && label !== '' ? label : 'Cancel'}
     </div>
   );
 };
@@ -50,7 +50,7 @@ export const DiscardButton: React.FC<ButtonProps> = ({
   return (
     <div className="discard-button-border" onClick={(e) => clickHandler(e)}>
       {showIcon && <XmarkIcon />}
-      {label !== '' ? label : 'Dicard Changes'}
+      {label && label !== '' ? label : 'Dicard Changes'}
     </div>
   );
 };

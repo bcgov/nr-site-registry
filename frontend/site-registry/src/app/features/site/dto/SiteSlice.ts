@@ -251,6 +251,7 @@ const siteSlice = createSlice({
 export const selectAllSites = (state: any) => state.sites.sites;
 export const loadingState = (state: any) => state.sites.fetchStatus;
 export const currentPageSelection = (state: any) => state.sites.currentPage;
+export const currentPageSize = (state: any) => state.sites.pageSize;
 export const resultsCount = (state: any) => state.sites.resultsCount;
 export const siteDetailsLoadingState = (state: any) =>
   state.sites.fetchSitesDetails;

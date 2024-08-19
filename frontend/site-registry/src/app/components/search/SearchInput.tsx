@@ -15,17 +15,9 @@ const SearchInput: React.FC<ISearchInput> = ({
   createNewHandler,
   placeHolderText,
 }) => {
-  const handler =
-    optionSelectHandler ??
-    ((e) => {
-      console.log('handle option select');
-    });
+  const handler = optionSelectHandler ?? ((e) => {});
 
-  const addNewHandler =
-    createNewHandler ??
-    ((e) => {
-      console.log('Handle create new from search');
-    });
+  const addNewHandler = createNewHandler ?? ((e) => {});
 
   const [createMode, SetCreateMode] = useState(false);
 

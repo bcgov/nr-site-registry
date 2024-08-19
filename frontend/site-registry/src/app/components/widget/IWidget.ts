@@ -3,6 +3,7 @@ import { RequestStatus } from '../../helpers/requests/status';
 export interface IWidget {
   title?: string;
   tableIsLoading?: RequestStatus;
+  isListLoading?: RequestStatus;
   tableColumns?: any[];
   tableData?: any[];
   customLabelCss?: string;
@@ -14,6 +15,8 @@ export interface IWidget {
   srMode?: boolean;
   primaryKeycolumnName?: string;
   changeHandler?: (event: any) => void;
+  onClickLeftIcon?: (event: any) => void;
+  onClickRightIcon?: (event: any) => void;
   handleCheckBoxChange?: (event: any) => void;
   sortHandler?: (row: any, ascSort: boolean) => void;
 }

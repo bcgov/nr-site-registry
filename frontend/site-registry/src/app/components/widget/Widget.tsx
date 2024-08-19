@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { IWidget } from './IWidget';
 import Table from '../table/Table';
 import './Widget.css';
@@ -10,6 +10,7 @@ const Widget: React.FC<IWidget> = ({
   title,
   tableColumns,
   tableIsLoading,
+  isListLoading,
   tableData,
   children,
   customLabelCss,
@@ -20,10 +21,17 @@ const Widget: React.FC<IWidget> = ({
   srMode,
   primaryKeycolumnName,
   changeHandler,
+  onClickRightIcon,
+  onClickLeftIcon,
   handleCheckBoxChange,
   sortHandler,
 }) => {
   let widgetSortHandler = sortHandler ?? (() => {});
+  const [widgetData, setWidgetData] = useState(tableData);
+  useEffect(() => {
+    setWidgetData(tableData);
+  }, [tableData]);
+
   return (
     <div className={`d-flex flex-column widget-container`}>
       {!hideTitle && title && (
@@ -34,7 +42,7 @@ const Widget: React.FC<IWidget> = ({
               label={''}
               isLabel={false}
               onChange={handleCheckBoxChange ?? (() => {})}
-              srMode = {srMode}
+              srMode={srMode}
             />
           )}
           <div className="w-100 me-1">
@@ -44,27 +52,32 @@ const Widget: React.FC<IWidget> = ({
       )}
       {children && <div>{children}</div>}
       {!hideTable && (
-        <div className="overflow-auto" style={{ maxHeight: '700px' }}>
+        <div
+          className={`${widgetData && widgetData.length > 12 ? 'widget-table-container' : ''}`}
+        >
           {/* <div> */}
-            <div className='me-1'>
-              <Table
-                label={title ?? ""}
-                isLoading={tableIsLoading ?? RequestStatus.idle}
-                columns={tableColumns ?? []}
-                data={tableData}
-                showPageOptions={false}
-                allowRowsSelect={allowRowsSelect}
-                changeHandler={changeHandler ?? (() => {})}
-                editMode={editMode ?? false}
-                srMode = {srMode ?? false}
-                idColumnName={primaryKeycolumnName ?? ''}
-                sortHandler={widgetSortHandler}
-              />
-            </div>
+          <div className="me-1">
+            <Table
+              label={title ?? ''}
+              isLoading={tableIsLoading ?? RequestStatus.idle}
+              isListLoading={isListLoading ?? RequestStatus.idle}
+              columns={tableColumns ?? []}
+              data={widgetData}
+              showPageOptions={false}
+              allowRowsSelect={allowRowsSelect}
+              changeHandler={changeHandler ?? (() => {})}
+              onClickLeftIcon={onClickLeftIcon ?? (() => {})}
+              onClickRightIcon={onClickRightIcon ?? (() => {})}
+              editMode={editMode ?? false}
+              srMode={srMode ?? false}
+              idColumnName={primaryKeycolumnName ?? ''}
+              sortHandler={widgetSortHandler}
+            />
           </div>
-        )}
-      </div>
-    );
-}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default Widget;

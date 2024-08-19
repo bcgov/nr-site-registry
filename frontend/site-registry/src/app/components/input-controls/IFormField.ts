@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 export enum FormFieldType {
   Text = 'text',
   TextArea = 'textarea',
+  Search = 'search',
   DropDown = 'dropdown',
   DropDownWithSearch = 'dropdownWithSearch',
   Date = 'date',
@@ -28,7 +29,8 @@ export interface IFormField {
     | FormFieldType.TextArea
     | FormFieldType.DropDownWithSearch
     | FormFieldType.DeleteIcon
-    | FormFieldType.IconButton;
+    | FormFieldType.IconButton
+    | FormFieldType.Search;
   label: string;
   isLabel?: boolean;
   placeholder?: string;
@@ -37,12 +39,18 @@ export interface IFormField {
   customEditLabelCss?: string;
   customInputTextCss?: string;
   customEditInputTextCss?: string;
+  customPlaceholderCss?: string;
+  customLeftIconCss?: string;
+  customRightIconCss?: string;
+  customErrorCss?: string;
   graphQLPropertyName?: string;
   allowNumbersOnly?: boolean;
   options?: { key: string; value: string; imageUrl?: any }[];
   value?: any;
   customLinkValue?: any;
   customIcon?: ReactNode;
+  customRightSearchIcon?: ReactNode;
+  customLeftSearchIcon?: ReactNode;
   isChecked?: boolean;
   isDateRange?: boolean;
   children?: IFormField[];
@@ -50,6 +58,7 @@ export interface IFormField {
   isDisabled?: boolean;
   suffix?: string;
   isImage?: boolean;
+  customInfoMessage?: ReactNode;
   validation?: {
     required?: boolean;
     minLength?: number;

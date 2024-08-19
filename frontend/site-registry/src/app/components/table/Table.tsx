@@ -10,6 +10,7 @@ import TableBody from './body/TableBody';
 interface TableProps {
   label: string;
   isLoading: RequestStatus;
+  isListLoading?: RequestStatus;
   columns: TableColumn[];
   data: any;
   totalResults?: number;
@@ -17,19 +18,22 @@ interface TableProps {
   changeResultsPerPage?: (pageNumber: number) => void;
   currentPage?: number;
   resultsPerPage?: number;
-  showPageOptions? : boolean;
-  allowRowsSelect? : boolean;
-  changeHandler:(eventRecord:any)=>void,
-  editMode: boolean,
-  srMode?: boolean,
-  idColumnName:string;
-  sortHandler?:(row:any,ascSort:boolean)=>void,
-  deleteHandler?:(eventRecord:any)=>void,
+  showPageOptions?: boolean;
+  allowRowsSelect?: boolean;
+  changeHandler: (eventRecord: any) => void;
+  onClickRightIcon?: (data: any) => void;
+  onClickLeftIcon?: (data: any) => void;
+  editMode: boolean;
+  srMode?: boolean;
+  idColumnName: string;
+  sortHandler?: (row: any, ascSort: boolean) => void;
+  deleteHandler?: (eventRecord: any) => void;
 }
 
 const Table: FC<TableProps> = ({
   label,
   isLoading,
+  isListLoading,
   columns,
   data,
   totalResults,
@@ -40,6 +44,8 @@ const Table: FC<TableProps> = ({
   showPageOptions,
   allowRowsSelect,
   changeHandler,
+  onClickLeftIcon,
+  onClickRightIcon,
   editMode,
   srMode,
   idColumnName,
@@ -68,7 +74,20 @@ const Table: FC<TableProps> = ({
               sortHandler={tableSortHandler}
             />
           </thead>
-            <TableBody isLoading={isLoading} columns={columns} data={data} allowRowsSelect={allowRowsSelect ?? false} changeHandler={changeHandler} editMode={editMode} srMode = {srMode}idColumnName={idColumnName} rowDeleteHandler={rowDeleteHandler} />
+          <TableBody
+            isLoading={isLoading}
+            isListLoading={isListLoading}
+            columns={columns}
+            data={data}
+            allowRowsSelect={allowRowsSelect ?? false}
+            changeHandler={changeHandler}
+            onClickLeftIcon={onClickLeftIcon ?? (() => {})}
+            onClickRightIcon={onClickRightIcon ?? (() => {})}
+            editMode={editMode}
+            srMode={srMode}
+            idColumnName={idColumnName}
+            rowDeleteHandler={rowDeleteHandler}
+          />
         </table>
       </div>
       <div>

@@ -46,8 +46,6 @@ import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
 import { fetchNotationParticipants } from './notations/NotationSlice';
 import { fetchDocuments } from './documents/DocumentsSlice';
-import { DropdownSearchInput } from '../../components/input-controls/InputControls';
-import Form from '../../components/form/Form';
 import SearchInput from '../../components/search/SearchInput';
 import {
   addSiteToFolio,
@@ -55,7 +53,7 @@ import {
   fetchFolioItems,
   folioItems,
 } from '../folios/FolioSlice';
-import { Folio, FolioContentDTO } from '../folios/dto/Folio';
+import { FolioContentDTO } from '../folios/dto/Folio';
 import { fetchSnapshots, snapshots } from './snapshot/SnapshotSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 import {
@@ -70,6 +68,7 @@ import {
   IFormField,
 } from '../../components/input-controls/IFormField';
 import BannerDetails from '../../components/banners/BannerDetails';
+import { fetchAssociatedSites } from './associates/AssociateSlice';
 
 const SiteDetails = () => {
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
@@ -82,7 +81,6 @@ const SiteDetails = () => {
     let selectedFolio = folioDetails.filter(
       (x: any) => x.folioId === folioId,
     )[0];
-    console.log('selectedFolio', selectedFolio);
     let dto: FolioContentDTO = {
       siteId: details.id,
       folioId: selectedFolio.id + '',
@@ -149,7 +147,7 @@ const SiteDetails = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
+      if (window.scrollY > 50) {
         // Adjust the scroll position as needed
         setIsVisible(true);
       } else {
@@ -164,20 +162,6 @@ const SiteDetails = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  // useEffect(() => {
-  //   if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
-  //     setUserType(UserType.External);
-  //   } else if (
-  //     loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
-  //   ) {
-  //     setUserType(UserType.Internal);
-  //   } else {
-  //     // not logged in
-  //     setUserType(UserType.External);
-  //   }
-  //   dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ""));
-  // }, [loggedInUser]);
 
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
@@ -217,6 +201,7 @@ const SiteDetails = () => {
         dispatch(fetchNotationParticipants(id ?? '')),
         dispatch(fetchSiteParticipants(id ?? '')),
         dispatch(fetchDocuments(id ?? '')),
+        dispatch(fetchAssociatedSites(id ?? '')),
         dispatch(fetchSiteDisclosure(id ?? '')),
       ])
         .then(() => {

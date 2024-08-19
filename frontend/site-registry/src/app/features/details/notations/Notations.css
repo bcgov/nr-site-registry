@@ -59,11 +59,11 @@
 }
 
 .custom-notation-participant-input-text {
-    font-size: 12px !important;
-    font-weight: 400 !important;
-    line-height: 16px !important;
-    text-align: left;
-    color: var(--typography-color-primary, #2D2D2D) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+  text-align: left;
+  color: var(--typography-color-primary, #2d2d2d) !important;
 }
 
 .custom-notation-edit-label {
@@ -83,10 +83,10 @@
 }
 
 .custom-notation-edit-dateInput {
-    font-size: 16px !important;
-    font-weight: 400 !important;
-    line-height: 26px !important;
-    text-align: left;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 26px !important;
+  text-align: left;
 }
 .notation-btn {
   border: 1px solid var(--surface-border-dark, #353433) !important;
@@ -201,4 +201,18 @@
   border-radius: var(--surface-border-radius-medium) !important;
   gap: var(--layout-margin-small) !important;
   background: var(--surface-primary-disabled, #edebe9) !important;
+}
+
+.custom-notation-edit-dateInput
+  .rs-input-group.rs-input-group-inside
+  .rs-input-group-addon {
+  top: 0;
+  background: none;
+  border: none;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.custom-notation-edit-dateInput .rs-input {
+  padding: 10px 11px !important;
 }

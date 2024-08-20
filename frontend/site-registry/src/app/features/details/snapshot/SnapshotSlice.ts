@@ -74,6 +74,7 @@ const snapshotsSlice = createSlice({
         state.status = RequestStatus.success;
         state.snapshot = action.payload;
         state.error = '';
+
         // Check if there's at least one snapshot and set its createdDate
         if (action.payload && action.payload.length > 0) {
           return (state.firstSnapshotCreatedDate =

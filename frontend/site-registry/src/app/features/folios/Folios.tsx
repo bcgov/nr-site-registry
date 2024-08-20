@@ -128,7 +128,7 @@ const Folios = () => {
   };
 
   const handleChange = (event: any) => {
-    console.log("event in folio",event)
+    console.log('event in folio', event);
     setTempArr((prevData) => {
       const folioToUpdate = prevData.map((folio) => {
         if (folio.id === event.row.id) {

@@ -174,7 +174,8 @@ describe('SnapshotService', () => {
       expect(snapshot).toEqual(res);
       expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
       expect(snapshotRepository.find).toHaveBeenCalledWith({
-        where: { userId },  order: { created: 'DESC' },
+        where: { userId },
+        order: { created: 'DESC' },
       });
     });
 
@@ -255,7 +256,7 @@ describe('SnapshotService', () => {
       jest
         .spyOn(snapshotRepository, 'find')
         .mockResolvedValueOnce(res as Snapshots[]);
-      const snapshot = await service.getSnapshotsByUserIdAndSiteId(siteId, userId);
+      const snapshot = await service.getSnapshotsBySiteId(siteId, userId);
 
       expect(snapshot).toEqual(res);
       expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
@@ -274,9 +275,9 @@ describe('SnapshotService', () => {
           new Error('Failed to retrieve snapshots by userId and siteId.'),
         );
 
-      await expect(service.getSnapshotsByUserIdAndSiteId(siteId, userId)).rejects.toThrow(
-        'Failed to retrieve snapshots by userId and siteId.',
-      );
+      await expect(
+        service.getSnapshotsBySiteId(siteId, userId),
+      ).rejects.toThrow('Failed to retrieve snapshots by userId and siteId.');
       expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
     });
   });
@@ -347,7 +348,7 @@ describe('SnapshotService', () => {
 
       expect(snapshot).toEqual(res);
       expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
-      expect(snapshotRepository.find).toHaveBeenCalledWith({ where: { id }});
+      expect(snapshotRepository.find).toHaveBeenCalledWith({ where: { id } });
     });
 
     it('should throw an error if repository throws an error', async () => {

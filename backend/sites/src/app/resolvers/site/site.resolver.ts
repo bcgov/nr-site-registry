@@ -117,7 +117,7 @@ export class SiteResolver {
     @Args('searchParam', { type: () => String }) searchParam: string,
   ) {
     const result = await this.siteService.searchSiteIds(searchParam);
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       return this.genericResponseProvider.createResponse(
         'Notation Paticipant Role fetched successfully',
         200,

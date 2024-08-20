@@ -232,8 +232,9 @@ export class SiteService {
       const result = await queryBuilder.getMany();
       if (result) {
         return result.map((obj: any) => ({ key: obj.id, value: obj.id }));
+      } else {
+        return []; // Return an empty array if no results
       }
-      return []; // Return an empty array if no results
     } catch (error) {
       throw new Error('Failed to retrieve site ids.');
     }

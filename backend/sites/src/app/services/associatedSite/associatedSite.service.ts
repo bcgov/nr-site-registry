@@ -33,6 +33,8 @@ export class AssociatedSiteService {
           transformedObjects,
         );
         return siteAssocs;
+      } else {
+        return [];
       }
     } catch (error) {
       throw new Error('Failed to retrieve associated site by siteId.');

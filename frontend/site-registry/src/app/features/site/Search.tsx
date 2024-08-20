@@ -12,7 +12,11 @@ import {
 } from './dto/SiteSlice';
 
 import { AppDispatch } from '../../Store';
-import { selectAllSites, currentPageSelection } from './dto/SiteSlice';
+import {
+  selectAllSites,
+  currentPageSelection,
+  currentPageSize,
+} from './dto/SiteSlice';
 import SearchResults from './SearchResults';
 import {
   ShoppingCartIcon,
@@ -42,6 +46,7 @@ const Search = () => {
   const sites = useSelector(selectAllSites);
   const currSearchVal = useSelector((state: any) => state.sites);
   const currentPageInState = useSelector(currentPageSelection);
+  const currentPageSizeInState = useSelector(currentPageSize);
   const totalRecords = useSelector(resultsCount);
   const [noUserAction, setUserAction] = useState(true);
   const [displayColumn, SetDisplayColumns] = useState(false);
@@ -72,6 +77,12 @@ const Search = () => {
     );
   }, [currentPageInState]);
 
+  useEffect(() => {
+    dispatch(
+      fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
+    );
+  }, [currentPageSizeInState]);
+
   const hideColumns = () => {
     SetDisplayColumns(false);
   };
@@ -96,6 +107,7 @@ const Search = () => {
   });
 
   const pageChange = (pageRequested: number, resultsCount: number) => {
+    console.log(pageRequested, resultsCount);
     dispatch(
       updatePageSizeSetting({
         currentPage: pageRequested,
@@ -170,16 +182,47 @@ const Search = () => {
 
   const changeHandler = (event: any) => {
     if (event && event.property === 'select_row') {
-      const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
-      if (index > -1 && !event.value) {
-        // If row is already selected, remove it
-        SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
+      if (event.value) {
+        const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
+        if (index === -1) {
+          SetSelectedRows([...selectedRows, event.row]);
+        } else {
+          // do nothing
+        }
       } else {
-        // If row is not selected, add it
-        SetSelectedRows([...selectedRows, event.row]);
+        SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
+      }
+
+      //const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
+      // if (index > -1 && !event.value) {
+      //   // If row is already selected, remove it
+      //   SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
+      // } else {
+      //   // If row is not selected, add it
+      //   SetSelectedRows([...selectedRows, event.row]);
+      // }
+    } else if (event && event.property === 'select_all') {
+      const newRows = event.value;
+      if (event.selected) {
+        SetSelectedRows((prevArray) => {
+          const existingIds = new Set(prevArray.map((obj) => obj.id));
+          const uniqueRows = newRows.filter(
+            (row: any) => !existingIds.has(row.id),
+          );
+          return [...prevArray, ...uniqueRows];
+        });
+      } else {
+        SetSelectedRows((prevArray) => {
+          const idsToRemove = new Set(newRows.map((row: any) => row.id));
+          return prevArray.filter((obj) => !idsToRemove.has(obj.id));
+        });
       }
     }
   };
+
+  useEffect(() => {
+    console.log('selectedRows', selectedRows);
+  }, [selectedRows]);
 
   const [showAddToFolio, SetShowAddToFolio] = useState(false);
 

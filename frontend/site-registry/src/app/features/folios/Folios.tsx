@@ -27,6 +27,7 @@ import {
   FolderPlusIcon,
   PencilIcon,
   RegFloppyDisk,
+  XmarkIcon,
 } from '../../components/common/icon';
 import SearchInput from '../../components/search/SearchInput';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
@@ -127,6 +128,7 @@ const Folios = () => {
   };
 
   const handleChange = (event: any) => {
+    console.log('event in folio', event);
     setTempArr((prevData) => {
       const folioToUpdate = prevData.map((folio) => {
         if (folio.id === event.row.id) {
@@ -176,7 +178,7 @@ const Folios = () => {
                 className="folio-edit-btn"
                 onClick={() => SetEditMode(false)}
               >
-                <CircleXMarkIcon />
+                <XmarkIcon />
                 <span>Cancel</span>
               </div>{' '}
               <div

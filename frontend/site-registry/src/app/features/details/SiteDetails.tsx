@@ -38,7 +38,12 @@ import { SiteDetailsMode } from './dto/SiteDetailsMode';
 import { UserType } from '../../helpers/requests/userType';
 import Actions from '../../components/action/Actions';
 import { ActionItems } from '../../components/action/ActionsConfig';
-import { getUser, showNotification } from '../../helpers/utility';
+import {
+  formatDate,
+  formatDateWithNoTimzoneName,
+  getUser,
+  showNotification,
+} from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import { fetchSiteParticipants } from './participants/ParticipantSlice';
 import { fetchSiteDisclosure } from './disclosure/DisclosureSlice';
@@ -53,8 +58,12 @@ import {
   fetchFolioItems,
   folioItems,
 } from '../folios/FolioSlice';
-import { FolioContentDTO } from '../folios/dto/Folio';
-import { fetchSnapshots, snapshots } from './snapshot/SnapshotSlice';
+import { Folio, FolioContentDTO } from '../folios/dto/Folio';
+import {
+  fetchSnapshots,
+  snapshots,
+  getFirstSnapshotCreatedDate,
+} from './snapshot/SnapshotSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 import {
   fetchNotationClassCd,
@@ -125,6 +134,7 @@ const SiteDetails = () => {
 
   const [isVisible, setIsVisible] = useState(false);
   const snapshot = useSelector(snapshots);
+  const snapshotTakenDate = useSelector(getFirstSnapshotCreatedDate);
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
@@ -542,16 +552,13 @@ const SiteDetails = () => {
           </div>
         )}
         <div className="section-details-header row">
-          <div className="d-flex">
-            <BannerDetails />
-            {UserType.External === userType &&
-              snapshot.status === RequestStatus.success &&
-              snapshot.snapshot.data !== null && (
-                <div className="py-2 snapshot">
-                  <span>{`Snapshot Taken: ${new Date(snapshot.snapshot.data[0].created)}`}</span>
-                </div>
-              )}
-          </div>
+          {UserType.External === userType && (
+            <div>
+              <BannerDetails
+                snapshotDate={`Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`}
+              />
+            </div>
+          )}
 
           {!isVisible && (
             <>

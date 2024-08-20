@@ -42,7 +42,12 @@ const SearchInput: React.FC<ISearchInput> = ({
         </label>
       )}
       <div className="search-box-container">
-        <div className="d-flex align-items-center justify-content-center w-100 position-relative">
+        <div className="d-flex align-items-center justify-content-center w-100 position-relative search-box ">
+          {!createMode && searchTerm.trim().length < 1 && (
+            <span id="search-icon" className="custom-icon px-2">
+              <MagnifyingGlassIcon />
+            </span>
+          )}
           <input
             id={label}
             aria-label={label}
@@ -52,18 +57,11 @@ const SearchInput: React.FC<ISearchInput> = ({
             placeholder={placeHolderText}
             value={searchTerm}
             type="text"
-            className={`form-control custom-search ${
-              searchTerm.length > 0 ? 'ps-2' : 'ps-5'
+            className={`no-border-shadow-outline form-control custom-search ${
+              searchTerm.length > 0 ? 'ps-2' : ''
             }`}
           />
-          {!createMode && searchTerm.trim().length < 1 ? (
-            <span
-              id="search-icon"
-              className="search-icon custom-icon position-absolute px-2"
-            >
-              <MagnifyingGlassIcon />
-            </span>
-          ) : (
+          {!createMode && searchTerm.trim().length < 1 ? null : (
             <span
               data-testid="clear-icon"
               id="clear-icon"

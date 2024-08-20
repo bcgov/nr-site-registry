@@ -2,10 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SiteResolver } from './site.resolver';
 import { SiteService } from '../../services/site/site.service';
 import {
+  FetchSiteDetail,
   FetchSiteResponse,
   SearchSiteResponse,
 } from '../../dto/response/genericResponse';
 import { sampleSites } from '../../mockData/site.mockData';
+import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
+import { DropdownDto } from '../../dto/dropdown.dto';
 
 describe('SiteResolver', () => {
   let siteResolver: SiteResolver;
@@ -32,7 +35,31 @@ describe('SiteResolver', () => {
               result.count = 1;
               return result;
             }),
-            findSiteBySiteId: jest.fn(),
+            findSiteBySiteId: jest.fn(() => {
+              const result = new FetchSiteDetail();
+              result.httpStatusCode = 200;
+              result.data = sampleSites[0];
+              return result;
+            }),
+            searchSiteIds: jest.fn(),
+          },
+        },
+        {
+          provide: GenericResponseProvider,
+          useValue: {
+            createResponse: jest.fn(
+              (
+                message: string,
+                httpStatusCode: number,
+                success: boolean,
+                data: DropdownDto[],
+              ) => ({
+                message,
+                httpStatusCode,
+                success,
+                data,
+              }),
+            ),
           },
         },
       ],

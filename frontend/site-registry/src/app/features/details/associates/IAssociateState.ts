@@ -1,3 +1,5 @@
+import { RequestStatus } from '../../../helpers/requests/status';
+
 export interface IAssociate {
   guid: string;
   siteId: string;
@@ -9,5 +11,5 @@ export interface IAssociate {
 export interface IAssociateState {
   siteAssociate: IAssociate[];
   error?: string;
-  status: string;
+  status: RequestStatus;
 }

@@ -1,6 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { Sites } from './sites.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
+
 
 @ObjectType()
 @Index(
@@ -13,7 +15,7 @@ import { Sites } from './sites.entity';
 @Index('sitesub_for_profile', ['sprofDateCompleted'], {})
 @Index('sitesub_comprised_of_frgn', ['subdivId'], {})
 @Entity('site_subdivisions')
-export class SiteSubdivisions {
+export class SiteSubdivisions extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { name: 'site_id', unique: true })
   siteId: string;

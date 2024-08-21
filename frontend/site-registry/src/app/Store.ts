@@ -14,7 +14,8 @@ import siteDisclosureReducer from './features/details/disclosure/DisclosureSlice
 import cartReducer from './features/cart/CartSlice';
 import documentsReducer from './features/details/documents/DocumentsSlice';
 import snapshotsReducer from './features/details/snapshot/SnapshotSlice';
-import folioReducer from './features/folios/FolioSlice';
+import folioReducer from './features/folios/redux/FolioSlice';
+import siteDetailsReducer from './features/details/SaveSiteDetailsSlice';
 
 const persistedStore: any = loadFromLocalStorage();
 
@@ -31,6 +32,7 @@ export const store = configureStore({
     documents: documentsReducer,
     folio: folioReducer,
     snapshots: snapshotsReducer,
+    siteDetails: siteDetailsReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

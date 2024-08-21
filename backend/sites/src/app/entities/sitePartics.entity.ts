@@ -14,6 +14,8 @@ import { PeopleOrgs } from './peopleOrgs.entity';
 import { Sites } from './sites.entity';
 import { SiteProfileOwners } from './siteProfileOwners.entity';
 import { SiteProfiles } from './siteProfiles.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
+
 
 @ObjectType()
 @Index('site_partics_pkey', ['id'], { unique: true })
@@ -21,7 +23,7 @@ import { SiteProfiles } from './siteProfiles.entity';
 @Index('sp_rwm_flag', ['rwmFlag'], {})
 @Index('sp_identified_by2_frgn', ['siteId'], {})
 @Entity('site_partics')
-export class SitePartics {
+export class SitePartics extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'id' })
   id: string;

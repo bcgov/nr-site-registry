@@ -6,7 +6,7 @@ import {
   addSiteToFolioRequest,
   fetchFolioItems,
   folioItems,
-} from './FolioSlice';
+} from './redux/FolioSlice';
 import { getUser, showNotification } from '../../helpers/utility';
 import { AppDispatch } from '../../Store';
 

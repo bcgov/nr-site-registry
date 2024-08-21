@@ -21,6 +21,7 @@ import Actions from "../../../components/action/Actions";
 import { SRVisibility } from "../../../helpers/requests/srVisibility";
 import { notationTypeDrpdown } from "../dropdowns/DropdownSlice";
 import { notationParticipants, updateSiteNotation } from "./NotationSlice";
+import { setupNotationDataForSaving } from "../SaveSiteDetailsSlice";
 
 const Notations = () => {
     const {
@@ -44,6 +45,11 @@ const Notations = () => {
     const [srTimeStamp, setSRTimeStamp] = useState('Sent to SR on June 2nd, 2013');
     const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
     const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(()=>{
+      dispatch(setupNotationDataForSaving( formData));
+      console.log("formData",formData)
+    },[formData])
 
     const loggedInUser = getUser();
     useEffect(()=>{

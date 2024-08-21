@@ -1,12 +1,15 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
-import { Resource, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { AuthenticatedUser, Resource, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import {
   FetchSiteDetail,
   FetchSiteResponse,
+  SaveSiteDetailsResponse,
   SearchSiteResponse,
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteService } from '../../services/site/site.service';
+import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
+import { GenericResponseProvider } from 'src/app/dto/response/genericResponseProvider';
 
 /**
  * Resolver for Region
@@ -14,7 +17,9 @@ import { SiteService } from '../../services/site/site.service';
 @Resolver(() => Sites)
 @Resource('site-service')
 export class SiteResolver {
-  constructor(private readonly siteService: SiteService) {}
+  constructor(private readonly siteService: SiteService,
+    private readonly genericResponseProvider: GenericResponseProvider<SaveSiteDetailsResponse>
+  ) {}
 
   /**
    * Find All Sites
@@ -99,5 +104,35 @@ export class SiteResolver {
   @Query(() => FetchSiteDetail, { name: 'findSiteBySiteId' })
   findSiteBySiteId(@Args('siteId', { type: () => String }) siteId: string) {
     return this.siteService.findSiteBySiteId(siteId);
+  }
+
+
+  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Mutation(() => SaveSiteDetailsResponse , { name: 'updateSiteDetails' })
+  updateSiteDetails(
+    @Args('siteDetailsDTO', { type: () => SaveSiteDetailsDTO})
+    siteDetailsDTO: SaveSiteDetailsDTO,
+    @AuthenticatedUser()
+    user: any,
+  )
+  {
+     const saveResult = this.siteService.saveSiteDetails(siteDetailsDTO,user);
+
+     if(saveResult)
+     {
+      return this.genericResponseProvider.createResponse(
+        `Successfully saved site details.`,
+        200,
+        false,
+      );
+     }
+     else
+     {
+      return this.genericResponseProvider.createResponse(
+        `Failed to save site details.`,
+        422,
+        false,
+      );
+     }
   }
 }

@@ -54,7 +54,7 @@ import {
   addSiteToFolioRequest,
   fetchFolioItems,
   folioItems,
-} from '../folios/FolioSlice';
+} from '../folios/redux/FolioSlice';
 import { Folio, FolioContentDTO } from '../folios/dto/Folio';
 import { fetchSnapshots, snapshots } from './snapshot/SnapshotSlice';
 import { RequestStatus } from '../../helpers/requests/status';
@@ -70,8 +70,11 @@ import {
   IFormField,
 } from '../../components/input-controls/IFormField';
 import BannerDetails from '../../components/banners/BannerDetails';
+import { getSiteDetailsToBeSaved, saveSiteDetails } from './SaveSiteDetailsSlice';
 
 const SiteDetails = () => {
+
+  const siteDetailsTobeSaved = useSelector(getSiteDetailsToBeSaved);
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
 
   const folioDetails = useSelector(folioItems);
@@ -427,6 +430,7 @@ const SiteDetails = () => {
             closeHandler={(response) => {
               setSave(false);
               if (response) {
+                dispatch(saveSiteDetails(siteDetailsTobeSaved)).unwrap();
                 dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
                 setEdit(false);
               }

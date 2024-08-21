@@ -21,6 +21,25 @@ export class FetchSiteResponse extends BaseHttpResponse {
   }
 }
 
+
+
+@ObjectType()
+export class SaveSiteDetailsResponse extends BaseHttpResponse {
+  @Field(() => [Sites])
+  data: Sites[];
+
+  constructor(
+    message?: string,
+    httpStatusCode?: number,
+    success?: boolean,
+    data?: Sites[] | null,
+  ) {
+    super(message, httpStatusCode, success);
+    this.data = data;
+  }
+}
+
+
 /**
  * Class for returing fetch site response from graphql services
  */

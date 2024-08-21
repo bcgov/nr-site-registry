@@ -1,6 +1,5 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { ResponseDto } from './response/response.dto';
-import { SitePartics } from '../entities/sitePartics.entity';
 import { IsDate, IsString } from 'class-validator';
 
 @ObjectType()

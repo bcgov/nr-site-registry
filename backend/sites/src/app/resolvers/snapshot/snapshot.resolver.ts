@@ -90,7 +90,7 @@ export class SnapshotsResolver {
       );
     } else {
       return this.genericResponseProvider.createResponse(
-        `Snapshot not found for user id: ${user.sub} and site id ${siteId}`,
+        `Snapshot not found for site id ${siteId}`,
         404,
         false,
         null,

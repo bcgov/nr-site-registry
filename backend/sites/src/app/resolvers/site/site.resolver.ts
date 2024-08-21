@@ -7,6 +7,10 @@ import {
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteService } from '../../services/site/site.service';
+import { DropdownDto, DropdownResponse } from 'src/app/dto/dropdown.dto';
+import { GenericResponseProvider } from 'src/app/dto/response/genericResponseProvider';
+import { UsePipes } from '@nestjs/common';
+import { GenericValidationPipe } from 'src/app/utils/validations/genericValidationPipe';
 
 /**
  * Resolver for Region
@@ -14,7 +18,12 @@ import { SiteService } from '../../services/site/site.service';
 @Resolver(() => Sites)
 @Resource('site-service')
 export class SiteResolver {
-  constructor(private readonly siteService: SiteService) {}
+  constructor(
+    private readonly siteService: SiteService,
+    private readonly genericResponseProvider: GenericResponseProvider<
+      DropdownDto[]
+    >,
+  ) {}
 
   /**
    * Find All Sites
@@ -99,5 +108,28 @@ export class SiteResolver {
   @Query(() => FetchSiteDetail, { name: 'findSiteBySiteId' })
   findSiteBySiteId(@Args('siteId', { type: () => String }) siteId: string) {
     return this.siteService.findSiteBySiteId(siteId);
+  }
+
+  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Query(() => DropdownResponse, { name: 'searchSiteIds' })
+  @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
+  async searchSiteIds(
+    @Args('searchParam', { type: () => String }) searchParam: string,
+  ) {
+    const result = await this.siteService.searchSiteIds(searchParam);
+    if (result && result.length > 0) {
+      return this.genericResponseProvider.createResponse(
+        'Notation Paticipant Role fetched successfully',
+        200,
+        true,
+        result,
+      );
+    } else {
+      return this.genericResponseProvider.createResponse(
+        `Notation Paticipant Role not found`,
+        404,
+        false,
+      );
+    }
   }
 }

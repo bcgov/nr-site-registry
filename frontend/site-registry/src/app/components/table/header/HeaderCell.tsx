@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { ColumnSize, TableColumn } from '../TableColumn';
-import { SortIcon , DropdownUpIcon, DropdownIcon } from '../../common/icon';
+import { SortIcon, DropdownUpIcon, DropdownIcon } from '../../common/icon';
 
 interface HeaderCellProps {
   item: TableColumn;
@@ -24,9 +24,13 @@ const getColumnSize = (columnSize: ColumnSize | undefined) => {
   }
 };
 
-const HeaderCell: FC<HeaderCellProps> = ({ item, index, sortHandler, currentSortColumn }) => {
+const HeaderCell: FC<HeaderCellProps> = ({
+  item,
+  index,
+  sortHandler,
+  currentSortColumn,
+}) => {
   const [ascendingSort, setSortDirection] = useState(false);
-  
 
   return (
     <th
@@ -37,21 +41,38 @@ const HeaderCell: FC<HeaderCellProps> = ({ item, index, sortHandler, currentSort
       )}  ${item.stickyCol ? 'positionSticky' : ''} `}
     >
       {item.displayName}
-      {!item.dynamicColumn && currentSortColumn === item.graphQLPropertyName && ascendingSort && <DropdownUpIcon className="column-sort-icon" onClick={() => {
-          sortHandler(item, !ascendingSort);
-          setSortDirection(!ascendingSort);
-        }}/> }
-      {!item.dynamicColumn && currentSortColumn === item.graphQLPropertyName && !ascendingSort &&  <DropdownIcon className="column-sort-icon" onClick={() => {
-          sortHandler(item, !ascendingSort);
-          setSortDirection(!ascendingSort);
-        }}/>}
-      {!item.dynamicColumn && currentSortColumn !== item.graphQLPropertyName && <SortIcon
-        className="column-sort-icon"
-        onClick={() => {
-          sortHandler(item, !ascendingSort);
-          setSortDirection(!ascendingSort);
-        }}
-      />}
+      {!item.dynamicColumn &&
+        currentSortColumn === item.graphQLPropertyName &&
+        ascendingSort && (
+          <DropdownUpIcon
+            className="column-sort-icon"
+            onClick={() => {
+              sortHandler(item, !ascendingSort);
+              setSortDirection(!ascendingSort);
+            }}
+          />
+        )}
+      {!item.dynamicColumn &&
+        currentSortColumn === item.graphQLPropertyName &&
+        !ascendingSort && (
+          <DropdownIcon
+            className="column-sort-icon"
+            onClick={() => {
+              sortHandler(item, !ascendingSort);
+              setSortDirection(!ascendingSort);
+            }}
+          />
+        )}
+      {!item.dynamicColumn &&
+        currentSortColumn !== item.graphQLPropertyName && (
+          <SortIcon
+            className="column-sort-icon"
+            onClick={() => {
+              sortHandler(item, !ascendingSort);
+              setSortDirection(!ascendingSort);
+            }}
+          />
+        )}
     </th>
   );
 };

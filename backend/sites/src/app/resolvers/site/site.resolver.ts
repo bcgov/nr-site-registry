@@ -8,8 +8,12 @@ import {
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteService } from '../../services/site/site.service';
-import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
+import { DropdownDto, DropdownResponse } from 'src/app/dto/dropdown.dto';
 import { GenericResponseProvider } from 'src/app/dto/response/genericResponseProvider';
+import { UsePipes } from '@nestjs/common';
+import { GenericValidationPipe } from 'src/app/utils/validations/genericValidationPipe';
+import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
+
 
 /**
  * Resolver for Region
@@ -17,9 +21,14 @@ import { GenericResponseProvider } from 'src/app/dto/response/genericResponsePro
 @Resolver(() => Sites)
 @Resource('site-service')
 export class SiteResolver {
-  constructor(private readonly siteService: SiteService,
-    private readonly genericResponseProvider: GenericResponseProvider<SaveSiteDetailsResponse>
+  constructor(
+    private readonly siteService: SiteService,
+    private readonly genericResponseProvider: GenericResponseProvider<
+      DropdownDto[]
+    >,
+    private readonly genericResponseProviderForSave: GenericResponseProvider<SaveSiteDetailsResponse>
   ) {}
+
 
   /**
    * Find All Sites
@@ -106,6 +115,29 @@ export class SiteResolver {
     return this.siteService.findSiteBySiteId(siteId);
   }
 
+  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Query(() => DropdownResponse, { name: 'searchSiteIds' })
+  @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
+  async searchSiteIds(
+    @Args('searchParam', { type: () => String }) searchParam: string,
+  ) {
+    const result = await this.siteService.searchSiteIds(searchParam);
+    if (result && result.length > 0) {
+      return this.genericResponseProvider.createResponse(
+        'Notation Paticipant Role fetched successfully',
+        200,
+        true,
+        result,
+      );
+    } else {
+      return this.genericResponseProvider.createResponse(
+        `Notation Paticipant Role not found`,
+        404,
+        false,
+      );
+    }
+  }
+
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
   @Mutation(() => SaveSiteDetailsResponse , { name: 'updateSiteDetails' })
@@ -120,7 +152,7 @@ export class SiteResolver {
 
      if(saveResult)
      {
-      return this.genericResponseProvider.createResponse(
+      return this.genericResponseProviderForSave.createResponse(
         `Successfully saved site details.`,
         200,
         false,
@@ -128,7 +160,7 @@ export class SiteResolver {
      }
      else
      {
-      return this.genericResponseProvider.createResponse(
+      return this.genericResponseProviderForSave.createResponse(
         `Failed to save site details.`,
         422,
         false,

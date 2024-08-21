@@ -14,7 +14,7 @@ import { LandHistories } from 'src/app/entities/landHistories.entity';
 import { SiteSubdivisions } from 'src/app/entities/siteSubdivisions.entity';
 import { SiteProfiles } from 'src/app/entities/siteProfiles.entity';
 import { SnapshotSiteContent } from 'src/app/dto/snapshotSiteContent';
-import { Events } from '../../entities/events.entity'
+import { Events } from '../../entities/events.entity';
 
 @Injectable()
 export class SnapshotsService {
@@ -38,7 +38,7 @@ export class SnapshotsService {
     @InjectRepository(SiteSubdivisions)
     private siteSubDivisionsRepo: Repository<SiteSubdivisions>,
     @InjectRepository(SiteProfiles)
-    private siteProfilesRepo: Repository<SiteProfiles>
+    private siteProfilesRepo: Repository<SiteProfiles>,
   ) {}
 
   async getSnapshots() {
@@ -52,8 +52,10 @@ export class SnapshotsService {
 
   async getSnapshotsByUserId(userId: string) {
     try {
-      const result = await this.snapshotRepository.find({ where: { userId },
-        order: { whenCreated: 'DESC' }, });
+      const result = await this.snapshotRepository.find({
+        where: { userId },
+        order: { whenCreated: 'DESC' },
+      });
       return result;
     } catch (error) {
       throw new Error('Failed to retrieve snapshots by userId.');
@@ -62,8 +64,10 @@ export class SnapshotsService {
 
   async getSnapshotsBySiteId(siteId: string, userId: string) {
     try {
-      const result = await this.snapshotRepository.find({ where: {siteId, userId },
-        order: { whenCreated: 'DESC' }, });
+      const result = await this.snapshotRepository.find({
+        where: { siteId, userId },
+        order: { whenCreated: 'DESC' },
+      });
       return result;
     } catch (error) {
       throw new Error('Failed to retrieve snapshots by userId and siteId.');
@@ -92,85 +96,87 @@ export class SnapshotsService {
     }
   }
 
-  async createSnapshotForSites(inputDto: CreateSnapshotDto[], userInfo: any) : Promise<boolean>
-  {
-    try
-    {
-
+  async createSnapshotForSites(
+    inputDto: CreateSnapshotDto[],
+    userInfo: any,
+  ): Promise<boolean> {
+    try {
       const snapShotsToBeSaved = [];
-     
-      const createSnapShotContent  =  inputDto.map(async (dto)=>{
-           if(dto)
-            {
-              const {siteId} = dto;
-              if(siteId !== '')
-              {
-                 
-                const snapShotContent: SnapshotSiteContent = new SnapshotSiteContent();
-               
 
-                snapShotContent.sitesSummary = await this.sitesRespository.findOne({where:{id: siteId}});
+      const createSnapShotContent = inputDto.map(async (dto) => {
+        if (dto) {
+          const { siteId } = dto;
+          if (siteId !== '') {
+            const snapShotContent: SnapshotSiteContent =
+              new SnapshotSiteContent();
 
-                snapShotContent.events = await this.eventsRepositoryRepo.find({where: { siteId} });
+            snapShotContent.sitesSummary = await this.sitesRespository.findOne({
+              where: { id: siteId },
+            });
 
-                  const fetchEventParticipants =  snapShotContent.events.map( async (event)=>{     
+            snapShotContent.events = await this.eventsRepositoryRepo.find({
+              where: { siteId },
+            });
 
-                    snapShotContent.eventsParticipants = await this.eventsParticipantsRepo.find({where: {eventId : event.id}}); 
-                    
-                  })
+            const fetchEventParticipants = snapShotContent.events.map(
+              async (event) => {
+                snapShotContent.eventsParticipants =
+                  await this.eventsParticipantsRepo.find({
+                    where: { eventId: event.id },
+                  });
+              },
+            );
 
-                  snapShotContent.siteParticipants = await this.siteParticipantsRepo.find({where: {siteId}});
+            snapShotContent.siteParticipants =
+              await this.siteParticipantsRepo.find({ where: { siteId } });
 
-                  snapShotContent.documents = await this.siteDocumentsRepo.find({where: {siteId}});
+            snapShotContent.documents = await this.siteDocumentsRepo.find({
+              where: { siteId },
+            });
 
-                  snapShotContent.landHistories = await this.landHistoriesRepo.find({where:{siteId}});
+            snapShotContent.landHistories = await this.landHistoriesRepo.find({
+              where: { siteId },
+            });
 
-                  snapShotContent.profiles = await this.siteProfilesRepo.find({where: { siteId}});
+            snapShotContent.profiles = await this.siteProfilesRepo.find({
+              where: { siteId },
+            });
 
-                  snapShotContent.subDivisions   = await this.siteSubDivisionsRepo.find({where: {siteId}});
+            snapShotContent.subDivisions = await this.siteSubDivisionsRepo.find(
+              { where: { siteId } },
+            );
 
-                  const newSnapshot = {
-                      userId : userInfo.sub,
-                      siteId : siteId,
-                      transactionId : new Date().getTime().toString(),
-                      snapshotData: snapShotContent,
-                      whenCreated: new Date(),
-                      whoCreated: userInfo.givenName,
-                  }
+            const newSnapshot = {
+              userId: userInfo.sub,
+              siteId: siteId,
+              transactionId: new Date().getTime().toString(),
+              snapshotData: snapShotContent,
+              whenCreated: new Date(),
+              whoCreated: userInfo.givenName,
+            };
 
-                  snapShotsToBeSaved.push(newSnapshot);
+            snapShotsToBeSaved.push(newSnapshot);
 
-                  await Promise.all(fetchEventParticipants);
-
-                 
-              }
-              else
-              {
-                console.log("Site id is empty")
-              }
-           }
-           else
-           {
-              console.log('At createSnapshotForUser dto is null')
-           }
-        })
+            await Promise.all(fetchEventParticipants);
+          } else {
+            console.log('Site id is empty');
+          }
+        } else {
+          console.log('At createSnapshotForUser dto is null');
+        }
+      });
 
       await Promise.all(createSnapShotContent);
 
-       const saveResult =  await this.snapshotRepository.save(snapShotsToBeSaved);
+      const saveResult = await this.snapshotRepository.save(snapShotsToBeSaved);
 
-       if(saveResult.length > 0)
-       {
-         return true;
-       }
-       else
-       {
+      if (saveResult.length > 0) {
+        return true;
+      } else {
         return false;
-       }
-    }
-    catch(error)
-    {
-      console.log('Failed To Create Snapshot',error);
+      }
+    } catch (error) {
+      console.log('Failed To Create Snapshot', error);
       throw error;
     }
   }

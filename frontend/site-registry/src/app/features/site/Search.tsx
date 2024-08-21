@@ -12,7 +12,11 @@ import {
 } from './dto/SiteSlice';
 
 import { AppDispatch } from '../../Store';
-import { selectAllSites, currentPageSelection ,currentPageSize } from './dto/SiteSlice';
+import {
+  selectAllSites,
+  currentPageSelection,
+  currentPageSize,
+} from './dto/SiteSlice';
 import SearchResults from './SearchResults';
 import {
   ShoppingCartIcon,
@@ -103,7 +107,7 @@ const Search = () => {
   });
 
   const pageChange = (pageRequested: number, resultsCount: number) => {
-    console.log(pageRequested,resultsCount)
+    console.log(pageRequested, resultsCount);
     dispatch(
       updatePageSizeSetting({
         currentPage: pageRequested,
@@ -180,24 +184,16 @@ const Search = () => {
   const changeHandler = (event: any) => {
     console.log('handle', event);
     if (event && event.property === 'select_row') {
-
-      if(event.value)
-      {
+      if (event.value) {
         const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
-        if(index === -1)
-        {
+        if (index === -1) {
           SetSelectedRows([...selectedRows, event.row]);
-        }
-        else
-        {
+        } else {
           // do nothing
         }
-      }
-      else
-      {
+      } else {
         SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
       }
-
 
       //const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
       // if (index > -1 && !event.value) {
@@ -207,34 +203,28 @@ const Search = () => {
       //   // If row is not selected, add it
       //   SetSelectedRows([...selectedRows, event.row]);
       // }
-    }
-    else if(event && event.property === 'select_all' )
-    {
-        const newRows = event.value;
-        if(event.selected)
-        {
-          SetSelectedRows((prevArray) => {
-            const existingIds = new Set(prevArray.map(obj => obj.id));
-            const uniqueRows = newRows.filter((row:any) => !existingIds.has(row.id));
-            return [...prevArray, ...uniqueRows];
+    } else if (event && event.property === 'select_all') {
+      const newRows = event.value;
+      if (event.selected) {
+        SetSelectedRows((prevArray) => {
+          const existingIds = new Set(prevArray.map((obj) => obj.id));
+          const uniqueRows = newRows.filter(
+            (row: any) => !existingIds.has(row.id),
+          );
+          return [...prevArray, ...uniqueRows];
         });
-        }
-        else
-        {
-          SetSelectedRows((prevArray) => {
-            const idsToRemove = new Set(newRows.map((row:any) => row.id));
-            return prevArray.filter(obj => !idsToRemove.has(obj.id));
+      } else {
+        SetSelectedRows((prevArray) => {
+          const idsToRemove = new Set(newRows.map((row: any) => row.id));
+          return prevArray.filter((obj) => !idsToRemove.has(obj.id));
         });
-        }
+      }
     }
-
-   
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log('selectedRows', selectedRows);
-
-  },[selectedRows])
+  }, [selectedRows]);
 
   const [showAddToFolio, SetShowAddToFolio] = useState(false);
 

@@ -47,68 +47,65 @@ const Table: FC<TableProps> = ({
   deleteHandler,
 }) => {
   const [currentSortColumn, SetCurrentSortColumn] = useState('');
-  const [allRowsSelectedPages, SetAllRowsSelectedPages] = useState<number[]>([]);
-  const [currentPageAllRowSelected, SetCurrentPageAllRowSelected] = useState(null || Boolean);
-  const [allRowsSelectedEventFlag, SetAllRowsSelectedEvenFlag] = useState(false);
-  
+  const [allRowsSelectedPages, SetAllRowsSelectedPages] = useState<number[]>(
+    [],
+  );
+  const [currentPageAllRowSelected, SetCurrentPageAllRowSelected] = useState(
+    null || Boolean,
+  );
+  const [allRowsSelectedEventFlag, SetAllRowsSelectedEvenFlag] =
+    useState(false);
 
-  const isCurrentPageAllRowsSelected = ()=>{
-    const isSelected = allRowsSelectedPages.findIndex((pageNumber)=> pageNumber === currentPage) !== -1;
-    console.log("is selected", isSelected);
+  const isCurrentPageAllRowsSelected = () => {
+    const isSelected =
+      allRowsSelectedPages.findIndex(
+        (pageNumber) => pageNumber === currentPage,
+      ) !== -1;
+    console.log('is selected', isSelected);
     SetCurrentPageAllRowSelected(isSelected);
-   }
+  };
 
-  const selectAllRows = (event:any,checked:boolean)=>{
-    console.log('All Rows Selected',event,checked,allRowsSelectedPages);
-    if(event)
-    {
+  const selectAllRows = (event: any, checked: boolean) => {
+    console.log('All Rows Selected', event, checked, allRowsSelectedPages);
+    if (event) {
       SetAllRowsSelectedEvenFlag(true);
-    if(checked)
-    {
-      let pageFound =  allRowsSelectedPages.find((pageNumber)=> pageNumber === currentPage);
-      if(!pageFound && currentPage != undefined)
-      {
-        allRowsSelectedPages.push(currentPage);
+      if (checked) {
+        let pageFound = allRowsSelectedPages.find(
+          (pageNumber) => pageNumber === currentPage,
+        );
+        if (!pageFound && currentPage != undefined) {
+          allRowsSelectedPages.push(currentPage);
+        }
+        SetAllRowsSelectedPages(allRowsSelectedPages);
+      } else {
+        removePageFromAllRowsSelected();
+      }
+
+      isCurrentPageAllRowsSelected();
+    }
+  };
+
+  const resetAllRowsSelectedEventFlag = () => {
+    SetAllRowsSelectedEvenFlag(false);
+  };
+
+  const removePageFromAllRowsSelected = () => {
+    console.log('reseting all rows if set');
+    if (allRowsSelectedPages.length > 0) {
+      let pageFound = allRowsSelectedPages.findIndex(
+        (pageNumber) => pageNumber === currentPage,
+      );
+      if (pageFound !== -1) {
+        allRowsSelectedPages.splice(pageFound, 1);
       }
       SetAllRowsSelectedPages(allRowsSelectedPages);
+      isCurrentPageAllRowsSelected();
     }
-    else
-    {
-      removePageFromAllRowsSelected();
-    }
+  };
 
+  useEffect(() => {
     isCurrentPageAllRowsSelected();
-    }
-  }
-
-
-  const resetAllRowsSelectedEventFlag = ()=>{
-   
-    SetAllRowsSelectedEvenFlag(false);
-    
-  }
-
-  const removePageFromAllRowsSelected = ()=>{
-    console.log("reseting all rows if set")
-      if(allRowsSelectedPages.length > 0)
-      {
-      let pageFound =  allRowsSelectedPages.findIndex((pageNumber)=> pageNumber === currentPage);
-      if(pageFound!== -1)
-      {
-        allRowsSelectedPages.splice(pageFound,1);
-      }
-       SetAllRowsSelectedPages(allRowsSelectedPages);
-       isCurrentPageAllRowsSelected();
-    }
-
-  }
-
-
- 
-
-  useEffect(()=>{
-    isCurrentPageAllRowsSelected();
-  },[currentPage])
+  }, [currentPage]);
 
   const parentSortHandler =
     sortHandler ??
@@ -137,7 +134,7 @@ const Table: FC<TableProps> = ({
               sortHandler={tableSortHandler}
               currentSortColumn={currentSortColumn}
               selectAllRowsHandler={selectAllRows}
-              currentPageAllRowsSelected = {currentPageAllRowSelected}
+              currentPageAllRowsSelected={currentPageAllRowSelected}
             />
           </thead>
           <TableBody

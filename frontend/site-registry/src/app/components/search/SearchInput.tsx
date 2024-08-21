@@ -51,11 +51,8 @@ const SearchInput: React.FC<ISearchInput> = ({
       )}
       <div className="search-box-container">
         <div className="d-flex align-items-center justify-content-center w-100 position-relative search-box ">
-        {!createMode && searchTerm.trim().length < 1 && (
-            <span
-              id="search-icon"
-              className="custom-icon px-2"
-            >
+          {!createMode && searchTerm.trim().length < 1 && (
+            <span id="search-icon" className="custom-icon px-2">
               <MagnifyingGlassIcon />
             </span>
           )}
@@ -72,9 +69,7 @@ const SearchInput: React.FC<ISearchInput> = ({
               searchTerm.length > 0 ? 'ps-2' : ''
             }`}
           />
-          {!createMode && searchTerm.trim().length < 1 ? (         
-        null
-          ) : (
+          {!createMode && searchTerm.trim().length < 1 ? null : (
             <span
               data-testid="clear-icon"
               id="clear-icon"

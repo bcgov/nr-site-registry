@@ -22,7 +22,7 @@ export const SaveButton: React.FC<ButtonProps> = ({
   return (
     <div className="custom-save-btn" onClick={clickHandler}>
       {showIcon && <FloppyDisk />}
-      { label && label !== '' ? label : 'Save'}
+      {label && label !== '' ? label : 'Save'}
     </div>
   );
 };
@@ -36,7 +36,7 @@ export const CancelButton: React.FC<ButtonProps> = ({
   return (
     <div className="custom-cancel-btn" onClick={(e) => clickHandler(e)}>
       {showIcon && <XmarkIcon />}
-      {label  && label !== '' ? label : 'Cancel'}
+      {label && label !== '' ? label : 'Cancel'}
     </div>
   );
 };

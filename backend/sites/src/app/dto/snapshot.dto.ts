@@ -30,20 +30,14 @@ export class SnapshotDto {
   @Field(() => GraphQLJSON)
   snapshotData: any;
 
-  @Field({nullable: true})
+  @Field({ nullable: true })
   created: Date | null;
-
 }
 
-
-
-
 @InputType()
-export class CreateSnapshotDto
-{
+export class CreateSnapshotDto {
   @Field()
   @IsNotEmpty()
   @IsString()
   siteId: string;
 }
-

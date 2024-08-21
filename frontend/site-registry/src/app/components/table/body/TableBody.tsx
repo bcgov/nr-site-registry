@@ -27,12 +27,12 @@ interface TableBodyProps {
   srMode?: boolean;
   idColumnName: string;
   rowDeleteHandler: (data: any) => void;
-  allRowsSelected:boolean;
+  allRowsSelected: boolean;
   currentPage: number;
-  allRowsSelectedPages:number[];
-  allRowsSelectedEventFlag:boolean;
-  resetAllRowsSelectedEventFlag:()=>void;
-  removePageFromAllRowsSelected:()=>void;
+  allRowsSelectedPages: number[];
+  allRowsSelectedEventFlag: boolean;
+  resetAllRowsSelectedEventFlag: () => void;
+  removePageFromAllRowsSelected: () => void;
 }
 
 interface SelectedRowsType {
@@ -54,44 +54,42 @@ const TableBody: FC<TableBodyProps> = ({
   allRowsSelectedPages,
   allRowsSelectedEventFlag,
   resetAllRowsSelectedEventFlag,
-  removePageFromAllRowsSelected
+  removePageFromAllRowsSelected,
 }) => {
   const [selectedRowIds, SetSelectedRowsId] = useState<SelectedRowsType>({});
 
-  useEffect(()=>{   
+  useEffect(() => {
+    if (!allRowsSelectedEventFlag) return;
 
-    if(!allRowsSelectedEventFlag)
-      return;
+    const rowsIds: string[] = data.map((item: any, index: number) => {
+      const checkboxId = getValue(index, idColumnName);
+      return checkboxId;
+    });
 
-    const rowsIds:string[] = data.map((item: any, index: number) => {
-      const checkboxId = getValue(index, idColumnName);  
-      return checkboxId;    
-    })
-
-    if(allRowsSelected)
-    {
+    if (allRowsSelected) {
       SetSelectedRowsId((prevItems) => ({
         ...prevItems,
         [currentPage]: [...(prevItems[currentPage] || []), ...rowsIds],
       }));
-
-    }
-    else
-    {
+    } else {
       SetSelectedRowsId((prevItems) => ({
         ...prevItems,
-        [currentPage]: (prevItems[currentPage] || []).filter(item => !rowsIds.includes(item)),
-      }));  
+        [currentPage]: (prevItems[currentPage] || []).filter(
+          (item) => !rowsIds.includes(item),
+        ),
+      }));
     }
 
-   
-    if(allRowsSelectedEventFlag)
-    {
-      changeHandler({id:'select_all',property:'select_all',value:data, selected: allRowsSelected})
+    if (allRowsSelectedEventFlag) {
+      changeHandler({
+        id: 'select_all',
+        property: 'select_all',
+        value: data,
+        selected: allRowsSelected,
+      });
       resetAllRowsSelectedEventFlag();
     }
-
-  },[allRowsSelected])
+  }, [allRowsSelected]);
 
   const handleSelectTableRow = (isChecked: any, id: string, rowIndex: any) => {
     if (isChecked) {
@@ -99,23 +97,25 @@ const TableBody: FC<TableBodyProps> = ({
         ...prevItems,
         [currentPage]: [...(prevItems[currentPage] || []), id],
       }));
-      
     } else {
-
       SetSelectedRowsId((prevItems) => ({
         ...prevItems,
-        [currentPage]: (prevItems[currentPage] || []).filter(item => item !== id),
+        [currentPage]: (prevItems[currentPage] || []).filter(
+          (item) => item !== id,
+        ),
       }));
 
-     
-      removePageFromAllRowsSelected();      
+      removePageFromAllRowsSelected();
     }
 
     tableRecordChangeHandler(rowIndex, 'select_row', isChecked);
   };
 
   const isChecked = (id: string) => {
-    return selectedRowIds[currentPage] && selectedRowIds[currentPage].indexOf(id) !== -1;
+    return (
+      selectedRowIds[currentPage] &&
+      selectedRowIds[currentPage].indexOf(id) !== -1
+    );
   };
 
   const renderNoResultsFound = () => {
@@ -427,8 +427,6 @@ const TableBody: FC<TableBodyProps> = ({
     const checkboxId = getValue(rowIndex, idColumnName);
     const rowChecked = isChecked(checkboxId);
 
-    
-
     return (
       <React.Fragment>
         <tr>
@@ -440,7 +438,11 @@ const TableBody: FC<TableBodyProps> = ({
                 className="checkbox-color"
                 aria-label="Select Row"
                 onChange={(event) => {
-                  handleSelectTableRow(event.target.checked, checkboxId, rowIndex);
+                  handleSelectTableRow(
+                    event.target.checked,
+                    checkboxId,
+                    rowIndex,
+                  );
                 }}
                 checked={rowChecked}
               />

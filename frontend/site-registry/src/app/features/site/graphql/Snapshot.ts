@@ -15,8 +15,6 @@ export const graphQLSnapshotBySiteId = () => {
   `;
 };
 
-
-
 export const createSnapshotForSitesQL = () => gql`
   mutation createSnapshotForSites($inputDto: [CreateSnapshotDto!]!) {
     createSnapshotForSites(inputDto: $inputDto) {

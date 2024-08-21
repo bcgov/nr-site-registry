@@ -1,7 +1,15 @@
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
-import { AuthenticatedUser, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
-import { CreateSnapshotDto, SnapshotDto, SnapshotResponse } from '../../dto/snapshot.dto';
+import {
+  AuthenticatedUser,
+  RoleMatchingMode,
+  Roles,
+} from 'nest-keycloak-connect';
+import {
+  CreateSnapshotDto,
+  SnapshotDto,
+  SnapshotResponse,
+} from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { SnapshotsService } from '../../services/snapshot/snapshot.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
@@ -67,9 +75,12 @@ export class SnapshotsResolver {
   async getSnapshotsBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
     @AuthenticatedUser()
-    user: any
+    user: any,
   ) {
-    const result = await this.snapshotsService.getSnapshotsBySiteId(siteId, user.sub);
+    const result = await this.snapshotsService.getSnapshotsBySiteId(
+      siteId,
+      user.sub,
+    );
     if (result && result.length > 0) {
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
@@ -79,7 +90,7 @@ export class SnapshotsResolver {
       );
     } else {
       return this.genericResponseProvider.createResponse(
-        `Snapshot not found for user id: ${user.sub} and site id ${siteId}`,
+        `Snapshot not found for site id ${siteId}`,
         404,
         false,
         null,
@@ -132,46 +143,39 @@ export class SnapshotsResolver {
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
   @Mutation(() => SnapshotResponse, { name: 'createSnapshotForSites' })
   async createSnapshotForSites(
-    @Args('inputDto', { type: () => [CreateSnapshotDto] }, new ValidationPipe()) inputDto: CreateSnapshotDto[],
-    @AuthenticatedUser() user:any
-  )
-  {
-     try
-     {
-        if(inputDto)
-        {
-          const isSaved =  this.snapshotsService.createSnapshotForSites(inputDto,user);
-          if(isSaved)
-          {
-            return this.genericResponseProvider.createResponse(
-              'Successfully created snapshots.',
-              201,
-              true,
-            );
-          }
-          else
-          {
-            return this.genericResponseProvider.createResponse(
-              `Failed to create snapshots. `,
-              422,
-              false,
-            );
-          }
-        }
-        else
-        {
+    @Args('inputDto', { type: () => [CreateSnapshotDto] }, new ValidationPipe())
+    inputDto: CreateSnapshotDto[],
+    @AuthenticatedUser() user: any,
+  ) {
+    try {
+      if (inputDto) {
+        const isSaved = this.snapshotsService.createSnapshotForSites(
+          inputDto,
+          user,
+        );
+        if (isSaved) {
           return this.genericResponseProvider.createResponse(
-            `Please provide valid input to create snapshots`,
+            'Successfully created snapshots.',
+            201,
+            true,
+          );
+        } else {
+          return this.genericResponseProvider.createResponse(
+            `Failed to create snapshots. `,
             422,
             false,
           );
         }
-     }
-     catch(error)
-     {
-        console.log("Error at createSnapshotForSites", error);
-        throw new Error('System Error, Please try again.');
-     }
+      } else {
+        return this.genericResponseProvider.createResponse(
+          `Please provide valid input to create snapshots`,
+          422,
+          false,
+        );
+      }
+    } catch (error) {
+      console.log('Error at createSnapshotForSites', error);
+      throw new Error('System Error, Please try again.');
+    }
   }
-
 }

@@ -21,7 +21,7 @@ describe('SnapshotResolver', () => {
           useValue: {
             getSnapshots: jest.fn(),
             getSnapshotsByUserId: jest.fn(),
-            getSnapshotsByUserIdAndSiteId: jest.fn(),
+            getSnapshotsBySiteId: jest.fn(),
             getSnapshotsById: jest.fn(),
             createSnapshot: jest.fn(),
           },
@@ -235,7 +235,7 @@ describe('SnapshotResolver', () => {
     });
   });
 
-  describe('getSnapshotsByUserIdAndSiteId', () => {
+  describe('getSnapshotsBySiteId', () => {
     const res: Snapshots[] = [
       {
         id: 1,
@@ -301,10 +301,10 @@ describe('SnapshotResolver', () => {
         data: res,
       };
       jest
-        .spyOn(service, 'getSnapshotsByUserIdAndSiteId')
+        .spyOn(service, 'getSnapshotsBySiteId')
         .mockResolvedValueOnce(mockResponse.data);
 
-      const result = await resolver.getSnapshotsByUserIdAndSiteId(siteId, userId);
+      const result = await resolver.getSnapshotsBySiteId(siteId, userId);
 
       expect(result).toEqual(mockResponse);
     });
@@ -315,12 +315,12 @@ describe('SnapshotResolver', () => {
       const mockResponse: SnapshotResponse = {
         httpStatusCode: 404,
         success: false,
-        message: `Snapshot not found for user id: ${userId} and site id ${siteId}`,
+        message: `Snapshot not found for site id ${siteId}`,
         data: null,
       };
-      jest.spyOn(service, 'getSnapshotsByUserIdAndSiteId').mockResolvedValueOnce(null);
+      jest.spyOn(service, 'getSnapshotsBySiteId').mockResolvedValueOnce(null);
 
-      const result = await resolver.getSnapshotsByUserIdAndSiteId(siteId, userId);
+      const result = await resolver.getSnapshotsBySiteId(siteId, userId);
 
       expect(result).toEqual(mockResponse);
     });

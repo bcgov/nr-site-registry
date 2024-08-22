@@ -14,5 +14,5 @@ export class ResponseDto {
   success?: boolean;
 
   @Field(() => String, { nullable: true })
-  timestamp?: String;
+  timestamp?: string;
 }

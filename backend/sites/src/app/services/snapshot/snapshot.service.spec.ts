@@ -256,10 +256,7 @@ describe('SnapshotService', () => {
       jest
         .spyOn(snapshotRepository, 'find')
         .mockResolvedValueOnce(res as Snapshots[]);
-      const snapshot = await service.getSnapshotsByUserIdAndSiteId(
-        siteId,
-        userId,
-      );
+      const snapshot = await service.getSnapshotsBySiteId(siteId, userId);
 
       expect(snapshot).toEqual(res);
       expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
@@ -279,7 +276,7 @@ describe('SnapshotService', () => {
         );
 
       await expect(
-        service.getSnapshotsByUserIdAndSiteId(siteId, userId),
+        service.getSnapshotsBySiteId(siteId, userId),
       ).rejects.toThrow('Failed to retrieve snapshots by userId and siteId.');
       expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
     });

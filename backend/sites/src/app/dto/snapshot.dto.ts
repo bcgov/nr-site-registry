@@ -33,3 +33,11 @@ export class SnapshotDto {
   @Field({ nullable: true })
   created: Date | null;
 }
+
+@InputType()
+export class CreateSnapshotDto {
+  @Field()
+  @IsNotEmpty()
+  @IsString()
+  siteId: string;
+}

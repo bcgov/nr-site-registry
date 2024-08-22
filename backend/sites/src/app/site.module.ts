@@ -75,6 +75,8 @@ import { UserJWTTokenDecoderMiddleware } from './middleware/userJwtTokenDecoder'
 import { UserService } from './services/user/user.service';
 import { User } from './entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { AssociatedSiteResolver } from './resolvers/associatedSite/associatedSite.resolver';
+import { AssociatedSiteService } from './services/associatedSite/associatedSite.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -163,6 +165,8 @@ import { JwtService } from '@nestjs/jwt';
     FolioContentsService,
     UserService,
     JwtService,
+    AssociatedSiteResolver,
+    AssociatedSiteService,
   ],
   controllers: [SiteController],
 })

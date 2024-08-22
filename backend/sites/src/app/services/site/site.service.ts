@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import {
   FetchSiteDetail,
   FetchSiteResponse,
@@ -9,6 +9,7 @@ import {
 import { Sites } from '../../entities/sites.entity';
 import { SiteUtil } from '../../utils/site.util';
 import { RecentViews } from 'src/app/entities/recentViews.entity';
+import { DropdownResponse } from 'src/app/dto/dropdown.dto';
 /**
  * Nestjs Service For Region Entity
  */
@@ -217,5 +218,25 @@ export class SiteService {
     });
 
     return response;
+  }
+
+  async searchSiteIds(searchParam: string) {
+    try {
+      // Use query builder to type cast the 'id' field to a string
+      const queryBuilder = this.siteRepository
+        .createQueryBuilder('sites')
+        .where('CAST(sites.id AS TEXT) LIKE :searchParam', {
+          searchParam: `%${searchParam}%`,
+        })
+        .orderBy('sites.id', 'ASC'); // Ordering by 'id' in ascending order;
+      const result = await queryBuilder.getMany();
+      if (result) {
+        return result.map((obj: any) => ({ key: obj.id, value: obj.id }));
+      } else {
+        return []; // Return an empty array if no results
+      }
+    } catch (error) {
+      throw new Error('Failed to retrieve site ids.');
+    }
   }
 }

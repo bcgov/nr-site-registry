@@ -47,9 +47,14 @@
   color: var(--typography-color-link);
 }
 
-/*.status-message-details span {
-  flex-direction: column;
-}*/
+.snapshot {
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 27.01px;
+  text-align: left;
+  color: var(--typography-color-disabled, #9f9d9c);
+}
 
 .message-current {
   background-color: var(--support-support-surface-color-success);

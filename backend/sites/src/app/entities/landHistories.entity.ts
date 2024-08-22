@@ -16,6 +16,9 @@ export class LandHistories {
   siteId: string;
 
   @Field()
+  guid: string;
+
+  @Field()
   @Column('character varying', { primary: true, name: 'lut_code', length: 6 })
   lutCode: string;
 

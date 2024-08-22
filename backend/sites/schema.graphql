@@ -89,6 +89,7 @@ type SiteParticRoles {
 
 type LandHistories {
   siteId: String!
+  guid: String!
   lutCode: String!
   note: String
   whoCreated: String!
@@ -619,6 +620,14 @@ type AssociatedSiteDto {
   note: String
 }
 
+type LandUseCodeResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [LandUseCd!]!
+}
+
 type Query {
   sites: FetchSiteResponse!
   searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
@@ -638,6 +647,7 @@ type Query {
   getSiteDisclosureBySiteId(siteId: String!): DisclosureResponse!
   getCartItemsForUser(userId: String!): CartResponse!
   getLandHistoriesForSite(siteId: String!, searchTerm: String, sortDirection: String): LandHistoryResponse!
+  getLandUseCodes: LandUseCodeResponse!
   getSiteNotationBySiteId(siteId: String!): NotationResponse!
   getSiteDocumentsBySiteId(siteId: String!): DocumentResponse!
   getFolioItemsForUser(userId: String!): FolioResponse!

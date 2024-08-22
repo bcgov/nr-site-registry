@@ -21,6 +21,7 @@ import { SiteProfiles } from 'src/app/entities/siteProfiles.entity';
 import { Subdivisions } from 'src/app/entities/subdivisions.entity';
 import { SRApprovalStatusEnum } from 'src/app/dto/srApprovalStatus';
 import { DropdownResponse } from 'src/app/dto/dropdown.dto';
+import { HistoryLog } from 'src/app/entities/HistoryLog.entity';
 /**
  * Nestjs Service For Region Entity
  */
@@ -47,6 +48,8 @@ export class SiteService {
     private siteProfilesRepo: Repository<SiteProfiles>,
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
+    @InjectRepository(HistoryLog)
+    private historyLogRepository: Repository<HistoryLog>
   ) {}
 
   /**
@@ -357,6 +360,19 @@ export class SiteService {
           } else {
             console.log('No changes To Site profiles');
           }
+
+
+          const historyLog:HistoryLog = {
+            userId : userInfo??userInfo.sub,
+            content : inputDTO,
+            id: null,
+            whoCreated: userInfo??userInfo.givenName,
+            whenCreated: new Date(),
+            whenUpdated : new Date(),
+            whoUpdated: userInfo??userInfo.givenName,
+          }
+
+          this.historyLogRepository.save(historyLog);
          
         } catch (error) {
           console.error('Save Site Details Transaction failed', error);

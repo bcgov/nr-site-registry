@@ -361,51 +361,84 @@ const Associate = () => {
   }, [searchParam]);
 
   const handleTableChange = (event: any) => {
-    if (event.property === 'siteIdAssociatedWith') {
-      const recordExist = formData.find(
-        (associate: any) =>
-          associate.siteId === event.row.siteId &&
-          associate.siteIdAssociatedWith === event.value.trim(),
-      );
-      if (recordExist !== undefined) {
-        setIsRecordExist(recordExist);
-        setCurrentRecordId(event.row.guid);
-      } else {
-        setIsRecordExist({});
-        setCurrentRecordId('');
-      }
-      setisListLoading(RequestStatus.loading);
-      setSearchParam(event.value.trim());
-    }
-    const isExist = formData.some(
-      (associate: any) =>
-        associate.siteId === event.row.siteId &&
-        associate.siteIdAssociatedWith === event.row.siteIdAssociatedWith,
-    );
-    if (isExist && event.property.includes('select_row')) {
+    if (
+      event.property.includes('select_all') ||
+      event.property.includes('select_row')
+    ) {
+      let rows = event.property === 'select_row' ? [event.row] : event.value;
+      let isTrue =
+        event.property === 'select_row' ? event.value : event.selected;
       // Update selectedRows state based on checkbox selection
-      if (event.value) {
+      if (isTrue) {
         setSelectedRows((prevSelectedRows) => [
           ...prevSelectedRows,
-          {
-            siteId: event.row.siteId,
-            siteIdAssociatedWith: event.row.siteIdAssociatedWith,
-            guid: event.row.guid,
-          },
+          ...rows.map((row: any) => ({
+            siteId: row.siteId,
+            siteIdAssociatedWith: row.siteIdAssociatedWith,
+            guid: row.guid,
+          })),
         ]);
       } else {
         setSelectedRows((prevSelectedRows) =>
           prevSelectedRows.filter(
-            (row) =>
-              !(
-                row.siteId === event.row.siteId &&
-                row.siteIdAssociatedWith === event.row.siteIdAssociatedWith &&
-                row.guid === event.row.guid
+            (selectedRow) =>
+              !rows.some(
+                (row: any) =>
+                  selectedRow.siteId === row.siteId &&
+                  selectedRow.siteIdAssociatedWith ===
+                    row.siteIdAssociatedWith &&
+                  selectedRow.guid === row.guid,
               ),
           ),
         );
       }
-    } else {
+    }
+    // const isExist = formData.some(
+    //   (associate: any) =>
+    //     associate.siteId === event.row.siteId &&
+    //     associate.siteIdAssociatedWith === event.row.siteIdAssociatedWith,
+    // );
+    // if (isExist && event.property.includes('select_row')) {
+    //   // Update selectedRows state based on checkbox selection
+    //   if (event.value) {
+    //     setSelectedRows((prevSelectedRows) => [
+    //       ...prevSelectedRows,
+    //       {
+    //         siteId: event.row.siteId,
+    //         siteIdAssociatedWith: event.row.siteIdAssociatedWith,
+    //         guid: event.row.guid,
+    //       },
+    //     ]);
+    //   } else {
+    //     setSelectedRows((prevSelectedRows) =>
+    //       prevSelectedRows.filter(
+    //         (row) =>
+    //           !(
+    //             row.siteId === event.row.siteId &&
+    //             row.siteIdAssociatedWith === event.row.siteIdAssociatedWith &&
+    //             row.guid === event.row.guid
+    //           ),
+    //       ),
+    //     );
+    //   }
+    // }
+    else {
+      if (event.property === 'siteIdAssociatedWith') {
+        const recordExist = formData.find(
+          (associate: any) =>
+            associate.siteId === event.row.siteId &&
+            associate.siteIdAssociatedWith === event.value.trim(),
+        );
+        if (recordExist !== undefined) {
+          setIsRecordExist(recordExist);
+          setCurrentRecordId(event.row.guid);
+        } else {
+          setIsRecordExist({});
+          setCurrentRecordId('');
+        }
+        setisListLoading(RequestStatus.loading);
+        setSearchParam(event.value.trim());
+      }
       const updatedAssociatedSites = formData.map((associate) => {
         if (associate.guid === event.row.guid) {
           return { ...associate, [event.property]: event.value };
@@ -540,6 +573,7 @@ const Associate = () => {
         </div>
         <div>
           <Widget
+            currentPage={1}
             changeHandler={handleTableChange}
             onClickLeftIcon={closeSearch}
             handleCheckBoxChange={(event: any) => handleWidgetCheckBox(event)}

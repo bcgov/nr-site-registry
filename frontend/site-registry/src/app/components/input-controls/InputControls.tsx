@@ -208,7 +208,7 @@ export const TextInput: React.FC<InputProps> = ({
   };
 
   // Replace any spaces in the label with underscores to create a valid id
-  const inputTxtId = label.replace(/\s+/g, '_');
+  const inputTxtId = label.replace(/\s+/g, '_') + '_' + v4();
   return (
     <ContainerElement
       className={`${tableMode ? 'table-border-light align-content-center ' : 'mb-3'} ${tableMode && stickyCol ? 'positionSticky' : ''} `}
@@ -285,7 +285,7 @@ export const DropdownInput: React.FC<InputProps> = ({
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
   // Replace any spaces in the label with underscores to create a valid id
-  const drdownId = label.replace(/\s+/g, '_');
+  const drdownId = label.replace(/\s+/g, '_') + '_' + v4();
   const [selected, setSelected] = useState<boolean>(false);
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -461,7 +461,7 @@ export const GroupInput: React.FC<InputProps> = ({
   const handleCheckBoxChange = (isChecked: boolean) => {
     onChange(isChecked);
   };
-
+  const groupId = label.replace(/\s+/g, '_') + '_' + v4();
   return (
     <div className="mb-3">
       {' '}
@@ -477,6 +477,7 @@ export const GroupInput: React.FC<InputProps> = ({
       )}
       {/* Label for the group input */}
       <label
+        htmlFor={groupId}
         className={`${
           !isEditing
             ? customLabelCss ?? ''
@@ -486,30 +487,35 @@ export const GroupInput: React.FC<InputProps> = ({
         {label}
       </label>
       {/* Bootstrap row for the group of child fields */}
-      <div className="row">
+      <div className="row" id={groupId}>
         {isEditing ? (
-          children?.map((child, index) => (
-            <div key={index} className="col">
-              {isChildLabel && (
-                <label
-                  className={`${!isEditing ? customLabelCss ?? '' : `form-label ${customEditLabelCss ?? 'custom-label'}`}`}
-                >
-                  {child.label}
-                </label>
-              )}
-              {/* Render each child field as an input element */}
-              <input
-                type={child.type}
-                className={`form-control custom-input  ${customPlaceholderCss ?? ''} ${
-                  customEditInputTextCss ?? 'custom-input-text'
-                } ${error && 'error'}`}
-                placeholder={child.placeholder}
-                value={child.value ?? ''}
-                onChange={(e) => handleTextInputChange(e, child)}
-                aria-label={child.label} // Accessibility
-              />
-            </div>
-          ))
+          children?.map((child, index) => {
+            const grpId = child.label.replace(/\s+/g, '_') + '_' + v4();
+            return (
+              <div key={index} className="col">
+                {isChildLabel && (
+                  <label
+                    htmlFor={grpId}
+                    className={`${!isEditing ? customLabelCss ?? '' : `form-label ${customEditLabelCss ?? 'custom-label'}`}`}
+                  >
+                    {child.label}
+                  </label>
+                )}
+                {/* Render each child field as an input element */}
+                <input
+                  id={grpId}
+                  type={child.type}
+                  className={`form-control custom-input  ${customPlaceholderCss ?? ''} ${
+                    customEditInputTextCss ?? 'custom-input-text'
+                  } ${error && 'error'}`}
+                  placeholder={child.placeholder}
+                  value={child.value ?? ''}
+                  onChange={(e) => handleTextInputChange(e, child)}
+                  aria-label={child.label} // Accessibility
+                />
+              </div>
+            );
+          })
         ) : (
           <span
             aria-label={label}
@@ -557,7 +563,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
     onChange(isChecked);
   };
   // Replace any spaces in the label with underscores to create a valid id
-  const dateRangeId = label.replace(/\s+/g, '_');
+  const dateRangeId = label.replace(/\s+/g, '_') + '_' + v4();
   return (
     <ContainerElement
       className={tableMode ? 'table-border-light align-content-center' : 'mb-3'}
@@ -638,7 +644,7 @@ export const DateInput: React.FC<InputProps> = ({
   };
 
   // Replace any spaces in the label with underscores to create a valid id
-  const dateRangeId = label.replace(/\s+/g, '_');
+  const dateRangeId = label.replace(/\s+/g, '_') + '_' + v4();
   return (
     <ContainerElement
       className={tableMode ? 'table-border-light align-content-center' : 'mb-3'}
@@ -706,7 +712,7 @@ export const CheckBoxInput: React.FC<InputProps> = ({
   srMode,
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
-  const inputTxtId = label.replace(/\s+/g, '_') + v4();
+  const inputTxtId = label.replace(/\s+/g, '_') + '_' + v4();
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.checked); // Toggle the checked state and pass it to the parent component
   };
@@ -776,7 +782,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
     onChange(e.target.value);
   };
 
-  const textAreaId = label.replace(/\s+/g, '_');
+  const textAreaId = label.replace(/\s+/g, '_') + '_' + v4();
   const ContainerElement = tableMode ? 'td' : 'div';
   const cols = textAreaColoum ?? undefined;
   const rows = textAreaRow ?? undefined;
@@ -852,7 +858,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
   tableMode,
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
-  const drdownId = label.replace(/\s+/g, '_');
+  const drdownId = label.replace(/\s+/g, '_') + '_' + v4();
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const handleSelectChange = (selectedValue: string) => {
@@ -1087,7 +1093,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
     }
   }, [options]);
 
-  const inputTxtId = label.replace(/\s+/g, '_');
+  const inputTxtId = label.replace(/\s+/g, '_') + '_' + v4();
   return (
     <ContainerElement
       className={`${tableMode ? 'table-border-light align-content-center ' : 'mb-3'} ${tableMode && stickyCol ? 'positionSticky' : ''} `}

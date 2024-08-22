@@ -20,6 +20,7 @@ const Widget: React.FC<IWidget> = ({
   editMode,
   srMode,
   primaryKeycolumnName,
+  currentPage,
   changeHandler,
   onClickRightIcon,
   onClickLeftIcon,
@@ -72,6 +73,7 @@ const Widget: React.FC<IWidget> = ({
               srMode={srMode ?? false}
               idColumnName={primaryKeycolumnName ?? ''}
               sortHandler={widgetSortHandler}
+              currentPage={currentPage}
             />
           </div>
         </div>

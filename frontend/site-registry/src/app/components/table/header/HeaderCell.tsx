@@ -45,6 +45,7 @@ const HeaderCell: FC<HeaderCellProps> = ({
         currentSortColumn === item.graphQLPropertyName &&
         ascendingSort && (
           <DropdownUpIcon
+            data-testid={`${item.graphQLPropertyName}-table-sort-ascending`}
             className="column-sort-icon"
             onClick={() => {
               sortHandler(item, !ascendingSort);
@@ -56,6 +57,7 @@ const HeaderCell: FC<HeaderCellProps> = ({
         currentSortColumn === item.graphQLPropertyName &&
         !ascendingSort && (
           <DropdownIcon
+            data-testid={`${item.graphQLPropertyName}-table-sort-descending`}
             className="column-sort-icon"
             onClick={() => {
               sortHandler(item, !ascendingSort);
@@ -66,6 +68,7 @@ const HeaderCell: FC<HeaderCellProps> = ({
       {!item.dynamicColumn &&
         currentSortColumn !== item.graphQLPropertyName && (
           <SortIcon
+            data-testid={`${item.graphQLPropertyName}-table-sort`}
             className="column-sort-icon"
             onClick={() => {
               sortHandler(item, !ascendingSort);

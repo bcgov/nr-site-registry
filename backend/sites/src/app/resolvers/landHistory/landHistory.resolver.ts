@@ -18,9 +18,6 @@ export class LandHistoryResolver {
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
   @Query(() => LandHistoryResponse, { name: 'getLandHistoriesForSite' })
-  // TODO: figure out how this works and if we need GenericValidationPipe here
-  // Passing an empty string to a nullable field throws a validation error
-  // @UsePipes(new GenericValidationPipe())
   async getLandHistoriesForSite(
     @Args('siteId', { type: () => String })
     siteId: string,

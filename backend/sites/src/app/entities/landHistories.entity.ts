@@ -65,10 +65,6 @@ export class LandHistories {
   })
   profileDateReceived: Date | null;
 
-  @ManyToOne(() => LandUseCd, (landUseCd) => landUseCd.landHistories)
-  @JoinColumn([{ name: 'lut_code', referencedColumnName: 'code' }])
-  lutCode2: LandUseCd;
-
   @Field(() => LandUseCd)
   @ManyToOne(() => LandUseCd, (landUseCd) => landUseCd.landHistories, {
     eager: true,

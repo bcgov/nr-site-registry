@@ -34,7 +34,7 @@ const Widget: React.FC<IWidget> = ({
               label={''}
               isLabel={false}
               onChange={handleCheckBoxChange ?? (() => {})}
-              srMode = {srMode}
+              srMode={srMode}
             />
           )}
           <div className="w-100 me-1">
@@ -46,25 +46,25 @@ const Widget: React.FC<IWidget> = ({
       {!hideTable && (
         <div className="overflow-auto" style={{ maxHeight: '700px' }}>
           {/* <div> */}
-            <div className='me-1'>
-              <Table
-                label={title ?? ""}
-                isLoading={tableIsLoading ?? RequestStatus.idle}
-                columns={tableColumns ?? []}
-                data={tableData}
-                showPageOptions={false}
-                allowRowsSelect={allowRowsSelect}
-                changeHandler={changeHandler ?? (() => {})}
-                editMode={editMode ?? false}
-                srMode = {srMode ?? false}
-                idColumnName={primaryKeycolumnName ?? ''}
-                sortHandler={widgetSortHandler}
-              />
-            </div>
+          <div className="me-1">
+            <Table
+              label={title ?? ''}
+              isLoading={tableIsLoading ?? RequestStatus.idle}
+              columns={tableColumns ?? []}
+              data={tableData}
+              showPageOptions={false}
+              allowRowsSelect={allowRowsSelect}
+              changeHandler={changeHandler ?? (() => {})}
+              editMode={editMode ?? false}
+              srMode={srMode ?? false}
+              idColumnName={primaryKeycolumnName ?? ''}
+              sortHandler={widgetSortHandler}
+            />
           </div>
-        )}
-      </div>
-    );
-}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default Widget;

@@ -1,8 +1,5 @@
-
 export interface INotationState {
-    siteNotation: [];
-    error?: string;
-    status: string;
+  siteNotation: [];
+  error?: string;
+  status: string;
 }
-
-

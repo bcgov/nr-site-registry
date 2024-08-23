@@ -48,11 +48,21 @@ describe('DropdownService', () => {
     }).compile();
 
     service = module.get<DropdownService>(DropdownService);
-    particRoleRepository = module.get<Repository<ParticRoleCd>>(getRepositoryToken(ParticRoleCd));
-    peopleOrgsRepository = module.get<Repository<PeopleOrgs>>(getRepositoryToken(PeopleOrgs));
-    eventClassCdRepository = module.get<Repository<EventClassCd>>(getRepositoryToken(EventClassCd));
-    eventTypeCdRepository = module.get<Repository<EventTypeCd>>(getRepositoryToken(EventTypeCd));
-    eventParticRoleCdRepository = module.get<Repository<EventParticRoleCd>>(getRepositoryToken(EventParticRoleCd));
+    particRoleRepository = module.get<Repository<ParticRoleCd>>(
+      getRepositoryToken(ParticRoleCd),
+    );
+    peopleOrgsRepository = module.get<Repository<PeopleOrgs>>(
+      getRepositoryToken(PeopleOrgs),
+    );
+    eventClassCdRepository = module.get<Repository<EventClassCd>>(
+      getRepositoryToken(EventClassCd),
+    );
+    eventTypeCdRepository = module.get<Repository<EventTypeCd>>(
+      getRepositoryToken(EventTypeCd),
+    );
+    eventParticRoleCdRepository = module.get<Repository<EventParticRoleCd>>(
+      getRepositoryToken(EventParticRoleCd),
+    );
   });
 
   afterEach(() => {
@@ -104,7 +114,9 @@ describe('DropdownService', () => {
 
       const result = await service.getPeopleOrgsCd();
 
-      expect(result[0].dropdownDto).toEqual(expectedOrgs.map(org => ({ key: org.id, value: org.displayName })));
+      expect(result[0].dropdownDto).toEqual(
+        expectedOrgs.map((org) => ({ key: org.id, value: org.displayName })),
+      );
       expect(peopleOrgsRepository.find).toHaveBeenCalled();
     });
 

@@ -15,47 +15,43 @@ export class NotationService {
 
   async getSiteNotationBySiteId(siteId: string) {
     try {
-      const result =  await this.notationRepository.find({ where: { siteId } });
-      if(result)
-        {
-            const transformedObjects = result.map(item => {
-                const obj = {
-                  id: item.id,
-                  siteId: item.siteId,
-                  psnorgId: item.psnorgId,
-                  completionDate: new Date(item.completionDate).toISOString(),
-                  requirementDueDate:new Date(item.requirementDueDate).toISOString(),
-                  requirementReceivedDate:new Date(item.requirementReceivedDate).toISOString(),
-                  requiredAction: item.requiredAction?.trim(),
-                  note: item.note?.trim(),
-                  etypCode: item.etypCode,
-                  eclsCode: item.eclsCode,
-                }
-                let notationParticipant = []
-                if(item.eventPartics.length > 0)
-                {
-                  notationParticipant = item.eventPartics.map(role => ({
-                        guid: v4(),
-                        eprCode : role.eprCode,
-                        psnorgId: role.psnorgId,
-                        displayName: role.psnorg.displayName,
-                  }));
-                }
-                else
-                {
-                  notationParticipant = [];
-                }
-              return {
-                  ...obj,
-                  notationParticipant: notationParticipant
-                }
-            })
-            const notations = plainToInstance(NotationDto, transformedObjects);
-            return notations;
-        }
-    } 
-    catch (error) 
-    {
+      const result = await this.notationRepository.find({ where: { siteId } });
+      if (result) {
+        const transformedObjects = result.map((item) => {
+          const obj = {
+            id: item.id,
+            siteId: item.siteId,
+            psnorgId: item.psnorgId,
+            completionDate: new Date(item.completionDate).toISOString(),
+            requirementDueDate: new Date(item.requirementDueDate).toISOString(),
+            requirementReceivedDate: new Date(
+              item.requirementReceivedDate,
+            ).toISOString(),
+            requiredAction: item.requiredAction?.trim(),
+            note: item.note?.trim(),
+            etypCode: item.etypCode,
+            eclsCode: item.eclsCode,
+          };
+          let notationParticipant = [];
+          if (item.eventPartics.length > 0) {
+            notationParticipant = item.eventPartics.map((role) => ({
+              guid: v4(),
+              eprCode: role.eprCode,
+              psnorgId: role.psnorgId,
+              displayName: role.psnorg.displayName,
+            }));
+          } else {
+            notationParticipant = [];
+          }
+          return {
+            ...obj,
+            notationParticipant: notationParticipant,
+          };
+        });
+        const notations = plainToInstance(NotationDto, transformedObjects);
+        return notations;
+      }
+    } catch (error) {
       throw error;
     }
   }

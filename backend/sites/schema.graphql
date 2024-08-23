@@ -1,0 +1,720 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type ConditionsText {
+  eventId: String!
+  conditionsComment: String!
+  whoCreated: String!
+  whoUpdated: String!
+  whenCreated: DateTime!
+  whenUpdated: DateTime!
+  rwmFlag: Float!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type BceRegionCd {
+  code: String!
+  description: String!
+}
+
+type Mailout {
+  siteId: String!
+  psnorgId: String!
+  bcerCode: String!
+  displayName: String!
+  commonName: String!
+  commonCityName: String!
+  organizationAddress: String!
+  orgAddress_2: String!
+  orgAddress_3: String!
+  organizationCityName: String!
+  provState: String!
+  postalCode: String!
+  mailingDate: DateTime!
+  responseDate: DateTime!
+  recordDate: DateTime!
+  revise: String!
+  complete: String!
+  completeDate: DateTime!
+  comments: String!
+  updateNotation: String!
+  updateNotationDate: DateTime!
+  whoCreated: String!
+  whenCreated: DateTime!
+  whoUpdated: String!
+  whenUpdated: DateTime!
+}
+
+type DocParticRoleCd {
+  code: String!
+  description: String!
+}
+
+type SiteDocs {
+  id: String!
+  siteId: String!
+  submissionDate: DateTime!
+  documentDate: DateTime
+  title: String!
+  note: String
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  rwmNoteFlag: Float
+  siteDocPartics: [SiteDocPartics!]!
+}
+
+type ParticRoleCd {
+  code: String!
+  description: String!
+}
+
+type SiteParticRoles {
+  prCode: String!
+  spId: String!
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  prCode2: ParticRoleCd!
+}
+
+type LandHistories {
+  siteId: String!
+  lutCode: String!
+  note: String
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  rwmNoteFlag: Float!
+  siteProfile: String
+  profileDateReceived: DateTime
+  landUse: LandUseCd!
+}
+
+type LandUseCd {
+  code: String!
+  description: String!
+}
+
+type SiteProfiles {
+  siteId: String!
+  dateCompleted: DateTime!
+  localAuthDateRecd: DateTime
+  localAuthName: String
+  localAuthAgency: String
+  localAuthAddress1: String
+  localAuthAddress2: String
+  localAuthPhoneAreaCode: String
+  localAuthPhoneNo: String
+  localAuthFaxAreaCode: String
+  localAuthFaxNo: String
+  localAuthDateSubmitted: DateTime
+  localAuthDateForwarded: DateTime
+  rwmDateReceived: DateTime
+  rwmParticId: String
+  rwmPhoneAreaCode: String
+  rwmPhoneNo: String
+  rwmFaxAreaCode: String
+  rwmFaxNo: String
+  investigationRequired: String
+  rwmDateDecision: DateTime
+  siteRegDateRecd: DateTime
+  siteRegDateEntered: DateTime
+  siteRegParticId: String
+  ownerParticId: String
+  siteAddress: String
+  siteCity: String
+  sitePostalCode: String
+  numberOfPids: Float
+  numberOfPins: Float
+  latDegrees: Float
+  latMinutes: Float
+  latSeconds: String
+  longDegrees: Float
+  longMinutes: Float
+  longSeconds: String
+  comments: String
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  localAuthEmail: String
+  plannedActivityComment: String
+  siteDisclosureComment: String
+  govDocumentsComment: String
+}
+
+type SitePartics {
+  id: String!
+  siteId: String!
+  psnorgId: String!
+  effectiveDate: DateTime!
+  endDate: DateTime
+  note: String
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  rwmNoteFlag: Float!
+  siteParticRoles: [SiteParticRoles!]!
+  psnorg: PeopleOrgs!
+}
+
+type SiteDocPartics {
+  id: String!
+  dprCode: String!
+  sdocId: String!
+  spId: String!
+  psnorgId: String!
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  dprCode2: DocParticRoleCd!
+  psnorg: PeopleOrgs!
+}
+
+type SiteCrownLandContaminated {
+  id: String!
+  estimatedCostOfRemediations: Float!
+  actualCostOfRemediations: Float!
+  contaminationOtherDesc: String!
+  whoCreated: String!
+  whoUpdated: String!
+  whenCreated: DateTime!
+  whenUpdated: DateTime!
+}
+
+type PeopleOrgs {
+  id: String!
+  organizationName: String
+  displayName: String!
+  entityType: String!
+  location: String!
+  bcerCode: String!
+  contactName: String!
+  mailUserid: String!
+  lastName: String!
+  firstName: String!
+  middleName: String!
+  whoCreated: String!
+  whoUpdated: String!
+  whenCreated: DateTime!
+  whenUpdated: DateTime!
+  endDate: DateTime!
+}
+
+type EventPartics {
+  eventId: String!
+  spId: String!
+  eprCode: String!
+  psnorgId: String!
+  whoCreated: String!
+  whoUpdated: String!
+  whenCreated: DateTime!
+  whenUpdated: DateTime!
+  rwmFlag: Float!
+  psnorg: PeopleOrgs
+}
+
+type SiteStatusCd {
+  code: String!
+  description: String!
+}
+
+type EventTypeCd {
+  code: String!
+  eclsCode: String!
+  sstCode: String
+  description: String!
+  reqCompletionDate: String!
+  reqRegionalApproval: String!
+  reqRemediationPlan: String!
+  reqRegistrarApproval: String!
+  reqSuccess: String!
+  siteRegistryVisible: String!
+}
+
+type Events {
+  id: String!
+  siteId: String!
+  eventDate: DateTime!
+  completionDate: DateTime
+  etypCode: String!
+  psnorgId: String!
+  spId: String!
+  requiredAction: String
+  note: String
+  regionAppFlag: String
+  regionUserid: String
+  regionDate: DateTime
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  rwmNoteFlag: Float!
+  rwmApprovalDate: DateTime
+  eclsCode: String!
+  requirementDueDate: DateTime
+  requirementReceivedDate: DateTime
+  conditionsTexts: [ConditionsText!]
+  eventPartics: [EventPartics!]
+  eventTypeCd: EventTypeCd!
+  site: Sites!
+}
+
+type SiteAssocs {
+  siteId: String!
+  siteIdAssociatedWith: String!
+  effectiveDate: DateTime!
+  note: String!
+  whoCreated: String!
+  whoUpdated: String!
+  whenCreated: DateTime!
+  whenUpdated: DateTime!
+  rwmFlag: Float!
+  rwmNoteFlag: Float!
+  commonPid: String!
+}
+
+type SiteSubdivisions {
+  siteId: String!
+  subdivId: String!
+  dateNoted: DateTime!
+  initialIndicator: String!
+  whoCreated: String!
+  whoUpdated: String!
+  whenCreated: DateTime!
+  whenUpdated: DateTime!
+  sprofDateCompleted: DateTime!
+  siteSubdivId: String!
+  sendToSr: String!
+}
+
+type ClassificationCd {
+  code: String!
+  description: String!
+}
+
+type SiteRiskCd {
+  code: String!
+  description: String!
+}
+
+type RecentViews {
+  userId: String!
+  siteId: String!
+  address: String!
+  city: String!
+  generalDescription: String
+  whenUpdated: DateTime
+}
+
+type Snapshots {
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  userId: String!
+  siteId: String!
+  transactionId: String!
+  snapshotData: JSON!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type Cart {
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  id: String!
+  userId: String!
+  siteId: String!
+  price: Float!
+  site: Sites
+}
+
+type Folio {
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  id: Float!
+  userId: String!
+  folioId: String!
+  description: String!
+  folioContents: [FolioContents!]
+}
+
+type FolioContents {
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  id: String!
+  siteId: String!
+  folioId: String!
+  folio: Folio!
+  site: Sites!
+}
+
+type Sites {
+  id: String!
+  bcerCode: String!
+  sstCode: String!
+  commonName: String!
+  addrType: String!
+  addrLine_1: String!
+  addrLine_2: String
+  addrLine_3: String
+  addrLine_4: String
+  city: String!
+  provState: String!
+  postalCode: String
+  latdeg: Float
+  longdeg: Float
+  victoriaFileNo: String
+  regionalFileNo: String
+  classCode: String
+  generalDescription: String
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  rwmGeneralDescFlag: Float!
+  consultantSubmitted: String
+  longDegrees: Float
+  longMinutes: Float
+  longSeconds: String
+  latDegrees: Float
+  latMinutes: Float
+  latSeconds: String
+  srStatus: String!
+  latlongReliabilityFlag: String!
+  siteRiskCode: String!
+  geometry: String
+  events: [Events!]!
+  landHistories: [LandHistories!]!
+  mailouts: [Mailout!]!
+  siteAssocs: [SiteAssocs!]!
+  siteAssocs2: [SiteAssocs!]!
+  siteDocs: [SiteDocs!]!
+  sitePartics: [SitePartics!]!
+  siteProfiles: [SiteProfiles!]!
+  siteSubdivisions: SiteSubdivisions!
+  bcerCode2: BceRegionCd!
+  classCode2: ClassificationCd!
+  siteRiskCode2: SiteRiskCd!
+  sstCode2: SiteStatusCd!
+  siteCrownLandContaminated: SiteCrownLandContaminated!
+  recentViewedSites: [RecentViews!]
+  cart: [Cart!]
+  folioContents: [FolioContents!]
+}
+
+type FetchSiteResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [Sites!]!
+}
+
+type FetchSiteDetail {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: Sites!
+}
+
+type SearchSiteResponse {
+  sites: [Sites!]!
+  count: Float!
+  page: Float!
+  pageSize: Float!
+}
+
+type RecentViewResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [RecentViews!]
+}
+
+type DropdownResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [DropdownDto!]
+}
+
+type DropdownResponseWithMetaData {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [NotationDropdownDto!]
+}
+
+type DropdownDto {
+  key: String!
+  value: String!
+}
+
+type NotationDropdownDto {
+  metaData: String!
+  dropdownDto: [DropdownDto!]!
+}
+
+type SnapshotResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [Snapshots!]
+}
+
+type SiteParticsResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [SiteParticsDto!]
+}
+
+type SiteParticsDto {
+  guid: String!
+  id: String!
+  psnorgId: String!
+  effectiveDate: DateTime!
+  endDate: DateTime
+  note: String
+  displayName: String!
+  prCode: String!
+  description: String!
+}
+
+type DisclosureResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [SiteProfiles!]
+}
+
+type CartResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [Cart!]
+}
+
+type LandHistoryResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [LandHistories!]!
+}
+
+type NotationResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [NotationDto!]
+}
+
+type NotationDto {
+  id: String!
+  psnorgId: String!
+  siteId: String!
+  completionDate: DateTime
+  etypCode: String!
+  eclsCode: String!
+  requiredAction: String
+  note: String
+  requirementDueDate: DateTime
+  requirementReceivedDate: DateTime
+  notationParticipant: [NotationParticipantDto!]
+}
+
+type NotationParticipantDto {
+  guid: String!
+  eprCode: String!
+  psnorgId: String!
+  displayName: String!
+}
+
+type DocumentResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [DocumentDto!]
+}
+
+type DocumentDto {
+  id: String!
+  psnorgId: String!
+  displayName: String!
+  siteId: String!
+  submissionDate: String!
+  documentDate: String
+  title: String!
+}
+
+type FolioResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [Folio!]
+}
+
+type FolioContentResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [FolioContents!]
+}
+
+type AssociatedSiteResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [AssociatedSiteDto!]
+}
+
+type AssociatedSiteDto {
+  guid: String!
+  siteId: String!
+  siteIdAssociatedWith: String!
+  effectiveDate: DateTime!
+  note: String
+}
+
+type Query {
+  sites: FetchSiteResponse!
+  searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
+  findSiteBySiteId(siteId: String!): FetchSiteDetail!
+  searchSiteIds(searchParam: String!): DropdownResponse!
+  getRecentViewsByUserId(userId: String!): RecentViewResponse!
+  getSnapshots: SnapshotResponse!
+  getSnapshotsByUserId(userId: String!): SnapshotResponse!
+  getSnapshotsBySiteId(siteId: String!): SnapshotResponse!
+  getSnapshotsById(id: Int!): SnapshotResponse!
+  getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
+  getParticipantRoleCd: DropdownResponse!
+  getPeopleOrgsCd: DropdownResponseWithMetaData!
+  getNotationTypeCd: DropdownResponseWithMetaData!
+  getNotationClassCd: DropdownResponse!
+  getNotationParticipantRoleCd: DropdownResponse!
+  getSiteDisclosureBySiteId(siteId: String!): DisclosureResponse!
+  getCartItemsForUser(userId: String!): CartResponse!
+  getLandHistoriesForSite(siteId: String!, searchTerm: String, sortDirection: String): LandHistoryResponse!
+  getSiteNotationBySiteId(siteId: String!): NotationResponse!
+  getSiteDocumentsBySiteId(siteId: String!): DocumentResponse!
+  getFolioItemsForUser(userId: String!): FolioResponse!
+  getSitesForFolio(folioDTO: FolioMinDTO!): FolioContentResponse!
+  getAssociatedSitesBySiteId(siteId: String!): AssociatedSiteResponse!
+}
+
+input FolioMinDTO {
+  id: Float!
+  userId: String!
+}
+
+type Mutation {
+  addRecentView(recentView: RecentViewDto!): RecentViewResponse!
+  createSnapshot(snapshot: SnapshotDto!): SnapshotResponse!
+  createSnapshotForSites(inputDto: [CreateSnapshotDto!]!): SnapshotResponse!
+  addCartItem(cartDTO: [CartDTO!]!): CartResponse!
+  deleteCartItem(cartDeleteDTO: [CartDeleteDTO!]!): CartResponse!
+  deleteCartItemWithSiteId(cartDeleteDTO: [CartDeleteDTOWithSiteID!]!): CartResponse!
+  addFolioItem(folioDTO: FolioDTO!): FolioResponse!
+  addSiteToFolio(folioDTO: [FolioContentDTO!]!): FolioResponse!
+  updateFolioItem(folioDTO: [FolioDTO!]!): FolioResponse!
+  deleteFolioItem(folioId: Float!): FolioResponse!
+  deleteSitesInFolio(folioDTO: [FolioContentDTO!]!): FolioResponse!
+}
+
+input RecentViewDto {
+  userId: String!
+  siteId: String!
+  address: String!
+  city: String!
+  generalDescription: String
+  whenUpdated: DateTime
+}
+
+input SnapshotDto {
+  userId: String!
+  siteId: String!
+  transactionId: String!
+  snapshotData: JSON!
+  created: DateTime
+}
+
+input CreateSnapshotDto {
+  siteId: String!
+}
+
+input CartDTO {
+  userId: String!
+  siteId: String!
+  price: Float!
+  whoCreated: String!
+}
+
+input CartDeleteDTO {
+  userId: String!
+  cartId: String!
+}
+
+input CartDeleteDTOWithSiteID {
+  userId: String!
+  siteId: String!
+}
+
+input FolioDTO {
+  id: Float!
+  userId: String!
+  description: String!
+  folioId: String!
+  whoCreated: String!
+  whenUpdated: String!
+}
+
+input FolioContentDTO {
+  siteId: String!
+  id: Float!
+  folioId: String!
+  userId: String!
+  whoCreated: String!
+}

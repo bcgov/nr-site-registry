@@ -12,6 +12,7 @@ import notationParticipantReducer from './features/details/notations/NotationSli
 import DropdownReducer from './features/details/dropdowns/DropdownSlice';
 import siteDisclosureReducer from './features/details/disclosure/DisclosureSlice';
 import cartReducer from './features/cart/CartSlice';
+import landUsesReducer from './features/details/landUses/LandUsesSlice';
 import documentsReducer from './features/details/documents/DocumentsSlice';
 import snapshotsReducer from './features/details/snapshot/SnapshotSlice';
 import folioReducer from './features/folios/FolioSlice';
@@ -28,6 +29,7 @@ export const store = configureStore({
     siteDisclosure: siteDisclosureReducer,
     dropdown: DropdownReducer,
     cart: cartReducer,
+    landUses: landUsesReducer,
     documents: documentsReducer,
     folio: folioReducer,
     snapshots: snapshotsReducer,

@@ -17,6 +17,8 @@ import {
   IconButton,
 } from '../../input-controls/InputControls';
 import { ChangeTracker } from '../../common/IChangeType';
+import { get } from '../utils';
+
 interface TableBodyProps {
   isLoading: RequestStatus;
   columns: TableColumn[];
@@ -387,7 +389,7 @@ const TableBody: FC<TableBodyProps> = ({
   };
 
   const getValue = (rowIndex: number, propertyName: string) => {
-    return data[rowIndex][propertyName];
+    return get(data[rowIndex], propertyName);
   };
 
   const getDataRow = (rowIndex: number) => {

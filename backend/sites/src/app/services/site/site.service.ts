@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import {
   FetchSiteDetail,
   FetchSiteResponse,
@@ -8,8 +8,7 @@ import {
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteUtil } from '../../utils/site.util';
-import { RecentViews } from 'src/app/entities/recentViews.entity';
-import { DropdownResponse } from 'src/app/dto/dropdown.dto';
+
 /**
  * Nestjs Service For Region Entity
  */

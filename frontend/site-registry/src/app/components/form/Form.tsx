@@ -85,8 +85,6 @@ const Form: React.FC<IFormRendererProps> = ({
                   allowNumbersOnly={field.allowNumbersOnly}
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
-                  onClickLeftIcon={onClickLeftIcon}
-                  onClickRightIcon={onClickRightIcon}
                   isLoading={isLoading}
                   customInfoMessage={field.customInfoMessage}
                 />
@@ -149,8 +147,6 @@ const Form: React.FC<IFormRendererProps> = ({
                   type={field.type}
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
-                  customRightSearchIcon={field.customRightSearchIcon}
-                  customLeftSearchIcon={field.customLeftSearchIcon}
                   customPlaceholderCss={field.customPlaceholderCss}
                 />
               )}

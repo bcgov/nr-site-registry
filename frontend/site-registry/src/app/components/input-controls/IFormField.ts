@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { RequestStatus } from '../../helpers/requests/status';
 
 export enum FormFieldType {
   Text = 'text',
@@ -49,8 +50,6 @@ export interface IFormField {
   value?: any;
   customLinkValue?: any;
   customIcon?: ReactNode;
-  customRightSearchIcon?: ReactNode;
-  customLeftSearchIcon?: ReactNode;
   isChecked?: boolean;
   isDateRange?: boolean;
   children?: IFormField[];
@@ -58,6 +57,7 @@ export interface IFormField {
   isDisabled?: boolean;
   suffix?: string;
   isImage?: boolean;
+  isLoading?: RequestStatus;
   customInfoMessage?: ReactNode;
   validation?: {
     required?: boolean;

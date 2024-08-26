@@ -20,7 +20,6 @@ import {
 import { ChangeTracker } from '../../common/IChangeType';
 interface TableBodyProps {
   isLoading: RequestStatus;
-  isListLoading?: RequestStatus;
   columns: TableColumn[];
   data: any;
   allowRowsSelect: boolean;
@@ -29,8 +28,6 @@ interface TableBodyProps {
   srMode?: boolean;
   idColumnName: string;
   rowDeleteHandler: (data: any) => void;
-  onClickLeftIcon: (data: any) => void;
-  onClickRightIcon: (data: any) => void;
   allRowsSelected: boolean;
   currentPage: number;
   allRowsSelectedPages: number[];
@@ -45,7 +42,6 @@ interface SelectedRowsType {
 
 const TableBody: FC<TableBodyProps> = ({
   isLoading,
-  isListLoading,
   columns,
   data,
   allowRowsSelect,
@@ -54,8 +50,6 @@ const TableBody: FC<TableBodyProps> = ({
   srMode,
   idColumnName,
   rowDeleteHandler,
-  onClickLeftIcon,
-  onClickRightIcon,
   allRowsSelected,
   currentPage,
   allRowsSelectedPages,
@@ -206,30 +200,14 @@ const TableBody: FC<TableBodyProps> = ({
           onChange={(value) =>
             tableRecordChangeHandler(rowKey, field.graphQLPropertyName, value)
           }
-          onClickLeftIcon={(value) =>
-            onClickLeftIcon({
-              row: getDataRow(rowKey),
-              property: field.graphQLPropertyName,
-              value: value,
-            })
-          }
-          onClickRightIcon={(value) =>
-            onClickRightIcon({
-              row: getDataRow(rowKey),
-              property: field.graphQLPropertyName,
-              value: value,
-            })
-          }
           type={FormFieldType.Text}
           validation={field.validation}
           allowNumbersOnly={field.allowNumbersOnly}
           isEditing={editMode ?? true}
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
-          customRightSearchIcon={field.customRightSearchIcon}
-          customLeftSearchIcon={field.customLeftSearchIcon}
           customPlaceholderCss={field.customPlaceholderCss}
-          isLoading={isListLoading}
+          isLoading={field.isLoading}
           customInfoMessage={field.customInfoMessage}
         />
       );

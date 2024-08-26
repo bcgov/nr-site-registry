@@ -170,12 +170,17 @@ export const isUserOfType = (roleType:UserRoleType) => {
     if(user !== null)
     {
       const userRoles: any = user.profile?.role;
+      
+      const externalUserRole:string =  process.env.REACT_APP_SITE_EXTERNAL_USER_ROLE ||((window as any)._env_ && (window as any)._env_.REACT_APP_SITE_EXTERNAL_USER_ROLE)
+      const internalUserRole:string =  process.env.REACT_APP_SITE_INTERNAL_USER_ROLE ||((window as any)._env_ && (window as any)._env_.REACT_APP_SITE_INTERNAL_USER_ROLE)
+      const srUserRole:string =  process.env.REACT_APP_SITE_SR_ROLE ||((window as any)._env_ && (window as any)._env_.REACT_APP_SITE_INTERNAL_SR_ROLE )
+
       switch(roleType)
       {        
          case 'client':
         
         
-          if(userRoles.includes("formsflow-client") || userRoles.includes("site-external-user"))
+          if(userRoles.includes(externalUserRole) || userRoles.includes("site-external-user"))
           {
               return true;
           }
@@ -184,7 +189,7 @@ export const isUserOfType = (roleType:UserRoleType) => {
             return false;
           }        
          case 'internal':         
-          if(userRoles.includes("site-internal-user"))
+          if(userRoles.includes(internalUserRole) || userRoles.includes("site-internal-user"))
           {
               return true;
           }
@@ -193,7 +198,7 @@ export const isUserOfType = (roleType:UserRoleType) => {
             return false;
           }  
           case 'sr':         
-          if(userRoles.includes("site-site-registrar"))
+          if(userRoles.includes(srUserRole) || userRoles.includes("site-site-registrar"))
           {
               return true;
           }

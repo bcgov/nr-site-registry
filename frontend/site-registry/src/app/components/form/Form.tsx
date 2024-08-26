@@ -21,8 +21,6 @@ interface IFormRendererProps {
   editMode?: boolean;
   isLoading?: RequestStatus;
   srMode?: boolean;
-  onClickLeftIcon?: () => void;
-  onClickRightIcon?: () => void;
   handleInputChange: (
     graphQLPropertyName: any,
     value: string | [Date, Date],
@@ -36,8 +34,6 @@ const Form: React.FC<IFormRendererProps> = ({
   srMode,
   isLoading,
   handleInputChange,
-  onClickLeftIcon,
-  onClickRightIcon,
 }) => {
   return (
     <>

@@ -8,7 +8,12 @@ interface AvatarProps {
   customTextCss?: string;
 }
 
-const Avatar: React.FC<AvatarProps> = ({ firstName, lastName, customImageCss, customTextCss }) => {
+const Avatar: React.FC<AvatarProps> = ({
+  firstName,
+  lastName,
+  customImageCss,
+  customTextCss,
+}) => {
   // Function to get initials
   const getInitials = (): string => {
     if (!firstName && !lastName) return '?';
@@ -18,8 +23,13 @@ const Avatar: React.FC<AvatarProps> = ({ firstName, lastName, customImageCss, cu
   };
 
   return (
-    <div className={`d-flex align-items-center justify-content-center ${customImageCss ?? 'avatar-image'}`} aria-label="User profile image">
-      <span className={`${customTextCss ?? 'avatar-txt'}`}>{getInitials()}</span>
+    <div
+      className={`d-flex align-items-center justify-content-center ${customImageCss ?? 'avatar-image'}`}
+      aria-label="User profile image"
+    >
+      <span className={`${customTextCss ?? 'avatar-txt'}`}>
+        {getInitials()}
+      </span>
     </div>
   );
 };

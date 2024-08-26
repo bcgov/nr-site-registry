@@ -11,30 +11,6 @@ export class SnapshotResponse extends ResponseDto {
 }
 
 @InputType()
-export class SnapshotDto {
-  @Field()
-  @IsNotEmpty()
-  @IsString()
-  userId: string;
-
-  @Field()
-  @IsNotEmpty()
-  @IsString()
-  siteId: string;
-
-  @Field()
-  @IsNotEmpty()
-  @IsString()
-  transactionId: string;
-
-  @Field(() => GraphQLJSON)
-  snapshotData: any;
-
-  @Field({ nullable: true })
-  created: Date | null;
-}
-
-@InputType()
 export class CreateSnapshotDto {
   @Field()
   @IsNotEmpty()

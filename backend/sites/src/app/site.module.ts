@@ -60,6 +60,8 @@ import { DisclosureResolver } from './resolvers/disclosure/disclosure.resolver';
 import { CartResolver } from './resolvers/cart/cart.resolver';
 import { CartService } from './services/cart/cart.service';
 import { Cart } from './entities/cart.entity';
+import { LandHistoryResolver } from './resolvers/landHistory/landHistory.resolver';
+import { LandHistoryService } from './services/landHistory/landHistory.service';
 import { NotationResolver } from './resolvers/notation/notation.resolver';
 import { NotationService } from './services/notation/notation.service';
 import { DocumentResolver } from './resolvers/document/document.resolver';
@@ -152,6 +154,8 @@ import { AssociatedSiteService } from './services/associatedSite/associatedSite.
     GenericResponseProvider,
     CartResolver,
     CartService,
+    LandHistoryResolver,
+    LandHistoryService,
     NotationResolver,
     NotationService,
     DocumentResolver,

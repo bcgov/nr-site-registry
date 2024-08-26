@@ -17,7 +17,6 @@ import {
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-
 /**
  * Application Module Wrapping All Functionality For User Micro Service
  */
@@ -68,7 +67,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   ],
   controllers: [AppController],
   providers: [
-    AppService,   
+    AppService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
@@ -83,4 +82,4 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     },
   ],
 })
-export class AppModule{}
+export class AppModule {}

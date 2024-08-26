@@ -1,4 +1,4 @@
-import { render, screen} from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import Disclosure from './Disclosure';
 import { Provider, useSelector } from 'react-redux';
 import configureStore from 'redux-mock-store';

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FormFieldType, IFormField } from './IFormField';
 import infoIcon from '../../images/info-icon.png';
 import { formatDate, formatDateRange } from '../../helpers/utility';
@@ -26,8 +26,6 @@ interface InputProps extends IFormField {
   isLoading?: RequestStatus;
   srMode?: boolean;
   onChange: (value: any) => void;
-  onClickLeftIcon?: (event: any) => void;
-  onClickRightIcon?: (event: any) => void;
 }
 
 const renderTableCell = (
@@ -980,8 +978,6 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   customEditLabelCss,
   customEditInputTextCss,
   customPlaceholderCss,
-  customLeftSearchIcon,
-  customRightSearchIcon,
   customLeftIconCss,
   customRightIconCss,
   customErrorCss,
@@ -989,8 +985,6 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   stickyCol,
   isLoading,
   onChange,
-  onClickLeftIcon,
-  onClickRightIcon,
   tableMode,
 }) => {
   const resetDetails = useSelector(resetSiteDetails);
@@ -1000,6 +994,18 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   const [menuPosition, setMenuPosition] = useState<'bottom' | 'top'>('bottom');
   const divRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [hasinfoMsg, setHasInfoMsg] = useState<React.ReactNode | null>(null);
+
+  useEffect(() => {
+    if (React.isValidElement(customInfoMessage)) {
+      const elementProps = (customInfoMessage as React.ReactElement).props;
+      if (Object.keys(elementProps).length > 0) {
+        setHasInfoMsg(customInfoMessage);
+      }
+    } else {
+      setHasInfoMsg(null);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (resetDetails) {
@@ -1023,36 +1029,40 @@ export const SearchCustomInput: React.FC<InputProps> = ({
     return true;
   };
 
-  const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
+  const handleTextInputChange = (value: any) => {
+    // console.log('hasinfoMsg1 --> ', hasinfoMsg);
+    const inputValue = value;
     validateInput(inputValue);
-
+    setHasInfoMsg(null);
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
+        if (inputValue.trim().toString() === '') {
+          setHasInfoMsg(customInfoMessage);
+          setIsOpen(false);
+        } else {
+          setHasInfoMsg(null);
+          setIsOpen(true);
+        }
         onChange(inputValue); // Update parent component state only if validation passes
+      } else {
+        setHasInfoMsg(customInfoMessage);
+        setIsOpen(false);
       }
     } else {
+      setHasInfoMsg(null);
       onChange(inputValue);
-    }
-
-    if (inputValue.trim().toString() === '') {
-      setIsOpen(false);
-    } else {
-      setIsOpen(true);
     }
   };
 
   const handleSelectInputChange = (selectedValue: any) => {
-    setIsOpen(false);
-    validateInput(selectedValue);
-    if (allowNumbersOnly) {
-      if (validateInput(selectedValue)) {
-        onChange(selectedValue); // Update parent component state only if validation passes
-      }
-    } else {
-      onChange(selectedValue);
-    }
+    setHasInfoMsg(customInfoMessage);
+    handleTextInputChange(selectedValue);
   };
+
+  const closeSearch = useCallback(() => {
+    setHasInfoMsg(null);
+    onChange('');
+  }, [handleTextInputChange]);
 
   const adjustMenuPosition = () => {
     if (inputRef.current && divRef.current) {
@@ -1074,6 +1084,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
     if (divRef.current != null) {
       // Check if the clicked target is outside the div element
       if (divRef.current && !divRef.current.contains(event.target as Node)) {
+        setHasInfoMsg(null);
         setIsOpen(false); // Close the div
       }
     }
@@ -1121,30 +1132,29 @@ export const SearchCustomInput: React.FC<InputProps> = ({
             }  ${error && 'error'}`}
             placeholder={placeholder}
             value={value ?? ''}
-            onChange={handleTextInputChange}
+            onChange={(event) => {
+              handleTextInputChange(event.target.value);
+            }}
             aria-label={label} // Accessibility
             required={error ? true : false}
           />
-          {customRightSearchIcon && value.length <= 0 ? (
+          {value.length <= 0 ? (
             <span
               id="right-icon"
               data-testid="right-icon"
               className={`${customRightIconCss ?? 'custom-search-icon-position custom-search-icon position-absolute px-2'}`}
-              onClick={onClickRightIcon}
             >
-              {customRightSearchIcon}
+              <MagnifyingGlassIcon />
             </span>
           ) : (
-            customLeftSearchIcon && (
-              <span
-                data-testid="left-icon"
-                id="left-icon"
-                className={`${customLeftIconCss ?? 'custom-clear-icon-position custom-search-icon position-absolute px-2'}`}
-                onClick={onClickLeftIcon}
-              >
-                {customLeftSearchIcon}
-              </span>
-            )
+            <span
+              data-testid="left-icon"
+              id="left-icon"
+              className={`${customLeftIconCss ?? 'custom-clear-icon-position custom-search-icon position-absolute px-2'}`}
+              onClick={closeSearch}
+            >
+              <CircleXMarkIcon />
+            </span>
           )}
 
           {/* Dropdown menu */}
@@ -1200,7 +1210,6 @@ export const SearchCustomInput: React.FC<InputProps> = ({
                       className="custom-search-input-item d-flex w-100 align-items-center"
                       role="menuitem"
                       aria-label={item.value}
-                      // aria-current={currentLanguage === item.key ? 'true' : undefined}
                       tabIndex={0} // Allow keyboard focus
                       key={item.key}
                       onClick={() => {
@@ -1211,19 +1220,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
                     </div>
                   ))
                 ) : (
-                  <div className="p-2">
-                    {customInfoMessage}
-                    {/* <img
-                              src={infoIcon}
-                              alt="info"
-                              aria-hidden="true"
-                              role="img"
-                              aria-label="User image"
-                            />
-                            <span aria-label={label} className="px-2 custom-not-found">
-                              No results found.
-                            </span> */}
-                  </div>
+                  <div className="p-2">{customInfoMessage}</div>
                 )}
               </div>
             )
@@ -1241,6 +1238,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
           {error}
         </span>
       )}
+      {hasinfoMsg !== null && !isOpen && hasinfoMsg}
     </ContainerElement>
   );
 };

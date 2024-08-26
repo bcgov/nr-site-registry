@@ -22,7 +22,9 @@ describe('DocumentService', () => {
     }).compile();
 
     service = module.get<DocumentService>(DocumentService);
-    siteDocsRepository = module.get<Repository<SiteDocs>>(getRepositoryToken(SiteDocs));
+    siteDocsRepository = module.get<Repository<SiteDocs>>(
+      getRepositoryToken(SiteDocs),
+    );
   });
 
   afterEach(() => {
@@ -65,7 +67,7 @@ describe('DocumentService', () => {
           id: '1',
           siteId: 'site1',
           title: 'Document 1',
-          note:'',
+          note: '',
           submissionDate: new Date(),
           documentDate: new Date(),
           whoCreated: 'whoCreated',
@@ -95,7 +97,9 @@ describe('DocumentService', () => {
           site: sampleSites[0],
         },
       ];
-      jest.spyOn(siteDocsRepository, 'find').mockResolvedValueOnce(mockSiteDocs);
+      jest
+        .spyOn(siteDocsRepository, 'find')
+        .mockResolvedValueOnce(mockSiteDocs);
 
       const result = await service.getSiteDocumentsBySiteId(siteId);
 
@@ -104,8 +108,12 @@ describe('DocumentService', () => {
       expect(result.length).toBe(1);
       expect(result[0].id).toEqual(mockSiteDocs[0].id);
       expect(result[0].siteId).toEqual(mockSiteDocs[0].siteId);
-      expect(result[0].psnorgId).toEqual(mockSiteDocs[0].siteDocPartics[0].psnorgId);
-      expect(result[0].displayName).toEqual(mockSiteDocs[0].siteDocPartics[0].psnorg.displayName);
+      expect(result[0].psnorgId).toEqual(
+        mockSiteDocs[0].siteDocPartics[0].psnorgId,
+      );
+      expect(result[0].displayName).toEqual(
+        mockSiteDocs[0].siteDocPartics[0].psnorg.displayName,
+      );
     });
 
     it('should return empty array when siteId does not exist', async () => {
@@ -121,78 +129,82 @@ describe('DocumentService', () => {
 
     it('should throw an error when repository throws an error', async () => {
       const siteId = 'site1';
-      const mockError = new Error('Failed to retrieve site documents by site id.');
+      const mockError = new Error(
+        'Failed to retrieve site documents by site id.',
+      );
       jest.spyOn(siteDocsRepository, 'find').mockRejectedValueOnce(mockError);
 
-      await expect(service.getSiteDocumentsBySiteId(siteId)).rejects.toThrow(mockError);
+      await expect(service.getSiteDocumentsBySiteId(siteId)).rejects.toThrow(
+        mockError,
+      );
     });
   });
 
   it('should transform and validate document data correctly', async () => {
     const siteId = 'site1';
     const mockPeopleOrgs: PeopleOrgs[] = [
-        {
-          id: 'org1',
-          organizationName: 'Organization 1', // Adding organizationName
-          displayName: 'Participant 1',
-          entityType: 'entityType',
-          location: 'location',
-          bcerCode: 'bcerCode',
-          contactName: 'contactName',
-          mailUserid: 'mailUserid',
-          lastName: 'lastName',
-          firstName: 'firstName',
-          middleName: 'middleName',
-          whoCreated: 'whoCreated',
-          whoUpdated: null,
-          whenCreated: new Date(),
-          whenUpdated: null,
-          endDate: null, // Adjust as per your entity definition
-          eventPartics: [], // Populate if needed
-          mailouts: [], // Populate if needed
-          bcerCode2: null, // Assuming BceRegionCd relationship is not included here
-          sisAddresses: [], // Populate if needed
-          siteCrownLandContaminateds: [], // Populate if needed
-          siteDocPartics: [], // Populate if needed
-          sitePartics: [], // Populate if needed
-          siteStaffs: [], // Populate if needed
-        },
-      ];
-      const mockSiteDocs: SiteDocs[] = [
-        {
-          id: '1',
-          siteId: 'site1',
-          title: 'Document 1',
-          note:'',
-          submissionDate: new Date(),
-          documentDate: new Date(),
-          whoCreated: 'whoCreated',
-          whoUpdated: null,
-          whenCreated: new Date(),
-          whenUpdated: null,
-          rwmFlag: 1,
-          rwmNoteFlag: null,
-          siteDocPartics: [
-            {
-              id: '1',
-              sdocId: '1',
-              spId: 'sp1',
-              psnorgId: 'org1',
-              whoCreated: 'whoCreated',
-              whoUpdated: null,
-              whenCreated: new Date(),
-              whenUpdated: null,
-              rwmFlag: 1,
-              dprCode: 'dpr1',
-              dprCode2: null, // Assuming this relationship is already defined elsewhere
-              psnorg: mockPeopleOrgs[0], // Assigning PeopleOrgs entity
-              sdoc: null, // Assigning SiteDocs entity
-              sp: null, // Assuming SitePartics entity is null for now
-            },
-          ],
-          site: sampleSites[0],
-        },
-      ];
+      {
+        id: 'org1',
+        organizationName: 'Organization 1', // Adding organizationName
+        displayName: 'Participant 1',
+        entityType: 'entityType',
+        location: 'location',
+        bcerCode: 'bcerCode',
+        contactName: 'contactName',
+        mailUserid: 'mailUserid',
+        lastName: 'lastName',
+        firstName: 'firstName',
+        middleName: 'middleName',
+        whoCreated: 'whoCreated',
+        whoUpdated: null,
+        whenCreated: new Date(),
+        whenUpdated: null,
+        endDate: null, // Adjust as per your entity definition
+        eventPartics: [], // Populate if needed
+        mailouts: [], // Populate if needed
+        bcerCode2: null, // Assuming BceRegionCd relationship is not included here
+        sisAddresses: [], // Populate if needed
+        siteCrownLandContaminateds: [], // Populate if needed
+        siteDocPartics: [], // Populate if needed
+        sitePartics: [], // Populate if needed
+        siteStaffs: [], // Populate if needed
+      },
+    ];
+    const mockSiteDocs: SiteDocs[] = [
+      {
+        id: '1',
+        siteId: 'site1',
+        title: 'Document 1',
+        note: '',
+        submissionDate: new Date(),
+        documentDate: new Date(),
+        whoCreated: 'whoCreated',
+        whoUpdated: null,
+        whenCreated: new Date(),
+        whenUpdated: null,
+        rwmFlag: 1,
+        rwmNoteFlag: null,
+        siteDocPartics: [
+          {
+            id: '1',
+            sdocId: '1',
+            spId: 'sp1',
+            psnorgId: 'org1',
+            whoCreated: 'whoCreated',
+            whoUpdated: null,
+            whenCreated: new Date(),
+            whenUpdated: null,
+            rwmFlag: 1,
+            dprCode: 'dpr1',
+            dprCode2: null, // Assuming this relationship is already defined elsewhere
+            psnorg: mockPeopleOrgs[0], // Assigning PeopleOrgs entity
+            sdoc: null, // Assigning SiteDocs entity
+            sp: null, // Assuming SitePartics entity is null for now
+          },
+        ],
+        site: sampleSites[0],
+      },
+    ];
     jest.spyOn(siteDocsRepository, 'find').mockResolvedValueOnce(mockSiteDocs);
 
     const result = await service.getSiteDocumentsBySiteId(siteId);
@@ -204,7 +216,9 @@ describe('DocumentService', () => {
     // Validate individual fields
     expect(result[0].id).toEqual(mockSiteDocs[0].id);
     expect(result[0].siteId).toEqual(mockSiteDocs[0].siteId);
-    expect(result[0].psnorgId).toEqual(mockSiteDocs[0].siteDocPartics[0].psnorgId);
+    expect(result[0].psnorgId).toEqual(
+      mockSiteDocs[0].siteDocPartics[0].psnorgId,
+    );
     // expect(result[0].displayName).toEqual(mockSiteDocs[0].siteDocPartics[0].displayName);
   });
 });

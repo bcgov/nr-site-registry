@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,8 +28,14 @@ import { GRAPHQL } from '../../../helpers/endpoints';
 import { print } from 'graphql';
 import { graphqlSearchSiteIdsQuery } from '../../site/graphql/Associate';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';
-import { GetAssociateConfig } from './AssociateConfig';
+import {
+  GetAssociateConfig,
+  UpdateDisplayTypeParams,
+  updateTableColumn,
+} from './AssociateConfig';
 import infoIcon from '../../../images/info-icon.png';
+import { TableColumn } from '../../../components/table/TableColumn';
+import { FormFieldType } from '../../../components/input-controls/IFormField';
 
 const Associate = () => {
   const {
@@ -42,6 +48,8 @@ const Associate = () => {
   const [formData, setFormData] = useState<
     { [key: string]: any | [Date, Date] }[]
   >([]);
+  const [updateForm, setUpdateForm] =
+    useState<{ [key: string]: any | [Date, Date] }[]>(formData);
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
@@ -49,14 +57,15 @@ const Associate = () => {
     { siteId: String; siteIdAssociatedWith: string; guid: string }[]
   >([]);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
-  const [isListloading, setisListLoading] = useState<RequestStatus>(
-    RequestStatus.loading,
-  );
   const [searchParam, setSearchParam] = useState('');
   const [internalRow, setInternalRow] = useState(associateColumnInternal);
   const [isDelete, setIsDelete] = useState(false);
+  const [isRecordExist, setIsRecordExist] = useState<{ [key: string]: any }>(
+    {},
+  );
+  const [isInfoMsg, setIsInfoMsg] = useState(false);
+  const [currentRecordId, setCurrentRecordId] = useState('');
 
-  // const { associateColumnInternal, srVisibilityAssocConfig} = GetConfig();
   const { id } = useParams();
   const dispatch = useDispatch<AppDispatch>();
   const mode = useSelector(siteDetailsMode);
@@ -65,17 +74,13 @@ const Associate = () => {
   const loggedInUser = getUser();
 
   useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
-      setUserType(UserType.External);
-    } else if (
-      loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
-    ) {
-      setUserType(UserType.Internal);
-    } else {
-      // not logged in
-      setUserType(UserType.External);
-    }
-  }, []);
+    const userType = loggedInUser?.profile.preferred_username?.includes('bceid')
+      ? UserType.External
+      : loggedInUser?.profile.preferred_username?.includes('idir')
+        ? UserType.Internal
+        : UserType.External;
+    setUserType(userType);
+  }, [loggedInUser]);
 
   useEffect(() => {
     setViewMode(mode);
@@ -84,28 +89,39 @@ const Associate = () => {
   useEffect(() => {
     if (resetDetails) {
       setFormData(sitesAssociated);
+      // need some updated array on click of save button on top
+      setUpdateForm(sitesAssociated);
     }
   }, [resetDetails]);
 
   useEffect(() => {
-    setFormData(sitesAssociated);
-  }, [id]);
+    if (sitesAssociated && sitesAssociated.length > 0) {
+      setFormData(sitesAssociated);
+      // need some updated array on click of save button on top
+      setUpdateForm(sitesAssociated);
+    } else {
+      setLoading(RequestStatus.loading);
+    }
+  }, [id, sitesAssociated]);
 
-  const clearSearch = () => {
+  const clearSearch = useCallback(() => {
     setSearchTerm('');
     setFormData(sitesAssociated);
-  };
+    // need some updated array on click of save button on top
+    setUpdateForm(sitesAssociated);
+  }, [sitesAssociated]);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = event.target.value;
-    setSearchTerm(searchTerm);
-    const filteredData =
-      sitesAssociated &&
-      sitesAssociated.filter((associate: any) => {
-        return deepSearch(associate, searchTerm.toLowerCase().trim());
-      });
-    setFormData(filteredData);
-  };
+  const handleSearchChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const searchTerm = event.target.value;
+      setSearchTerm(searchTerm);
+      const filteredData = sitesAssociated.filter((associate: any) =>
+        deepSearch(associate, searchTerm.toLowerCase().trim()),
+      );
+      setFormData(filteredData);
+    },
+    [sitesAssociated],
+  );
 
   const deepSearch = (obj: any, searchTerm: string): boolean => {
     for (const key in obj) {
@@ -147,16 +163,16 @@ const Associate = () => {
     return false;
   };
 
-  const handleSortChange = (
-    graphQLPropertyName: any,
-    value: String | [Date, Date],
-  ) => {
-    setSortByValue((prevData) => ({
-      ...prevData,
-      [graphQLPropertyName]: value,
-    }));
-    sortItems(value, formData);
-  };
+  const handleSortChange = useCallback(
+    (graphQLPropertyName: any, value: string | [Date, Date]) => {
+      setSortByValue((prevData) => ({
+        ...prevData,
+        [graphQLPropertyName]: value,
+      }));
+      sortItems(value, formData);
+    },
+    [formData],
+  );
 
   const sortItems = (sortBy: any, data: any) => {
     let sorted = [...data];
@@ -201,28 +217,21 @@ const Associate = () => {
         });
         return response.data.data.searchSiteIds;
       } else {
-        throw new Error('Invalid searchParam'); // Handle invalid input
+        throw new Error('Invalid searchParam');
       }
     } catch (error) {
       throw error;
     }
   };
 
-  const [isRecordExist, setIsRecordExist] = useState<{ [key: string]: any }>(
-    {},
-  );
-  const [isInfoMsg, setIsInfoMsg] = useState(false);
-  const [currentRecordId, setCurrentRecordId] = useState('');
-
   useEffect(() => {
     if (Object.keys(isRecordExist).length > 0) {
       setFormData((prev) =>
-        prev.map((associate) => {
-          if (associate.guid === currentRecordId) {
-            return { ...associate, ['siteIdAssociatedWith']: '' };
-          }
-          return associate;
-        }),
+        prev.map((associate) =>
+          associate.guid === currentRecordId
+            ? { ...associate, siteIdAssociatedWith: '' }
+            : associate,
+        ),
       );
       setIsRecordExist({});
       setCurrentRecordId('');
@@ -231,22 +240,54 @@ const Associate = () => {
   }, [isInfoMsg]);
 
   useEffect(() => {
-    let infoMsg: ReactNode = <></>;
-    if (
-      searchParam !== null &&
-      searchParam !== undefined &&
-      searchParam !== ''
-    ) {
-      const getData = setTimeout(async () => {
+    if (searchParam) {
+      const indexToUpdate = associateColumnInternal.findIndex(
+        (item) =>
+          item.displayType?.graphQLPropertyName === 'siteIdAssociatedWith',
+      );
+      const timeoutId = setTimeout(async () => {
         try {
           const response = await fetchSiteIds(searchParam);
-          if (response && response?.success) {
-            const siteIds = formData.map((obj) => obj.siteIdAssociatedWith);
-            let result: [];
-            // response.data.filter((item: any) => !siteIds.includes(item.value.toString()));
+          let result = [];
+          let infoMsg = <></>;
+          let params = {
+            indexToUpdate,
+            updates: {
+              isLoading: RequestStatus.success,
+              options: [],
+              customInfoMessage: infoMsg,
+            },
+          };
 
-            if (response && response.data.length === 0) {
-              result = [];
+          if (!response?.success) {
+            infoMsg = (
+              <div className="text-wrap ">
+                <img
+                  src={infoIcon}
+                  alt="info"
+                  aria-hidden="true"
+                  role="img"
+                  aria-label="User image"
+                />
+                <span
+                  aria-label={'info-message'}
+                  className="px-2 custom-not-found"
+                >
+                  No results found.
+                </span>
+              </div>
+            );
+            params = {
+              ...params,
+              updates: {
+                ...params.updates,
+                isLoading: RequestStatus.idle,
+                customInfoMessage: infoMsg,
+              },
+            };
+          } else {
+            const siteIds = formData.map((obj) => obj.siteIdAssociatedWith);
+            if (response.data.length === 0) {
               infoMsg = (
                 <div>
                   <img
@@ -282,7 +323,7 @@ const Associate = () => {
                     aria-label={'info-message'}
                     className="text-wrap p-2 custom-not-found"
                   >
-                    Site ID: {isRecordExist.siteIdAssociatedWith} is alreday
+                    Site ID: {isRecordExist.siteIdAssociatedWith} is already
                     selected.
                   </span>
                 </div>
@@ -293,70 +334,23 @@ const Associate = () => {
               infoMsg = <></>;
               setIsInfoMsg(false);
             }
-            const updatedInternlRows =
-              associateColumnInternal &&
-              associateColumnInternal.map((item) => {
-                if (
-                  item.displayType?.graphQLPropertyName ===
-                  'siteIdAssociatedWith'
-                ) {
-                  return {
-                    ...item,
-                    displayType: {
-                      ...item.displayType,
-                      options: result ?? response.data, // Fallback to existing options if dropdownDto is not found
-                      customInfoMessage: infoMsg,
-                    },
-                  };
-                }
-                return item;
-              });
-            setInternalRow(updatedInternlRows);
-            setisListLoading(RequestStatus.success);
-          } else {
-            infoMsg = (
-              <div className="text-wrap ">
-                <img
-                  src={infoIcon}
-                  alt="info"
-                  aria-hidden="true"
-                  role="img"
-                  aria-label="User image"
-                />
-                <span
-                  aria-label={'info-message'}
-                  className="px-2 custom-not-found"
-                >
-                  No results found.
-                </span>
-              </div>
-            );
-            const updatedInternlRows =
-              associateColumnInternal &&
-              associateColumnInternal.map((item) => {
-                if (
-                  item.displayType?.graphQLPropertyName ===
-                  'siteIdAssociatedWith'
-                ) {
-                  return {
-                    ...item,
-                    displayType: {
-                      ...item.displayType,
-                      options: [], // Fallback to existing options if dropdownDto is not found
-                      customInfoMessage: infoMsg,
-                    },
-                  };
-                }
-                return item;
-              });
-            setInternalRow(updatedInternlRows);
-            setisListLoading(RequestStatus.success);
+            params = {
+              ...params,
+              updates: {
+                ...params.updates,
+                options: result,
+                customInfoMessage: infoMsg,
+              },
+            };
           }
-        } catch (error) {
-          throw new Error('Invalid searchParam'); // Handle invalid input
+
+          setInternalRow(updateTableColumn(associateColumnInternal, params));
+        } catch {
+          throw new Error('Invalid searchParam');
         }
       }, 2000);
-      return () => clearTimeout(getData);
+
+      return () => clearTimeout(timeoutId);
     }
   }, [searchParam]);
 
@@ -392,86 +386,95 @@ const Associate = () => {
           ),
         );
       }
-    }
-    // const isExist = formData.some(
-    //   (associate: any) =>
-    //     associate.siteId === event.row.siteId &&
-    //     associate.siteIdAssociatedWith === event.row.siteIdAssociatedWith,
-    // );
-    // if (isExist && event.property.includes('select_row')) {
-    //   // Update selectedRows state based on checkbox selection
-    //   if (event.value) {
-    //     setSelectedRows((prevSelectedRows) => [
-    //       ...prevSelectedRows,
-    //       {
-    //         siteId: event.row.siteId,
-    //         siteIdAssociatedWith: event.row.siteIdAssociatedWith,
-    //         guid: event.row.guid,
-    //       },
-    //     ]);
-    //   } else {
-    //     setSelectedRows((prevSelectedRows) =>
-    //       prevSelectedRows.filter(
-    //         (row) =>
-    //           !(
-    //             row.siteId === event.row.siteId &&
-    //             row.siteIdAssociatedWith === event.row.siteIdAssociatedWith &&
-    //             row.guid === event.row.guid
-    //           ),
-    //       ),
-    //     );
-    //   }
-    // }
-    else {
+    } else {
       if (event.property === 'siteIdAssociatedWith') {
-        const recordExist = formData.find(
+        // Parameters for the update
+        let params: UpdateDisplayTypeParams = {
+          indexToUpdate: associateColumnInternal.findIndex(
+            (item) =>
+              item.displayType?.graphQLPropertyName === 'siteIdAssociatedWith',
+          ),
+          updates: {
+            isLoading: RequestStatus.loading,
+            options: [],
+            customInfoMessage: <></>,
+          },
+        };
+        setInternalRow(updateTableColumn(internalRow, params));
+        const recordExist = updateForm.find(
           (associate: any) =>
             associate.siteId === event.row.siteId &&
-            associate.siteIdAssociatedWith === event.value.trim(),
+            associate.siteIdAssociatedWith === event.value.trim() &&
+            associate.siteIdAssociatedWith !== '',
         );
         if (recordExist !== undefined) {
           setIsRecordExist(recordExist);
           setCurrentRecordId(event.row.guid);
+          let infoMsg = (
+            <div className="py-2">
+              <img
+                src={infoIcon}
+                alt="info"
+                aria-hidden="true"
+                role="img"
+                aria-label="User image"
+              />
+              <span
+                aria-label={'info-message'}
+                className="text-wrap p-2 custom-not-found"
+              >
+                Site ID: {event.value.trim()} is already selected.
+              </span>
+            </div>
+          );
+          params = {
+            ...params,
+            updates: {
+              ...params.updates,
+              isLoading: RequestStatus.success,
+              customInfoMessage: infoMsg,
+            },
+          };
+          setInternalRow(updateTableColumn(associateColumnInternal, params));
         } else {
+          // need some updated array on click of save button on top
+          // setUpdateForm(formData);
           setIsRecordExist({});
           setCurrentRecordId('');
         }
-        setisListLoading(RequestStatus.loading);
         setSearchParam(event.value.trim());
       }
-      const updatedAssociatedSites = formData.map((associate) => {
-        if (associate.guid === event.row.guid) {
-          return { ...associate, [event.property]: event.value };
-        }
-        return associate;
-      });
+      const updatedAssociatedSites = formData.map((associate) =>
+        associate.guid === event.row.guid
+          ? { ...associate, [event.property]: event.value }
+          : associate,
+      );
       setFormData(updatedAssociatedSites);
       // dispatch(updateAssociatedSites(updatedAssociatedSites));
-      const IsExist = selectedRows.some((row) => row.guid === event.row.guid);
-      if (IsExist) {
-        setSelectedRows((prev: any) => {
-          return prev.map((row: any) => {
-            if (row.guid === event.row.guid) {
-              return { ...row, [event.property]: event.value };
-            }
-            return row;
-          });
-        });
+
+      if (selectedRows.some((row) => row.guid === event.row.guid)) {
+        setSelectedRows((prev) =>
+          prev.map((row) =>
+            row.guid === event.row.guid
+              ? { ...row, [event.property]: event.value }
+              : row,
+          ),
+        );
       }
     }
-    const currLabel =
-      associateColumnInternal &&
-      associateColumnInternal.find(
-        (row: any) => row.graphQLPropertyName === event.property,
-      );
-    const tracker = new ChangeTracker(
-      IChangeType.Modified,
-      'Associated Sites: ' + currLabel?.displayName,
+    const currLabel = associateColumnInternal.find(
+      (row) => row.graphQLPropertyName === event.property,
     );
-    dispatch(trackChanges(tracker.toPlainObject()));
+    dispatch(
+      trackChanges(
+        new ChangeTracker(
+          IChangeType.Modified,
+          'Associated Sites: ' + currLabel?.displayName,
+        ).toPlainObject(),
+      ),
+    );
   };
 
-  // need to do this tomorrow??
   const handleTableSort = (row: any, ascDir: any) => {
     let property = row['graphQLPropertyName'];
     setFormData((prevData) => {
@@ -509,9 +512,8 @@ const Associate = () => {
 
   const handleRemoveAssociate = (assocIsDelete: boolean = false) => {
     if (assocIsDelete) {
-      // Remove selected rows from formData state
-      setFormData((prevData) => {
-        return prevData.filter(
+      setFormData((prevData) =>
+        prevData.filter(
           (assoc) =>
             !selectedRows.some(
               (row) =>
@@ -519,11 +521,16 @@ const Associate = () => {
                 row.siteIdAssociatedWith === assoc.siteIdAssociatedWith &&
                 row.guid === assoc.guid,
             ),
-        );
-      });
-      const tracker = new ChangeTracker(IChangeType.Deleted, 'Associated Site');
-      dispatch(trackChanges(tracker.toPlainObject()));
-      // Clear selectedRows state
+        ),
+      );
+      dispatch(
+        trackChanges(
+          new ChangeTracker(
+            IChangeType.Deleted,
+            'Associated Site',
+          ).toPlainObject(),
+        ),
+      );
       setSelectedRows([]);
       setIsDelete(false);
     } else {
@@ -532,7 +539,7 @@ const Associate = () => {
   };
 
   const handleAddAssociate = () => {
-    const newAssocs = {
+    const newAssoc = {
       guid: v4(),
       siteId: id,
       siteIdAssociatedWith: '',
@@ -540,13 +547,15 @@ const Associate = () => {
       note: '',
       sr: true,
     };
-    setFormData((prevData) => [newAssocs, ...prevData]);
-    const tracker = new ChangeTracker(IChangeType.Added, 'New Associated Site');
-    dispatch(trackChanges(tracker.toPlainObject()));
-  };
-
-  const closeSearch = (event: any) => {
-    handleTableChange({ ...event, value: '' });
+    setFormData((prevData) => [newAssoc, ...prevData]);
+    dispatch(
+      trackChanges(
+        new ChangeTracker(
+          IChangeType.Added,
+          'New Associated Site',
+        ).toPlainObject(),
+      ),
+    );
   };
 
   return (
@@ -575,7 +584,6 @@ const Associate = () => {
           <Widget
             currentPage={1}
             changeHandler={handleTableChange}
-            onClickLeftIcon={closeSearch}
             handleCheckBoxChange={(event: any) => handleWidgetCheckBox(event)}
             title={'Associated Sites'}
             tableColumns={
@@ -589,7 +597,6 @@ const Associate = () => {
             tableIsLoading={
               formData && formData.length < 0 ? loading : RequestStatus.idle
             }
-            isListLoading={isListloading}
             allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
             aria-label="Associated Sites Widget"
             customLabelCss="custom-associate-widget-lbl"

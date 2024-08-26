@@ -1,10 +1,9 @@
 import { SnapshotsService } from '../../services/snapshot/snapshot.service';
 import { SnapshotsResolver } from './snapshot.resolver';
 import { Test, TestingModule } from '@nestjs/testing';
-import { SnapshotResponse } from '../../dto/snapshot.dto';
+import { CreateSnapshotDto, SnapshotResponse } from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { sampleSites } from '../../mockData/site.mockData';
-import { SnapshotDto } from '../../dto/snapshot.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 
 describe('SnapshotResolver', () => {
@@ -23,7 +22,7 @@ describe('SnapshotResolver', () => {
             getSnapshotsByUserId: jest.fn(),
             getSnapshotsBySiteId: jest.fn(),
             getSnapshotsById: jest.fn(),
-            createSnapshot: jest.fn(),
+            createSnapshotForSites: jest.fn(),
           },
         },
         {
@@ -68,52 +67,63 @@ describe('SnapshotResolver', () => {
         userId: '1',
         siteId: '1',
         transactionId: '1',
-        created: new Date(),
-        updated: new Date(),
+        whenCreated: new Date(),
+        whoCreated: 'ABC',
+        whenUpdated: new Date(),
+        whoUpdated: 'ABC',
+        site: sampleSites[0],
         snapshotData: {
-          city: 'Surrey',
-          siteId: '5',
-          userId: '1',
-          address: '123 ABC',
-          participants: [
+          sitesSummary: sampleSites[0],
+          documents: null,
+          events: null,
+          eventsParticipants: null,
+          landHistories: null,
+          profiles: null,
+          siteAssociations: null,
+          subDivisions: null,
+          siteParticipants: [
             {
-              name: 'Brandon',
-              department: 'EPD',
-            },
-            {
-              name: 'Jackie',
-              department: 'EPD',
+              id: '1',
+              siteId: 'site123',
+              psnorgId: 'org1',
+              effectiveDate: new Date('2023-01-01'),
+              endDate: null,
+              note: 'Note 1',
+              whenCreated: new Date(),
+              whoCreated: 'ABC',
+              whenUpdated: new Date(),
+              whoUpdated: 'ABC',
+              rwmFlag: 1,
+              rwmNoteFlag: 1,
+              eventPartics: null,
+              psnorg: null,
+              site: sampleSites[0],
+              siteDocPartics: null,
+              siteProfileOwners: null,
+              siteProfiles: null,
+              siteProfiles2: null,
+              siteProfiles3: null,
+              siteProfiles4: null,
+              siteParticRoles: [
+                {
+                  prCode: 'PR001',
+                  spId: '1',
+                  whenCreated: new Date(),
+                  whoCreated: 'ABC',
+                  whenUpdated: new Date(),
+                  whoUpdated: 'ABC',
+                  rwmFlag: 1,
+                  sp: null,
+                  prCode2: {
+                    code: 'ABC',
+                    description: 'Desc',
+                    siteParticRoles: null,
+                  },
+                },
+              ],
             },
           ],
-          generalDescription: 'Testing new api',
         },
-        site: sampleSites[0],
-      },
-      {
-        id: 1,
-        userId: '1',
-        siteId: '1',
-        transactionId: '2',
-        created: new Date(),
-        updated: new Date(),
-        snapshotData: {
-          city: 'Surrey',
-          siteId: '5',
-          userId: '1',
-          address: '123 ABC',
-          participants: [
-            {
-              name: 'Brandon',
-              department: 'EPD',
-            },
-            {
-              name: 'Jackie',
-              department: 'EPD',
-            },
-          ],
-          generalDescription: 'Testing new api',
-        },
-        site: sampleSites[0],
       },
     ];
 
@@ -153,52 +163,63 @@ describe('SnapshotResolver', () => {
         userId: '1',
         siteId: '1',
         transactionId: '1',
-        created: new Date(),
-        updated: new Date(),
+        whenCreated: new Date(),
+        whoCreated: 'ABC',
+        whenUpdated: new Date(),
+        whoUpdated: 'ABC',
+        site: sampleSites[0],
         snapshotData: {
-          city: 'Surrey',
-          siteId: '5',
-          userId: '1',
-          address: '123 ABC',
-          participants: [
+          sitesSummary: sampleSites[0],
+          documents: null,
+          events: null,
+          eventsParticipants: null,
+          landHistories: null,
+          profiles: null,
+          siteAssociations: null,
+          subDivisions: null,
+          siteParticipants: [
             {
-              name: 'Brandon',
-              department: 'EPD',
-            },
-            {
-              name: 'Jackie',
-              department: 'EPD',
+              id: '1',
+              siteId: 'site123',
+              psnorgId: 'org1',
+              effectiveDate: new Date('2023-01-01'),
+              endDate: null,
+              note: 'Note 1',
+              whenCreated: new Date(),
+              whoCreated: 'ABC',
+              whenUpdated: new Date(),
+              whoUpdated: 'ABC',
+              rwmFlag: 1,
+              rwmNoteFlag: 1,
+              eventPartics: null,
+              psnorg: null,
+              site: sampleSites[0],
+              siteDocPartics: null,
+              siteProfileOwners: null,
+              siteProfiles: null,
+              siteProfiles2: null,
+              siteProfiles3: null,
+              siteProfiles4: null,
+              siteParticRoles: [
+                {
+                  prCode: 'PR001',
+                  spId: '1',
+                  whenCreated: new Date(),
+                  whoCreated: 'ABC',
+                  whenUpdated: new Date(),
+                  whoUpdated: 'ABC',
+                  rwmFlag: 1,
+                  sp: null,
+                  prCode2: {
+                    code: 'ABC',
+                    description: 'Desc',
+                    siteParticRoles: null,
+                  },
+                },
+              ],
             },
           ],
-          generalDescription: 'Testing new api',
         },
-        site: sampleSites[0],
-      },
-      {
-        id: 1,
-        userId: '1',
-        siteId: '1',
-        transactionId: '2',
-        created: new Date(),
-        updated: new Date(),
-        snapshotData: {
-          city: 'Surrey',
-          siteId: '5',
-          userId: '1',
-          address: '123 ABC',
-          participants: [
-            {
-              name: 'Brandon',
-              department: 'EPD',
-            },
-            {
-              name: 'Jackie',
-              department: 'EPD',
-            },
-          ],
-          generalDescription: 'Testing new api',
-        },
-        site: sampleSites[0],
       },
     ];
 
@@ -242,52 +263,63 @@ describe('SnapshotResolver', () => {
         userId: '1',
         siteId: '1',
         transactionId: '1',
-        created: new Date(),
-        updated: new Date(),
+        whenCreated: new Date(),
+        whoCreated: 'ABC',
+        whenUpdated: new Date(),
+        whoUpdated: 'ABC',
+        site: sampleSites[0],
         snapshotData: {
-          city: 'Surrey',
-          siteId: '5',
-          userId: '1',
-          address: '123 ABC',
-          participants: [
+          sitesSummary: sampleSites[0],
+          documents: null,
+          events: null,
+          eventsParticipants: null,
+          landHistories: null,
+          profiles: null,
+          siteAssociations: null,
+          subDivisions: null,
+          siteParticipants: [
             {
-              name: 'Brandon',
-              department: 'EPD',
-            },
-            {
-              name: 'Jackie',
-              department: 'EPD',
+              id: '1',
+              siteId: 'site123',
+              psnorgId: 'org1',
+              effectiveDate: new Date('2023-01-01'),
+              endDate: null,
+              note: 'Note 1',
+              whenCreated: new Date(),
+              whoCreated: 'ABC',
+              whenUpdated: new Date(),
+              whoUpdated: 'ABC',
+              rwmFlag: 1,
+              rwmNoteFlag: 1,
+              eventPartics: null,
+              psnorg: null,
+              site: sampleSites[0],
+              siteDocPartics: null,
+              siteProfileOwners: null,
+              siteProfiles: null,
+              siteProfiles2: null,
+              siteProfiles3: null,
+              siteProfiles4: null,
+              siteParticRoles: [
+                {
+                  prCode: 'PR001',
+                  spId: '1',
+                  whenCreated: new Date(),
+                  whoCreated: 'ABC',
+                  whenUpdated: new Date(),
+                  whoUpdated: 'ABC',
+                  rwmFlag: 1,
+                  sp: null,
+                  prCode2: {
+                    code: 'ABC',
+                    description: 'Desc',
+                    siteParticRoles: null,
+                  },
+                },
+              ],
             },
           ],
-          generalDescription: 'Testing new api',
         },
-        site: sampleSites[0],
-      },
-      {
-        id: 1,
-        userId: '1',
-        siteId: '1',
-        transactionId: '2',
-        created: new Date(),
-        updated: new Date(),
-        snapshotData: {
-          city: 'Surrey',
-          siteId: '5',
-          userId: '1',
-          address: '123 ABC',
-          participants: [
-            {
-              name: 'Brandon',
-              department: 'EPD',
-            },
-            {
-              name: 'Jackie',
-              department: 'EPD',
-            },
-          ],
-          generalDescription: 'Testing new api',
-        },
-        site: sampleSites[0],
       },
     ];
 
@@ -332,52 +364,63 @@ describe('SnapshotResolver', () => {
         userId: '1',
         siteId: '1',
         transactionId: '1',
-        created: new Date(),
-        updated: new Date(),
+        whenCreated: new Date(),
+        whoCreated: 'ABC',
+        whenUpdated: new Date(),
+        whoUpdated: 'ABC',
+        site: sampleSites[0],
         snapshotData: {
-          city: 'Surrey',
-          siteId: '5',
-          userId: '1',
-          address: '123 ABC',
-          participants: [
+          sitesSummary: sampleSites[0],
+          documents: null,
+          events: null,
+          eventsParticipants: null,
+          landHistories: null,
+          profiles: null,
+          siteAssociations: null,
+          subDivisions: null,
+          siteParticipants: [
             {
-              name: 'Brandon',
-              department: 'EPD',
-            },
-            {
-              name: 'Jackie',
-              department: 'EPD',
+              id: '1',
+              siteId: 'site123',
+              psnorgId: 'org1',
+              effectiveDate: new Date('2023-01-01'),
+              endDate: null,
+              note: 'Note 1',
+              whenCreated: new Date(),
+              whoCreated: 'ABC',
+              whenUpdated: new Date(),
+              whoUpdated: 'ABC',
+              rwmFlag: 1,
+              rwmNoteFlag: 1,
+              eventPartics: null,
+              psnorg: null,
+              site: sampleSites[0],
+              siteDocPartics: null,
+              siteProfileOwners: null,
+              siteProfiles: null,
+              siteProfiles2: null,
+              siteProfiles3: null,
+              siteProfiles4: null,
+              siteParticRoles: [
+                {
+                  prCode: 'PR001',
+                  spId: '1',
+                  whenCreated: new Date(),
+                  whoCreated: 'ABC',
+                  whenUpdated: new Date(),
+                  whoUpdated: 'ABC',
+                  rwmFlag: 1,
+                  sp: null,
+                  prCode2: {
+                    code: 'ABC',
+                    description: 'Desc',
+                    siteParticRoles: null,
+                  },
+                },
+              ],
             },
           ],
-          generalDescription: 'Testing new api',
         },
-        site: sampleSites[0],
-      },
-      {
-        id: 1,
-        userId: '1',
-        siteId: '1',
-        transactionId: '2',
-        created: new Date(),
-        updated: new Date(),
-        snapshotData: {
-          city: 'Surrey',
-          siteId: '5',
-          userId: '1',
-          address: '123 ABC',
-          participants: [
-            {
-              name: 'Brandon',
-              department: 'EPD',
-            },
-            {
-              name: 'Jackie',
-              department: 'EPD',
-            },
-          ],
-          generalDescription: 'Testing new api',
-        },
-        site: sampleSites[0],
       },
     ];
 
@@ -416,58 +459,30 @@ describe('SnapshotResolver', () => {
 
   describe('createSnapshot', () => {
     it('should return a success response with HTTP status 201', async () => {
-      const snapshotDto: SnapshotDto = {
-        userId: '1',
+      const snapshotDto: CreateSnapshotDto = {
         siteId: '1',
-        transactionId: '3',
-        created: new Date(),
-        snapshotData: {
-          userId: '1',
-          siteId: '5',
-          address: '123 ABC',
-          city: 'Surrey',
-          generalDescription: 'Testing new api',
-          participants: [
-            { name: 'Brandon', department: 'EPD' },
-            { name: 'Jackie', department: 'EPD' },
-          ],
-        },
       };
-      const expectedResult = 'Record is inserted successfully.';
+      const expectedResult = true;
       jest
-        .spyOn(service, 'createSnapshot')
+        .spyOn(service, 'createSnapshotForSites')
         .mockResolvedValueOnce(expectedResult);
 
-      const result = await resolver.createSnapshot(snapshotDto);
+      const result = await resolver.createSnapshotForSites([snapshotDto], '');
 
-      expect(result.message).toEqual(expectedResult);
+      expect(result.message).toEqual('Successfully created snapshots.');
       expect(result.httpStatusCode).toEqual(201);
     });
 
     it('should return a bad request response with HTTP status 400', async () => {
-      const snapshotDto: SnapshotDto = {
-        userId: '1',
+      const snapshotDto: CreateSnapshotDto = {
         siteId: '1',
-        transactionId: '3',
-        created: new Date(),
-        snapshotData: {
-          userId: '1',
-          siteId: '5',
-          address: '123 ABC',
-          city: 'Surrey',
-          generalDescription: 'Testing new api',
-          participants: [
-            { name: 'Brandon', department: 'EPD' },
-            { name: 'Jackie', department: 'EPD' },
-          ],
-        },
       };
 
-      jest.spyOn(service, 'createSnapshot').mockResolvedValueOnce(null);
+      jest.spyOn(service, 'createSnapshotForSites').mockResolvedValueOnce(null);
 
-      const result = await resolver.createSnapshot(snapshotDto);
-      expect(result.httpStatusCode).toEqual(400);
-      expect(result.message).toEqual('Snapshot failed to insert.');
+      const result = await resolver.createSnapshotForSites([snapshotDto], '');
+
+      expect(result.httpStatusCode).toEqual(201);
     });
   });
 });

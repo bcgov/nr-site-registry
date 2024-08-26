@@ -115,7 +115,6 @@ const Notations = () => {
           return true;
         }
       }
-
       const stringValue =
         typeof value === 'string'
           ? value.toLowerCase()
@@ -141,6 +140,9 @@ const Notations = () => {
         }
       }
 
+      if (stringValue.includes(searchTerm)) {
+        return true;
+      }
       if (stringValue.includes(searchTerm)) {
         return true;
       }
@@ -187,6 +189,7 @@ const Notations = () => {
       setFormData(updatedNotation);
       // dispatch(updateSiteNotation(updatedNotation))
     }
+
     const flattedArr = flattenFormRows(notationFormRowsInternal);
     const currLabel =
       flattedArr &&
@@ -269,7 +272,6 @@ const Notations = () => {
           })),
         ]);
       } else {
-        // setSelectedRows(prevSelectedRows => prevSelectedRows.filter(row => !(row.id === id && row.participantId === event.row.guid)));
         setSelectedRows((prevSelectedRows) =>
           prevSelectedRows.filter(
             (selectedRow) =>
@@ -281,17 +283,7 @@ const Notations = () => {
           ),
         );
       }
-    }
-    // const isExist = formData.some(item => item.id === id && item.notationParticipant.some((participant: any) => participant.guid === event.row.guid));
-    // if (isExist && event.property.includes('select_row')) {
-    //   // Update selectedRows state based on checkbox selection
-    //   if (event.value) {
-    //       setSelectedRows(prevSelectedRows => [...prevSelectedRows, { id, participantId: event.row.guid }]);
-    //   } else {
-    //       setSelectedRows(prevSelectedRows => prevSelectedRows.filter(row => !(row.id === id && row.participantId === event.row.guid)));
-    //   }
-    // }
-    else {
+    } else {
       const updateNotationParticipant = formData.map((notation) => {
         if (notation.id === id) {
           const updatedNotationParticipant = notation.notationParticipant.map(
@@ -309,6 +301,7 @@ const Notations = () => {
         }
         return notation;
       });
+
       const currLabel =
         notationColumnInternal &&
         notationColumnInternal.find(
@@ -387,11 +380,10 @@ const Notations = () => {
 
   const handleAddParticipant = (id: any) => {
     const newParticipant = {
-      id: v4(), // Generate a unique ID for the new participant
-      role: '',
-      participantName: '',
-      sr: false,
-      date: new Date(),
+      displayName: '',
+      eprCode: '',
+      psnorgId: '',
+      guid: v4(),
     };
 
     setFormData((prevFormData) => {

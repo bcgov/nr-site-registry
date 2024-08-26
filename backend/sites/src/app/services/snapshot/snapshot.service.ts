@@ -1,19 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { plainToInstance } from 'class-transformer';
-import { CreateSnapshotDto, SnapshotDto } from '../../dto/snapshot.dto';
+import { CreateSnapshotDto } from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { Repository } from 'typeorm';
-import { validateOrReject } from 'class-validator';
-import { Sites } from 'src/app/entities/sites.entity';
-import { EventPartics } from 'src/app/entities/eventPartics.entity';
-import { SitePartics } from 'src/app/entities/sitePartics.entity';
-import { SiteDocs } from 'src/app/entities/siteDocs.entity';
-import { SiteAssocs } from 'src/app/entities/siteAssocs.entity';
-import { LandHistories } from 'src/app/entities/landHistories.entity';
-import { SiteSubdivisions } from 'src/app/entities/siteSubdivisions.entity';
-import { SiteProfiles } from 'src/app/entities/siteProfiles.entity';
-import { SnapshotSiteContent } from 'src/app/dto/snapshotSiteContent';
+import { Sites } from '../../entities/sites.entity';
+import { EventPartics } from '../../entities/eventPartics.entity';
+import { SitePartics } from '../../entities/sitePartics.entity';
+import { SiteDocs } from '../../entities/siteDocs.entity';
+import { SiteAssocs } from '../../entities/siteAssocs.entity';
+import { LandHistories } from '../../entities/landHistories.entity';
+import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
+import { SiteProfiles } from '../../entities/siteProfiles.entity';
+import { SnapshotSiteContent } from '../../dto/snapshotSiteContent';
 import { Events } from '../../entities/events.entity';
 
 @Injectable()
@@ -80,19 +78,6 @@ export class SnapshotsService {
       return result;
     } catch (error) {
       throw error;
-    }
-  }
-
-  async createSnapshot(snapshotDto: SnapshotDto) {
-    try {
-      await validateOrReject(snapshotDto);
-      const snapshot = plainToInstance(Snapshots, snapshotDto);
-      const result = await this.snapshotRepository.save(snapshot);
-      if (result) {
-        return 'Record is inserted successfully.';
-      }
-    } catch (error) {
-      throw new Error('Failed to insert snapshot.');
     }
   }
 

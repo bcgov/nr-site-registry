@@ -10,7 +10,6 @@ const Widget: React.FC<IWidget> = ({
   title,
   tableColumns,
   tableIsLoading,
-  isListLoading,
   tableData,
   children,
   customLabelCss,
@@ -22,8 +21,6 @@ const Widget: React.FC<IWidget> = ({
   primaryKeycolumnName,
   currentPage,
   changeHandler,
-  onClickRightIcon,
-  onClickLeftIcon,
   handleCheckBoxChange,
   sortHandler,
 }) => {
@@ -61,14 +58,11 @@ const Widget: React.FC<IWidget> = ({
             <Table
               label={title ?? ''}
               isLoading={tableIsLoading ?? RequestStatus.idle}
-              isListLoading={isListLoading ?? RequestStatus.idle}
               columns={tableColumns ?? []}
               data={widgetData}
               showPageOptions={false}
               allowRowsSelect={allowRowsSelect}
               changeHandler={changeHandler ?? (() => {})}
-              onClickLeftIcon={onClickLeftIcon ?? (() => {})}
-              onClickRightIcon={onClickRightIcon ?? (() => {})}
               editMode={editMode ?? false}
               srMode={srMode ?? false}
               idColumnName={primaryKeycolumnName ?? ''}

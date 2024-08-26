@@ -6,6 +6,7 @@ import { DashboardService } from '../../services/dashboard/dashboard.service';
 import { RecentViewDto, RecentViewResponse } from '../../dto/recentView.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
+import { CustomRoles } from 'src/app/dto/roles/role';
 
 @Resolver(() => RecentViews)
 export class DashboardResolver {
@@ -16,7 +17,7 @@ export class DashboardResolver {
     >,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => RecentViewResponse, { name: 'getRecentViewsByUserId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getRecentViewsByUserId(
@@ -40,7 +41,7 @@ export class DashboardResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Mutation(() => RecentViewResponse, { name: 'addRecentView' })
   async addRecentView(
     @Args('recentView', { type: () => RecentViewDto }, new ValidationPipe())

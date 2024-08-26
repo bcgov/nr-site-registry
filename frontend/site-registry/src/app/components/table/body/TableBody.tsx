@@ -56,6 +56,12 @@ const TableBody: FC<TableBodyProps> = ({
   resetAllRowsSelectedEventFlag,
   removePageFromAllRowsSelected,
 }) => {
+
+  useEffect(()=>{
+    console.log(data)
+  },[data])
+
+
   const [selectedRowIds, SetSelectedRowsId] = useState<SelectedRowsType>({});
 
   useEffect(() => {

@@ -5,6 +5,7 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { SiteParticsDto, SiteParticsResponse } from '../../dto/sitePartics.dto';
 import { ParticipantService } from '../../services/participant/participant.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
+import { CustomRoles } from 'src/app/dto/roles/role';
 
 @Resolver(() => SiteParticsDto)
 export class ParticipantResolver {
@@ -15,7 +16,7 @@ export class ParticipantResolver {
     >,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => SiteParticsResponse, { name: 'getSiteParticipantBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSiteParticipantsBySiteId(

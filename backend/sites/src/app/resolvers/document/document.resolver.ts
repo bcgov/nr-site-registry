@@ -6,6 +6,7 @@ import { Args, Query, Resolver } from '@nestjs/graphql';
 import { GenericValidationPipe } from "../../utils/validations/genericValidationPipe";
 import { UsePipes } from "@nestjs/common";
 import { DocumentDto, DocumentResponse } from "../../dto/document.dto";
+import { CustomRoles } from "src/app/dto/roles/role";
 
 
 @Resolver(() => SiteDocs)
@@ -15,7 +16,7 @@ export class DocumentResolver {
         private readonly genericResponseProvider: GenericResponseProvider<DocumentDto[]>,
     ){}
 
-    @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+    @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
     @Query(() => DocumentResponse, { name: 'getSiteDocumentsBySiteId' })
     @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
     async getSiteDocumentsBySiteId( @Args('siteId', { type: () => String }) siteId: string,)

@@ -14,6 +14,7 @@ import { Snapshots } from '../../entities/snapshots.entity';
 import { SnapshotsService } from '../../services/snapshot/snapshot.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
+import { CustomRoles } from 'src/app/dto/roles/role';
 
 @Resolver(() => Snapshots)
 export class SnapshotsResolver {
@@ -24,7 +25,7 @@ export class SnapshotsResolver {
     >,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => SnapshotResponse, { name: 'getSnapshots' })
   async getSnapshots() {
     const result = await this.snapshotsService.getSnapshots();
@@ -45,7 +46,7 @@ export class SnapshotsResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => SnapshotResponse, { name: 'getSnapshotsByUserId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSnapshotsByUserId(
@@ -69,7 +70,7 @@ export class SnapshotsResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => SnapshotResponse, { name: 'getSnapshotsBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSnapshotsBySiteId(
@@ -98,7 +99,7 @@ export class SnapshotsResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => SnapshotResponse, { name: 'getSnapshotsById' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSnapshotsById(@Args('id', { type: () => Int }) id: number) {
@@ -120,7 +121,7 @@ export class SnapshotsResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Mutation(() => SnapshotResponse, { name: 'createSnapshot' })
   async createSnapshot(
     @Args('snapshot', { type: () => SnapshotDto }, new ValidationPipe())
@@ -140,7 +141,7 @@ export class SnapshotsResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Mutation(() => SnapshotResponse, { name: 'createSnapshotForSites' })
   async createSnapshotForSites(
     @Args('inputDto', { type: () => [CreateSnapshotDto] }, new ValidationPipe())

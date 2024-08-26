@@ -3,6 +3,7 @@ import { RoleMatchingMode, Roles } from "nest-keycloak-connect";
 import { DropdownDto, DropdownResponse, DropdownResponseWithMetaData, NotationDropdownDto } from "../../dto/dropdown.dto";
 import { GenericResponseProvider } from "../../dto/response/genericResponseProvider";
 import { DropdownService } from "../../services/dropdown/dropdown.service";
+import { CustomRoles } from "src/app/dto/roles/role";
 
 
 @Resolver(() => DropdownDto)
@@ -13,7 +14,7 @@ export class DropdownResolver {
         private readonly genericResponseProviderNotation: GenericResponseProvider<NotationDropdownDto[]>,
     ){}
 
-    @Roles({roles: ['site-admin'], mode: RoleMatchingMode.ANY})
+    @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
     @Query(() => DropdownResponse, { name: 'getParticipantRoleCd' })
     async getParticipantRoleCd()
     {
@@ -29,7 +30,7 @@ export class DropdownResolver {
 
 
     
-    @Roles({roles: ['site-admin'], mode: RoleMatchingMode.ANY})
+    @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
     @Query(() => DropdownResponseWithMetaData, { name: 'getPeopleOrgsCd' })
     async getPeopleOrgsCd()
     {
@@ -44,7 +45,7 @@ export class DropdownResolver {
     }
 
 
-    @Roles({roles: ['site-admin'], mode: RoleMatchingMode.ANY})
+    @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
     @Query(() => DropdownResponseWithMetaData, { name: 'getNotationTypeCd' })
     async getNotationTypeCd()
     {
@@ -58,7 +59,7 @@ export class DropdownResolver {
         }
     }
 
-    @Roles({roles: ['site-admin'], mode: RoleMatchingMode.ANY})
+    @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
     @Query(() => DropdownResponse, { name: 'getNotationClassCd' })
     async getNotationClassCd()
     {
@@ -72,7 +73,7 @@ export class DropdownResolver {
         }
     }
 
-    @Roles({roles: ['site-admin'], mode: RoleMatchingMode.ANY})
+    @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
     @Query(() => DropdownResponse, { name: 'getNotationParticipantRoleCd' })
     async getNotationParticipantRoleCd()
     {

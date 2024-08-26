@@ -13,6 +13,7 @@ import { GenericResponseProvider } from 'src/app/dto/response/genericResponsePro
 import { UsePipes } from '@nestjs/common';
 import { GenericValidationPipe } from 'src/app/utils/validations/genericValidationPipe';
 import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
+import { CustomRoles } from 'src/app/dto/roles/role';
 
 
 /**
@@ -33,7 +34,7 @@ export class SiteResolver {
   /**
    * Find All Sites
    */
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => FetchSiteResponse, { name: 'sites' })
   findAll() {
     return this.siteService.findAll();
@@ -46,7 +47,7 @@ export class SiteResolver {
    * @param pageSize size of the page
    * @returns sites where id or address matches the search param along with pagination params
    */
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => SearchSiteResponse, { name: 'searchSites' })
   async searchSites(
     @Args('searchParam', { type: () => String }) searchParam: string,
@@ -109,13 +110,13 @@ export class SiteResolver {
     );
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => FetchSiteDetail, { name: 'findSiteBySiteId' })
   findSiteBySiteId(@Args('siteId', { type: () => String }) siteId: string) {
     return this.siteService.findSiteBySiteId(siteId);
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => DropdownResponse, { name: 'searchSiteIds' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async searchSiteIds(
@@ -139,7 +140,7 @@ export class SiteResolver {
   }
 
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Mutation(() => SaveSiteDetailsResponse , { name: 'updateSiteDetails' })
   updateSiteDetails(
     @Args('siteDetailsDTO', { type: () => SaveSiteDetailsDTO})

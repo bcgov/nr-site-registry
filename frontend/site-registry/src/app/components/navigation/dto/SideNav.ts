@@ -15,6 +15,7 @@ import {
   deleteRequestStatus,
   addCartItemRequestStatus,
 } from '../../../features/cart/CartSlice';
+import { UserRoleType } from '../../../helpers/utility';
 
 export class SideNav {
   constructor(
@@ -28,7 +29,7 @@ export class SideNav {
   ) {}
 }
 
-const getSideBarNavList = () => {
+const getSideBarNavList = (userRole:any) => {
   const dashboardIcon = HouseIcon;
   const textSearchIcon = MagnifyingGlassIcon;
   const mapLocationIcon = MapLocationIcon;
@@ -38,40 +39,89 @@ const getSideBarNavList = () => {
   const referenceIcon = BookIcon;
   const cartIcon = ShoppingCartIcon;
 
-  const sideNavList: SideNav[] = [
-    new SideNav(1, 'Dashboard', true, dashboardIcon, '/dashboard'),
-    new SideNav(2, 'Search', true, null, '/', [
-      new SideNav(1, 'Text Search', false, textSearchIcon, '/search'),
-      new SideNav(2, 'Map Search', false, mapLocationIcon, '/map'),
-    ]),
-    new SideNav(
-      3,
-      'Resources',
-      true,
-      null,
-      '/',
-      [
-        new SideNav(1, 'Tools', false, toolsIcon, '/tools'),
-        new SideNav(2, 'Reference', false, referenceIcon, '/ref'),
-      ],
-      false,
-    ),
-    new SideNav(
-      4,
-      'Account',
-      true,
-      null,
-      '/',
-      [
-        new SideNav(1, 'Folios', false, foliosIcon, '/folios'),
-        new SideNav(2, 'Purchases', false, purchasesIcon, '/purchases'),
-      ],
-      false,
-    ),
-    new SideNav(5, 'Cart', false, cartIcon, '/site/cart', [], true),
-  ];
+  console.log('userRole in getSideBarNavList',userRole);
 
-  return sideNavList;
+
+  const roleBasedSideBarList:any = {
+    client: [
+      new SideNav(1, 'Dashboard', true, dashboardIcon, '/dashboard'),
+      new SideNav(2, 'Search', true, null, '/', [
+        new SideNav(1, 'Text Search', false, textSearchIcon, '/search'),
+        new SideNav(2, 'Map Search', false, mapLocationIcon, '/map'),
+      ]),
+      new SideNav(
+        3,
+        'Resources',
+        true,
+        null,
+        '/',
+        [
+          new SideNav(1, 'Tools', false, toolsIcon, '/tools'),
+          new SideNav(2, 'Reference', false, referenceIcon, '/ref'),
+        ],
+        false,
+      ),
+      new SideNav(
+        4,
+        'Account',
+        true,
+        null,
+        '/',
+        [
+          new SideNav(1, 'Folios', false, foliosIcon, '/folios'),
+          new SideNav(2, 'Purchases', false, purchasesIcon, '/purchases'),
+        ],
+        false,
+      ),
+      new SideNav(5, 'Cart', false, cartIcon, '/site/cart', [], true),
+    ],
+    internal: [
+      new SideNav(1, 'Dashboard', true, dashboardIcon, '/dashboard'),
+      new SideNav(2, 'Search', true, null, '/', [
+        new SideNav(1, 'Text Search', false, textSearchIcon, '/search'),
+        new SideNav(2, 'Map Search', false, mapLocationIcon, '/map'),
+      ]),
+      new SideNav(
+        3,
+        'Resources',
+        true,
+        null,
+        '/',
+        [
+          new SideNav(1, 'Tools', false, toolsIcon, '/tools'),
+          new SideNav(2, 'Reference', false, referenceIcon, '/ref'),
+        ],
+        false,
+      ),      
+    ],
+    sr: [
+      new SideNav(1, 'Dashboard', true, dashboardIcon, '/dashboard'),
+      new SideNav(2, 'Search', true, null, '/', [
+        new SideNav(1, 'Text Search', false, textSearchIcon, '/search'),
+        new SideNav(2, 'Map Search', false, mapLocationIcon, '/map'),
+      ]),
+      new SideNav(
+        3,
+        'Resources',
+        true,
+        null,
+        '/',
+        [
+          new SideNav(1, 'Tools', false, toolsIcon, '/tools'),
+          new SideNav(2, 'Reference', false, referenceIcon, '/ref'),
+        ],
+        false,
+      ),      
+    ],
+    public:[      
+      new SideNav(2, 'Search', true, null, '/', [
+        new SideNav(1, 'Text Search', false, textSearchIcon, '/search'),
+        new SideNav(2, 'Map Search', false, mapLocationIcon, '/map'),
+      ]),      
+      new SideNav(5, 'Cart', false, cartIcon, '/site/cart', [], true),
+    ]
+  };
+  return roleBasedSideBarList[userRole];
 };
 
 export { getSideBarNavList };

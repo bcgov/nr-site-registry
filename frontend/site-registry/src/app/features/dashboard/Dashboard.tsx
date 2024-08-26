@@ -10,7 +10,7 @@ import { UserType } from "../../helpers/requests/userType";
 import "./Dashboard.css";
 import PageContainer from "../../components/simple/PageContainer";
 import Widget from "../../components/widget/Widget";
-import { getUser } from "../../helpers/utility";
+import { getUser, isUserOfType, UserRoleType } from "../../helpers/utility";
 import { AppDispatch } from '../../Store';
 
 interface DashboardWidgetProps {

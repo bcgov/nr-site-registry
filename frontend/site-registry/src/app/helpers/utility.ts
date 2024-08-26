@@ -152,3 +152,72 @@ export const showNotification = (
     notifyError(errorMessage);
   }
 };
+
+
+export enum UserRoleType
+{
+   CLIENT = 'client',
+   INTERNAL = 'internal',
+   SR = 'sr'
+}
+
+
+
+
+export const isUserOfType = (roleType:UserRoleType) => {
+
+    const user = getUser();
+    if(user !== null)
+    {
+      const userRoles: any = user.profile?.role;
+      switch(roleType)
+      {        
+         case 'client':
+        
+        
+          if(userRoles.includes("formsflow-client") || userRoles.includes("site-external-user"))
+          {
+              return true;
+          }
+          else
+          {
+            return false;
+          }        
+         case 'internal':         
+          if(userRoles.includes("site-internal-user"))
+          {
+              return true;
+          }
+          else
+          {
+            return false;
+          }  
+          case 'sr':         
+          if(userRoles.includes("site-site-registrar"))
+          {
+              return true;
+          }
+          else
+          {
+            return false;
+          }  
+
+      }
+       
+    }
+
+}
+
+
+export const getLoggedInUserType = () => {
+  return isUserOfType(UserRoleType.CLIENT)?UserRoleType.CLIENT : isUserOfType(UserRoleType.INTERNAL)? UserRoleType.INTERNAL : isUserOfType(UserRoleType.SR) ? UserRoleType.SR: UserRoleType.CLIENT;
+}
+
+
+export const isUserRoleInternalUser= () => {
+  
+}
+
+export const isUserRoleSiteRegistrar= () =>  {
+  
+}

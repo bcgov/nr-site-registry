@@ -1,4 +1,5 @@
 import { DropdownItem } from '../../../components/action/IActions';
+import Associate from '../associates/Associate';
 import Disclosure from '../disclosure/Disclosure';
 import Documents from '../documents/Documents';
 import LandUses from '../landUses/LandUses';
@@ -23,7 +24,7 @@ export const navComponents: JSX.Element[] = [
   <Notations />,
   <Participants />,
   <Documents />,
-  <></>,
+  <Associate />,
   <LandUses />,
   <></>,
   <Disclosure />,

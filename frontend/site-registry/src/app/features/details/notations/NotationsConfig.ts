@@ -45,7 +45,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -57,11 +58,51 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
     ],
 
     [
+      {
+        type: FormFieldType.DropDown,
+        label: 'Notation Class',
+        placeholder: 'Notation Class',
+        graphQLPropertyName: 'eclsCode',
+        options: notationClass.data,
+        value: '',
+        colSize: 'col-lg-5 col-md-6 col-sm-12',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss: 'custom-notation-edit-input',
+      },
+      {
+        type: FormFieldType.Date,
+        label: 'Required Date',
+        placeholder: 'MM/DD/YY',
+        graphQLPropertyName: 'requirementDueDate',
+        value: '',
+        colSize: 'col-lg-3 col-md-6 col-sm-12',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss: 'custom-notation-edit-dateInput',
+      },
+      {
+        type: FormFieldType.DropDown,
+        label: 'Ministry Contact',
+        placeholder: 'Ministry Contact',
+        graphQLPropertyName: 'psnorgId',
+        options: ministryContact,
+        value: '',
+        isImage: true,
+        colSize: 'col-lg-4 col-md-12 col-sm-12',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss: 'custom-notation-edit-input',
+      },
       {
         type: FormFieldType.DropDown,
         label: 'Notation Class',
@@ -116,6 +157,18 @@ export const GetNotationConfig = () => {
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
       },
+      {
+        type: FormFieldType.Text,
+        label: 'Required Actions',
+        placeholder: 'Required Actions',
+        graphQLPropertyName: 'requiredAction',
+        value: '',
+        colSize: 'col-lg-12 col-md-12 col-sm-12',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss: 'custom-notation-edit-input',
+      },
     ],
 
     [
@@ -149,8 +202,34 @@ export const GetNotationConfig = () => {
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
       },
+      {
+        type: FormFieldType.DropDown,
+        label: 'Notation Type',
+        placeholder: 'Notation Type',
+        graphQLPropertyName: 'etypCode',
+        options: [],
+        value: '',
+        colSize: 'col-lg-11 col-md-11 col-sm-11 col-10',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss: 'custom-notation-edit-input',
+      },
     ],
     [
+      {
+        type: FormFieldType.DropDown,
+        label: 'Notation Class',
+        placeholder: 'Notation Class',
+        graphQLPropertyName: 'eclsCode',
+        options: notationClass.data,
+        value: '',
+        colSize: 'col-lg-12 col-md-12 col-sm-12',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss: 'custom-notation-edit-input',
+      },
       {
         type: FormFieldType.DropDown,
         label: 'Notation Class',
@@ -176,7 +255,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -188,7 +268,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -200,7 +281,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
     ],
     [
@@ -216,8 +298,32 @@ export const GetNotationConfig = () => {
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
       },
+      {
+        type: FormFieldType.Text,
+        label: 'Required Actions',
+        placeholder: 'Required Actions',
+        graphQLPropertyName: 'requiredAction',
+        value: '',
+        colSize: 'col-lg-12 col-md-12 col-sm-12',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss: 'custom-notation-edit-input',
+      },
     ],
     [
+      {
+        type: FormFieldType.Text,
+        label: 'Note',
+        placeholder: 'Note',
+        graphQLPropertyName: 'note',
+        value: '',
+        colSize: 'col-lg-12 col-md-12 col-sm-12',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss: 'custom-notation-edit-input',
+      },
       {
         type: FormFieldType.Text,
         label: 'Note',
@@ -265,6 +371,19 @@ export const GetNotationConfig = () => {
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
       },
+      {
+        type: FormFieldType.DropDown,
+        label: 'Notation Type',
+        placeholder: 'Notation Type',
+        graphQLPropertyName: 'etypCode',
+        options: [],
+        value: '',
+        colSize: 'col-xxl-11 col-xl-11 col-lg-11 col-md-11 col-sm-11 col-xs-11',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss: 'custom-notation-edit-input',
+      },
     ],
 
     [
@@ -291,7 +410,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -303,7 +423,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -315,11 +436,24 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
     ],
 
     [
+      {
+        type: FormFieldType.Text,
+        label: 'Required Actions',
+        placeholder: 'Required Actions',
+        graphQLPropertyName: 'requiredAction',
+        value: '',
+        colSize: 'col-lg-12 col-md-12 col-sm-12',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss: 'custom-notation-edit-input',
+      },
       {
         type: FormFieldType.Text,
         label: 'Required Actions',
@@ -348,8 +482,36 @@ export const GetNotationConfig = () => {
         customEditInputTextCss: 'custom-notation-edit-input',
       },
     ],
+    [
+      {
+        type: FormFieldType.Text,
+        label: 'Note',
+        placeholder: 'Note',
+        graphQLPropertyName: 'note',
+        value: '',
+        colSize: 'col-lg-12 col-md-12 col-sm-12',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss: 'custom-notation-edit-input',
+      },
+    ],
 
     [
+      {
+        type: FormFieldType.DropDown,
+        label: 'Ministry Contact',
+        placeholder: 'Ministry Contact',
+        graphQLPropertyName: 'psnorgId',
+        options: ministryContact,
+        value: '',
+        isImage: true,
+        colSize: 'col-lg-4 col-md-6 col-sm-12',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss: 'custom-notation-edit-input',
+      },
       {
         type: FormFieldType.DropDown,
         label: 'Ministry Contact',
@@ -435,7 +597,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -448,7 +611,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
     ],
   ];

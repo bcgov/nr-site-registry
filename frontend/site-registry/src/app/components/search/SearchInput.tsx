@@ -3,6 +3,7 @@ import { CircleXMarkIcon, MagnifyingGlassIcon } from '../common/icon';
 import { ISearchInput } from './ISearchInput';
 import './SearchInput.css';
 import React from 'react';
+import { v4 } from 'uuid';
 
 const SearchInput: React.FC<ISearchInput> = ({
   label,
@@ -15,17 +16,9 @@ const SearchInput: React.FC<ISearchInput> = ({
   createNewHandler,
   placeHolderText,
 }) => {
-  const handler =
-    optionSelectHandler ??
-    ((e) => {
-      console.log('handle option select');
-    });
+  const handler = optionSelectHandler ?? ((e) => {});
 
-  const addNewHandler =
-    createNewHandler ??
-    ((e) => {
-      console.log('Handle create new from search');
-    });
+  const addNewHandler = createNewHandler ?? ((e) => {});
 
   const [createMode, SetCreateMode] = useState(false);
 
@@ -37,12 +30,14 @@ const SearchInput: React.FC<ISearchInput> = ({
       clearSearch();
     }
   };
-
+  const searchId = label
+    ? label.replace(/\s+/g, '_') + '_' + v4()
+    : 'search_' + v4();
   return (
     <div>
       {label && (
         <label
-          htmlFor={label}
+          htmlFor={searchId}
           className="form-label custom-search-label"
           aria-labelledby={label}
         >
@@ -57,7 +52,7 @@ const SearchInput: React.FC<ISearchInput> = ({
             </span>
           )}
           <input
-            id={label}
+            id={searchId}
             aria-label={label}
             onChange={(event) => {
               handleSearchChange(event);
@@ -82,9 +77,10 @@ const SearchInput: React.FC<ISearchInput> = ({
 
           {searchTerm && !createMode && options && options.length > 0 && (
             <div className="search-options">
-              {options.map((option) => {
+              {options.map((option, index) => {
                 return (
                   <div
+                    key={index}
                     className="search-option-item"
                     onClick={(e) => {
                       handler(option);

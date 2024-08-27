@@ -11,5 +11,5 @@ interface IDropdowns {
 export interface IDropdownsState {
   dropdowns: IDropdowns;
   error?: string;
-  status: string;
+  status: RequestStatus;
 }

@@ -15,6 +15,7 @@ import {
   DropdownSearchInput,
   DeleteIcon,
   IconButton,
+  SearchCustomInput,
 } from '../../input-controls/InputControls';
 import { ChangeTracker } from '../../common/IChangeType';
 import { get } from '../utils';
@@ -149,8 +150,11 @@ const TableBody: FC<TableBodyProps> = ({
       value: value,
     };
 
-    if (isDeleteRow) rowDeleteHandler(changeRecord);
-    else changeHandler(changeRecord);
+    if (isDeleteRow) {
+      rowDeleteHandler(changeRecord);
+    } else {
+      changeHandler(changeRecord);
+    }
   };
 
   const getTableCellHtml = (
@@ -170,6 +174,7 @@ const TableBody: FC<TableBodyProps> = ({
           customInputTextCss={field.customInputTextCss}
           customEditLabelCss={field.customEditLabelCss}
           customEditInputTextCss={field.customEditInputTextCss}
+          customPlaceholderCss={field.customPlaceholderCss}
           placeholder={field.placeholder}
           value={value}
           onChange={(value) =>
@@ -181,6 +186,31 @@ const TableBody: FC<TableBodyProps> = ({
           isEditing={editMode ?? true}
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
+        />
+      );
+    } else if (field.type === FormFieldType.Search) {
+      return (
+        <SearchCustomInput
+          label={field.label}
+          customLabelCss={field.customLabelCss}
+          customInputTextCss={field.customInputTextCss}
+          customEditLabelCss={field.customEditLabelCss}
+          customEditInputTextCss={field.customEditInputTextCss}
+          placeholder={field.placeholder}
+          value={value}
+          options={field.options || []}
+          onChange={(value) =>
+            tableRecordChangeHandler(rowKey, field.graphQLPropertyName, value)
+          }
+          type={FormFieldType.Text}
+          validation={field.validation}
+          allowNumbersOnly={field.allowNumbersOnly}
+          isEditing={editMode ?? true}
+          tableMode={field.tableMode ?? false}
+          stickyCol={field.stickyCol}
+          customPlaceholderCss={field.customPlaceholderCss}
+          isLoading={field.isLoading}
+          customInfoMessage={field.customInfoMessage}
         />
       );
     } else if (field.type === FormFieldType.Label) {
@@ -236,6 +266,7 @@ const TableBody: FC<TableBodyProps> = ({
           customInputTextCss={field.customInputTextCss}
           customEditLabelCss={field.customEditLabelCss}
           customEditInputTextCss={field.customEditInputTextCss}
+          customPlaceholderCss={field.customPlaceholderCss}
           placeholder={field.placeholder}
           value={value}
           onChange={(value) =>
@@ -259,6 +290,7 @@ const TableBody: FC<TableBodyProps> = ({
           customInputTextCss={field.customInputTextCss}
           customEditLabelCss={field.customEditLabelCss}
           customEditInputTextCss={field.customEditInputTextCss}
+          customPlaceholderCss={field.customPlaceholderCss}
           placeholder={field.placeholder}
           isChecked={value === 'true' ? true : false}
           // value={value}
@@ -284,6 +316,7 @@ const TableBody: FC<TableBodyProps> = ({
           customInputTextCss={field.customInputTextCss}
           customEditLabelCss={field.customEditLabelCss}
           customEditInputTextCss={field.customEditInputTextCss}
+          customPlaceholderCss={field.customPlaceholderCss}
           placeholder={field.placeholder}
           value={value}
           onChange={(value) =>
@@ -303,6 +336,7 @@ const TableBody: FC<TableBodyProps> = ({
           customInputTextCss={field.customInputTextCss}
           customEditLabelCss={field.customEditLabelCss}
           customEditInputTextCss={field.customEditInputTextCss}
+          customPlaceholderCss={field.customPlaceholderCss}
           placeholder={field.placeholder}
           value={value}
           onChange={(value) =>
@@ -326,6 +360,7 @@ const TableBody: FC<TableBodyProps> = ({
           customInputTextCss={field.customInputTextCss}
           customEditLabelCss={field.customEditLabelCss}
           customEditInputTextCss={field.customEditInputTextCss}
+          customPlaceholderCss={field.customPlaceholderCss}
           placeholder={field.placeholder}
           options={field.options || []}
           value={value}
@@ -431,7 +466,7 @@ const TableBody: FC<TableBodyProps> = ({
 
     return (
       <React.Fragment>
-        <tr>
+        <tr data-testid="table-row">
           {allowRowsSelect && (
             <td className="table-border-light content-text positionSticky align-content-center">
               <input

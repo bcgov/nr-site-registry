@@ -81,18 +81,7 @@ const getSideBarNavList = (userRole:any) => {
         new SideNav(1, 'Text Search', false, textSearchIcon, '/search'),
         new SideNav(2, 'Map Search', false, mapLocationIcon, '/map'),
       ]),
-      new SideNav(
-        3,
-        'Resources',
-        true,
-        null,
-        '/',
-        [
-          new SideNav(1, 'Tools', false, toolsIcon, '/tools'),
-          new SideNav(2, 'Reference', false, referenceIcon, '/ref'),
-        ],
-        false,
-      ),      
+          
     ],
     sr: [
       new SideNav(1, 'Dashboard', true, dashboardIcon, '/dashboard'),

@@ -31,8 +31,7 @@ const roleBasedRoutes:any = {
     { path: '/dashboard', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
-    { path: '/folios', element: <Folios /> },
-    { path: '/folios/:id', element: <FolioContents /> },
+
     { path: '/map', element: <MapSearch /> },
     { path: '/map/:id', element: <MapSearch /> },
   ],

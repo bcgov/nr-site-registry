@@ -27,9 +27,9 @@ function SideBar() {
   const user = getUser();
 
   useEffect(()=>{
-   console.log('user updated');
+   console.log('user updated',user);
    SetNavList(getSideBarNavList(getLoggedInUserType()));
-  },[user])
+  },[getLoggedInUserType])
 
   const cartItemsArr = useSelector(cartItems);
 

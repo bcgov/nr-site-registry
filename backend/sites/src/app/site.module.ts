@@ -11,6 +11,7 @@ import { SiteDocs } from './entities/siteDocs.entity';
 import { SitePartics } from './entities/sitePartics.entity';
 import { SiteProfiles } from './entities/siteProfiles.entity';
 import { SiteSubdivisions } from './entities/siteSubdivisions.entity';
+import { Subdivisions } from './entities/subdivisions.entity';
 import { BceRegionCd } from './entities/bceRegionCd.entity';
 import { ClassificationCd } from './entities/classificationCd.entity';
 import { SiteRiskCd } from './entities/siteRiskCd.entity';
@@ -93,6 +94,7 @@ import { AssociatedSiteService } from './services/associatedSite/associatedSite.
       SitePartics,
       SiteProfiles,
       SiteSubdivisions,
+      Subdivisions,
       BceRegionCd,
       ClassificationCd,
       SiteRiskCd,

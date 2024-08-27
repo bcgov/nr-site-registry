@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, Index } from 'typeorm';
+import { Column, Entity, Index, OneToMany } from 'typeorm';
+import { SiteSubdivisions } from './siteSubdivisions.entity';
 
 @ObjectType()
 @Index('subdivisions_pkey', ['id'], { unique: true })
@@ -138,4 +139,11 @@ export class Subdivisions {
   @Field()
   @Column('character', { name: 'valid_pid', nullable: true, length: 1 })
   validPid: string | null;
+
+  @Field(() => SiteSubdivisions)
+  @OneToMany(
+    () => SiteSubdivisions,
+    (siteSubdivisions) => siteSubdivisions.subdivision,
+  )
+  siteSubdivisions: SiteSubdivisions[];
 }

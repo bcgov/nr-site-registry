@@ -5,11 +5,7 @@ import {
   RoleMatchingMode,
   Roles,
 } from 'nest-keycloak-connect';
-import {
-  CreateSnapshotDto,
-  SnapshotDto,
-  SnapshotResponse,
-} from '../../dto/snapshot.dto';
+import { CreateSnapshotDto, SnapshotResponse } from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { SnapshotsService } from '../../services/snapshot/snapshot.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
@@ -120,28 +116,7 @@ export class SnapshotsResolver {
       );
     }
   }
-
- @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
-  @Mutation(() => SnapshotResponse, { name: 'createSnapshot' })
-  async createSnapshot(
-    @Args('snapshot', { type: () => SnapshotDto }, new ValidationPipe())
-    snapshot: SnapshotDto,
-  ) {
-    const message = await this.snapshotsService.createSnapshot(snapshot);
-
-    if (message) {
-      return this.genericResponseProvider.createResponse(message, 201, true);
-    } else {
-      return this.genericResponseProvider.createResponse(
-        `Snapshot failed to insert.`,
-        400,
-        false,
-        null,
-      );
-    }
-  }
-
- @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Mutation(() => SnapshotResponse, { name: 'createSnapshotForSites' })
   async createSnapshotForSites(
     @Args('inputDto', { type: () => [CreateSnapshotDto] }, new ValidationPipe())

@@ -1,20 +1,22 @@
-import { GenericResponseProvider } from "../../dto/response/genericResponseProvider";
-import { SiteDocs } from "../../entities/siteDocs.entity";
-import { DocumentService } from "../../services/document/document.service";
-import { RoleMatchingMode, Roles } from "nest-keycloak-connect";
+import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
+import { SiteDocs } from '../../entities/siteDocs.entity';
+import { DocumentService } from '../../services/document/document.service';
+import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { GenericValidationPipe } from "../../utils/validations/genericValidationPipe";
-import { UsePipes } from "@nestjs/common";
-import { DocumentDto, DocumentResponse } from "../../dto/document.dto";
+import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
+import { UsePipes } from '@nestjs/common';
+import { DocumentDto, DocumentResponse } from '../../dto/document.dto';
 import { CustomRoles } from "src/app/dto/roles/role";
 
 
 @Resolver(() => SiteDocs)
 export class DocumentResolver {
-    constructor(
-        private readonly documentService: DocumentService,
-        private readonly genericResponseProvider: GenericResponseProvider<DocumentDto[]>,
-    ){}
+  constructor(
+    private readonly documentService: DocumentService,
+    private readonly genericResponseProvider: GenericResponseProvider<
+      DocumentDto[]
+    >,
+  ) {}
 
     @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
     @Query(() => DocumentResponse, { name: 'getSiteDocumentsBySiteId' })

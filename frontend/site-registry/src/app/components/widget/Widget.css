@@ -11,3 +11,8 @@
   line-height: 18px;
   text-align: left;
 }
+
+.widget-table-container {
+  max-height: 700px;
+  overflow: auto;
+}

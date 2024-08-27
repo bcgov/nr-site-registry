@@ -36,9 +36,9 @@ export class Events extends ChangeAuditEntity {
   @Column('timestamp without time zone', { name: 'event_date' })
   eventDate: Date;
 
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "completion_date",
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'completion_date',
     nullable: true,
   })
   completionDate: Date | null;
@@ -55,33 +55,37 @@ export class Events extends ChangeAuditEntity {
   @Column('bigint', { name: 'sp_id' })
   spId: string;
 
-  @Field({nullable: true})
-  @Column("character varying", { name: "required_action", nullable: true, length: 500 })
+  @Field({ nullable: true })
+  @Column('character varying', {
+    name: 'required_action',
+    nullable: true,
+    length: 500,
+  })
   requiredAction: string | null;
 
-  @Field({nullable: true})
-  @Column("character varying", { name: "note", nullable: true, length: 500 })
+  @Field({ nullable: true })
+  @Column('character varying', { name: 'note', nullable: true, length: 500 })
   note: string | null;
 
-  @Field({nullable: true})
-  @Column("character varying", {
-    name: "region_app_flag",
+  @Field({ nullable: true })
+  @Column('character varying', {
+    name: 'region_app_flag',
     nullable: true,
     length: 1,
   })
   regionAppFlag: string | null;
 
-  @Field({nullable: true})
-  @Column("character varying", {
-    name: "region_userid",
+  @Field({ nullable: true })
+  @Column('character varying', {
+    name: 'region_userid',
     nullable: true,
     length: 16,
   })
   regionUserid: string | null;
 
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "region_date",
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'region_date',
     nullable: true,
   })
   regionDate: Date | null;
@@ -90,9 +94,9 @@ export class Events extends ChangeAuditEntity {
   @Column('character varying', { name: 'who_created', length: 30 })
   whoCreated: string;
 
-  @Field({nullable: true})
-  @Column("character varying", {
-    name: "who_updated",
+  @Field({ nullable: true })
+  @Column('character varying', {
+    name: 'who_updated',
     nullable: true,
     length: 30,
   })
@@ -102,9 +106,9 @@ export class Events extends ChangeAuditEntity {
   @Column('timestamp without time zone', { name: 'when_created' })
   whenCreated: Date;
 
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "when_updated",
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'when_updated',
     nullable: true,
   })
   whenUpdated: Date | null;
@@ -117,9 +121,9 @@ export class Events extends ChangeAuditEntity {
   @Column('smallint', { name: 'rwm_note_flag' })
   rwmNoteFlag: number;
 
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "rwm_approval_date",
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'rwm_approval_date',
     nullable: true,
   })
   rwmApprovalDate: Date | null;
@@ -128,16 +132,16 @@ export class Events extends ChangeAuditEntity {
   @Column('character varying', { name: 'ecls_code', length: 6 })
   eclsCode: string;
 
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "requirement_due_date",
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'requirement_due_date',
     nullable: true,
   })
   requirementDueDate: Date | null;
 
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "requirement_received_date",
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'requirement_received_date',
     nullable: true,
   })
   requirementReceivedDate: Date | null;

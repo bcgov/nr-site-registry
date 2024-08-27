@@ -173,7 +173,7 @@ div.tableWidth::-webkit-scrollbar-track {
   width: 60%;
 }
 
-.small {
+.custom-small {
   width: 10%;
 }
 
@@ -187,7 +187,7 @@ div.tableWidth::-webkit-scrollbar-track {
 
 table td {
   white-space: nowrap; /* Prevent text from wrapping initially */
-  overflow: hidden; /* Hide overflowed text */
+  /* overflow: hidden; */
   text-overflow: ellipsis; /* Display ellipsis for overflowed text */
   word-wrap: break-word; /* Allow word breaks */
   overflow-wrap: break-word; /* Alternative for newer browsers */
@@ -196,3 +196,7 @@ table td {
   border: 1px solid;
   border-color: var(--surface-border-light);
 }
+
+/* table {
+  overflow: hidden;
+} */

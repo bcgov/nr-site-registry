@@ -22,12 +22,19 @@ describe('DocumentResolver', () => {
         {
           provide: GenericResponseProvider,
           useValue: {
-            createResponse: jest.fn((message: string, httpStatusCode: number, success: boolean, data?: DocumentDto[]) => ({
-              message,
-              httpStatusCode,
-              success,
-              data,
-            })),
+            createResponse: jest.fn(
+              (
+                message: string,
+                httpStatusCode: number,
+                success: boolean,
+                data?: DocumentDto[],
+              ) => ({
+                message,
+                httpStatusCode,
+                success,
+                data,
+              }),
+            ),
           },
         },
       ],
@@ -35,34 +42,42 @@ describe('DocumentResolver', () => {
 
     resolver = module.get<DocumentResolver>(DocumentResolver);
     documentService = module.get<DocumentService>(DocumentService);
-    genericResponseProvider = module.get<GenericResponseProvider<DocumentDto[]>>(GenericResponseProvider);
+    genericResponseProvider = module.get<
+      GenericResponseProvider<DocumentDto[]>
+    >(GenericResponseProvider);
   });
 
   it('should return site documents if found', async () => {
     const siteId = '123';
-    const mockDocuments: DocumentDto[] = [{
-      id: '1',
-      siteId: 'SITE456',
-      title: 'Document 1',
-      psnorgId:'1',
-      displayName:'Display Name',
-      submissionDate: new Date('2024-07-17').toISOString(),
-      documentDate: new Date('2024-07-17').toISOString(),
-    }];
+    const mockDocuments: DocumentDto[] = [
+      {
+        id: '1',
+        siteId: 'SITE456',
+        title: 'Document 1',
+        psnorgId: '1',
+        displayName: 'Display Name',
+        submissionDate: new Date('2024-07-17').toISOString(),
+        documentDate: new Date('2024-07-17').toISOString(),
+      },
+    ];
     const expectedResult: DocumentResponse = {
       message: 'Documents fetched successfully.',
       httpStatusCode: 200,
       success: true,
       data: mockDocuments,
     };
-    jest.spyOn(documentService, 'getSiteDocumentsBySiteId').mockResolvedValueOnce(mockDocuments);
+    jest
+      .spyOn(documentService, 'getSiteDocumentsBySiteId')
+      .mockResolvedValueOnce(mockDocuments);
 
     const result = await resolver.getSiteDocumentsBySiteId(siteId);
 
     expect(result).toEqual(expectedResult);
     expect(mockDocuments[0].id).toEqual('1');
     expect(mockDocuments[0].psnorgId).toEqual('1');
-    expect(documentService.getSiteDocumentsBySiteId).toHaveBeenCalledWith(siteId);
+    expect(documentService.getSiteDocumentsBySiteId).toHaveBeenCalledWith(
+      siteId,
+    );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       'Documents fetched successfully.',
       200,
@@ -81,12 +96,16 @@ describe('DocumentResolver', () => {
       data: null,
     };
 
-    jest.spyOn(documentService, 'getSiteDocumentsBySiteId').mockResolvedValueOnce(mockEmptyDocuments);
+    jest
+      .spyOn(documentService, 'getSiteDocumentsBySiteId')
+      .mockResolvedValueOnce(mockEmptyDocuments);
 
     const result = await resolver.getSiteDocumentsBySiteId(siteId);
 
     expect(result).toEqual(expectedResult);
-    expect(documentService.getSiteDocumentsBySiteId).toHaveBeenCalledWith(siteId);
+    expect(documentService.getSiteDocumentsBySiteId).toHaveBeenCalledWith(
+      siteId,
+    );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       `Documents not found for site id ${siteId}`,
       404,
@@ -99,13 +118,17 @@ describe('DocumentResolver', () => {
     const siteId = 123; // Invalid type
     const mockEmptyDocuments: DocumentDto[] = [];
 
-    jest.spyOn(documentService, 'getSiteDocumentsBySiteId').mockResolvedValueOnce(mockEmptyDocuments);
+    jest
+      .spyOn(documentService, 'getSiteDocumentsBySiteId')
+      .mockResolvedValueOnce(mockEmptyDocuments);
 
     const result = await resolver.getSiteDocumentsBySiteId(siteId as any);
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
-    expect(result.message).toContain(`Documents not found for site id ${siteId}`);
+    expect(result.message).toContain(
+      `Documents not found for site id ${siteId}`,
+    );
   });
 
   it('should return an error for empty siteId parameter', async () => {
@@ -125,19 +148,19 @@ describe('DocumentResolver', () => {
       id: '1',
       siteId: 'SITE456',
       title: 'Document 1',
-      psnorgId:'1',
-      displayName:'Display Name',
+      psnorgId: '1',
+      displayName: 'Display Name',
       submissionDate: new Date('2024-07-17'),
       documentDate: new Date('2024-07-17'),
     });
 
-    jest.spyOn(documentService, 'getSiteDocumentsBySiteId').mockResolvedValueOnce(mockLargeDocuments);
+    jest
+      .spyOn(documentService, 'getSiteDocumentsBySiteId')
+      .mockResolvedValueOnce(mockLargeDocuments);
 
     const result = await resolver.getSiteDocumentsBySiteId(siteId);
 
     expect(result.success).toEqual(true);
     expect(result.data).toHaveLength(1000);
   });
-
 });
-

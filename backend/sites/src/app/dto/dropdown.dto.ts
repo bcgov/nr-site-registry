@@ -9,10 +9,9 @@ export class DropdownResponse extends ResponseDto {
 
 @ObjectType()
 export class DropdownResponseWithMetaData extends ResponseDto {
-    @Field(() => [NotationDropdownDto],  { nullable: true })
-    data: NotationDropdownDto[] | null;
+  @Field(() => [NotationDropdownDto], { nullable: true })
+  data: NotationDropdownDto[] | null;
 }
-
 
 @ObjectType()
 export class DropdownDto {
@@ -25,10 +24,9 @@ export class DropdownDto {
 
 @ObjectType()
 export class NotationDropdownDto {
-
   @Field()
-  metaData: string
+  metaData: string;
 
   @Field(() => [DropdownDto])
-  dropdownDto: DropdownDto[]
+  dropdownDto: DropdownDto[];
 }

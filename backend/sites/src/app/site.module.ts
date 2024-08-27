@@ -11,6 +11,7 @@ import { SiteDocs } from './entities/siteDocs.entity';
 import { SitePartics } from './entities/sitePartics.entity';
 import { SiteProfiles } from './entities/siteProfiles.entity';
 import { SiteSubdivisions } from './entities/siteSubdivisions.entity';
+import { Subdivisions } from './entities/subdivisions.entity';
 import { BceRegionCd } from './entities/bceRegionCd.entity';
 import { ClassificationCd } from './entities/classificationCd.entity';
 import { SiteRiskCd } from './entities/siteRiskCd.entity';
@@ -60,6 +61,8 @@ import { DisclosureResolver } from './resolvers/disclosure/disclosure.resolver';
 import { CartResolver } from './resolvers/cart/cart.resolver';
 import { CartService } from './services/cart/cart.service';
 import { Cart } from './entities/cart.entity';
+import { LandHistoryResolver } from './resolvers/landHistory/landHistory.resolver';
+import { LandHistoryService } from './services/landHistory/landHistory.service';
 import { NotationResolver } from './resolvers/notation/notation.resolver';
 import { NotationService } from './services/notation/notation.service';
 import { DocumentResolver } from './resolvers/document/document.resolver';
@@ -92,6 +95,7 @@ import { HistoryLog } from './entities/HistoryLog.entity';
       SitePartics,
       SiteProfiles,
       SiteSubdivisions,
+      Subdivisions,
       BceRegionCd,
       ClassificationCd,
       SiteRiskCd,
@@ -154,6 +158,8 @@ import { HistoryLog } from './entities/HistoryLog.entity';
     GenericResponseProvider,
     CartResolver,
     CartService,
+    LandHistoryResolver,
+    LandHistoryService,
     NotationResolver,
     NotationService,
     DocumentResolver,

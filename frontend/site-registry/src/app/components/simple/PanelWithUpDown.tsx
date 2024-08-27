@@ -41,7 +41,7 @@ const PanelWithUpDown: FC<PanelWithUpDownProps> = ({
               className="border-0 bg-transparent"
               onClick={() => setShowDetails(!showDetails)}
               aria-label="Expand section"
-              data-testid = "Expand section"
+              data-testid="Expand section"
             >
               <ChevronDown />
             </button>
@@ -58,7 +58,7 @@ const PanelWithUpDown: FC<PanelWithUpDownProps> = ({
                 className="border-0 bg-transparent"
                 onClick={() => setShowDetails(!showDetails)}
                 aria-label="Collapse section"
-                data-testid = "Collapse section"
+                data-testid="Collapse section"
               >
                 <ChevronUp />
               </button>

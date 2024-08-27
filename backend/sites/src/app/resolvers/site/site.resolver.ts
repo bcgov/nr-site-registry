@@ -8,10 +8,10 @@ import {
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteService } from '../../services/site/site.service';
-import { DropdownDto, DropdownResponse } from 'src/app/dto/dropdown.dto';
-import { GenericResponseProvider } from 'src/app/dto/response/genericResponseProvider';
+import { DropdownDto, DropdownResponse } from '../../dto/dropdown.dto';
+import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { UsePipes } from '@nestjs/common';
-import { GenericValidationPipe } from 'src/app/utils/validations/genericValidationPipe';
+import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
 import { CustomRoles } from 'src/app/dto/roles/role';
 

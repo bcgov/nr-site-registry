@@ -1,5 +1,5 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { UsePipes} from '@nestjs/common';
+import { UsePipes } from '@nestjs/common';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
@@ -11,9 +11,11 @@ import { CustomRoles } from 'src/app/dto/roles/role';
 @Resolver(() => Events)
 export class NotationResolver {
   constructor(
-    private readonly notationService: NotationService, 
-    private readonly genericResponseProvider: GenericResponseProvider<NotationDto[]>,
-  ) { }
+    private readonly notationService: NotationService,
+    private readonly genericResponseProvider: GenericResponseProvider<
+      NotationDto[]
+    >,
+  ) {}
 
  @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => NotationResponse, { name: 'getSiteNotationBySiteId' })
@@ -23,11 +25,19 @@ export class NotationResolver {
   ) {
     const result = await this.notationService.getSiteNotationBySiteId(siteId);
     if (result && result.length > 0) {
-      return this.genericResponseProvider.createResponse('Site Notation fetched successfully', 200, true, result);
-    }
-    else
-    {
-      return this.genericResponseProvider.createResponse(`Site Notation data not found for site id: ${siteId}`, 404, false, null);
+      return this.genericResponseProvider.createResponse(
+        'Site Notation fetched successfully',
+        200,
+        true,
+        result,
+      );
+    } else {
+      return this.genericResponseProvider.createResponse(
+        `Site Notation data not found for site id: ${siteId}`,
+        404,
+        false,
+        null,
+      );
     }
   }
 }

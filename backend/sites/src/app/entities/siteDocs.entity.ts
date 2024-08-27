@@ -31,7 +31,7 @@ export class SiteDocs extends ChangeAuditEntity {
   @Column('timestamp without time zone', { name: 'submission_date' })
   submissionDate: Date;
 
-  @Field({nullable: true})
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'document_date',
     nullable: true,
@@ -42,7 +42,7 @@ export class SiteDocs extends ChangeAuditEntity {
   @Column('character varying', { name: 'title', length: 150 })
   title: string;
 
-  @Field({nullable: true})
+  @Field({ nullable: true })
   @Column('character varying', { name: 'note', nullable: true, length: 255 })
   note: string | null;
 
@@ -50,7 +50,7 @@ export class SiteDocs extends ChangeAuditEntity {
   @Column('character varying', { name: 'who_created', length: 30 })
   whoCreated: string;
 
-  @Field({nullable: true})
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'who_updated',
     nullable: true,
@@ -62,7 +62,7 @@ export class SiteDocs extends ChangeAuditEntity {
   @Column('timestamp without time zone', { name: 'when_created' })
   whenCreated: Date;
 
-  @Field({nullable: true})
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'when_updated',
     nullable: true,
@@ -73,12 +73,14 @@ export class SiteDocs extends ChangeAuditEntity {
   @Column('smallint', { name: 'rwm_flag' })
   rwmFlag: number;
 
-  @Field({nullable: true})
+  @Field({ nullable: true })
   @Column('smallint', { name: 'rwm_note_flag', nullable: true })
   rwmNoteFlag: number | null;
 
   @Field(() => [SiteDocPartics])
-  @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sdoc, {eager: true})
+  @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sdoc, {
+    eager: true,
+  })
   siteDocPartics: SiteDocPartics[];
 
   @ManyToOne(() => Sites, (sites) => sites.siteDocs, { onDelete: 'CASCADE' })

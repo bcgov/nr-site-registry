@@ -21,7 +21,7 @@ export class LandHistories extends ChangeAuditEntity{
   @Column('character varying', { primary: true, name: 'lut_code', length: 6 })
   lutCode: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', { name: 'note', nullable: true, length: 255 })
   note: string | null;
 
@@ -29,7 +29,7 @@ export class LandHistories extends ChangeAuditEntity{
   @Column('character varying', { name: 'who_created', length: 30 })
   whoCreated: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'who_updated',
     nullable: true,
@@ -41,7 +41,7 @@ export class LandHistories extends ChangeAuditEntity{
   @Column('timestamp without time zone', { name: 'when_created' })
   whenCreated: Date;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'when_updated',
     nullable: true,
@@ -56,20 +56,23 @@ export class LandHistories extends ChangeAuditEntity{
   @Column('smallint', { name: 'rwm_note_flag' })
   rwmNoteFlag: number;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('character', { name: 'site_profile', nullable: true, length: 1 })
   siteProfile: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   @Column('timestamp without time zone', {
     name: 'profile_date_received',
     nullable: true,
   })
   profileDateReceived: Date | null;
 
-  @ManyToOne(() => LandUseCd, (landUseCd) => landUseCd.landHistories)
+  @Field(() => LandUseCd)
+  @ManyToOne(() => LandUseCd, (landUseCd) => landUseCd.landHistories, {
+    eager: true,
+  })
   @JoinColumn([{ name: 'lut_code', referencedColumnName: 'code' }])
-  lutCode2: LandUseCd;
+  landUse: LandUseCd;
 
   @ManyToOne(() => Sites, (sites) => sites.landHistories, {
     onDelete: 'CASCADE',

@@ -1,8 +1,7 @@
+import { RequestStatus } from '../../../helpers/requests/status';
 
 export interface IDocumentsState {
-    siteDocuments: [];
-    error?: string;
-    status: string;
+  siteDocuments: [];
+  error?: string;
+  status: RequestStatus;
 }
-
-

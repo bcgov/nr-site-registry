@@ -26,6 +26,7 @@ import GetConfig from './ParticipantConfig';
 import { IParticipant } from './IParticipantState';
 import { v4 } from 'uuid';
 import { getUser } from '../../../helpers/utility';
+import ModalDialog from '../../../components/modaldialog/ModalDialog';
 
 const Participants = () => {
   const {
@@ -44,6 +45,8 @@ const Participants = () => {
   const [selectedRows, setSelectedRows] = useState<
     { participantId: any; psnorgId: any; prCode: string; guid: string }[]
   >([]);
+  const [isDelete, setIsDelete] = useState(false);
+
   const dispatch = useDispatch<AppDispatch>();
   const resetDetails = useSelector(resetSiteDetails);
   const mode = useSelector(siteDetailsMode);
@@ -133,53 +136,63 @@ const Participants = () => {
     alert(event);
   };
 
-  const handleRemoveParticipant = () => {
-    // Remove selected rows from formData state
-    setFormData((prevData) => {
-      return prevData.filter(
-        (participant) =>
-          !selectedRows.some(
-            (row) =>
-              row.participantId === participant.id &&
-              row.psnorgId === participant.psnorgId &&
-              row.prCode === participant.prCode &&
-              row.guid === participant.guid,
-          ),
+  const handleRemoveParticipant = (particIsDelete: boolean = false) => {
+    if (particIsDelete) {
+      // Remove selected rows from formData state
+      setFormData((prevData) => {
+        return prevData.filter(
+          (participant) =>
+            !selectedRows.some(
+              (row) =>
+                row.participantId === participant.id &&
+                row.psnorgId === participant.psnorgId &&
+                row.prCode === participant.prCode &&
+                row.guid === participant.guid,
+            ),
+        );
+      });
+      const tracker = new ChangeTracker(
+        IChangeType.Deleted,
+        'Site Participant',
       );
-    });
-
-    const tracker = new ChangeTracker(IChangeType.Deleted, 'Site Participant');
-    dispatch(trackChanges(tracker.toPlainObject()));
-
-    // Clear selectedRows state
-    setSelectedRows([]);
+      dispatch(trackChanges(tracker.toPlainObject()));
+      // Clear selectedRows state
+      setSelectedRows([]);
+      setIsDelete(false);
+    } else {
+      setIsDelete(true);
+    }
   };
 
   const handleTableChange = (event: any) => {
-    const isExist = formData.some(
-      (participant: any) => participant.id === event.row.id,
-    );
-    if (isExist && event.property.includes('select_row')) {
+    if (
+      event.property.includes('select_all') ||
+      event.property.includes('select_row')
+    ) {
+      let rows = event.property === 'select_row' ? [event.row] : event.value;
+      let isTrue =
+        event.property === 'select_row' ? event.value : event.selected;
       // Update selectedRows state based on checkbox selection
-      if (event.value) {
+      if (isTrue) {
         setSelectedRows((prevSelectedRows) => [
           ...prevSelectedRows,
-          {
-            participantId: event.row.id,
-            psnorgId: event.row.psnorgId,
-            prCode: event.row.prCode,
-            guid: event.row.guid,
-          },
+          ...rows.map((row: any) => ({
+            participantId: row.id,
+            psnorgId: row.psnorgId,
+            prCode: row.prCode,
+            guid: row.guid,
+          })),
         ]);
       } else {
         setSelectedRows((prevSelectedRows) =>
           prevSelectedRows.filter(
-            (row) =>
-              !(
-                row.participantId === event.row.id &&
-                row.psnorgId === event.row.psnorgId &&
-                row.prCode === event.row.prCode &&
-                row.guid === event.row.guid
+            (selectedRow) =>
+              !rows.some(
+                (row: any) =>
+                  selectedRow.participantId === row.id &&
+                  selectedRow.psnorgId === row.psnorgId &&
+                  selectedRow.prCode === row.prCode &&
+                  selectedRow.guid === row.guid,
               ),
           ),
         );
@@ -205,6 +218,7 @@ const Participants = () => {
         });
       }
     }
+
     const currLabel =
       participantColumnInternal &&
       participantColumnInternal.find(
@@ -333,6 +347,7 @@ const Participants = () => {
       </div>
       <div>
         <Widget
+          currentPage={1}
           changeHandler={handleTableChange}
           handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
           title={'Site Participants'}
@@ -382,7 +397,9 @@ const Participants = () => {
                   className={`d-flex align-items-center ${selectedRows.length > 0 ? `participant-btn` : `participant-btn-disable`}`}
                   disabled={selectedRows.length <= 0}
                   type="button"
-                  onClick={handleRemoveParticipant}
+                  onClick={() => {
+                    handleRemoveParticipant();
+                  }}
                   aria-label={'Remove Participant'}
                 >
                   <UserMinus
@@ -410,6 +427,20 @@ const Participants = () => {
             )}
         </Widget>
       </div>
+      {isDelete && (
+        <ModalDialog
+          key={v4()}
+          label={`Are you sure to ${isDelete ? 'delete' : 'replace'} associated site ?`}
+          closeHandler={(response) => {
+            if (response) {
+              if (isDelete) {
+                handleRemoveParticipant(response);
+              }
+            }
+            setIsDelete(false);
+          }}
+        />
+      )}
     </div>
   );
 };

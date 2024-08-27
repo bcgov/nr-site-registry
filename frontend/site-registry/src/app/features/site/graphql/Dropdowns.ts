@@ -18,90 +18,75 @@ export const graphQLParticipantRoleCd = () => {
 };
 
 export const graphQLPeopleOrgsCd = () => {
-    return(
-        gql
-        `query getPeopleOrgsCd
-        {
-            getPeopleOrgsCd
-            {
-                httpStatusCode,
-                success,
-                message,
-                timestamp,
-                data {
-                    metaData
-                    dropdownDto 
-                    {
-                        key
-                        value
-                    }
-                }
-            }
-        }`
-    )
-}
+  return gql`
+    query getPeopleOrgsCd {
+      getPeopleOrgsCd {
+        httpStatusCode
+        success
+        message
+        timestamp
+        data {
+          metaData
+          dropdownDto {
+            key
+            value
+          }
+        }
+      }
+    }
+  `;
+};
 
 export const graphQLNotationClassCd = () => {
-    return(
-        gql
-        `query getNotationClassCd
-        {
-            getNotationClassCd
-            {
-                httpStatusCode,
-                success,
-                message,
-                timestamp,
-                data {
-                    key
-                    value
-                }
-            }
-        }`
-    )
-}
+  return gql`
+    query getNotationClassCd {
+      getNotationClassCd {
+        httpStatusCode
+        success
+        message
+        timestamp
+        data {
+          key
+          value
+        }
+      }
+    }
+  `;
+};
 
 export const graphQLNotationParticipantRoleCd = () => {
-    return(
-        gql
-        `query getNotationParticipantRoleCd
-        {
-            getNotationParticipantRoleCd
-            {
-                httpStatusCode,
-                success,
-                message,
-                timestamp,
-                data {
-                    key
-                    value
-                }
-            }
-        }`
-    )
-}
+  return gql`
+    query getNotationParticipantRoleCd {
+      getNotationParticipantRoleCd {
+        httpStatusCode
+        success
+        message
+        timestamp
+        data {
+          key
+          value
+        }
+      }
+    }
+  `;
+};
 
 export const graphQLNotationTypeCd = () => {
-    return(
-        gql
-        `query getNotationTypeCd
-        {
-            getNotationTypeCd
-            {
-                httpStatusCode,
-                success,
-                message,
-                timestamp,
-                data 
-                {
-                    metaData
-                    dropdownDto 
-                    {
-                        key
-                        value
-                    }
-                }
-            }
-        }`
-    )
-}
+  return gql`
+    query getNotationTypeCd {
+      getNotationTypeCd {
+        httpStatusCode
+        success
+        message
+        timestamp
+        data {
+          metaData
+          dropdownDto {
+            key
+            value
+          }
+        }
+      }
+    }
+  `;
+};

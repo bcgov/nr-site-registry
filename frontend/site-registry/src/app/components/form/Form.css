@@ -145,3 +145,138 @@
 .custom-textarea {
   min-height: calc(1.5em + 0.75rem + 5px) !important;
 }
+
+.custom-search-input-label {
+  color: var(--typography-color-primary);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  text-align: left;
+}
+
+select::placeholder,
+option::placeholder,
+textarea::placeholder,
+input::placeholder {
+  color: var(--typography-color-disabled) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+  text-align: left !important;
+}
+
+.custom-search-input {
+  border: 1px solid var(--surface-color-border-light, #d8d8d8) !important;
+  background-color: var(--surface-background-white, #ffffff) !important;
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium) !important;
+  border-radius: var(--layout-margin-xsmall) !important;
+}
+
+.custom-search-icon-position {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.custom-search-icon {
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 20px;
+  text-align: center;
+  color: var(--icons-color-disabled, #9f9d9c);
+}
+
+.custom-clear-icon-position {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.custom-search-box-container {
+  display: flex;
+  flex-direction: row;
+  gap: var(--layout-margin-small);
+}
+
+.custom-search-input-item {
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium);
+  gap: var(--layout-margin-medium);
+  color: var(--typography-color-primary);
+}
+
+.custom-search-input-item:hover {
+  background-color: var(--surface-secondary-hover);
+  color: var(--typography-color-secondary);
+}
+
+.custom-search-input-item-first-child {
+  display: flex;
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium);
+  gap: var(--layout-margin-medium);
+}
+
+.custom-search-input-item-label {
+  color: var(--typography-color-disabled);
+  font: var(--typography-regular-label);
+}
+
+.custom-search-input-menu {
+  height: auto;
+  max-height: 220px;
+  overflow: auto;
+  border-radius: var(--surface-border-radius-medium);
+  padding: var(--layout-padding-medium) 0px var(--layout-padding-medium) 0px;
+  box-shadow: var(--surface-shadow-medium);
+  background-color: var(--surface-background-white);
+  /* inset: 37% auto auto auto; */
+  position: absolute;
+  /* left: calc(100% - 295px); */
+  z-index: 9999 !important;
+}
+
+/* Dropdown positioning when there's enough space below */
+.custom-search-input-menu-bottom {
+  top: 100%;
+  left: 0;
+}
+
+/* Dropdown positioning when there's not enough space below */
+.custom-search-input-menu-top {
+  bottom: 100%;
+  left: 0;
+}
+
+.custom-horizontal-line {
+  color: rgba(0, 0, 0, 0.175);
+}
+
+.custom-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050; /* Ensure it appears above other content */
+}
+
+.custom-fa-spin {
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

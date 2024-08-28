@@ -161,7 +161,6 @@ const Search = () => {
 
   const handleAddToShoppingCart = () => {
     const loggedInUser = getUser();
-    console.log(selectedRows);
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
@@ -182,7 +181,6 @@ const Search = () => {
   const [selectedRows, SetSelectedRows] = useState<any[]>([]);
 
   const changeHandler = (event: any) => {
-    console.log('handle', event);
     if (event && event.property === 'select_row') {
       if (event.value) {
         const index = selectedRows.findIndex((r: any) => r.id === event.row.id);

@@ -12,6 +12,7 @@ export interface IWidget {
   hideTitle?: boolean;
   editMode?: boolean;
   srMode?: boolean;
+  currentPage?: number;
   primaryKeycolumnName?: string;
   changeHandler?: (event: any) => void;
   handleCheckBoxChange?: (event: any) => void;

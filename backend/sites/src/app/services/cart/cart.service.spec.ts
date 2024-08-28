@@ -1,10 +1,10 @@
-import { DeleteResult, Repository } from 'typeorm';
+import { DeepPartial, DeleteResult, Repository } from 'typeorm';
 import { CartService } from './cart.service';
 import { Cart } from '../../entities/cart.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { sampleSites } from '../../mockData/site.mockData';
-import { CartDTO } from 'src/app/dto/cart.dto';
+import { CartDeleteDTO, CartDTO } from '../../dto/cart.dto';
 
 describe('CartSerive', () => {
   let cartService: CartService;
@@ -16,7 +16,24 @@ describe('CartSerive', () => {
         CartService,
         {
           provide: getRepositoryToken(Cart),
-          useClass: Repository,
+          useValue: {
+            find: jest.fn(),
+            save: jest.fn(),
+            delete: jest.fn(),
+            createQueryBuilder: jest.fn(() => ({
+              delete: jest.fn(() => ({
+                from: jest.fn(() => ({
+                  where: jest.fn(() => ({
+                    andWhere: jest.fn(() => ({
+                      execute: jest
+                        .fn()
+                        .mockResolvedValue({ affected: 1 } as DeleteResult),
+                    })),
+                  })),
+                })),
+              })),
+            })),
+          },
         },
       ],
     }).compile();
@@ -60,10 +77,6 @@ describe('CartSerive', () => {
   });
 
   it('should insert a new cart Item', async () => {
-    // Mock recentViewsRepository methods
-    jest.spyOn(cartRepository, 'findOne').mockResolvedValue(null);
-    jest.spyOn(cartRepository, 'save').mockResolvedValueOnce({} as Cart); // Mock save method
-
     // Prepare test data
     const cartItemDTO: CartDTO = {
       userId: '1',
@@ -72,11 +85,26 @@ describe('CartSerive', () => {
       whoCreated: 'Midhun',
     };
 
+    const cartItem: DeepPartial<Cart[]> = [
+      {
+        userId: '2',
+        siteId: '2',
+        price: 200,
+        whoCreated: 'Midhun',
+        site: null,
+      },
+    ];
+
+    // Mock recentViewsRepository methods
+    jest.spyOn(cartRepository, 'find').mockResolvedValue(cartItem as any);
+    jest
+      .spyOn(cartRepository, 'save')
+      .mockResolvedValueOnce([cartItemDTO] as any); // Mock save method
     // Execute the method
-    const result = await cartService.addCartItem(cartItemDTO);
+    const result = await cartService.addCartItem([cartItemDTO], '');
 
     // Assert the result
-    expect(result).toBe('Cart Item Added.');
+    expect(result).toBe(true);
   });
 
   it('should delete cart item', async () => {
@@ -87,9 +115,12 @@ describe('CartSerive', () => {
 
     // Mock recentViewsRepository methods
     jest.spyOn(cartRepository, 'delete').mockResolvedValue(deleteResult);
-
+    const cartItems: CartDeleteDTO = {
+      userId: '1',
+      cartId: '1',
+    };
     // Execute the method
-    const result = await cartService.deleteCartItem('1');
+    const result = await cartService.deleteCartItem([cartItems], '');
 
     // Assert the result
     expect(result).toBe(true);

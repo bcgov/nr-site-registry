@@ -16,7 +16,7 @@ const getColumnSize = (columnSize: ColumnSize | undefined) => {
     case ColumnSize.Double:
       return 'double';
     case ColumnSize.Small:
-      return 'small';
+      return 'custom-small';
     case ColumnSize.XtraSmall:
       return 'xtraSmall';
     default:

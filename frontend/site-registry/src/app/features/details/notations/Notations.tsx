@@ -32,6 +32,8 @@ import Actions from '../../../components/action/Actions';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import { notationTypeDrpdown } from '../dropdowns/DropdownSlice';
 import { notationParticipants, updateSiteNotation } from './NotationSlice';
+import ModalDialog from '../../../components/modaldialog/ModalDialog';
+import { v4 } from 'uuid';
 
 const Notations = () => {
   const {
@@ -58,8 +60,18 @@ const Notations = () => {
   );
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
   const [searchTerm, setSearchTerm] = useState('');
+  const [isDelete, setIsDelete] = useState(false);
+  const [isUpdated, setIsUpdated] = useState(false);
+  const [updatedNotationFormRowEditMode, setUpdatedNotationFormRowEditMode] =
+    useState<IFormField[][]>([]);
+  const [selectedRows, setSelectedRows] = useState<
+    { id: any; participantId: any }[]
+  >([]);
+  const [currentNotation, setCurrentNotation] = useState({});
 
   const loggedInUser = getUser();
+  const resetDetails = useSelector(resetSiteDetails);
+
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
       setUserType(UserType.External);
@@ -73,6 +85,16 @@ const Notations = () => {
     }
     setFormData(notations);
   }, []);
+
+  useEffect(() => {
+    setViewMode(mode);
+  }, [mode]);
+
+  useEffect(() => {
+    if (resetDetails) {
+      setFormData(notations);
+    }
+  }, [resetDetails]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value;
@@ -93,7 +115,6 @@ const Notations = () => {
           return true;
         }
       }
-
       const stringValue =
         typeof value === 'string'
           ? value.toLowerCase()
@@ -122,29 +143,18 @@ const Notations = () => {
       if (stringValue.includes(searchTerm)) {
         return true;
       }
+      if (stringValue.includes(searchTerm)) {
+        return true;
+      }
     }
     return false;
   };
-
-  useEffect(() => {
-    setViewMode(mode);
-  }, [mode]);
 
   const clearSearch = () => {
     setSearchTerm('');
     setFormData(notations);
   };
 
-  const resetDetails = useSelector(resetSiteDetails);
-  useEffect(() => {
-    if (resetDetails) {
-      setFormData(notations);
-    }
-  }, [resetDetails]);
-
-  const [isUpdated, setIsUpdated] = useState(false);
-  const [updatedNotationFormRowEditMode, setUpdatedNotationFormRowEditMode] =
-    useState<IFormField[][]>([]);
   const handleInputChange = (
     id: number,
     graphQLPropertyName: any,
@@ -177,8 +187,9 @@ const Notations = () => {
         return notation;
       });
       setFormData(updatedNotation);
-      dispatch(updateSiteNotation(updatedNotation));
+      // dispatch(updateSiteNotation(updatedNotation))
     }
+
     const flattedArr = flattenFormRows(notationFormRowsInternal);
     const currLabel =
       flattedArr &&
@@ -197,63 +208,78 @@ const Notations = () => {
     alert(`${value}, ${id}`);
   };
 
-  const [selectedRows, setSelectedRows] = useState<
-    { id: any; participantId: any }[]
-  >([]);
-
-  const handleRemoveParticipant = (id: any) => {
-    // Remove selected rows from formData state
-    setFormData((prevData) => {
-      return prevData.map((notation) => {
-        if (notation.id === id) {
-          // Filter out selected rows from notationParticipant array
-          const updatedNotationParticipant =
-            notation.notationParticipant.filter(
-              (participant: any) =>
-                !selectedRows.some(
-                  (row) =>
-                    row.id === notation.id &&
-                    row.participantId === participant.guid,
-                ),
-            );
-          return {
-            ...notation,
-            notationParticipant: updatedNotationParticipant,
-          };
-        }
-        return notation;
+  const handleRemoveParticipant = (
+    currNotation: any,
+    particIsDelete: boolean = false,
+  ) => {
+    if (particIsDelete) {
+      // Remove selected rows from formData state
+      setFormData((prevData) => {
+        return prevData.map((notation) => {
+          if (notation.id === currNotation.id) {
+            // Filter out selected rows from notationParticipant array
+            const updatedNotationParticipant =
+              notation.notationParticipant.filter(
+                (participant: any) =>
+                  !selectedRows.some(
+                    (row) =>
+                      row.id === notation.id &&
+                      row.participantId === participant.guid,
+                  ),
+              );
+            return {
+              ...notation,
+              notationParticipant: updatedNotationParticipant,
+            };
+          }
+          return notation;
+        });
       });
-    });
-    const tracker = new ChangeTracker(
-      IChangeType.Deleted,
-      'Notation Participant Delete',
-    );
-    dispatch(trackChanges(tracker.toPlainObject()));
-    // Clear selectedRows state
+      const tracker = new ChangeTracker(
+        IChangeType.Deleted,
+        'Notation Participant Delete',
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+      // Clear selectedRows state
 
-    const updateSelectedRows = selectedRows.filter((row) => row.id !== id);
-    setSelectedRows(updateSelectedRows);
+      const updateSelectedRows = selectedRows.filter(
+        (row) => row.id !== currNotation.id,
+      );
+      setSelectedRows(updateSelectedRows);
+      setCurrentNotation({});
+      setIsDelete(false);
+    } else {
+      setCurrentNotation(currNotation);
+      setIsDelete(true);
+    }
   };
 
   const handleTableChange = (id: any, event: any) => {
-    const isExist = formData.some(
-      (item) =>
-        item.id === id &&
-        item.notationParticipant.some(
-          (participant: any) => participant.guid === event.row.guid,
-        ),
-    );
-    if (isExist && event.property.includes('select_row')) {
-      // Update selectedRows state based on checkbox selection
-      if (event.value) {
+    if (
+      event.property.includes('select_all') ||
+      event.property.includes('select_row')
+    ) {
+      let rows = event.property === 'select_row' ? [event.row] : event.value;
+      let isTrue =
+        event.property === 'select_row' ? event.value : event.selected;
+      if (isTrue) {
+        // setSelectedRows(prevSelectedRows => [...prevSelectedRows, { id, participantId: event.row.guid }]);
         setSelectedRows((prevSelectedRows) => [
           ...prevSelectedRows,
-          { id, participantId: event.row.guid },
+          ...rows.map((row: any) => ({
+            id,
+            participantId: row.guid,
+          })),
         ]);
       } else {
         setSelectedRows((prevSelectedRows) =>
           prevSelectedRows.filter(
-            (row) => !(row.id === id && row.participantId === event.row.guid),
+            (selectedRow) =>
+              !rows.some(
+                (row: any) =>
+                  selectedRow.participantId === row.guid &&
+                  selectedRow.id === id,
+              ),
           ),
         );
       }
@@ -275,8 +301,18 @@ const Notations = () => {
         }
         return notation;
       });
+
+      const currLabel =
+        notationColumnInternal &&
+        notationColumnInternal.find(
+          (row) => row.graphQLPropertyName === event.property,
+        );
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Notation Participant: ' + currLabel?.displayName,
+      );
       setFormData(updateNotationParticipant);
-      dispatch(updateSiteNotation(updateNotationParticipant));
+      // dispatch(updateSiteNotation(updateNotationParticipant))
     }
   };
 
@@ -344,11 +380,10 @@ const Notations = () => {
 
   const handleAddParticipant = (id: any) => {
     const newParticipant = {
-      id: Date.now(), // Generate a unique ID for the new participant
-      role: '',
-      participantName: '',
-      sr: false,
-      date: new Date(),
+      displayName: '',
+      eprCode: '',
+      psnorgId: '',
+      guid: v4(),
     };
 
     setFormData((prevFormData) => {
@@ -536,188 +571,12 @@ const Notations = () => {
               />
             </div>
           </div>
-          <div
-            data-testid="notation-rows"
-            className={`col-lg-12 overflow-auto p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`}
-            style={{ maxHeight: '800px' }}
-          >
-            {formData &&
-              formData.map((notation, index) => (
-                <div key={index}>
-                  {viewMode === SiteDetailsMode.SRMode &&
-                    userType === UserType.Internal && (
-                      <CheckBoxInput
-                        type={FormFieldType.Checkbox}
-                        label={''}
-                        isLabel={false}
-                        onChange={(value) =>
-                          handleParentChekBoxChange(notation.id, value)
-                        }
-                        srMode={viewMode === SiteDetailsMode.SRMode}
-                      />
-                    )}
-                  <PanelWithUpDown
-                    firstChild={
-                      <div className="w-100" key={index}>
-                        <Form
-                          formRows={handleNotationFormRowFirstChild(notation)}
-                          formData={notation}
-                          editMode={viewMode === SiteDetailsMode.EditMode}
-                          srMode={viewMode === SiteDetailsMode.SRMode}
-                          handleInputChange={(graphQLPropertyName, value) =>
-                            handleInputChange(
-                              notation.id,
-                              graphQLPropertyName,
-                              value,
-                            )
-                          }
-                          aria-label="Sort Notation Form"
-                        />
-                        {userType === UserType.Internal && (
-                          <span className="sr-time-stamp">
-                            {notation.srTimeStamp}
-                          </span>
-                        )}
-                      </div>
-                    }
-                    secondChild={
-                      <div className="w-100">
-                        <Form
-                          formRows={
-                            userType === UserType.External
-                              ? handleNotationFormRowExternal(notation)
-                              : viewMode === SiteDetailsMode.EditMode
-                                ? handleChangeNotationFormRow(notation)
-                                : viewMode === SiteDetailsMode.SRMode
-                                  ? handleNotationFormRowExternal(notation)
-                                  : handleNotationFormRowsInternal(notation)
-                          }
-                          formData={notation}
-                          editMode={viewMode === SiteDetailsMode.EditMode}
-                          srMode={viewMode === SiteDetailsMode.SRMode}
-                          handleInputChange={(graphQLPropertyName, value) =>
-                            handleInputChange(
-                              notation.id,
-                              graphQLPropertyName,
-                              value,
-                            )
-                          }
-                          aria-label="Sort Notation Form"
-                        />
-                        <Widget
-                          changeHandler={(event) =>
-                            handleTableChange(notation.id, event)
-                          }
-                          handleCheckBoxChange={(event) =>
-                            handleWidgetCheckBox(event)
-                          }
-                          title={'Notation Participants'}
-                          tableColumns={
-                            userType === UserType.Internal
-                              ? notationColumnInternal
-                              : notationColumnExternal
-                          }
-                          tableData={notation.notationParticipant}
-                          tableIsLoading={
-                            notation.notationParticipant.length > 0
-                              ? loading
-                              : RequestStatus.idle
-                          }
-                          allowRowsSelect={
-                            viewMode === SiteDetailsMode.EditMode
-                          }
-                          aria-label="Notation Widget"
-                          hideTable={false}
-                          hideTitle={false}
-                          editMode={
-                            viewMode === SiteDetailsMode.EditMode &&
-                            userType === UserType.Internal
-                          }
-                          srMode={
-                            viewMode === SiteDetailsMode.SRMode &&
-                            userType === UserType.Internal
-                          }
-                          primaryKeycolumnName="guid"
-                          sortHandler={(row, ascDir) => {
-                            handleTableSort(row, ascDir, notation.id);
-                          }}
-                        >
-                          {viewMode === SiteDetailsMode.EditMode &&
-                            userType === UserType.Internal && (
-                              <div
-                                className="d-flex gap-2 flex-wrap "
-                                key={notation.id}
-                              >
-                                <button
-                                  id="add-participant-btn"
-                                  className=" d-flex align-items-center notation-btn"
-                                  type="button"
-                                  onClick={() =>
-                                    handleAddParticipant(notation.id)
-                                  }
-                                  aria-label={'Add Participant'}
-                                >
-                                  <UserPlus className="btn-user-icon" />
-                                  <span className="notation-btn-lbl">
-                                    {'Add Participant'}
-                                  </span>
-                                </button>
-
-                                <button
-                                  id="delete-participant-btn"
-                                  className={`d-flex align-items-center ${isAnyParticipantSelected(notation.id) ? `notation-btn` : `notation-btn-disable`}`}
-                                  disabled={
-                                    !isAnyParticipantSelected(notation.id)
-                                  }
-                                  type="button"
-                                  onClick={() =>
-                                    handleRemoveParticipant(notation.id)
-                                  }
-                                  aria-label={'Remove Participant'}
-                                >
-                                  <UserMinus
-                                    className={`${isAnyParticipantSelected(notation.id) ? `btn-user-icon` : `btn-user-icon-disabled`}`}
-                                  />
-                                  <span
-                                    className={`${isAnyParticipantSelected(notation.id) ? `notation-btn-lbl` : `notation-btn-lbl-disabled`}`}
-                                  >
-                                    {'Remove Participant'}
-                                  </span>
-                                </button>
-                              </div>
-                            )}
-                          {viewMode === SiteDetailsMode.SRMode &&
-                            userType === UserType.Internal && (
-                              <Actions
-                                label="Set SR Visibility"
-                                items={srVisibilityConfig}
-                                onItemClick={handleItemClick}
-                                customCssToggleBtn={
-                                  false
-                                    ? `notation-sr-btn`
-                                    : `notation-sr-btn-disable`
-                                }
-                                disable={viewMode === SiteDetailsMode.SRMode}
-                              />
-                            )}
-                        </Widget>
-                        {userType === UserType.Internal && (
-                          <p className="sr-time-stamp">
-                            {notation.srTimeStamp}
-                          </p>
-                        )}
-                      </div>
-                    }
-                  />
-                </div>
-              ))}
-          </div>
         </div>
       </div>
       <div
         data-testid="notation-rows"
         className={`col-lg-12 overflow-auto p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`}
-        style={{ maxHeight: '1000px' }}
+        style={{ maxHeight: '800px' }}
       >
         {formData &&
           formData.map((notation, index) => (
@@ -731,6 +590,7 @@ const Notations = () => {
                     onChange={(value) =>
                       handleParentChekBoxChange(notation.id, value)
                     }
+                    srMode={viewMode === SiteDetailsMode.SRMode}
                   />
                 )}
               <PanelWithUpDown
@@ -789,6 +649,7 @@ const Notations = () => {
                         handleWidgetCheckBox(event)
                       }
                       title={'Notation Participants'}
+                      currentPage={1}
                       tableColumns={
                         userType === UserType.Internal
                           ? notationColumnInternal
@@ -841,9 +702,7 @@ const Notations = () => {
                               className={`d-flex align-items-center ${isAnyParticipantSelected(notation.id) ? `notation-btn` : `notation-btn-disable`}`}
                               disabled={!isAnyParticipantSelected(notation.id)}
                               type="button"
-                              onClick={() =>
-                                handleRemoveParticipant(notation.id)
-                              }
+                              onClick={() => handleRemoveParticipant(notation)}
                               aria-label={'Remove Participant'}
                             >
                               <UserMinus
@@ -881,6 +740,21 @@ const Notations = () => {
             </div>
           ))}
       </div>
+      {isDelete && (
+        <ModalDialog
+          key={v4()}
+          label={`Are you sure to ${isDelete ? 'delete' : 'replace'} notation participant ?`}
+          closeHandler={(response) => {
+            if (response) {
+              if (isDelete) {
+                handleRemoveParticipant(currentNotation, response);
+              }
+            }
+            setCurrentNotation({});
+            setIsDelete(false);
+          }}
+        />
+      )}
     </div>
   );
 };

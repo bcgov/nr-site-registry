@@ -72,6 +72,19 @@ export class SnapshotsService {
     }
   }
 
+  async getMostRecentSnapshot(siteId: string, userId: string) {
+    try {
+      const result = await this.snapshotRepository.findOne({
+        where: { siteId, userId },
+        order: { whenCreated: 'DESC' },
+      });
+
+      return result;
+    } catch (error) {
+      throw new Error('Failed to retrieve the most recent snapshot.');
+    }
+  }
+
   async getSnapshotsById(id: number) {
     try {
       const result = await this.snapshotRepository.find({ where: { id } });

@@ -145,7 +145,7 @@ export class SnapshotsResolver {
       );
     }
   }
-  
+
   @Roles({
     roles: [
       CustomRoles.External,
@@ -193,11 +193,7 @@ export class SnapshotsResolver {
   }
 
   @Roles({
-    roles: [
-      CustomRoles.External,
-      CustomRoles.Internal,
-      CustomRoles.SiteRegistrar,
-    ],
+    roles: [CustomRoles.External],
     mode: RoleMatchingMode.ANY,
   })
   @Query(() => BannerTypeResponse, { name: 'getBannerType' })

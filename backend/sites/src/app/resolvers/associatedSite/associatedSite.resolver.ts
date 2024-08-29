@@ -20,7 +20,14 @@ export class AssociatedSiteResolver {
     >,
   ) {}
 
-  @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => AssociatedSiteResponse, { name: 'getAssociatedSitesBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getAssociatedSitesBySiteId(

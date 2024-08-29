@@ -1,10 +1,8 @@
-import { Field, InputType } from "@nestjs/graphql";
-import { ChangeAuditEntityDTO } from "./changeAuditEntity.dto";
-
+import { Field, InputType } from '@nestjs/graphql';
+import { ChangeAuditEntityDTO } from './changeAuditEntity.dto';
 
 @InputType()
-export class SiteSummaryDTO extends ChangeAuditEntityDTO
-{
+export class SiteSummaryDTO extends ChangeAuditEntityDTO {
   @Field()
   id: string;
 
@@ -104,6 +102,6 @@ export class SiteSummaryDTO extends ChangeAuditEntityDTO
   @Field()
   latlongReliabilityFlag: string;
 
-  @Field() 
+  @Field()
   siteRiskCode: string;
 }

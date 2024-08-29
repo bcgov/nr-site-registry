@@ -87,8 +87,8 @@ export const sampleSites: Sites[] = [
     snapshots: snapshots,
     cart: cart,
     folioContents: folio,
-    srAction:'',
-    userAction:''
+    srAction: '',
+    userAction: '',
   },
   {
     id: '222',
@@ -144,7 +144,7 @@ export const sampleSites: Sites[] = [
     snapshots: snapshots,
     cart: cart,
     folioContents: folio,
-     srAction:'',
-    userAction:''
+    srAction: '',
+    userAction: '',
   },
 ];

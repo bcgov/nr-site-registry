@@ -17,7 +17,14 @@ export class DashboardResolver {
     >,
   ) {}
 
-  @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => RecentViewResponse, { name: 'getRecentViewsByUserId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getRecentViewsByUserId(
@@ -41,7 +48,14 @@ export class DashboardResolver {
     }
   }
 
-  @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Mutation(() => RecentViewResponse, { name: 'addRecentView' })
   async addRecentView(
     @Args('recentView', { type: () => RecentViewDto }, new ValidationPipe())

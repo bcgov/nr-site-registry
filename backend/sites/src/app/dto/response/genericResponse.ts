@@ -21,8 +21,6 @@ export class FetchSiteResponse extends BaseHttpResponse {
   }
 }
 
-
-
 @ObjectType()
 export class SaveSiteDetailsResponse extends BaseHttpResponse {
   @Field(() => [Sites])
@@ -38,7 +36,6 @@ export class SaveSiteDetailsResponse extends BaseHttpResponse {
     this.data = data;
   }
 }
-
 
 /**
  * Class for returing fetch site response from graphql services

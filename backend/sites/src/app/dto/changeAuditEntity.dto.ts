@@ -1,8 +1,6 @@
-import { Field } from "@nestjs/graphql";
+import { Field } from '@nestjs/graphql';
 
-export class ChangeAuditEntityDTO
-{
-
+export class ChangeAuditEntityDTO {
   @Field()
   userAction: string;
 

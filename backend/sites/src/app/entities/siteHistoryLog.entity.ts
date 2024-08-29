@@ -1,11 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  Index
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm';
 import { SaveSiteDetailsDTO } from '../dto/saveSiteDetails.dto';
 import { BaseAuditEntity } from './baseAuditEntity';
 

@@ -16,7 +16,14 @@ export class ParticipantResolver {
     >,
   ) {}
 
- @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => SiteParticsResponse, { name: 'getSiteParticipantBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSiteParticipantsBySiteId(

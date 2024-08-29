@@ -13,7 +13,6 @@ import { EventTypeCd } from './eventTypeCd.entity';
 import { Sites } from './sites.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
 
-
 @ObjectType()
 @Index('event_described_by_frgn', ['eclsCode', 'etypCode'], {})
 @Index('events_pkey', ['id'], { unique: true })

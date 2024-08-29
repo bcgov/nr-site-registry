@@ -4,7 +4,6 @@ import { LandUseCd } from './landUseCd.entity';
 import { Sites } from './sites.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
 
-
 @ObjectType()
 @Index('land_histories_pkey', ['lutCode', 'siteId'], { unique: true })
 @Index('sluh_described_by_frgn', ['lutCode'], {})
@@ -12,7 +11,7 @@ import { ChangeAuditEntity } from './changeAuditEntity';
 @Index('sluh_rwm_note_flag', ['rwmNoteFlag'], {})
 @Index('sluh_applicable_to_frgn', ['siteId'], {})
 @Entity('land_histories')
-export class LandHistories extends ChangeAuditEntity{
+export class LandHistories extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'site_id' })
   siteId: string;

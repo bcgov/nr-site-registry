@@ -4,7 +4,6 @@ import { Sites } from './sites.entity';
 import { Subdivisions } from './subdivisions.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
 
-
 @ObjectType()
 @Index(
   'site_subdivisions_site_id_subdiv_id_sprof_date_completed_key',
@@ -77,9 +76,13 @@ export class SiteSubdivisions extends ChangeAuditEntity {
   @JoinColumn([{ name: 'site_id', referencedColumnName: 'id' }])
   site: Sites;
 
-  @ManyToOne(() => Subdivisions, (subdivisions) => subdivisions.siteSubdivisions, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(
+    () => Subdivisions,
+    (subdivisions) => subdivisions.siteSubdivisions,
+    {
+      onDelete: 'CASCADE',
+    },
+  )
   @JoinColumn([{ name: 'subdiv_id', referencedColumnName: 'id' }])
   subdivision: Subdivisions;
 }

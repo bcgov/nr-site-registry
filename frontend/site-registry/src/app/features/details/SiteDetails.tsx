@@ -63,6 +63,8 @@ import {
   fetchSnapshots,
   snapshots,
   getFirstSnapshotCreatedDate,
+  selectBannerType,
+  getBannerType,
 } from './snapshot/SnapshotSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 import {
@@ -77,7 +79,8 @@ import {
   IFormField,
 } from '../../components/input-controls/IFormField';
 import BannerDetails from '../../components/banners/BannerDetails';
-import { 
+import {
+  getSiteDetailsToBeSaved,
   resetSaveSiteDetails,
   resetSaveSiteDetailsRequestStatus,
   saveRequestStatus,
@@ -87,13 +90,12 @@ import {
 import { fetchAssociatedSites } from './associates/AssociateSlice';
 
 const SiteDetails = () => {
-  
+  const siteDetailsTobeSaved = useSelector(getSiteDetailsToBeSaved);
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
 
   const folioDetails = useSelector(folioItems);
 
   const addSiteToFolioRequestStatus = useSelector(addSiteToFolioRequest);
-
 
   const handleFolioSelect = (folioId: string) => {
     let selectedFolio = folioDetails.filter(
@@ -144,6 +146,7 @@ const SiteDetails = () => {
   const [isVisible, setIsVisible] = useState(false);
   const snapshot = useSelector(snapshots);
   const snapshotTakenDate = useSelector(getFirstSnapshotCreatedDate);
+  const bannerType = useSelector(selectBannerType);
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
@@ -155,36 +158,29 @@ const SiteDetails = () => {
 
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
 
-  useEffect(()=>{
-
-    if(saveSiteDetailsRequestStatus === RequestStatus.success || saveSiteDetailsRequestStatus === RequestStatus.failed)
-    {
-      if(saveSiteDetailsRequestStatus === RequestStatus.success)
-      {
+  useEffect(() => {
+    if (
+      saveSiteDetailsRequestStatus === RequestStatus.success ||
+      saveSiteDetailsRequestStatus === RequestStatus.failed
+    ) {
+      if (saveSiteDetailsRequestStatus === RequestStatus.success) {
         dispatch(resetSaveSiteDetails(null));
         dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
         setEdit(false);
-      }
-      else
-      {
+      } else {
         // dont close edit mode
       }
 
       showNotification(
         saveSiteDetailsRequestStatus,
         'Successfully saved site details',
-        'Failed To save site details'
+        'Failed To save site details',
       );
       dispatch(resetSaveSiteDetailsRequestStatus(null));
-
-      
-    }  
-    else
-    {
-       // do nothing
+    } else {
+      // do nothing
     }
-
-  },[saveSiteDetailsRequestStatus])
+  }, [saveSiteDetailsRequestStatus]);
 
   const navigate = useNavigate();
   const onClickBackButton = () => {
@@ -241,8 +237,11 @@ const SiteDetails = () => {
     if (id) {
       dispatch(resetSaveSiteDetails(null));
       dispatch(setupSiteIdForSaving(id));
+      dispatch(setupSiteIdForSaving(id));
       Promise.all([
         dispatch(fetchSnapshots(id ?? '')),
+        dispatch(getBannerType(id)),
+        // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '' })),
       ])
         .then(() => {
@@ -453,11 +452,7 @@ const SiteDetails = () => {
             closeHandler={(response) => {
               setSave(false);
               if (response) {
-                
-               
-               
                 dispatch(saveSiteDetails(null)).unwrap();
-              
               }
             }}
           >
@@ -586,13 +581,16 @@ const SiteDetails = () => {
           </div>
         )}
         <div className="section-details-header row">
-          {UserType.External === userType && (
-            <div>
-              <BannerDetails
-                snapshotDate={`Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`}
-              />
-            </div>
-          )}
+          {UserType.External === userType &&
+            snapshot.status === RequestStatus.success &&
+            snapshot.snapshot.data !== null && (
+              <div>
+                <BannerDetails
+                  bannerType={bannerType}
+                  snapshotDate={`Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`}
+                />
+              </div>
+            )}
 
           {!isVisible && (
             <>

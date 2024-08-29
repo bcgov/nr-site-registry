@@ -290,6 +290,8 @@ type Events {
 }
 
 type SiteAssocs {
+  userAction: String!
+  srAction: String!
   siteId: String!
   siteIdAssociatedWith: String!
   effectiveDate: DateTime!
@@ -587,6 +589,16 @@ type SnapshotResponse {
   data: [Snapshots!]
 }
 
+type BannerTypeData {
+  bannerType: String!
+}
+
+type BannerTypeResponse {
+  httpStatusCode: Int!
+  message: String!
+  data: BannerTypeData
+}
+
 type DisclosureResponse {
   message: String
   httpStatusCode: Int
@@ -653,6 +665,7 @@ type Query {
   getSnapshotsByUserId(userId: String!): SnapshotResponse!
   getSnapshotsBySiteId(siteId: String!): SnapshotResponse!
   getSnapshotsById(id: Int!): SnapshotResponse!
+  getBannerType(siteId: String!): BannerTypeResponse!
   getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
   getParticipantRoleCd: DropdownResponse!
   getPeopleOrgsCd(searchParam: String, entityType: String): DropdownResponse!
@@ -702,17 +715,19 @@ input SaveSiteDetailsDTO {
 }
 
 input SiteSummaryDTO {
+  userAction: String!
+  srAction: String!
   id: String!
-  bcerCode: String!
-  sstCode: String!
-  commonName: String!
-  addrType: String!
+  bcerCode: String
+  sstCode: String
+  commonName: String
+  addrType: String
   addrLine_1: String!
   addrLine_2: String
   addrLine_3: String
   addrLine_4: String
   city: String!
-  provState: String!
+  provState: String
   postalCode: String
   latdeg: Float
   longdeg: Float
@@ -720,12 +735,12 @@ input SiteSummaryDTO {
   regionalFileNo: String
   classCode: String
   generalDescription: String
-  whoCreated: String!
+  whoCreated: String
   whoUpdated: String
-  whenCreated: DateTime!
+  whenCreated: DateTime
   whenUpdated: DateTime
-  rwmFlag: Float!
-  rwmGeneralDescFlag: Float!
+  rwmFlag: Float
+  rwmGeneralDescFlag: Float
   consultantSubmitted: String
   longDegrees: Float
   longMinutes: Float
@@ -733,12 +748,14 @@ input SiteSummaryDTO {
   latDegrees: Float
   latMinutes: Float
   latSeconds: String
-  srStatus: String!
-  latlongReliabilityFlag: String!
-  siteRiskCode: String!
+  srStatus: String
+  latlongReliabilityFlag: String
+  siteRiskCode: String
 }
 
 input NotationIputDTO {
+  userAction: String!
+  srAction: String!
   id: String!
   psnorgId: String!
   siteId: String!
@@ -753,6 +770,8 @@ input NotationIputDTO {
 }
 
 input NotationParticipantInputDTO {
+  userAction: String!
+  srAction: String!
   guid: String!
   eprCode: String!
   psnorgId: String!
@@ -760,6 +779,8 @@ input NotationParticipantInputDTO {
 }
 
 input SiteParticsInputDto {
+  userAction: String!
+  srAction: String!
   guid: String!
   id: String!
   psnorgId: String!
@@ -772,6 +793,8 @@ input SiteParticsInputDto {
 }
 
 input DocumentInputDTO {
+  userAction: String!
+  srAction: String!
   id: String!
   psnorgId: String!
   displayName: String!
@@ -782,6 +805,8 @@ input DocumentInputDTO {
 }
 
 input SiteAssociationsInputDTO {
+  userAction: String!
+  srAction: String!
   siteId: String!
   siteIdAssociatedWith: String!
   effectiveDate: DateTime!
@@ -796,6 +821,8 @@ input SiteAssociationsInputDTO {
 }
 
 input SubDivisionsInputDTO {
+  userAction: String!
+  srAction: String!
   id: String!
   dateNoted: DateTime!
   pin: String!
@@ -819,6 +846,8 @@ input SubDivisionsInputDTO {
 }
 
 input LandHistoriesInputDTO {
+  userAction: String!
+  srAction: String!
   siteId: String!
   lutCode: String!
   note: String!
@@ -833,6 +862,8 @@ input LandHistoriesInputDTO {
 }
 
 input SiteProfilesInputDTO {
+  userAction: String!
+  srAction: String!
   siteId: String!
   dateCompleted: DateTime!
   localAuthDateRecd: DateTime

@@ -39,5 +39,8 @@ export class SaveSiteDetailsDTO
   @Field(()=>[SiteProfilesInputDTO],{nullable: true})
   profiles?: SiteProfilesInputDTO[];
 
+  @Field(()=>String)
+  siteId: string;
+
 } 
 

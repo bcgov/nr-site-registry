@@ -300,21 +300,13 @@ export class SiteService {
                 console.log('No changes To Site Summary');
               }
 
-              if (events) {
-                // events.map(
-                //   (event) => (event.srAction = SRApprovalStatusEnum.Pending),
-                // );
-
+              if (events) {               
                 await transactionalEntityManager.save(Events, events);
               } else {
                 console.log('No changes To Site Events');
               }
 
-              if (eventsParticipants) {
-                // eventsParticipants.map(
-                //   (participant) =>
-                //     (participant.srAction = SRApprovalStatusEnum.Pending),
-                // );
+              if (eventsParticipants) {              
 
                 await transactionalEntityManager.save(
                   EventPartics,
@@ -324,11 +316,7 @@ export class SiteService {
                 console.log('No changes To Site Event Participants');
               }
 
-              if (siteParticipants) {
-                // siteParticipants.map(
-                //   (participant) =>
-                //     (participant.srAction = SRApprovalStatusEnum.Pending),
-                // );
+              if (siteParticipants) {            
                 await transactionalEntityManager.save(
                   SitePartics,
                   siteParticipants,
@@ -337,11 +325,7 @@ export class SiteService {
                 console.log('No changes To Site Participants');
               }
 
-              if (siteAssociations) {
-                // siteAssociations.map(
-                //   (association) =>
-                //     (association.srAction = SRApprovalStatusEnum.Pending),
-                // );
+              if (siteAssociations) {           
                 await transactionalEntityManager.save(
                   SiteAssocs,
                   siteAssociations,
@@ -350,11 +334,7 @@ export class SiteService {
                 console.log('No changes To Site Associations');
               }
 
-              if (subDivisions) {
-                // subDivisions.map(
-                //   (subDivison) =>
-                //     (subDivison.srAction = SRApprovalStatusEnum.Pending),
-                // );
+              if (subDivisions) {           
                 await transactionalEntityManager.save(
                   Subdivisions,
                   subDivisions,
@@ -363,11 +343,7 @@ export class SiteService {
                 console.log('No changes To Site subDivisions');
               }
 
-              if (landHistories) {
-                // landHistories.map(
-                //   (history) =>
-                //     (history.srAction = SRApprovalStatusEnum.Pending),
-                // );
+              if (landHistories) {            
                 await transactionalEntityManager.save(
                   LandHistories,
                   landHistories,
@@ -376,11 +352,7 @@ export class SiteService {
                 console.log('No changes To Site LandHistories');
               }
 
-              if (profiles) {
-                // profiles.map(
-                //   (profile) =>
-                //     (profile.srAction = SRApprovalStatusEnum.Pending),
-                // );
+              if (profiles) {              
                 await transactionalEntityManager.save(SiteProfiles, profiles);
               } else {
                 console.log('No changes To Site profiles');
@@ -394,6 +366,7 @@ export class SiteService {
                 whenCreated: new Date(),
                 whenUpdated: new Date(),
                 whoUpdated: userInfo ?? userInfo.givenName,
+                siteId: inputDTO.siteId
               };
 
               await this.historyLogRepository.save(historyLog);

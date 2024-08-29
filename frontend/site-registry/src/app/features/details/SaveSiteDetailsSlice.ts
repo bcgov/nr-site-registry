@@ -17,6 +17,7 @@ const initialState: SaveSiteDetails = {
   subDivisionsData: null,
   profilesData: null,
   siteAssociationsData: null,
+  siteId: ''
 };
 
 export const saveSiteDetails = createAsyncThunk(
@@ -36,12 +37,34 @@ const siteDetailsSlice = createSlice({
   name: 'siteDetails',
   initialState,
   reducers: {
+    resetSaveSiteDetails: (state, action) => {
+      const newState = {
+        ...state,
+      };
+      newState.saveRequestStatus = RequestStatus.idle;
+      newState.notationData = null;
+      newState.siteParticipantData = null;
+      newState.documentsData = null;
+      newState.landHistoriesData = null;
+      newState.subDivisionsData = null;
+      newState.profilesData = null;
+      newState.siteAssociationsData = null;
+      newState.siteId = '';
+      return newState;
+    },
     resetSaveSiteDetailsRequestStatus: (state, action) => {
       const newState = {
         ...state,
       };
 
       newState.saveRequestStatus = RequestStatus.idle;
+      return newState;
+    },
+    setupSiteIdForSaving: (state, action) => {
+      const newState = {
+        ...state,
+      };
+      newState.siteId = action.payload;
       return newState;
     },
     setupNotationDataForSaving: (state, action) => {
@@ -107,10 +130,20 @@ export const getSiteDetailsToBeSaved = (state: any) => {
     subDivisions: state.siteDetails.subDivisions,
     landHistories: state.siteDetails.landHistories,
     profiles: state.siteDetails.profiles,
+    siteId: state.siteDetails.siteId
   };
 };
 
-export const { resetSaveSiteDetailsRequestStatus, setupNotationDataForSaving } =
+export const { 
+  resetSaveSiteDetailsRequestStatus, 
+  resetSaveSiteDetails, 
+  setupNotationDataForSaving,
+  setupSiteIdForSaving,
+  setupDocumentsDataForSaving,
+  setupLandHistoriesDataForSaving,
+  setupSiteAssociationDataForSaving,
+  setupSiteParticipantDataForSaving,
+  setupSubDivisionsDataForSaving } =
   siteDetailsSlice.actions;
 
 export default siteDetailsSlice.reducer;

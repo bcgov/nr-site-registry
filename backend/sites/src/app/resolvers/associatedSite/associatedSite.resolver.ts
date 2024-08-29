@@ -9,7 +9,7 @@ import {
   AssociatedSiteDto,
   AssociatedSiteResponse,
 } from '../../dto/associatedSite.dto';
-import { CustomRoles } from 'src/app/dto/roles/role';
+import { CustomRoles } from 'src/app/common/role';
 
 @Resolver(() => SiteAssocs)
 export class AssociatedSiteResolver {

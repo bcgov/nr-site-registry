@@ -6,7 +6,7 @@ import {
   Roles,
 } from 'nest-keycloak-connect';
 import {} from '../../dto/recentView.dto';
-import { CustomRoles } from 'src/app/dto/roles/role';
+import { CustomRoles } from '../../common/role' 
 
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';

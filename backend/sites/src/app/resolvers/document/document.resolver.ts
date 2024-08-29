@@ -6,7 +6,7 @@ import { Args, Query, Resolver } from '@nestjs/graphql';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { UsePipes } from '@nestjs/common';
 import { DocumentDto, DocumentResponse } from '../../dto/document.dto';
-import { CustomRoles } from "src/app/dto/roles/role";
+import { CustomRoles } from '../../common/role';
 
 
 @Resolver(() => SiteDocs)

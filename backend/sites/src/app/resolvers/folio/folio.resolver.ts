@@ -15,7 +15,7 @@ import {
   FolioContentResponse,
 } from 'src/app/dto/folioContent.dto';
 import { FolioContents } from 'src/app/entities/folioContents.entity';
-import { CustomRoles } from 'src/app/dto/roles/role';
+import { CustomRoles } from '../../common/role';
 
 @Resolver(() => Folio)
 export class FolioResolver {

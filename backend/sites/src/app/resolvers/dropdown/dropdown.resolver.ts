@@ -8,7 +8,7 @@ import {
 } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { DropdownService } from '../../services/dropdown/dropdown.service';
-import { CustomRoles } from "src/app/dto/roles/role";
+import { CustomRoles } from '../../common/role';
 
 
 @Resolver(() => DropdownDto)

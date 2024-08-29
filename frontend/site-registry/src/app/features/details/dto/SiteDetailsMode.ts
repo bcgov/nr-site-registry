@@ -15,4 +15,5 @@ export interface SaveSiteDetails {
   landHistoriesData:any;
   documentsData: any;
   profilesData:any;
+  siteId: string;
 }

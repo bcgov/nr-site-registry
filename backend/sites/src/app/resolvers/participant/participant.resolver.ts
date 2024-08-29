@@ -5,7 +5,7 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { SiteParticsDto, SiteParticsResponse } from '../../dto/sitePartics.dto';
 import { ParticipantService } from '../../services/participant/participant.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
-import { CustomRoles } from 'src/app/dto/roles/role';
+import { CustomRoles } from '../../common/role';
 
 @Resolver(() => SiteParticsDto)
 export class ParticipantResolver {

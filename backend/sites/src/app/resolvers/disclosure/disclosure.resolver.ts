@@ -6,7 +6,7 @@ import { GenericValidationPipe } from '../../utils/validations/genericValidation
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { DisclosureResponse } from '../../dto/disclosure.dto';
 import { DisclosureService } from '../../services/disclosure/disclosure.service';
-import { CustomRoles } from 'src/app/dto/roles/role';
+import { CustomRoles } from '../../common/role';
 
 @Resolver(() => SiteProfiles)
 export class DisclosureResolver {

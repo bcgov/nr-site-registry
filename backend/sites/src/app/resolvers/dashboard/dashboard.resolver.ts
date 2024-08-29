@@ -6,7 +6,7 @@ import { DashboardService } from '../../services/dashboard/dashboard.service';
 import { RecentViewDto, RecentViewResponse } from '../../dto/recentView.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
-import { CustomRoles } from 'src/app/dto/roles/role';
+import { CustomRoles } from '../../common/role';
 
 @Resolver(() => RecentViews)
 export class DashboardResolver {

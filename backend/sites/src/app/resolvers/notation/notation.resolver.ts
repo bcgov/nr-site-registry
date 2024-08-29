@@ -6,7 +6,7 @@ import { GenericValidationPipe } from '../../utils/validations/genericValidation
 import { Events } from '../../entities/events.entity';
 import { NotationService } from '../../services/notation/notation.service';
 import { NotationDto, NotationResponse } from '../../dto/notation.dto';
-import { CustomRoles } from 'src/app/dto/roles/role';
+import { CustomRoles } from '../../common/role';
 
 @Resolver(() => Events)
 export class NotationResolver {

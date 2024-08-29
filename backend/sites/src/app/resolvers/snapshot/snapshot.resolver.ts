@@ -10,7 +10,7 @@ import { Snapshots } from '../../entities/snapshots.entity';
 import { SnapshotsService } from '../../services/snapshot/snapshot.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { CustomRoles } from 'src/app/dto/roles/role';
+import { CustomRoles } from '../../common/role';
 
 @Resolver(() => Snapshots)
 export class SnapshotsResolver {

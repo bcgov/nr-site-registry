@@ -21,6 +21,10 @@ export class HistoryLog extends BaseAuditEntity {
   @Column('character varying', { name: 'user_id', length: 100 })
   userId: string;
 
+  @Field()
+  @Column('character varying', { name: 'site_id' })
+  siteId: string;
+
   @Field(() => GraphQLJSON)
   @Column('jsonb', { name: 'snapshot_data' })
   content: SaveSiteDetailsDTO;

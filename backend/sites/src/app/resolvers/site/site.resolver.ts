@@ -13,7 +13,7 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { UsePipes } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
-import { CustomRoles } from 'src/app/dto/roles/role';
+import { CustomRoles } from '../../common/role';
 
 
 /**

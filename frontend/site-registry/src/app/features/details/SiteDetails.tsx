@@ -77,7 +77,7 @@ import {
   IFormField,
 } from '../../components/input-controls/IFormField';
 import BannerDetails from '../../components/banners/BannerDetails';
-import { getSiteDetailsToBeSaved, saveSiteDetails } from './SaveSiteDetailsSlice';
+import { getSiteDetailsToBeSaved, resetSaveSiteDetails, saveSiteDetails, setupSiteIdForSaving } from './SaveSiteDetailsSlice';
 import { fetchAssociatedSites } from './associates/AssociateSlice';
 
 const SiteDetails = () => {
@@ -198,8 +198,11 @@ const SiteDetails = () => {
   }, [mode]);
 
   useEffect(() => {
+    
     setIsLoading(true); // Set loading state to true before starting API calls
     if (id) {
+      dispatch(resetSaveSiteDetails(null));
+      dispatch(setupSiteIdForSaving(id))
       Promise.all([
         dispatch(fetchPeopleOrgsCd()),
         dispatch(fetchParticipantRoleCd()),

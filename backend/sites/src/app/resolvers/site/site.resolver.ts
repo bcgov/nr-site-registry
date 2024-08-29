@@ -1,8 +1,9 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
-import { Resource, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { AuthenticatedUser, Resource, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import {
   FetchSiteDetail,
   FetchSiteResponse,
+  SaveSiteDetailsResponse,
   SearchSiteResponse,
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
@@ -11,6 +12,9 @@ import { DropdownDto, DropdownResponse } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { UsePipes } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
+import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
+import { CustomRoles } from '../../common/role';
+
 
 /**
  * Resolver for Region
@@ -23,12 +27,14 @@ export class SiteResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       DropdownDto[]
     >,
+    private readonly genericResponseProviderForSave: GenericResponseProvider<SaveSiteDetailsResponse>
   ) {}
+
 
   /**
    * Find All Sites
    */
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => FetchSiteResponse, { name: 'sites' })
   findAll() {
     return this.siteService.findAll();
@@ -41,7 +47,7 @@ export class SiteResolver {
    * @param pageSize size of the page
    * @returns sites where id or address matches the search param along with pagination params
    */
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => SearchSiteResponse, { name: 'searchSites' })
   async searchSites(
     @Args('searchParam', { type: () => String }) searchParam: string,
@@ -104,13 +110,13 @@ export class SiteResolver {
     );
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => FetchSiteDetail, { name: 'findSiteBySiteId' })
   findSiteBySiteId(@Args('siteId', { type: () => String }) siteId: string) {
     return this.siteService.findSiteBySiteId(siteId);
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Query(() => DropdownResponse, { name: 'searchSiteIds' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async searchSiteIds(
@@ -131,5 +137,35 @@ export class SiteResolver {
         false,
       );
     }
+  }
+
+
+ @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
+  @Mutation(() => SaveSiteDetailsResponse , { name: 'updateSiteDetails' })
+  updateSiteDetails(
+    @Args('siteDetailsDTO', { type: () => SaveSiteDetailsDTO})
+    siteDetailsDTO: SaveSiteDetailsDTO,
+    @AuthenticatedUser()
+    user: any,
+  )
+  {
+     const saveResult = this.siteService.saveSiteDetails(siteDetailsDTO,user);
+
+     if(saveResult)
+     {
+      return this.genericResponseProviderForSave.createResponse(
+        `Successfully saved site details.`,
+        200,
+        false,
+      );
+     }
+     else
+     {
+      return this.genericResponseProviderForSave.createResponse(
+        `Failed to save site details.`,
+        422,
+        false,
+      );
+     }
   }
 }

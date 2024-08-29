@@ -11,7 +11,8 @@ import cartReducer from './features/cart/CartSlice';
 import landUsesReducer from './features/details/landUses/LandUsesSlice';
 import documentsReducer from './features/details/documents/DocumentsSlice';
 import snapshotsReducer from './features/details/snapshot/SnapshotSlice';
-import folioReducer from './features/folios/FolioSlice';
+import folioReducer from './features/folios/redux/FolioSlice';
+import siteDetailsReducer from './features/details/SaveSiteDetailsSlice';
 import associatedSitesReducer from './features/details/associates/AssociateSlice';
 
 const persistedStore: any = loadFromLocalStorage();
@@ -31,6 +32,7 @@ export const store = configureStore({
     folio: folioReducer,
     snapshots: snapshotsReducer,
     associatedSites: associatedSitesReducer,
+    siteDetails: siteDetailsReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

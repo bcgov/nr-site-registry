@@ -2,6 +2,8 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { LandUseCd } from './landUseCd.entity';
 import { Sites } from './sites.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
+
 
 @ObjectType()
 @Index('land_histories_pkey', ['lutCode', 'siteId'], { unique: true })
@@ -10,7 +12,7 @@ import { Sites } from './sites.entity';
 @Index('sluh_rwm_note_flag', ['rwmNoteFlag'], {})
 @Index('sluh_applicable_to_frgn', ['siteId'], {})
 @Entity('land_histories')
-export class LandHistories {
+export class LandHistories extends ChangeAuditEntity{
   @Field()
   @Column('bigint', { primary: true, name: 'site_id' })
   siteId: string;

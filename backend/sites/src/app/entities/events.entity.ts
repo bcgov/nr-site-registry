@@ -11,6 +11,8 @@ import { ConditionsText } from './conditionsText.entity';
 import { EventPartics } from './eventPartics.entity';
 import { EventTypeCd } from './eventTypeCd.entity';
 import { Sites } from './sites.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
+
 
 @ObjectType()
 @Index('event_described_by_frgn', ['eclsCode', 'etypCode'], {})
@@ -21,7 +23,7 @@ import { Sites } from './sites.entity';
 @Index('event_applicable_to_frgn', ['siteId'], {})
 @Index('event_responsibility_of_frgn', ['spId'], {})
 @Entity('events')
-export class Events {
+export class Events extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'id' })
   id: string;

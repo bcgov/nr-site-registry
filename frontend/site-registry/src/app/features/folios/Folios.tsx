@@ -17,7 +17,7 @@ import {
   resetFolioSiteUpdateStatus,
   updateFolioItem,
   updateRequestStatus,
-} from './FolioSlice';
+} from './redux/FolioSlice';
 import { Folio } from './dto/Folio';
 import { deepSearch, getUser, showNotification } from '../../helpers/utility';
 import { AppDispatch } from '../../Store';

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository, Like } from 'typeorm';
 import {
   FetchSiteDetail,
   FetchSiteResponse,
@@ -8,7 +8,20 @@ import {
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteUtil } from '../../utils/site.util';
-
+import { RecentViews } from '../../entities/recentViews.entity';
+import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
+import { Events } from '../../entities/events.entity';
+import { EventPartics } from '../../entities/eventPartics.entity';
+import { SitePartics } from '../../entities/sitePartics.entity';
+import { SiteDocs } from '../../entities/siteDocs.entity';
+import { SiteAssocs } from '../../entities/siteAssocs.entity';
+import { LandHistories } from '../../entities/landHistories.entity';
+import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
+import { SiteProfiles } from '../../entities/siteProfiles.entity';
+import { Subdivisions } from '../../entities/subdivisions.entity';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { DropdownResponse } from '../../dto/dropdown.dto';
+import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 /**
  * Nestjs Service For Region Entity
  */
@@ -17,6 +30,26 @@ export class SiteService {
   constructor(
     @InjectRepository(Sites)
     private siteRepository: Repository<Sites>,
+    @InjectRepository(Events)
+    private eventsRepositoryRepo: Repository<Events>,
+    @InjectRepository(EventPartics)
+    private eventsParticipantsRepo: Repository<EventPartics>,
+    @InjectRepository(SitePartics)
+    private siteParticipantsRepo: Repository<SitePartics>,
+    @InjectRepository(SiteDocs)
+    private siteDocumentsRepo: Repository<SiteDocs>,
+    @InjectRepository(SiteAssocs)
+    private siteAssociationsRepo: Repository<SiteAssocs>,
+    @InjectRepository(LandHistories)
+    private landHistoriesRepo: Repository<LandHistories>,
+    @InjectRepository(SiteSubdivisions)
+    private siteSubDivisionsRepo: Repository<SiteSubdivisions>,
+    @InjectRepository(SiteProfiles)
+    private siteProfilesRepo: Repository<SiteProfiles>,
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager,
+    @InjectRepository(HistoryLog)
+    private historyLogRepository: Repository<HistoryLog>,
   ) {}
 
   /**
@@ -236,6 +269,117 @@ export class SiteService {
       }
     } catch (error) {
       throw new Error('Failed to retrieve site ids.');
+    }
+  }
+
+  async saveSiteDetails(
+    inputDTO: SaveSiteDetailsDTO,
+    userInfo: any,
+  ): Promise<boolean> {
+    try {
+      if (!inputDTO) {
+        return false;
+      } else {
+        const {
+          sitesSummary,
+          events,
+          eventsParticipants,
+          siteParticipants,
+          siteAssociations,
+          subDivisions,
+          landHistories,
+          profiles,
+        } = inputDTO;
+
+        return await this.entityManager.transaction(
+          async (transactionalEntityManager: EntityManager) => {
+            try {
+              if (sitesSummary) {
+                await transactionalEntityManager.save(Sites, sitesSummary);
+              } else {
+                console.log('No changes To Site Summary');
+              }
+
+              if (events) {               
+                await transactionalEntityManager.save(Events, events);
+              } else {
+                console.log('No changes To Site Events');
+              }
+
+              if (eventsParticipants) {              
+
+                await transactionalEntityManager.save(
+                  EventPartics,
+                  eventsParticipants,
+                );
+              } else {
+                console.log('No changes To Site Event Participants');
+              }
+
+              if (siteParticipants) {            
+                await transactionalEntityManager.save(
+                  SitePartics,
+                  siteParticipants,
+                );
+              } else {
+                console.log('No changes To Site Participants');
+              }
+
+              if (siteAssociations) {           
+                await transactionalEntityManager.save(
+                  SiteAssocs,
+                  siteAssociations,
+                );
+              } else {
+                console.log('No changes To Site Associations');
+              }
+
+              if (subDivisions) {           
+                await transactionalEntityManager.save(
+                  Subdivisions,
+                  subDivisions,
+                );
+              } else {
+                console.log('No changes To Site subDivisions');
+              }
+
+              if (landHistories) {            
+                await transactionalEntityManager.save(
+                  LandHistories,
+                  landHistories,
+                );
+              } else {
+                console.log('No changes To Site LandHistories');
+              }
+
+              if (profiles) {              
+                await transactionalEntityManager.save(SiteProfiles, profiles);
+              } else {
+                console.log('No changes To Site profiles');
+              }
+
+              const historyLog: HistoryLog = {
+                userId: userInfo ?? userInfo.sub,
+                content: inputDTO,
+                id: null,
+                whoCreated: userInfo ?? userInfo.givenName,
+                whenCreated: new Date(),
+                whenUpdated: new Date(),
+                whoUpdated: userInfo ?? userInfo.givenName,
+                siteId: inputDTO.siteId
+              };
+
+              await this.historyLogRepository.save(historyLog);
+            } catch (error) {
+              console.error('Save Site Details Transaction failed', error);
+              return false;
+            }
+          },
+        );
+      }
+    } catch (error) {
+      console.log('Save site details error', error);
+      throw error;
     }
   }
 }

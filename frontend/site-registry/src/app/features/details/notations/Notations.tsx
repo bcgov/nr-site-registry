@@ -34,40 +34,31 @@ import { notationTypeDrpdown } from '../dropdowns/DropdownSlice';
 import { notationParticipants, updateSiteNotation } from './NotationSlice';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';
 import { v4 } from 'uuid';
+import { setupNotationDataForSaving } from "../SaveSiteDetailsSlice";
 
 const Notations = () => {
-  const {
-    notationColumnInternal,
-    notationFormRowsInternal,
-    notationFormRowExternal,
-    notationFormRowsFirstChild,
-    notationColumnExternal,
-    notationFormRowEditMode,
-    srVisibilityConfig,
-    notationFormRowsFirstChildIsRequired,
-  } = GetNotationConfig();
-  const notations = useSelector(notationParticipants);
-  const dispatch = useDispatch<AppDispatch>();
-  const mode = useSelector(siteDetailsMode);
-  const notationType = useSelector(notationTypeDrpdown);
-  const [userType, setUserType] = useState<UserType>(UserType.External);
-  const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
-  const [formData, setFormData] =
-    useState<{ [key: string]: any | [Date, Date] }[]>(notations);
-  const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
-  const [srTimeStamp, setSRTimeStamp] = useState(
-    'Sent to SR on June 2nd, 2013',
-  );
-  const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isDelete, setIsDelete] = useState(false);
-  const [isUpdated, setIsUpdated] = useState(false);
-  const [updatedNotationFormRowEditMode, setUpdatedNotationFormRowEditMode] =
-    useState<IFormField[][]>([]);
-  const [selectedRows, setSelectedRows] = useState<
-    { id: any; participantId: any }[]
-  >([]);
-  const [currentNotation, setCurrentNotation] = useState({});
+    const {
+      notationColumnInternal, 
+      notationFormRowsInternal, 
+      notationFormRowExternal, 
+      notationFormRowsFirstChild, 
+      notationColumnExternal, 
+      notationFormRowEditMode, 
+      srVisibilityConfig,
+      notationFormRowsFirstChildIsRequired 
+    } = GetNotationConfig();
+    const notations = useSelector(notationParticipants);
+    const dispatch = useDispatch<AppDispatch>();
+    const mode = useSelector(siteDetailsMode);
+    const notationType = useSelector(notationTypeDrpdown);
+    const [userType, setUserType] = useState<UserType>(UserType.External);
+    const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
+    const [formData, setFormData] =  useState<{ [key: string]: any | [Date, Date] }[]>(notations);
+    const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
+    const [srTimeStamp, setSRTimeStamp] = useState('Sent to SR on June 2nd, 2013');
+    const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
+    const [searchTerm, setSearchTerm] = useState('');
+    
 
   const loggedInUser = getUser();
   const resetDetails = useSelector(resetSiteDetails);

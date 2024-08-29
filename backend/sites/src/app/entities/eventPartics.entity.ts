@@ -4,6 +4,8 @@ import { EventParticRoleCd } from './eventParticRoleCd.entity';
 import { Events } from './events.entity';
 import { PeopleOrgs } from './peopleOrgs.entity';
 import { SitePartics } from './sitePartics.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
+
 
 @ObjectType()
 @Index('event_partics_pkey', ['eprCode', 'eventId', 'spId'], { unique: true })
@@ -13,7 +15,7 @@ import { SitePartics } from './sitePartics.entity';
 @Index('ep_rwm_flag', ['rwmFlag'], {})
 @Index('ep_played_by_frgn', ['spId'], {})
 @Entity('event_partics')
-export class EventPartics {
+export class EventPartics extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'event_id' })
   eventId: string;

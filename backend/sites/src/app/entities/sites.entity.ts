@@ -25,7 +25,9 @@ import { RecentViews } from './recentViews.entity';
 import { Snapshots } from './snapshots.entity';
 import { Cart } from './cart.entity';
 import { FolioContents } from './folioContents.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
 // import { loggerMiddleware } from '../resolvers/site/site.resolver';
+
 
 @ObjectType()
 @Index('site_bco', ['bcerCode', 'classCode', 'id', 'rwmFlag', 'sstCode'], {})
@@ -38,7 +40,7 @@ import { FolioContents } from './folioContents.entity';
 @Index('site_described_by_frgn', ['sstCode'], {})
 @Index('sites_victoria_file_no_key', ['victoriaFileNo'], { unique: true })
 @Entity('sites')
-export class Sites {
+export class Sites extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'id' })
   id: string;

@@ -63,6 +63,8 @@ import {
   fetchSnapshots,
   snapshots,
   getFirstSnapshotCreatedDate,
+  selectBannerType,
+  getBannerType,
 } from './snapshot/SnapshotSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 import {
@@ -142,6 +144,7 @@ const SiteDetails = () => {
   const [isVisible, setIsVisible] = useState(false);
   const snapshot = useSelector(snapshots);
   const snapshotTakenDate = useSelector(getFirstSnapshotCreatedDate);
+  const bannerType = useSelector(selectBannerType);
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
@@ -232,8 +235,11 @@ const SiteDetails = () => {
     if (id) {
       dispatch(resetSaveSiteDetails(null));
       dispatch(setupSiteIdForSaving(id));
+      dispatch(setupSiteIdForSaving(id));
       Promise.all([
         dispatch(fetchSnapshots(id ?? '')),
+        dispatch(getBannerType(id)),
+        // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '' })),
       ])
         .then(() => {
@@ -573,13 +579,16 @@ const SiteDetails = () => {
           </div>
         )}
         <div className="section-details-header row">
-          {UserType.External === userType && (
-            <div>
-              <BannerDetails
-                snapshotDate={`Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`}
-              />
-            </div>
-          )}
+          {UserType.External === userType &&
+            snapshot.status === RequestStatus.success &&
+            snapshot.snapshot.data !== null && (
+              <div>
+                <BannerDetails
+                  bannerType={bannerType}
+                  snapshotDate={`Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`}
+                />
+              </div>
+            )}
 
           {!isVisible && (
             <>

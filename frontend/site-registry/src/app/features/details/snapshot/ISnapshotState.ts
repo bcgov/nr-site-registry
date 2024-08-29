@@ -6,6 +6,7 @@ export interface ISnapshotState {
   status: RequestStatus;
   createSnapshotRequest: RequestStatus;
   firstSnapshotCreatedDate: string | null;
+  bannerType: string;
 }
 
 export interface CreateSnapshotInputDto {

@@ -66,7 +66,6 @@ const BannerDetails: React.FC<BannerDetailsProps> = ({
       iconType = <TickIcon />;
       break;
     default:
-      console.log('nupur - No banner type found');
       bannerLabel = BannerMessages.blankMessage;
       break;
   }

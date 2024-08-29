@@ -235,10 +235,9 @@ const SiteDetails = () => {
     if (id) {
       dispatch(resetSaveSiteDetails(null));
       dispatch(setupSiteIdForSaving(id));
-      dispatch(setupSiteIdForSaving(id));
       Promise.all([
         dispatch(fetchSnapshots(id ?? '')),
-        dispatch(getBannerType(id)),
+        dispatch(getBannerType(id ?? '')),
         // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '' })),
       ])

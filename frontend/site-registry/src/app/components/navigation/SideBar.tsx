@@ -12,24 +12,27 @@ import {
   fetchCartItems,
 } from '../../features/cart/CartSlice';
 import { AppDispatch } from '../../Store';
-import { getLoggedInUserType, getUser, showNotification } from '../../helpers/utility';
+import {
+  getLoggedInUserType,
+  getUser,
+  showNotification,
+} from '../../helpers/utility';
 
 function SideBar() {
   let userCartItems = useSelector(cartItems);
   const dispatch = useDispatch<AppDispatch>();
 
-  const [navList,SetNavList] = useState([]);
- 
+  const [navList, SetNavList] = useState([]);
 
   let cartItemAdded = useSelector(addCartItemRequestStatus);
   let cartItemDeleted = useSelector(deleteRequestStatus);
 
   const user = getUser();
 
-  useEffect(()=>{
-   console.log('user updated');
-   SetNavList(getSideBarNavList(getLoggedInUserType()));
-  },[user])
+  useEffect(() => {
+    console.log('user updated');
+    SetNavList(getSideBarNavList(getLoggedInUserType()));
+  }, [user]);
 
   const cartItemsArr = useSelector(cartItems);
 
@@ -55,7 +58,6 @@ function SideBar() {
     );
   }, [cartItemDeleted]);
 
- 
   const location = useLocation();
   let tabIndex = 1;
 
@@ -129,14 +131,15 @@ function SideBar() {
   return (
     <div className="side-bar position-sticky ">
       <div className="sideBar-Nav" role="menu">
-        {navList.filter((item:any) => {
+        {navList
+          .filter((item: any) => {
             return !item.lowerSection;
           })
-          .map((item:any, index:number) => (
+          .map((item: any, index: number) => (
             <React.Fragment key={index}>
               {renderMenuOption(item, index)}
               {item.children &&
-                item.children.map((child:any, index:number) => {
+                item.children.map((child: any, index: number) => {
                   return (
                     <React.Fragment key={index}>
                       {renderMenuOption(child, index)}
@@ -149,14 +152,14 @@ function SideBar() {
 
       <div className="sideBar-Nav" role="menu">
         {navList
-          .filter((item:any) => {
+          .filter((item: any) => {
             return item.lowerSection;
           })
-          .map((item:any, childIndex:number) => (
+          .map((item: any, childIndex: number) => (
             <React.Fragment key={childIndex}>
               {renderMenuOption(item, childIndex)}
               {item.children &&
-                item.children.map((item:any, index:number) => {
+                item.children.map((item: any, index: number) => {
                   return renderMenuOption(item, index);
                 })}
               {/* Additional static item */}

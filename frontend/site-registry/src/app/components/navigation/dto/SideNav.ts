@@ -29,7 +29,7 @@ export class SideNav {
   ) {}
 }
 
-const getSideBarNavList = (userRole:any) => {
+const getSideBarNavList = (userRole: any) => {
   const dashboardIcon = HouseIcon;
   const textSearchIcon = MagnifyingGlassIcon;
   const mapLocationIcon = MapLocationIcon;
@@ -39,10 +39,7 @@ const getSideBarNavList = (userRole:any) => {
   const referenceIcon = BookIcon;
   const cartIcon = ShoppingCartIcon;
 
-
-
-
-  const roleBasedSideBarList:any = {
+  const roleBasedSideBarList: any = {
     client: [
       new SideNav(1, 'Dashboard', true, dashboardIcon, '/dashboard'),
       new SideNav(2, 'Search', true, null, '/', [
@@ -92,7 +89,7 @@ const getSideBarNavList = (userRole:any) => {
           new SideNav(2, 'Reference', false, referenceIcon, '/ref'),
         ],
         false,
-      ),      
+      ),
     ],
     sr: [
       new SideNav(1, 'Dashboard', true, dashboardIcon, '/dashboard'),
@@ -111,15 +108,15 @@ const getSideBarNavList = (userRole:any) => {
           new SideNav(2, 'Reference', false, referenceIcon, '/ref'),
         ],
         false,
-      ),      
+      ),
     ],
-    public:[      
+    public: [
       new SideNav(2, 'Search', true, null, '/', [
         new SideNav(1, 'Text Search', false, textSearchIcon, '/search'),
         new SideNav(2, 'Map Search', false, mapLocationIcon, '/map'),
-      ]),      
+      ]),
       new SideNav(5, 'Cart', false, cartIcon, '/site/cart', [], true),
-    ]
+    ],
   };
   return roleBasedSideBarList[userRole];
 };

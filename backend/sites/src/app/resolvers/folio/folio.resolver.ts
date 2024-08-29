@@ -130,7 +130,7 @@ export class FolioResolver {
     @AuthenticatedUser()
     user: any,
   ) {
-    console.log("user",user)
+   
     try {
       const message = await this.folioService.addSiteToFolio(
         folioContentDTO,

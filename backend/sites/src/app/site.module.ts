@@ -78,7 +78,7 @@ import { User } from './entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { AssociatedSiteResolver } from './resolvers/associatedSite/associatedSite.resolver';
 import { AssociatedSiteService } from './services/associatedSite/associatedSite.service';
-import { HistoryLog } from './entities/HistoryLog.entity';
+import { HistoryLog } from './entities/siteHistoryLog.entity';
 
 /**
  * Module for wrapping all functionalities in sites microserivce

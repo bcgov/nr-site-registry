@@ -39,7 +39,7 @@ const getSideBarNavList = (userRole:any) => {
   const referenceIcon = BookIcon;
   const cartIcon = ShoppingCartIcon;
 
-  console.log('userRole in getSideBarNavList',userRole);
+
 
 
   const roleBasedSideBarList:any = {

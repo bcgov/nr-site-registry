@@ -174,8 +174,10 @@ export const isUserOfType = (roleType:UserRoleType) => {
       {        
          case 'client':
         
-        
-          if(userRoles.includes("formsflow-client") || userRoles.includes("site-external-user"))
+          const externalUserRole = process.env.REACT_APP_SITE_EXTERNAL_USER_ROLE ||
+            ((window as any)._env_ && (window as any)._env_.REACT_APP_SITE_EXTERNAL_USER_ROLE) || 'site-external-user';
+
+          if(userRoles.includes(externalUserRole))
           {
               return true;
           }
@@ -183,8 +185,11 @@ export const isUserOfType = (roleType:UserRoleType) => {
           {
             return false;
           }        
-         case 'internal':         
-          if(userRoles.includes("site-internal-user"))
+         case 'internal':  
+         const internalUserRole = process.env.REACT_APP_SITE_INTERNAL_USER_ROLE ||
+         ((window as any)._env_ && (window as any)._env_.REACT_APP_SITE_INTERNAL_USER_ROLE) || 'site-internal-user';
+
+          if(userRoles.includes(internalUserRole))
           {
               return true;
           }
@@ -193,7 +198,9 @@ export const isUserOfType = (roleType:UserRoleType) => {
             return false;
           }  
           case 'sr':         
-          if(userRoles.includes("site-site-registrar"))
+          const srUserRole = process.env.REACT_APP_SITE_REGISTRAR_USER_ROLE ||
+          ((window as any)._env_ && (window as any)._env_.REACT_APP_SITE_REGISTRAR_USER_ROLE) || 'site-registrar';
+          if(userRoles.includes(srUserRole))
           {
               return true;
           }

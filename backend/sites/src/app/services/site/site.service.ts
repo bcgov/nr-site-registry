@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository,  Like } from 'typeorm';
+import { EntityManager, Repository, Like } from 'typeorm';
 import {
   FetchSiteDetail,
   FetchSiteResponse,
@@ -8,20 +8,20 @@ import {
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteUtil } from '../../utils/site.util';
-import { RecentViews } from 'src/app/entities/recentViews.entity';
-import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
-import { Events } from 'src/app/entities/events.entity';
-import { EventPartics } from 'src/app/entities/eventPartics.entity';
-import { SitePartics } from 'src/app/entities/sitePartics.entity';
-import { SiteDocs } from 'src/app/entities/siteDocs.entity';
-import { SiteAssocs } from 'src/app/entities/siteAssocs.entity';
-import { LandHistories } from 'src/app/entities/landHistories.entity';
-import { SiteSubdivisions } from 'src/app/entities/siteSubdivisions.entity';
-import { SiteProfiles } from 'src/app/entities/siteProfiles.entity';
-import { Subdivisions } from 'src/app/entities/subdivisions.entity';
-import { SRApprovalStatusEnum } from 'src/app/dto/srApprovalStatus';
-import { DropdownResponse } from 'src/app/dto/dropdown.dto';
-import { HistoryLog } from 'src/app/entities/HistoryLog.entity';
+import { RecentViews } from '../../entities/recentViews.entity';
+import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
+import { Events } from '../../entities/events.entity';
+import { EventPartics } from '../../entities/eventPartics.entity';
+import { SitePartics } from '../../entities/sitePartics.entity';
+import { SiteDocs } from '../../entities/siteDocs.entity';
+import { SiteAssocs } from '../../entities/siteAssocs.entity';
+import { LandHistories } from '../../entities/landHistories.entity';
+import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
+import { SiteProfiles } from '../../entities/siteProfiles.entity';
+import { Subdivisions } from '../../entities/subdivisions.entity';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { DropdownResponse } from '../../dto/dropdown.dto';
+import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 /**
  * Nestjs Service For Region Entity
  */
@@ -49,7 +49,7 @@ export class SiteService {
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
     @InjectRepository(HistoryLog)
-    private historyLogRepository: Repository<HistoryLog>
+    private historyLogRepository: Repository<HistoryLog>,
   ) {}
 
   /**
@@ -272,119 +272,141 @@ export class SiteService {
     }
   }
 
-  async saveSiteDetails(inputDTO: SaveSiteDetailsDTO, userInfo: any): Promise<boolean> {
+  async saveSiteDetails(
+    inputDTO: SaveSiteDetailsDTO,
+    userInfo: any,
+  ): Promise<boolean> {
+    try {
+      if (!inputDTO) {
+        return false;
+      } else {
+        const {
+          sitesSummary,
+          events,
+          eventsParticipants,
+          siteParticipants,
+          siteAssociations,
+          subDivisions,
+          landHistories,
+          profiles,
+        } = inputDTO;
 
-    try
-    {
-    if (!inputDTO) {
-      return false;
+        return await this.entityManager.transaction(
+          async (transactionalEntityManager: EntityManager) => {
+            try {
+              if (sitesSummary) {
+                await transactionalEntityManager.save(Sites, sitesSummary);
+              } else {
+                console.log('No changes To Site Summary');
+              }
+
+              if (events) {
+                // events.map(
+                //   (event) => (event.srAction = SRApprovalStatusEnum.Pending),
+                // );
+
+                await transactionalEntityManager.save(Events, events);
+              } else {
+                console.log('No changes To Site Events');
+              }
+
+              if (eventsParticipants) {
+                // eventsParticipants.map(
+                //   (participant) =>
+                //     (participant.srAction = SRApprovalStatusEnum.Pending),
+                // );
+
+                await transactionalEntityManager.save(
+                  EventPartics,
+                  eventsParticipants,
+                );
+              } else {
+                console.log('No changes To Site Event Participants');
+              }
+
+              if (siteParticipants) {
+                // siteParticipants.map(
+                //   (participant) =>
+                //     (participant.srAction = SRApprovalStatusEnum.Pending),
+                // );
+                await transactionalEntityManager.save(
+                  SitePartics,
+                  siteParticipants,
+                );
+              } else {
+                console.log('No changes To Site Participants');
+              }
+
+              if (siteAssociations) {
+                // siteAssociations.map(
+                //   (association) =>
+                //     (association.srAction = SRApprovalStatusEnum.Pending),
+                // );
+                await transactionalEntityManager.save(
+                  SiteAssocs,
+                  siteAssociations,
+                );
+              } else {
+                console.log('No changes To Site Associations');
+              }
+
+              if (subDivisions) {
+                // subDivisions.map(
+                //   (subDivison) =>
+                //     (subDivison.srAction = SRApprovalStatusEnum.Pending),
+                // );
+                await transactionalEntityManager.save(
+                  Subdivisions,
+                  subDivisions,
+                );
+              } else {
+                console.log('No changes To Site subDivisions');
+              }
+
+              if (landHistories) {
+                // landHistories.map(
+                //   (history) =>
+                //     (history.srAction = SRApprovalStatusEnum.Pending),
+                // );
+                await transactionalEntityManager.save(
+                  LandHistories,
+                  landHistories,
+                );
+              } else {
+                console.log('No changes To Site LandHistories');
+              }
+
+              if (profiles) {
+                // profiles.map(
+                //   (profile) =>
+                //     (profile.srAction = SRApprovalStatusEnum.Pending),
+                // );
+                await transactionalEntityManager.save(SiteProfiles, profiles);
+              } else {
+                console.log('No changes To Site profiles');
+              }
+
+              const historyLog: HistoryLog = {
+                userId: userInfo ?? userInfo.sub,
+                content: inputDTO,
+                id: null,
+                whoCreated: userInfo ?? userInfo.givenName,
+                whenCreated: new Date(),
+                whenUpdated: new Date(),
+                whoUpdated: userInfo ?? userInfo.givenName,
+              };
+
+              await this.historyLogRepository.save(historyLog);
+            } catch (error) {
+              console.error('Save Site Details Transaction failed', error);
+              return false;
+            }
+          },
+        );
+      }
+    } catch (error) {
+      console.log('Save site details error', error);
+      throw error;
     }
-
-    const {
-      sitesSummary,
-      events,
-      eventsParticipants,
-      siteParticipants,
-      siteAssociations,
-      subDivisions,
-      landHistories,
-      profiles,
-    } = inputDTO;
-
-    return await this.entityManager.transaction(
-      async (transactionalEntityManager: EntityManager) => {
-        try {
-          if (sitesSummary) {            
-            sitesSummary.srStatus = SRApprovalStatusEnum.Pending;
-            await transactionalEntityManager.save(Sites, sitesSummary);
-          } else {
-            console.log('No changes To Site Summary');
-          }
-
-          if (events) {
-
-            events.map(event=> event.srAction = SRApprovalStatusEnum.Pending);
-
-            transactionalEntityManager.save(Events, events);
-            
-          } else {
-            console.log('No changes To Site Events');
-          }
-
-          if (eventsParticipants) {
-
-            eventsParticipants.map(participant => participant.srAction = SRApprovalStatusEnum.Pending);
-
-            await transactionalEntityManager.save(
-              EventPartics,
-              eventsParticipants,
-            );
-          } else {
-            console.log('No changes To Site Event Participants');
-          }
-
-          if (siteParticipants) {
-            siteParticipants.map(participant => participant.srAction = SRApprovalStatusEnum.Pending);
-            await transactionalEntityManager.save(
-              SitePartics,
-              siteParticipants,
-            );
-          } else {
-            console.log('No changes To Site Participants');
-          }
-
-          if (siteAssociations) {
-            siteAssociations.map(association => association.srAction = SRApprovalStatusEnum.Pending);
-            await transactionalEntityManager.save(SiteAssocs, siteAssociations);
-          } else {
-            console.log('No changes To Site Associations');
-          }
-
-          if (subDivisions) {
-            subDivisions.map(subDivison => subDivison.srAction = SRApprovalStatusEnum.Pending);
-            await transactionalEntityManager.save(Subdivisions, subDivisions);
-          } else {
-            console.log('No changes To Site subDivisions');
-          }
-
-          if (landHistories) {
-            landHistories.map(history => history.srAction = SRApprovalStatusEnum.Pending);
-            await transactionalEntityManager.save(LandHistories, landHistories);
-          } else {
-            console.log('No changes To Site LandHistories');
-          }
-
-          if (profiles) {
-            profiles.map(profile => profile.srAction = SRApprovalStatusEnum.Pending);
-            await transactionalEntityManager.save(SiteProfiles, profiles);
-          } else {
-            console.log('No changes To Site profiles');
-          }
-
-
-          const historyLog:HistoryLog = {
-            userId : userInfo??userInfo.sub,
-            content : inputDTO,
-            id: null,
-            whoCreated: userInfo??userInfo.givenName,
-            whenCreated: new Date(),
-            whenUpdated : new Date(),
-            whoUpdated: userInfo??userInfo.givenName,
-          }
-
-          this.historyLogRepository.save(historyLog);
-         
-        } catch (error) {
-          console.error('Save Site Details Transaction failed', error);
-          return false;
-        }
-      },
-    );
-  }
-  catch(error)
-  {
-    console.log("Save site details error", error);
-    throw error;
-  }
   }
 }

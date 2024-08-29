@@ -10,6 +10,7 @@ import {
 } from '../components/input-controls/IFormField';
 import { RequestStatus } from './requests/status';
 import { notifyError, notifySuccess } from '../components/alert/Alert';
+import { useEffect, useState } from 'react';
 
 export const serializeDate = (data: any) => {
   const serializedData: any = { ...data };
@@ -76,6 +77,26 @@ export function getUser() {
   }
 
   return User.fromStorageString(oidcStorage);
+}
+
+export function useUser() {
+  const [user, setUser] = useState<User | null>(null);
+
+  const handleStorageChange = () => {
+    setUser(getUser());
+  };
+
+  useEffect(() => {
+    handleStorageChange();
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  return user;
 }
 
 export const consoleLog = (identifier: string, message: any) => {

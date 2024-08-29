@@ -14,8 +14,8 @@ import {
 import { AppDispatch } from '../../Store';
 import {
   getLoggedInUserType,
-  getUser,
   showNotification,
+  useUser,
 } from '../../helpers/utility';
 
 function SideBar() {
@@ -27,7 +27,7 @@ function SideBar() {
   let cartItemAdded = useSelector(addCartItemRequestStatus);
   let cartItemDeleted = useSelector(deleteRequestStatus);
 
-  const user = getUser();
+  const user = useUser();
 
   useEffect(() => {
     console.log('user updated');

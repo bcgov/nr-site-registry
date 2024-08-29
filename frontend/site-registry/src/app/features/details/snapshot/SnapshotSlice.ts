@@ -63,6 +63,14 @@ export const getBannerType = createAsyncThunk(
           siteId: siteId,
         },
       });
+
+      if (
+        !response.data ||
+        response.data.errors ||
+        !response.data.data.getBannerType.data
+      ) {
+        throw new Error('Invalid response or banner type not found');
+      }
       return response.data.data.getBannerType.data.bannerType;
     } catch (error) {
       throw error;
@@ -123,8 +131,13 @@ const snapshotsSlice = createSlice({
         state.status = RequestStatus.loading;
       })
       .addCase(getBannerType.fulfilled, (state, action) => {
-        state.status = RequestStatus.success;
-        state.bannerType = action.payload;
+        if (action.payload) {
+          state.status = RequestStatus.success;
+          state.bannerType = action.payload;
+        } else {
+          state.status = RequestStatus.failed;
+          state.error = 'Failed to fetch banner type';
+        }
       })
       .addCase(getBannerType.rejected, (state, action) => {
         state.status = RequestStatus.failed;

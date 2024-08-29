@@ -57,8 +57,15 @@ const Notations = () => {
     const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
     const [srTimeStamp, setSRTimeStamp] = useState('Sent to SR on June 2nd, 2013');
     const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
-    const [searchTerm, setSearchTerm] = useState('');
-    
+    const [searchTerm, setSearchTerm] = useState('');  
+    const [isDelete, setIsDelete] = useState(false);
+    const [isUpdated, setIsUpdated] = useState(false);
+    const [updatedNotationFormRowEditMode, setUpdatedNotationFormRowEditMode] =
+      useState<IFormField[][]>([]);
+    const [selectedRows, setSelectedRows] = useState<
+      { id: any; participantId: any }[]
+    >([]);
+    const [currentNotation, setCurrentNotation] = useState({});
 
   const loggedInUser = getUser();
   const resetDetails = useSelector(resetSiteDetails);

@@ -153,78 +153,66 @@ export const showNotification = (
   }
 };
 
-
-export enum UserRoleType
-{
-   CLIENT = 'client',
-   INTERNAL = 'internal',
-   SR = 'sr'
+export enum UserRoleType {
+  CLIENT = 'client',
+  INTERNAL = 'internal',
+  SR = 'sr',
 }
 
+export const isUserOfType = (roleType: UserRoleType) => {
+  const user = getUser();
+  if (user !== null) {
+    const userRoles: any = user.profile?.role;
+    switch (roleType) {
+      case 'client':
+        const externalUserRole =
+          process.env.REACT_APP_SITE_EXTERNAL_USER_ROLE ||
+          ((window as any)._env_ &&
+            (window as any)._env_.REACT_APP_SITE_EXTERNAL_USER_ROLE) ||
+          'site-external-user';
 
+        if (userRoles.includes(externalUserRole)) {
+          return true;
+        } else {
+          return false;
+        }
+      case 'internal':
+        const internalUserRole =
+          process.env.REACT_APP_SITE_INTERNAL_USER_ROLE ||
+          ((window as any)._env_ &&
+            (window as any)._env_.REACT_APP_SITE_INTERNAL_USER_ROLE) ||
+          'site-internal-user';
 
-
-export const isUserOfType = (roleType:UserRoleType) => {
-
-    const user = getUser();
-    if(user !== null)
-    {
-      const userRoles: any = user.profile?.role;
-      switch(roleType)
-      {        
-         case 'client':
-        
-          const externalUserRole = process.env.REACT_APP_SITE_EXTERNAL_USER_ROLE ||
-            ((window as any)._env_ && (window as any)._env_.REACT_APP_SITE_EXTERNAL_USER_ROLE) || 'site-external-user';
-
-          if(userRoles.includes(externalUserRole))
-          {
-              return true;
-          }
-          else
-          {
-            return false;
-          }        
-         case 'internal':  
-         const internalUserRole = process.env.REACT_APP_SITE_INTERNAL_USER_ROLE ||
-         ((window as any)._env_ && (window as any)._env_.REACT_APP_SITE_INTERNAL_USER_ROLE) || 'site-internal-user';
-
-          if(userRoles.includes(internalUserRole))
-          {
-              return true;
-          }
-          else
-          {
-            return false;
-          }  
-          case 'sr':         
-          const srUserRole = process.env.REACT_APP_SITE_REGISTRAR_USER_ROLE ||
-          ((window as any)._env_ && (window as any)._env_.REACT_APP_SITE_REGISTRAR_USER_ROLE) || 'site-registrar';
-          if(userRoles.includes(srUserRole))
-          {
-              return true;
-          }
-          else
-          {
-            return false;
-          }  
-
-      }
-       
+        if (userRoles.includes(internalUserRole)) {
+          return true;
+        } else {
+          return false;
+        }
+      case 'sr':
+        const srUserRole =
+          process.env.REACT_APP_SITE_REGISTRAR_USER_ROLE ||
+          ((window as any)._env_ &&
+            (window as any)._env_.REACT_APP_SITE_REGISTRAR_USER_ROLE) ||
+          'site-registrar';
+        if (userRoles.includes(srUserRole)) {
+          return true;
+        } else {
+          return false;
+        }
     }
-
-}
-
+  }
+};
 
 export const getLoggedInUserType = () => {
-  return isUserOfType(UserRoleType.CLIENT)?UserRoleType.CLIENT : isUserOfType(UserRoleType.INTERNAL)? UserRoleType.INTERNAL : isUserOfType(UserRoleType.SR) ? UserRoleType.SR: UserRoleType.CLIENT;
-}
+  return isUserOfType(UserRoleType.CLIENT)
+    ? UserRoleType.CLIENT
+    : isUserOfType(UserRoleType.INTERNAL)
+      ? UserRoleType.INTERNAL
+      : isUserOfType(UserRoleType.SR)
+        ? UserRoleType.SR
+        : UserRoleType.CLIENT;
+};
 
+export const isUserRoleInternalUser = () => {};
 
-export const isUserRoleInternalUser= () => {
-  
-}
-
-export const isUserRoleSiteRegistrar= () =>  {
-  
-}
+export const isUserRoleSiteRegistrar = () => {};

@@ -139,7 +139,7 @@ import { HistoryLog } from './entities/siteHistoryLog.entity';
       Folio,
       FolioContents,
       User,
-      HistoryLog
+      HistoryLog,
     ]),
   ],
   providers: [

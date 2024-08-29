@@ -32,7 +32,7 @@ export const store = configureStore({
     folio: folioReducer,
     snapshots: snapshotsReducer,
     associatedSites: associatedSitesReducer,
-    siteDetails: siteDetailsReducer
+    siteDetails: siteDetailsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

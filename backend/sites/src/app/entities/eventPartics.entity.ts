@@ -6,7 +6,6 @@ import { PeopleOrgs } from './peopleOrgs.entity';
 import { SitePartics } from './sitePartics.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
 
-
 @ObjectType()
 @Index('event_partics_pkey', ['eprCode', 'eventId', 'spId'], { unique: true })
 @Index('ep_classified_by_frgn', ['eprCode'], {})

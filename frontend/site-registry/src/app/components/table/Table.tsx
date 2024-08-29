@@ -51,14 +51,12 @@ const Table: FC<TableProps> = ({
     [],
   );
 
-  useEffect(()=>{
-    if(data.length === 0)
-    {
+  useEffect(() => {
+    if (data.length === 0) {
       SetAllRowsSelectedPages([]);
       SetCurrentPageAllRowSelected(false);
     }
-   
-  },[data])
+  }, [data]);
 
   const [currentPageAllRowSelected, SetCurrentPageAllRowSelected] = useState(
     null || Boolean,

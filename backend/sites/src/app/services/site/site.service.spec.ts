@@ -23,16 +23,16 @@ describe('SiteService', () => {
   let eventsParticipantsRepository: Repository<EventPartics>;
   let siteParticipantsRepository: Repository<SitePartics>;
   let siteDocumentsRepo: Repository<SiteDocs>;
-  let siteAssociationsRepo : Repository<SiteAssocs>;
+  let siteAssociationsRepo: Repository<SiteAssocs>;
   let landHistoriesRepo: Repository<LandHistories>;
   let siteSubDivisionsRepo: Repository<SiteSubdivisions>;
-  let siteProfilesRepo : Repository<SiteProfiles>;
+  let siteProfilesRepo: Repository<SiteProfiles>;
   let entityManager: EntityManager;
   let historyLogRepository: Repository<HistoryLog>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-        providers: [
+      providers: [
         SiteService,
         {
           provide: getRepositoryToken(Sites),
@@ -43,7 +43,7 @@ describe('SiteService', () => {
                 { id: '121', commonName: 'duncan' },
                 { id: '222', commonName: 'vancouver' },
               ];
-            }),          
+            }),
             createQueryBuilder: jest.fn(() => ({
               where: jest.fn().mockReturnThis(),
               orWhere: jest.fn().mockReturnThis(),
@@ -56,189 +56,207 @@ describe('SiteService', () => {
             findOneOrFail: jest.fn(() => {
               return { id: '123', region_name: 'victoria' };
             }),
-            save: jest.fn(()=>{
+            save: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            })
+                { id: '124', siteId: '123' },
+              ];
+            }),
           },
         },
         {
           provide: getRepositoryToken(Events),
-          useValue:{
-            find: jest.fn(()=>{
+          useValue: {
+            find: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            }),          
-            save: jest.fn(()=>{
+                { id: '124', siteId: '123' },
+              ];
+            }),
+            save: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            })
-          }
+                { id: '124', siteId: '123' },
+              ];
+            }),
+          },
         },
         {
           provide: getRepositoryToken(EventPartics),
-          useValue:{
-            find: jest.fn(()=>{
+          useValue: {
+            find: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            }),        
-            save: jest.fn(()=>{
+                { id: '124', siteId: '123' },
+              ];
+            }),
+            save: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            })
-          }
+                { id: '124', siteId: '123' },
+              ];
+            }),
+          },
         },
         {
           provide: getRepositoryToken(SitePartics),
-          useValue:{
-            find: jest.fn(()=>{
+          useValue: {
+            find: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            }),        
-            save: jest.fn(()=>{
+                { id: '124', siteId: '123' },
+              ];
+            }),
+            save: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            })
-          }
+                { id: '124', siteId: '123' },
+              ];
+            }),
+          },
         },
         {
           provide: getRepositoryToken(SiteDocs),
-          useValue:{
-            find: jest.fn(()=>{
+          useValue: {
+            find: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            }),          
-            save: jest.fn(()=>{
+                { id: '124', siteId: '123' },
+              ];
+            }),
+            save: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            })
-          }
+                { id: '124', siteId: '123' },
+              ];
+            }),
+          },
         },
         {
           provide: getRepositoryToken(SiteAssocs),
-          useValue:{
-            find: jest.fn(()=>{
+          useValue: {
+            find: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            }),         
-            save: jest.fn(()=>{
+                { id: '124', siteId: '123' },
+              ];
+            }),
+            save: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            })
-          }
+                { id: '124', siteId: '123' },
+              ];
+            }),
+          },
         },
         {
           provide: getRepositoryToken(LandHistories),
-          useValue:{
-            find: jest.fn(()=>{
+          useValue: {
+            find: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            }),         
-            save: jest.fn(()=>{
+                { id: '124', siteId: '123' },
+              ];
+            }),
+            save: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            })
-          }
+                { id: '124', siteId: '123' },
+              ];
+            }),
+          },
         },
         {
           provide: getRepositoryToken(SiteSubdivisions),
-          useValue:{
-            find: jest.fn(()=>{
+          useValue: {
+            find: jest.fn(() => {
               return [
                 { siteId: '123', subdivId: '123' },
-                { siteId: '124', subdivId: '123' }
-              ]
-            }),        
-            save: jest.fn(()=>{
+                { siteId: '124', subdivId: '123' },
+              ];
+            }),
+            save: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            })
-          }
+                { id: '124', siteId: '123' },
+              ];
+            }),
+          },
         },
         {
           provide: getRepositoryToken(SiteProfiles),
-          useValue:{
-            find: jest.fn(()=>{
+          useValue: {
+            find: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
+                { id: '124', siteId: '123' },
+              ];
             }),
-            save: jest.fn(()=>{
+            save: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            })
-          }
+                { id: '124', siteId: '123' },
+              ];
+            }),
+          },
         },
         {
           provide: EntityManager,
           useValue: {
             transaction: jest.fn(async () => {
-            return await true;
+              return await true;
             }),
           },
         },
         {
           provide: getRepositoryToken(HistoryLog),
-          useValue:{
-            find: jest.fn(()=>{
+          useValue: {
+            find: jest.fn(() => {
               return [
                 { id: '123', userId: '123' },
-                { id: '124', userId: '123' }
-              ]
+                { id: '124', userId: '123' },
+              ];
             }),
-          save: jest.fn(()=>{
+            save: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' }
-              ]
-            })
-          }
+                { id: '124', siteId: '123' },
+              ];
+            }),
+          },
         },
       ],
     }).compile();
 
     siteService = module.get<SiteService>(SiteService);
     siteRepository = module.get<Repository<Sites>>(getRepositoryToken(Sites));
-    eventsRepository = module.get<Repository<Events>>(getRepositoryToken(Events));
-    eventsParticipantsRepository = module.get<Repository<EventPartics>>(getRepositoryToken(EventPartics));
-    siteParticipantsRepository = module.get<Repository<SitePartics>>(getRepositoryToken(SitePartics));
-    siteDocumentsRepo = module.get<Repository<SiteDocs>>(getRepositoryToken(SiteDocs));
-    siteAssociationsRepo = module.get<Repository<SiteAssocs>>(getRepositoryToken(SiteAssocs));
-    landHistoriesRepo = module.get<Repository<LandHistories>>(getRepositoryToken(LandHistories));
-    siteSubDivisionsRepo = module.get<Repository<SiteSubdivisions>>(getRepositoryToken(SiteSubdivisions));
-    siteProfilesRepo = module.get<Repository<SiteProfiles>>(getRepositoryToken(SiteProfiles));
-    historyLogRepository = module.get<Repository<HistoryLog>>(getRepositoryToken(HistoryLog));
+    eventsRepository = module.get<Repository<Events>>(
+      getRepositoryToken(Events),
+    );
+    eventsParticipantsRepository = module.get<Repository<EventPartics>>(
+      getRepositoryToken(EventPartics),
+    );
+    siteParticipantsRepository = module.get<Repository<SitePartics>>(
+      getRepositoryToken(SitePartics),
+    );
+    siteDocumentsRepo = module.get<Repository<SiteDocs>>(
+      getRepositoryToken(SiteDocs),
+    );
+    siteAssociationsRepo = module.get<Repository<SiteAssocs>>(
+      getRepositoryToken(SiteAssocs),
+    );
+    landHistoriesRepo = module.get<Repository<LandHistories>>(
+      getRepositoryToken(LandHistories),
+    );
+    siteSubDivisionsRepo = module.get<Repository<SiteSubdivisions>>(
+      getRepositoryToken(SiteSubdivisions),
+    );
+    siteProfilesRepo = module.get<Repository<SiteProfiles>>(
+      getRepositoryToken(SiteProfiles),
+    );
+    historyLogRepository = module.get<Repository<HistoryLog>>(
+      getRepositoryToken(HistoryLog),
+    );
     entityManager = module.get<EntityManager>(EntityManager);
   });
 
@@ -337,44 +355,35 @@ describe('SiteService', () => {
         error,
       );
     });
-
-
-
-
-   
-
   });
 
-  describe('Saving Snapshot Data',()=>{
-
-    it('Save Snapshot Data', async()=>{
-
+  describe('Saving Snapshot Data', () => {
+    it('Save Snapshot Data', async () => {
       const userInfo = { sub: 'userId', givenName: 'UserName' };
 
       const inputDTO: SaveSiteDetailsDTO = {
-        events:[{
-          "id": "1",
-          "psnorgId": "1",
-          "siteId": "1",
-          "completionDate": new Date(),
-          "etypCode": "1",
-          "eclsCode": "1",
-          "requiredAction": "1",
-          "note": "1",
-          "requirementDueDate": new Date(),
-          "requirementReceivedDate": new Date(),
-          "userAction": "pending",
-          "srAction": "pending",
-          "notationParticipant": null
-        }]
-      }
+        events: [
+          {
+            id: '1',
+            psnorgId: '1',
+            siteId: '1',
+            completionDate: new Date(),
+            etypCode: '1',
+            eclsCode: '1',
+            requiredAction: '1',
+            note: '1',
+            requirementDueDate: new Date(),
+            requirementReceivedDate: new Date(),
+            userAction: 'pending',
+            srAction: 'pending',
+            notationParticipant: null,
+          },
+        ],
+      };
 
-      const result = await siteService.saveSiteDetails(inputDTO,userInfo);
+      const result = await siteService.saveSiteDetails(inputDTO, userInfo);
 
       expect(result).toBe(true);
-    })
-
-
-
-  })
+    });
+  });
 });

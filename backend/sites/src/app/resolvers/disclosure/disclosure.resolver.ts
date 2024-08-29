@@ -17,7 +17,14 @@ export class DisclosureResolver {
     >,
   ) {}
 
-  @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => DisclosureResponse, { name: 'getSiteDisclosureBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSiteDisclosureBySiteId(

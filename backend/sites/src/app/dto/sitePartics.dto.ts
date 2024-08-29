@@ -47,10 +47,8 @@ export class SiteParticsDto {
   description: string;
 }
 
-
 @InputType()
-export class SiteParticsInputDto extends ChangeAuditEntityDTO
-{
+export class SiteParticsInputDto extends ChangeAuditEntityDTO {
   @Field()
   guid: string;
 

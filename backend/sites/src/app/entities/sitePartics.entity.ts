@@ -16,7 +16,6 @@ import { SiteProfileOwners } from './siteProfileOwners.entity';
 import { SiteProfiles } from './siteProfiles.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
 
-
 @ObjectType()
 @Index('site_partics_pkey', ['id'], { unique: true })
 @Index('sp_identified_by_frgn', ['psnorgId'], {})

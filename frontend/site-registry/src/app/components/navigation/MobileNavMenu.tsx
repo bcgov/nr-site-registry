@@ -11,7 +11,7 @@ const MobileNavMenu = (props: any) => {
   return (
     <div className="mobile-nav">
       <div className="mobile-nav-top">
-        {menuOptions.map((item:any, index:number) => {
+        {menuOptions.map((item: any, index: number) => {
           return (
             <React.Fragment key={index}>
               <div className="mobile-nav-menu-item flex-column" role="menu">
@@ -36,7 +36,7 @@ const MobileNavMenu = (props: any) => {
                 </div>
 
                 {item.children &&
-                  item.children.map((item:any, index:number) => {
+                  item.children.map((item: any, index: number) => {
                     return (
                       <div
                         key={index}

@@ -17,7 +17,7 @@ const initialState: SaveSiteDetails = {
   subDivisionsData: null,
   profilesData: null,
   siteAssociationsData: null,
-  siteId: ''
+  siteId: '',
 };
 
 export const saveSiteDetails = createAsyncThunk(
@@ -28,7 +28,7 @@ export const saveSiteDetails = createAsyncThunk(
       variables: {
         siteDetailsDTO: siteDetailsDTO,
       },
-    });  
+    });
     return request.data;
   },
 );
@@ -130,20 +130,20 @@ export const getSiteDetailsToBeSaved = (state: any) => {
     subDivisions: state.siteDetails.subDivisions,
     landHistories: state.siteDetails.landHistories,
     profiles: state.siteDetails.profiles,
-    siteId: state.siteDetails.siteId
+    siteId: state.siteDetails.siteId,
   };
 };
 
-export const { 
-  resetSaveSiteDetailsRequestStatus, 
-  resetSaveSiteDetails, 
+export const {
+  resetSaveSiteDetailsRequestStatus,
+  resetSaveSiteDetails,
   setupNotationDataForSaving,
   setupSiteIdForSaving,
   setupDocumentsDataForSaving,
   setupLandHistoriesDataForSaving,
   setupSiteAssociationDataForSaving,
   setupSiteParticipantDataForSaving,
-  setupSubDivisionsDataForSaving } =
-  siteDetailsSlice.actions;
+  setupSubDivisionsDataForSaving,
+} = siteDetailsSlice.actions;
 
 export default siteDetailsSlice.reducer;

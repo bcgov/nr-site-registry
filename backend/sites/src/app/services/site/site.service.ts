@@ -300,14 +300,13 @@ export class SiteService {
                 console.log('No changes To Site Summary');
               }
 
-              if (events) {               
+              if (events) {
                 await transactionalEntityManager.save(Events, events);
               } else {
                 console.log('No changes To Site Events');
               }
 
-              if (eventsParticipants) {              
-
+              if (eventsParticipants) {
                 await transactionalEntityManager.save(
                   EventPartics,
                   eventsParticipants,
@@ -316,7 +315,7 @@ export class SiteService {
                 console.log('No changes To Site Event Participants');
               }
 
-              if (siteParticipants) {            
+              if (siteParticipants) {
                 await transactionalEntityManager.save(
                   SitePartics,
                   siteParticipants,
@@ -325,7 +324,7 @@ export class SiteService {
                 console.log('No changes To Site Participants');
               }
 
-              if (siteAssociations) {           
+              if (siteAssociations) {
                 await transactionalEntityManager.save(
                   SiteAssocs,
                   siteAssociations,
@@ -334,7 +333,7 @@ export class SiteService {
                 console.log('No changes To Site Associations');
               }
 
-              if (subDivisions) {           
+              if (subDivisions) {
                 await transactionalEntityManager.save(
                   Subdivisions,
                   subDivisions,
@@ -343,7 +342,7 @@ export class SiteService {
                 console.log('No changes To Site subDivisions');
               }
 
-              if (landHistories) {            
+              if (landHistories) {
                 await transactionalEntityManager.save(
                   LandHistories,
                   landHistories,
@@ -352,7 +351,7 @@ export class SiteService {
                 console.log('No changes To Site LandHistories');
               }
 
-              if (profiles) {              
+              if (profiles) {
                 await transactionalEntityManager.save(SiteProfiles, profiles);
               } else {
                 console.log('No changes To Site profiles');
@@ -366,7 +365,7 @@ export class SiteService {
                 whenCreated: new Date(),
                 whenUpdated: new Date(),
                 whoUpdated: userInfo ?? userInfo.givenName,
-                siteId: inputDTO.siteId
+                siteId: inputDTO.siteId,
               };
 
               await this.historyLogRepository.save(historyLog);

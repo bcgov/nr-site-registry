@@ -1,6 +1,5 @@
-export enum SRApprovalStatusEnum
-{
-    Public = "public",
-    Pending = "pending",
-    Private = "private"
+export enum SRApprovalStatusEnum {
+  Public = 'public',
+  Pending = 'pending',
+  Private = 'private',
 }

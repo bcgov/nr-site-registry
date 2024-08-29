@@ -9,12 +9,14 @@ import Cart from '../features/cart/Cart';
 import Folios from '../features/folios/Folios';
 import FolioContents from '../features/folios/FolioContent';
 import App from '../../App';
-import { getLoggedInUserType, getUser, isUserOfType, UserRoleType } from '../helpers/utility';
+import {
+  getLoggedInUserType,
+  getUser,
+  isUserOfType,
+  UserRoleType,
+} from '../helpers/utility';
 
-
-
-
-const roleBasedRoutes:any = {
+const roleBasedRoutes: any = {
   client: [
     { path: '/', element: <Dashboard /> },
     { path: '/dashboard', element: <Dashboard /> },
@@ -43,7 +45,7 @@ const roleBasedRoutes:any = {
     { path: '/map', element: <MapSearch /> },
     { path: '/map/:id', element: <MapSearch /> },
   ],
-  public:[
+  public: [
     { path: '/', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
@@ -51,26 +53,24 @@ const roleBasedRoutes:any = {
     { path: '/map/:id', element: <MapSearch /> },
     { path: '/site/cart', element: <Cart /> },
     { path: '/folios/:id', element: <FolioContents /> },
-  
-  ]
+  ],
 };
 
 // Create routes based on the user's role
-const createRoutesForRole = (role:string) => [
+const createRoutesForRole = (role: string) => [
   {
     element: <App />,
     errorElement: <h1>Page not found</h1>,
-    children: roleBasedRoutes[role]?.map((route:any) => ({
+    children: roleBasedRoutes[role]?.map((route: any) => ({
       path: route.path,
       element: route.element,
-      children: route.children
+      children: route.children,
     })),
   },
 ];
 
-
 const userType = getLoggedInUserType();
-console.log('userType',userType,createRoutesForRole(userType))
+console.log('userType', userType, createRoutesForRole(userType));
 const siteRouter = createBrowserRouter(createRoutesForRole(userType));
 
 // const AppRoutes = () => {

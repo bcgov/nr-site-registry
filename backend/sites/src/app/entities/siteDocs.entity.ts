@@ -12,7 +12,6 @@ import { SiteDocPartics } from './siteDocPartics.entity';
 import { Sites } from './sites.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
 
-
 @ObjectType()
 @Index('site_docs_pkey', ['id'], { unique: true })
 @Index('sdoc_rwm_flag', ['rwmFlag'], {})

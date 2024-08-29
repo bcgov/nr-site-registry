@@ -17,7 +17,14 @@ export class NotationResolver {
     >,
   ) {}
 
- @Roles({ roles: [CustomRoles.External,CustomRoles.Internal,CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => NotationResponse, { name: 'getSiteNotationBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSiteNotationBySiteId(

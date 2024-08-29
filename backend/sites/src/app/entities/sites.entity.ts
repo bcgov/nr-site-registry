@@ -28,7 +28,6 @@ import { FolioContents } from './folioContents.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
 // import { loggerMiddleware } from '../resolvers/site/site.resolver';
 
-
 @ObjectType()
 @Index('site_bco', ['bcerCode', 'classCode', 'id', 'rwmFlag', 'sstCode'], {})
 @Index('site_responsibility_o_frgn', ['bcerCode'], {})

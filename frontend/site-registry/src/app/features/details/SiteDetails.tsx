@@ -57,7 +57,7 @@ import {
   addSiteToFolioRequest,
   fetchFolioItems,
   folioItems,
-} from '../folios/FolioSlice';
+} from '../folios/redux/FolioSlice';
 import { Folio, FolioContentDTO } from '../folios/dto/Folio';
 import {
   fetchSnapshots,
@@ -77,9 +77,16 @@ import {
   IFormField,
 } from '../../components/input-controls/IFormField';
 import BannerDetails from '../../components/banners/BannerDetails';
+import {
+  getSiteDetailsToBeSaved,
+  resetSaveSiteDetails,
+  saveSiteDetails,
+  setupSiteIdForSaving,
+} from './SaveSiteDetailsSlice';
 import { fetchAssociatedSites } from './associates/AssociateSlice';
 
 const SiteDetails = () => {
+  const siteDetailsTobeSaved = useSelector(getSiteDetailsToBeSaved);
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
 
   const folioDetails = useSelector(folioItems);
@@ -197,6 +204,8 @@ const SiteDetails = () => {
   useEffect(() => {
     setIsLoading(true); // Set loading state to true before starting API calls
     if (id) {
+      dispatch(resetSaveSiteDetails(null));
+      dispatch(setupSiteIdForSaving(id));
       Promise.all([
         // dispatch(fetchParticipantRoleCd()),
         // dispatch(fetchNotationClassCd()),
@@ -419,6 +428,7 @@ const SiteDetails = () => {
             closeHandler={(response) => {
               setSave(false);
               if (response) {
+                dispatch(saveSiteDetails(siteDetailsTobeSaved)).unwrap();
                 dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
                 setEdit(false);
               }

@@ -54,6 +54,7 @@ import {
 } from './NotationSlice';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';
 import { v4 } from 'uuid';
+import { setupNotationDataForSaving } from '../SaveSiteDetailsSlice';
 import { useParams } from 'react-router-dom';
 import { GRAPHQL } from '../../../helpers/endpoints';
 import { print } from 'graphql';

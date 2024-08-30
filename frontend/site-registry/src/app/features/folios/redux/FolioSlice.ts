@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { RequestStatus } from '../../helpers/requests/status';
-import { Folio, FolioContentDTO, FolioMinDTO, FolioState } from './dto/Folio';
-import { getAxiosInstance } from '../../helpers/utility';
-import { GRAPHQL } from '../../helpers/endpoints';
+import { RequestStatus } from '../../../helpers/requests/status';
+import { Folio, FolioContentDTO, FolioMinDTO, FolioState } from '../dto/Folio';
+import { getAxiosInstance } from '../../../helpers/utility';
+import { GRAPHQL } from '../../../helpers/endpoints';
 import {
   addFolioItemQL,
   addSiteToFolioQL,
@@ -11,7 +11,7 @@ import {
   getFolioItemsForUserQL,
   getSitesForFolioQL,
   updateFolioItemQL,
-} from './graphql/Folio';
+} from '../graphql/Folio';
 import { print } from 'graphql';
 
 const initialState: FolioState = {

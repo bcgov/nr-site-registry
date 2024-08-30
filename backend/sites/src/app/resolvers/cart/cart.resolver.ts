@@ -6,6 +6,7 @@ import {
   Roles,
 } from 'nest-keycloak-connect';
 import {} from '../../dto/recentView.dto';
+import { CustomRoles } from '../../common/role';
 
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
@@ -25,7 +26,7 @@ export class CartResolver {
     private readonly genericResponseProvider: GenericResponseProvider<Cart[]>,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Query(() => CartResponse, { name: 'getCartItemsForUser' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getCartItemsForUser(
@@ -55,7 +56,7 @@ export class CartResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => CartResponse, { name: 'addCartItem' })
   async addCartItem(
     @Args('cartDTO', { type: () => [CartDTO] }, new ValidationPipe())
@@ -82,7 +83,7 @@ export class CartResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => CartResponse, { name: 'deleteCartItem' })
   async deleteCartItem(
     @Args(
@@ -118,7 +119,7 @@ export class CartResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => CartResponse, { name: 'deleteCartItemWithSiteId' })
   async deleteCartItemWithSiteId(
     @Args(

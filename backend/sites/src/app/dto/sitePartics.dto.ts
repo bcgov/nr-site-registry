@@ -1,6 +1,7 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { ResponseDto } from './response/response.dto';
 import { IsDate, IsString } from 'class-validator';
+import { ChangeAuditEntityDTO } from './changeAuditEntity.dto';
 
 @ObjectType()
 export class SiteParticsResponse extends ResponseDto {
@@ -10,6 +11,44 @@ export class SiteParticsResponse extends ResponseDto {
 
 @ObjectType()
 export class SiteParticsDto {
+  @Field()
+  guid: string;
+
+  @Field()
+  @IsString()
+  id: string;
+
+  @Field()
+  @IsString()
+  psnorgId: string;
+
+  @Field()
+  @IsDate()
+  effectiveDate: Date;
+
+  @Field({ nullable: true })
+  @IsDate()
+  endDate: Date | null;
+
+  @Field({ nullable: true })
+  @IsString()
+  note: string | null;
+
+  @Field()
+  @IsString()
+  displayName: string;
+
+  @Field()
+  @IsString()
+  prCode: string;
+
+  @Field()
+  @IsString()
+  description: string;
+}
+
+@InputType()
+export class SiteParticsInputDto extends ChangeAuditEntityDTO {
   @Field()
   guid: string;
 

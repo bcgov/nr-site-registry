@@ -3,14 +3,12 @@ import { DropdownItem } from '../../../components/action/IActions';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
-import {
-  participantNameDrpdown,
-  participantRoleDrpdown,
-} from '../dropdowns/DropdownSlice';
+import { participantRoleDrpdown } from '../dropdowns/DropdownSlice';
+import { RequestStatus } from '../../../helpers/requests/status';
+import { siteParticipants } from './ParticipantSlice';
+import { useEffect } from 'react';
 
 export const GetConfig = () => {
-  const particNameDropdwn = useSelector(participantNameDrpdown);
-  const particRoleDropdwn = useSelector(participantRoleDrpdown);
   const participantColumnInternal: TableColumn[] = [
     {
       id: 1,
@@ -24,16 +22,21 @@ export const GetConfig = () => {
         isLabel: false,
         graphQLPropertyName: 'psnorgId',
         placeholder: 'Please enter participant name.',
+        isLoading: RequestStatus.idle,
         value: '',
-        options: particNameDropdwn.data.flatMap(
-          (item: any) => item.dropdownDto,
-        ),
+        options: [],
+        filteredOptions: [],
         colSize: 'col-lg-6 col-md-6 col-sm-12',
         customLabelCss: 'custom-participant-lbl-text',
         customInputTextCss: 'custom-participant-input-text',
         customEditLabelCss: 'custom-participant-edit-label',
         customEditInputTextCss: 'custom-participant-edit-input',
+        customPlaceholderCss: 'custom-participant-search-placeholder',
+        customMenuMessage: <span>Please select site participant name:</span>,
         tableMode: true,
+        handleSearch: () => {
+          console.log('handleSearch click');
+        },
       },
     },
     {
@@ -48,13 +51,14 @@ export const GetConfig = () => {
         graphQLPropertyName: 'prCode',
         placeholder: 'Please select the role',
         value: '',
-        options: particRoleDropdwn.data,
+        options: [],
         colSize: 'col-lg-6 col-md-6 col-sm-12',
         customLabelCss: 'custom-participant-lbl-text',
         customInputTextCss: 'custom-participant-input-text',
         customEditLabelCss: 'custom-participant-edit-label',
         customEditInputTextCss: 'custom-participant-edit-input',
         tableMode: true,
+        customInfoMessage: null,
       },
     },
     {
@@ -62,7 +66,7 @@ export const GetConfig = () => {
       displayName: 'Start Date',
       active: true,
       graphQLPropertyName: 'effectiveDate',
-      columnSize: ColumnSize.Default,
+      columnSize: ColumnSize.Small,
       displayType: {
         type: FormFieldType.Date,
         graphQLPropertyName: 'effectiveDate',
@@ -83,7 +87,7 @@ export const GetConfig = () => {
       displayName: 'End Date',
       active: true,
       graphQLPropertyName: 'endDate',
-      columnSize: ColumnSize.Default,
+      columnSize: ColumnSize.Small,
       displayType: {
         type: FormFieldType.Date,
         graphQLPropertyName: 'endDate',
@@ -131,8 +135,11 @@ export const GetConfig = () => {
         graphQLPropertyName: 'sr',
         value: false,
         tableMode: true,
+        stickyCol: true,
       },
-      columnSize: ColumnSize.Default,
+      columnSize: ColumnSize.XtraSmall,
+      // dynamicColumn: true,
+      stickyCol: true,
     },
   ];
 
@@ -144,15 +151,13 @@ export const GetConfig = () => {
       graphQLPropertyName: 'psnorgId',
       columnSize: ColumnSize.Double,
       displayType: {
-        type: FormFieldType.DropDown,
+        type: FormFieldType.Search,
         label: '',
         isLabel: false,
         graphQLPropertyName: 'psnorgId',
         placeholder: 'Please enter participant name.',
         value: '',
-        options: particNameDropdwn.data.flatMap(
-          (item: any) => item.dropdownDto,
-        ),
+        options: [],
         colSize: 'col-lg-6 col-md-6 col-sm-12',
         customLabelCss: 'custom-participant-lbl-text',
         customInputTextCss: 'custom-participant-input-text',
@@ -173,7 +178,7 @@ export const GetConfig = () => {
         graphQLPropertyName: 'prCode',
         placeholder: 'Please select the role',
         value: '',
-        options: particRoleDropdwn.data,
+        options: [],
         colSize: 'col-lg-6 col-md-6 col-sm-12',
         customLabelCss: 'custom-participant-lbl-text',
         customInputTextCss: 'custom-participant-input-text',

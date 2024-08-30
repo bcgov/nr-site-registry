@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import PanelWithUpDown from '../../../components/simple/PanelWithUpDown';
 import Form from '../../../components/form/Form';
-import GetNotationConfig from './NotationsConfig';
 import './Notations.css';
 import Widget from '../../../components/widget/Widget';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { UserType } from '../../../helpers/requests/userType';
 import { AppDispatch } from '../../../Store';
 import { useDispatch, useSelector } from 'react-redux';
-import { Plus, UserMinus, UserPlus } from '../../../components/common/icon';
+import {
+  Plus,
+  SpinnerIcon,
+  UserMinus,
+  UserPlus,
+} from '../../../components/common/icon';
 import {
   ChangeTracker,
   IChangeType,
@@ -19,7 +23,11 @@ import {
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
-import { flattenFormRows, getUser } from '../../../helpers/utility';
+import {
+  flattenFormRows,
+  getAxiosInstance,
+  getUser,
+} from '../../../helpers/utility';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
@@ -30,10 +38,27 @@ import {
 } from '../../../components/input-controls/IFormField';
 import Actions from '../../../components/action/Actions';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
-import { notationTypeDrpdown } from '../dropdowns/DropdownSlice';
-import { notationParticipants, updateSiteNotation } from './NotationSlice';
+import {
+  fetchNotationClassCd,
+  fetchNotationParticipantRoleCd,
+  fetchNotationTypeCd,
+  notationClassDrpdown,
+  notationParticipantRoleDrpdown,
+  notationTypeDrpdown,
+  participantNameDrpdown,
+} from '../dropdowns/DropdownSlice';
+import {
+  fetchNotationParticipants,
+  notationParticipants,
+  updateSiteNotation,
+} from './NotationSlice';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';
 import { v4 } from 'uuid';
+import { useParams } from 'react-router-dom';
+import { GRAPHQL } from '../../../helpers/endpoints';
+import { print } from 'graphql';
+import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
+import GetNotationConfig from './NotationsConfig';
 
 const Notations = () => {
   const {
@@ -46,11 +71,19 @@ const Notations = () => {
     srVisibilityConfig,
     notationFormRowsFirstChildIsRequired,
   } = GetNotationConfig();
+
   const notations = useSelector(notationParticipants);
   const dispatch = useDispatch<AppDispatch>();
   const mode = useSelector(siteDetailsMode);
   const notationType = useSelector(notationTypeDrpdown);
-  const [userType, setUserType] = useState<UserType>(UserType.External);
+  const notationParticipantRole = useSelector(notationParticipantRoleDrpdown);
+  const notationClass = useSelector(notationClassDrpdown);
+  const participantName = useSelector(participantNameDrpdown);
+  const loggedInUser = getUser();
+  const resetDetails = useSelector(resetSiteDetails);
+  const { id } = useParams();
+
+  const [userType, setUserType] = useState('');
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [formData, setFormData] =
     useState<{ [key: string]: any | [Date, Date] }[]>(notations);
@@ -68,9 +101,9 @@ const Notations = () => {
     { id: any; participantId: any }[]
   >([]);
   const [currentNotation, setCurrentNotation] = useState({});
-
-  const loggedInUser = getUser();
-  const resetDetails = useSelector(resetSiteDetails);
+  const [ministryInfo, setMinistryInfo] = useState<{ key: any; value: any }[]>(
+    [],
+  );
 
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
@@ -91,10 +124,91 @@ const Notations = () => {
   }, [mode]);
 
   useEffect(() => {
+    if (id) {
+      Promise.all([
+        fetchMinistryContact('EMP')
+          .then((res) => {
+            setMinistryInfo(res.data);
+          })
+          .catch((error) => {
+            console.error('Error fetching data:', error);
+          }),
+        dispatch(fetchNotationClassCd()),
+        dispatch(fetchNotationTypeCd()),
+        dispatch(fetchNotationParticipantRoleCd()),
+        dispatch(fetchNotationParticipants(id ?? '')),
+      ])
+        .then(() => {
+          setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
+        })
+        .catch((error) => {
+          setLoading(RequestStatus.failed);
+          console.error('Error fetching data:', error);
+        });
+    }
+  }, [id]);
+
+  useEffect(() => {
     if (resetDetails) {
       setFormData(notations);
     }
   }, [resetDetails]);
+
+  const fetchMinistryContact = async (entityType: string) => {
+    try {
+      if (
+        entityType !== null &&
+        entityType !== undefined &&
+        entityType !== ''
+      ) {
+        const response = await getAxiosInstance().post(GRAPHQL, {
+          query: print(graphQLPeopleOrgsCd()),
+          variables: {
+            entityType: entityType,
+          },
+        });
+        return response.data.data.getPeopleOrgsCd;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+  useEffect(() => {
+    // if(ministryInfo && notationClass && notationParticipantRole && participantName)
+    // {
+    if (userType === UserType.External) {
+      console.log(userType);
+    }
+    if (userType === UserType.Internal) {
+      if (mode === SiteDetailsMode.SRMode) {
+        console.log(userType, mode);
+      }
+
+      if (mode === SiteDetailsMode.EditMode) {
+        console.log(userType, mode);
+      }
+
+      if (mode === SiteDetailsMode.ViewOnlyMode) {
+        console.log('notations -> ', notations);
+        console.log('ministryInfo => ', ministryInfo);
+        console.log('notationClass => ', notationClass);
+        console.log('participantName => ', participantName);
+        console.log('notationParticipantRole => ', notationParticipantRole);
+        console.log(notationFormRowsInternal);
+        console.log(userType, mode);
+      }
+    }
+    // }
+  }, [
+    notationParticipantRole,
+    notationClass,
+    participantName,
+    ministryInfo,
+    mode,
+    userType,
+  ]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value;
@@ -524,6 +638,19 @@ const Notations = () => {
       'eclsCode',
     );
   };
+
+  if (loading === RequestStatus.loading) {
+    return (
+      <div className="participant-loading-overlay">
+        <div className="participant-spinner-container">
+          <SpinnerIcon
+            data-testid="loading-spinner"
+            className="participant-fa-spin"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-2">

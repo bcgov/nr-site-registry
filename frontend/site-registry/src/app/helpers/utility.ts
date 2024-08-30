@@ -10,6 +10,12 @@ import {
 } from '../components/input-controls/IFormField';
 import { RequestStatus } from './requests/status';
 import { notifyError, notifySuccess } from '../components/alert/Alert';
+import { TableColumn } from '../components/table/TableColumn';
+
+export interface UpdateDisplayTypeParams {
+  indexToUpdate: number;
+  updates: Partial<IFormField>; // Use Partial<IFormField> to allow partial updates
+}
 
 export const serializeDate = (data: any) => {
   const serializedData: any = { ...data };
@@ -151,4 +157,34 @@ export const showNotification = (
   } else if (currentStatus === RequestStatus.failed) {
     notifyError(errorMessage);
   }
+};
+
+export const updateTableColumn = (
+  columns: TableColumn[],
+  params: UpdateDisplayTypeParams,
+): TableColumn[] => {
+  const { indexToUpdate, updates } = params;
+
+  if (indexToUpdate === -1) {
+    return columns;
+  }
+
+  const itemToUpdate = columns[indexToUpdate];
+
+  const updatedItem: TableColumn = {
+    ...itemToUpdate,
+    displayType: {
+      ...itemToUpdate.displayType, // Use fallback if displayType is undefined
+      ...updates, // Apply the updates
+      type:
+        updates.type ?? itemToUpdate.displayType?.type ?? FormFieldType.Text, // Provide a default type
+      label: updates.label ?? itemToUpdate.displayType?.label ?? '', // Provide a default label
+    },
+  };
+
+  return [
+    ...columns.slice(0, indexToUpdate),
+    updatedItem,
+    ...columns.slice(indexToUpdate + 1),
+  ];
 };

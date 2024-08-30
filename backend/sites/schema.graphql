@@ -631,7 +631,7 @@ type Query {
   getSnapshotsById(id: Int!): SnapshotResponse!
   getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
   getParticipantRoleCd: DropdownResponse!
-  getPeopleOrgsCd: DropdownResponseWithMetaData!
+  getPeopleOrgsCd(searchParam: String, entityType: String): DropdownResponse!
   getNotationTypeCd: DropdownResponseWithMetaData!
   getNotationClassCd: DropdownResponse!
   getNotationParticipantRoleCd: DropdownResponse!
@@ -652,7 +652,6 @@ input FolioMinDTO {
 
 type Mutation {
   addRecentView(recentView: RecentViewDto!): RecentViewResponse!
-  createSnapshot(snapshot: SnapshotDto!): SnapshotResponse!
   createSnapshotForSites(inputDto: [CreateSnapshotDto!]!): SnapshotResponse!
   addCartItem(cartDTO: [CartDTO!]!): CartResponse!
   deleteCartItem(cartDeleteDTO: [CartDeleteDTO!]!): CartResponse!
@@ -671,14 +670,6 @@ input RecentViewDto {
   city: String!
   generalDescription: String
   whenUpdated: DateTime
-}
-
-input SnapshotDto {
-  userId: String!
-  siteId: String!
-  transactionId: String!
-  snapshotData: JSON!
-  created: DateTime
 }
 
 input CreateSnapshotDto {

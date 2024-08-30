@@ -8,10 +8,15 @@ import {
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
-import { getAxiosInstance, getUser } from '../../../helpers/utility';
+import {
+  getAxiosInstance,
+  getUser,
+  UpdateDisplayTypeParams,
+  updateTableColumn,
+} from '../../../helpers/utility';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
-import { associatedSites, updateAssociatedSites } from './AssociateSlice';
+import { associatedSites, fetchAssociatedSites } from './AssociateSlice';
 import {
   ChangeTracker,
   IChangeType,
@@ -21,21 +26,19 @@ import './Associate.css';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import Widget from '../../../components/widget/Widget';
 import Actions from '../../../components/action/Actions';
-import { UserMinus, UserPlus } from '../../../components/common/icon';
+import {
+  SpinnerIcon,
+  UserMinus,
+  UserPlus,
+} from '../../../components/common/icon';
 import { v4 } from 'uuid';
 import { useParams } from 'react-router-dom';
 import { GRAPHQL } from '../../../helpers/endpoints';
 import { print } from 'graphql';
 import { graphqlSearchSiteIdsQuery } from '../../site/graphql/Associate';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';
-import {
-  GetAssociateConfig,
-  UpdateDisplayTypeParams,
-  updateTableColumn,
-} from './AssociateConfig';
+import { GetAssociateConfig } from './AssociateConfig';
 import infoIcon from '../../../images/info-icon.png';
-import { TableColumn } from '../../../components/table/TableColumn';
-import { FormFieldType } from '../../../components/input-controls/IFormField';
 
 const Associate = () => {
   const {
@@ -102,8 +105,20 @@ const Associate = () => {
     } else {
       setLoading(RequestStatus.loading);
     }
-  }, [id, sitesAssociated]);
+  }, [sitesAssociated]);
 
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchAssociatedSites(id ?? ''))
+        .then(() => {
+          setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
+        })
+        .catch((error) => {
+          setLoading(RequestStatus.failed);
+          console.error('Error fetching data:', error);
+        });
+    }
+  }, [id]);
   const clearSearch = useCallback(() => {
     setSearchTerm('');
     setFormData(sitesAssociated);
@@ -348,7 +363,7 @@ const Associate = () => {
         } catch {
           throw new Error('Invalid searchParam');
         }
-      }, 2000);
+      }, 300);
 
       return () => clearTimeout(timeoutId);
     }
@@ -558,6 +573,18 @@ const Associate = () => {
     );
   };
 
+  if (loading === RequestStatus.loading) {
+    return (
+      <div className="participant-loading-overlay">
+        <div className="participant-spinner-container">
+          <SpinnerIcon
+            data-testid="loading-spinner"
+            className="participant-fa-spin"
+          />
+        </div>
+      </div>
+    );
+  }
   return (
     <div
       className="row"

@@ -242,21 +242,8 @@ const SiteDetails = () => {
       dispatch(resetSaveSiteDetails(null));
       dispatch(setupSiteIdForSaving(id));
       Promise.all([
-        dispatch(fetchPeopleOrgsCd()),
-        dispatch(fetchParticipantRoleCd()),
-        dispatch(fetchNotationClassCd()),
-        dispatch(fetchNotationTypeCd()),
-        dispatch(fetchNotationParticipantRoleCd()),
-        // Calling snapshot for the implementation of snapshot string on top
-        // This will change in future based on condition of User type.
         dispatch(fetchSnapshots(id ?? '')),
-        // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '' })),
-        dispatch(fetchNotationParticipants(id ?? '')),
-        dispatch(fetchSiteParticipants(id ?? '')),
-        dispatch(fetchDocuments(id ?? '')),
-        dispatch(fetchAssociatedSites(id ?? '')),
-        dispatch(fetchSiteDisclosure(id ?? '')),
       ])
         .then(() => {
           setIsLoading(false); // Set loading state to false after all API calls are resolved

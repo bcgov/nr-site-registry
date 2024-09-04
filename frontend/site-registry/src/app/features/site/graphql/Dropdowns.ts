@@ -19,18 +19,15 @@ export const graphQLParticipantRoleCd = () => {
 
 export const graphQLPeopleOrgsCd = () => {
   return gql`
-    query getPeopleOrgsCd {
-      getPeopleOrgsCd {
+    query getPeopleOrgsCd($searchParam: String, $entityType: String) {
+      getPeopleOrgsCd(searchParam: $searchParam, entityType: $entityType) {
         httpStatusCode
         success
         message
         timestamp
         data {
-          metaData
-          dropdownDto {
-            key
-            value
-          }
+          key
+          value
         }
       }
     }

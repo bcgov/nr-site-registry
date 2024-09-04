@@ -655,7 +655,7 @@ type Query {
   getSnapshotsById(id: Int!): SnapshotResponse!
   getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
   getParticipantRoleCd: DropdownResponse!
-  getPeopleOrgsCd: DropdownResponseWithMetaData!
+  getPeopleOrgsCd(searchParam: String, entityType: String): DropdownResponse!
   getNotationTypeCd: DropdownResponseWithMetaData!
   getNotationClassCd: DropdownResponse!
   getNotationParticipantRoleCd: DropdownResponse!

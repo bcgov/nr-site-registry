@@ -40,47 +40,41 @@ export class DropdownService {
     }
   }
 
-  async getPeopleOrgsCd() {
+  async getPeopleOrgsCd(searchParam: string, entityType: string) {
     try {
-      const result = await this.peopleOrgsRepository.find();
-      if (result) {
-        return result.reduce((acc, item) => {
-          const existingMetaData = acc.find(
-            (meta) => meta.metaData === item.entityType,
-          );
-          const dropdownItem = {
-            key: item.id,
-            value: item.displayName,
-          };
-          if (existingMetaData) {
-            existingMetaData.dropdownDto.push(dropdownItem);
-          } else {
-            acc.push({
-              metaData: item.entityType,
-              dropdownDto: [dropdownItem],
-            });
-          }
-
-          return acc;
-        }, []);
+      const queryBuilder =
+        this.peopleOrgsRepository.createQueryBuilder('people_orgs');
+      // Apply filters based on the provided parameters
+      if (searchParam) {
+        queryBuilder.andWhere(
+          'CAST(people_orgs.displayName AS TEXT) LIKE :searchParam',
+          {
+            searchParam: `%${searchParam.toUpperCase().trim()}%`,
+          },
+        );
       }
 
-      // let result = [];
-      // if (entityTypes && entityTypes.length > 0)
-      // {
-      //     result = await this.peopleOrgsRepository
-      //     .createQueryBuilder('people_orgs') // Alias for the main entity
-      //     .where('people_orgs.entity_Type IN (:...entityTypes)', { entityTypes }) // Filtering by entityType
-      //     .getMany();
-      //     if(result)
-      //     {
-      //         return result.map((obj: any) => ({key: obj.id, value: obj.displayName}));
-      //     }
-      // }
-      // else
-      // {
-      //     result = await this.peopleOrgsRepository.find();
-      // }
+      if (entityType) {
+        queryBuilder.andWhere('people_orgs.entityType = :entityType', {
+          entityType,
+        });
+      }
+
+      // Order the results by 'id' in ascending order
+      queryBuilder.orderBy('people_orgs.displayName', 'ASC');
+
+      // Execute the query and get the results
+      const result = await queryBuilder.getMany();
+
+      // Return formatted results
+      if (result) {
+        return result.map((obj: any) => ({
+          key: obj.id,
+          value: obj.displayName,
+        }));
+      } else {
+        return []; // Return an empty array if no results
+      }
     } catch (error) {
       throw new Error('Failed to retrieve people orgs.');
     }

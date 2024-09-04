@@ -6,7 +6,6 @@ import {
 import { participantNameDrpdown } from '../dropdowns/DropdownSlice';
 
 export const GetDocumentsConfig = () => {
-  const participantName = useSelector(participantNameDrpdown);
   const documentFirstChildFormRows: IFormField[][] = [
     [
       {
@@ -59,7 +58,7 @@ export const GetDocumentsConfig = () => {
         label: 'Author',
         placeholder: 'Author....',
         graphQLPropertyName: 'psnorgId',
-        options: participantName.data.flatMap((item: any) => item.dropdownDto),
+        options: [],
         value: '',
         colSize:
           'col-lg-3 col-md-3 col-sm-12 d-none d-xl-block d-xxl-block d-lg-block',
@@ -67,6 +66,7 @@ export const GetDocumentsConfig = () => {
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
         customEditInputTextCss: 'custom-document-edit-input-text',
+        customPlaceholderCss: 'custom-document-search-placeholder',
       },
       {
         type: FormFieldType.Date,
@@ -107,13 +107,14 @@ export const GetDocumentsConfig = () => {
         label: 'Author',
         placeholder: 'Author....',
         graphQLPropertyName: 'psnorgId',
-        options: participantName.data.flatMap((item: any) => item.dropdownDto),
+        options: [],
         value: '',
         colSize: 'col-lg-6 col-md-12 col-sm-12',
         customLabelCss: 'custom-docuemnt-lbl-text',
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
         customEditInputTextCss: 'custom-document-edit-input-text ',
+        customPlaceholderCss: 'custom-document-search-placeholder',
       },
       {
         type: FormFieldType.Date,

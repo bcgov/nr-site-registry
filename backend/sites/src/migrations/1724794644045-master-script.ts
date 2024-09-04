@@ -10,21 +10,83 @@ export class MasterScript1724794644045 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "sites"."cart" DROP COLUMN "whenUpdated"`,
     );
-    await queryRunner.query(
-      `ALTER TABLE "sites"."folio" DROP COLUMN "whenCreated"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "sites"."folio" DROP COLUMN "whenUpdated"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "sites"."folio_contents" DROP COLUMN "whenCreated"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "sites"."folio_contents" DROP COLUMN "whenUpdated"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "sites"."snapshots" DROP COLUMN "whenCreated"`,
-    );
+
+    await queryRunner.query(`
+      DO $$
+       BEGIN
+       IF EXISTS (      
+           SELECT 1
+           FROM information_schema.columns
+           WHERE table_schema = 'sites'
+             AND table_name = 'folio'
+             AND column_name = 'whenCreated'       
+       ) THEN
+        ALTER TABLE "sites"."folio" DROP COLUMN "whenCreated";
+       END IF;
+       END $$
+     `);
+
+     await queryRunner.query(`
+      DO $$
+       BEGIN
+       IF EXISTS (      
+           SELECT 1
+           FROM information_schema.columns
+           WHERE table_schema = 'sites'
+             AND table_name = 'folio'
+             AND column_name = 'whenUpdated'       
+       ) THEN
+        ALTER TABLE "sites"."folio" DROP COLUMN "whenUpdated";
+       END IF;
+       END $$
+     `);
+
+     await queryRunner.query(`
+      DO $$
+       BEGIN
+       IF EXISTS (      
+           SELECT 1
+           FROM information_schema.columns
+           WHERE table_schema = 'sites'
+             AND table_name = 'folio_contents'
+             AND column_name = 'whenUpdated'       
+       ) THEN
+        ALTER TABLE "sites"."folio_contents" DROP COLUMN "whenUpdated";
+       END IF;
+       END $$
+     `);
+
+     await queryRunner.query(`
+      DO $$
+       BEGIN
+       IF EXISTS (      
+           SELECT 1
+           FROM information_schema.columns
+           WHERE table_schema = 'sites'
+             AND table_name = 'folio_contents'
+             AND column_name = 'whenCreated'       
+       ) THEN
+        ALTER TABLE "sites"."folio_contents" DROP COLUMN "whenCreated";
+       END IF;
+       END $$
+     `);
+
+
+    // await queryRunner.query(
+    //   `ALTER TABLE "sites"."folio" DROP COLUMN "whenCreated"`,
+    // );
+    // await queryRunner.query(
+    //   `ALTER TABLE "sites"."folio" DROP COLUMN "whenUpdated"`,
+    // );
+    // await queryRunner.query(
+    //   `ALTER TABLE "sites"."folio_contents" DROP COLUMN "whenCreated"`,
+    // );
+    // await queryRunner.query(
+    //   `ALTER TABLE "sites"."folio_contents" DROP COLUMN "whenUpdated"`,
+    // );
+    // await queryRunner.query(
+    //   `ALTER TABLE "sites"."snapshots" DROP COLUMN "whenCreated"`,
+    // );
     await queryRunner.query(
       `ALTER TABLE "sites"."snapshots" DROP COLUMN "whenUpdated"`,
     );
@@ -40,18 +102,81 @@ export class MasterScript1724794644045 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "sites"."cart" ADD "when_updated" TIMESTAMP NOT NULL DEFAULT now()`,
     );
-    await queryRunner.query(
-      `ALTER TABLE "sites"."folio" ADD "when_created" TIMESTAMP NOT NULL DEFAULT now()`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "sites"."folio" ADD "when_updated" TIMESTAMP NOT NULL DEFAULT now()`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "sites"."folio_contents" ADD "when_created" TIMESTAMP NOT NULL DEFAULT now()`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "sites"."folio_contents" ADD "when_updated" TIMESTAMP NOT NULL DEFAULT now()`,
-    );
+
+    
+    await queryRunner.query(`
+      DO $$
+       BEGIN
+       IF NOT EXISTS (      
+           SELECT 1
+           FROM information_schema.columns
+           WHERE table_schema = 'sites'
+             AND table_name = 'folio'
+             AND column_name = 'when_updated'       
+       ) THEN
+        ALTER TABLE "sites"."folio" ADD "when_updated" TIMESTAMP NOT NULL DEFAULT now();
+       END IF;
+       END $$
+     `);
+
+     await queryRunner.query(`
+      DO $$
+       BEGIN
+       IF NOT EXISTS (      
+           SELECT 1
+           FROM information_schema.columns
+           WHERE table_schema = 'sites'
+             AND table_name = 'folio'
+             AND column_name = 'when_created'       
+       ) THEN
+        ALTER TABLE "sites"."folio" ADD "when_created" TIMESTAMP NOT NULL DEFAULT now();
+       END IF;
+       END $$
+     `);
+
+     await queryRunner.query(`
+      DO $$
+       BEGIN
+       IF NOT EXISTS (      
+           SELECT 1
+           FROM information_schema.columns
+           WHERE table_schema = 'sites'
+             AND table_name = 'folio_contents'
+             AND column_name = 'when_created'       
+       ) THEN
+        ALTER TABLE "sites"."folio_contents" ADD "when_created" TIMESTAMP NOT NULL DEFAULT now();
+       END IF;
+       END $$
+     `);
+
+     await queryRunner.query(`
+      DO $$
+       BEGIN
+       IF NOT EXISTS (      
+           SELECT 1
+           FROM information_schema.columns
+           WHERE table_schema = 'sites'
+             AND table_name = 'folio_contents'
+             AND column_name = 'when_updated'       
+       ) THEN
+        ALTER TABLE "sites"."folio_contents" ADD "when_updated" TIMESTAMP NOT NULL DEFAULT now();
+       END IF;
+       END $$
+     `);
+
+
+    // await queryRunner.query(
+    //   `ALTER TABLE "sites"."folio" ADD "when_created" TIMESTAMP NOT NULL DEFAULT now()`,
+    // );
+    // await queryRunner.query(
+    //   `ALTER TABLE "sites"."folio" ADD "when_updated" TIMESTAMP NOT NULL DEFAULT now()`,
+    // );
+    // await queryRunner.query(
+    //   `ALTER TABLE "sites"."folio_contents" ADD "when_created" TIMESTAMP NOT NULL DEFAULT now()`,
+    // );
+    // await queryRunner.query(
+    //   `ALTER TABLE "sites"."folio_contents" ADD "when_updated" TIMESTAMP NOT NULL DEFAULT now()`,
+    // );
     await queryRunner.query(
       `ALTER TABLE "sites"."snapshots" ADD "when_created" TIMESTAMP NOT NULL DEFAULT now()`,
     );

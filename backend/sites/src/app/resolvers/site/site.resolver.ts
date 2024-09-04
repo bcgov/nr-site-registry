@@ -179,13 +179,13 @@ export class SiteResolver {
     mode: RoleMatchingMode.ANY,
   })
   @Mutation(() => SaveSiteDetailsResponse, { name: 'updateSiteDetails' })
-  updateSiteDetails(
+  async updateSiteDetails(
     @Args('siteDetailsDTO', { type: () => SaveSiteDetailsDTO })
     siteDetailsDTO: SaveSiteDetailsDTO,
     @AuthenticatedUser()
     user: any,
   ) {
-    const saveResult = this.siteService.saveSiteDetails(siteDetailsDTO, user);
+    const saveResult = await this.siteService.saveSiteDetails(siteDetailsDTO, user);
 
     if (saveResult) {
       return this.genericResponseProviderForSave.createResponse(

@@ -16,4 +16,5 @@ export interface SaveSiteDetails {
   documentsData: any;
   profilesData: any;
   siteId: string;
+  sitesSummary: any;
 }

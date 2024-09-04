@@ -77,21 +77,23 @@ import {
   IFormField,
 } from '../../components/input-controls/IFormField';
 import BannerDetails from '../../components/banners/BannerDetails';
-import {
-  getSiteDetailsToBeSaved,
+import { 
   resetSaveSiteDetails,
+  resetSaveSiteDetailsRequestStatus,
+  saveRequestStatus,
   saveSiteDetails,
   setupSiteIdForSaving,
 } from './SaveSiteDetailsSlice';
 import { fetchAssociatedSites } from './associates/AssociateSlice';
 
 const SiteDetails = () => {
-  const siteDetailsTobeSaved = useSelector(getSiteDetailsToBeSaved);
+  
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
 
   const folioDetails = useSelector(folioItems);
 
   const addSiteToFolioRequestStatus = useSelector(addSiteToFolioRequest);
+
 
   const handleFolioSelect = (folioId: string) => {
     let selectedFolio = folioDetails.filter(
@@ -150,6 +152,39 @@ const SiteDetails = () => {
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
+
+  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
+
+  useEffect(()=>{
+
+    if(saveSiteDetailsRequestStatus === RequestStatus.success || saveSiteDetailsRequestStatus === RequestStatus.failed)
+    {
+      if(saveSiteDetailsRequestStatus === RequestStatus.success)
+      {
+        dispatch(resetSaveSiteDetails(null));
+        dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+        setEdit(false);
+      }
+      else
+      {
+        // dont close edit mode
+      }
+
+      showNotification(
+        saveSiteDetailsRequestStatus,
+        'Successfully saved site details',
+        'Failed To save site details'
+      );
+      dispatch(resetSaveSiteDetailsRequestStatus(null));
+
+      
+    }  
+    else
+    {
+       // do nothing
+    }
+
+  },[saveSiteDetailsRequestStatus])
 
   const navigate = useNavigate();
   const onClickBackButton = () => {
@@ -431,9 +466,11 @@ const SiteDetails = () => {
             closeHandler={(response) => {
               setSave(false);
               if (response) {
-                dispatch(saveSiteDetails(siteDetailsTobeSaved)).unwrap();
-                dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
-                setEdit(false);
+                
+               
+               
+                dispatch(saveSiteDetails(null)).unwrap();
+              
               }
             }}
           >

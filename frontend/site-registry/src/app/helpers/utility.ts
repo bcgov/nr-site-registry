@@ -252,3 +252,28 @@ export const updateTableColumn = (
     ...columns.slice(indexToUpdate + 1),
   ];
 };
+
+export const updateFields = (
+  fieldArray: IFormField[][],
+  params: UpdateDisplayTypeParams,
+): IFormField[][] => {
+  const { indexToUpdate, updates } = params;
+
+  if (indexToUpdate < 0 || indexToUpdate >= fieldArray.length) {
+    return fieldArray; // Return the original array if index is out of bounds
+  }
+
+  // Update fields in the specified row
+  const updatedRow = fieldArray[indexToUpdate].map((field) => ({
+    ...field,
+    ...updates,
+    type: updates.type ?? field.type,
+    label: updates.label ?? field.label,
+  }));
+
+  return [
+    ...fieldArray.slice(0, indexToUpdate),
+    updatedRow,
+    ...fieldArray.slice(indexToUpdate + 1),
+  ];
+};

@@ -62,8 +62,7 @@ const siteDisclosureSlice = createSlice({
   },
 });
 
-export const siteDisclosure = (state: any) =>
-  state.siteDisclosure.siteDisclosure;
+export const siteDisclosure = (state: any) => state.siteDisclosure;
 export const { updateSiteDisclosure } = siteDisclosureSlice.actions;
 
 export default siteDisclosureSlice.reducer;

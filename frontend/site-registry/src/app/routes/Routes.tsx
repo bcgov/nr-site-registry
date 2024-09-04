@@ -21,6 +21,7 @@ const roleBasedRoutes: any = {
     { path: '/', element: <Dashboard /> },
     { path: '/dashboard', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
+    { path: '/dashboard/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
     { path: '/folios', element: <Folios /> },
     { path: '/folios/:id', element: <FolioContents /> },

@@ -207,18 +207,8 @@ const SiteDetails = () => {
       dispatch(resetSaveSiteDetails(null));
       dispatch(setupSiteIdForSaving(id));
       Promise.all([
-        // dispatch(fetchParticipantRoleCd()),
-        // dispatch(fetchNotationClassCd()),
-        // dispatch(fetchNotationTypeCd()),
-        // dispatch(fetchNotationParticipantRoleCd()),
-
         dispatch(fetchSnapshots(id ?? '')),
-
         dispatch(fetchSitesDetails({ siteId: id ?? '' })),
-
-        dispatch(fetchDocuments(id ?? '')),
-
-        dispatch(fetchSiteDisclosure(id ?? '')),
       ])
         .then(() => {
           setIsLoading(false); // Set loading state to false after all API calls are resolved
@@ -586,9 +576,9 @@ const SiteDetails = () => {
           items={navItems}
           components={navComponents}
           dropdownItems={dropDownNavItems}
-          isDisable={
-            UserType.External === userType && snapshot.snapshot.data === null
-          }
+          isDisable={false}
+          //   UserType.External === userType && snapshot.snapshot.data === null
+          // }
         />
       </PageContainer>
     </>

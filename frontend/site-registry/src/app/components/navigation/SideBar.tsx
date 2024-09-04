@@ -35,7 +35,6 @@ function SideBar() {
   // }, [user]);
 
   useEffect(() => {
-    console.log('user updated');
     SetNavList(getSideBarNavList(getLoggedInUserType()));
   }, []);
 

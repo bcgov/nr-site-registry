@@ -1073,7 +1073,6 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   };
 
   const handleTextInputChange = (value: any) => {
-    // console.log('hasinfoMsg1 --> ', hasinfoMsg);
     const inputValue = value;
     validateInput(inputValue);
     setHasInfoMsg(null);

@@ -36,6 +36,9 @@ import {
 } from '../../cart/CartSlice';
 import { getUser } from '../../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
+import { setupSiteSummaryForSaving } from '../SaveSiteDetailsSlice';
+import { UserActionEnum } from '../../../common/userActionEnum';
+import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 
 const Summary = () => {
   const auth = useAuth();
@@ -116,6 +119,7 @@ const Summary = () => {
   };
 
   const handleInputChange = (graphQLPropertyName: any, value: any) => {
+   
     const trackerLabel = getTrackerLabel(graphQLPropertyName);
     if (detailsMode === SiteDetailsMode.SRMode) {
       const tracker = new ChangeTracker(
@@ -129,10 +133,28 @@ const Summary = () => {
         'Site Location Details ' + trackerLabel,
       );
       dispatch(trackChanges(tracker.toPlainObject()));
+
+      if(graphQLPropertyName === 'latMinutes'|| graphQLPropertyName === 'longMinutes'|| graphQLPropertyName === 'latDegrees' || graphQLPropertyName === 'longDegrees' )
+      {
+          value = parseFloat(value);
+      }
+      else
+      {
+          // do nothing
+      }
+
       const newState = {
         ...editSiteDetailsObject,
         [graphQLPropertyName]: value,
       };
+      console.log(newState);
+
+      dispatch(setupSiteSummaryForSaving({
+        ...newState,
+        "userAction" : UserActionEnum.updated,
+        "srAction" :  SRApprovalStatusEnum.Pending
+      }))
+
       setEditSiteDetailsObject(newState);
     }
   };

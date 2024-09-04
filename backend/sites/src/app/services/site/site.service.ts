@@ -291,7 +291,7 @@ export class SiteService {
           profiles,
         } = inputDTO;
 
-        return await this.entityManager.transaction(
+        const transactionResult = await this.entityManager.transaction(
           async (transactionalEntityManager: EntityManager) => {
             try {
               if (sitesSummary) {
@@ -358,23 +358,28 @@ export class SiteService {
               }
 
               const historyLog: HistoryLog = {
-                userId: userInfo ?? userInfo.sub,
+                userId: userInfo ? userInfo.sub : '' ,
                 content: inputDTO,
                 id: null,
-                whoCreated: userInfo ?? userInfo.givenName,
+                whoCreated: userInfo ? userInfo.givenName : '',
                 whenCreated: new Date(),
                 whenUpdated: new Date(),
-                whoUpdated: userInfo ?? userInfo.givenName,
+                whoUpdated: userInfo ? userInfo.givenName : '',
                 siteId: inputDTO.siteId,
               };
 
-              await this.historyLogRepository.save(historyLog);
+              await transactionalEntityManager.save(HistoryLog,historyLog);
+
+              return true;
             } catch (error) {
               console.error('Save Site Details Transaction failed', error);
               return false;
             }
           },
         );
+
+        if (transactionResult) return true;
+        else return false;
       }
     } catch (error) {
       console.log('Save site details error', error);

@@ -576,9 +576,9 @@ const SiteDetails = () => {
           items={navItems}
           components={navComponents}
           dropdownItems={dropDownNavItems}
-          isDisable={false}
-          //   UserType.External === userType && snapshot.snapshot.data === null
-          // }
+          isDisable={
+            UserType.External === userType && snapshot.snapshot.data === null
+          }
         />
       </PageContainer>
     </>

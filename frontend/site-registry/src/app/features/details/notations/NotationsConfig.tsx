@@ -8,13 +8,6 @@ import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import { RequestStatus } from '../../../helpers/requests/status';
 
 export const GetNotationConfig = () => {
-  // const participantName = useSelector(participantNameDrpdown);
-  // const ministryContact = participantName.data
-  //   .filter((items: any) => items.metaData === 'EMP')
-  //   .flatMap((items: any) => items.dropdownDto);
-  // const notationParticipantRole = useSelector(notationParticipantRoleDrpdown);
-  // const notationClass = useSelector(notationClassDrpdown);
-
   const notationFormRowsInternal: IFormField[][] = [
     [
       {
@@ -64,7 +57,6 @@ export const GetNotationConfig = () => {
         label: 'Notation Class',
         placeholder: 'Notation Class',
         graphQLPropertyName: 'eclsCode',
-        // options: notationClass.data,
         options: [],
         value: '',
         colSize: 'col-lg-5 col-md-6 col-sm-12',
@@ -90,7 +82,6 @@ export const GetNotationConfig = () => {
         label: 'Ministry Contact',
         placeholder: 'Ministry Contact',
         graphQLPropertyName: 'psnorgId',
-        // options: ministryContact,
         options: [],
         value: '',
         isImage: true,
@@ -155,7 +146,6 @@ export const GetNotationConfig = () => {
         label: 'Notation Class',
         placeholder: 'Notation Class',
         graphQLPropertyName: 'eclsCode',
-        // options: notationClass.data,
         options: [],
         value: '',
         colSize: 'col-lg-12 col-md-12 col-sm-12',
@@ -240,7 +230,6 @@ export const GetNotationConfig = () => {
         label: 'Ministry Contact',
         placeholder: 'Ministry Contact',
         graphQLPropertyName: 'psnorgId',
-        // options: ministryContact,
         options: [],
         value: '',
         isImage: true,
@@ -277,7 +266,6 @@ export const GetNotationConfig = () => {
         label: 'Notation Class',
         placeholder: 'Notation Class',
         graphQLPropertyName: 'eclsCode',
-        // options: notationClass.data,
         options: [],
         value: '',
         colSize: 'col-xxl-6 col-xl-6 col-lg-12 col-md-12 col-sm-12 col-xs-12',
@@ -362,7 +350,6 @@ export const GetNotationConfig = () => {
         label: 'Ministry Contact',
         placeholder: 'Ministry Contact',
         graphQLPropertyName: 'psnorgId',
-        // options: ministryContact,
         options: [],
         value: '',
         isImage: true,
@@ -476,7 +463,6 @@ export const GetNotationConfig = () => {
         label: 'Text',
         graphQLPropertyName: 'eprCode',
         value: '',
-        // options: notationParticipantRole.data,
         options: [],
         allowNumbersOnly: true,
         colSize: 'col-lg-6 col-md-6 col-sm-12',
@@ -500,11 +486,11 @@ export const GetNotationConfig = () => {
         graphQLPropertyName: 'psnorgId',
         placeholder: 'Please enter participant name.',
         value: '',
-        // options: participantName.data.flatMap((item: any) => item.dropdownDto),
         options: [],
         colSize: 'col-lg-6 col-md-6 col-sm-12',
         customInputTextCss: 'custom-notation-participant-input-text',
         customEditInputTextCss: 'custom-notation-participant-input-text',
+        customPlaceholderCss: 'custom-notation-search-placeholder',
         tableMode: true,
         customMenuMessage: <span>Please select site participant name:</span>,
         filteredOptions: [],
@@ -542,7 +528,6 @@ export const GetNotationConfig = () => {
         label: 'Text',
         graphQLPropertyName: 'eprCode',
         value: '',
-        // options: notationParticipantRole.data,
         options: [],
         allowNumbersOnly: true,
         colSize: 'col-lg-6 col-md-6 col-sm-12',
@@ -566,11 +551,11 @@ export const GetNotationConfig = () => {
         graphQLPropertyName: 'psnorgId',
         placeholder: 'Please enter participant name.',
         value: '',
-        // options: participantName.data.flatMap((item: any) => item.dropdownDto),
         options: [],
         colSize: 'col-lg-6 col-md-6 col-sm-12',
         customInputTextCss: 'custom-notation-participant-input-text',
         customEditInputTextCss: 'custom-notation-participant-input-text',
+        customPlaceholderCss: 'custom-notation-search-placeholder',
         tableMode: true,
         customMenuMessage: <span>Please select site participant name:</span>,
         filteredOptions: [],

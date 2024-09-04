@@ -182,13 +182,8 @@ const Notations = () => {
     }
   }, [resetDetails]);
 
-  // Define the type for options
-  interface Option {
-    key: string;
-    value: string;
-  }
   const [searchSiteParticipant, setSearchSiteParticipant] = useState('');
-  const [options, setOptions] = useState<Option[]>([]);
+  const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
   const fetchNotationParticipant = async (searchParam: string) => {
     try {
       if (
@@ -282,7 +277,7 @@ const Notations = () => {
     if (status === RequestStatus.success) {
       if (notations) {
         // Function to get distinct key-value pairs
-        const psnOrgs: Option[] = notations.flatMap((item: any) =>
+        const psnOrgs: any = notations.flatMap((item: any) =>
           Array.isArray(item.notationParticipant)
             ? item.notationParticipant.map((participant: any) => ({
                 key: participant.psnorgId,
@@ -292,7 +287,7 @@ const Notations = () => {
         );
 
         // Remove duplicates based on 'key'
-        const uniquePsnOrgs: Option[] = Array.from(
+        const uniquePsnOrgs: any = Array.from(
           new Map(psnOrgs.map((item: any) => [item.key, item])).values(),
         );
 
@@ -803,11 +798,11 @@ const Notations = () => {
 
   if (loading === RequestStatus.loading) {
     return (
-      <div className="participant-loading-overlay">
-        <div className="participant-spinner-container">
+      <div className="notation-loading-overlay">
+        <div className="notation-spinner-container">
           <SpinnerIcon
             data-testid="loading-spinner"
-            className="participant-fa-spin"
+            className="notation-fa-spin"
           />
         </div>
       </div>

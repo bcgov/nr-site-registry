@@ -77,7 +77,6 @@ const Participants = () => {
   const particRoleDropdwn = useSelector(participantRoleDrpdown);
   const { siteParticipants: siteParticipant, status } =
     useSelector(siteParticipants);
-  // const psnOrgs = useSelector(participantNameDrpdown);
   const { id } = useParams();
   const loggedInUser = getUser();
 

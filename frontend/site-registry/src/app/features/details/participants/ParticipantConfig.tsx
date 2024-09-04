@@ -151,19 +151,26 @@ export const GetConfig = () => {
       graphQLPropertyName: 'psnorgId',
       columnSize: ColumnSize.Double,
       displayType: {
-        type: FormFieldType.Search,
+        type: FormFieldType.DropDownWithSearch,
         label: '',
         isLabel: false,
         graphQLPropertyName: 'psnorgId',
         placeholder: 'Please enter participant name.',
+        isLoading: RequestStatus.idle,
         value: '',
         options: [],
+        filteredOptions: [],
         colSize: 'col-lg-6 col-md-6 col-sm-12',
         customLabelCss: 'custom-participant-lbl-text',
         customInputTextCss: 'custom-participant-input-text',
         customEditLabelCss: 'custom-participant-edit-label',
-        customEditInputTextCss: 'custom-participant-edit-input ',
+        customEditInputTextCss: 'custom-participant-edit-input',
+        customPlaceholderCss: 'custom-participant-search-placeholder',
+        customMenuMessage: <span>Please select site participant name:</span>,
         tableMode: true,
+        handleSearch: () => {
+          console.log('handleSearch click');
+        },
       },
     },
     {
@@ -185,6 +192,7 @@ export const GetConfig = () => {
         customEditLabelCss: 'custom-participant-edit-label',
         customEditInputTextCss: 'custom-participant-edit-input',
         tableMode: true,
+        customInfoMessage: null,
       },
     },
     {

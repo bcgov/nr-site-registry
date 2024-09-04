@@ -56,6 +56,7 @@ const Participants = () => {
     srVisibilityParcticConfig,
   } = GetConfig();
   const [internalRow, setInternalRow] = useState(participantColumnInternal);
+  const [externalRow, setExternalRow] = useState(participantColumnExternal);
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [formData, setFormData] = useState<
@@ -178,6 +179,7 @@ const Participants = () => {
                 handleSearch: handleSearch,
               },
             };
+
             setInternalRow(updateTableColumn(internalRow, params));
           });
         } catch (error) {
@@ -209,6 +211,7 @@ const Participants = () => {
             customInfoMessage: <></>,
           },
         };
+        setExternalRow(updateTableColumn(externalRow, params));
         setInternalRow(updateTableColumn(internalRow, params));
       }
       setFormData(siteParticipant);
@@ -226,6 +229,7 @@ const Participants = () => {
           options: particRoleDropdwn.data,
         },
       };
+      setExternalRow(updateTableColumn(externalRow, params));
       setInternalRow(updateTableColumn(internalRow, params));
     }
   }, [particRoleDropdwn]);
@@ -554,9 +558,7 @@ const Participants = () => {
           handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
           title={'Site Participants'}
           tableColumns={
-            userType === UserType.Internal
-              ? internalRow
-              : participantColumnExternal
+            userType === UserType.Internal ? internalRow : externalRow
           }
           tableData={formData}
           tableIsLoading={status ?? RequestStatus.idle}

@@ -57,7 +57,7 @@ const documentsSlice = createSlice({
   },
 });
 
-export const documents = (state: any) => state.documents.siteDocuments;
+export const documents = (state: any) => state.documents;
 
 export const { updateSiteDocument } = documentsSlice.actions;
 

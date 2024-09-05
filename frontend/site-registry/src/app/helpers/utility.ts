@@ -10,6 +10,12 @@ import {
 } from '../components/input-controls/IFormField';
 import { RequestStatus } from './requests/status';
 import { notifyError, notifySuccess } from '../components/alert/Alert';
+import { TableColumn } from '../components/table/TableColumn';
+
+export interface UpdateDisplayTypeParams {
+  indexToUpdate: number;
+  updates: Partial<IFormField>; // Use Partial<IFormField> to allow partial updates
+}
 
 export const serializeDate = (data: any) => {
   const serializedData: any = { ...data };
@@ -151,4 +157,123 @@ export const showNotification = (
   } else if (currentStatus === RequestStatus.failed) {
     notifyError(errorMessage);
   }
+};
+
+export enum UserRoleType {
+  CLIENT = 'client',
+  INTERNAL = 'internal',
+  SR = 'sr',
+}
+
+export const isUserOfType = (roleType: UserRoleType) => {
+  const user = getUser();
+  if (user !== null) {
+    const userRoles: any = user.profile?.role;
+    switch (roleType) {
+      case 'client':
+        const externalUserRole =
+          process.env.REACT_APP_SITE_EXTERNAL_USER_ROLE ||
+          ((window as any)._env_ &&
+            (window as any)._env_.REACT_APP_SITE_EXTERNAL_USER_ROLE) ||
+          'site-external-user';
+
+        if (userRoles.includes(externalUserRole)) {
+          return true;
+        } else {
+          return false;
+        }
+      case 'internal':
+        const internalUserRole =
+          process.env.REACT_APP_SITE_INTERNAL_USER_ROLE ||
+          ((window as any)._env_ &&
+            (window as any)._env_.REACT_APP_SITE_INTERNAL_USER_ROLE) ||
+          'site-internal-user';
+
+        if (userRoles.includes(internalUserRole)) {
+          return true;
+        } else {
+          return false;
+        }
+      case 'sr':
+        const srUserRole =
+          process.env.REACT_APP_SITE_REGISTRAR_USER_ROLE ||
+          ((window as any)._env_ &&
+            (window as any)._env_.REACT_APP_SITE_REGISTRAR_USER_ROLE) ||
+          'site-registrar';
+        if (userRoles.includes(srUserRole)) {
+          return true;
+        } else {
+          return false;
+        }
+    }
+  }
+};
+
+export const getLoggedInUserType = () => {
+  return isUserOfType(UserRoleType.CLIENT)
+    ? UserRoleType.CLIENT
+    : isUserOfType(UserRoleType.INTERNAL)
+      ? UserRoleType.INTERNAL
+      : isUserOfType(UserRoleType.SR)
+        ? UserRoleType.SR
+        : UserRoleType.CLIENT;
+};
+
+export const isUserRoleInternalUser = () => {};
+
+export const isUserRoleSiteRegistrar = () => {};
+
+export const updateTableColumn = (
+  columns: TableColumn[],
+  params: UpdateDisplayTypeParams,
+): TableColumn[] => {
+  const { indexToUpdate, updates } = params;
+
+  if (indexToUpdate === -1) {
+    return columns;
+  }
+
+  const itemToUpdate = columns[indexToUpdate];
+
+  const updatedItem: TableColumn = {
+    ...itemToUpdate,
+    displayType: {
+      ...itemToUpdate.displayType, // Use fallback if displayType is undefined
+      ...updates, // Apply the updates
+      type:
+        updates.type ?? itemToUpdate.displayType?.type ?? FormFieldType.Text, // Provide a default type
+      label: updates.label ?? itemToUpdate.displayType?.label ?? '', // Provide a default label
+    },
+  };
+
+  return [
+    ...columns.slice(0, indexToUpdate),
+    updatedItem,
+    ...columns.slice(indexToUpdate + 1),
+  ];
+};
+
+export const updateFields = (
+  fieldArray: IFormField[][],
+  params: UpdateDisplayTypeParams,
+): IFormField[][] => {
+  const { indexToUpdate, updates } = params;
+
+  if (indexToUpdate < 0 || indexToUpdate >= fieldArray.length) {
+    return fieldArray; // Return the original array if index is out of bounds
+  }
+
+  // Update fields in the specified row
+  const updatedRow = fieldArray[indexToUpdate].map((field) => ({
+    ...field,
+    ...updates,
+    type: updates.type ?? field.type,
+    label: updates.label ?? field.label,
+  }));
+
+  return [
+    ...fieldArray.slice(0, indexToUpdate),
+    updatedRow,
+    ...fieldArray.slice(indexToUpdate + 1),
+  ];
 };

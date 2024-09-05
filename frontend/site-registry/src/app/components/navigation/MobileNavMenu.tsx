@@ -3,14 +3,15 @@ import { getSideBarNavList } from './dto/SideNav';
 import './MobileNavMenu.css';
 import { Link } from 'react-router-dom';
 import UserAccount from '../account/UserAccount';
+import { getLoggedInUserType } from '../../helpers/utility';
 
 const MobileNavMenu = (props: any) => {
-  const menuOptions = getSideBarNavList();
+  const menuOptions = getSideBarNavList(getLoggedInUserType());
 
   return (
     <div className="mobile-nav">
       <div className="mobile-nav-top">
-        {menuOptions.map((item, index) => {
+        {menuOptions.map((item: any, index: number) => {
           return (
             <React.Fragment key={index}>
               <div className="mobile-nav-menu-item flex-column" role="menu">
@@ -35,7 +36,7 @@ const MobileNavMenu = (props: any) => {
                 </div>
 
                 {item.children &&
-                  item.children.map((item, index) => {
+                  item.children.map((item: any, index: number) => {
                     return (
                       <div
                         key={index}

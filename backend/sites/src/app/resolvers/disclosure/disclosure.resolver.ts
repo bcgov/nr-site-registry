@@ -6,6 +6,7 @@ import { GenericValidationPipe } from '../../utils/validations/genericValidation
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { DisclosureResponse } from '../../dto/disclosure.dto';
 import { DisclosureService } from '../../services/disclosure/disclosure.service';
+import { CustomRoles } from '../../common/role';
 
 @Resolver(() => SiteProfiles)
 export class DisclosureResolver {
@@ -16,7 +17,14 @@ export class DisclosureResolver {
     >,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => DisclosureResponse, { name: 'getSiteDisclosureBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSiteDisclosureBySiteId(

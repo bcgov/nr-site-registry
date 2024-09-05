@@ -707,6 +707,7 @@ export const CheckBoxInput: React.FC<InputProps> = ({
   value,
   onChange,
   tableMode,
+  stickyCol,
   srMode,
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
@@ -719,15 +720,13 @@ export const CheckBoxInput: React.FC<InputProps> = ({
 
   return (
     <ContainerElement
-      className={
-        tableMode ? 'table-border-light align-content-center' : 'd-inline mb-3'
-      }
+      className={`${tableMode ? 'table-border-light align-content-center ' : 'd-inline mb-3'} ${tableMode && stickyCol ? 'positionSticky' : ''} `}
     >
       <div
         className={
           tableMode
             ? !disableCheckBox
-              ? 'pt-1'
+              ? 'p-0'
               : ''
             : 'd-inline form-check p-0'
         }
@@ -853,28 +852,64 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
   customPlaceholderCss,
   stickyCol,
   onChange,
+  handleSearch,
   tableMode,
+  filteredOptions = [],
+  isLoading,
+  customInfoMessage,
 }) => {
+  const divRef = useRef<HTMLDivElement>(null);
   const ContainerElement = tableMode ? 'td' : 'div';
   const drdownId = label.replace(/\s+/g, '_') + '_' + v4();
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filteredOpts, setFilteredOpts] =
+    useState<{ key: any; value: any }[]>(filteredOptions);
+  const [isClear, setIsClear] = useState(false);
 
-  const handleSelectChange = (selectedValue: string) => {
-    onChange(selectedValue.trim());
+  const handleSelectChange = (selectedOption: any) => {
+    onChange(selectedOption);
+    setSearchTerm('');
+    setFilteredOpts([]);
   };
 
+  const handler = handleSearch ?? ((e) => {});
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = event.target.value.trim();
+    setFilteredOpts([]);
+    const searchTerm = event.target.value;
+    handler(searchTerm);
     setSearchTerm(searchTerm);
   };
 
+  useEffect(() => {
+    setFilteredOpts(filteredOptions);
+    setIsClear(false);
+  }, [filteredOptions]);
+
   const clearSearch = () => {
     setSearchTerm('');
+    setFilteredOpts([]);
+    setIsClear(true);
   };
 
-  const filteredOptions = options?.filter((option) =>
-    option.value.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  // Function to handle clicks outside the div element
+  const handleClickOutside = (event: MouseEvent) => {
+    if (divRef.current != null) {
+      // Check if the clicked target is outside the div element
+      if (divRef.current && !divRef.current.contains(event.target as Node)) {
+        setSearchTerm('');
+        setFilteredOpts([]);
+      }
+    }
+  };
+
+  // Add and remove event listener for clicks on the document
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   return (
     <ContainerElement
       className={`${tableMode ? 'table-border-light align-content-center' : 'mb-3'} ${tableMode && stickyCol ? 'position-sticky' : ''} `}
@@ -912,9 +947,10 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
           >
             {value
               ? options?.find((opt) => opt.key === value)?.value
-              : placeholder}
+              : // ? value
+                placeholder}
           </Dropdown.Toggle>
-          <Dropdown.Menu className="custom-dropdown-menu">
+          <Dropdown.Menu className="custom-dropdown-menu" ref={divRef}>
             <div className="mx-2">
               <SearchInput
                 label={'Search Staff'}
@@ -922,34 +958,40 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
                 clearSearch={clearSearch}
                 handleSearchChange={handleSearchChange}
               />
-              {filteredOptions?.length === 0 && (
-                <div className="py-2">
-                  <img
-                    src={infoIcon}
-                    alt="info"
-                    aria-hidden="true"
-                    role="img"
-                    aria-label="User image"
-                  />
-                  <span aria-label={label} className="px-2 custom-not-found">
-                    No results found.
-                  </span>
-                </div>
+            </div>
+            {filteredOpts && filteredOpts.length > 0 && searchTerm !== '' && (
+              <Dropdown.Divider />
+            )}
+            <div
+              className={`${filteredOptions.length === 0 && searchTerm !== '' ? 'custom-min-height' : ''} custom-dropdown-search-menu`}
+            >
+              {isLoading === RequestStatus.loading ? (
+                filteredOptions.length === 0 &&
+                searchTerm !== '' && (
+                  <div className="custom-loading-overlay">
+                    <div className="text-center">
+                      <SpinnerIcon
+                        data-testid="loading-spinner"
+                        className="custom-fa-spin"
+                      />
+                    </div>
+                  </div>
+                )
+              ) : filteredOpts?.length > 0 ? (
+                filteredOpts?.map((option, index) => {
+                  return (
+                    <Dropdown.Item
+                      key={index}
+                      onClick={() => handleSelectChange(option)}
+                    >
+                      {option.value}
+                    </Dropdown.Item>
+                  );
+                })
+              ) : (
+                <div className="py-2">{!isClear && customInfoMessage}</div>
               )}
             </div>
-            <Dropdown.Divider />
-            {filteredOptions?.map((option, index) => {
-              if (index <= 5) {
-                return (
-                  <Dropdown.Item
-                    key={index}
-                    onClick={() => handleSelectChange(option.key)}
-                  >
-                    {option.value}
-                  </Dropdown.Item>
-                );
-              }
-            })}
           </Dropdown.Menu>
         </Dropdown>
       ) : (
@@ -982,6 +1024,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   customRightIconCss,
   customErrorCss,
   customInfoMessage,
+  customMenuMessage,
   stickyCol,
   isLoading,
   onChange,
@@ -1030,7 +1073,6 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   };
 
   const handleTextInputChange = (value: any) => {
-    // console.log('hasinfoMsg1 --> ', hasinfoMsg);
     const inputValue = value;
     validateInput(inputValue);
     setHasInfoMsg(null);
@@ -1050,13 +1092,14 @@ export const SearchCustomInput: React.FC<InputProps> = ({
       }
     } else {
       setHasInfoMsg(null);
+      setIsOpen(true);
       onChange(inputValue);
     }
   };
 
   const handleSelectInputChange = (selectedValue: any) => {
     setHasInfoMsg(customInfoMessage);
-    handleTextInputChange(selectedValue);
+    handleTextInputChange({ ...selectedValue });
   };
 
   const closeSearch = useCallback(() => {
@@ -1163,8 +1206,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
               // <div className='position-relative'>
               <div
                 id="menu"
-                // className="w-100 custom-search-input-menu mt-4"
-                className={`w-100 custom-search-input-menu ${
+                className={`custom-search-input-menu  ${
                   menuPosition === 'bottom'
                     ? 'custom-search-input-menu-bottom'
                     : 'custom-search-input-menu-top'
@@ -1180,13 +1222,13 @@ export const SearchCustomInput: React.FC<InputProps> = ({
                       {/* Default option */}
                       <div
                         id="menu-item"
-                        className="custom-search-input-item-first-child"
+                        className="custom-search-input-item-first-child w-100"
                         role="menuitem"
                         aria-disabled="true"
                         tabIndex={-1} // Prevent tab focus on disabled items
                       >
                         <div className="custom-search-input-item-label pb-1">
-                          <span>Please select a site ID:</span>
+                          {customMenuMessage && customMenuMessage}
                           {customInfoMessage && customInfoMessage}
                         </div>
                       </div>
@@ -1207,13 +1249,13 @@ export const SearchCustomInput: React.FC<InputProps> = ({
                   options.map((item) => (
                     <div
                       id="menu-item"
-                      className="custom-search-input-item d-flex w-100 align-items-center"
+                      className="custom-search-input-item d-flex align-items-center w-100"
                       role="menuitem"
                       aria-label={item.value}
                       tabIndex={0} // Allow keyboard focus
                       key={item.key}
                       onClick={() => {
-                        handleSelectInputChange(item.value);
+                        handleSelectInputChange(item);
                       }}
                     >
                       <span>{item.value}</span>

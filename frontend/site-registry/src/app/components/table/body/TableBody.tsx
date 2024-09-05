@@ -211,6 +211,7 @@ const TableBody: FC<TableBodyProps> = ({
           customPlaceholderCss={field.customPlaceholderCss}
           isLoading={field.isLoading}
           customInfoMessage={field.customInfoMessage}
+          customMenuMessage={field.customMenuMessage}
         />
       );
     } else if (field.type === FormFieldType.Label) {
@@ -371,6 +372,10 @@ const TableBody: FC<TableBodyProps> = ({
           isEditing={editMode ?? true}
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
+          handleSearch={field.handleSearch}
+          filteredOptions={field.filteredOptions || []}
+          isLoading={field.isLoading}
+          customInfoMessage={field.customInfoMessage}
         />
       );
     } else if (field.type === FormFieldType.DeleteIcon) {

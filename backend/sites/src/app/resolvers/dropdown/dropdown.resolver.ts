@@ -8,6 +8,7 @@ import {
 } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { DropdownService } from '../../services/dropdown/dropdown.service';
+import { CustomRoles } from '../../common/role';
 
 @Resolver(() => DropdownDto)
 export class DropdownResolver {
@@ -21,7 +22,14 @@ export class DropdownResolver {
     >,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => DropdownResponse, { name: 'getParticipantRoleCd' })
   async getParticipantRoleCd() {
     const result = await this.dropdownService.getParticipantRoleCd();
@@ -42,27 +50,57 @@ export class DropdownResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
-  @Query(() => DropdownResponseWithMetaData, { name: 'getPeopleOrgsCd' })
-  async getPeopleOrgsCd() {
-    const result = await this.dropdownService.getPeopleOrgsCd();
-    if (result.length > 0) {
-      return this.genericResponseProvider.createResponse(
-        'People Organization fetched successfully',
-        200,
-        true,
-        result,
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => DropdownResponse, { name: 'getPeopleOrgsCd' })
+  async getPeopleOrgsCd(
+    @Args('searchParam', { type: () => String, nullable: true })
+    searchParam?: string,
+    @Args('entityType', { type: () => String, nullable: true })
+    entityType?: string,
+  ) {
+    try {
+      const result = await this.dropdownService.getPeopleOrgsCd(
+        searchParam,
+        entityType,
       );
-    } else {
+      if (result && result.length > 0) {
+        return this.genericResponseProvider.createResponse(
+          'People Organization fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        return this.genericResponseProvider.createResponse(
+          `People Organization not found`,
+          404,
+          false,
+        );
+      }
+    } catch (error) {
       return this.genericResponseProvider.createResponse(
-        `People Organization not found`,
-        404,
+        'Failed to fetch People Organization',
+        500,
         false,
       );
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => DropdownResponseWithMetaData, { name: 'getNotationTypeCd' })
   async getNotationTypeCd() {
     const result = await this.dropdownService.getNotationTypeCd();
@@ -82,7 +120,14 @@ export class DropdownResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => DropdownResponse, { name: 'getNotationClassCd' })
   async getNotationClassCd() {
     const result = await this.dropdownService.getNotationClassCd();
@@ -102,7 +147,14 @@ export class DropdownResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => DropdownResponse, { name: 'getNotationParticipantRoleCd' })
   async getNotationParticipantRoleCd() {
     const result = await this.dropdownService.getNotationParticipantRoleCd();

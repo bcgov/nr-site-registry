@@ -16,7 +16,7 @@ import {
   getSiteForFolio,
   resetFolioSiteDeleteStatus,
   sitesInFolio,
-} from './FolioSlice';
+} from './redux/FolioSlice';
 import { Folio, FolioContentDTO } from './dto/Folio';
 import {
   AngleLeft,

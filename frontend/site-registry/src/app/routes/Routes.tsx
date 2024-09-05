@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 // import Landing from "../features/landing/Landing"
 import { Routes, Route, createBrowserRouter } from 'react-router-dom';
 import Search from '../features/site/Search';
@@ -9,68 +9,71 @@ import Cart from '../features/cart/Cart';
 import Folios from '../features/folios/Folios';
 import FolioContents from '../features/folios/FolioContent';
 import App from '../../App';
+import {
+  getLoggedInUserType,
+  getUser,
+  isUserOfType,
+  UserRoleType,
+} from '../helpers/utility';
 
-const siteRouter = createBrowserRouter([
+const roleBasedRoutes: any = {
+  client: [
+    { path: '/', element: <Dashboard /> },
+    { path: '/dashboard', element: <Dashboard /> },
+    { path: '/search', element: <Search /> },
+    { path: '/dashboard/site/details/:id', element: <SiteDetails /> },
+    { path: '/search/site/details/:id', element: <SiteDetails /> },
+    { path: '/folios', element: <Folios /> },
+    { path: '/folios/:id', element: <FolioContents /> },
+    { path: '/map', element: <MapSearch /> },
+    { path: '/map/:id', element: <MapSearch /> },
+    { path: '/site/cart', element: <Cart /> },
+  ],
+  internal: [
+    { path: '/', element: <Dashboard /> },
+    { path: '/dashboard', element: <Dashboard /> },
+    { path: '/search', element: <Search /> },
+    { path: '/dashboard/site/details/:id', element: <SiteDetails /> },
+    { path: '/search/site/details/:id', element: <SiteDetails /> },
+    { path: '/folios', element: <Folios /> },
+    { path: '/folios/:id', element: <FolioContents /> },
+    { path: '/map', element: <MapSearch /> },
+    { path: '/map/:id', element: <MapSearch /> },
+  ],
+  sr: [
+    { path: '/', element: <Dashboard /> },
+    { path: '/search', element: <Search /> },
+    { path: '/search/site/details/:id', element: <SiteDetails /> },
+    { path: '/map', element: <MapSearch /> },
+    { path: '/map/:id', element: <MapSearch /> },
+  ],
+  public: [
+    { path: '/', element: <Dashboard /> },
+    { path: '/search', element: <Search /> },
+    { path: '/search/site/details/:id', element: <SiteDetails /> },
+    { path: '/map', element: <MapSearch /> },
+    { path: '/map/:id', element: <MapSearch /> },
+    { path: '/site/cart', element: <Cart /> },
+    { path: '/folios/:id', element: <FolioContents /> },
+  ],
+};
+
+// Create routes based on the user's role
+const createRoutesForRole = (role: string) => [
   {
     element: <App />,
     errorElement: <h1>Page not found</h1>,
-    children: [
-      {
-        path: '/',
-        element: <Dashboard />,
-      },
-      {
-        path: '/search',
-        element: <Search />,
-      },
-      {
-        path: '/search/site/details/:id',
-        element: <SiteDetails />,
-      },
-      {
-        path: '/folios',
-        element: <Folios />,
-      },
-      {
-        path: '/folios/:id',
-        element: <FolioContents />,
-      },
-      {
-        path: '/dashboard',
-        element: <Dashboard />,
-      },
-      {
-        path: '/dashboard/site/details/:id',
-        element: <SiteDetails />,
-      },
-      {
-        path: '/dashboard',
-        element: <Dashboard />,
-        children: [
-          {
-            path: '/dashboard/site/details/:id',
-            element: <SiteDetails />,
-          },
-        ],
-      },
-
-      {
-        path: '/map',
-        element: <MapSearch />,
-        children: [
-          {
-            path: '/map/:id',
-            element: <MapSearch />,
-          },
-        ],
-      },
-      {
-        path: '/site/cart',
-        element: <Cart />,
-      },
-    ],
+    children: roleBasedRoutes[role]?.map((route: any) => ({
+      path: route.path,
+      element: route.element,
+      children: route.children,
+    })),
   },
-]);
+];
+
+const userType = getLoggedInUserType();
+console.log('userType', userType, createRoutesForRole(userType));
+const siteRouter = createBrowserRouter(createRoutesForRole(userType));
 
 // const AppRoutes = () => {
 

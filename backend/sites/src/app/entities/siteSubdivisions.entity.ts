@@ -2,6 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { Sites } from './sites.entity';
 import { Subdivisions } from './subdivisions.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
 
 @ObjectType()
 @Index(
@@ -14,7 +15,7 @@ import { Subdivisions } from './subdivisions.entity';
 @Index('sitesub_for_profile', ['sprofDateCompleted'], {})
 @Index('sitesub_comprised_of_frgn', ['subdivId'], {})
 @Entity('site_subdivisions')
-export class SiteSubdivisions {
+export class SiteSubdivisions extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { name: 'site_id' })
   siteId: string;
@@ -75,9 +76,13 @@ export class SiteSubdivisions {
   @JoinColumn([{ name: 'site_id', referencedColumnName: 'id' }])
   site: Sites;
 
-  @ManyToOne(() => Subdivisions, (subdivisions) => subdivisions.siteSubdivisions, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(
+    () => Subdivisions,
+    (subdivisions) => subdivisions.siteSubdivisions,
+    {
+      onDelete: 'CASCADE',
+    },
+  )
   @JoinColumn([{ name: 'subdiv_id', referencedColumnName: 'id' }])
   subdivision: Subdivisions;
 }

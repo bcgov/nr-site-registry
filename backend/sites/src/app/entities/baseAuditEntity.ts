@@ -18,10 +18,18 @@ export class BaseAuditEntity {
   whoUpdated: string | null;
 
   @Field()
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    name: 'when_created',
+  })
   whenCreated: Date;
 
   @Field({ nullable: true })
-  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    name: 'when_updated',
+  })
   whenUpdated: Date | null;
 }

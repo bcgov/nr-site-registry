@@ -56,6 +56,8 @@ type DocParticRoleCd {
 }
 
 type SiteDocs {
+  userAction: String!
+  srAction: String!
   id: String!
   siteId: String!
   submissionDate: DateTime!
@@ -88,6 +90,8 @@ type SiteParticRoles {
 }
 
 type LandHistories {
+  userAction: String!
+  srAction: String!
   siteId: String!
   guid: String!
   lutCode: String!
@@ -109,6 +113,8 @@ type LandUseCd {
 }
 
 type SiteProfiles {
+  userAction: String!
+  srAction: String!
   siteId: String!
   dateCompleted: DateTime!
   localAuthDateRecd: DateTime
@@ -157,6 +163,8 @@ type SiteProfiles {
 }
 
 type SitePartics {
+  userAction: String!
+  srAction: String!
   id: String!
   siteId: String!
   psnorgId: String!
@@ -219,6 +227,8 @@ type PeopleOrgs {
 }
 
 type EventPartics {
+  userAction: String!
+  srAction: String!
   eventId: String!
   spId: String!
   eprCode: String!
@@ -250,6 +260,8 @@ type EventTypeCd {
 }
 
 type Events {
+  userAction: String!
+  srAction: String!
   id: String!
   siteId: String!
   eventDate: DateTime!
@@ -293,6 +305,8 @@ type SiteAssocs {
 }
 
 type SiteSubdivisions {
+  userAction: String!
+  srAction: String!
   siteId: String!
   subdivId: String!
   dateNoted: DateTime!
@@ -378,6 +392,8 @@ type FolioContents {
 }
 
 type Sites {
+  userAction: String!
+  srAction: String!
   id: String!
   bcerCode: String!
   sstCode: String!
@@ -440,6 +456,14 @@ type FetchSiteResponse {
   data: [Sites!]!
 }
 
+type SaveSiteDetailsResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [Sites!]!
+}
+
 type FetchSiteDetail {
   message: String
   httpStatusCode: Int
@@ -453,6 +477,73 @@ type SearchSiteResponse {
   count: Float!
   page: Float!
   pageSize: Float!
+}
+
+type NotationResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [NotationDto!]
+}
+
+type NotationDto {
+  id: String!
+  psnorgId: String!
+  siteId: String!
+  completionDate: DateTime
+  etypCode: String!
+  eclsCode: String!
+  requiredAction: String
+  note: String
+  requirementDueDate: DateTime
+  requirementReceivedDate: DateTime
+  notationParticipant: [NotationParticipantDto!]
+}
+
+type NotationParticipantDto {
+  guid: String!
+  eprCode: String!
+  psnorgId: String!
+  displayName: String!
+}
+
+type SiteParticsResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [SiteParticsDto!]
+}
+
+type SiteParticsDto {
+  guid: String!
+  id: String!
+  psnorgId: String!
+  effectiveDate: DateTime!
+  endDate: DateTime
+  note: String
+  displayName: String!
+  prCode: String!
+  description: String!
+}
+
+type DocumentResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [DocumentDto!]
+}
+
+type DocumentDto {
+  id: String!
+  psnorgId: String!
+  displayName: String!
+  siteId: String!
+  submissionDate: String!
+  documentDate: String
+  title: String!
 }
 
 type RecentViewResponse {
@@ -497,26 +588,6 @@ type SnapshotResponse {
   data: [Snapshots!]
 }
 
-type SiteParticsResponse {
-  message: String
-  httpStatusCode: Int
-  success: Boolean
-  timestamp: String
-  data: [SiteParticsDto!]
-}
-
-type SiteParticsDto {
-  guid: String!
-  id: String!
-  psnorgId: String!
-  effectiveDate: DateTime!
-  endDate: DateTime
-  note: String
-  displayName: String!
-  prCode: String!
-  description: String!
-}
-
 type DisclosureResponse {
   message: String
   httpStatusCode: Int
@@ -539,53 +610,6 @@ type LandHistoryResponse {
   success: Boolean
   timestamp: String
   data: [LandHistories!]!
-}
-
-type NotationResponse {
-  message: String
-  httpStatusCode: Int
-  success: Boolean
-  timestamp: String
-  data: [NotationDto!]
-}
-
-type NotationDto {
-  id: String!
-  psnorgId: String!
-  siteId: String!
-  completionDate: DateTime
-  etypCode: String!
-  eclsCode: String!
-  requiredAction: String
-  note: String
-  requirementDueDate: DateTime
-  requirementReceivedDate: DateTime
-  notationParticipant: [NotationParticipantDto!]
-}
-
-type NotationParticipantDto {
-  guid: String!
-  eprCode: String!
-  psnorgId: String!
-  displayName: String!
-}
-
-type DocumentResponse {
-  message: String
-  httpStatusCode: Int
-  success: Boolean
-  timestamp: String
-  data: [DocumentDto!]
-}
-
-type DocumentDto {
-  id: String!
-  psnorgId: String!
-  displayName: String!
-  siteId: String!
-  submissionDate: String!
-  documentDate: String
-  title: String!
 }
 
 type FolioResponse {
@@ -640,7 +664,7 @@ type Query {
   getSnapshotsById(id: Int!): SnapshotResponse!
   getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
   getParticipantRoleCd: DropdownResponse!
-  getPeopleOrgsCd: DropdownResponseWithMetaData!
+  getPeopleOrgsCd(searchParam: String, entityType: String): DropdownResponse!
   getNotationTypeCd: DropdownResponseWithMetaData!
   getNotationClassCd: DropdownResponse!
   getNotationParticipantRoleCd: DropdownResponse!
@@ -661,8 +685,8 @@ input FolioMinDTO {
 }
 
 type Mutation {
+  updateSiteDetails(siteDetailsDTO: SaveSiteDetailsDTO!): SaveSiteDetailsResponse!
   addRecentView(recentView: RecentViewDto!): RecentViewResponse!
-  createSnapshot(snapshot: SnapshotDto!): SnapshotResponse!
   createSnapshotForSites(inputDto: [CreateSnapshotDto!]!): SnapshotResponse!
   addCartItem(cartDTO: [CartDTO!]!): CartResponse!
   deleteCartItem(cartDeleteDTO: [CartDeleteDTO!]!): CartResponse!
@@ -674,6 +698,198 @@ type Mutation {
   deleteSitesInFolio(folioDTO: [FolioContentDTO!]!): FolioResponse!
 }
 
+input SaveSiteDetailsDTO {
+  sitesSummary: SiteSummaryDTO
+  events: [NotationIputDTO!]
+  eventsParticipants: [NotationParticipantInputDTO!]
+  siteParticipants: [SiteParticsInputDto!]
+  documents: [DocumentInputDTO!]
+  siteAssociations: [SiteAssociationsInputDTO!]
+  subDivisions: [SubDivisionsInputDTO!]
+  landHistories: [LandHistoriesInputDTO!]
+  profiles: [SiteProfilesInputDTO!]
+  siteId: String!
+}
+
+input SiteSummaryDTO {
+  id: String!
+  bcerCode: String!
+  sstCode: String!
+  commonName: String!
+  addrType: String!
+  addrLine_1: String!
+  addrLine_2: String
+  addrLine_3: String
+  addrLine_4: String
+  city: String!
+  provState: String!
+  postalCode: String
+  latdeg: Float
+  longdeg: Float
+  victoriaFileNo: String
+  regionalFileNo: String
+  classCode: String
+  generalDescription: String
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  rwmGeneralDescFlag: Float!
+  consultantSubmitted: String
+  longDegrees: Float
+  longMinutes: Float
+  longSeconds: String
+  latDegrees: Float
+  latMinutes: Float
+  latSeconds: String
+  srStatus: String!
+  latlongReliabilityFlag: String!
+  siteRiskCode: String!
+}
+
+input NotationIputDTO {
+  id: String!
+  psnorgId: String!
+  siteId: String!
+  completionDate: DateTime
+  etypCode: String!
+  eclsCode: String!
+  requiredAction: String
+  note: String
+  requirementDueDate: DateTime
+  requirementReceivedDate: DateTime
+  notationParticipant: [NotationParticipantInputDTO!]
+}
+
+input NotationParticipantInputDTO {
+  guid: String!
+  eprCode: String!
+  psnorgId: String!
+  displayName: String!
+}
+
+input SiteParticsInputDto {
+  guid: String!
+  id: String!
+  psnorgId: String!
+  effectiveDate: DateTime!
+  endDate: DateTime
+  note: String
+  displayName: String!
+  prCode: String!
+  description: String!
+}
+
+input DocumentInputDTO {
+  id: String!
+  psnorgId: String!
+  displayName: String!
+  siteId: String!
+  submissionDate: String!
+  documentDate: String
+  title: String!
+}
+
+input SiteAssociationsInputDTO {
+  siteId: String!
+  siteIdAssociatedWith: String!
+  effectiveDate: DateTime!
+  note: String!
+  whoCreated: String!
+  whoUpdated: String!
+  whenCreated: DateTime!
+  whenUpdated: DateTime!
+  rwmFlag: Float!
+  rwmNoteFlag: Float!
+  commonPid: String!
+}
+
+input SubDivisionsInputDTO {
+  id: String!
+  dateNoted: DateTime!
+  pin: String!
+  pid: String!
+  bcaaFolioNumber: String!
+  entityType: String!
+  addrLine_1: String!
+  addrLine_2: String!
+  addrLine_3: String!
+  addrLine_4: String!
+  city: String!
+  postalCode: String!
+  legalDescription: String!
+  whoCreated: String!
+  whoUpdated: String!
+  whenCreated: DateTime!
+  whenUpdated: DateTime!
+  crownLandsFileNo: String!
+  pidStatusCd: String!
+  validPid: String!
+}
+
+input LandHistoriesInputDTO {
+  siteId: String!
+  lutCode: String!
+  note: String!
+  whoCreated: String!
+  whoUpdated: String!
+  whenCreated: DateTime!
+  whenUpdated: DateTime!
+  rwmFlag: Float!
+  rwmNoteFlag: Float!
+  siteProfile: String!
+  profileDateReceived: DateTime!
+}
+
+input SiteProfilesInputDTO {
+  siteId: String!
+  dateCompleted: DateTime!
+  localAuthDateRecd: DateTime
+  localAuthName: String
+  localAuthAgency: String
+  localAuthAddress1: String
+  localAuthAddress2: String
+  localAuthPhoneAreaCode: String
+  localAuthPhoneNo: String
+  localAuthFaxAreaCode: String
+  localAuthFaxNo: String
+  localAuthDateSubmitted: DateTime
+  localAuthDateForwarded: DateTime
+  rwmDateReceived: DateTime
+  rwmParticId: String
+  rwmPhoneAreaCode: String
+  rwmPhoneNo: String
+  rwmFaxAreaCode: String
+  rwmFaxNo: String
+  investigationRequired: String
+  rwmDateDecision: DateTime
+  siteRegDateRecd: DateTime
+  siteRegDateEntered: DateTime
+  siteRegParticId: String
+  ownerParticId: String
+  siteAddress: String
+  siteCity: String
+  sitePostalCode: String
+  numberOfPids: Float
+  numberOfPins: Float
+  latDegrees: Float
+  latMinutes: Float
+  latSeconds: String
+  longDegrees: Float
+  longMinutes: Float
+  longSeconds: String
+  comments: String
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  localAuthEmail: String
+  plannedActivityComment: String
+  siteDisclosureComment: String
+  govDocumentsComment: String
+}
+
 input RecentViewDto {
   userId: String!
   siteId: String!
@@ -681,14 +897,6 @@ input RecentViewDto {
   city: String!
   generalDescription: String
   whenUpdated: DateTime
-}
-
-input SnapshotDto {
-  userId: String!
-  siteId: String!
-  transactionId: String!
-  snapshotData: JSON!
-  created: DateTime
 }
 
 input CreateSnapshotDto {

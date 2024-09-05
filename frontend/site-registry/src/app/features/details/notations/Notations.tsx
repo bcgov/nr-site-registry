@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import PanelWithUpDown from '../../../components/simple/PanelWithUpDown';
 import Form from '../../../components/form/Form';
-import GetNotationConfig from './NotationsConfig';
 import './Notations.css';
 import Widget from '../../../components/widget/Widget';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { UserType } from '../../../helpers/requests/userType';
 import { AppDispatch } from '../../../Store';
 import { useDispatch, useSelector } from 'react-redux';
-import { Plus, UserMinus, UserPlus } from '../../../components/common/icon';
+import {
+  Plus,
+  SpinnerIcon,
+  UserMinus,
+  UserPlus,
+} from '../../../components/common/icon';
 import {
   ChangeTracker,
   IChangeType,
@@ -19,7 +23,13 @@ import {
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
-import { flattenFormRows, getUser } from '../../../helpers/utility';
+import {
+  flattenFormRows,
+  getAxiosInstance,
+  getUser,
+  UpdateDisplayTypeParams,
+  updateTableColumn,
+} from '../../../helpers/utility';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
@@ -30,10 +40,28 @@ import {
 } from '../../../components/input-controls/IFormField';
 import Actions from '../../../components/action/Actions';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
-import { notationTypeDrpdown } from '../dropdowns/DropdownSlice';
-import { notationParticipants, updateSiteNotation } from './NotationSlice';
+import {
+  fetchNotationClassCd,
+  fetchNotationParticipantRoleCd,
+  fetchNotationTypeCd,
+  notationClassDrpdown,
+  notationParticipantRoleDrpdown,
+  notationTypeDrpdown,
+  participantNameDrpdown,
+} from '../dropdowns/DropdownSlice';
+import {
+  fetchNotationParticipants,
+  notationParticipants,
+  updateSiteNotation,
+} from './NotationSlice';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';
 import { v4 } from 'uuid';
+import { useParams } from 'react-router-dom';
+import { GRAPHQL } from '../../../helpers/endpoints';
+import { print } from 'graphql';
+import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
+import GetNotationConfig from './NotationsConfig';
+import infoIcon from '../../../images/info-icon.png';
 
 const Notations = () => {
   const {
@@ -46,11 +74,19 @@ const Notations = () => {
     srVisibilityConfig,
     notationFormRowsFirstChildIsRequired,
   } = GetNotationConfig();
-  const notations = useSelector(notationParticipants);
+
+  const { siteNotation: notations, status } = useSelector(notationParticipants);
   const dispatch = useDispatch<AppDispatch>();
   const mode = useSelector(siteDetailsMode);
   const notationType = useSelector(notationTypeDrpdown);
-  const [userType, setUserType] = useState<UserType>(UserType.External);
+  const notationParticipantRole = useSelector(notationParticipantRoleDrpdown);
+  const notationClass = useSelector(notationClassDrpdown);
+  const participantName = useSelector(participantNameDrpdown);
+  const loggedInUser = getUser();
+  const resetDetails = useSelector(resetSiteDetails);
+  const { id } = useParams();
+
+  const [userType, setUserType] = useState('');
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [formData, setFormData] =
     useState<{ [key: string]: any | [Date, Date] }[]>(notations);
@@ -68,9 +104,35 @@ const Notations = () => {
     { id: any; participantId: any }[]
   >([]);
   const [currentNotation, setCurrentNotation] = useState({});
+  const [ministryContactOptions, setMinistryContactOptions] = useState([]);
+  const [internalTableColumn, setInternalTableColumn] = useState(
+    notationColumnInternal,
+  );
+  const [externalTableColumn, setExternalTableCoulmn] = useState(
+    notationColumnExternal,
+  );
 
-  const loggedInUser = getUser();
-  const resetDetails = useSelector(resetSiteDetails);
+  const fetchMinistryContact = async (entityType: string) => {
+    try {
+      if (
+        entityType !== null &&
+        entityType !== undefined &&
+        entityType !== ''
+      ) {
+        const response = await getAxiosInstance().post(GRAPHQL, {
+          query: print(graphQLPeopleOrgsCd()),
+          variables: {
+            entityType: entityType,
+          },
+        });
+        return response.data.data.getPeopleOrgsCd;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
 
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
@@ -83,7 +145,6 @@ const Notations = () => {
       // not logged in
       setUserType(UserType.External);
     }
-    setFormData(notations);
   }, []);
 
   useEffect(() => {
@@ -91,10 +152,181 @@ const Notations = () => {
   }, [mode]);
 
   useEffect(() => {
+    if (id) {
+      Promise.all([
+        fetchMinistryContact('EMP')
+          .then((res) => {
+            setMinistryContactOptions(res.data);
+          })
+          .catch((error) => {
+            console.error('Error fetching data:', error);
+          }),
+        dispatch(fetchNotationClassCd()),
+        dispatch(fetchNotationTypeCd()),
+        dispatch(fetchNotationParticipantRoleCd()),
+        dispatch(fetchNotationParticipants(id ?? '')),
+      ])
+        .then(() => {
+          setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
+        })
+        .catch((error) => {
+          setLoading(RequestStatus.failed);
+          console.error('Error fetching data:', error);
+        });
+    }
+  }, [id]);
+
+  useEffect(() => {
     if (resetDetails) {
       setFormData(notations);
     }
   }, [resetDetails]);
+
+  const [searchSiteParticipant, setSearchSiteParticipant] = useState('');
+  const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
+  const fetchNotationParticipant = async (searchParam: string) => {
+    try {
+      if (
+        searchParam !== null &&
+        searchParam !== undefined &&
+        searchParam !== ''
+      ) {
+        const response = await getAxiosInstance().post(GRAPHQL, {
+          query: print(graphQLPeopleOrgsCd()),
+          variables: {
+            searchParam: searchParam,
+          },
+        });
+        return response.data.data.getPeopleOrgsCd;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    if (searchSiteParticipant) {
+      const timeoutId = setTimeout(async () => {
+        try {
+          fetchNotationParticipant(searchSiteParticipant).then((res) => {
+            const indexToUpdate = notationColumnInternal.findIndex(
+              (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
+            );
+            let infoMsg = <></>;
+            if (!res.success) {
+              infoMsg = (
+                <div className="px-2">
+                  <img
+                    src={infoIcon}
+                    alt="info"
+                    aria-hidden="true"
+                    role="img"
+                    aria-label="User image"
+                  />
+                  <span
+                    aria-label={'info-message'}
+                    className="text-wrap px-2 custom-not-found"
+                  >
+                    No results found.
+                  </span>
+                </div>
+              );
+            }
+            let params: UpdateDisplayTypeParams = {
+              indexToUpdate: indexToUpdate,
+              updates: {
+                isLoading: RequestStatus.success,
+                options: options,
+                filteredOptions: res.data,
+                customInfoMessage: infoMsg,
+                handleSearch: handleSearch,
+              },
+            };
+            setInternalTableColumn(
+              updateTableColumn(internalTableColumn, params),
+            );
+          });
+        } catch (error) {
+          throw new Error('Invalid searchParam');
+        }
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchSiteParticipant]);
+
+  const handleSearch = (value: any) => {
+    setSearchSiteParticipant(value.trim());
+    let params: UpdateDisplayTypeParams = {
+      indexToUpdate: notationColumnInternal.findIndex(
+        (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
+      ),
+      updates: {
+        isLoading: RequestStatus.loading,
+        options: options,
+        filteredOptions: [],
+        handleSearch: handleSearch,
+        customInfoMessage: <></>,
+      },
+    };
+    setInternalTableColumn(updateTableColumn(internalTableColumn, params));
+  };
+
+  useEffect(() => {
+    if (status === RequestStatus.success) {
+      if (notations) {
+        // Function to get distinct key-value pairs
+        const psnOrgs: any = notations.flatMap((item: any) =>
+          Array.isArray(item.notationParticipant)
+            ? item.notationParticipant.map((participant: any) => ({
+                key: participant.psnorgId,
+                value: participant.displayName,
+              }))
+            : [],
+        );
+
+        // Remove duplicates based on 'key'
+        const uniquePsnOrgs: any = Array.from(
+          new Map(psnOrgs.map((item: any) => [item.key, item])).values(),
+        );
+
+        setOptions(uniquePsnOrgs);
+        // Parameters for the update
+        let params: UpdateDisplayTypeParams = {
+          indexToUpdate: notationColumnInternal.findIndex(
+            (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
+          ),
+          updates: {
+            isLoading: RequestStatus.success,
+            options: psnOrgs,
+            filteredOptions: [],
+            handleSearch: handleSearch,
+            customInfoMessage: <></>,
+          },
+        };
+        setInternalTableColumn(updateTableColumn(internalTableColumn, params));
+        setExternalTableCoulmn(updateTableColumn(internalTableColumn, params));
+      }
+      setFormData(notations);
+    }
+  }, [notations, status]);
+
+  useEffect(() => {
+    if (notationParticipantRole) {
+      const indexToUpdate = notationColumnInternal.findIndex(
+        (item) => item.displayType?.graphQLPropertyName === 'eprCode',
+      );
+      let params: UpdateDisplayTypeParams = {
+        indexToUpdate: indexToUpdate,
+        updates: {
+          options: notationParticipantRole.data || [],
+        },
+      };
+      setExternalTableCoulmn(updateTableColumn(internalTableColumn, params));
+      setInternalTableColumn(updateTableColumn(internalTableColumn, params));
+    }
+  }, [loading]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value;
@@ -187,7 +419,7 @@ const Notations = () => {
         return notation;
       });
       setFormData(updatedNotation);
-      // dispatch(updateSiteNotation(updatedNotation))
+      dispatch(updateSiteNotation(updatedNotation));
     }
 
     const flattedArr = flattenFormRows(notationFormRowsInternal);
@@ -263,7 +495,6 @@ const Notations = () => {
       let isTrue =
         event.property === 'select_row' ? event.value : event.selected;
       if (isTrue) {
-        // setSelectedRows(prevSelectedRows => [...prevSelectedRows, { id, participantId: event.row.guid }]);
         setSelectedRows((prevSelectedRows) => [
           ...prevSelectedRows,
           ...rows.map((row: any) => ({
@@ -289,6 +520,34 @@ const Notations = () => {
           const updatedNotationParticipant = notation.notationParticipant.map(
             (participant: any) => {
               if (participant.guid === event.row.guid) {
+                if (
+                  typeof event.value === 'object' &&
+                  event.value !== null &&
+                  event.property === 'psnorgId'
+                ) {
+                  // Parameters for the update
+                  let params: UpdateDisplayTypeParams = {
+                    indexToUpdate: notationColumnInternal.findIndex(
+                      (item) =>
+                        item.displayType?.graphQLPropertyName === 'psnorgId',
+                    ),
+                    updates: {
+                      isLoading: RequestStatus.success,
+                      options: options,
+                      filteredOptions: [],
+                      handleSearch: handleSearch,
+                      customInfoMessage: <></>,
+                    },
+                  };
+                  setInternalTableColumn(
+                    updateTableColumn(internalTableColumn, params),
+                  );
+                  return {
+                    ...participant,
+                    [event.property]: event.value.key,
+                    ['displayName']: event.value.value,
+                  };
+                }
                 return { ...participant, [event.property]: event.value };
               }
               return participant;
@@ -312,7 +571,7 @@ const Notations = () => {
         'Notation Participant: ' + currLabel?.displayName,
       );
       setFormData(updateNotationParticipant);
-      // dispatch(updateSiteNotation(updateNotationParticipant))
+      dispatch(updateSiteNotation(updateNotationParticipant));
     }
   };
 
@@ -353,7 +612,7 @@ const Notations = () => {
 
   const handleOnAddNotation = () => {
     const newNotation = {
-      id: formData.length + 1, // Generate a unique ID for the new notation
+      id: v4(), // Generate a unique ID for the new notation
       etypCode: '', // Default values for other properties
       requirementReceivedDate: new Date(),
       completionDate: new Date(),
@@ -475,6 +734,18 @@ const Notations = () => {
             options: dropdownDto || row.options, // Fallback to existing options if dropdownDto is not found
           };
         }
+        if (row.graphQLPropertyName === 'eclsCode') {
+          return {
+            ...row,
+            options: notationClass.data || [],
+          };
+        }
+        if (row.graphQLPropertyName === 'psnorgId') {
+          return {
+            ...row,
+            options: ministryContactOptions || [],
+          };
+        }
         return row;
       }),
     );
@@ -524,6 +795,19 @@ const Notations = () => {
       'eclsCode',
     );
   };
+
+  if (loading === RequestStatus.loading) {
+    return (
+      <div className="notation-loading-overlay">
+        <div className="notation-spinner-container">
+          <SpinnerIcon
+            data-testid="loading-spinner"
+            className="notation-fa-spin"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-2">
@@ -652,8 +936,8 @@ const Notations = () => {
                       currentPage={1}
                       tableColumns={
                         userType === UserType.Internal
-                          ? notationColumnInternal
-                          : notationColumnExternal
+                          ? internalTableColumn
+                          : externalTableColumn
                       }
                       tableData={notation.notationParticipant}
                       tableIsLoading={

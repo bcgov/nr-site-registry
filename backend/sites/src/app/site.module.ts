@@ -80,6 +80,7 @@ import { AssociatedSiteResolver } from './resolvers/associatedSite/associatedSit
 import { AssociatedSiteService } from './services/associatedSite/associatedSite.service';
 import { LandUseCodeResolver } from './resolvers/landUseCode/landUseCode.resolver';
 import { LandUseCodeService } from './services/landUseCode/landUseCode.service';
+import { HistoryLog } from './entities/siteHistoryLog.entity';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -140,6 +141,7 @@ import { LandUseCodeService } from './services/landUseCode/landUseCode.service';
       Folio,
       FolioContents,
       User,
+      HistoryLog,
     ]),
   ],
   providers: [

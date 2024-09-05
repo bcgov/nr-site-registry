@@ -61,6 +61,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
                   customInfoMessage={field.customInfoMessage}
+                  customMenuMessage={field.customMenuMessage}
                 />
               )}
               {field.type === FormFieldType.Search && (
@@ -84,6 +85,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   srMode={srMode ?? false}
                   isLoading={isLoading}
                   customInfoMessage={field.customInfoMessage}
+                  customMenuMessage={field.customMenuMessage}
                 />
               )}
               {field.type === FormFieldType.TextArea && (
@@ -145,6 +147,10 @@ const Form: React.FC<IFormRendererProps> = ({
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
                   customPlaceholderCss={field.customPlaceholderCss}
+                  handleSearch={field.handleSearch}
+                  filteredOptions={field.filteredOptions || []}
+                  isLoading={field.isLoading}
+                  customInfoMessage={field.customInfoMessage}
                 />
               )}
               {field.type === FormFieldType.DateRange && (

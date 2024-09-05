@@ -13,13 +13,14 @@ import { SiteProfileLandUses } from './siteProfileLandUses.entity';
 import { SiteProfileOwners } from './siteProfileOwners.entity';
 import { SitePartics } from './sitePartics.entity';
 import { Sites } from './sites.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
 
 @ObjectType()
 @Index('site_profiles_pkey', ['dateCompleted', 'siteId'], { unique: true })
 @Index('sprof_rwm_site_partic', ['rwmParticId'], {})
 @Index('sprof_site_reg_site_partic', ['siteRegParticId'], {})
 @Entity('site_profiles')
-export class SiteProfiles {
+export class SiteProfiles extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'site_id' })
   siteId: string;

@@ -58,20 +58,36 @@ export class DropdownResolver {
     ],
     mode: RoleMatchingMode.ANY,
   })
-  @Query(() => DropdownResponseWithMetaData, { name: 'getPeopleOrgsCd' })
-  async getPeopleOrgsCd() {
-    const result = await this.dropdownService.getPeopleOrgsCd();
-    if (result.length > 0) {
-      return this.genericResponseProvider.createResponse(
-        'People Organization fetched successfully',
-        200,
-        true,
-        result,
+  @Query(() => DropdownResponse, { name: 'getPeopleOrgsCd' })
+  async getPeopleOrgsCd(
+    @Args('searchParam', { type: () => String, nullable: true })
+    searchParam?: string,
+    @Args('entityType', { type: () => String, nullable: true })
+    entityType?: string,
+  ) {
+    try {
+      const result = await this.dropdownService.getPeopleOrgsCd(
+        searchParam,
+        entityType,
       );
-    } else {
+      if (result && result.length > 0) {
+        return this.genericResponseProvider.createResponse(
+          'People Organization fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        return this.genericResponseProvider.createResponse(
+          `People Organization not found`,
+          404,
+          false,
+        );
+      }
+    } catch (error) {
       return this.genericResponseProvider.createResponse(
-        `People Organization not found`,
-        404,
+        'Failed to fetch People Organization',
+        500,
         false,
       );
     }

@@ -47,6 +47,7 @@ export interface IFormField {
   graphQLPropertyName?: string;
   allowNumbersOnly?: boolean;
   options?: { key: string; value: string; imageUrl?: any }[];
+  filteredOptions?: { key: string; value: string }[];
   value?: any;
   customLinkValue?: any;
   customIcon?: ReactNode;
@@ -59,6 +60,7 @@ export interface IFormField {
   isImage?: boolean;
   isLoading?: RequestStatus;
   customInfoMessage?: ReactNode;
+  customMenuMessage?: ReactNode;
   validation?: {
     required?: boolean;
     minLength?: number;
@@ -71,4 +73,5 @@ export interface IFormField {
   href?: string;
   textAreaRow?: number;
   textAreaColoum?: number;
+  handleSearch?: (event: any) => void;
 }

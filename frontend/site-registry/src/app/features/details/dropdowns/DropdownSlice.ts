@@ -27,10 +27,14 @@ const initialState: IDropdownsState = {
 
 export const fetchPeopleOrgsCd = createAsyncThunk(
   'dropdowns/getPeopleOrgsCd',
-  async () => {
+  async (args?: { searchParam?: string; entityType?: string }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphQLPeopleOrgsCd()),
+        variables: {
+          searchParam: args?.searchParam ?? '',
+          entityType: args?.entityType ?? '',
+        },
       });
       return response.data.data;
     } catch (error) {

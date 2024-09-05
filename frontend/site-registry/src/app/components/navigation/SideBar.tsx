@@ -29,8 +29,12 @@ function SideBar() {
 
   const user = getUser();
 
+  // useEffect(() => {
+  //   console.log('user updated');
+  //   SetNavList(getSideBarNavList(getLoggedInUserType()));
+  // }, [user]);
+
   useEffect(() => {
-    console.log('user updated');
     SetNavList(getSideBarNavList(getLoggedInUserType()));
   }, []);
 

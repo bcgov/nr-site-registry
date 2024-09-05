@@ -57,8 +57,7 @@ const notationParticipantSlice = createSlice({
   },
 });
 
-export const notationParticipants = (state: any) =>
-  state.notationParticipant.siteNotation;
+export const notationParticipants = (state: any) => state.notationParticipant;
 
 export const { updateSiteNotation } = notationParticipantSlice.actions;
 

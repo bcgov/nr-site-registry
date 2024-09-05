@@ -15,18 +15,39 @@ import {
 } from '../../../components/common/IChangeType';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import Widget from '../../../components/widget/Widget';
-import { UserMinus, UserPlus } from '../../../components/common/icon';
+import {
+  SpinnerIcon,
+  UserMinus,
+  UserPlus,
+} from '../../../components/common/icon';
 import Actions from '../../../components/action/Actions';
 import './Participant.css';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
-import { siteParticipants, updateSiteParticipants } from './ParticipantSlice';
+import {
+  fetchSiteParticipants,
+  siteParticipants,
+  updateSiteParticipants,
+} from './ParticipantSlice';
 import { useParams } from 'react-router-dom';
 import GetConfig from './ParticipantConfig';
-import { IParticipant } from './IParticipantState';
 import { v4 } from 'uuid';
-import { getUser } from '../../../helpers/utility';
+import {
+  getAxiosInstance,
+  getUser,
+  UpdateDisplayTypeParams,
+  updateTableColumn,
+} from '../../../helpers/utility';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';
+import {
+  fetchParticipantRoleCd,
+  participantNameDrpdown,
+  participantRoleDrpdown,
+} from '../dropdowns/DropdownSlice';
+import infoIcon from '../../../images/info-icon.png';
+import { GRAPHQL } from '../../../helpers/endpoints';
+import { print } from 'graphql';
+import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
 
 const Participants = () => {
   const {
@@ -34,6 +55,8 @@ const Participants = () => {
     participantColumnExternal,
     srVisibilityParcticConfig,
   } = GetConfig();
+  const [internalRow, setInternalRow] = useState(participantColumnInternal);
+  const [externalRow, setExternalRow] = useState(participantColumnExternal);
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [formData, setFormData] = useState<
@@ -42,18 +65,22 @@ const Participants = () => {
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchSiteParticipant, setSearchSiteParticipant] = useState('');
   const [selectedRows, setSelectedRows] = useState<
     { participantId: any; psnorgId: any; prCode: string; guid: string }[]
   >([]);
   const [isDelete, setIsDelete] = useState(false);
+  const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
 
   const dispatch = useDispatch<AppDispatch>();
   const resetDetails = useSelector(resetSiteDetails);
   const mode = useSelector(siteDetailsMode);
-  const siteParticipant: IParticipant[] = useSelector(siteParticipants);
+  const particRoleDropdwn = useSelector(participantRoleDrpdown);
+  const { siteParticipants: siteParticipant, status } =
+    useSelector(siteParticipants);
   const { id } = useParams();
-
   const loggedInUser = getUser();
+
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
       setUserType(UserType.External);
@@ -78,8 +105,134 @@ const Participants = () => {
   }, [resetDetails]);
 
   useEffect(() => {
-    setFormData(siteParticipant);
+    if (id) {
+      Promise.all([
+        dispatch(fetchParticipantRoleCd()),
+        dispatch(fetchSiteParticipants(id ?? '')),
+      ])
+        .then(() => {
+          setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
+        })
+        .catch((error) => {
+          setLoading(RequestStatus.failed);
+          console.error('Error fetching data:', error);
+        });
+    }
   }, [id]);
+
+  const fetchSiteParticipant = async (searchParam: string) => {
+    try {
+      if (
+        searchParam !== null &&
+        searchParam !== undefined &&
+        searchParam !== ''
+      ) {
+        const response = await getAxiosInstance().post(GRAPHQL, {
+          query: print(graphQLPeopleOrgsCd()),
+          variables: {
+            searchParam: searchParam,
+          },
+        });
+        return response.data.data.getPeopleOrgsCd;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+  useEffect(() => {
+    if (searchSiteParticipant) {
+      const timeoutId = setTimeout(async () => {
+        try {
+          fetchSiteParticipant(searchSiteParticipant).then((res) => {
+            const indexToUpdate = participantColumnInternal.findIndex(
+              (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
+            );
+            let infoMsg = <></>;
+            if (!res.success) {
+              infoMsg = (
+                <div className="px-2">
+                  <img
+                    src={infoIcon}
+                    alt="info"
+                    aria-hidden="true"
+                    role="img"
+                    aria-label="User image"
+                  />
+                  <span
+                    aria-label={'info-message'}
+                    className="text-wrap px-2 custom-not-found"
+                  >
+                    No results found.
+                  </span>
+                </div>
+              );
+            }
+            let params: UpdateDisplayTypeParams = {
+              indexToUpdate: indexToUpdate,
+              updates: {
+                isLoading: RequestStatus.success,
+                options: options,
+                filteredOptions: res.data,
+                customInfoMessage: infoMsg,
+                handleSearch: handleSearch,
+              },
+            };
+
+            setInternalRow(updateTableColumn(internalRow, params));
+          });
+        } catch (error) {
+          throw new Error('Invalid searchParam');
+        }
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchSiteParticipant]);
+
+  useEffect(() => {
+    if (status === RequestStatus.success) {
+      if (siteParticipant) {
+        const psnOrgs = siteParticipant.map((item: any) => ({
+          key: item.psnorgId,
+          value: item.displayName,
+        }));
+        setOptions(psnOrgs);
+        // Parameters for the update
+        let params: UpdateDisplayTypeParams = {
+          indexToUpdate: participantColumnInternal.findIndex(
+            (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
+          ),
+          updates: {
+            isLoading: RequestStatus.success,
+            options: psnOrgs,
+            filteredOptions: [],
+            handleSearch: handleSearch,
+            customInfoMessage: <></>,
+          },
+        };
+        setExternalRow(updateTableColumn(externalRow, params));
+        setInternalRow(updateTableColumn(internalRow, params));
+      }
+      setFormData(siteParticipant);
+    }
+  }, [siteParticipant, status]);
+
+  useEffect(() => {
+    if (particRoleDropdwn) {
+      const indexToUpdate = participantColumnInternal.findIndex(
+        (item) => item.displayType?.graphQLPropertyName === 'prCode',
+      );
+      let params: UpdateDisplayTypeParams = {
+        indexToUpdate: indexToUpdate,
+        updates: {
+          options: particRoleDropdwn.data,
+        },
+      };
+      setExternalRow(updateTableColumn(externalRow, params));
+      setInternalRow(updateTableColumn(internalRow, params));
+    }
+  }, [particRoleDropdwn]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value;
@@ -164,6 +317,22 @@ const Participants = () => {
     }
   };
 
+  const handleSearch = (value: any) => {
+    setSearchSiteParticipant(value.trim());
+    let params: UpdateDisplayTypeParams = {
+      indexToUpdate: participantColumnInternal.findIndex(
+        (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
+      ),
+      updates: {
+        isLoading: RequestStatus.loading,
+        options: options,
+        filteredOptions: [],
+        handleSearch: handleSearch,
+        customInfoMessage: <></>,
+      },
+    };
+    setInternalRow(updateTableColumn(internalRow, params));
+  };
   const handleTableChange = (event: any) => {
     if (
       event.property.includes('select_all') ||
@@ -200,6 +369,31 @@ const Participants = () => {
     } else {
       const updatedParticipant = formData.map((participant) => {
         if (participant.guid === event.row.guid) {
+          if (
+            typeof event.value === 'object' &&
+            event.value !== null &&
+            event.property === 'psnorgId'
+          ) {
+            // Parameters for the update
+            let params: UpdateDisplayTypeParams = {
+              indexToUpdate: participantColumnInternal.findIndex(
+                (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
+              ),
+              updates: {
+                isLoading: RequestStatus.success,
+                options: options,
+                filteredOptions: [],
+                handleSearch: handleSearch,
+                customInfoMessage: <></>,
+              },
+            };
+            setInternalRow(updateTableColumn(internalRow, params));
+            return {
+              ...participant,
+              [event.property]: event.value.key,
+              ['displayName']: event.value.value,
+            };
+          }
           return { ...participant, [event.property]: event.value };
         }
         return participant;
@@ -322,6 +516,18 @@ const Participants = () => {
     }
   };
 
+  if (loading === RequestStatus.loading) {
+    return (
+      <div className="participant-loading-overlay">
+        <div className="participant-spinner-container">
+          <SpinnerIcon
+            data-testid="loading-spinner"
+            className="participant-fa-spin"
+          />
+        </div>
+      </div>
+    );
+  }
   return (
     <div
       className="row"
@@ -352,12 +558,10 @@ const Participants = () => {
           handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
           title={'Site Participants'}
           tableColumns={
-            userType === UserType.Internal
-              ? participantColumnInternal
-              : participantColumnExternal
+            userType === UserType.Internal ? internalRow : externalRow
           }
           tableData={formData}
-          tableIsLoading={formData.length > 0 ? loading : RequestStatus.idle}
+          tableIsLoading={status ?? RequestStatus.idle}
           allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
           aria-label="Site Participant Widget"
           customLabelCss="custom-participant-widget-lbl"

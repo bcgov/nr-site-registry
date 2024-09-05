@@ -216,3 +216,43 @@
 .custom-notation-edit-dateInput .rs-input {
   padding: 10px 11px !important;
 }
+
+.notation-fa-spin {
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.notation-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050; /* Ensure it appears above other content */
+}
+
+.notation-spinner-container {
+  text-align: center;
+}
+
+.custom-notation-search-placeholder::placeholder {
+  color: var(--typography-color-disabled) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+  text-align: left !important;
+  transform: translateX(25px) translateY(2px) !important;
+}

@@ -18,6 +18,7 @@ import { RequestStatus } from '../../../helpers/requests/status';
 import {
   Minus,
   Plus,
+  SpinnerIcon,
   UserMinus,
   UserPlus,
 } from '../../../components/common/icon';
@@ -33,7 +34,12 @@ import {
 } from '../../../helpers/utility';
 import Actions from '../../../components/action/Actions';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
-import { siteDisclosure, updateSiteDisclosure } from './DisclosureSlice';
+import {
+  fetchSiteDisclosure,
+  siteDisclosure,
+  updateSiteDisclosure,
+} from './DisclosureSlice';
+import { useParams } from 'react-router-dom';
 
 // const disclosureData = {
 //         disclosureId:1,
@@ -76,10 +82,14 @@ const Disclosure = () => {
   const [srTimeStamp, setSRTimeStamp] = useState(
     'Sent to SR on June 2nd, 2013',
   );
+
   const dispatch = useDispatch<AppDispatch>();
   const mode = useSelector(siteDetailsMode);
-  const disclosureData = useSelector(siteDisclosure);
+  const { siteDisclosure: disclosureData, status } =
+    useSelector(siteDisclosure);
   const loggedInUser = getUser();
+  const { id } = useParams();
+
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
       setUserType(UserType.External);
@@ -91,12 +101,33 @@ const Disclosure = () => {
       // not logged in
       setUserType(UserType.External);
     }
-    setFormData(disclosureData ?? {});
+    // setFormData(disclosureData ?? {});
   }, []);
 
   useEffect(() => {
     setViewMode(mode);
   }, [mode]);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchSiteDisclosure(id ?? ''))
+        .then(() => {
+          setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
+        })
+        .catch((error) => {
+          setLoading(RequestStatus.failed);
+          console.error('Error fetching data:', error);
+        });
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (status === RequestStatus.success) {
+      if (disclosureData) {
+        setFormData(disclosureData);
+      }
+    }
+  }, [disclosureData, status]);
 
   const handleInputChange = (
     id: number,
@@ -272,6 +303,19 @@ const Disclosure = () => {
         break;
     }
   };
+
+  if (loading === RequestStatus.loading) {
+    return (
+      <div className="disclosure-loading-overlay">
+        <div className="disclosure-spinner-container">
+          <SpinnerIcon
+            data-testid="loading-spinner"
+            className="disclosure-fa-spin"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

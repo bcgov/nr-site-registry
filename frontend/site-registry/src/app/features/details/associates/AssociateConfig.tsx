@@ -12,11 +12,6 @@ import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import { RequestStatus } from '../../../helpers/requests/status';
 
-export interface UpdateDisplayTypeParams {
-  indexToUpdate: number;
-  updates: Partial<IFormField>; // Use Partial<IFormField> to allow partial updates
-}
-
 export const GetAssociateConfig = () => {
   const location = useLocation();
   // Get the current path
@@ -47,6 +42,7 @@ export const GetAssociateConfig = () => {
         customEditLabelCss: 'custom-associate-edit-label',
         customEditInputTextCss: 'custom-associate-edit-input',
         customPlaceholderCss: 'custom-associate-search-placeholder',
+        customMenuMessage: <span>Please select a site ID:</span>,
         customInfoMessage: null,
         validation: {
           pattern: /^[0-9,\s]*$/,
@@ -280,34 +276,4 @@ export const GetAssociateConfig = () => {
     associateColumnExternal,
     srVisibilityAssocConfig,
   };
-};
-
-export const updateTableColumn = (
-  columns: TableColumn[],
-  params: UpdateDisplayTypeParams,
-): TableColumn[] => {
-  const { indexToUpdate, updates } = params;
-
-  if (indexToUpdate === -1) {
-    return columns;
-  }
-
-  const itemToUpdate = columns[indexToUpdate];
-
-  const updatedItem: TableColumn = {
-    ...itemToUpdate,
-    displayType: {
-      ...itemToUpdate.displayType, // Use fallback if displayType is undefined
-      ...updates, // Apply the updates
-      type:
-        updates.type ?? itemToUpdate.displayType?.type ?? FormFieldType.Text, // Provide a default type
-      label: updates.label ?? itemToUpdate.displayType?.label ?? '', // Provide a default label
-    },
-  };
-
-  return [
-    ...columns.slice(0, indexToUpdate),
-    updatedItem,
-    ...columns.slice(indexToUpdate + 1),
-  ];
 };

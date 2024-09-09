@@ -45,6 +45,7 @@ const TableHeader: FC<TableHeaderProps> = ({
             onClick={(event) => {
               selectAllRowsHandler(event, !currentPageAllRowsSelected);
             }}
+            defaultChecked={false}
           />
         </th>
       )}

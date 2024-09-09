@@ -6,16 +6,16 @@ export class SiteSummaryDTO extends ChangeAuditEntityDTO {
   @Field()
   id: string;
 
-  @Field()
+  @Field({ nullable: true })
   bcerCode: string;
 
-  @Field()
+  @Field({ nullable: true })
   sstCode: string;
 
-  @Field()
+  @Field({ nullable: true })
   commonName: string;
 
-  @Field()
+  @Field({ nullable: true })
   addrType: string;
 
   @Field()
@@ -33,7 +33,7 @@ export class SiteSummaryDTO extends ChangeAuditEntityDTO {
   @Field()
   city: string;
 
-  @Field()
+  @Field({ nullable: true })
   provState: string;
 
   @Field({ nullable: true })
@@ -57,22 +57,22 @@ export class SiteSummaryDTO extends ChangeAuditEntityDTO {
   @Field({ nullable: true })
   generalDescription: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   whoCreated: string;
 
   @Field({ nullable: true })
   whoUpdated: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   whenCreated: Date;
 
   @Field({ nullable: true })
   whenUpdated: Date | null;
 
-  @Field()
+  @Field({ nullable: true })
   rwmFlag: number;
 
-  @Field()
+  @Field({ nullable: true })
   rwmGeneralDescFlag: number;
 
   @Field({ nullable: true })
@@ -96,12 +96,12 @@ export class SiteSummaryDTO extends ChangeAuditEntityDTO {
   @Field({ nullable: true })
   latSeconds: string | null;
 
-  @Field()
+  @Field({ nullable: true })
   srStatus: string;
 
-  @Field()
+  @Field({ nullable: true })
   latlongReliabilityFlag: string;
 
-  @Field()
+  @Field({ nullable: true })
   siteRiskCode: string;
 }

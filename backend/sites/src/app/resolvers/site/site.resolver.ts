@@ -17,7 +17,7 @@ import { DropdownDto, DropdownResponse } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { UsePipes } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
-import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
+import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { CustomRoles } from '../../common/role';
 
 /**
@@ -179,13 +179,16 @@ export class SiteResolver {
     mode: RoleMatchingMode.ANY,
   })
   @Mutation(() => SaveSiteDetailsResponse, { name: 'updateSiteDetails' })
-  updateSiteDetails(
+  async updateSiteDetails(
     @Args('siteDetailsDTO', { type: () => SaveSiteDetailsDTO })
     siteDetailsDTO: SaveSiteDetailsDTO,
     @AuthenticatedUser()
     user: any,
   ) {
-    const saveResult = this.siteService.saveSiteDetails(siteDetailsDTO, user);
+    const saveResult = await this.siteService.saveSiteDetails(
+      siteDetailsDTO,
+      user,
+    );
 
     if (saveResult) {
       return this.genericResponseProviderForSave.createResponse(

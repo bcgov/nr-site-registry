@@ -78,15 +78,15 @@ import {
 } from '../../components/input-controls/IFormField';
 import BannerDetails from '../../components/banners/BannerDetails';
 import {
-  getSiteDetailsToBeSaved,
   resetSaveSiteDetails,
+  resetSaveSiteDetailsRequestStatus,
+  saveRequestStatus,
   saveSiteDetails,
   setupSiteIdForSaving,
 } from './SaveSiteDetailsSlice';
 import { fetchAssociatedSites } from './associates/AssociateSlice';
 
 const SiteDetails = () => {
-  const siteDetailsTobeSaved = useSelector(getSiteDetailsToBeSaved);
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
 
   const folioDetails = useSelector(folioItems);
@@ -151,6 +151,32 @@ const SiteDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
 
+  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
+
+  useEffect(() => {
+    if (
+      saveSiteDetailsRequestStatus === RequestStatus.success ||
+      saveSiteDetailsRequestStatus === RequestStatus.failed
+    ) {
+      if (saveSiteDetailsRequestStatus === RequestStatus.success) {
+        dispatch(resetSaveSiteDetails(null));
+        dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+        setEdit(false);
+      } else {
+        // dont close edit mode
+      }
+
+      showNotification(
+        saveSiteDetailsRequestStatus,
+        'Successfully saved site details',
+        'Failed To save site details',
+      );
+      dispatch(resetSaveSiteDetailsRequestStatus(null));
+    } else {
+      // do nothing
+    }
+  }, [saveSiteDetailsRequestStatus]);
+
   const navigate = useNavigate();
   const onClickBackButton = () => {
     navigate(-1);
@@ -207,21 +233,8 @@ const SiteDetails = () => {
       dispatch(resetSaveSiteDetails(null));
       dispatch(setupSiteIdForSaving(id));
       Promise.all([
-        dispatch(fetchPeopleOrgsCd()),
-        dispatch(fetchParticipantRoleCd()),
-        dispatch(fetchNotationClassCd()),
-        dispatch(fetchNotationTypeCd()),
-        dispatch(fetchNotationParticipantRoleCd()),
-        // Calling snapshot for the implementation of snapshot string on top
-        // This will change in future based on condition of User type.
         dispatch(fetchSnapshots(id ?? '')),
-        // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '' })),
-        dispatch(fetchNotationParticipants(id ?? '')),
-        dispatch(fetchSiteParticipants(id ?? '')),
-        dispatch(fetchDocuments(id ?? '')),
-        dispatch(fetchAssociatedSites(id ?? '')),
-        dispatch(fetchSiteDisclosure(id ?? '')),
       ])
         .then(() => {
           setIsLoading(false); // Set loading state to false after all API calls are resolved
@@ -431,9 +444,7 @@ const SiteDetails = () => {
             closeHandler={(response) => {
               setSave(false);
               if (response) {
-                dispatch(saveSiteDetails(siteDetailsTobeSaved)).unwrap();
-                dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
-                setEdit(false);
+                dispatch(saveSiteDetails(null)).unwrap();
               }
             }}
           >

@@ -33,7 +33,7 @@ export const fetchCartItems = createAsyncThunk(
           userId: userId,
         },
       });
-      return response.data.data.getCartItemsForUser.data;
+      return response.data;
     } catch (error) {
       throw error;
     }
@@ -105,17 +105,32 @@ const cartSlice = createSlice({
         state.fetchRequestStatus = RequestStatus.loading;
       })
       .addCase(fetchCartItems.fulfilled, (state, action) => {
-        state.fetchRequestStatus = RequestStatus.success;
-        state.cartItems = action.payload;
+        if (
+          action?.payload?.data?.getCartItemsForUser?.httpStatusCode === 200
+        ) {
+          state.fetchRequestStatus = RequestStatus.success;
+          state.cartItems = action.payload.data.getCartItemsForUser.data;
+        } else {
+          state.fetchRequestStatus = RequestStatus.failed;
+        }
       })
       .addCase(fetchCartItems.rejected, (state, action) => {
         state.fetchRequestStatus = RequestStatus.failed;
       })
       .addCase(addCartItem.fulfilled, (state, action) => {
-        state.addRequestStatus = RequestStatus.success;
+        console.log('action.payload', action.payload);
+        if (
+          action?.payload?.data?.addCartItem?.httpStatusCode === 201
+        )
+          state.addRequestStatus = RequestStatus.success;
+        else state.addRequestStatus = RequestStatus.failed;
       })
       .addCase(deleteCartItem.fulfilled, (state, action) => {
-        state.deleteRequestStatus = RequestStatus.success;
+        if (
+          action?.payload?.data?.deleteCartItem?.httpStatusCode === 200
+        )
+          state.deleteRequestStatus = RequestStatus.success;
+        else state.deleteRequestStatus = RequestStatus.failed;
       })
       .addCase(deleteCartItemWithSiteId.fulfilled, (state, action) => {
         state.deleteRequestStatus = RequestStatus.success;

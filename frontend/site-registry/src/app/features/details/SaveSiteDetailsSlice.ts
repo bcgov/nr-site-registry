@@ -18,15 +18,17 @@ const initialState: SaveSiteDetails = {
   profilesData: null,
   siteAssociationsData: null,
   siteId: '',
+  sitesSummary: null,
 };
 
 export const saveSiteDetails = createAsyncThunk(
   'saveSiteDetails',
-  async (siteDetailsDTO: any) => {
+  async (siteDetailsDTO: any, { getState }) => {
+    const saveDTO = getSiteDetailsToBeSaved(getState());
     const request = await getAxiosInstance().post(GRAPHQL, {
       query: print(updateSiteDetails()),
       variables: {
-        siteDetailsDTO: siteDetailsDTO,
+        siteDetailsDTO: saveDTO,
       },
     });
     return request.data;
@@ -58,6 +60,13 @@ const siteDetailsSlice = createSlice({
       };
 
       newState.saveRequestStatus = RequestStatus.idle;
+      return newState;
+    },
+    setupSiteSummaryForSaving: (state, action) => {
+      const newState = {
+        ...state,
+      };
+      newState.sitesSummary = action.payload;
       return newState;
     },
     setupSiteIdForSaving: (state, action) => {
@@ -113,7 +122,9 @@ const siteDetailsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(saveSiteDetails.fulfilled, (state, action) => {
-        state.saveRequestStatus = RequestStatus.success;
+        if (action?.payload?.data?.updateSiteDetails?.httpStatusCode === 200)
+          state.saveRequestStatus = RequestStatus.success;
+        else state.saveRequestStatus = RequestStatus.failed;
       })
       .addCase(saveSiteDetails.rejected, (state, action) => {
         state.saveRequestStatus = RequestStatus.failed;
@@ -131,8 +142,12 @@ export const getSiteDetailsToBeSaved = (state: any) => {
     landHistories: state.siteDetails.landHistories,
     profiles: state.siteDetails.profiles,
     siteId: state.siteDetails.siteId,
+    sitesSummary: state.siteDetails.sitesSummary,
   };
 };
+
+export const saveRequestStatus = (state: any) =>
+  state.siteDetails.saveRequestStatus;
 
 export const {
   resetSaveSiteDetailsRequestStatus,
@@ -144,6 +159,7 @@ export const {
   setupSiteAssociationDataForSaving,
   setupSiteParticipantDataForSaving,
   setupSubDivisionsDataForSaving,
+  setupSiteSummaryForSaving,
 } = siteDetailsSlice.actions;
 
 export default siteDetailsSlice.reducer;

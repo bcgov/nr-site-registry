@@ -29,10 +29,14 @@ function SideBar() {
 
   const user = useUser();
 
+  // useEffect(() => {
+  //   console.log('user updated');
+  //   SetNavList(getSideBarNavList(getLoggedInUserType()));
+  // }, [user]);
+
   useEffect(() => {
-    console.log('user updated');
     SetNavList(getSideBarNavList(getLoggedInUserType()));
-  }, [user]);
+  }, []);
 
   const cartItemsArr = useSelector(cartItems);
 

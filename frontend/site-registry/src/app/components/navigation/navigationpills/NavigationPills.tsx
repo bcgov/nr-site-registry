@@ -1,18 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './NavigationPills.css';
 import { INavigationPills } from './INavigationPills';
 import { Link } from 'react-router-dom';
 import Actions from '../../action/Actions';
+import { set } from 'date-fns';
 
 const NavigationPills: React.FC<INavigationPills> = ({
   items,
   components,
   dropdownItems,
   isDisable,
+  matchedIndex
 }) => {
-  const [activeIndex, setActiveIndex] = useState<number>(0);
+   const [activeIndex, setActiveIndex] = useState<number>(0);
 
+  useEffect(() => {
+    console.log("nupur NP - matchedIndex", matchedIndex);
+    if (matchedIndex !== undefined && matchedIndex >= 0 && matchedIndex < items.length) {
+      setActiveIndex(matchedIndex);
+    }
+  }, [matchedIndex, items.length]);
+
+  // const [activeIndex, setActiveIndex] = useState<number>(
+  //   matchedIndex !== undefined && matchedIndex >= 0 && matchedIndex < items.length ? matchedIndex : 0
+  // );
+  
   const handlePillClick = (index: number) => {
+    console.log("nupur NP - handlePillClick", index);
     setActiveIndex(index);
   };
 

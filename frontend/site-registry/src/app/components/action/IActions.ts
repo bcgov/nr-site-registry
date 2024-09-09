@@ -13,4 +13,5 @@ export interface IActions {
   customCssMenu?: string;
   customCssMenuItem?: string;
   onItemClick: (value: string, index?: any) => void;
+  showActions?: boolean;
 }

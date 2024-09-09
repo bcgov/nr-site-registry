@@ -35,6 +35,72 @@
   justify-content: center;
 }
 
+.btn-voice-command-enabled{
+  background: var(--surface-primary-default, #053662);
+  cursor: pointer;
+  color: var(--typography-color-primary-invert, #ffffff);
+}
+
+.search-header  .d-flex.align-items-center{
+  display: flex;
+  justify-content: space-between; /* Adjust this as needed */
+  align-items: center;
+  width: 100%; /* Ensure it spans the full width of its parent */
+}
+
+.mic-and-info-banner-container {
+  /*position: relative; /* Confirm this is set */
+  display: flex; /* This will help with alignment */
+  align-items: center; /* Align items vertically */
+  justify-content: space-between; /* Space between mic and banner */
+  /*width: 100%; /* Adjust as needed */
+}
+
+.infoBanner {
+  position: absolute;
+  top: -50px; /* Adjust this value to move the banner above the mic button */
+  left: 0;
+  z-index: 100; /* Ensure it's on top */
+  background-color: white; /* Background color for visibility */
+  padding: 8px; /* Padding for content */
+  border-radius: 4px; /* Optional: for rounded corners */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: for better visibility */
+}
+
+.micButton {
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  color: white; /* Set the text/icon color to white */
+}
+
+.micEnabled {
+  background: linear-gradient(to right, #007bff, #85d7ff); /* Gradient from blue to light blue */
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5); /* Blue box-shadow */
+}
+
+/* .micDisabled {
+  background-color: grey;
+  box-shadow: none;
+  transform: rotate(-45deg);
+} */
+
+.micDisabled::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 2px;
+  background-color: red;
+  transform: rotate(-45deg);
+}
+.micDisabled {
+  position: relative;
+  background-color: grey;
+} 
+
 .custom-text-search-control {
   border: none !important;
   /* display: flex; */

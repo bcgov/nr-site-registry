@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { act, useEffect, useRef, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import CustomLabel from '../../components/simple/CustomLabel';
@@ -8,6 +8,7 @@ import {
   AngleLeft,
   DropdownIcon,
   FolderPlusIcon,
+  MicrophoneIcon,
   ShoppingCartIcon,
   SpinnerIcon,
 } from '../../components/common/icon';
@@ -85,6 +86,7 @@ import {
   setupSiteIdForSaving,
 } from './SaveSiteDetailsSlice';
 import { fetchAssociatedSites } from './associates/AssociateSlice';
+import { is } from 'date-fns/locale';
 
 const SiteDetails = () => {
   
@@ -185,6 +187,7 @@ const SiteDetails = () => {
     }
 
   },[saveSiteDetailsRequestStatus])
+
 
   const navigate = useNavigate();
   const onClickBackButton = () => {
@@ -308,11 +311,15 @@ const SiteDetails = () => {
     }
   };
   const handleAddToCart = () => {
+    console.log('nupur - Add to cart clicked');
     dispatch(resetCartItemAddedStatus);
     const loggedInUser = getUser();
     if (loggedInUser === null) {
+      console.log('nupur - Not logged in');
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
+      console.log('nupur - Adding to cart for id: ', details.id);
+      console.log('nupur - id:', details.id);
       dispatch(resetCartItemAddedStatus(null));
       dispatch(
         addCartItem([
@@ -326,6 +333,261 @@ const SiteDetails = () => {
       ).unwrap();
     }
   };
+
+  const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+  const [isListening, setIsListening] = useState(false);
+  const isListeningRef =  useRef(isListening);
+
+  useEffect(() => { 
+    isListeningRef.current = isListening;
+  }, [isListening]);
+
+  const [showActions, setShowActions] = useState(false);
+  type SpeechRecognitionType = typeof SpeechRecognition | null;
+  const [recognition, setRecognition] = useState<SpeechRecognitionType>(null);
+  const [activeComponent, setActiveComponent] = useState<JSX.Element | null>(null);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [matchedIndex, setMatchedIndex] = useState(-1);
+  // Toggle showActions state
+  // const toggleActionsVisibility = () => {
+  //   console.log('nupur - Toggling actions visibility...');
+  //   setShowActions(!showActions);
+  // };
+  
+  useEffect(() => {
+    const recognitionInstance = new SpeechRecognition();
+    recognitionInstance.continuous = true;
+    recognitionInstance.interimResults = true;
+    recognitionInstance.lang = 'en-US';
+    
+    recognitionInstance.onresult = (event: any) => {
+      if(isListeningRef.current) {
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            const command = event.results[i][0].transcript.trim().toLowerCase();
+            console.log('nupur - command is : ', command);
+            console.log('nupur - Entire navItems array:', navItems);
+            const matchedIndex = navItems.findIndex(item => command.toLowerCase().includes(item.toLowerCase()));
+            setMatchedIndex(matchedIndex);
+            console.log('nupur - matchedIndex:', matchedIndex);
+            console.log('nupur - navItems:', navItems[matchedIndex]);
+            console.log('nupur - navComponents:', navComponents[matchedIndex]);
+            if (matchedIndex !== -1) {
+              console.log('nupur - Match found in navItems:', navItems[matchedIndex]);
+            } else {
+              console.log('nupur - No match found in navItems for command');
+            }
+            //console.log('nupur - navComponents:', navComponents[matchedIndex]);
+            
+            if(command.includes("enable mic") || command.includes("enable mike")) {
+              console.log('Enabling mic...');
+              //toggleSpeechRecognition();
+              handleStartListening();
+            }
+            console.log('nupur - isListening is : ', isListening);
+            if (command.includes("add to cart")) {
+              handleAddToCart();
+            } else if (command.includes("notations") || command.includes("summary") || command.includes("associated sites") ||
+              command.includes("documents") || command.includes("suspect land uses") || command.includes("parcel description") ||
+                command.includes("site disclosure")) {
+              
+              setActiveComponent(navComponents[matchedIndex]);
+              setActiveTab(navItems[matchedIndex]);
+            }
+            // Add more conditions as needed
+            else if (command.includes("edit mode")) {
+              setEdit(true);
+              setViewMode(SiteDetailsMode.EditMode);
+            } else if (command.includes("sr mode")) {
+              setEdit(true);
+              setViewMode(SiteDetailsMode.SRMode);
+            } else if (command.includes("view mode")) {
+              setEdit(false);
+              setViewMode(SiteDetailsMode.ViewOnlyMode);
+            } else if (command.includes("cancel")) {
+              setSave(false);
+              setEdit(false);
+              setViewMode(SiteDetailsMode.ViewOnlyMode);
+              setShowActions(false);
+            } else if (command.includes("go back") || command.includes("stop")) {
+              setIsListening(false);
+              recognitionInstance.stop();
+              onClickBackButton();
+            }  else if (command.includes("show action")) {
+              setShowActions(true);
+            } else if (command.includes("hide action")) {
+              setShowActions(false);
+             }
+            
+            else {
+              console.log("Speech Command not recognized:", command);
+              // Handle unrecognized command or do nothing
+            
+            }
+          }
+        }
+      }
+    };
+    setRecognition(recognitionInstance);
+    handleStartListening();
+    recognitionInstance.start();
+    return () => {
+      console.log('nupur - Cleaning up speech recognition in SiteDetails...');
+      handleStopListening();
+      recognitionInstance.stop();
+    };
+  }, []);
+
+  
+  const initializeSpeechRecognition = () => {
+    console.log('nupur - Initializing speech recognition...');
+    if (recognition) {
+      //recognition.start();
+      //setIsListening(true);
+      recognition.onend = () => {
+        if (isListening) {
+          console.log('nupur - Restarting speech recognition...');
+          recognition.start(); // Restart recognition if still listening
+        }
+      };
+      recognition.onerror = (event: any) => {
+        console.error('nupur - Speech recognition error:', event.error);
+      //setError('Voice recognition failed. Please try again.');
+        //handleSessionTimeout();
+      };
+    }
+  };
+
+  const handleSessionTimeout = () => {
+    // Optionally restart recognition or notify the user
+    setIsListening(false); // Stop listening if it was active
+    setTimeout(() => {
+        setIsListening(true); // Restart listening after a short delay
+    }, 1000); // Adjust delay as needed
+  };
+  
+  const handleStartListening = () => {
+    console.log('nupur - Starting speech recognition...');
+    //setIsListening(true);
+    initializeSpeechRecognition();
+  };
+  
+  const handleStopListening = () => {
+    console.log('nupur - Stopping speech recognition...');
+    if (recognition) {
+      recognition.stop();
+      setIsListening(false);
+    }
+  };
+
+  const handleMicButtonClick = async () => {
+    try {
+      const result = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      switch (result.state) {
+        case 'granted':
+          // Permission has already been granted
+          //alert('Microphone is ready to use.');
+          toggleSpeechRecognition();
+          // Here, you can also start using the microphone directly
+          break;
+        case 'denied':
+          // Permission has been denied
+          alert('Microphone permission has been denied. Please enable it in your browser settings.');
+          break;
+        case 'prompt':
+          const userAgreed = window.confirm("This app wants to use your microphone. Do you want to allow it?");
+          if (userAgreed) {
+            // Step 3: Request permission
+            try {
+              await navigator.mediaDevices.getUserMedia({ audio: true });
+              // Permission granted, microphone enabled
+              console.log("Microphone permission granted.");
+              // Proceed with enabling the microphone feature in your app
+            } catch (error) {
+              // Permission denied or an error occurred
+              console.error("Microphone permission denied or not available.", error);
+            }
+          }
+          // This case might not occur if permission is already granted but is here for completeness
+          //alert('Please allow microphone access.');
+          // Here, you would normally request permission
+          break;
+        default:
+          console.error('Unexpected permission state');
+      }
+      result.onchange = () => {
+        console.log('nupur - Microphone permission state has changed', result.state);
+      };
+    }catch (error) {  
+      console.error('nupur - Error checking microphone permission', error);
+    }
+  };
+
+
+  const toggleSpeechRecognition = () => {
+    console.log('nupur - Toggling speech recognition...before toggle isListening: ', isListening);
+    isListeningRef.current = !isListeningRef.current;
+    setIsListening(isListeningRef.current);
+    console.log('nupur - isListening after toggling is set to:', isListeningRef.current);
+    if (isListeningRef.current) { 
+      handleStartListening(); // Ensure this starts the recognition
+    } else {
+      handleStopListening(); // Ensure this stops the recognition
+    }
+  };
+
+  // const InfoBanner = () => (
+  //   <div className='infoBanner'>
+  //     Say "Enable mic" to start speaking.
+  //   </div>
+  // );
+
+  async function checkMicrophonePermission() {
+    try {
+      const result = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      if (result.state === 'granted') {
+        console.log('nupur - Microphone permission granted');
+        // Permission has been granted, you can start audio capture
+      } else if (result.state === 'prompt') {
+        console.log('nupur - Microphone permission is prompt');
+        // Permission needs to be requested (e.g., the user has not yet granted or denied permission)
+        const userAgreed = window.confirm("This app wants to use your microphone. Do you want to allow it?");
+
+          if (userAgreed) {
+            // Step 3: Request permission
+            try {
+              await navigator.mediaDevices.getUserMedia({ audio: true });
+              // Permission granted, microphone enabled
+              console.log("Microphone permission granted.");
+              // Proceed with enabling the microphone feature in your app
+            } catch (error) {
+              // Permission denied or an error occurred
+              console.error("Microphone permission denied or not available.", error);
+            }
+          }
+        } else if (result.state === 'denied') {
+          console.log('nupur - Microphone permission denied');
+          // Permission has been denied, you cannot start audio capture
+        }
+  
+      // Optional: Listen for changes in permission state
+      result.onchange = () => {
+        if(result.state === 'granted') {
+          
+            alert('Microphone permission has been granted. You can now use the microphone.');
+          
+           console.log('nupur - Microphone permission state has changed', result.state);
+        }
+      } 
+    }
+    catch (error) {
+      console.error('nupur - Error checking microphone permission', error);
+      // This can happen if the browser doesn't support the Permissions API or the 'microphone' permission name
+    }
+  }
+  
+  // Call the function to check microphone permissions
+  //checkMicrophonePermission();
 
   if (isLoading || snapshot.status === RequestStatus.loading) {
     return (
@@ -344,6 +606,22 @@ const SiteDetails = () => {
       {isVisible && (
         <div className="d-flex justify-content-between custom-sticky-header w-100">
           <div className="d-flex gap-2 flex-wrap align-items-center">
+            {/* Voice command activation button */}
+          <button
+            className={`micButton ${isListening ? "micEnabled" : "micDisabled"}`}
+            onClick= {handleMicButtonClick}
+            aria-label="Activate voice command"
+          >
+            
+            <MicrophoneIcon /> {/* Replace with your microphone icon */}
+            {isListeningRef.current && <span className="speaking-dots">•••</span>}
+          </button>
+          <button
+            className="d-flex btn-back align-items-center me-3"
+            onClick={onClickBackButton}
+          >
+            <AngleLeft className="btn-icon" />
+          </button>
             <button
               className="d-flex btn-back align-items-center me-3"
               onClick={onClickBackButton}
@@ -362,6 +640,7 @@ const SiteDetails = () => {
               </div>
             </div>
           </div>
+         
           <div className="d-flex gap-2 justify-align-center pe-2 position-relative">
             {/* For Action Dropdown*/}
             {!edit &&
@@ -371,6 +650,7 @@ const SiteDetails = () => {
                   label="Action"
                   items={ActionItems}
                   onItemClick={handleItemClick}
+                  showActions={showActions}
                 />
               )}
 
@@ -492,13 +772,25 @@ const SiteDetails = () => {
 
         {!isVisible && (
           <div className="d-flex justify-content-between">
+             <button
+            className={`micButton ${isListening ? "micEnabled" : "micDisabled"}`}
+            onClick={handleMicButtonClick}
+            
+            aria-label="Activate voice command"
+          >
+            
+            <MicrophoneIcon /> {/* Replace with your microphone icon */}
+            {isListening && <span className="speaking-dots">•••</span>}
+          </button>
             <button
               className="d-flex btn-back align-items-center"
               onClick={onClickBackButton}
             >
+        
               <AngleLeft className="btn-icon" />
               <span className="btn-back-lbl">Back to</span>
             </button>
+            
             <div className="d-flex gap-2 justify-align-center pe-2 pos-relative">
               {/* For Action Dropdown*/}
               {!edit &&
@@ -508,6 +800,7 @@ const SiteDetails = () => {
                     label="Action"
                     items={ActionItems}
                     onItemClick={handleItemClick}
+                    showActions={showActions}
                   />
                 )}
 
@@ -593,7 +886,7 @@ const SiteDetails = () => {
               />
             </div>
           )}
-
+          
           {!isVisible && (
             <>
               <div>
@@ -616,7 +909,9 @@ const SiteDetails = () => {
           isDisable={
             UserType.External === userType && snapshot.snapshot.data === null
           }
+          matchedIndex={matchedIndex}
         />
+  
       </PageContainer>
     </>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Search.css';
 import '@bcgov/design-tokens/css/variables.css';
 import { useSelector, useDispatch } from 'react-redux';
@@ -27,6 +27,7 @@ import {
   CircleXMarkIcon,
   MagnifyingGlassIcon,
   BarsIcon,
+  MicrophoneIcon,
 } from '../../components/common/icon';
 import Intro from './Intro';
 import Column from './columns/Column';
@@ -38,6 +39,7 @@ import { getUser } from '../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import AddToFolio from '../folios/AddToFolio';
+import { ca } from 'date-fns/locale';
 
 const Search = () => {
   const auth = useAuth();
@@ -129,19 +131,37 @@ const Search = () => {
   // }, [dispatch,  searchText]);
 
   const handleClearSearch = () => {
+    console.log('nupur - Entered handleClearSearch');
     setSearchText('');
+    setSearchTerm('');
+    console.log('nupur - searchTerm has been cleared', searchTerm);
     setUserAction(true);
     dispatch(resetSites(null));
     dispatch(updateSearchQuery(''));
   };
 
   const handleTextChange = (event: any) => {
+    console.log("nupur - Entered handleTextChange");
     setUserAction(false);
     setSearchText(event.target.value);
     if (event.target.value.length >= 3) {
       dispatch(setFetchLoadingState(null));
       dispatch(fetchSites({ searchParam: event.target.value }));
       dispatch(updateSearchQuery(event.target.value));
+    } else {
+      dispatch(resetSites(null));
+    }
+  };
+
+  const handleTextChangeViaVoice = (value: any) => {
+    console.log("nupur - Entered handleTextChangeViaVoice");
+    setUserAction(false);
+    setSearchTerm(value);
+    console.log('nupur - value', value);
+    if (value.length >= 3) {
+      dispatch(setFetchLoadingState(null));
+      dispatch(fetchSites({ searchParam: value }));
+      dispatch(updateSearchQuery(value));
     } else {
       dispatch(resetSites(null));
     }
@@ -226,10 +246,209 @@ const Search = () => {
 
   const [showAddToFolio, SetShowAddToFolio] = useState(false);
 
+  const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+  const [isListening, setIsListening] = useState(false);
+  const isListeningRef =  useRef(isListening);
+
+  useEffect(() => { 
+    isListeningRef.current = isListening;
+  }, [isListening]);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  type SpeechRecognitionType = typeof SpeechRecognition | null;
+  const [recognition, setRecognition] = useState<SpeechRecognitionType>(null);
+
+  useEffect(() => {
+    const recognitionInstance = new SpeechRecognition();
+    recognitionInstance.continuous = true;
+    recognitionInstance.interimResults = true;
+    recognitionInstance.lang = 'en-US';
+    
+  
+    recognitionInstance.onresult = (event: any) => {
+      console.log('nupur - isListening inside onresult:', isListening);
+      if(isListeningRef.current) {
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            const command = event.results[i][0].transcript.trim().toLowerCase();
+            console.log('nupur - command is : ', command);
+            if(command.includes("enable mic") || command.includes("enable mike")) {
+              console.log('Enabling mic...');
+              //toggleSpeechRecognition();
+
+              handleStartListening();
+            }
+            console.log("nupur - isListening", isListening);
+            if (command.startsWith('search')) {
+              // Extract the text after the "search" keyword
+              const searchCommand = command.substring('search'.length).trim();
+              console.log('nupur - Extracted search commmand is :', searchCommand);
+              handleTextChangeViaVoice(searchCommand);
+              // Update the search term state
+              //setSearchTerm(searchCommand); // Make sure you have a state or method to update the search term in your component
+            }
+          }
+        }
+      }
+    }
+
+    setRecognition(recognitionInstance);
+    recognitionInstance.start();
+  
+    return () => {
+      console.log('nupur - Cleaning up speech recognition in Search...');
+      recognitionInstance.stop();
+    };
+  }, []);
+
+  const initializeSpeechRecognition = () => {
+    console.log('nupur - Initializing speech recognition...');
+    if (recognition) {
+      
+      //recognition.start();
+      //setIsListening(true);
+      recognition.onend = () => {
+        if (isListeningRef.current) {
+          console.log('nupur - Restarting speech recognition...');
+          recognition.start(); // Restart recognition if still listening
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+          console.error('nupur - Speech recognition error:', event.error);
+      //setError('Voice recognition failed. Please try again.');
+          //handleSessionTimeout();
+      };
+    
+      recognition.onend = () => {
+          console.warn('nupur - peech recognition service has stopped.');
+          //handleSessionTimeout();
+      };
+    }
+  };
+
+  const handleMicButtonClick = async () => {
+    // try {
+    //   // Request microphone access
+    //   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    //   toggleSpeechRecognition();
+    //   // Permission granted, use the stream for your feature
+    //   console.log("Microphone access granted", stream);
+    // } catch (error) {
+    //   // Permission denied or another error
+    //   console.error("Error accessing microphone", error);
+    //   alert("Microphone access was denied or an error occurred. Please check your settings.");
+    // }
+    try{
+      const result = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      switch (result.state) {
+        case 'granted':
+          // Permission has already been granted
+          //alert('Microphone is ready to use.');
+          toggleSpeechRecognition();
+          // Here, you can also start using the microphone directly
+          break;
+        case 'denied':
+          // Permission has been denied
+          alert('Microphone permission has been denied. Please enable it in your browser settings.');
+          break;
+        case 'prompt':
+          const userAgreed = window.confirm("This app wants to use your microphone. Do you want to allow it?");
+          if (userAgreed) {
+            // Step 3: Request permission
+            try {
+              await navigator.mediaDevices.getUserMedia({ audio: true });
+              // Permission granted, microphone enabled
+              console.log("Microphone permission granted.");
+              // Proceed with enabling the microphone feature in your app
+            } catch (error) {
+              // Permission denied or an error occurred
+              console.error("Microphone permission denied or not available.", error);
+            }
+          }
+          // This case might not occur if permission is already granted but is here for completeness
+          //alert('Please allow microphone access.');
+          // Here, you would normally request permission
+          break;
+        default:
+          console.error('Unexpected permission state');
+        }
+        result.onchange = () => {
+          if(result.state === 'granted') {
+            alert('Microphone permission has been granted. You can now use the microphone.');
+          }
+          console.log('nupur - Microphone permission state has changed to ', result.state);
+        };
+      }
+      catch (error) { 
+        console.error('Error querying microphone permission:', error);
+      }
+  };
+
+
+  
+  const toggleSpeechRecognition = () => {
+    console.log('nupur - Toggling speech recognition...before toggle isListening: ', isListening);
+    isListeningRef.current = !isListeningRef.current;
+    setIsListening(isListeningRef.current);
+    console.log('nupur - isListening after toggling is set to:', isListeningRef.current);
+    if (isListeningRef.current) { 
+      handleStartListening(); // Ensure this starts the recognition
+    } else {
+      handleStopListening(); // Ensure this stops the recognition
+    }
+  };
+
+
+  const handleStartListening = () => {
+    console.log('nupur - Starting speech recognition...');
+    //setIsListening(true);
+    initializeSpeechRecognition();
+  };
+
+  const handleSessionTimeout = () => {
+    // Optionally restart recognition or notify the user
+    setIsListening(false); // Stop listening if it was active
+    setTimeout(() => {
+      setIsListening(true); // Restart listening after a short delay
+    }, 1000); // Adjust delay as needed
+  };
+  
+  const handleStopListening = () => {
+    console.log('nupur - Stopping speech recognition...');
+    if (recognition) {
+      setIsListening(false);
+      recognition.stop();
+    }
+  };
+
+  
+
+  // const InfoBanner = () => (
+  //   <div className="infoBanner">
+  //     Say "Enable mic" to start speaking.
+  //   </div>
+  // );
+
   return (
     <PageContainer role="Search">
       <div className="row search-container">
-        <h1 className="search-text-label">Search Site Registry</h1>
+     
+      <div className="search-header d-flex justify-content-between align-items-center">
+          <h1 className="search-text-label d-flex row">Search Site Registry</h1>
+          <div className="mic-and-info-banner-container">
+           
+            <button
+              className={`micButton ${isListening ? "micEnabled" : "micDisabled"}`} 
+              onClick={handleMicButtonClick}
+              aria-label="Activate voice command"
+            >
+              <MicrophoneIcon />
+              {isListening && <span className="speaking-dots">•••</span>}
+            </button>
+          </div>
+        </div>
+          
         <div className="">
           <div className="d-flex align-items-center">
             <div className="custom-text-search">
@@ -239,19 +458,34 @@ const Search = () => {
                 </div>
               )}
 
-              <div className={`custom-text-search-middle`}>
-                <input
-                  tabIndex={13}
-                  aria-label="Search input"
-                  placeholder="Search"
-                  onChange={handleTextChange}
-                  value={searchText}
-                  type="text"
-                  className={`textSearch custom-text-search-control  ${
-                    !noUserAction ? `addBorder` : ``
-                  }`}
-                />
-              </div>
+              {!isListening && <div className={`custom-text-search-middle`}>
+                 <input
+                    tabIndex={13}
+                    aria-label="Search input"
+                    placeholder="Search"
+                    onChange={handleTextChange}
+                    value={searchText}
+                    type="text"
+                    className={`textSearch custom-text-search-control  ${
+                      !noUserAction ? `addBorder` : ``
+                    }`}
+                  />
+                </div>}
+                
+                {isListening && <div className={`custom-text-search-middle`}>
+                  <input
+                    tabIndex={13}
+                    aria-label="Search input"
+                    placeholder="Search"
+                    onChange={handleTextChangeViaVoice}
+                    value={searchTerm}
+                    type="text"
+                    className={`textSearch custom-text-search-control  ${
+                      !noUserAction ? `addBorder` : ``
+                    }`}
+                  />
+                </div>
+                }
               {noUserAction ? null : (
                 <div className="custom-text-search-end">
                   <CircleXMarkIcon

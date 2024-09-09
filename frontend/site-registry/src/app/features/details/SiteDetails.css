@@ -81,6 +81,18 @@
   background: var(--surface-primary-default, #053662);
 }
 
+.btn-voice-command-enabled{
+  background: var(--surface-primary-default, #053662);
+  cursor: pointer;
+  color: var(--typography-color-primary-invert, #ffffff);
+}
+
+.btn-voice-command-disabled{
+  background: var(--surface-primary-default, #053662);
+  cursor: pointer;
+  color: var(--surface-tertiary-disabled);
+}
+
 .btn-folio {
   padding: var(--layout-padding-small) var(--layout-padding-medium)
     var(--layout-padding-small) var(--layout-padding-medium);
@@ -228,4 +240,71 @@
   box-shadow: 0px 1.2px 3.6px 0px #0000001a;
   padding: var(--layout-padding-medium) var(--layout-padding-small)
     var(--layout-padding-medium) var(--layout-padding-small);
+}
+
+@keyframes speaking {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.speaking-dots {
+  display: inline-block;
+  margin-left: 5px;
+  animation: speaking 1s infinite;
+}
+
+.micButton {
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  color: white; /* Set the text/icon color to white */
+}
+
+.micEnabled {
+  background: linear-gradient(to right, #007bff, #85d7ff); /* Gradient from blue to light blue */
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5); /* Blue box-shadow */
+}
+
+/* .micDisabled {
+  background-color: grey;
+  box-shadow: none;
+} */
+
+.micDisabled::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 2px;
+  background-color: red;
+  transform: rotate(-45deg);
+}
+.micDisabled {
+  background-color: grey;
+  position: relative;
+}
+
+.infoBanner {
+  position: absolute; /* Positioned absolutely within its relative parent */
+  top: 10%; /* Adjust this value to align with the center of the button */
+  transform: translateY(-50%); /* Centers the banner vertically relative to the button */
+  
+  margin-left: 60px; /* Adds some space between the banner and the button */
+  background-color: #007bff;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  max-width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000; /* Ensure it's above other elements */
 }

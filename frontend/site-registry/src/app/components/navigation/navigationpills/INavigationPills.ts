@@ -5,4 +5,5 @@ export interface INavigationPills {
   dropdownItems?: any;
   isDisable?: boolean;
   components?: JSX.Element[];
+  matchedIndex?: number;
 }

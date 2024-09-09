@@ -1,6 +1,8 @@
 import { IActions } from './IActions';
 import Dropdown from 'react-bootstrap/Dropdown';
 import './Actions.css';
+import { useEffect, useState } from 'react';
+import { set } from 'date-fns';
 
 const Actions: React.FC<IActions> = ({
   label,
@@ -10,9 +12,15 @@ const Actions: React.FC<IActions> = ({
   customCssMenuItem,
   customCssToggleBtn,
   onItemClick,
+  showActions = false
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    setIsOpen(showActions);
+  }, [showActions]);
   return (
-    <Dropdown>
+    <Dropdown show={isOpen} onToggle={()=> setIsOpen(!isOpen)}>
       <Dropdown.Toggle
         variant=""
         id="dropdown-action"
@@ -25,7 +33,9 @@ const Actions: React.FC<IActions> = ({
         {items.map((item, index) => (
           <Dropdown.Item
             key={index}
-            onClick={() => onItemClick(item.value, index)}
+            onClick={() => {onItemClick(item.value, index); 
+              setIsOpen(false);}} // Optionally close the dropdown on item click
+            
             className={`disable ${customCssMenuItem ?? 'custom-action-item'}`}
           >
             {item.label}

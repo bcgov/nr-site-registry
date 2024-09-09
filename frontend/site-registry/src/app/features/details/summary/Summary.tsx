@@ -461,7 +461,9 @@ const Summary = () => {
               )}
             </div>
           </div>
+          
         }
+        showDetailsPassedWithSpeech={false}
       />
 
       <PanelWithUpDown
@@ -505,6 +507,7 @@ const Summary = () => {
             </div>
           )
         }
+        showDetailsPassedWithSpeech={false}
       />
 
       <div className="">

@@ -358,7 +358,7 @@ export class SiteService {
               }
 
               const historyLog: HistoryLog = {
-                userId: userInfo ? userInfo.sub : '' ,
+                userId: userInfo ? userInfo.sub : '',
                 content: inputDTO,
                 id: null,
                 whoCreated: userInfo ? userInfo.givenName : '',
@@ -368,7 +368,7 @@ export class SiteService {
                 siteId: inputDTO.siteId,
               };
 
-              await transactionalEntityManager.save(HistoryLog,historyLog);
+              await transactionalEntityManager.save(HistoryLog, historyLog);
 
               return true;
             } catch (error) {

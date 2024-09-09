@@ -38,6 +38,7 @@ import { getUser } from '../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import AddToFolio from '../folios/AddToFolio';
+import { downloadCSV } from '../../helpers/csvExport/csvExport';
 
 const Search = () => {
   const auth = useAuth();
@@ -226,6 +227,12 @@ const Search = () => {
 
   const [showAddToFolio, SetShowAddToFolio] = useState(false);
 
+  const handleExport = () => {
+    if (selectedRows.length > 0) {
+      downloadCSV(selectedRows);
+    }
+  };
+
   return (
     <PageContainer role="Search">
       <div className="row search-container">
@@ -407,7 +414,7 @@ const Search = () => {
                 />
               )}
 
-              <div className="search-result-actions-btn">
+              <div className="search-result-actions-btn" onClick={handleExport}>
                 <FileExportIcon />
                 <span>Export Results As File</span>
               </div>

@@ -362,6 +362,7 @@ describe('SiteService', () => {
       const userInfo = { sub: 'userId', givenName: 'UserName' };
 
       const inputDTO: SaveSiteDetailsDTO = {
+        siteId: '1',
         events: [
           {
             id: '1',

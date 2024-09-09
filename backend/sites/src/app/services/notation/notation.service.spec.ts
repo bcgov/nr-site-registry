@@ -58,6 +58,8 @@ describe('ParticipantService', () => {
         conditionsTexts: null,
         eventTypeCd: null,
         site: null,
+        userAction: 'pending',
+        srAction: 'pending',
         eventPartics: [
           {
             spId: '1', // Replace with a unique identifier
@@ -98,6 +100,8 @@ describe('ParticipantService', () => {
               bcerCode2: null,
             },
             whenCreated: new Date(),
+            userAction: 'pending',
+            srAction: 'pending',
           },
         ],
       },
@@ -172,8 +176,12 @@ describe('ParticipantService', () => {
         conditionsTexts: null,
         eventTypeCd: null,
         site: null,
+        userAction: 'pending',
+        srAction: 'pending',
         eventPartics: [
           {
+            userAction: 'pending',
+            srAction: 'pending',
             spId: '1', // Replace with a unique identifier
             eventId: '1', // Link to corresponding event ID
             eprCode: 'EPR001',
@@ -246,6 +254,8 @@ describe('ParticipantService', () => {
         eventTypeCd: null,
         site: null,
         eventPartics: [],
+        userAction: 'pending',
+        srAction: 'pending',
       },
     ];
     jest
@@ -300,8 +310,12 @@ describe('ParticipantService', () => {
         conditionsTexts: null,
         eventTypeCd: null,
         site: null,
+        userAction: 'pending',
+        srAction: 'pending',
         eventPartics: [
           {
+            userAction: 'pending',
+            srAction: 'pending',
             spId: '1', // Replace with a unique identifier
             eventId: '1', // Link to corresponding event ID
             eprCode: 'EPR001',
@@ -313,6 +327,7 @@ describe('ParticipantService', () => {
             whenUpdated: new Date(),
             whoCreated: '',
             whoUpdated: '',
+
             psnorg: {
               id: 'PSNORG001',
               organizationName: 'Organization A',

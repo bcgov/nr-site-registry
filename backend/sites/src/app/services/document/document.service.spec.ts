@@ -76,6 +76,8 @@ describe('DocumentService', () => {
           whenUpdated: null,
           rwmFlag: 1,
           rwmNoteFlag: null,
+          userAction: 'pending',
+          srAction: 'pending',
           siteDocPartics: [
             {
               id: '1',
@@ -184,6 +186,8 @@ describe('DocumentService', () => {
         whenUpdated: null,
         rwmFlag: 1,
         rwmNoteFlag: null,
+        userAction: 'pending',
+        srAction: 'pending',
         siteDocPartics: [
           {
             id: '1',

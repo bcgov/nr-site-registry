@@ -77,7 +77,7 @@ import {
   IFormField,
 } from '../../components/input-controls/IFormField';
 import BannerDetails from '../../components/banners/BannerDetails';
-import { 
+import {
   resetSaveSiteDetails,
   resetSaveSiteDetailsRequestStatus,
   saveRequestStatus,
@@ -87,13 +87,11 @@ import {
 import { fetchAssociatedSites } from './associates/AssociateSlice';
 
 const SiteDetails = () => {
-  
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
 
   const folioDetails = useSelector(folioItems);
 
   const addSiteToFolioRequestStatus = useSelector(addSiteToFolioRequest);
-
 
   const handleFolioSelect = (folioId: string) => {
     let selectedFolio = folioDetails.filter(
@@ -155,36 +153,29 @@ const SiteDetails = () => {
 
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
 
-  useEffect(()=>{
-
-    if(saveSiteDetailsRequestStatus === RequestStatus.success || saveSiteDetailsRequestStatus === RequestStatus.failed)
-    {
-      if(saveSiteDetailsRequestStatus === RequestStatus.success)
-      {
+  useEffect(() => {
+    if (
+      saveSiteDetailsRequestStatus === RequestStatus.success ||
+      saveSiteDetailsRequestStatus === RequestStatus.failed
+    ) {
+      if (saveSiteDetailsRequestStatus === RequestStatus.success) {
         dispatch(resetSaveSiteDetails(null));
         dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
         setEdit(false);
-      }
-      else
-      {
+      } else {
         // dont close edit mode
       }
 
       showNotification(
         saveSiteDetailsRequestStatus,
         'Successfully saved site details',
-        'Failed To save site details'
+        'Failed To save site details',
       );
       dispatch(resetSaveSiteDetailsRequestStatus(null));
-
-      
-    }  
-    else
-    {
-       // do nothing
+    } else {
+      // do nothing
     }
-
-  },[saveSiteDetailsRequestStatus])
+  }, [saveSiteDetailsRequestStatus]);
 
   const navigate = useNavigate();
   const onClickBackButton = () => {
@@ -453,11 +444,7 @@ const SiteDetails = () => {
             closeHandler={(response) => {
               setSave(false);
               if (response) {
-                
-               
-               
                 dispatch(saveSiteDetails(null)).unwrap();
-              
               }
             }}
           >

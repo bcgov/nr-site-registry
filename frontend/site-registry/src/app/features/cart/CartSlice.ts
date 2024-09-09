@@ -106,10 +106,7 @@ const cartSlice = createSlice({
       })
       .addCase(fetchCartItems.fulfilled, (state, action) => {
         if (
-          action.payload &&
-          action.payload.data &&
-          action.payload.data.getCartItemsForUser &&
-          action.payload.data.getCartItemsForUser.httpStatusCode === 200
+          action?.payload?.data?.getCartItemsForUser?.httpStatusCode === 200
         ) {
           state.fetchRequestStatus = RequestStatus.success;
           state.cartItems = action.payload.data.getCartItemsForUser.data;
@@ -121,22 +118,16 @@ const cartSlice = createSlice({
         state.fetchRequestStatus = RequestStatus.failed;
       })
       .addCase(addCartItem.fulfilled, (state, action) => {
-        console.log("action.payload",action.payload);
+        console.log('action.payload', action.payload);
         if (
-          action.payload &&
-          action.payload.data &&
-          action.payload.data.addCartItem &&
-          action.payload.data.addCartItem.httpStatusCode === 200
+          action?.payload?.data?.addCartItem?.httpStatusCode === 201
         )
           state.addRequestStatus = RequestStatus.success;
         else state.addRequestStatus = RequestStatus.failed;
       })
       .addCase(deleteCartItem.fulfilled, (state, action) => {
         if (
-          action.payload &&
-          action.payload.data &&
-          action.payload.data.deleteCartItem &&
-          action.payload.data.deleteCartItem.httpStatusCode === 200
+          action?.payload?.data?.deleteCartItem?.httpStatusCode === 200
         )
           state.deleteRequestStatus = RequestStatus.success;
         else state.deleteRequestStatus = RequestStatus.failed;

@@ -119,7 +119,6 @@ const Summary = () => {
   };
 
   const handleInputChange = (graphQLPropertyName: any, value: any) => {
-   
     const trackerLabel = getTrackerLabel(graphQLPropertyName);
     if (detailsMode === SiteDetailsMode.SRMode) {
       const tracker = new ChangeTracker(
@@ -134,13 +133,15 @@ const Summary = () => {
       );
       dispatch(trackChanges(tracker.toPlainObject()));
 
-      if(graphQLPropertyName === 'latMinutes'|| graphQLPropertyName === 'longMinutes'|| graphQLPropertyName === 'latDegrees' || graphQLPropertyName === 'longDegrees' )
-      {
-          value = parseFloat(value);
-      }
-      else
-      {
-          // do nothing
+      if (
+        graphQLPropertyName === 'latMinutes' ||
+        graphQLPropertyName === 'longMinutes' ||
+        graphQLPropertyName === 'latDegrees' ||
+        graphQLPropertyName === 'longDegrees'
+      ) {
+        value = parseFloat(value);
+      } else {
+        // do nothing
       }
 
       const newState = {
@@ -149,11 +150,13 @@ const Summary = () => {
       };
       console.log(newState);
 
-      dispatch(setupSiteSummaryForSaving({
-        ...newState,
-        "userAction" : UserActionEnum.updated,
-        "srAction" :  SRApprovalStatusEnum.Pending
-      }))
+      dispatch(
+        setupSiteSummaryForSaving({
+          ...newState,
+          userAction: UserActionEnum.updated,
+          srAction: SRApprovalStatusEnum.Pending,
+        }),
+      );
 
       setEditSiteDetailsObject(newState);
     }

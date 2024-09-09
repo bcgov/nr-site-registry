@@ -18,13 +18,13 @@ const initialState: SaveSiteDetails = {
   profilesData: null,
   siteAssociationsData: null,
   siteId: '',
-  sitesSummary: null
+  sitesSummary: null,
 };
 
 export const saveSiteDetails = createAsyncThunk(
   'saveSiteDetails',
-  async (siteDetailsDTO: any,{ getState }) => {
-    const saveDTO = getSiteDetailsToBeSaved(getState())
+  async (siteDetailsDTO: any, { getState }) => {
+    const saveDTO = getSiteDetailsToBeSaved(getState());
     const request = await getAxiosInstance().post(GRAPHQL, {
       query: print(updateSiteDetails()),
       variables: {
@@ -121,11 +121,10 @@ const siteDetailsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(saveSiteDetails.fulfilled, (state, action) => {       
-        if(action.payload.data && action.payload.data.updateSiteDetails && action.payload.data.updateSiteDetails.httpStatusCode === 200)
-        state.saveRequestStatus = RequestStatus.success;
-        else
-        state.saveRequestStatus = RequestStatus.failed;
+      .addCase(saveSiteDetails.fulfilled, (state, action) => {
+        if (action?.payload?.data?.updateSiteDetails?.httpStatusCode === 200)
+          state.saveRequestStatus = RequestStatus.success;
+        else state.saveRequestStatus = RequestStatus.failed;
       })
       .addCase(saveSiteDetails.rejected, (state, action) => {
         state.saveRequestStatus = RequestStatus.failed;
@@ -133,7 +132,7 @@ const siteDetailsSlice = createSlice({
   },
 });
 
-export const getSiteDetailsToBeSaved = (state: any) => { 
+export const getSiteDetailsToBeSaved = (state: any) => {
   return {
     events: state.siteDetails.notationData,
     siteParticipants: state.siteDetails.siteParticipantData,
@@ -147,7 +146,8 @@ export const getSiteDetailsToBeSaved = (state: any) => {
   };
 };
 
-export const saveRequestStatus = (state:any) => state.siteDetails.saveRequestStatus;
+export const saveRequestStatus = (state: any) =>
+  state.siteDetails.saveRequestStatus;
 
 export const {
   resetSaveSiteDetailsRequestStatus,
@@ -159,7 +159,7 @@ export const {
   setupSiteAssociationDataForSaving,
   setupSiteParticipantDataForSaving,
   setupSubDivisionsDataForSaving,
-  setupSiteSummaryForSaving
+  setupSiteSummaryForSaving,
 } = siteDetailsSlice.actions;
 
 export default siteDetailsSlice.reducer;

@@ -26,7 +26,7 @@ export class MasterScript1724794644045 implements MigrationInterface {
        END $$
      `);
 
-     await queryRunner.query(`
+    await queryRunner.query(`
       DO $$
        BEGIN
        IF EXISTS (      
@@ -41,7 +41,7 @@ export class MasterScript1724794644045 implements MigrationInterface {
        END $$
      `);
 
-     await queryRunner.query(`
+    await queryRunner.query(`
       DO $$
        BEGIN
        IF EXISTS (      
@@ -56,7 +56,7 @@ export class MasterScript1724794644045 implements MigrationInterface {
        END $$
      `);
 
-     await queryRunner.query(`
+    await queryRunner.query(`
       DO $$
        BEGIN
        IF EXISTS (      
@@ -70,7 +70,6 @@ export class MasterScript1724794644045 implements MigrationInterface {
        END IF;
        END $$
      `);
-
 
     // await queryRunner.query(
     //   `ALTER TABLE "sites"."folio" DROP COLUMN "whenCreated"`,
@@ -103,7 +102,6 @@ export class MasterScript1724794644045 implements MigrationInterface {
       `ALTER TABLE "sites"."cart" ADD "when_updated" TIMESTAMP NOT NULL DEFAULT now()`,
     );
 
-    
     await queryRunner.query(`
       DO $$
        BEGIN
@@ -119,7 +117,7 @@ export class MasterScript1724794644045 implements MigrationInterface {
        END $$
      `);
 
-     await queryRunner.query(`
+    await queryRunner.query(`
       DO $$
        BEGIN
        IF NOT EXISTS (      
@@ -134,7 +132,7 @@ export class MasterScript1724794644045 implements MigrationInterface {
        END $$
      `);
 
-     await queryRunner.query(`
+    await queryRunner.query(`
       DO $$
        BEGIN
        IF NOT EXISTS (      
@@ -149,7 +147,7 @@ export class MasterScript1724794644045 implements MigrationInterface {
        END $$
      `);
 
-     await queryRunner.query(`
+    await queryRunner.query(`
       DO $$
        BEGIN
        IF NOT EXISTS (      
@@ -163,7 +161,6 @@ export class MasterScript1724794644045 implements MigrationInterface {
        END IF;
        END $$
      `);
-
 
     // await queryRunner.query(
     //   `ALTER TABLE "sites"."folio" ADD "when_created" TIMESTAMP NOT NULL DEFAULT now()`,

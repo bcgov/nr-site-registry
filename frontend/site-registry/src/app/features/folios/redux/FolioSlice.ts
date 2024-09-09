@@ -169,24 +169,21 @@ const folioSlice = createSlice({
       .addCase(fetchFolioItems.pending, (state) => {
         state.fetchRequestStatus = RequestStatus.loading;
       })
-      .addCase(fetchFolioItems.fulfilled, (state, action) => {       
+      .addCase(fetchFolioItems.fulfilled, (state, action) => {
         if (
-          action.payload &&
-          action.payload.data &&
-          action.payload.data.getFolioItemsForUser &&
-          action.payload.data.getFolioItemsForUser.httpStatusCode === 200
+          action?.payload?.data?.getFolioItemsForUser?.httpStatusCode === 200
         ) {
           state.fetchRequestStatus = RequestStatus.success;
           state.folioItems = action.payload.data.getFolioItemsForUser.data;
         } else {
           state.fetchRequestStatus = RequestStatus.failed;
-        }     
+        }
       })
       .addCase(fetchFolioItems.rejected, (state, action) => {
         state.fetchRequestStatus = RequestStatus.failed;
       })
       .addCase(addFolioItem.fulfilled, (state, action) => {
-        if (action.payload.data.addFolioItem.httpStatusCode === 400)
+        if (action?.payload?.data?.addFolioItem?.httpStatusCode === 400)
           state.addRequestStatus = RequestStatus.failed;
         else state.addRequestStatus = RequestStatus.success;
       })
@@ -195,73 +192,51 @@ const folioSlice = createSlice({
         state.addRequestStatus = RequestStatus.failed;
       })
       .addCase(addSiteToFolio.fulfilled, (state, action) => {
-        console.log("action.payload.data.addSiteToFolio.httpStatusCode",action.payload.data.addSiteToFolio.httpStatusCode)
+       
         if (
-          action.payload &&
-          action.payload.data &&
-          action.payload.data.addSiteToFolio &&
-          action.payload.data.addSiteToFolio.httpStatusCode === 201
+          action?.payload?.data?.addSiteToFolio?.httpStatusCode === 201
         ) {
           state.addSiteToFolioRequest = RequestStatus.success;
-          
         } else {
           state.addSiteToFolioRequest = RequestStatus.failed;
-        } 
-        
+        }
       })
       .addCase(addSiteToFolio.rejected, (state, action) => {
         state.addSiteToFolioRequest = RequestStatus.failed;
       })
       .addCase(deleteSitesInFolio.fulfilled, (state, action) => {
-       
         if (
-          action.payload &&
-          action.payload.data &&
-          action.payload.data.deleteSitesInFolio &&
-          action.payload.data.deleteSitesInFolio.httpStatusCode === 200
+          action?.payload?.data?.deleteSitesInFolio?.httpStatusCode === 200
         ) {
           state.deleteSiteInFolioRequest = RequestStatus.success;
-          
         } else {
           state.deleteSiteInFolioRequest = RequestStatus.failed;
-        } 
-
+        }
       })
       .addCase(deleteSitesInFolio.rejected, (state, action) => {
         state.deleteSiteInFolioRequest = RequestStatus.failed;
       })
-      .addCase(updateFolioItem.fulfilled, (state, action) => {       
+      .addCase(updateFolioItem.fulfilled, (state, action) => {
         if (
-          action.payload &&
-          action.payload.data &&
-          action.payload.data.updateFolioItem &&
-          action.payload.data.updateFolioItem.httpStatusCode === 201
+          action?.payload?.data?.updateFolioItem?.httpStatusCode === 201
         ) {
           state.updateRequestStatus = RequestStatus.success;
-          
         } else {
           state.updateRequestStatus = RequestStatus.failed;
-        } 
-        
+        }
       })
       .addCase(updateFolioItem.rejected, (state, action) => {
         console.log('error', action);
         state.updateRequestStatus = RequestStatus.failed;
       })
       .addCase(deleteFolioItem.fulfilled, (state, action) => {
-       
         if (
-          action.payload &&
-          action.payload.data &&
-          action.payload.data.deleteFolioItem &&
-          action.payload.data.deleteFolioItem.httpStatusCode === 200
+          action?.payload?.data?.deleteFolioItem?.httpStatusCode === 200
         ) {
           state.deleteRequestStatus = RequestStatus.success;
-          
         } else {
           state.deleteRequestStatus = RequestStatus.failed;
-        } 
-
+        }
       })
       .addCase(getSiteForFolio.fulfilled, (state, action) => {
         console.log('action ', action);

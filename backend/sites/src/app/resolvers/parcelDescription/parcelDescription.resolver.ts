@@ -3,6 +3,7 @@ import { Resource, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { Subdivisions } from '../../entities/subdivisions.entity';
 import { ParcelDescriptionsService } from '../../services/parcelDescriptions/parcelDescriptions.service';
 import { ParcelDescriptionsResponse } from '../../dto/response/parcelDescriptionsResponse';
+import { CustomRoles } from '../../common/role';
 
 /**
  * Resolver for Parcel Description
@@ -24,7 +25,10 @@ export class ParcelDescriptionResolver {
    * @param sortByDir sorting direction. Either ASC or DESC.
    * @returns parcel descriptions (subdivisions) belonging to the given site.
    */
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [CustomRoles.Internal, CustomRoles.SiteRegistrar],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => ParcelDescriptionsResponse, {
     name: 'getParcelDescriptionsBySiteId',
   })

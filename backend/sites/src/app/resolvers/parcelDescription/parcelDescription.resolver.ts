@@ -2,9 +2,9 @@ import { Args, Int, Query, Resolver } from '@nestjs/graphql';
 import { Resource, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { Subdivisions } from '../../entities/subdivisions.entity';
 import { ParcelDescriptionsService } from '../../services/parcelDescriptions/parcelDescriptions.service';
-import { ParcelDescriptionsResponse } from '../../dto/response/parcelDescriptionsResponse';
 import { CustomRoles } from '../../common/role';
-import { ParcelDescriptionsServiceResult } from 'src/app/services/parcelDescriptions/parcelDescriptions.service.types';
+import { GenericPagedResponse } from '../../dto/response/genericResponse';
+import { ParcelDescriptionDto } from '../../dto/parcelDescription.dto';
 
 /**
  * Resolver for Parcel Description
@@ -30,7 +30,7 @@ export class ParcelDescriptionResolver {
     roles: [CustomRoles.Internal, CustomRoles.SiteRegistrar],
     mode: RoleMatchingMode.ANY,
   })
-  @Query(() => ParcelDescriptionsResponse, {
+  @Query(() => GenericPagedResponse<ParcelDescriptionDto>, {
     name: 'getParcelDescriptionsBySiteId',
   })
   async getParcelDescriptionsBySiteId(
@@ -41,7 +41,7 @@ export class ParcelDescriptionResolver {
     @Args('sortBy', { type: () => String }) sortBy: string,
     @Args('sortByDir', { type: () => String }) sortByDir: string,
   ) {
-    const result: ParcelDescriptionsServiceResult =
+    const response =
       await this.parcelDescriptionService.getParcelDescriptionsBySiteId(
         siteId,
         page,
@@ -51,18 +51,6 @@ export class ParcelDescriptionResolver {
         sortByDir,
       );
 
-    let response = new ParcelDescriptionsResponse();
-    response.data = result.data;
-    response.count = result.count;
-    response.page = result.page;
-    response.pageSize = result.pageSize;
-    response.success = result.success;
-    response.message = result.message;
-    if (result.success) {
-      response.httpStatusCode = 200;
-    } else {
-      response.httpStatusCode = 500;
-    }
     return response;
   }
 }

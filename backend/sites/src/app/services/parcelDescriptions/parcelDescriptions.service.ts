@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { ParcelDescriptionDto } from '../../dto/parcelDescription.dto';
-import { ParcelDescriptionsServiceResult } from './parcelDescriptions.service.types';
+import { GenericPagedResponse } from '../../dto/response/genericResponse';
 
 @Injectable()
 export class ParcelDescriptionsService {
@@ -27,7 +27,7 @@ export class ParcelDescriptionsService {
     searchParam: string,
     sortParam: string,
     sortDir: string,
-  ): Promise<ParcelDescriptionsServiceResult> {
+  ): Promise<GenericPagedResponse<ParcelDescriptionDto[]>> {
     // Sanitize the query parameters.
     const filterTerm = searchParam ? searchParam : '';
     const orderBy = [
@@ -107,7 +107,6 @@ export class ParcelDescriptionsService {
     let count: number;
     let responsePage = page;
     let responsePageSize = pageSize;
-    let success = true;
 
     try {
       countResult = await this.entityManager.query(
@@ -117,16 +116,15 @@ export class ParcelDescriptionsService {
       rawResults = await this.entityManager.query(query, queryParams);
       count = countResult.length > 0 ? countResult[0]?.count : 0;
     } catch (error) {
-      // Catch communication errors and unexpected responses
-      return {
-        data: [],
-        count: 0,
-        page: 0,
-        pageSize: 0,
-        success: false,
-        message:
-          'There was an error communicating with the database. Try again later.',
-      } as ParcelDescriptionsServiceResult;
+      return new GenericPagedResponse<ParcelDescriptionDto[]>(
+        'There was an error communicating with the database. Try again later.',
+        500,
+        false,
+        [],
+        0,
+        0,
+        0,
+      );
     }
 
     results = rawResults.map((rawResult: any): ParcelDescriptionDto => {
@@ -139,13 +137,14 @@ export class ParcelDescriptionsService {
       );
     });
 
-    return {
-      data: results,
-      count: count,
-      page: responsePage,
-      pageSize: responsePageSize,
-      success: success,
-      message: 'Success',
-    } as ParcelDescriptionsServiceResult;
+    return new GenericPagedResponse<ParcelDescriptionDto[]>(
+      'Parcel Descriptions fetched successfully.',
+      200,
+      true,
+      results,
+      count,
+      responsePage,
+      responsePageSize,
+    );
   }
 }

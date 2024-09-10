@@ -281,7 +281,8 @@ describe('SiteSubdivisionsService', () => {
           page: page,
           pageSize: pageSize,
           success: returnSuccess,
-          message: 'Success',
+          httpStatusCode: 200,
+          message: 'Parcel Descriptions fetched successfully.',
         }),
       );
     });
@@ -357,6 +358,7 @@ describe('SiteSubdivisionsService', () => {
       expect(response).toEqual(
         expect.objectContaining({
           data: [],
+          httpStatusCode: 500,
           count: 0,
           page: 0,
           pageSize: 0,

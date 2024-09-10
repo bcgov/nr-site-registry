@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 @ObjectType()
 export class ResponseDto {
   constructor() {
-    this.timestamp = format(new Date(), 'MMMM do, yyyy');
+    this.timestamp = new Date().toISOString();
   }
 
   @Field(() => String, { nullable: true })

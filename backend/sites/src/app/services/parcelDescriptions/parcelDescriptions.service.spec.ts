@@ -1,7 +1,6 @@
 import { EntityManager, Repository } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ParcelDescriptionsService } from './parcelDescriptions.service';
-import { ParcelDescriptionDto } from '../../dto/parcelDescription.dto';
 
 describe('SiteSubdivisionsService', () => {
   let siteSubdivisionService: ParcelDescriptionsService;
@@ -257,7 +256,7 @@ describe('SiteSubdivisionsService', () => {
       );
     });
 
-    it('Constructs the correct response from the query result.', async () => {
+    it('returns the correct results.', async () => {
       let response = await siteSubdivisionService.getParcelDescriptionsBySiteId(
         siteId,
         page,
@@ -279,10 +278,10 @@ describe('SiteSubdivisionsService', () => {
             }),
           ]),
           count: returnCount,
-          httpStatusCode: returnHttpStatusCode,
           page: page,
           pageSize: pageSize,
           success: returnSuccess,
+          message: 'Success',
         }),
       );
     });
@@ -345,7 +344,7 @@ describe('SiteSubdivisionsService', () => {
       entityManager.query = queryMock;
     });
 
-    it('produces an error response', async () => {
+    it('produces the correct result', async () => {
       let response = await siteSubdivisionService.getParcelDescriptionsBySiteId(
         siteId,
         page,
@@ -359,7 +358,6 @@ describe('SiteSubdivisionsService', () => {
         expect.objectContaining({
           data: [],
           count: 0,
-          httpStatusCode: 500,
           page: 0,
           pageSize: 0,
           success: false,

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
-import { ParcelDescriptionsResponse } from '../../dto/response/parcelDescriptionsResponse';
 import { ParcelDescriptionDto } from '../../dto/parcelDescription.dto';
+import { ParcelDescriptionsServiceResult } from './parcelDescriptions.service.types';
 
 @Injectable()
 export class ParcelDescriptionsService {
@@ -27,7 +27,7 @@ export class ParcelDescriptionsService {
     searchParam: string,
     sortParam: string,
     sortDir: string,
-  ): Promise<ParcelDescriptionsResponse> {
+  ): Promise<ParcelDescriptionsServiceResult> {
     // Sanitize the query parameters.
     const filterTerm = searchParam ? searchParam : '';
     const orderBy = [
@@ -105,11 +105,9 @@ export class ParcelDescriptionsService {
     let rawResults: any;
     let results: ParcelDescriptionDto[] = [];
     let count: number;
-    let httpStatusCode = 200;
     let responsePage = page;
     let responsePageSize = pageSize;
     let success = true;
-    let message = '';
 
     try {
       countResult = await this.entityManager.query(
@@ -120,36 +118,34 @@ export class ParcelDescriptionsService {
       count = countResult.length > 0 ? countResult[0]?.count : 0;
     } catch (error) {
       // Catch communication errors and unexpected responses
-      results = [];
-      count = 0;
-      httpStatusCode = 500;
-      responsePage = 0;
-      responsePageSize = 0;
-      success = false;
-      message =
-        'There was an error communicating with the database. Try again later.';
+      return {
+        data: [],
+        count: 0,
+        page: 0,
+        pageSize: 0,
+        success: false,
+        message:
+          'There was an error communicating with the database. Try again later.',
+      } as ParcelDescriptionsServiceResult;
     }
 
-    if (success) {
-      results = rawResults.map((rawResult: any): ParcelDescriptionDto => {
-        return new ParcelDescriptionDto(
-          rawResult.id,
-          rawResult.description_type,
-          rawResult.id_pin_number,
-          new Date(rawResult.date_noted),
-          rawResult.land_description,
-        );
-      });
-    }
+    results = rawResults.map((rawResult: any): ParcelDescriptionDto => {
+      return new ParcelDescriptionDto(
+        rawResult.id,
+        rawResult.description_type,
+        rawResult.id_pin_number,
+        new Date(rawResult.date_noted),
+        rawResult.land_description,
+      );
+    });
 
-    const response = new ParcelDescriptionsResponse();
-    response.data = results;
-    response.count = count;
-    response.httpStatusCode = httpStatusCode;
-    response.page = responsePage;
-    response.pageSize = responsePageSize;
-    response.success = success;
-    response.message = message;
-    return response;
+    return {
+      data: results,
+      count: count,
+      page: responsePage,
+      pageSize: responsePageSize,
+      success: success,
+      message: 'Success',
+    } as ParcelDescriptionsServiceResult;
   }
 }

@@ -4,6 +4,7 @@ import { Subdivisions } from '../../entities/subdivisions.entity';
 import { ParcelDescriptionsService } from '../../services/parcelDescriptions/parcelDescriptions.service';
 import { ParcelDescriptionsResponse } from '../../dto/response/parcelDescriptionsResponse';
 import { CustomRoles } from '../../common/role';
+import { ParcelDescriptionsServiceResult } from 'src/app/services/parcelDescriptions/parcelDescriptions.service.types';
 
 /**
  * Resolver for Parcel Description
@@ -40,13 +41,28 @@ export class ParcelDescriptionResolver {
     @Args('sortBy', { type: () => String }) sortBy: string,
     @Args('sortByDir', { type: () => String }) sortByDir: string,
   ) {
-    return await this.parcelDescriptionService.getParcelDescriptionsBySiteId(
-      siteId,
-      page,
-      pageSize,
-      searchParam,
-      sortBy,
-      sortByDir,
-    );
+    const result: ParcelDescriptionsServiceResult =
+      await this.parcelDescriptionService.getParcelDescriptionsBySiteId(
+        siteId,
+        page,
+        pageSize,
+        searchParam,
+        sortBy,
+        sortByDir,
+      );
+
+    let response = new ParcelDescriptionsResponse();
+    response.data = result.data;
+    response.count = result.count;
+    response.page = result.page;
+    response.pageSize = result.pageSize;
+    response.success = result.success;
+    response.message = result.message;
+    if (result.success) {
+      response.httpStatusCode = 200;
+    } else {
+      response.httpStatusCode = 500;
+    }
+    return response;
   }
 }

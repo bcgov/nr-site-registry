@@ -317,6 +317,8 @@ describe('SnapshotService', () => {
                     },
                   },
                 ],
+                userAction: '',
+                srAction: '',
               },
             ],
           },
@@ -402,6 +404,8 @@ describe('SnapshotService', () => {
                     },
                   },
                 ],
+                userAction: '',
+                srAction: '',
               },
             ],
           },
@@ -500,6 +504,8 @@ describe('SnapshotService', () => {
                     },
                   },
                 ],
+                userAction: '',
+                srAction: '',
               },
             ],
           },
@@ -670,6 +676,8 @@ describe('SnapshotService', () => {
                     },
                   },
                 ],
+                userAction: '',
+                srAction: '',
               },
             ],
           },
@@ -763,6 +771,20 @@ describe('SnapshotService', () => {
         service.createSnapshotForSites([snapshotDto], ''),
       ).rejects.toThrow('Failed to insert snapshot.');
       expect(snapshotRepository.save).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getBannerTypeForSnapshot', () => {
+    const siteId = '1';
+    const userId = '1';
+    const expectedBannerType = 'current';
+
+    it('should return the correct banner type', async () => {
+      jest.spyOn(service, 'getBannerType').mockResolvedValueOnce('current');
+
+      const result = await service.getBannerType(siteId, userId);
+
+      expect(result).toEqual(expectedBannerType);
     });
   });
 });

@@ -290,6 +290,8 @@ type Events {
 }
 
 type SiteAssocs {
+  userAction: String!
+  srAction: String!
   siteId: String!
   siteIdAssociatedWith: String!
   effectiveDate: DateTime!
@@ -587,6 +589,16 @@ type SnapshotResponse {
   data: [Snapshots!]
 }
 
+type BannerTypeData {
+  bannerType: String!
+}
+
+type BannerTypeResponse {
+  httpStatusCode: Int!
+  message: String!
+  data: BannerTypeData
+}
+
 type DisclosureResponse {
   message: String
   httpStatusCode: Int
@@ -653,6 +665,7 @@ type Query {
   getSnapshotsByUserId(userId: String!): SnapshotResponse!
   getSnapshotsBySiteId(siteId: String!): SnapshotResponse!
   getSnapshotsById(id: Int!): SnapshotResponse!
+  getBannerType(siteId: String!): BannerTypeResponse!
   getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
   getParticipantRoleCd: DropdownResponse!
   getPeopleOrgsCd(searchParam: String, entityType: String): DropdownResponse!

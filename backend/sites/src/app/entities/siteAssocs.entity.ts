@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { Sites } from './sites.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
 
 @ObjectType()
 @Index('sa_rwm_flag', ['rwmFlag'], {})
@@ -9,7 +10,7 @@ import { Sites } from './sites.entity';
 @Index('site_assocs_pkey', ['siteId', 'siteIdAssociatedWith'], { unique: true })
 @Index('sa_associated_with_frgn', ['siteIdAssociatedWith'], {})
 @Entity('site_assocs')
-export class SiteAssocs {
+export class SiteAssocs extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'site_id' })
   siteId: string;

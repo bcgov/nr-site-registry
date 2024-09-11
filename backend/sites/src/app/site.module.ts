@@ -78,6 +78,8 @@ import { User } from './entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { AssociatedSiteResolver } from './resolvers/associatedSite/associatedSite.resolver';
 import { AssociatedSiteService } from './services/associatedSite/associatedSite.service';
+import { LandUseCodeResolver } from './resolvers/landUseCode/landUseCode.resolver';
+import { LandUseCodeService } from './services/landUseCode/landUseCode.service';
 import { HistoryLog } from './entities/siteHistoryLog.entity';
 
 /**
@@ -160,6 +162,8 @@ import { HistoryLog } from './entities/siteHistoryLog.entity';
     CartService,
     LandHistoryResolver,
     LandHistoryService,
+    LandUseCodeResolver,
+    LandUseCodeService,
     NotationResolver,
     NotationService,
     DocumentResolver,

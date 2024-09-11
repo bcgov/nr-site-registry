@@ -1,13 +1,18 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getLandHistoriesForSiteQuery } from './graphql/LandUses';
+import {
+  getLandHistoriesForSiteQuery,
+  getLandUseCodesQuery,
+} from './graphql/LandUses';
 import { print } from 'graphql';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { getAxiosInstance } from '../../../helpers/utility';
 import { GRAPHQL } from '../../../helpers/endpoints';
 
 const initialState = {
-  fetchRequestStatus: RequestStatus.idle,
+  landUsesFetchRequestStatus: RequestStatus.idle,
   landUses: [],
+  landUseCodesFetchRequestStatus: RequestStatus.idle,
+  landUseCodes: [],
 };
 
 export const fetchLandUses = createAsyncThunk(
@@ -18,7 +23,7 @@ export const fetchLandUses = createAsyncThunk(
     sortDirection,
   }: {
     siteId: string;
-    searchTerm: string;
+    searchTerm?: string;
     sortDirection?: string;
   }) => {
     try {
@@ -34,25 +39,56 @@ export const fetchLandUses = createAsyncThunk(
   },
 );
 
+export const fetchLandUseCodes = createAsyncThunk(
+  'landUses/fetchLandUseCodes',
+  async () => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(getLandUseCodesQuery),
+      });
+
+      return response.data.data.getLandUseCodes.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
+
 const landUsesSlice = createSlice({
   name: 'landUses',
   initialState,
-  reducers: {},
+  reducers: {
+    updateLandUses: (state, action) => {
+      state.landUses = action.payload;
+      state.landUsesFetchRequestStatus = RequestStatus.success;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchLandUses.pending, (state) => {
-        state.fetchRequestStatus = RequestStatus.loading;
+        state.landUsesFetchRequestStatus = RequestStatus.loading;
       })
       .addCase(fetchLandUses.fulfilled, (state, action) => {
-        state.fetchRequestStatus = RequestStatus.success;
+        state.landUsesFetchRequestStatus = RequestStatus.success;
         state.landUses = action.payload;
       })
       .addCase(fetchLandUses.rejected, (state, action) => {
-        state.fetchRequestStatus = RequestStatus.failed;
+        state.landUsesFetchRequestStatus = RequestStatus.failed;
+      })
+      .addCase(fetchLandUseCodes.pending, (state) => {
+        state.landUseCodesFetchRequestStatus = RequestStatus.loading;
+      })
+      .addCase(fetchLandUseCodes.fulfilled, (state, action) => {
+        state.landUseCodesFetchRequestStatus = RequestStatus.success;
+        state.landUseCodes = action.payload;
+      })
+      .addCase(fetchLandUseCodes.rejected, (state, action) => {
+        state.landUseCodesFetchRequestStatus = RequestStatus.failed;
       });
   },
 });
 
 export const landUses = (state: any) => state.landUses;
+export const { updateLandUses } = landUsesSlice.actions;
 
 export default landUsesSlice.reducer;

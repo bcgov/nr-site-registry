@@ -227,7 +227,7 @@ export const TextInput: React.FC<InputProps> = ({
               htmlFor={inputTxtId}
               className={`${
                 !isEditing
-                  ? (customLabelCss ?? '')
+                  ? customLabelCss ?? ''
                   : `form-label ${customEditLabelCss ?? 'custom-label'}`
               }`}
             >
@@ -316,7 +316,7 @@ export const DropdownInput: React.FC<InputProps> = ({
           htmlFor={drdownId}
           className={`${
             !isEditing
-              ? (customLabelCss ?? '')
+              ? customLabelCss ?? ''
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
           aria-labelledby={label}
@@ -478,7 +478,7 @@ export const GroupInput: React.FC<InputProps> = ({
         htmlFor={groupId}
         className={`${
           !isEditing
-            ? (customLabelCss ?? '')
+            ? customLabelCss ?? ''
             : `form-label ${customEditLabelCss ?? 'custom-label'}`
         }`}
       >
@@ -494,7 +494,7 @@ export const GroupInput: React.FC<InputProps> = ({
                 {isChildLabel && (
                   <label
                     htmlFor={grpId}
-                    className={`${!isEditing ? (customLabelCss ?? '') : `form-label ${customEditLabelCss ?? 'custom-label'}`}`}
+                    className={`${!isEditing ? customLabelCss ?? '' : `form-label ${customEditLabelCss ?? 'custom-label'}`}`}
                   >
                     {child.label}
                   </label>
@@ -580,7 +580,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
           htmlFor={dateRangeId}
           className={`${
             !isEditing
-              ? (customLabelCss ?? '')
+              ? customLabelCss ?? ''
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
         >
@@ -661,7 +661,7 @@ export const DateInput: React.FC<InputProps> = ({
           htmlFor={dateRangeId}
           className={`${
             !isEditing
-              ? (customLabelCss ?? '')
+              ? customLabelCss ?? ''
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
         >
@@ -747,7 +747,7 @@ export const CheckBoxInput: React.FC<InputProps> = ({
             htmlFor={inputTxtId}
             className={`${
               !isEditing
-                ? (customLabelCss ?? '')
+                ? customLabelCss ?? ''
                 : `px-1 form-label ${customEditLabelCss ?? 'custom-label'}`
             }`}
           >
@@ -804,7 +804,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
               htmlFor={textAreaId}
               className={`${
                 !isEditing
-                  ? (customLabelCss ?? '')
+                  ? customLabelCss ?? ''
                   : `form-label ${customEditLabelCss ?? 'custom-label'}`
               }`}
             >
@@ -928,7 +928,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
           htmlFor={drdownId}
           className={`${
             !isEditing
-              ? (customLabelCss ?? '')
+              ? customLabelCss ?? ''
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
         >
@@ -1157,7 +1157,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
           htmlFor={inputTxtId}
           className={`${
             !isEditing
-              ? (customLabelCss ?? '')
+              ? customLabelCss ?? ''
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
         >

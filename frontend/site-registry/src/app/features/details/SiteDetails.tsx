@@ -65,8 +65,6 @@ import {
   getFirstSnapshotCreatedDate,
   selectBannerType,
   getBannerType,
-  selectBannerType,
-  getBannerType,
 } from './snapshot/SnapshotSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 import {

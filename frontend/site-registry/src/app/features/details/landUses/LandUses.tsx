@@ -125,6 +125,10 @@ const LandUses: FC = () => {
       ? RequestStatus.loading
       : RequestStatus.idle;
 
+  const getLandUseObjectByCode = (code: string) => {
+    return landUseCodes.find((landUseCode: any) => landUseCode.code === code);
+  };
+
   const onTableChange = (event: any) => {
     if (event.property.includes('select_row')) {
       handleRowSelect(event.row.guid);
@@ -142,7 +146,13 @@ const LandUses: FC = () => {
       if (landUse.guid === event.row.guid) {
         // Create a deep copy of the landUse object
         const updatedLandUse = JSON.parse(JSON.stringify(landUse));
-        set(updatedLandUse, event.property, event.value);
+
+        if (event.property === 'landUse.code') {
+          set(updatedLandUse, 'landUse', getLandUseObjectByCode(event.value));
+        } else {
+          set(updatedLandUse, event.property, event.value);
+        }
+
         return updatedLandUse;
       }
       return landUse;

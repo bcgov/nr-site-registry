@@ -131,6 +131,13 @@ const LandUses: FC = () => {
       return;
     }
 
+    if (event.property.includes('select_all')) {
+      event.selected
+        ? setSelectedRowIds(new Set(tableData.map((row) => row.guid)))
+        : setSelectedRowIds(new Set());
+      return;
+    }
+
     const updatedLandUses = tableData.map((landUse) => {
       if (landUse.guid === event.row.guid) {
         // Create a deep copy of the landUse object
@@ -258,6 +265,7 @@ const LandUses: FC = () => {
         </div>
       </div>
       <Widget
+        currentPage={1}
         changeHandler={onTableChange}
         title={'Suspect Land Uses'}
         tableColumns={tableColumns}

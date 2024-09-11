@@ -260,7 +260,7 @@ const Notations = () => {
     setSearchSiteParticipant(value.trim());
     let params: UpdateDisplayTypeParams = {
       indexToUpdate: notationColumnInternal.findIndex(
-        (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
+        (item: any) => item.displayType?.graphQLPropertyName === 'psnorgId',
       ),
       updates: {
         isLoading: RequestStatus.loading,

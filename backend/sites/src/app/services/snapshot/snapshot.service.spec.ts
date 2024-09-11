@@ -317,6 +317,8 @@ describe('SnapshotService', () => {
                     },
                   },
                 ],
+                userAction: '',
+                srAction: '',
               },
             ],
           },
@@ -402,6 +404,8 @@ describe('SnapshotService', () => {
                     },
                   },
                 ],
+                userAction: '',
+                srAction: '',
               },
             ],
           },
@@ -500,6 +504,8 @@ describe('SnapshotService', () => {
                     },
                   },
                 ],
+                userAction: '',
+                srAction: '',
               },
             ],
           },
@@ -531,6 +537,79 @@ describe('SnapshotService', () => {
         service.getSnapshotsBySiteId(siteId, userId),
       ).rejects.toThrow('Failed to retrieve snapshots by userId and siteId.');
       expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getMostRecentSnapshot', () => {
+    it('should return a single snapshot for a given userId and siteId', async () => {
+      const userId = '1';
+      const siteId = '1';
+      const res: Snapshots = {
+        id: 1,
+        userId: '1',
+        siteId: '1',
+        transactionId: '1',
+        whenCreated: new Date(2024, 8, 28),
+        whoCreated: 'ABC',
+        whenUpdated: new Date(2024, 8, 28),
+        whoUpdated: 'ABC',
+        site: sampleSites[0],
+        snapshotData: {
+          sitesSummary: sampleSites[0],
+          documents: null,
+          events: null,
+          eventsParticipants: null,
+          landHistories: null,
+          profiles: null,
+          siteAssociations: null,
+          subDivisions: null,
+          siteParticipants: null,
+        },
+      };
+      jest
+        .spyOn(snapshotRepository, 'findOne')
+        .mockResolvedValueOnce(res as Snapshots);
+      const snapshot = await service.getMostRecentSnapshot(siteId, userId);
+
+      expect(snapshot).toEqual(res);
+      expect(snapshotRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(snapshotRepository.findOne).toHaveBeenCalledWith({
+        where: { siteId, userId },
+        order: { whenCreated: 'DESC' },
+      });
+    });
+
+    it('should throw an error if repository throws an error', async () => {
+      const userId = '1';
+      const siteId = '1';
+      const errorMessage = 'Failed to retrieve the most recent snapshot';
+      jest
+        .spyOn(snapshotRepository, 'findOne')
+        .mockRejectedValueOnce(new Error(errorMessage));
+
+      await expect(
+        service.getMostRecentSnapshot(siteId, userId),
+      ).rejects.toThrow(errorMessage);
+      expect(snapshotRepository.findOne).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('when there are no results', () => {
+    it('returns null', async () => {
+      const userId = '1';
+      const siteId = '1';
+      const res: Snapshots = null;
+      jest
+        .spyOn(snapshotRepository, 'findOne')
+        .mockResolvedValueOnce(res as Snapshots);
+      const snapshot = await service.getMostRecentSnapshot(siteId, userId);
+
+      expect(snapshot).toBeNull();
+      expect(snapshotRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(snapshotRepository.findOne).toHaveBeenCalledWith({
+        where: { siteId, userId },
+        order: { whenCreated: 'DESC' },
+      });
     });
   });
 
@@ -597,6 +676,8 @@ describe('SnapshotService', () => {
                     },
                   },
                 ],
+                userAction: '',
+                srAction: '',
               },
             ],
           },
@@ -690,6 +771,20 @@ describe('SnapshotService', () => {
         service.createSnapshotForSites([snapshotDto], ''),
       ).rejects.toThrow('Failed to insert snapshot.');
       expect(snapshotRepository.save).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getBannerTypeForSnapshot', () => {
+    const siteId = '1';
+    const userId = '1';
+    const expectedBannerType = 'current';
+
+    it('should return the correct banner type', async () => {
+      jest.spyOn(service, 'getBannerType').mockResolvedValueOnce('current');
+
+      const result = await service.getBannerType(siteId, userId);
+
+      expect(result).toEqual(expectedBannerType);
     });
   });
 });

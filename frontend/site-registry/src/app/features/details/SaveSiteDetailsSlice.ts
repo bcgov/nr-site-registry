@@ -122,11 +122,7 @@ const siteDetailsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(saveSiteDetails.fulfilled, (state, action) => {
-        if (
-          action.payload.data &&
-          action.payload.data.updateSiteDetails &&
-          action.payload.data.updateSiteDetails.httpStatusCode === 200
-        )
+        if (action?.payload?.data?.updateSiteDetails?.httpStatusCode === 200)
           state.saveRequestStatus = RequestStatus.success;
         else state.saveRequestStatus = RequestStatus.failed;
       })

@@ -17,7 +17,7 @@ import { DropdownDto, DropdownResponse } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { UsePipes } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
-import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
+import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { CustomRoles } from '../../common/role';
 
 /**

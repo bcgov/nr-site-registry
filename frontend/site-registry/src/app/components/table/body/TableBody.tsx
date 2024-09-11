@@ -165,10 +165,12 @@ const TableBody: FC<TableBodyProps> = ({
     href: string,
     changeHandler: any,
     editMode: boolean,
+    columnIndex: number,
   ) => {
     if (field.type === FormFieldType.Text) {
       return (
         <TextInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -191,6 +193,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Search) {
       return (
         <SearchCustomInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -217,6 +220,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Label) {
       return (
         <Label
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -238,6 +242,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Link) {
       return (
         <Link
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -262,6 +267,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.DropDown) {
       return (
         <DropdownInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -286,6 +292,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Checkbox) {
       return (
         <CheckBoxInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -312,6 +319,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Date) {
       return (
         <DateInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -332,6 +340,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.TextArea) {
       return (
         <TextAreaInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -356,6 +365,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.DropDownWithSearch) {
       return (
         <DropdownSearchInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -381,6 +391,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.DeleteIcon) {
       return (
         <DeleteIcon
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -406,6 +417,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.IconButton) {
       return (
         <IconButton
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -462,6 +474,7 @@ const TableBody: FC<TableBodyProps> = ({
       column.linkRedirectionURL ?? '',
       changeHandler,
       editMode,
+      columnIndex,
     );
   };
 
@@ -470,8 +483,8 @@ const TableBody: FC<TableBodyProps> = ({
     const rowChecked = isChecked(checkboxId);
 
     return (
-      <React.Fragment>
-        <tr data-testid="table-row">
+      <React.Fragment key={rowIndex}>
+        <tr data-testid="table-row" key={rowIndex}>
           {allowRowsSelect && (
             <td className="table-border-light content-text positionSticky align-content-center">
               <input
@@ -486,7 +499,7 @@ const TableBody: FC<TableBodyProps> = ({
                     rowIndex,
                   );
                 }}
-                checked={rowChecked}
+                checked={rowChecked || false}
               />
             </td>
           )}

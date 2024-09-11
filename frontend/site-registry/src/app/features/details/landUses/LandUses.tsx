@@ -11,7 +11,6 @@ import { useParams } from 'react-router-dom';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
-import useDebouncedValue from '../../../helpers/useDebouncedValue';
 import Widget from '../../../components/widget/Widget';
 import { RequestStatus } from '../../../helpers/requests/status';
 import {
@@ -26,7 +25,10 @@ import {
   ChangeTracker,
   IChangeType,
 } from '../../../components/common/IChangeType';
-import { set } from '../../../components/table/utils';
+import { get, set } from '../../../components/table/utils';
+import './LandUses.css';
+
+type createdAtSortDirection = 'newToOld' | 'oldTonew';
 
 const getColumns = (landUseCodes: any[] = [], editMode = false) => {
   const landUseCodeColumns = editMode
@@ -36,7 +38,7 @@ const getColumns = (landUseCodes: any[] = [], editMode = false) => {
         active: true,
         graphQLPropertyName: 'landUse.code',
         displayType: {
-          type: FormFieldType.DropDownWithSearch,
+          type: FormFieldType.DropDown,
           label: 'Land Use',
           options: landUseCodes.map(({ description, code }) => {
             return { value: description, key: code };
@@ -87,13 +89,10 @@ const LandUses: FC = () => {
   } = useSelector(landUses);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
 
   const viewMode = useSelector(siteDetailsMode);
   const resetDetails = useSelector(resetSiteDetails);
-  const [sortByValue, setSortByValue] = useState<{
-    [key: string]: any;
-  }>({});
+  const [sortByValue, setSortByValue] = useState<createdAtSortDirection>();
 
   const [tableData, setTableData] = useState<{ [key: string]: any }[]>([]);
   const [selectedRowIds, setSelectedRowIds] = useState(new Set<string>());
@@ -105,17 +104,9 @@ const LandUses: FC = () => {
 
   useEffect(() => {
     if (siteId) {
-      let sortDirection = sortByValue.sortBy === 'newToOld' ? 'DESC' : 'ASC';
-
-      dispatch(
-        fetchLandUses({
-          siteId,
-          searchTerm: debouncedSearchTerm,
-          sortDirection,
-        }),
-      );
+      dispatch(fetchLandUses({ siteId }));
     }
-  }, [dispatch, debouncedSearchTerm, siteId, sortByValue]);
+  }, [dispatch, siteId]);
 
   useEffect(() => {
     setTableData(landUsesData);
@@ -192,6 +183,61 @@ const LandUses: FC = () => {
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
+  const handleSortChange = (_: any, value: string | [Date, Date]) => {
+    const sortDirection = value as createdAtSortDirection;
+    setSortByValue(sortDirection as createdAtSortDirection);
+    sortByDate(sortDirection, tableData);
+  };
+
+  const sortByDate = (sortDirection: createdAtSortDirection, data: any) => {
+    let sorted = [...data];
+    switch (sortDirection) {
+      case 'newToOld':
+        sorted.sort(
+          (a, b) =>
+            new Date(b.whenCreated).getTime() -
+            new Date(a.whenCreated).getTime(),
+        );
+        break;
+      case 'oldTonew':
+        sorted.sort(
+          (a, b) =>
+            new Date(a.whenCreated).getTime() -
+            new Date(b.whenCreated).getTime(),
+        );
+        break;
+      default:
+        break;
+    }
+    setTableData(sorted);
+  };
+
+  const handleTableSort = (row: any, ascDir: boolean) => {
+    const property = row['graphQLPropertyName'];
+    setTableData((prevData) => {
+      let landUses = [...prevData];
+      landUses.sort(function (rowA: any, rowB: any) {
+        const valueA = get(rowA, property);
+        const valueB = get(rowB, property);
+
+        if (valueA > valueB) return ascDir ? 1 : -1;
+        if (valueA < valueB) return ascDir ? -1 : 1;
+        return 0;
+      });
+      return landUses;
+    });
+  };
+
+  const dataWithTextSearchApplied = !searchTerm
+    ? tableData
+    : tableData.filter((rowData) => {
+        const term = searchTerm.toLowerCase().trim();
+        return (
+          rowData.note?.toLowerCase().includes(term) ||
+          rowData.landUse?.description?.toLowerCase().includes(term)
+        );
+      });
+
   return (
     <div>
       <div className="row">
@@ -205,11 +251,9 @@ const LandUses: FC = () => {
         </div>
         <div className={`col-lg-4`}>
           <Sort
-            formData={sortByValue}
+            formData={{ sortBy: sortByValue }}
             editMode={true}
-            handleSortChange={(key, value) => {
-              setSortByValue({ [key]: value });
-            }}
+            handleSortChange={handleSortChange}
           />
         </div>
       </div>
@@ -217,27 +261,28 @@ const LandUses: FC = () => {
         changeHandler={onTableChange}
         title={'Suspect Land Uses'}
         tableColumns={tableColumns}
-        tableData={tableData}
+        tableData={dataWithTextSearchApplied}
         allowRowsSelect={editModeEnabled}
         tableIsLoading={tableLoading}
         editMode={editModeEnabled}
         srMode={viewMode === SiteDetailsMode.SRMode}
         primaryKeycolumnName="guid"
+        sortHandler={handleTableSort}
       >
         {editModeEnabled && (
           <div className="d-flex gap-2 flex-wrap ">
             <button
-              className="d-flex align-items-center participant-btn"
+              className="d-flex align-items-center land-uses-btn"
               type="button"
               onClick={handleAddLandUse}
               aria-label={'Add Land Use'}
             >
               <Plus />
-              <span>Add Land Use</span>
+              <span className="land-uses-lbl">Add Land Use</span>
             </button>
 
             <button
-              className={`d-flex align-items-center participant-btn`}
+              className={`d-flex align-items-center land-uses-btn ${selectedRowIds.size <= 0 && 'land-uses-btn-disabled'}`}
               disabled={selectedRowIds.size <= 0}
               type="button"
               onClick={handleRemoveLandUse}

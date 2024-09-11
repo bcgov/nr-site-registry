@@ -23,7 +23,7 @@ export const fetchLandUses = createAsyncThunk(
     sortDirection,
   }: {
     siteId: string;
-    searchTerm: string;
+    searchTerm?: string;
     sortDirection?: string;
   }) => {
     try {

@@ -10,7 +10,9 @@ export class LandUseCodeService {
 
   async getLandUseCodes(): Promise<LandUseCd[]> {
     try {
-      const result = await this.landUseCodeRepository.find();
+      const result = await this.landUseCodeRepository.find({
+        order: { code: 'ASC' },
+      });
       return result;
     } catch (error) {
       throw error;

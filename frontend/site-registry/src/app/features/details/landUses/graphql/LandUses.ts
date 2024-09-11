@@ -16,6 +16,7 @@ export const getLandHistoriesForSiteQuery = gql`
         siteId
         lutCode
         note
+        whenCreated
         landUse {
           code
           description

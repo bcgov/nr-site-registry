@@ -22,6 +22,7 @@ import { Subdivisions } from '../../entities/subdivisions.entity';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { DropdownResponse } from '../../dto/dropdown.dto';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
+import { LandHistoryService } from '../landHistory/landHistory.service';
 /**
  * Nestjs Service For Region Entity
  */
@@ -50,6 +51,8 @@ export class SiteService {
     private readonly entityManager: EntityManager,
     @InjectRepository(HistoryLog)
     private historyLogRepository: Repository<HistoryLog>,
+
+    private readonly landHistoryService: LandHistoryService,
   ) {}
 
   /**
@@ -281,6 +284,7 @@ export class SiteService {
         return false;
       } else {
         const {
+          siteId,
           sitesSummary,
           events,
           eventsParticipants,
@@ -343,8 +347,8 @@ export class SiteService {
               }
 
               if (landHistories) {
-                await transactionalEntityManager.save(
-                  LandHistories,
+                this.landHistoryService.updateLandHistoriesForSite(
+                  siteId,
                   landHistories,
                 );
               } else {

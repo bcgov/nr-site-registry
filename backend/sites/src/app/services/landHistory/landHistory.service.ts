@@ -1,7 +1,8 @@
 import { v4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Brackets } from 'typeorm';
+import { Repository, Brackets, In } from 'typeorm';
 import { LandHistories } from '../../entities/landHistories.entity';
+import { LandHistoriesInputDTO } from 'src/app/dto/landHistoriesInput.dto';
 
 export class LandHistoryService {
   constructor(
@@ -47,6 +48,71 @@ export class LandHistoryService {
       return result;
     } catch (error) {
       throw error;
+    }
+  }
+
+  async updateLandHistoriesForSite(
+    siteId: string,
+    landHistoriesInput: LandHistoriesInputDTO[],
+  ): Promise<LandHistories[]> {
+    const deletes = landHistoriesInput
+      .filter((arg) => !!arg.shouldDelete)
+      .map((arg) => arg.originalLandUseCode);
+
+    const additions = landHistoriesInput
+      .filter((arg) => !arg.shouldDelete && !arg.originalLandUseCode)
+      .map((arg) => {
+        return {
+          siteId,
+          lutCode: arg.landUseCode,
+          note: arg.note,
+          whoCreated: 'stub', // TODO: figure out how to get current user
+          whenCreated: new Date(),
+          rwmFlag: 0,
+          rwmNoteFlag: 0,
+        };
+      });
+
+    const updates = landHistoriesInput
+      .filter((arg) => !arg.shouldDelete && !!arg.originalLandUseCode)
+      .map((arg) => {
+        const whereClause = { lutCode: arg.originalLandUseCode, siteId };
+        const data = {
+          lutCode: arg.landUseCode || arg.originalLandUseCode,
+          note: arg.note || undefined,
+          whoUpdated: 'stub', // TODO: figure out how to get current user
+          whenUpdated: new Date(),
+        };
+
+        return [whereClause, data];
+      });
+
+    try {
+      const updatedRecords =
+        await this.landHistoryRepository.manager.transaction(
+          async (transactionalEntityManager) => {
+            await transactionalEntityManager.save(LandHistories, additions);
+
+            for (const [whereClause, data] of updates) {
+              await transactionalEntityManager.update(
+                LandHistories,
+                whereClause,
+                data,
+              );
+            }
+
+            await transactionalEntityManager.delete(LandHistories, {
+              siteId,
+              lutCode: In(deletes),
+            });
+            return null;
+          },
+        );
+
+      return updatedRecords;
+    } catch (e) {
+      console.log('Error updating land histories', e);
+      return [];
     }
   }
 }

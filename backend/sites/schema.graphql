@@ -664,6 +664,14 @@ type LandUseCodeResponse {
   data: [LandUseCd!]!
 }
 
+type ParcelDescriptionDto {
+  id: Float!
+  descriptionType: String!
+  idPinNumber: String!
+  dateNoted: DateTime!
+  landDescription: String!
+}
+
 type Query {
   sites: FetchSiteResponse!
   searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
@@ -675,6 +683,7 @@ type Query {
   getSnapshotsBySiteId(siteId: String!): SnapshotResponse!
   getSnapshotsById(id: Int!): SnapshotResponse!
   getBannerType(siteId: String!): BannerTypeResponse!
+  getParcelDescriptionsBySiteId(siteId: Int!, page: Int!, pageSize: Int!, searchParam: String!, sortBy: String!, sortByDir: String!): ParcelDescriptionDto!
   getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
   getParticipantRoleCd: DropdownResponse!
   getPeopleOrgsCd(searchParam: String, entityType: String): DropdownResponse!
@@ -858,17 +867,10 @@ input SubDivisionsInputDTO {
 input LandHistoriesInputDTO {
   userAction: String!
   srAction: String!
-  siteId: String!
-  lutCode: String!
-  note: String!
-  whoCreated: String!
-  whoUpdated: String!
-  whenCreated: DateTime!
-  whenUpdated: DateTime!
-  rwmFlag: Float!
-  rwmNoteFlag: Float!
-  siteProfile: String!
-  profileDateReceived: DateTime!
+  originalLandUseCode: String
+  landUseCode: String
+  note: String
+  shouldDelete: Boolean! = false
 }
 
 input SiteProfilesInputDTO {

@@ -113,6 +113,7 @@ const subdivisions: Subdivisions[] = [
     siteSubdivisions: null,
   },
 ];
+
 siteSubdivisions = [
   {
     siteSubdivId: '456',
@@ -128,6 +129,8 @@ siteSubdivisions = [
     sendToSr: 'Y',
     site: null,
     subdivision: null,
+    userAction: '',
+    srAction: '',
   },
   {
     siteSubdivId: '457',
@@ -143,6 +146,8 @@ siteSubdivisions = [
     sendToSr: 'Y',
     site: null,
     subdivision: null,
+    userAction: '',
+    srAction: '',
   },
   {
     siteSubdivId: '458',
@@ -158,6 +163,8 @@ siteSubdivisions = [
     sendToSr: 'Y',
     site: null,
     subdivision: null,
+    userAction: '',
+    srAction: '',
   },
 ];
 

@@ -30,9 +30,7 @@ export class ParcelDescriptionResolver {
     roles: [CustomRoles.Internal, CustomRoles.SiteRegistrar],
     mode: RoleMatchingMode.ANY,
   })
-  @Query(() => GenericPagedResponse<ParcelDescriptionDto>, {
-    name: 'getParcelDescriptionsBySiteId',
-  })
+  @Query(() => ParcelDescriptionDto, { name: 'getParcelDescriptionsBySiteId' })
   async getParcelDescriptionsBySiteId(
     @Args('siteId', { type: () => Int }) siteId: number,
     @Args('page', { type: () => Int }) page: number,

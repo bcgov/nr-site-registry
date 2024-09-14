@@ -448,8 +448,8 @@ const SiteDetails = () => {
           <ModalDialog
             closeHandler={(response) => {
               setSave(false);
-              if (response) {
-                dispatch(saveSiteDetails(null)).unwrap();
+              if (response && id) {
+                dispatch(saveSiteDetails(id)).unwrap();
               }
             }}
           >

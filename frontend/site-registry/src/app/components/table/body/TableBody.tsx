@@ -148,6 +148,7 @@ const TableBody: FC<TableBodyProps> = ({
       row: getDataRow(rowKey),
       property: propertyName,
       value: value,
+      index: rowKey,
     };
 
     if (isDeleteRow) {

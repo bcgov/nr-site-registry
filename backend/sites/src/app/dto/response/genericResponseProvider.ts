@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GenericResponse } from './genericResponse';
+import { GenericPagedResponse, GenericResponse } from './genericResponse';
 
 @Injectable()
 export class GenericResponseProvider<T> {

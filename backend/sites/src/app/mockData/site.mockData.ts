@@ -127,7 +127,9 @@ siteSubdivisions = [
     sprofDateCompleted: null,
     sendToSr: 'Y',
     site: null,
-    subdivision: null,
+    subdivision: null ,
+    srAction: '',
+    userAction: ''
   },
   {
     siteSubdivId: '457',
@@ -143,6 +145,8 @@ siteSubdivisions = [
     sendToSr: 'Y',
     site: null,
     subdivision: null,
+    srAction: '',
+    userAction: ''
   },
   {
     siteSubdivId: '458',
@@ -158,6 +162,8 @@ siteSubdivisions = [
     sendToSr: 'Y',
     site: null,
     subdivision: null,
+    srAction: '',
+    userAction: ''
   },
 ];
 

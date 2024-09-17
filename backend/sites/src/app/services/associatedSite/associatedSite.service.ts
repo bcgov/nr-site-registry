@@ -44,7 +44,7 @@ export class AssociatedSiteService {
     } catch (error) {
       // Log or handle the error as necessary
       throw new Error(
-        `Failed to retrieve associated sites by site ID: ${error.message}`,
+        `Failed to retrieve associated sites by site ID: ${siteId}`,
       );
     }
   }

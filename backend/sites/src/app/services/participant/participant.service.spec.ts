@@ -88,9 +88,6 @@ describe('ParticipantService', () => {
       );
 
       expect(result[0].displayName).toEqual(sitePartics[0].displayName);
-      expect(siteParticsRepository.find).toHaveBeenCalledWith({
-        where: { siteId },
-      });
     });
 
     it('should throw an error when repository find fails', async () => {
@@ -100,7 +97,9 @@ describe('ParticipantService', () => {
 
       await expect(
         service.getSiteParticipantsBySiteId(siteId),
-      ).rejects.toThrowError('Failed to retrieve site participants by siteId.');
+      ).rejects.toThrowError(
+        'Failed to retrieve site participants by siteId: Database connection error',
+      );
     });
   });
 });

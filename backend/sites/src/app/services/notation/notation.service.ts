@@ -4,10 +4,9 @@ import { In, Repository } from 'typeorm';
 import { Events } from '../../entities/events.entity';
 import { NotationDto } from '../../dto/notation.dto';
 import { plainToInstance } from 'class-transformer';
-import { UserActionEnum } from 'src/app/common/userActionEnum';
-import { SRApprovalStatusEnum } from 'src/app/common/srApprovalStatusEnum';
-import { EventPartics } from 'src/app/entities/eventPartics.entity';
-import { PeopleOrgs } from 'src/app/entities/peopleOrgs.entity';
+import { UserActionEnum } from '../../common/userActionEnum';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { EventPartics } from '../../entities/eventPartics.entity';
 
 @Injectable()
 export class NotationService {
@@ -93,7 +92,7 @@ export class NotationService {
       return plainToInstance(NotationDto, transformedObjects);
     } catch (error) {
       // Handle or log the error as needed
-      throw new Error(`Failed to get site notation: ${error.message}`);
+      throw new Error(`Failed to get site notation.`);
     }
   }
 }

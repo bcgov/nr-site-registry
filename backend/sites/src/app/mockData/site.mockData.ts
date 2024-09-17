@@ -128,6 +128,8 @@ siteSubdivisions = [
     sendToSr: 'Y',
     site: null,
     subdivision: null,
+    userAction: 'pending',
+    srAction: 'pending',
   },
   {
     siteSubdivId: '457',
@@ -143,6 +145,8 @@ siteSubdivisions = [
     sendToSr: 'Y',
     site: null,
     subdivision: null,
+    userAction: 'pending',
+    srAction: 'pending',
   },
   {
     siteSubdivId: '458',
@@ -158,6 +162,8 @@ siteSubdivisions = [
     sendToSr: 'Y',
     site: null,
     subdivision: null,
+    userAction: 'pending',
+    srAction: 'pending',
   },
 ];
 

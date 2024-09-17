@@ -27,7 +27,7 @@ export class DisclosureService {
     } catch (error) {
       // Log or handle the error as necessary
       throw new Error(
-        `Failed to retrieve site disclosures for siteId ${siteId}: ${error.message}`,
+        `Failed to retrieve site disclosures for siteId ${siteId}`,
       );
     }
   }

@@ -192,10 +192,7 @@ const folioSlice = createSlice({
         state.addRequestStatus = RequestStatus.failed;
       })
       .addCase(addSiteToFolio.fulfilled, (state, action) => {
-       
-        if (
-          action?.payload?.data?.addSiteToFolio?.httpStatusCode === 201
-        ) {
+        if (action?.payload?.data?.addSiteToFolio?.httpStatusCode === 201) {
           state.addSiteToFolioRequest = RequestStatus.success;
         } else {
           state.addSiteToFolioRequest = RequestStatus.failed;
@@ -205,9 +202,7 @@ const folioSlice = createSlice({
         state.addSiteToFolioRequest = RequestStatus.failed;
       })
       .addCase(deleteSitesInFolio.fulfilled, (state, action) => {
-        if (
-          action?.payload?.data?.deleteSitesInFolio?.httpStatusCode === 200
-        ) {
+        if (action?.payload?.data?.deleteSitesInFolio?.httpStatusCode === 200) {
           state.deleteSiteInFolioRequest = RequestStatus.success;
         } else {
           state.deleteSiteInFolioRequest = RequestStatus.failed;
@@ -217,9 +212,7 @@ const folioSlice = createSlice({
         state.deleteSiteInFolioRequest = RequestStatus.failed;
       })
       .addCase(updateFolioItem.fulfilled, (state, action) => {
-        if (
-          action?.payload?.data?.updateFolioItem?.httpStatusCode === 201
-        ) {
+        if (action?.payload?.data?.updateFolioItem?.httpStatusCode === 201) {
           state.updateRequestStatus = RequestStatus.success;
         } else {
           state.updateRequestStatus = RequestStatus.failed;
@@ -230,9 +223,7 @@ const folioSlice = createSlice({
         state.updateRequestStatus = RequestStatus.failed;
       })
       .addCase(deleteFolioItem.fulfilled, (state, action) => {
-        if (
-          action?.payload?.data?.deleteFolioItem?.httpStatusCode === 200
-        ) {
+        if (action?.payload?.data?.deleteFolioItem?.httpStatusCode === 200) {
           state.deleteRequestStatus = RequestStatus.success;
         } else {
           state.deleteRequestStatus = RequestStatus.failed;

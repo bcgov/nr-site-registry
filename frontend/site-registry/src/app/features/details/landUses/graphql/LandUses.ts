@@ -12,13 +12,26 @@ export const getLandHistoriesForSiteQuery = gql`
       sortDirection: $sortDirection
     ) {
       data {
+        guid
         siteId
         lutCode
         note
+        whenCreated
         landUse {
           code
           description
         }
+      }
+    }
+  }
+`;
+
+export const getLandUseCodesQuery = gql`
+  {
+    getLandUseCodes {
+      data {
+        description
+        code
       }
     }
   }

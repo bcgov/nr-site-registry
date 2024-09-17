@@ -119,16 +119,12 @@ const cartSlice = createSlice({
       })
       .addCase(addCartItem.fulfilled, (state, action) => {
         console.log('action.payload', action.payload);
-        if (
-          action?.payload?.data?.addCartItem?.httpStatusCode === 201
-        )
+        if (action?.payload?.data?.addCartItem?.httpStatusCode === 201)
           state.addRequestStatus = RequestStatus.success;
         else state.addRequestStatus = RequestStatus.failed;
       })
       .addCase(deleteCartItem.fulfilled, (state, action) => {
-        if (
-          action?.payload?.data?.deleteCartItem?.httpStatusCode === 200
-        )
+        if (action?.payload?.data?.deleteCartItem?.httpStatusCode === 200)
           state.deleteRequestStatus = RequestStatus.success;
         else state.deleteRequestStatus = RequestStatus.failed;
       })

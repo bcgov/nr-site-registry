@@ -165,12 +165,12 @@ const TableBody: FC<TableBodyProps> = ({
     href: string,
     changeHandler: any,
     editMode: boolean,
-    columnIndex: number
+    columnIndex: number,
   ) => {
     if (field.type === FormFieldType.Text) {
       return (
         <TextInput
-        key={columnIndex}
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -193,7 +193,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Search) {
       return (
         <SearchCustomInput
-        key={columnIndex}
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -220,7 +220,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Label) {
       return (
         <Label
-        key={columnIndex}
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -242,7 +242,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Link) {
       return (
         <Link
-        key={columnIndex}
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -267,7 +267,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.DropDown) {
       return (
         <DropdownInput
-        key={columnIndex}
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -292,7 +292,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Checkbox) {
       return (
         <CheckBoxInput
-        key={columnIndex}
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -319,7 +319,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Date) {
       return (
         <DateInput
-        key={columnIndex}
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -340,7 +340,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.TextArea) {
       return (
         <TextAreaInput
-        key={columnIndex}
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -365,7 +365,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.DropDownWithSearch) {
       return (
         <DropdownSearchInput
-        key={columnIndex}
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -391,7 +391,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.DeleteIcon) {
       return (
         <DeleteIcon
-        key={columnIndex}
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -417,7 +417,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.IconButton) {
       return (
         <IconButton
-        key={columnIndex}
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -474,7 +474,7 @@ const TableBody: FC<TableBodyProps> = ({
       column.linkRedirectionURL ?? '',
       changeHandler,
       editMode,
-      columnIndex
+      columnIndex,
     );
   };
 
@@ -498,7 +498,7 @@ const TableBody: FC<TableBodyProps> = ({
                     checkboxId,
                     rowIndex,
                   );
-                }}              
+                }}
                 checked={rowChecked || false}
               />
             </td>

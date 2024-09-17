@@ -6,6 +6,7 @@ import { GRAPHQL } from '../../../helpers/endpoints';
 import {
   createSnapshotForSitesQL,
   graphQLSnapshotBySiteId,
+  graphQLGetBannerType,
 } from '../../site/graphql/Snapshot';
 import { print } from 'graphql';
 
@@ -16,6 +17,7 @@ const initialState: ISnapshotState = {
   error: '',
   firstSnapshotCreatedDate: null,
   createSnapshotRequest: RequestStatus.idle,
+  bannerType: '',
 };
 
 // Define the asynchronous thunk to fetch site participants from the backend
@@ -47,6 +49,32 @@ export const createSnapshotForSites = createAsyncThunk(
       },
     });
     return response.data;
+  },
+);
+
+// Define the asynchronous thunk to fetch site participants from the backend
+export const getBannerType = createAsyncThunk(
+  'snapshots/getBannerType',
+  async (siteId: string) => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(graphQLGetBannerType()),
+        variables: {
+          siteId: siteId,
+        },
+      });
+
+      if (
+        !response.data ||
+        response.data.errors ||
+        !response.data.data.getBannerType.data
+      ) {
+        throw new Error('Invalid response or banner type not found');
+      }
+      return response.data.data.getBannerType.data.bannerType;
+    } catch (error) {
+      throw error;
+    }
   },
 );
 
@@ -97,6 +125,22 @@ const snapshotsSlice = createSlice({
       })
       .addCase(createSnapshotForSites.rejected, (state, action) => {
         state.createSnapshotRequest = RequestStatus.failed;
+      })
+      .addCase(getBannerType.pending, (state) => {
+        state.status = RequestStatus.loading;
+      })
+      .addCase(getBannerType.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.status = RequestStatus.success;
+          state.bannerType = action.payload;
+        } else {
+          state.status = RequestStatus.failed;
+          state.error = 'Failed to fetch banner type';
+        }
+      })
+      .addCase(getBannerType.rejected, (state, action) => {
+        state.status = RequestStatus.failed;
+        state.error = action.error.message ?? '';
       });
   },
 });
@@ -111,5 +155,7 @@ export const createSnapshotForSitesStatus = (state: any) =>
   state.snapshots.createSnapshotRequest;
 
 export const { resetCreateSnapshotForSitesStatus } = snapshotsSlice.actions;
+
+export const selectBannerType = (state: any) => state.snapshots.bannerType;
 
 export default snapshotsSlice.reducer;

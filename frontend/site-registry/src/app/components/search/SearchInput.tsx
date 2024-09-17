@@ -53,6 +53,7 @@ const SearchInput: React.FC<ISearchInput> = ({
           )}
           <input
             id={searchId}
+            data-testid={searchId}
             aria-label={label}
             onChange={(event) => {
               handleSearchChange(event);

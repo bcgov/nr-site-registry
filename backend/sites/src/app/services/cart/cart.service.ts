@@ -58,11 +58,9 @@ export class CartService {
 
         if (insertedRecords.length > 0) return true;
         else return false;
-      }
-      else if(cartItemsToInsert?.length === 0)
-      {
+      } else if (cartItemsToInsert?.length === 0) {
         return true;
-      } 
+      }
 
       return false;
     } catch (error) {

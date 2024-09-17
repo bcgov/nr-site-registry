@@ -1,0 +1,12 @@
+.land-uses-btn {
+  padding: var(--layout-padding-small) var(--layout-padding-medium);
+  border-radius: var(--surface-border-radius-medium);
+  gap: var(--layout-margin-small);
+  border: 1px solid var(--surface-border-dark, #353433);
+  background: var(--surface-background-white, #ffffff);
+
+  &.land-uses-btn-disabled {
+    border: none;
+    background: var(--surface-primary-disabled, #edebe9);
+  }
+}

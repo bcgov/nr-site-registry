@@ -1,12 +1,16 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RequestStatus } from '../../helpers/requests/status';
 
-import { getAxiosInstance } from '../../helpers/utility';
+import {
+  deepFilterByUserAction,
+  getAxiosInstance,
+} from '../../helpers/utility';
 import { GRAPHQL } from '../../helpers/endpoints';
 
 import { print } from 'graphql';
 import { updateSiteDetails } from './graphql/SaveSiteDetails';
 import { SaveSiteDetails } from './dto/SiteDetailsMode';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 const initialState: SaveSiteDetails = {
   saveRequestStatus: RequestStatus.idle,
@@ -134,7 +138,11 @@ const siteDetailsSlice = createSlice({
 
 export const getSiteDetailsToBeSaved = (state: any) => {
   return {
-    events: state.siteDetails.notationData,
+    events: deepFilterByUserAction(state.siteDetails.notationData, [
+      UserActionEnum.added,
+      UserActionEnum.updated,
+      UserActionEnum.deleted,
+    ]),
     siteParticipants: state.siteDetails.siteParticipantData,
     documents: state.siteDetails.documentsData,
     siteAssociations: state.siteDetails.siteAssociations,
@@ -148,7 +156,7 @@ export const getSiteDetailsToBeSaved = (state: any) => {
 
 export const saveRequestStatus = (state: any) =>
   state.siteDetails.saveRequestStatus;
-
+export const trackSiteNotation = (state: any) => state.siteDetails.notationData;
 export const {
   resetSaveSiteDetailsRequestStatus,
   resetSaveSiteDetails,

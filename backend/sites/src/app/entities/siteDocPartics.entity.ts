@@ -70,15 +70,12 @@ export class SiteDocPartics {
   @ManyToOne(
     () => DocParticRoleCd,
     (docParticRoleCd) => docParticRoleCd.siteDocPartics,
-    { eager: true },
   )
   @JoinColumn([{ name: 'dpr_code', referencedColumnName: 'code' }])
   dprCode2: DocParticRoleCd;
 
   @Field(() => PeopleOrgs)
-  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.siteDocPartics, {
-    eager: true,
-  })
+  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.siteDocPartics)
   @JoinColumn([{ name: 'psnorg_id', referencedColumnName: 'id' }])
   psnorg: PeopleOrgs;
 

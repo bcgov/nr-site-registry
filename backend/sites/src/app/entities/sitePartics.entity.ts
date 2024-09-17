@@ -74,22 +74,20 @@ export class SitePartics extends ChangeAuditEntity {
   @Column('smallint', { name: 'rwm_note_flag' })
   rwmNoteFlag: number;
 
-  @OneToMany(() => EventPartics, (eventPartics) => eventPartics.sp)
-  eventPartics: EventPartics[];
+  //Commented this as event participant is no longer depends on site participant
+  //Uncomment the code in cases there will be migartion issue from oracle
+  // @OneToMany(() => EventPartics, (eventPartics) => eventPartics.sp)
+  // eventPartics: EventPartics[];
 
   @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sp)
   siteDocPartics: SiteDocPartics[];
 
   @Field(() => [SiteParticRoles])
-  @OneToMany(() => SiteParticRoles, (siteParticRoles) => siteParticRoles.sp, {
-    eager: true,
-  })
+  @OneToMany(() => SiteParticRoles, (siteParticRoles) => siteParticRoles.sp)
   siteParticRoles: SiteParticRoles[];
 
   @Field(() => PeopleOrgs)
-  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.sitePartics, {
-    eager: true,
-  })
+  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.sitePartics)
   @JoinColumn([{ name: 'psnorg_id', referencedColumnName: 'id' }])
   psnorg: PeopleOrgs;
 

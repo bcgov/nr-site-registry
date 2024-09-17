@@ -227,7 +227,7 @@ export const TextInput: React.FC<InputProps> = ({
               htmlFor={inputTxtId}
               className={`${
                 !isEditing
-                  ? (customLabelCss ?? '')
+                  ? customLabelCss ?? ''
                   : `form-label ${customEditLabelCss ?? 'custom-label'}`
               }`}
             >
@@ -316,7 +316,7 @@ export const DropdownInput: React.FC<InputProps> = ({
           htmlFor={drdownId}
           className={`${
             !isEditing
-              ? (customLabelCss ?? '')
+              ? customLabelCss ?? ''
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
           aria-labelledby={label}
@@ -478,7 +478,7 @@ export const GroupInput: React.FC<InputProps> = ({
         htmlFor={groupId}
         className={`${
           !isEditing
-            ? (customLabelCss ?? '')
+            ? customLabelCss ?? ''
             : `form-label ${customEditLabelCss ?? 'custom-label'}`
         }`}
       >
@@ -494,7 +494,7 @@ export const GroupInput: React.FC<InputProps> = ({
                 {isChildLabel && (
                   <label
                     htmlFor={grpId}
-                    className={`${!isEditing ? (customLabelCss ?? '') : `form-label ${customEditLabelCss ?? 'custom-label'}`}`}
+                    className={`${!isEditing ? customLabelCss ?? '' : `form-label ${customEditLabelCss ?? 'custom-label'}`}`}
                   >
                     {child.label}
                   </label>
@@ -580,7 +580,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
           htmlFor={dateRangeId}
           className={`${
             !isEditing
-              ? (customLabelCss ?? '')
+              ? customLabelCss ?? ''
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
         >
@@ -661,7 +661,7 @@ export const DateInput: React.FC<InputProps> = ({
           htmlFor={dateRangeId}
           className={`${
             !isEditing
-              ? (customLabelCss ?? '')
+              ? customLabelCss ?? ''
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
         >
@@ -716,7 +716,8 @@ export const CheckBoxInput: React.FC<InputProps> = ({
     onChange(e.target.checked); // Toggle the checked state and pass it to the parent component
   };
 
-  const disableCheckBox = isEditing || srMode ? false : true;
+  // const disableCheckBox = isEditing || srMode ? false : true;
+  const disableCheckBox = srMode ? false : true;
 
   return (
     <ContainerElement
@@ -747,7 +748,7 @@ export const CheckBoxInput: React.FC<InputProps> = ({
             htmlFor={inputTxtId}
             className={`${
               !isEditing
-                ? (customLabelCss ?? '')
+                ? customLabelCss ?? ''
                 : `px-1 form-label ${customEditLabelCss ?? 'custom-label'}`
             }`}
           >
@@ -804,7 +805,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
               htmlFor={textAreaId}
               className={`${
                 !isEditing
-                  ? (customLabelCss ?? '')
+                  ? customLabelCss ?? ''
                   : `form-label ${customEditLabelCss ?? 'custom-label'}`
               }`}
             >
@@ -928,7 +929,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
           htmlFor={drdownId}
           className={`${
             !isEditing
-              ? (customLabelCss ?? '')
+              ? customLabelCss ?? ''
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
         >
@@ -1056,12 +1057,11 @@ export const SearchCustomInput: React.FC<InputProps> = ({
     }
   }, [resetDetails]);
 
-  const validateInput = (inputValue: string) => {
+  const validateInput = (inputValue: any) => {
     if (validation) {
       if (inputValue === null || inputValue === undefined) {
         return false;
       }
-
       if (validation.pattern && !validation.pattern.test(inputValue)) {
         setError(validation.customMessage || 'Invalid input');
         return false;
@@ -1074,10 +1074,10 @@ export const SearchCustomInput: React.FC<InputProps> = ({
 
   const handleTextInputChange = (value: any) => {
     const inputValue = value;
-    validateInput(inputValue);
+    // validateInput(inputValue);
     setHasInfoMsg(null);
     if (allowNumbersOnly) {
-      if (validateInput(inputValue)) {
+      if (validateInput(parseInt(inputValue, 10))) {
         if (inputValue.trim().toString() === '') {
           setHasInfoMsg(customInfoMessage);
           setIsOpen(false);
@@ -1099,7 +1099,8 @@ export const SearchCustomInput: React.FC<InputProps> = ({
 
   const handleSelectInputChange = (selectedValue: any) => {
     setHasInfoMsg(customInfoMessage);
-    handleTextInputChange({ ...selectedValue });
+    const { value } = selectedValue;
+    handleTextInputChange(value);
   };
 
   const closeSearch = useCallback(() => {
@@ -1157,7 +1158,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
           htmlFor={inputTxtId}
           className={`${
             !isEditing
-              ? (customLabelCss ?? '')
+              ? customLabelCss ?? ''
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
         >

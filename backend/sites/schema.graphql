@@ -487,6 +487,8 @@ type NotationResponse {
 }
 
 type NotationDto {
+  userAction: String!
+  srAction: String!
   id: String!
   psnorgId: String!
   siteId: String!
@@ -501,7 +503,10 @@ type NotationDto {
 }
 
 type NotationParticipantDto {
+  userAction: String!
+  srAction: String!
   guid: String!
+  eventId: String!
   eprCode: String!
   psnorgId: String!
   displayName: String!
@@ -702,7 +707,8 @@ input SaveSiteDetailsDTO {
 }
 
 input SiteSummaryDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   id: String!
   bcerCode: String
@@ -741,7 +747,8 @@ input SiteSummaryDTO {
 }
 
 input NotationIputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   id: String!
   psnorgId: String!
@@ -757,16 +764,19 @@ input NotationIputDTO {
 }
 
 input NotationParticipantInputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   guid: String!
+  eventId: String!
   eprCode: String!
   psnorgId: String!
   displayName: String!
 }
 
 input SiteParticsInputDto {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   guid: String!
   id: String!
@@ -780,7 +790,8 @@ input SiteParticsInputDto {
 }
 
 input DocumentInputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   id: String!
   psnorgId: String!
@@ -792,7 +803,8 @@ input DocumentInputDTO {
 }
 
 input SiteAssociationsInputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   siteId: String!
   siteIdAssociatedWith: String!
@@ -808,7 +820,8 @@ input SiteAssociationsInputDTO {
 }
 
 input SubDivisionsInputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   id: String!
   dateNoted: DateTime!
@@ -833,7 +846,8 @@ input SubDivisionsInputDTO {
 }
 
 input LandHistoriesInputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   siteId: String!
   lutCode: String!
@@ -849,7 +863,8 @@ input LandHistoriesInputDTO {
 }
 
 input SiteProfilesInputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   siteId: String!
   dateCompleted: DateTime!

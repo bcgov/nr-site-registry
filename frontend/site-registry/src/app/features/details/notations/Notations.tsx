@@ -62,6 +62,13 @@ import { print } from 'graphql';
 import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
 import GetNotationConfig from './NotationsConfig';
 import infoIcon from '../../../images/info-icon.png';
+import {
+  saveRequestStatus,
+  setupNotationDataForSaving,
+  trackSiteNotation,
+} from '../SaveSiteDetailsSlice';
+import { UserActionEnum } from '../../../common/userActionEnum';
+import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 
 const Notations = () => {
   const {
@@ -84,8 +91,14 @@ const Notations = () => {
   const participantName = useSelector(participantNameDrpdown);
   const loggedInUser = getUser();
   const resetDetails = useSelector(resetSiteDetails);
-  const { id } = useParams();
+  const { id: siteId } = useParams();
 
+  //need to discuss about this as when I add notation participant
+  //it will add the participant in table but without refresing the page I wont have
+  //id, therefore without refreshing If i am gonna try to deleted the just added participant
+  //it wont delete the participant from table as I dont have the extact id from table.
+  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
+  const trackNotation = useSelector(trackSiteNotation);
   const [userType, setUserType] = useState('');
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [formData, setFormData] =
@@ -111,6 +124,8 @@ const Notations = () => {
   const [externalTableColumn, setExternalTableCoulmn] = useState(
     notationColumnExternal,
   );
+  const [searchSiteParticipant, setSearchSiteParticipant] = useState('');
+  const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
 
   const fetchMinistryContact = async (entityType: string) => {
     try {
@@ -152,7 +167,7 @@ const Notations = () => {
   }, [mode]);
 
   useEffect(() => {
-    if (id) {
+    if (siteId) {
       Promise.all([
         fetchMinistryContact('EMP')
           .then((res) => {
@@ -164,7 +179,7 @@ const Notations = () => {
         dispatch(fetchNotationClassCd()),
         dispatch(fetchNotationTypeCd()),
         dispatch(fetchNotationParticipantRoleCd()),
-        dispatch(fetchNotationParticipants(id ?? '')),
+        dispatch(fetchNotationParticipants(siteId ?? '')),
       ])
         .then(() => {
           setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
@@ -174,16 +189,16 @@ const Notations = () => {
           console.error('Error fetching data:', error);
         });
     }
-  }, [id]);
+  }, [siteId]);
+  // }, [siteId, saveSiteDetailsRequestStatus]);
 
   useEffect(() => {
     if (resetDetails) {
       setFormData(notations);
+      dispatch(setupNotationDataForSaving(null));
     }
   }, [resetDetails]);
 
-  const [searchSiteParticipant, setSearchSiteParticipant] = useState('');
-  const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
   const fetchNotationParticipant = async (searchParam: string) => {
     try {
       if (
@@ -260,7 +275,7 @@ const Notations = () => {
     setSearchSiteParticipant(value.trim());
     let params: UpdateDisplayTypeParams = {
       indexToUpdate: notationColumnInternal.findIndex(
-        (item:any) => item.displayType?.graphQLPropertyName === 'psnorgId',
+        (item: any) => item.displayType?.graphQLPropertyName === 'psnorgId',
       ),
       updates: {
         isLoading: RequestStatus.loading,
@@ -309,6 +324,7 @@ const Notations = () => {
         setExternalTableCoulmn(updateTableColumn(internalTableColumn, params));
       }
       setFormData(notations);
+      dispatch(setupNotationDataForSaving(notations));
     }
   }, [notations, status]);
 
@@ -412,13 +428,56 @@ const Notations = () => {
               ...notation,
               [graphQLPropertyName]: value,
               ['etypCode']: '',
+              // userAction: notation?.userAction === UserActionEnum.added ? UserActionEnum.added : UserActionEnum.updated,
+              apiAction: notation?.apiAction ?? UserActionEnum.updated,
+              srAction: SRApprovalStatusEnum.Pending,
             };
           }
-          return { ...notation, [graphQLPropertyName]: value };
+          return {
+            ...notation,
+            [graphQLPropertyName]: value,
+            // userAction: notation?.userAction === UserActionEnum.added ? UserActionEnum.added : UserActionEnum.updated,
+            apiAction: notation?.apiAction ?? UserActionEnum.updated,
+            srAction: SRApprovalStatusEnum.Pending,
+          };
+        }
+        return notation;
+      });
+
+      const trackNotatn = trackNotation.map((notation: any) => {
+        if (notation.id === id) {
+          if (graphQLPropertyName === 'eclsCode') {
+            // setIsUpdated(true);
+            // const updatedRow = [...notationFormRowEditMode].map((items) => {
+            //   return items.map((row) => ({
+            //     ...row,
+            //     options: notationType.data.find(
+            //       (items: any) => items.metaData === value,
+            //     ).dropdownDto,
+            //   }));
+            // });
+            // setUpdatedNotationFormRowEditMode(updatedRow);
+            return {
+              ...notation,
+              [graphQLPropertyName]: value,
+              ['etypCode']: '',
+              // userAction: notation?.userAction === UserActionEnum.added ? UserActionEnum.added : UserActionEnum.updated,
+              apiAction: notation?.apiAction ?? UserActionEnum.updated,
+              srAction: SRApprovalStatusEnum.Pending,
+            };
+          }
+          return {
+            ...notation,
+            [graphQLPropertyName]: value,
+            // userAction: notation?.userAction === UserActionEnum.added ? UserActionEnum.added : UserActionEnum.updated,
+            apiAction: notation?.apiAction ?? UserActionEnum.updated,
+            srAction: SRApprovalStatusEnum.Pending,
+          };
         }
         return notation;
       });
       setFormData(updatedNotation);
+      dispatch(setupNotationDataForSaving(trackNotatn));
       dispatch(updateSiteNotation(updatedNotation));
     }
 
@@ -436,6 +495,7 @@ const Notations = () => {
   const handleWidgetCheckBox = (event: any) => {
     alert(event);
   };
+
   const handleParentChekBoxChange = (id: any, value: any) => {
     alert(`${value}, ${id}`);
   };
@@ -446,27 +506,81 @@ const Notations = () => {
   ) => {
     if (particIsDelete) {
       // Remove selected rows from formData state
-      setFormData((prevData) => {
-        return prevData.map((notation) => {
-          if (notation.id === currNotation.id) {
-            // Filter out selected rows from notationParticipant array
-            const updatedNotationParticipant =
-              notation.notationParticipant.filter(
-                (participant: any) =>
-                  !selectedRows.some(
+      const updatedPartics = formData.map((notation) => {
+        if (notation.id === currNotation.id) {
+          // Filter out selected rows from notationParticipant array
+
+          const updatedNotationParticipant =
+            notation.notationParticipant.filter(
+              (participant: any) =>
+                !selectedRows.some(
+                  (row) =>
+                    row.id === notation.id &&
+                    row.participantId === participant.guid,
+                ),
+            );
+          return {
+            ...notation,
+            notationParticipant: updatedNotationParticipant,
+            // userAction: UserActionEnum.deleted,
+            // srAction: SRApprovalStatusEnum.Pending,
+          };
+        }
+        return notation;
+      });
+      // setFormData((prevData) => {
+      //   return prevData.map((notation) => {
+      //     if (notation.id === currNotation.id) {
+      //       // Filter out selected rows from notationParticipant array
+      //       const updatedNotationParticipant =
+      //         notation.notationParticipant.filter(
+      //           (participant: any) =>
+      //             !selectedRows.some(
+      //               (row) =>
+      //                 row.id === notation.id &&
+      //                 row.participantId === participant.guid,
+      //             ),
+      //         );
+      //       return {
+      //         ...notation,
+      //         notationParticipant: updatedNotationParticipant,
+      //       };
+      //     }
+      //     return notation;
+      //   });
+      // });
+
+      // Step 2: Prepare data for saving with userAction set to deleted for participants
+      const trackNotatn = trackNotation.map((notation: any) => {
+        if (notation.id === currNotation.id) {
+          return {
+            ...notation,
+            notationParticipant: notation.notationParticipant.map(
+              (participant: any) => {
+                if (
+                  selectedRows.some(
                     (row) =>
                       row.id === notation.id &&
                       row.participantId === participant.guid,
-                  ),
-              );
-            return {
-              ...notation,
-              notationParticipant: updatedNotationParticipant,
-            };
-          }
-          return notation;
-        });
+                  )
+                ) {
+                  return {
+                    ...participant,
+                    apiAction: UserActionEnum.deleted, // Set apiAction to deleted for participants
+                    srAction: SRApprovalStatusEnum.Pending,
+                  };
+                }
+                return participant;
+              },
+            ),
+          };
+        }
+        return notation;
       });
+
+      setFormData(updatedPartics);
+      dispatch(setupNotationDataForSaving(trackNotatn));
+
       const tracker = new ChangeTracker(
         IChangeType.Deleted,
         'Notation Participant Delete',
@@ -533,7 +647,7 @@ const Notations = () => {
                     ),
                     updates: {
                       isLoading: RequestStatus.success,
-                      options: options,
+                      options: [...options, event.value],
                       filteredOptions: [],
                       handleSearch: handleSearch,
                       customInfoMessage: <></>,
@@ -546,9 +660,18 @@ const Notations = () => {
                     ...participant,
                     [event.property]: event.value.key,
                     ['displayName']: event.value.value,
+                    // userAction: participant?.userAction === UserActionEnum.added ? UserActionEnum.added : UserActionEnum.updated,
+                    apiAction: participant?.apiAction ?? UserActionEnum.updated,
+                    srAction: SRApprovalStatusEnum.Pending,
                   };
                 }
-                return { ...participant, [event.property]: event.value };
+                return {
+                  ...participant,
+                  [event.property]: event.value,
+                  // userAction: participant?.userAction === UserActionEnum.added ? UserActionEnum.added : UserActionEnum.updated,
+                  apiAction: participant?.apiAction ?? UserActionEnum.updated,
+                  srAction: SRApprovalStatusEnum.Pending,
+                };
               }
               return participant;
             },
@@ -560,6 +683,63 @@ const Notations = () => {
         }
         return notation;
       });
+      setFormData(updateNotationParticipant);
+      const trackNotatn = trackNotation.map((notation: any) => {
+        if (notation.id === id) {
+          const updatedNotatnParticipant = notation.notationParticipant.map(
+            (participant: any) => {
+              if (participant.guid === event.row.guid) {
+                if (
+                  typeof event.value === 'object' &&
+                  event.value !== null &&
+                  event.property === 'psnorgId'
+                ) {
+                  // Parameters for the update
+                  // let params: UpdateDisplayTypeParams = {
+                  //   indexToUpdate: notationColumnInternal.findIndex(
+                  //     (item) =>
+                  //       item.displayType?.graphQLPropertyName === 'psnorgId',
+                  //   ),
+                  //   updates: {
+                  //     isLoading: RequestStatus.success,
+                  //     options: options,
+                  //     filteredOptions: [],
+                  //     handleSearch: handleSearch,
+                  //     customInfoMessage: <></>,
+                  //   },
+                  // };
+                  // setInternalTableColumn(
+                  //   updateTableColumn(internalTableColumn, params),
+                  // );
+                  return {
+                    ...participant,
+                    [event.property]: event.value.key,
+                    ['displayName']: event.value.value,
+                    // userAction: participant?.userAction === UserActionEnum.added ? UserActionEnum.added : UserActionEnum.updated,
+                    apiAction: participant?.apiAction ?? UserActionEnum.updated,
+                    srAction: SRApprovalStatusEnum.Pending,
+                  };
+                }
+                return {
+                  ...participant,
+                  [event.property]: event.value,
+                  // userAction: participant?.userAction === UserActionEnum.added ? UserActionEnum.added : UserActionEnum.updated,
+                  apiAction: participant?.apiAction ?? UserActionEnum.updated,
+                  srAction: SRApprovalStatusEnum.Pending,
+                };
+              }
+              return participant;
+            },
+          );
+          return {
+            ...notation,
+            notationParticipant: updatedNotatnParticipant,
+          };
+        }
+        return notation;
+      });
+
+      dispatch(setupNotationDataForSaving(trackNotatn));
 
       const currLabel =
         notationColumnInternal &&
@@ -570,7 +750,7 @@ const Notations = () => {
         IChangeType.Modified,
         'Notation Participant: ' + currLabel?.displayName,
       );
-      setFormData(updateNotationParticipant);
+
       dispatch(updateSiteNotation(updateNotationParticipant));
     }
   };
@@ -613,26 +793,35 @@ const Notations = () => {
   const handleOnAddNotation = () => {
     const newNotation = {
       id: v4(), // Generate a unique ID for the new notation
+      siteId: siteId,
       etypCode: '', // Default values for other properties
       requirementReceivedDate: new Date(),
       completionDate: new Date(),
       eclsCode: '',
       requirementDueDate: new Date(),
-      ministryContact: '',
       requiredAction: '',
       note: '',
+      // userAction: UserActionEnum.added,
+      apiAction: UserActionEnum.added,
+      srAction: SRApprovalStatusEnum.Pending,
       notationParticipant: [
         {
           displayName: '',
           eprCode: '',
           psnorgId: '',
-          guid: '',
+          eventId: '',
+          // spId:'',
+          guid: v4(),
+          // userAction: UserActionEnum.added,
+          apiAction: UserActionEnum.added,
+          srAction: SRApprovalStatusEnum.Pending,
         },
       ],
     };
 
     // Add the new notation to formData
     setFormData((prevData) => [newNotation, ...prevData]);
+    dispatch(setupNotationDataForSaving([newNotation, ...trackNotation]));
     const tracker = new ChangeTracker(IChangeType.Added, 'New Notation Added');
     dispatch(trackChanges(tracker.toPlainObject()));
   };
@@ -640,26 +829,59 @@ const Notations = () => {
   const handleAddParticipant = (id: any) => {
     const newParticipant = {
       displayName: '',
+      eventId: '',
+      // spId:'',
       eprCode: '',
       psnorgId: '',
       guid: v4(),
+      // userAction: UserActionEnum.added,
+      apiAction: UserActionEnum.added,
+      srAction: SRApprovalStatusEnum.Pending,
     };
-
-    setFormData((prevFormData) => {
-      return prevFormData.map((notation) => {
-        if (notation.id === id) {
-          // Create a new array with the updated notation object
-          return {
-            ...notation,
-            notationParticipant: [
-              newParticipant,
-              ...notation.notationParticipant,
-            ],
-          };
-        }
-        return notation;
-      });
+    const updatedPartics = formData.map((notation) => {
+      if (notation.id === id) {
+        // Create a new array with the updated notation object
+        return {
+          ...notation,
+          notationParticipant: [
+            newParticipant,
+            ...notation.notationParticipant,
+          ],
+        };
+      }
+      return notation;
     });
+    const trackSiteNotation = trackNotation.map((notation: any) => {
+      if (notation.id === id) {
+        // Create a new array with the updated notation object
+        return {
+          ...notation,
+          notationParticipant: [
+            newParticipant,
+            ...notation.notationParticipant,
+          ],
+        };
+      }
+      return notation;
+    });
+    // setFormData((prevFormData) => {
+    //   return prevFormData.map((notation) => {
+    //     if (notation.id === id) {
+    //       // Create a new array with the updated notation object
+    //       return {
+    //         ...notation,
+    //         notationParticipant: [
+    //           newParticipant,
+    //           ...notation.notationParticipant,
+    //         ],
+    //       };
+    //     }
+    //     return notation;
+    //   });
+    // });
+
+    setFormData(updatedPartics);
+    dispatch(setupNotationDataForSaving(trackSiteNotation));
     const tracker = new ChangeTracker(
       IChangeType.Added,
       'Notation Participant Added',

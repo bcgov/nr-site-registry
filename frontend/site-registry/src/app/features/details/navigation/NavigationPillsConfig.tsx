@@ -20,18 +20,16 @@ export const navItems: string[] = [
   'Site Disclosure',
 ];
 
-export function navComponents(): JSX.Element[] {
-  return [
-    <Summary />,
-    <Notations />,
-    <Participants />,
-    <Documents />,
-    <Associate />,
-    <LandUses />,
-    <ParcelDescriptions />,
-    <Disclosure />,
-  ];
-}
+export const navComponents: JSX.Element[] = [
+  <Summary />,
+  <Notations />,
+  <Participants />,
+  <Documents />,
+  <Associate />,
+  <LandUses />,
+  <ParcelDescriptions />,
+  <Disclosure />,
+];
 
 export const dropDownNavItems: DropdownItem[] = [
   {

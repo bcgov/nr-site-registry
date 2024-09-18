@@ -1,6 +1,14 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RequestStatus } from '../../../helpers/requests/status';
-import { IParcelDescriptionDto } from './parcelDescriptionDto';
+import {
+  IParcelDescriptionDto,
+  IParcelDescriptionResponseDto,
+} from './parcelDescriptionDto';
+import { print } from 'graphql';
+import { getAxiosInstance } from '../../../helpers/utility';
+import { GRAPHQL } from '../../../helpers/endpoints';
+import { format } from 'date-fns';
+import { graphQLParcelDescriptionBySiteId } from '../../site/graphql/ParcelDescriptions';
 
 export interface IParcelDescriptionState {
   siteId: number;
@@ -15,10 +23,19 @@ export interface IParcelDescriptionState {
   sortByInputValue: { [key: string]: any };
 }
 
+export interface IFetchParcelDescriptionParams {
+  siteId: number;
+  page: number;
+  pageSize: number;
+  searchParam: string;
+  sortBy: string;
+  sortByDir: string;
+}
+
 const defaultValues = {
   siteId: 0,
   data: [],
-  requestStatus: RequestStatus.idle,
+  requestStatus: RequestStatus.loading,
   totalResults: 0,
   currentPage: 1,
   resultsPerPage: 5,
@@ -41,15 +58,70 @@ const initialState: IParcelDescriptionState = {
   sortByInputValue: defaultValues.sortByInputValue,
 };
 
+export const fetchParcelDescriptions = createAsyncThunk(
+  'parcelDescriptions/fetchParcelDescriptions',
+  async (params: IFetchParcelDescriptionParams) => {
+    const axios = getAxiosInstance();
+    let response;
+    try {
+      response = await axios.post(GRAPHQL, {
+        query: print(graphQLParcelDescriptionBySiteId()),
+        variables: {
+          siteId: params.siteId,
+          page: params.page,
+          pageSize: params.pageSize,
+          searchParam: params.searchParam,
+          sortBy: params.sortBy,
+          sortByDir: params.sortByDir,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+    if (response?.status != 200) {
+      return {} as IParcelDescriptionResponseDto;
+    }
+    let rawData = response.data?.data?.getParcelDescriptionsBySiteId;
+
+    let formattedData: IParcelDescriptionDto[] = rawData?.data?.map(
+      (parcelDescription: IParcelDescriptionDto) => {
+        // This slices the Z (Zulu Time) designator off of the ISO8601 date string
+        // preventing the browser from applying it's local timezone to the date
+        // object when formatting. Since all of our date strings have a time of
+        // 00:00:00, if a time zone with a negative value were applied it would
+        // cause the resulting formatted date string to be one day lower than it
+        // should be.
+        let dateNoted = new Date(parcelDescription?.dateNoted.slice(0, -1));
+        let formattedDateNoted = dateNoted
+          ? format(new Date(dateNoted), 'PPP')
+          : '';
+        return {
+          id: parcelDescription?.id,
+          descriptionType: parcelDescription?.descriptionType,
+          idPinNumber: parcelDescription?.idPinNumber,
+          dateNoted: formattedDateNoted,
+          landDescription: parcelDescription?.landDescription,
+        };
+      },
+    );
+
+    let formattedResponse: IParcelDescriptionResponseDto = {
+      page: rawData.page,
+      pageSize: rawData.pageSize,
+      count: rawData.count,
+      data: formattedData,
+    };
+
+    return formattedResponse;
+  },
+);
+
 export const parcelDescriptionsSlice = createSlice({
   name: 'parcelDescriptions',
   initialState,
   reducers: {
     setData: (state, action) => {
       state.data = action.payload;
-    },
-    setRequestStatus: (state, action) => {
-      state.requestStatus = action.payload;
     },
     setCurrentPage: (state, action) => {
       state.currentPage = action.payload;
@@ -72,25 +144,28 @@ export const parcelDescriptionsSlice = createSlice({
     setSortByInputValue: (state, action) => {
       state.sortByInputValue = action.payload;
     },
-    resetStateForNewSiteId: (state, action) => {
-      state.siteId = action.payload;
-      state.data = defaultValues.data;
-      state.requestStatus = defaultValues.requestStatus;
-      state.totalResults = defaultValues.totalResults;
-      state.currentPage = defaultValues.currentPage;
-      state.resultsPerPage = defaultValues.resultsPerPage;
-      state.searchParam = defaultValues.searchParam;
-      state.sortBy = defaultValues.sortBy;
-      state.sortByDir = defaultValues.sortByDir;
-      state.sortByInputValue = defaultValues.sortByInputValue;
-    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchParcelDescriptions.pending, (state) => {
+        state.requestStatus = RequestStatus.loading;
+      })
+      .addCase(fetchParcelDescriptions.fulfilled, (state, action) => {
+        state.requestStatus = RequestStatus.success;
+        state.data = action.payload.data;
+        state.currentPage = action.payload.page;
+        state.resultsPerPage = action.payload.pageSize;
+        state.totalResults = action.payload.count;
+      })
+      .addCase(fetchParcelDescriptions.rejected, (state, action) => {
+        state.requestStatus = RequestStatus.failed;
+      });
   },
 });
 
 export default parcelDescriptionsSlice.reducer;
 export const {
   setData,
-  setRequestStatus,
   setCurrentPage,
   setTotalResults,
   setResultsPerPage,
@@ -98,5 +173,4 @@ export const {
   setSortBy,
   setSortByDir,
   setSortByInputValue,
-  resetStateForNewSiteId,
 } = parcelDescriptionsSlice.actions;

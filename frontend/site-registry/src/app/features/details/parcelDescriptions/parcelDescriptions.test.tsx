@@ -7,66 +7,16 @@ import configureStore, {
 import ParcelDescriptions from './parcelDescriptions';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { IParcelDescriptionState } from './parcelDescriptionsSlice';
-import { act } from 'react';
-import { getParcelDescriptions } from './getParcelDescriptions';
-import {
-  IParcelDescriptionDto,
-  IParcelDescriptionResponseDto,
-} from './parcelDescriptionDto';
-
-jest.mock('./getParcelDescriptions');
-const mockedGetParcelDescriptions = jest.mocked(getParcelDescriptions);
+import thunk from 'redux-thunk';
 
 describe('Parcel Descriptions Component', () => {
-  const mockStore: MockStoreCreator<unknown, {}> = configureStore([]);
+  const mockStore: MockStoreCreator<unknown, {}> = configureStore([thunk]);
 
   let store: MockStoreEnhanced<unknown, {}>;
   let siteId = 1;
   let currentPage = 1;
   let resultsPerPage = 5;
   let totalResults = 10;
-  let getParcelDescriptionsReturnValue = {
-    page: 2,
-    pageSize: 5,
-    count: 10,
-    data: [
-      {
-        id: 16,
-        descriptionType: 'Parcel ID',
-        idPinNumber: '123456',
-        dateNoted: 'May 26th, 2023',
-        landDescription: 'sixth land description',
-      },
-      {
-        id: 17,
-        descriptionType: 'Crown Land PIN',
-        idPinNumber: '654321',
-        dateNoted: 'May 25th, 2023',
-        landDescription: 'seventh land description',
-      },
-      {
-        id: 18,
-        descriptionType: 'Crown Land File Number',
-        idPinNumber: 'ax213456',
-        dateNoted: 'May 24th, 2023',
-        landDescription: 'eigth land description',
-      },
-      {
-        id: 19,
-        descriptionType: 'Parcel ID',
-        idPinNumber: '789012',
-        dateNoted: 'May 23rd, 2023',
-        landDescription: 'ninth land description',
-      },
-      {
-        id: 20,
-        descriptionType: 'Crown Land PIN',
-        idPinNumber: '210987',
-        dateNoted: 'May 22nd, 2023',
-        landDescription: 'tenth land description',
-      },
-    ] as IParcelDescriptionDto[],
-  } as IParcelDescriptionResponseDto;
 
   type TestState = { parcelDescriptions: IParcelDescriptionState };
   let testState: TestState = {
@@ -122,9 +72,6 @@ describe('Parcel Descriptions Component', () => {
 
   beforeEach(() => {
     store = mockStore(testState);
-    mockedGetParcelDescriptions.mockResolvedValue(
-      getParcelDescriptionsReturnValue,
-    );
   });
 
   afterEach(() => {
@@ -139,294 +86,194 @@ describe('Parcel Descriptions Component', () => {
     );
 
     const parcelDescriptionsComponent = screen.getByTestId(
-      'parcel-descriptions-component',
+      /^parcel-descriptions-component.*/,
     );
     expect(parcelDescriptionsComponent).toBeInTheDocument();
   });
 
-  describe('when rendering for a new site', () => {
-    let siteId = 2;
+  it('handles selecting the page.', () => {
+    const newPage = 2;
 
-    it("updates the site id to the loaded site's id", async () => {
-      render(
-        <Provider store={store}>
-          <ParcelDescriptions />
-        </Provider>,
-      );
+    render(
+      <Provider store={store}>
+        <ParcelDescriptions />
+      </Provider>,
+    );
 
-      const actions = store.getActions();
-      expect(actions).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            type: 'parcelDescriptions/resetStateForNewSiteId',
-            payload: siteId,
-          }),
-        ]),
-      );
-    });
+    const pageSelect = screen.getByTestId(/^pagination-control-select.*/);
+    fireEvent.change(pageSelect, { target: { value: newPage } });
+    const actions = store.getActions();
+    expect(actions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'parcelDescriptions/setCurrentPage',
+          payload: newPage,
+        }),
+      ]),
+    );
   });
 
-  describe('when rendering for the same site', () => {
-    it("updates the site id to the loaded site's id", async () => {
-      render(
-        <Provider store={store}>
-          <ParcelDescriptions />
-        </Provider>,
-      );
+  it('handles changing the results per page.', () => {
+    const newResultsPerPage = 10;
 
-      const actions = store.getActions();
-      expect(actions).not.toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            type: 'parcelDescriptions/resetStateForNewSiteId',
-            payload: siteId,
-          }),
-        ]),
-      );
+    render(
+      <Provider store={store}>
+        <ParcelDescriptions />
+      </Provider>,
+    );
+
+    const resultsPerPageSelect = screen.getByTestId(
+      /^results-per-page-select.*/,
+    );
+    fireEvent.change(resultsPerPageSelect, {
+      target: { value: newResultsPerPage },
     });
+    const actions = store.getActions();
+    expect(actions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'parcelDescriptions/setResultsPerPage',
+          payload: newResultsPerPage,
+        }),
+      ]),
+    );
+  });
 
-    it('handles selecting the page.', () => {
-      const newPage = 2;
+  it('handles changing the search parameter.', () => {
+    const newSearchParam = 'first';
 
-      render(
-        <Provider store={store}>
-          <ParcelDescriptions />
-        </Provider>,
-      );
+    render(
+      <Provider store={store}>
+        <ParcelDescriptions />
+      </Provider>,
+    );
 
-      const pageSelect = screen.getByTestId('pagination-control-select');
-      fireEvent.change(pageSelect, { target: { value: newPage } });
-      const actions = store.getActions();
-      expect(actions).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            type: 'parcelDescriptions/setRequestStatus',
-            payload: 'pending',
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setCurrentPage',
-            payload: newPage,
-          }),
-        ]),
-      );
-    });
+    const searchInput = screen.getByTestId(/^Search.*/);
+    fireEvent.change(searchInput, { target: { value: newSearchParam } });
+    const actions = store.getActions();
+    expect(actions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'parcelDescriptions/setSearchParam',
+          payload: newSearchParam,
+        }),
+      ]),
+    );
+  });
 
-    it('handles changing the results per page.', () => {
-      const newResultsPerPage = 10;
+  it('handles changing the sort by input to new to old', () => {
+    const newSortBy = 'newToOld';
 
-      render(
-        <Provider store={store}>
-          <ParcelDescriptions />
-        </Provider>,
-      );
+    render(
+      <Provider store={store}>
+        <ParcelDescriptions />
+      </Provider>,
+    );
 
-      const resultsPerPageSelect = screen.getByTestId(
-        'results-per-page-select',
-      );
-      fireEvent.change(resultsPerPageSelect, {
-        target: { value: newResultsPerPage },
-      });
-      const actions = store.getActions();
-      expect(actions).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            type: 'parcelDescriptions/setRequestStatus',
-            payload: 'pending',
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setResultsPerPage',
-            payload: newResultsPerPage,
-          }),
-        ]),
-      );
-    });
+    const sortByInput = screen.getByTestId(/^Sort_By.*/);
+    fireEvent.change(sortByInput, { target: { value: newSortBy } });
+    const actions = store.getActions();
+    expect(actions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'parcelDescriptions/setSortByInputValue',
+          payload: { sortBy: newSortBy },
+        }),
+        expect.objectContaining({
+          type: 'parcelDescriptions/setSortBy',
+          payload: 'date_noted',
+        }),
+        expect.objectContaining({
+          type: 'parcelDescriptions/setSortByDir',
+          payload: 'DESC',
+        }),
+      ]),
+    );
+  });
 
-    it('handles changing the search parameter.', () => {
-      const newSearchParam = 'first';
+  it('handles changing the sort by input to old to new', () => {
+    const newSortBy = 'oldTonew';
 
-      render(
-        <Provider store={store}>
-          <ParcelDescriptions />
-        </Provider>,
-      );
+    render(
+      <Provider store={store}>
+        <ParcelDescriptions />
+      </Provider>,
+    );
 
-      const searchInput = screen.getByTestId('Search');
-      fireEvent.change(searchInput, { target: { value: newSearchParam } });
-      const actions = store.getActions();
-      expect(actions).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            type: 'parcelDescriptions/setRequestStatus',
-            payload: 'pending',
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setSearchParam',
-            payload: newSearchParam,
-          }),
-        ]),
-      );
-    });
+    const sortByInput = screen.getByTestId(/^Sort_By.*/);
+    fireEvent.change(sortByInput, { target: { value: newSortBy } });
+    const actions = store.getActions();
+    expect(actions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'parcelDescriptions/setSortByInputValue',
+          payload: { sortBy: newSortBy },
+        }),
+        expect.objectContaining({
+          type: 'parcelDescriptions/setSortBy',
+          payload: 'date_noted',
+        }),
+        expect.objectContaining({
+          type: 'parcelDescriptions/setSortByDir',
+          payload: 'ASC',
+        }),
+      ]),
+    );
+  });
 
-    it('handles changing the sort by input to new to old', () => {
-      const newSortBy = 'newToOld';
+  it('handles changing the sort by input to the default option', () => {
+    const newSortBy = '';
 
-      render(
-        <Provider store={store}>
-          <ParcelDescriptions />
-        </Provider>,
-      );
+    render(
+      <Provider store={store}>
+        <ParcelDescriptions />
+      </Provider>,
+    );
 
-      const sortByInput = screen.getByTestId('Sort_By');
-      fireEvent.change(sortByInput, { target: { value: newSortBy } });
-      const actions = store.getActions();
-      expect(actions).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            type: 'parcelDescriptions/setRequestStatus',
-            payload: 'pending',
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setSortByInputValue',
-            payload: { sortBy: newSortBy },
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setSortBy',
-            payload: 'date_noted',
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setSortByDir',
-            payload: 'DESC',
-          }),
-        ]),
-      );
-    });
+    const sortByInput = screen.getByTestId(/^Sort_By.*/);
+    fireEvent.change(sortByInput, { target: { value: newSortBy } });
+    const actions = store.getActions();
+    expect(actions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'parcelDescriptions/setSortByInputValue',
+          payload: { sortBy: newSortBy },
+        }),
+        expect.objectContaining({
+          type: 'parcelDescriptions/setSortBy',
+          payload: 'id',
+        }),
+        expect.objectContaining({
+          type: 'parcelDescriptions/setSortByDir',
+          payload: 'ASC',
+        }),
+      ]),
+    );
+  });
 
-    it('handles changing the sort by input to old to new', () => {
-      const newSortBy = 'oldTonew';
+  it('handles clicking on the description type table sort', () => {
+    render(
+      <Provider store={store}>
+        <ParcelDescriptions />
+      </Provider>,
+    );
 
-      render(
-        <Provider store={store}>
-          <ParcelDescriptions />
-        </Provider>,
-      );
-
-      const sortByInput = screen.getByTestId('Sort_By');
-      fireEvent.change(sortByInput, { target: { value: newSortBy } });
-      const actions = store.getActions();
-      expect(actions).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            type: 'parcelDescriptions/setRequestStatus',
-            payload: 'pending',
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setSortByInputValue',
-            payload: { sortBy: newSortBy },
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setSortBy',
-            payload: 'date_noted',
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setSortByDir',
-            payload: 'ASC',
-          }),
-        ]),
-      );
-    });
-
-    it('handles changing the sort by input to the default option', () => {
-      const newSortBy = '';
-
-      render(
-        <Provider store={store}>
-          <ParcelDescriptions />
-        </Provider>,
-      );
-
-      const sortByInput = screen.getByTestId('Sort_By');
-      fireEvent.change(sortByInput, { target: { value: newSortBy } });
-      const actions = store.getActions();
-      expect(actions).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            type: 'parcelDescriptions/setRequestStatus',
-            payload: 'pending',
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setSortByInputValue',
-            payload: { sortBy: newSortBy },
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setSortBy',
-            payload: 'id',
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setSortByDir',
-            payload: 'ASC',
-          }),
-        ]),
-      );
-    });
-
-    it('handles clicking on the description type table sort', () => {
-      render(
-        <Provider store={store}>
-          <ParcelDescriptions />
-        </Provider>,
-      );
-
-      const descriptionTypeSortButton = screen.getByTestId(
-        'descriptionType-table-sort',
-      );
-      fireEvent.click(descriptionTypeSortButton);
-      const actions = store.getActions();
-      expect(actions).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            type: 'parcelDescriptions/setRequestStatus',
-            payload: 'pending',
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setSortBy',
-            payload: 'description_type',
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setSortByDir',
-            payload: 'DESC',
-          }),
-        ]),
-      );
-    });
-
-    it('handles loading new data', async () => {
-      await act(async () => {
-        render(
-          <Provider store={store}>
-            <ParcelDescriptions />
-          </Provider>,
-        );
-      });
-      await waitFor(() => {
-        expect(mockedGetParcelDescriptions).toHaveBeenCalled();
-      });
-      const actions = store.getActions();
-      expect(actions).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            type: 'parcelDescriptions/setData',
-            payload: getParcelDescriptionsReturnValue.data,
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setTotalResults',
-            payload: getParcelDescriptionsReturnValue.count,
-          }),
-          expect.objectContaining({
-            type: 'parcelDescriptions/setRequestStatus',
-            payload: 'idle',
-          }),
-        ]),
-      );
-    });
+    const descriptionTypeSortButton = screen.getByTestId(
+      /^descriptionType-table-sort.*/,
+    );
+    fireEvent.click(descriptionTypeSortButton);
+    const actions = store.getActions();
+    expect(actions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          payload: 'description_type',
+          type: 'parcelDescriptions/setSortBy',
+        }),
+        expect.objectContaining({
+          payload: 'DESC',
+          type: 'parcelDescriptions/setSortByDir',
+        }),
+      ]),
+    );
   });
 });

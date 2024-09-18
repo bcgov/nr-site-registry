@@ -7,20 +7,17 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../Store';
 import {
+  fetchParcelDescriptions,
+  IFetchParcelDescriptionParams,
   IParcelDescriptionState,
-  resetStateForNewSiteId,
   setCurrentPage,
-  setData,
-  setRequestStatus,
   setResultsPerPage,
   setSearchParam,
   setSortBy,
   setSortByDir,
   setSortByInputValue,
-  setTotalResults,
 } from './parcelDescriptionsSlice';
 import { columns } from './parcelDescriptionsConfig';
-import { getParcelDescriptions } from './getParcelDescriptions';
 import './parcelDescriptions.css';
 import { useParams } from 'react-router-dom';
 
@@ -32,10 +29,6 @@ const ParcelDescriptions = () => {
   const { id } = useParams();
   const siteId = Number(id);
 
-  if (parcelDescriptionsState.siteId !== siteId) {
-    dispatch(resetStateForNewSiteId(siteId));
-  }
-
   const data = parcelDescriptionsState.data;
   const requestStatus = parcelDescriptionsState.requestStatus;
   const totalResults = parcelDescriptionsState.totalResults;
@@ -46,38 +39,20 @@ const ParcelDescriptions = () => {
   const sortByDir = parcelDescriptionsState.sortByDir;
   const sortByInputValue = parcelDescriptionsState.sortByInputValue;
 
-  async function updateParcelDescriptions() {
-    let parcelDescriptions = await getParcelDescriptions(
-      siteId,
-      currentPage,
-      resultsPerPage,
-      searchParam,
-      sortBy,
-      sortByDir,
-    );
-    dispatch(setData(parcelDescriptions.data));
-    dispatch(setTotalResults(parcelDescriptions.count));
-    dispatch(setRequestStatus(RequestStatus.idle));
-  }
-
   const handleSelectPage = (newPage: number) => {
-    dispatch(setRequestStatus(RequestStatus.pending));
     dispatch(setCurrentPage(newPage));
   };
 
   const handleChangeResultsPerPage = (newResultsPerPage: number) => {
-    dispatch(setRequestStatus(RequestStatus.pending));
     dispatch(setResultsPerPage(newResultsPerPage));
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setRequestStatus(RequestStatus.pending));
     const newSearchParam = event.target.value;
     dispatch(setSearchParam(newSearchParam));
   };
 
   const handleSearchClear = () => {
-    dispatch(setRequestStatus(RequestStatus.pending));
     dispatch(setSearchParam(''));
   };
 
@@ -105,7 +80,6 @@ const ParcelDescriptions = () => {
         dispatch(setSortByDir('ASC'));
         break;
     }
-    dispatch(setRequestStatus(RequestStatus.pending));
   };
 
   const handleTableSortChange = (column: TableColumn, descending: boolean) => {
@@ -127,11 +101,18 @@ const ParcelDescriptions = () => {
         break;
     }
     dispatch(setSortByDir(descending ? 'DESC' : 'ASC'));
-    dispatch(setRequestStatus(RequestStatus.pending));
   };
 
   useEffect(() => {
-    updateParcelDescriptions();
+    const params: IFetchParcelDescriptionParams = {
+      siteId: siteId,
+      page: currentPage,
+      pageSize: resultsPerPage,
+      searchParam: searchParam,
+      sortBy: sortBy,
+      sortByDir: sortByDir,
+    };
+    dispatch(fetchParcelDescriptions(params));
   }, [currentPage, resultsPerPage, searchParam, sortBy, sortByDir]);
 
   return (

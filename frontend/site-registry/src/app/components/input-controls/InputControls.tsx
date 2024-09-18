@@ -1084,7 +1084,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
     // validateInput(inputValue);
     setHasInfoMsg(null);
     if (allowNumbersOnly) {
-      if (validateInput(parseInt(inputValue, 10))) {
+      if (validateInput(inputValue)) {
         if (inputValue.trim().toString() === '') {
           setHasInfoMsg(customInfoMessage);
           setIsOpen(false);

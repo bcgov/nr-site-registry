@@ -22,12 +22,15 @@ import {
 import { columns } from './parcelDescriptionsConfig';
 import { getParcelDescriptions } from './getParcelDescriptions';
 import './parcelDescriptions.css';
+import { useParams } from 'react-router-dom';
 
-const ParcelDescriptions = ({ siteId }: { siteId: number }) => {
+const ParcelDescriptions = () => {
   const dispatch = useDispatch<AppDispatch>();
   const parcelDescriptionsState: IParcelDescriptionState = useSelector(
     (state: RootState) => state.parcelDescriptions,
   );
+  const { id } = useParams();
+  const siteId = Number(id);
 
   if (parcelDescriptionsState.siteId !== siteId) {
     dispatch(resetStateForNewSiteId(siteId));

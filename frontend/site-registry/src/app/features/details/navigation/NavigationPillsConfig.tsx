@@ -20,7 +20,7 @@ export const navItems: string[] = [
   'Site Disclosure',
 ];
 
-export function navComponents(siteId: number): JSX.Element[] {
+export function navComponents(): JSX.Element[] {
   return [
     <Summary />,
     <Notations />,
@@ -28,7 +28,7 @@ export function navComponents(siteId: number): JSX.Element[] {
     <Documents />,
     <Associate />,
     <LandUses />,
-    <ParcelDescriptions siteId={siteId} />,
+    <ParcelDescriptions />,
     <Disclosure />,
   ];
 }

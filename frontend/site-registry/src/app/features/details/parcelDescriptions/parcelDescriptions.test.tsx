@@ -134,7 +134,7 @@ describe('Parcel Descriptions Component', () => {
   it('renders the Parcel Descriptions components', async () => {
     render(
       <Provider store={store}>
-        <ParcelDescriptions siteId={siteId} />
+        <ParcelDescriptions />
       </Provider>,
     );
 
@@ -150,7 +150,7 @@ describe('Parcel Descriptions Component', () => {
     it("updates the site id to the loaded site's id", async () => {
       render(
         <Provider store={store}>
-          <ParcelDescriptions siteId={siteId} />
+          <ParcelDescriptions />
         </Provider>,
       );
 
@@ -170,7 +170,7 @@ describe('Parcel Descriptions Component', () => {
     it("updates the site id to the loaded site's id", async () => {
       render(
         <Provider store={store}>
-          <ParcelDescriptions siteId={siteId} />
+          <ParcelDescriptions />
         </Provider>,
       );
 
@@ -190,7 +190,7 @@ describe('Parcel Descriptions Component', () => {
 
       render(
         <Provider store={store}>
-          <ParcelDescriptions siteId={siteId} />
+          <ParcelDescriptions />
         </Provider>,
       );
 
@@ -216,7 +216,7 @@ describe('Parcel Descriptions Component', () => {
 
       render(
         <Provider store={store}>
-          <ParcelDescriptions siteId={siteId} />
+          <ParcelDescriptions />
         </Provider>,
       );
 
@@ -246,7 +246,7 @@ describe('Parcel Descriptions Component', () => {
 
       render(
         <Provider store={store}>
-          <ParcelDescriptions siteId={siteId} />
+          <ParcelDescriptions />
         </Provider>,
       );
 
@@ -272,7 +272,7 @@ describe('Parcel Descriptions Component', () => {
 
       render(
         <Provider store={store}>
-          <ParcelDescriptions siteId={siteId} />
+          <ParcelDescriptions />
         </Provider>,
       );
 
@@ -306,7 +306,7 @@ describe('Parcel Descriptions Component', () => {
 
       render(
         <Provider store={store}>
-          <ParcelDescriptions siteId={siteId} />
+          <ParcelDescriptions />
         </Provider>,
       );
 
@@ -340,7 +340,7 @@ describe('Parcel Descriptions Component', () => {
 
       render(
         <Provider store={store}>
-          <ParcelDescriptions siteId={siteId} />
+          <ParcelDescriptions />
         </Provider>,
       );
 
@@ -372,7 +372,7 @@ describe('Parcel Descriptions Component', () => {
     it('handles clicking on the description type table sort', () => {
       render(
         <Provider store={store}>
-          <ParcelDescriptions siteId={siteId} />
+          <ParcelDescriptions />
         </Provider>,
       );
 
@@ -403,7 +403,7 @@ describe('Parcel Descriptions Component', () => {
       await act(async () => {
         render(
           <Provider store={store}>
-            <ParcelDescriptions siteId={siteId} />
+            <ParcelDescriptions />
           </Provider>,
         );
       });

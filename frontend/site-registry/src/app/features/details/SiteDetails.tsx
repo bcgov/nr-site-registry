@@ -606,7 +606,7 @@ const SiteDetails = () => {
         </div>
         <NavigationPills
           items={navItems}
-          components={navComponents(Number(id))}
+          components={navComponents()}
           dropdownItems={dropDownNavItems}
           isDisable={
             UserType.External === userType && snapshot.snapshot.data === null

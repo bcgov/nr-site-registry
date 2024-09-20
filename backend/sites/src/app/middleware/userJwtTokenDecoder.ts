@@ -22,6 +22,7 @@ export class UserJWTTokenDecoderMiddleware implements NestMiddleware {
         const { email, sub, identity_provider, given_name, family_name } =
           decodedToken;
 
+        req['user'] = decodedToken;
         await this.userService.createUserIfNotFound(
           email,
           sub,

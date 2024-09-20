@@ -1,4 +1,7 @@
 import { v4 } from 'uuid';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
+import { Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets, In } from 'typeorm';
 import { LandHistories } from '../../entities/landHistories.entity';
@@ -10,6 +13,7 @@ export class LandHistoryService {
     @InjectRepository(LandHistories)
     private landHistoryRepository: Repository<LandHistories>,
     private transactionManagerService: TransactionManagerService,
+    @Inject(REQUEST) private readonly request: Request, // Inject the request object
   ) {}
 
   async getLandHistoriesForSite(
@@ -57,6 +61,7 @@ export class LandHistoryService {
     siteId: string,
     landHistoriesInput: LandHistoriesInputDTO[],
   ): Promise<LandHistories[]> {
+    const user = this.request['req']['user'] || {};
     const deletes = landHistoriesInput
       .filter((arg) => !!arg.shouldDelete)
       .map((arg) => arg.originalLandUseCode);
@@ -68,7 +73,7 @@ export class LandHistoryService {
           siteId,
           lutCode: arg.landUseCode,
           note: arg.note,
-          whoCreated: 'stub', // TODO: figure out how to get current user
+          whoCreated: user.name,
           whenCreated: new Date(),
           rwmFlag: 0,
           rwmNoteFlag: 0,
@@ -82,7 +87,7 @@ export class LandHistoryService {
         const data = {
           lutCode: arg.landUseCode || arg.originalLandUseCode,
           note: arg.note || undefined,
-          whoUpdated: 'stub', // TODO: figure out how to get current user
+          whoUpdated: user.name,
           whenUpdated: new Date(),
         };
 

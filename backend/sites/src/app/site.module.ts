@@ -83,6 +83,7 @@ import { LandUseCodeService } from './services/landUseCode/landUseCode.service';
 import { HistoryLog } from './entities/siteHistoryLog.entity';
 import { ParcelDescriptionResolver } from './resolvers/parcelDescription/parcelDescription.resolver';
 import { ParcelDescriptionsService } from './services/parcelDescriptions/parcelDescriptions.service';
+import { TransactionManagerService } from './services/transactionManager/transactionManager.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -179,6 +180,7 @@ import { ParcelDescriptionsService } from './services/parcelDescriptions/parcelD
     JwtService,
     AssociatedSiteResolver,
     AssociatedSiteService,
+    TransactionManagerService,
   ],
   controllers: [SiteController],
 })

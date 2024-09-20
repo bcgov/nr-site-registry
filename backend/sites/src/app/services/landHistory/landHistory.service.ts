@@ -3,11 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets, In } from 'typeorm';
 import { LandHistories } from '../../entities/landHistories.entity';
 import { LandHistoriesInputDTO } from 'src/app/dto/landHistoriesInput.dto';
+import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 
 export class LandHistoryService {
   constructor(
     @InjectRepository(LandHistories)
     private landHistoryRepository: Repository<LandHistories>,
+    private transactionManagerService: TransactionManagerService,
   ) {}
 
   async getLandHistoriesForSite(
@@ -88,26 +90,27 @@ export class LandHistoryService {
       });
 
     try {
-      const updatedRecords =
-        await this.landHistoryRepository.manager.transaction(
-          async (transactionalEntityManager) => {
-            await transactionalEntityManager.save(LandHistories, additions);
+      const entityManager = this.transactionManagerService.getEntityManager();
 
-            for (const [whereClause, data] of updates) {
-              await transactionalEntityManager.update(
-                LandHistories,
-                whereClause,
-                data,
-              );
-            }
+      const updatedRecords = await entityManager.transaction(
+        async (transactionalEntityManager) => {
+          await transactionalEntityManager.save(LandHistories, additions);
 
-            await transactionalEntityManager.delete(LandHistories, {
-              siteId,
-              lutCode: In(deletes),
-            });
-            return null;
-          },
-        );
+          for (const [whereClause, data] of updates) {
+            await transactionalEntityManager.update(
+              LandHistories,
+              whereClause,
+              data,
+            );
+          }
+
+          await transactionalEntityManager.delete(LandHistories, {
+            siteId,
+            lutCode: In(deletes),
+          });
+          return null;
+        },
+      );
 
       return updatedRecords;
     } catch (e) {

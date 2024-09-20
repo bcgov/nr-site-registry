@@ -23,6 +23,7 @@ import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { DropdownResponse } from '../../dto/dropdown.dto';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { LandHistoryService } from '../landHistory/landHistory.service';
+import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 /**
  * Nestjs Service For Region Entity
  */
@@ -53,6 +54,7 @@ export class SiteService {
     private historyLogRepository: Repository<HistoryLog>,
 
     private readonly landHistoryService: LandHistoryService,
+    private transactionManagerService: TransactionManagerService,
   ) {}
 
   /**
@@ -297,6 +299,10 @@ export class SiteService {
 
         const transactionResult = await this.entityManager.transaction(
           async (transactionalEntityManager: EntityManager) => {
+            this.transactionManagerService.setEntityManager(
+              transactionalEntityManager,
+            );
+
             try {
               if (sitesSummary) {
                 await transactionalEntityManager.save(Sites, sitesSummary);
@@ -347,7 +353,7 @@ export class SiteService {
               }
 
               if (landHistories) {
-                this.landHistoryService.updateLandHistoriesForSite(
+                await this.landHistoryService.updateLandHistoriesForSite(
                   siteId,
                   landHistories,
                 );

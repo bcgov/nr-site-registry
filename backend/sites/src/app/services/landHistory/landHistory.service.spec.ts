@@ -91,6 +91,7 @@ describe('LandHistoryService', () => {
           originalLandUseCode: null,
           srAction: '',
           userAction: '',
+          apiAction: '',
         },
       ];
 
@@ -126,6 +127,7 @@ describe('LandHistoryService', () => {
           originalLandUseCode,
           srAction: '',
           userAction: '',
+          apiAction: '',
         },
       ];
 
@@ -157,6 +159,7 @@ describe('LandHistoryService', () => {
           originalLandUseCode,
           srAction: '',
           userAction: '',
+          apiAction: '',
         },
       ];
 

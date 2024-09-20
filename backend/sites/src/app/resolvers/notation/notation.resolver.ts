@@ -6,6 +6,8 @@ import { GenericValidationPipe } from '../../utils/validations/genericValidation
 import { Events } from '../../entities/events.entity';
 import { NotationService } from '../../services/notation/notation.service';
 import { NotationDto, NotationResponse } from '../../dto/notation.dto';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Resolver(() => Events)
 export class NotationResolver {
@@ -22,8 +24,14 @@ export class NotationResolver {
   async getSiteNotationBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
   ) {
+    sitesLogger.info(
+      'NotationResolver.getSiteNotationBySiteId() start siteId:' + ' ' + siteId,
+    );
     const result = await this.notationService.getSiteNotationBySiteId(siteId);
     if (result && result.length > 0) {
+      sitesLogger.info(
+        'NotationResolver.getSiteNotationBySiteId() RES:200 end',
+      );
       return this.genericResponseProvider.createResponse(
         'Site Notation fetched successfully',
         200,
@@ -31,6 +39,9 @@ export class NotationResolver {
         result,
       );
     } else {
+      sitesLogger.info(
+        'NotationResolver.getSiteNotationBySiteId() RES:404 end',
+      );
       return this.genericResponseProvider.createResponse(
         `Site Notation data not found for site id: ${siteId}`,
         404,

@@ -6,7 +6,6 @@ import {
   Roles,
 } from 'nest-keycloak-connect';
 import {} from '../../dto/recentView.dto';
-
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { Cart } from '../../entities/cart.entity';
@@ -17,6 +16,8 @@ import {
   CartDTO,
   CartResponse,
 } from '../../dto/cart.dto';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Resolver(() => Cart)
 export class CartResolver {
@@ -32,9 +33,13 @@ export class CartResolver {
     @Args('userId', { type: () => String }) userId: string,
     @AuthenticatedUser() user: any,
   ) {
+    sitesLogger.info(
+      'CartResolver.getCartItemsForUser() start userId:' + ' ' + userId,
+    );
     try {
       const result = await this.cartService.getCartItemsForUser(user?.sub);
       if (result.length > 0) {
+        sitesLogger.info('CartResolver.getCartItemsForUser() RES:200 end');
         return this.genericResponseProvider.createResponse(
           'Cart items fetched successfully',
           200,
@@ -42,6 +47,7 @@ export class CartResolver {
           result,
         );
       } else {
+        sitesLogger.info('CartResolver.getCartItemsForUser() RES:422 end');
         return this.genericResponseProvider.createResponse(
           `Cart items not found for user id: ${userId}`,
           422,
@@ -50,7 +56,11 @@ export class CartResolver {
         );
       }
     } catch (error) {
-      console.log('Error', error);
+      sitesLogger.error(
+        'Exception occured in CartResolver.getCartItemsForUser() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw new Error('System Error, Please try again.');
     }
   }
@@ -62,22 +72,34 @@ export class CartResolver {
     cartDTO: CartDTO[],
     @AuthenticatedUser() user: any,
   ) {
+    sitesLogger.info(
+      'CartResolver.addCartItem() start cartDTO:' +
+        ' ' +
+        JSON.stringify(cartDTO),
+    );
     try {
       const result = await this.cartService.addCartItem(cartDTO, user?.sub);
-      if (result)
+      if (result) {
+        sitesLogger.info('CartResolver.addCartItem() RES:201 end');
         return this.genericResponseProvider.createResponse(
           'Items added to cart',
           201,
           true,
         );
-      else
+      } else {
+        sitesLogger.info('CartResolver.addCartItem() RES:422 end');
         return this.genericResponseProvider.createResponse(
           'Unable to add items to cart',
           422,
           true,
         );
+      }
     } catch (error) {
-      console.log('Error', error);
+      sitesLogger.error(
+        'Exception occured in CartResolver.addCartItem() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw new Error('System Error, Please try again.');
     }
   }
@@ -93,6 +115,11 @@ export class CartResolver {
     cartDeleteDTO: CartDeleteDTO[],
     @AuthenticatedUser() user: any,
   ) {
+    sitesLogger.info(
+      'CartResolver.deleteCartItem() start cartDTO:' +
+        ' ' +
+        JSON.stringify(cartDeleteDTO),
+    );
     try {
       const message = await this.cartService.deleteCartItem(
         cartDeleteDTO,
@@ -100,12 +127,14 @@ export class CartResolver {
       );
 
       if (message) {
+        sitesLogger.info('CartResolver.deleteCartItem() RES:200 end');
         return this.genericResponseProvider.createResponse(
           'Successfully deleted cart items.',
           200,
           true,
         );
       } else {
+        sitesLogger.info('CartResolver.deleteCartItem() RES:422 end');
         return this.genericResponseProvider.createResponse(
           `Unable to delete cart items. `,
           422,
@@ -113,7 +142,11 @@ export class CartResolver {
         );
       }
     } catch (error) {
-      console.log('Error', error);
+      sitesLogger.error(
+        'Exception occured in CartResolver.deleteCartItem() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw new Error('System Error, Please try again.');
     }
   }

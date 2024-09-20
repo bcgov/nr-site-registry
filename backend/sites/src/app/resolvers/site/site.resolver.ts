@@ -11,7 +11,8 @@ import { DropdownDto, DropdownResponse } from 'src/app/dto/dropdown.dto';
 import { GenericResponseProvider } from 'src/app/dto/response/genericResponseProvider';
 import { UsePipes } from '@nestjs/common';
 import { GenericValidationPipe } from 'src/app/utils/validations/genericValidationPipe';
-
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 /**
  * Resolver for Region
  */
@@ -79,6 +80,7 @@ export class SiteResolver {
     @Args('whenUpdated', { type: () => String, nullable: true })
     whenUpdated?: Date,
   ) {
+    sitesLogger.info('SiteResolver.searchSites() start ');
     return await this.siteService.searchSites(
       searchParam,
       page,
@@ -107,6 +109,9 @@ export class SiteResolver {
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
   @Query(() => FetchSiteDetail, { name: 'findSiteBySiteId' })
   findSiteBySiteId(@Args('siteId', { type: () => String }) siteId: string) {
+    sitesLogger.info(
+      'SiteResolver.findSiteBySiteId() start siteId:' + ' ' + siteId,
+    );
     return this.siteService.findSiteBySiteId(siteId);
   }
 
@@ -116,8 +121,12 @@ export class SiteResolver {
   async searchSiteIds(
     @Args('searchParam', { type: () => String }) searchParam: string,
   ) {
+    sitesLogger.info(
+      'SiteResolver.searchSiteIds() start searchParam:' + ' ' + searchParam,
+    );
     const result = await this.siteService.searchSiteIds(searchParam);
     if (result && result.length > 0) {
+      sitesLogger.info('SiteResolver.searchSiteIds() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Notation Paticipant Role fetched successfully',
         200,
@@ -125,6 +134,7 @@ export class SiteResolver {
         result,
       );
     } else {
+      sitesLogger.info('SiteResolver.searchSiteIds() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Notation Paticipant Role not found`,
         404,

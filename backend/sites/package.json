@@ -39,6 +39,7 @@
     "@types/graphql-type-json": "^0.3.5",
     "apollo-server-express": "^3.10.2",
     "class-transformer": "^0.5.1",
+    "cls-rtracer": "^2.6.3",
     "date-fns": "^3.6.0",
     "graphql": "^16.6.0",
     "graphql-type-json": "^0.3.2",
@@ -48,7 +49,9 @@
     "reflect-metadata": "^0.2.2",
     "rimraf": "^5.0.5",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "winston": "^3.14.2",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.3.2",

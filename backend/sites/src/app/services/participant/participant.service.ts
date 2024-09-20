@@ -5,6 +5,9 @@ import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { SitePartics } from '../../entities/sitePartics.entity';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
+
 @Injectable()
 export class ParticipantService {
   constructor(
@@ -13,6 +16,8 @@ export class ParticipantService {
   ) {}
 
   async getSiteParticipantsBySiteId(siteId: string) {
+    sitesLogger.info('ParticipantService.getSiteParticipantsBySiteId() start');
+    sitesLogger.debug('ParticipantService.getSiteParticipantsBySiteId() start');
     try {
       const result = await this.siteParticsRepository.find({
         where: { siteId },
@@ -34,9 +39,20 @@ export class ParticipantService {
           })
           .flat();
         const sitePartics = plainToInstance(SiteParticsDto, transformedObjects);
+        sitesLogger.info(
+          'ParticipantService.getSiteParticipantsBySiteId() end',
+        );
+        sitesLogger.debug(
+          'ParticipantService.getSiteParticipantsBySiteId() end',
+        );
         return sitePartics;
       }
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in ParticipantService.getSiteParticipantsBySiteId() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw new Error('Failed to retrieve site participants by siteId.');
     }
   }

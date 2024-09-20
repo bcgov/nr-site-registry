@@ -5,6 +5,8 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { SiteParticsDto, SiteParticsResponse } from '../../dto/sitePartics.dto';
 import { ParticipantService } from '../../services/participant/participant.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Resolver(() => SiteParticsDto)
 export class ParticipantResolver {
@@ -21,9 +23,17 @@ export class ParticipantResolver {
   async getSiteParticipantsBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
   ) {
+    sitesLogger.info(
+      'ParticipantResolver.getSiteParticipantsBySiteId() start siteId:' +
+        ' ' +
+        siteId,
+    );
     const result =
       await this.participantService.getSiteParticipantsBySiteId(siteId);
     if (result.length > 0) {
+      sitesLogger.info(
+        'ParticipantResolver.getSiteParticipantsBySiteId() RES:200 end',
+      );
       return this.genericResponseProvider.createResponse(
         'Participants fetched successfully',
         200,
@@ -31,6 +41,9 @@ export class ParticipantResolver {
         result,
       );
     } else {
+      sitesLogger.info(
+        'ParticipantResolver.getSiteParticipantsBySiteId() RES:404 end',
+      );
       return this.genericResponseProvider.createResponse(
         `Participants data not found for site id: ${siteId}`,
         404,

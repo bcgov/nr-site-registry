@@ -1,6 +1,8 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets } from 'typeorm';
 import { LandHistories } from '../../entities/landHistories.entity';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 export class LandHistoryService {
   constructor(
@@ -13,6 +15,8 @@ export class LandHistoryService {
     searchTerm: string,
     sortDirection: 'ASC' | 'DESC',
   ): Promise<LandHistories[]> {
+    sitesLogger.info('LandHistoryService.getLandHistoriesForSite() start');
+    sitesLogger.debug('LandHistoryService.getLandHistoriesForSite() start');
     try {
       const query = this.landHistoryRepository
         .createQueryBuilder('landHistory')
@@ -40,8 +44,15 @@ export class LandHistoryService {
       }
 
       const result = await query.getMany();
+      sitesLogger.info('LandHistoryService.getLandHistoriesForSite() end');
+      sitesLogger.debug('LandHistoryService.getLandHistoriesForSite() end');
       return result;
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in LandHistoryService.getLandHistoriesForSite() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw error;
     }
   }

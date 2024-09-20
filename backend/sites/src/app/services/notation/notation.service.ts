@@ -5,6 +5,8 @@ import { Events } from '../../entities/events.entity';
 import { NotationDto } from '../../dto/notation.dto';
 import { plainToInstance } from 'class-transformer';
 import { v4 } from 'uuid';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Injectable()
 export class NotationService {
@@ -14,6 +16,8 @@ export class NotationService {
   ) {}
 
   async getSiteNotationBySiteId(siteId: string) {
+    sitesLogger.info('NotationService.getSiteNotationBySiteId() start');
+    sitesLogger.debug('NotationService.getSiteNotationBySiteId() start');
     try {
       const result = await this.notationRepository.find({ where: { siteId } });
       if (result) {
@@ -49,9 +53,18 @@ export class NotationService {
           };
         });
         const notations = plainToInstance(NotationDto, transformedObjects);
+        sitesLogger.info('NotationService.getSiteNotationBySiteId() end');
+        sitesLogger.debug('NotationService.getSiteNotationBySiteId() end');
         return notations;
       }
+      sitesLogger.info('NotationService.getSiteNotationBySiteId() end');
+      sitesLogger.debug('NotationService.getSiteNotationBySiteId() end');
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in NotationService.getSiteNotationBySiteId() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw error;
     }
   }

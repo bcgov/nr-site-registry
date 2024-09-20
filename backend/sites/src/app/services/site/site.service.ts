@@ -10,6 +10,8 @@ import { Sites } from '../../entities/sites.entity';
 import { SiteUtil } from '../../utils/site.util';
 import { RecentViews } from 'src/app/entities/recentViews.entity';
 import { DropdownResponse } from 'src/app/dto/dropdown.dto';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 /**
  * Nestjs Service For Region Entity
  */
@@ -25,12 +27,16 @@ export class SiteService {
    * @returns FetchSiteResponse -- returns sites
    */
   async findAll() {
+    sitesLogger.info('SiteService.findAll() start');
+    sitesLogger.debug('SiteService.findAll() start');
     const response = new FetchSiteResponse();
 
     response.httpStatusCode = 200;
 
     response.data = await this.siteRepository.find();
 
+    sitesLogger.info('SiteService.findAll() end');
+    sitesLogger.debug('SiteService.findAll() end');
     return response;
   }
 
@@ -62,6 +68,8 @@ export class SiteService {
     whenCreated?: Date,
     whenUpdated?: Date,
   ) {
+    sitesLogger.info('SiteService.searchSites() start');
+    sitesLogger.debug('SiteService.searchSites() start');
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
 
@@ -199,7 +207,8 @@ export class SiteService {
     response.count = result[1] ? result[1] : 0;
     response.page = page;
     response.pageSize = pageSize;
-
+    sitesLogger.info('SiteService.searchSites() end');
+    sitesLogger.debug('SiteService.searchSites() end');
     return response;
   }
 
@@ -209,6 +218,8 @@ export class SiteService {
    * @returns a single site matching the site ID
    */
   async findSiteBySiteId(siteId: string) {
+    sitesLogger.info('SiteService.findSiteBySiteId() start');
+    sitesLogger.debug('SiteService.findSiteBySiteId() start');
     const response = new FetchSiteDetail();
 
     response.httpStatusCode = 200;
@@ -216,11 +227,14 @@ export class SiteService {
     response.data = await this.siteRepository.findOneOrFail({
       where: { id: siteId },
     });
-
+    sitesLogger.info('SiteService.findSiteBySiteId() end');
+    sitesLogger.debug('SiteService.findSiteBySiteId() end');
     return response;
   }
 
   async searchSiteIds(searchParam: string) {
+    sitesLogger.info('SiteService.searchSiteIds() start');
+    sitesLogger.debug('SiteService.searchSiteIds() start');
     try {
       // Use query builder to type cast the 'id' field to a string
       const queryBuilder = this.siteRepository
@@ -231,11 +245,20 @@ export class SiteService {
         .orderBy('sites.id', 'ASC'); // Ordering by 'id' in ascending order;
       const result = await queryBuilder.getMany();
       if (result) {
+        sitesLogger.info('SiteService.searchSiteIds() end');
+        sitesLogger.debug('SiteService.searchSiteIds() end');
         return result.map((obj: any) => ({ key: obj.id, value: obj.id }));
       } else {
+        sitesLogger.info('SiteService.searchSiteIds() end');
+        sitesLogger.debug('SiteService.searchSiteIds() end');
         return []; // Return an empty array if no results
       }
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in SiteService.searchSiteIds() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw new Error('Failed to retrieve site ids.');
     }
   }

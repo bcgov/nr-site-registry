@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { SiteAssocs } from '../../entities/siteAssocs.entity';
 import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Injectable()
 export class AssociatedSiteService {
@@ -15,6 +17,12 @@ export class AssociatedSiteService {
 
   async getAssociatedSitesBySiteId(siteId: string) {
     try {
+      sitesLogger.info(
+        'AssociatedSiteService.getAssociatedSitesBySiteId() start',
+      );
+      sitesLogger.debug(
+        'AssociatedSiteService.getAssociatedSitesBySiteId() start',
+      );
       const result = await this.assocSiteRepository.find({
         where: { siteId },
       });
@@ -32,11 +40,22 @@ export class AssociatedSiteService {
           AssociatedSiteDto,
           transformedObjects,
         );
+        sitesLogger.info(
+          'AssociatedSiteService.getAssociatedSitesBySiteId() end',
+        );
+        sitesLogger.debug(
+          'AssociatedSiteService.getAssociatedSitesBySiteId() end',
+        );
         return siteAssocs;
       } else {
         return [];
       }
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in AssociatedSiteService.getAssociatedSitesBySiteId() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw new Error('Failed to retrieve associated site by siteId.');
     }
   }

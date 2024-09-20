@@ -68,6 +68,7 @@ import {
 } from './snapshot/SnapshotSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 import {
+  fetchMinistryContact,
   fetchNotationClassCd,
   fetchNotationParticipantRoleCd,
   fetchNotationTypeCd,
@@ -230,6 +231,9 @@ const SiteDetails = () => {
     setViewMode(mode);
   }, [mode]);
 
+  // NEEDS TO FETCH DATA BASED ON CONDITION WHEATHER IT IS EXTERNAL USER OR INTERNAL USER
+  // BY DOING THIS WE CAN STOP UNNECCESSARY CALL TO DATABASE
+  // THERE ARE SOME CALLS WHICH MAY NOT REQUIRED ON DETAILS PAGE.
   useEffect(() => {
     setIsLoading(true); // Set loading state to true before starting API calls
     if (id) {
@@ -238,6 +242,11 @@ const SiteDetails = () => {
       Promise.all([
         dispatch(fetchSnapshots(id ?? '')),
         dispatch(getBannerType(id ?? '')),
+        dispatch(fetchMinistryContact('EMP')),
+        dispatch(fetchNotationClassCd()),
+        dispatch(fetchNotationTypeCd()),
+        dispatch(fetchNotationParticipantRoleCd()),
+        dispatch(fetchNotationParticipants(id ?? '')),
         // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '' })),
       ])

@@ -124,7 +124,6 @@ const snapshotsSlice = createSlice({
         else state.createSnapshotRequest = RequestStatus.failed;
       })
       .addCase(createSnapshotForSites.rejected, (state, action) => {
-        console.log('error', action);
         state.createSnapshotRequest = RequestStatus.failed;
       })
       .addCase(getBannerType.pending, (state) => {

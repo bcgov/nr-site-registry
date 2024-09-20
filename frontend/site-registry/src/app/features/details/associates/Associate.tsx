@@ -39,6 +39,7 @@ import { graphqlSearchSiteIdsQuery } from '../../site/graphql/Associate';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';
 import { GetAssociateConfig } from './AssociateConfig';
 import infoIcon from '../../../images/info-icon.png';
+import { saveRequestStatus } from '../SaveSiteDetailsSlice';
 
 const Associate = () => {
   const {
@@ -75,6 +76,7 @@ const Associate = () => {
   const sitesAssociated = useSelector(associatedSites);
   const resetDetails = useSelector(resetSiteDetails);
   const loggedInUser = getUser();
+  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
 
   useEffect(() => {
     const userType = loggedInUser?.profile.preferred_username?.includes('bceid')
@@ -368,6 +370,22 @@ const Associate = () => {
       return () => clearTimeout(timeoutId);
     }
   }, [searchParam]);
+
+  useEffect(() => {
+    // Parameters for the update
+    let params: UpdateDisplayTypeParams = {
+      indexToUpdate: associateColumnInternal.findIndex(
+        (item) =>
+          item.displayType?.graphQLPropertyName === 'siteIdAssociatedWith',
+      ),
+      updates: {
+        isLoading: RequestStatus.loading,
+        options: [],
+        customInfoMessage: <></>,
+      },
+    };
+    setInternalRow(updateTableColumn(internalRow, params));
+  }, [saveSiteDetailsRequestStatus]);
 
   const handleTableChange = (event: any) => {
     if (

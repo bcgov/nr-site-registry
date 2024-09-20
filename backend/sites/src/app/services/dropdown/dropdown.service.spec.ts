@@ -96,7 +96,7 @@ describe('DropdownService', () => {
       jest.spyOn(particRoleRepository, 'find').mockRejectedValueOnce(error);
 
       await expect(service.getParticipantRoleCd()).rejects.toThrowError(
-        'Failed to retrieve participants role code.',
+        'Failed to retrieve participant role codes.',
       );
     });
   });
@@ -145,7 +145,7 @@ describe('DropdownService', () => {
         .mockReturnValue(mockQueryBuilder);
 
       await expect(service.getPeopleOrgsCd('', '')).rejects.toThrowError(
-        'Failed to retrieve people orgs.',
+        'Failed to retrieve people organizations.',
       );
     });
   });

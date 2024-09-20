@@ -6,6 +6,7 @@ interface IDropdowns {
   notationClass: [];
   notationParticipantRole: [];
   notationType: [];
+  ministryContact: [];
 }
 
 export interface IDropdownsState {

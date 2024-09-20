@@ -194,7 +194,7 @@ export class SiteResolver {
       return this.genericResponseProviderForSave.createResponse(
         `Successfully saved site details.`,
         200,
-        false,
+        true,
       );
     } else {
       return this.genericResponseProviderForSave.createResponse(

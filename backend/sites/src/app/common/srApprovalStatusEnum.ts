@@ -1,5 +1,6 @@
 export enum SRApprovalStatusEnum {
-  Public = 'public',
-  Pending = 'pending',
-  Private = 'private',
+  PUBLIC = 'public',
+  PENDING = 'pending',
+  PRIVATE = 'private',
+  DEFAULT = '',
 }

@@ -108,7 +108,6 @@ const Search = () => {
   });
 
   const pageChange = (pageRequested: number, resultsCount: number) => {
-    console.log(pageRequested, resultsCount);
     dispatch(
       updatePageSizeSetting({
         currentPage: pageRequested,
@@ -220,10 +219,6 @@ const Search = () => {
       }
     }
   };
-
-  useEffect(() => {
-    console.log('selectedRows', selectedRows);
-  }, [selectedRows]);
 
   const [showAddToFolio, SetShowAddToFolio] = useState(false);
 

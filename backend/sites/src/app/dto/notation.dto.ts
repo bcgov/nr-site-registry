@@ -1,7 +1,10 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { ResponseDto } from './response/response.dto';
 import { IsString } from 'class-validator';
-import { ChangeAuditEntityDTO } from './changeAuditEntity.dto';
+import {
+  ChangeAuditEntityDTO,
+  ChangeAuditObjectTypeDTO,
+} from './changeAuditEntity.dto';
 
 @ObjectType()
 export class NotationResponse extends ResponseDto {
@@ -10,7 +13,7 @@ export class NotationResponse extends ResponseDto {
 }
 
 @ObjectType()
-export class NotationDto {
+export class NotationDto extends ChangeAuditObjectTypeDTO {
   @Field()
   @IsString()
   id: string;
@@ -88,9 +91,12 @@ export class NotationIputDTO extends ChangeAuditEntityDTO {
 }
 
 @ObjectType()
-export class NotationParticipantDto {
+export class NotationParticipantDto extends ChangeAuditObjectTypeDTO {
   @Field()
   guid: string;
+
+  @Field()
+  eventId: string;
 
   @Field()
   eprCode: string;
@@ -107,6 +113,9 @@ export class NotationParticipantDto {
 export class NotationParticipantInputDTO extends ChangeAuditEntityDTO {
   @Field()
   guid: string;
+
+  @Field()
+  eventId: string;
 
   @Field()
   eprCode: string;

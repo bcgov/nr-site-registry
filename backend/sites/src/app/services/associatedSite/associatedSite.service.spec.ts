@@ -73,12 +73,16 @@ describe('AssociatedSiteService', () => {
 
     it('should throw an error when repository find fails', async () => {
       const siteId = 'site123';
-      const error = new Error('Database connection error');
+      const error = new Error(
+        `Failed to retrieve associated sites by site ID: ${siteId}`,
+      );
       jest.spyOn(assocSiteRepository, 'find').mockRejectedValueOnce(error);
 
       await expect(
         service.getAssociatedSitesBySiteId(siteId),
-      ).rejects.toThrowError('Failed to retrieve associated site by siteId.');
+      ).rejects.toThrowError(
+        `Failed to retrieve associated sites by site ID: ${siteId}`,
+      );
     });
   });
 });

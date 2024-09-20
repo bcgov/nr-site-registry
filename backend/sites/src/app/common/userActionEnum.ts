@@ -1,5 +1,6 @@
 export enum UserActionEnum {
-  updated = 'updated',
-  deleted = 'deleted',
-  added = 'added',
+  UPDATED = 'updated',
+  DELETED = 'deleted',
+  ADDED = 'added',
+  DEFAULT = '',
 }

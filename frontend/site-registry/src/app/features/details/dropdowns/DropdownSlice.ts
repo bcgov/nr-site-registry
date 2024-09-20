@@ -20,6 +20,7 @@ const initialState: IDropdownsState = {
     notationClass: [],
     notationType: [],
     notationParticipantRole: [],
+    ministryContact: [],
   },
   status: RequestStatus.idle,
   error: '',
@@ -99,6 +100,22 @@ export const fetchNotationTypeCd = createAsyncThunk(
   },
 );
 
+export const fetchMinistryContact = createAsyncThunk(
+  'dropdowns/getMinistryContact',
+  async (entityType: string) => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(graphQLPeopleOrgsCd()),
+        variables: {
+          entityType: entityType,
+        },
+      });
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
 // Define the recent views slice
 const dropdowns = createSlice({
   name: 'dropdowns',
@@ -160,12 +177,25 @@ const dropdowns = createSlice({
       .addCase(fetchNotationTypeCd.rejected, (state, action) => {
         state.status = RequestStatus.failed;
         state.error = action.error.message;
+      })
+      .addCase(fetchMinistryContact.pending, (state) => {
+        state.status = RequestStatus.loading;
+      })
+      .addCase(fetchMinistryContact.fulfilled, (state, action) => {
+        state.status = RequestStatus.success;
+        state.dropdowns.ministryContact = action.payload;
+      })
+      .addCase(fetchMinistryContact.rejected, (state, action) => {
+        state.status = RequestStatus.failed;
+        state.error = action.error.message;
       });
   },
 });
 
 export const participantNameDrpdown = (state: any) =>
   state.dropdown.dropdowns.participantNames.getPeopleOrgsCd;
+export const ministryContactDrpdown = (state: any) =>
+  state.dropdown.dropdowns.ministryContact.getPeopleOrgsCd;
 export const participantRoleDrpdown = (state: any) =>
   state.dropdown.dropdowns.participantRoles.getParticipantRoleCd;
 export const notationParticipantRoleDrpdown = (state: any) =>

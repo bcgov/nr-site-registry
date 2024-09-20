@@ -24,6 +24,7 @@ import { DropdownResponse } from '../../dto/dropdown.dto';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { LandHistoryService } from '../landHistory/landHistory.service';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
+import { UserActionEnum } from '../../common/userActionEnum';
 /**
  * Nestjs Service For Region Entity
  */
@@ -310,8 +311,12 @@ export class SiteService {
                 console.log('No changes To Site Summary');
               }
 
-              if (events) {
-                await transactionalEntityManager.save(Events, events);
+              if (events && events.length > 0) {
+                await this.processEvents(
+                  events,
+                  userInfo,
+                  transactionalEntityManager,
+                );
               } else {
                 console.log('No changes To Site Events');
               }
@@ -394,6 +399,174 @@ export class SiteService {
     } catch (error) {
       console.log('Save site details error', error);
       throw error;
+    }
+  }
+
+  /**
+   * Processes and saves events and participants based on the provided actions.
+   * @param events - Array of event data including actions to be performed.
+   * @param userInfo - Information about the user performing the actions.
+   * @param transactionalEntityManager - Entity manager for handling transactions.
+   */
+  async processEvents(
+    events: any[], // Replace 'any' with actual type if possible
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    if (events && events.length > 0) {
+      // Arrays to store new and updated entities
+      const newEvents: Events[] = [];
+      const updatedEvents: { id: string; changes: Partial<Events> }[] = [];
+      const newEventPartics: EventPartics[] = [];
+      const updatedEventPartics: {
+        id: string;
+        changes: Partial<EventPartics>;
+      }[] = [];
+
+      // Process participants based on their action
+      const processParticipants = async (
+        eventId: string,
+        participants: any[],
+      ) => {
+        const participantPromises = participants.map(async (partic) => {
+          const { guid, displayName, apiAction, ...particData } = partic;
+          switch (apiAction) {
+            case UserActionEnum.ADDED:
+              return {
+                ...particData,
+                eventId,
+                rwmFlag: 50,
+                userAction: UserActionEnum.ADDED,
+                whenCreated: new Date(),
+                whoCreated: userInfo ? userInfo.givenName : '',
+              };
+            case UserActionEnum.UPDATED:
+              const existingPartic =
+                await this.eventsParticipantsRepo.findOneByOrFail({ id: guid });
+              return {
+                id: guid,
+                changes: {
+                  ...existingPartic,
+                  ...particData,
+                  userAction: UserActionEnum.UPDATED,
+                  whenUpdated: new Date(),
+                  whoUpdated: userInfo ? userInfo.givenName : '',
+                },
+              };
+            case UserActionEnum.DELETED:
+              await transactionalEntityManager.delete(EventPartics, {
+                id: guid,
+              });
+              return null;
+            default:
+              console.warn('Unknown action for event participant:', apiAction);
+              return null;
+          }
+        });
+        const participantResults = await Promise.all(participantPromises);
+
+        participantResults.forEach((result) => {
+          if (result) {
+            if (result.eventId) {
+              newEventPartics.push(result);
+            } else if (result.id) {
+              updatedEventPartics.push(result);
+            }
+          }
+        });
+      };
+
+      // Main processing loop for events
+      const eventPromises = events.map(async (notation) => {
+        const { notationParticipant, apiAction, ...eventData } = notation;
+        let notationId = notation.id;
+        let event: Events = {
+          ...new Events(),
+          ...eventData,
+        };
+        switch (apiAction) {
+          case UserActionEnum.ADDED:
+            // Generate new ID for the new event
+            const newId = await this.eventsRepositoryRepo
+              .createQueryBuilder()
+              .select('MAX(id)', 'maxid')
+              .getRawOne()
+              .then((result) => (Number(result.maxid) || 0) + 1);
+
+            // Get the ID of the newly created event
+            notationId = newId.toString();
+
+            newEvents.push({
+              ...event,
+              id: notationId,
+              eventDate: new Date(),
+              rwmFlag: 50,
+              rwmNoteFlag: 50,
+              userAction: UserActionEnum.ADDED,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+            break;
+
+          case UserActionEnum.UPDATED:
+            const existingEvent =
+              await this.eventsRepositoryRepo.findOneByOrFail({
+                id: notation.id,
+              });
+            updatedEvents.push({
+              id: notation.id,
+              changes: {
+                ...new Events(),
+                ...existingEvent,
+                ...event,
+                userAction: UserActionEnum.UPDATED,
+                whenUpdated: new Date(),
+                whoUpdated: userInfo ? userInfo.givenName : '',
+              },
+            });
+            break;
+
+          case UserActionEnum.DELETED:
+            // Handle deletion if necessary
+            break;
+
+          default:
+            console.warn('Unknown action for event:', apiAction);
+        }
+
+        // Process related participants regardless of event action
+        if (notationParticipant && notationParticipant.length > 0) {
+          await processParticipants(notationId, notationParticipant);
+        }
+      });
+
+      await Promise.all(eventPromises);
+
+      // Save new events and event participants in bulk
+      if (newEvents.length > 0) {
+        await transactionalEntityManager.save(Events, newEvents);
+      }
+
+      if (newEventPartics.length > 0) {
+        await transactionalEntityManager.save(EventPartics, newEventPartics);
+      }
+
+      // Update existing events and participants in bulk
+      if (updatedEvents.length > 0) {
+        await Promise.all(
+          updatedEvents.map(({ id, changes }) =>
+            transactionalEntityManager.update(Events, { id }, changes),
+          ),
+        );
+      }
+
+      if (updatedEventPartics.length > 0) {
+        await Promise.all(
+          updatedEventPartics.map(({ id, changes }) =>
+            transactionalEntityManager.update(EventPartics, { id }, changes),
+          ),
+        );
+      }
     }
   }
 }

@@ -386,6 +386,7 @@ describe('SiteService', () => {
             requirementDueDate: new Date(),
             requirementReceivedDate: new Date(),
             userAction: 'pending',
+            apiAction: 'pending',
             srAction: 'pending',
             notationParticipant: null,
           },

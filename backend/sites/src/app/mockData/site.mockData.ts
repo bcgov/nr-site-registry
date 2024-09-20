@@ -113,7 +113,6 @@ const subdivisions: Subdivisions[] = [
     siteSubdivisions: null,
   },
 ];
-
 siteSubdivisions = [
   {
     siteSubdivId: '456',

@@ -1,5 +1,12 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { IsInt, IsDate, IsString } from 'class-validator';
+import { PagedResponseDto } from './response/response.dto';
+
+@ObjectType()
+export class ParcelDescriptionsResponse extends PagedResponseDto {
+  @Field(() => [ParcelDescriptionDto], { nullable: true })
+  data: ParcelDescriptionDto[] | null;
+}
 
 @ObjectType()
 export class ParcelDescriptionDto {

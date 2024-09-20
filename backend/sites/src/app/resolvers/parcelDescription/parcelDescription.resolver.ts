@@ -3,8 +3,7 @@ import { Resource, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { Subdivisions } from '../../entities/subdivisions.entity';
 import { ParcelDescriptionsService } from '../../services/parcelDescriptions/parcelDescriptions.service';
 import { CustomRoles } from '../../common/role';
-import { GenericPagedResponse } from '../../dto/response/genericResponse';
-import { ParcelDescriptionDto } from '../../dto/parcelDescription.dto';
+import { ParcelDescriptionsResponse } from '../../dto/parcelDescription.dto';
 
 /**
  * Resolver for Parcel Description
@@ -30,7 +29,9 @@ export class ParcelDescriptionResolver {
     roles: [CustomRoles.Internal, CustomRoles.SiteRegistrar],
     mode: RoleMatchingMode.ANY,
   })
-  @Query(() => ParcelDescriptionDto, { name: 'getParcelDescriptionsBySiteId' })
+  @Query(() => ParcelDescriptionsResponse, {
+    name: 'getParcelDescriptionsBySiteId',
+  })
   async getParcelDescriptionsBySiteId(
     @Args('siteId', { type: () => Int }) siteId: number,
     @Args('page', { type: () => Int }) page: number,

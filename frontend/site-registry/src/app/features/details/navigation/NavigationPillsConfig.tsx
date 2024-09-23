@@ -4,6 +4,7 @@ import Disclosure from '../disclosure/Disclosure';
 import Documents from '../documents/Documents';
 import LandUses from '../landUses/LandUses';
 import Notations from '../notations/Notations';
+import ParcelDescriptions from '../parcelDescriptions/parcelDescriptions';
 import Participants from '../participants/Participant';
 
 import Summary from '../summary/Summary';
@@ -26,7 +27,7 @@ export const navComponents: JSX.Element[] = [
   <Documents />,
   <Associate />,
   <LandUses />,
-  <></>,
+  <ParcelDescriptions />,
   <Disclosure />,
 ];
 

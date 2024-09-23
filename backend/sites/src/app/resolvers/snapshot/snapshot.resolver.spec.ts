@@ -115,6 +115,9 @@ describe('SnapshotResolver', () => {
                   whoUpdated: 'ABC',
                   rwmFlag: 1,
                   sp: null,
+                  id: 'hhh-jjj-lll',
+                  userAction: 'pending',
+                  srAction: 'pending',
                   prCode2: {
                     code: 'ABC',
                     description: 'Desc',
@@ -212,6 +215,9 @@ describe('SnapshotResolver', () => {
                   whoUpdated: 'ABC',
                   rwmFlag: 1,
                   sp: null,
+                  id: 'hhh-jjj-lll',
+                  userAction: 'pending',
+                  srAction: 'pending',
                   prCode2: {
                     code: 'ABC',
                     description: 'Desc',
@@ -307,6 +313,9 @@ describe('SnapshotResolver', () => {
                 {
                   prCode: 'PR001',
                   spId: '1',
+                  id: 'hhh-jjj-lll',
+                  userAction: 'pending',
+                  srAction: 'pending',
                   whenCreated: new Date(),
                   whoCreated: 'ABC',
                   whenUpdated: new Date(),
@@ -409,6 +418,9 @@ describe('SnapshotResolver', () => {
                 {
                   prCode: 'PR001',
                   spId: '1',
+                  id: 'hhh-jjj-lll',
+                  userAction: 'pending',
+                  srAction: 'pending',
                   whenCreated: new Date(),
                   whoCreated: 'ABC',
                   whenUpdated: new Date(),

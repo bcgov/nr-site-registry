@@ -14,7 +14,8 @@ import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { Events } from '../../entities/events.entity';
 import { SiteDocs } from '../../entities/siteDocs.entity';
-import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
+import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
+import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -105,6 +106,23 @@ describe('SiteService', () => {
               return [
                 { id: '123', siteId: '123' },
                 { id: '124', siteId: '123' },
+              ];
+            }),
+            save: jest.fn(() => {
+              return [
+                { id: '123', siteId: '123' },
+                { id: '124', siteId: '123' },
+              ];
+            }),
+          },
+        },
+        {
+          provide: getRepositoryToken(SiteParticRoles),
+          useValue: {
+            find: jest.fn(() => {
+              return [
+                { id: 'fff-jjjj-lll', siteId: '123' },
+                { id: 'sdsff-jjhh-llkkj', siteId: '123' },
               ];
             }),
             save: jest.fn(() => {

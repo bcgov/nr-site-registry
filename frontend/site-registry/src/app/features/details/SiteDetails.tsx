@@ -247,6 +247,8 @@ const SiteDetails = () => {
         dispatch(fetchNotationTypeCd()),
         dispatch(fetchNotationParticipantRoleCd()),
         dispatch(fetchNotationParticipants(id ?? '')),
+        dispatch(fetchParticipantRoleCd()),
+        dispatch(fetchSiteParticipants(id ?? '')),
         // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '' })),
       ])

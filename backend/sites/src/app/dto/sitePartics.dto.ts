@@ -12,7 +12,7 @@ export class SiteParticsResponse extends ResponseDto {
 @ObjectType()
 export class SiteParticsDto {
   @Field()
-  guid: string;
+  partiRoleId: string;
 
   @Field()
   @IsString()
@@ -21,6 +21,9 @@ export class SiteParticsDto {
   @Field()
   @IsString()
   psnorgId: string;
+
+  @Field()
+  siteId: string;
 
   @Field()
   @IsDate()
@@ -50,7 +53,7 @@ export class SiteParticsDto {
 @InputType()
 export class SiteParticsInputDto extends ChangeAuditEntityDTO {
   @Field()
-  guid: string;
+  partiRoleId: string;
 
   @Field()
   @IsString()
@@ -59,6 +62,9 @@ export class SiteParticsInputDto extends ChangeAuditEntityDTO {
   @Field()
   @IsString()
   psnorgId: string;
+
+  @Field()
+  siteId: string;
 
   @Field()
   @IsDate()

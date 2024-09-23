@@ -35,13 +35,14 @@ export class DropdownService {
   async getParticipantRoleCd() {
     try {
       const result = await this.particRoleRepository.find();
-      if (result) {
+      if (result && result.length > 0) {
         return result.map((obj: ParticRoleCd) => ({
           key: obj.code,
           value: obj.description,
         }));
+      } else {
+        return [];
       }
-      return [];
     } catch (error) {
       throw new Error('Failed to retrieve participant role codes.');
     }
@@ -99,7 +100,7 @@ export class DropdownService {
   async getNotationTypeCd() {
     try {
       const result = await this.eventTypeCdRepository.find();
-      if (result) {
+      if (result && result.length > 0) {
         return result.reduce(
           (acc, item: EventTypeCd) => {
             const existingMetaData = acc.find(
@@ -124,8 +125,9 @@ export class DropdownService {
             dropdownDto: { key: string; value: string }[];
           }[],
         );
+      } else {
+        return [];
       }
-      return [];
     } catch (error) {
       throw new Error('Failed to retrieve notation type codes.');
     }
@@ -140,13 +142,14 @@ export class DropdownService {
   async getNotationClassCd() {
     try {
       const result = await this.eventClassCdRepository.find();
-      if (result) {
+      if (result && result.length > 0) {
         return result.map((obj: EventClassCd) => ({
           key: obj.code,
           value: obj.description,
         }));
+      } else {
+        return [];
       }
-      return [];
     } catch (error) {
       throw new Error('Failed to retrieve notation class codes.');
     }
@@ -161,13 +164,14 @@ export class DropdownService {
   async getNotationParticipantRoleCd() {
     try {
       const result = await this.eventParticRoleCdRepository.find();
-      if (result) {
+      if (result && result.length > 0) {
         return result.map((obj: EventParticRoleCd) => ({
           key: obj.code,
           value: obj.description,
         }));
+      } else {
+        return [];
       }
-      return [];
     } catch (error) {
       throw new Error('Failed to retrieve notation participant role codes.');
     }

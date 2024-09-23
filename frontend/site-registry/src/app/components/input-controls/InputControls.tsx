@@ -877,6 +877,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
     onChange(selectedOption);
     setSearchTerm('');
     setFilteredOpts([]);
+    handler('');
   };
 
   const handler = handleSearch ?? ((e) => {});
@@ -896,6 +897,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
     setSearchTerm('');
     setFilteredOpts([]);
     setIsClear(true);
+    handler('');
   };
 
   // Function to handle clicks outside the div element
@@ -903,8 +905,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
     if (divRef.current != null) {
       // Check if the clicked target is outside the div element
       if (divRef.current && !divRef.current.contains(event.target as Node)) {
-        setSearchTerm('');
-        setFilteredOpts([]);
+        clearSearch();
       }
     }
   };
@@ -967,9 +968,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
                 handleSearchChange={handleSearchChange}
               />
             </div>
-            {filteredOpts && filteredOpts.length > 0 && searchTerm !== '' && (
-              <Dropdown.Divider />
-            )}
+            {filteredOpts && filteredOpts.length > 0 && <Dropdown.Divider />}
             <div
               className={`${filteredOptions.length === 0 && searchTerm !== '' ? 'custom-min-height' : ''} custom-dropdown-search-menu`}
             >
@@ -1081,7 +1080,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
 
   const handleTextInputChange = (value: any) => {
     const inputValue = value;
-    // validateInput(inputValue);
+    validateInput(inputValue);
     setHasInfoMsg(null);
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {

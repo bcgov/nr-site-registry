@@ -23,6 +23,8 @@ import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { DropdownResponse } from '../../dto/dropdown.dto';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { UserActionEnum } from '../../common/userActionEnum';
+import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
+import { SiteProfileOwners } from '../../entities/siteProfileOwners.entity';
 /**
  * Nestjs Service For Region Entity
  */
@@ -37,6 +39,8 @@ export class SiteService {
     private eventsParticipantsRepo: Repository<EventPartics>,
     @InjectRepository(SitePartics)
     private siteParticipantsRepo: Repository<SitePartics>,
+    @InjectRepository(SiteParticRoles)
+    private siteParticipantRolesRepo: Repository<SiteParticRoles>,
     @InjectRepository(SiteDocs)
     private siteDocumentsRepo: Repository<SiteDocs>,
     @InjectRepository(SiteAssocs)
@@ -320,10 +324,11 @@ export class SiteService {
                 console.log('No changes To Site Event Participants');
               }
 
-              if (siteParticipants) {
-                await transactionalEntityManager.save(
-                  SitePartics,
+              if (siteParticipants && siteParticipants.length > 0) {
+                await this.processSiteParticipants(
                   siteParticipants,
+                  userInfo,
+                  transactionalEntityManager,
                 );
               } else {
                 console.log('No changes To Site Participants');
@@ -393,6 +398,192 @@ export class SiteService {
   }
 
   /**
+   * Processes and saves site participants based on the provided actions.
+   * @param siteParticipants - Array of event data including actions to be performed.
+   * @param userInfo - Information about the user performing the actions.
+   * @param transactionalEntityManager - Entity manager for handling transactions.
+   */
+  async processSiteParticipants(
+    siteParticipants: any[], // Replace 'any' with actual type if possible
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    if (siteParticipants && siteParticipants.length) {
+      // Arrays to store new and updated entities
+      const newSitePartics: SitePartics[] = [];
+      const updatedSitePartics: {
+        id: string;
+        changes: Partial<SitePartics>;
+      }[] = [];
+      const deleteSitePartics: { id: string }[] = [];
+      const newSiteParticRoles: SiteParticRoles[] = [];
+      const updatedSiteParticRoles: {
+        id: string;
+        changes: Partial<SiteParticRoles>;
+      }[] = [];
+      const deleteSiteParticRoles: { id: string }[] = [];
+
+      // Main processing loop for site participants
+      const siteParticsPromises = siteParticipants.map(async (participant) => {
+        const {
+          description,
+          displayName,
+          prCode,
+          apiAction,
+          partiRoleId,
+          ...siteParticsData
+        } = participant;
+
+        // Validate participant ID
+        let participantId = participant.id || ''; // Ensure it's a string
+
+        let sitePartic: SitePartics = {
+          ...new SitePartics(),
+          ...siteParticsData,
+        };
+
+        let siteParticRole: SiteParticRoles = {
+          ...new SiteParticRoles(),
+          prCode,
+        };
+
+        switch (apiAction) {
+          case UserActionEnum.ADDED:
+            // Generate new ID for the new event
+            const newId = await this.siteParticipantsRepo
+              .createQueryBuilder()
+              .select('MAX(id)', 'maxid')
+              .getRawOne()
+              .then((result) => (Number(result.maxid) || 0) + 1);
+
+            // Get the ID of the newly created event
+            participantId = newId.toString();
+
+            newSitePartics.push({
+              ...sitePartic,
+              id: participantId,
+              rwmFlag: 0,
+              rwmNoteFlag: 0,
+              userAction: UserActionEnum.ADDED,
+              srAction: SRApprovalStatusEnum.PENDING,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+
+            newSiteParticRoles.push({
+              ...siteParticRole,
+              spId: participantId,
+              rwmFlag: 0,
+              userAction: UserActionEnum.ADDED,
+              srAction: SRApprovalStatusEnum.PENDING,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+            break;
+
+          case UserActionEnum.UPDATED:
+            const existingSitePartic =
+              await this.siteParticipantsRepo.findOneByOrFail({
+                id: participantId,
+              });
+            updatedSitePartics.push({
+              id: participantId,
+              changes: {
+                ...new SitePartics(),
+                ...existingSitePartic,
+                ...sitePartic,
+                userAction: UserActionEnum.UPDATED,
+                srAction: SRApprovalStatusEnum.PENDING,
+                whenUpdated: new Date(),
+                whoUpdated: userInfo ? userInfo.givenName : '',
+              },
+            });
+
+            if (existingSitePartic) {
+              const existingSitePartic =
+                await this.siteParticipantRolesRepo.findOneByOrFail({
+                  id: partiRoleId,
+                });
+              updatedSiteParticRoles.push({
+                id: partiRoleId,
+                changes: {
+                  ...existingSitePartic,
+                  ...siteParticRole,
+                  userAction: UserActionEnum.UPDATED,
+                  srAction: SRApprovalStatusEnum.PENDING,
+                  whenUpdated: new Date(),
+                  whoUpdated: userInfo ? userInfo.givenName : '',
+                },
+              });
+            }
+
+            break;
+
+          case UserActionEnum.DELETED:
+            // Handle deletion if necessary
+            // need to confirm for deletion as in meeting there some confusion for deleting site participant and notation participant.
+            deleteSitePartics.push({ id: participantId });
+            deleteSiteParticRoles.push({ id: partiRoleId });
+            break;
+
+          default:
+            console.warn('Unknown action for event:', apiAction);
+        }
+      });
+
+      await Promise.all(siteParticsPromises);
+
+      // Save new site participants and site participant roles in bulk
+      if (newSitePartics.length > 0) {
+        await transactionalEntityManager.save(SitePartics, newSitePartics);
+      }
+      if (newSiteParticRoles.length > 0) {
+        await transactionalEntityManager.save(
+          SiteParticRoles,
+          newSiteParticRoles,
+        );
+      }
+
+      // Update existing site participants and site participant roles in bulk
+      if (updatedSitePartics.length > 0) {
+        await Promise.all(
+          updatedSitePartics.map(({ id, changes }) =>
+            transactionalEntityManager.update(SitePartics, { id }, changes),
+          ),
+        );
+      }
+
+      if (updatedSiteParticRoles.length > 0) {
+        await Promise.all(
+          updatedSiteParticRoles.map(({ id, changes }) =>
+            transactionalEntityManager.update(SiteParticRoles, { id }, changes),
+          ),
+        );
+      }
+
+      // Delete existing site participants and site participant roles in bulk
+      if (deleteSiteParticRoles.length > 0) {
+        await Promise.all(
+          deleteSiteParticRoles.map(({ id }) =>
+            transactionalEntityManager.delete(SiteParticRoles, { id }),
+          ),
+        );
+      }
+      if (deleteSitePartics.length > 0) {
+        await Promise.all(
+          deleteSitePartics.map(({ id }) =>
+            transactionalEntityManager
+              .delete(SiteProfileOwners, { spId: id })
+              .then(() => {
+                transactionalEntityManager.delete(SitePartics, { id });
+              }),
+          ),
+        );
+      }
+    }
+  }
+
+  /**
    * Processes and saves events and participants based on the provided actions.
    * @param events - Array of event data including actions to be performed.
    * @param userInfo - Information about the user performing the actions.
@@ -419,7 +610,8 @@ export class SiteService {
         participants: any[],
       ) => {
         const participantPromises = participants.map(async (partic) => {
-          const { guid, displayName, apiAction, ...particData } = partic;
+          const { eventParticId, displayName, apiAction, ...particData } =
+            partic;
           switch (apiAction) {
             case UserActionEnum.ADDED:
               return {
@@ -432,9 +624,11 @@ export class SiteService {
               };
             case UserActionEnum.UPDATED:
               const existingPartic =
-                await this.eventsParticipantsRepo.findOneByOrFail({ id: guid });
+                await this.eventsParticipantsRepo.findOneByOrFail({
+                  id: eventParticId,
+                });
               return {
-                id: guid,
+                id: eventParticId,
                 changes: {
                   ...existingPartic,
                   ...particData,
@@ -445,7 +639,7 @@ export class SiteService {
               };
             case UserActionEnum.DELETED:
               await transactionalEntityManager.delete(EventPartics, {
-                id: guid,
+                id: eventParticId,
               });
               return null;
             default:

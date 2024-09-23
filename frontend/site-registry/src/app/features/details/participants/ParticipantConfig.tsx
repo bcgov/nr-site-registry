@@ -30,9 +30,7 @@ export const GetConfig = () => {
         customPlaceholderCss: 'custom-participant-search-placeholder',
         customMenuMessage: <span>Please select site participant name:</span>,
         tableMode: true,
-        handleSearch: () => {
-          console.log('handleSearch click');
-        },
+        handleSearch: () => {},
       },
     },
     {
@@ -164,9 +162,9 @@ export const GetConfig = () => {
         customPlaceholderCss: 'custom-participant-search-placeholder',
         customMenuMessage: <span>Please select site participant name:</span>,
         tableMode: true,
-        handleSearch: () => {
-          console.log('handleSearch click');
-        },
+        // handleSearch: () => {
+        //   console.log('handleSearch click');
+        // },
       },
     },
     {

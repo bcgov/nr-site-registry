@@ -9,9 +9,10 @@ export const graphQLSiteParticipantsBySiteId = () => {
         message
         timestamp
         data {
-          guid
+          partiRoleId
           id
           psnorgId
+          siteId
           effectiveDate
           endDate
           note

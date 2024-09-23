@@ -27,6 +27,7 @@ import {
   flattenFormRows,
   getAxiosInstance,
   getUser,
+  resultCache,
   UpdateDisplayTypeParams,
   updateTableColumn,
 } from '../../../helpers/utility';
@@ -60,6 +61,7 @@ import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
 import GetNotationConfig from './NotationsConfig';
 import infoIcon from '../../../images/info-icon.png';
 import {
+  saveRequestStatus,
   setupNotationDataForSaving,
   trackSiteNotation,
 } from '../SaveSiteDetailsSlice';
@@ -89,6 +91,7 @@ const Notations = () => {
   const resetDetails = useSelector(resetSiteDetails);
   const { id: siteId } = useParams();
   const trackNotation = useSelector(trackSiteNotation);
+  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
 
   const [userType, setUserType] = useState('');
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
@@ -125,11 +128,21 @@ const Notations = () => {
   const fetchNotationParticipant = useCallback(async (searchParam: string) => {
     if (searchParam.trim()) {
       try {
+        // Check cache first
+        if (resultCache[searchParam]) {
+          return resultCache[searchParam];
+        }
+
         const response = await getAxiosInstance().post(GRAPHQL, {
           query: print(graphQLPeopleOrgsCd()),
           variables: { searchParam },
         });
-        return response.data.data.getPeopleOrgsCd;
+
+        // Store result in cache if successful
+        if (response?.data?.data?.getPeopleOrgsCd?.success) {
+          resultCache[searchParam] = response.data.data.getPeopleOrgsCd.data;
+          return response.data.data.getPeopleOrgsCd;
+        }
       } catch (error) {
         console.error('Error fetching notation participant:', error);
         return [];
@@ -149,7 +162,6 @@ const Notations = () => {
           ),
           updates: {
             isLoading: RequestStatus.loading,
-            options,
             filteredOptions: [],
             handleSearch,
             customInfoMessage: <></>,
@@ -260,7 +272,8 @@ const Notations = () => {
             updates: {
               isLoading: RequestStatus.success,
               options,
-              filteredOptions: res.data,
+              filteredOptions:
+                res.data ?? resultCache[searchSiteParticipant] ?? [],
               customInfoMessage: infoMsg,
               handleSearch,
             },
@@ -298,7 +311,7 @@ const Notations = () => {
     if (resetDetails) {
       dispatch(fetchNotationParticipants(siteId ?? ''));
     }
-  }, [resetDetails]);
+  }, [resetDetails, saveSiteDetailsRequestStatus]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value;
@@ -367,71 +380,56 @@ const Notations = () => {
     if (viewMode === SiteDetailsMode.SRMode) {
       console.log({ [graphQLPropertyName]: value, id });
     } else {
-      const updatedNotation = formData.map((notation) => {
-        if (notation.id === id) {
-          if (graphQLPropertyName === 'eclsCode') {
-            setIsUpdated(true);
-            const updatedRow = [...notationFormRowEditMode].map((items) => {
-              return items.map((row) => ({
-                ...row,
-                options: notationType.data.find(
-                  (items: any) => items.metaData === value,
-                ).dropdownDto,
-              }));
-            });
-            setUpdatedNotationFormRowEditMode(updatedRow);
-            return {
+      const updateNotations = (notations: any) => {
+        return notations.map((notation: any) => {
+          if (notation.id === id) {
+            let updatedNotation = {
               ...notation,
               [graphQLPropertyName]: value,
-              ['etypCode']: '',
               apiAction: notation?.apiAction ?? UserActionEnum.updated,
               srAction: SRApprovalStatusEnum.Pending,
             };
-          }
-          return {
-            ...notation,
-            [graphQLPropertyName]: value,
-            apiAction: notation?.apiAction ?? UserActionEnum.updated,
-            srAction: SRApprovalStatusEnum.Pending,
-          };
-        }
-        return notation;
-      });
 
-      const trackNotatn = trackNotation.map((notation: any) => {
-        if (notation.id === id) {
-          if (graphQLPropertyName === 'eclsCode') {
-            return {
-              ...notation,
-              [graphQLPropertyName]: value,
-              ['etypCode']: '',
-              apiAction: notation?.apiAction ?? UserActionEnum.updated,
-              srAction: SRApprovalStatusEnum.Pending,
-            };
+            if (graphQLPropertyName === 'eclsCode') {
+              setIsUpdated(true);
+              const updatedRow = [...notationFormRowEditMode].map((items) => {
+                return items.map((row) => ({
+                  ...row,
+                  options: notationType.data.find(
+                    (item: any) => item.metaData === value,
+                  ).dropdownDto,
+                }));
+              });
+              setUpdatedNotationFormRowEditMode(updatedRow);
+              updatedNotation['etypCode'] = '';
+            }
+
+            return updatedNotation;
           }
-          return {
-            ...notation,
-            [graphQLPropertyName]: value,
-            apiAction: notation?.apiAction ?? UserActionEnum.updated,
-            srAction: SRApprovalStatusEnum.Pending,
-          };
-        }
-        return notation;
-      });
+          return notation;
+        });
+      };
+
+      // Update both formData and trackNotation in one go
+      const updatedNotation = updateNotations(formData);
+      const updatedTrackNotation = updateNotations(trackNotation);
+
       setFormData(updatedNotation);
-      dispatch(setupNotationDataForSaving(trackNotatn));
       dispatch(updateSiteNotation(updatedNotation));
-    }
+      dispatch(setupNotationDataForSaving(updatedTrackNotation));
 
-    const flattedArr = flattenFormRows(notationFormRowsInternal);
-    const currLabel =
-      flattedArr &&
-      flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
-    const tracker = new ChangeTracker(
-      IChangeType.Modified,
-      'Notations: ' + currLabel?.label,
-    );
-    dispatch(trackChanges(tracker.toPlainObject()));
+      const flattedArr = flattenFormRows(notationFormRowsInternal);
+      const currLabel =
+        flattedArr &&
+        flattedArr.find(
+          (row) => row.graphQLPropertyName === graphQLPropertyName,
+        );
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Notations: ' + currLabel?.label,
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    }
   };
 
   const handleWidgetCheckBox = (event: any) => {
@@ -447,74 +445,57 @@ const Notations = () => {
     particIsDelete = false,
   ) => {
     if (particIsDelete) {
-      // Set the participants as deleted and remove them from formData state
-      const updatedPartics = formData.map((notation) => {
-        if (notation.id === currNotation.id) {
-          // Filter out selected rows from notationParticipant array
-          const updatedNotationParticipant = notation.notationParticipant
-            .map((participant: any) => {
-              if (
-                selectedRows.some(
-                  (row) =>
-                    row.id === notation.id &&
-                    row.participantId === participant.guid,
-                )
-              ) {
-                return {
-                  ...participant,
-                  apiAction: UserActionEnum.deleted, // Set apiAction to deleted for participants
-                  srAction: SRApprovalStatusEnum.Pending,
-                };
-              }
-              return participant;
-            })
-            .filter(
-              (participant: any) =>
-                !selectedRows.some(
-                  (row) =>
-                    row.id === notation.id &&
-                    row.participantId === participant.guid,
-                ),
-            );
-
-          return {
-            ...notation,
-            notationParticipant: updatedNotationParticipant,
-          };
-        }
-        return notation;
-      });
-
-      // Prepare data for saving with userAction set to deleted for participants
-      const trackNotatn = trackNotation.map((notation: any) => {
-        if (notation.id === currNotation.id) {
-          return {
-            ...notation,
-            notationParticipant: notation.notationParticipant.map(
+      const updateNotations = (notations: any) => {
+        return notations.map((notation: any) => {
+          if (notation.id === currNotation.id) {
+            const updatedNotationParticipant = notation.notationParticipant.map(
               (participant: any) => {
                 if (
                   selectedRows.some(
                     (row) =>
                       row.id === notation.id &&
-                      row.participantId === participant.guid,
+                      row.participantId === participant.eventParticId,
                   )
                 ) {
                   return {
                     ...participant,
-                    apiAction: UserActionEnum.deleted,
+                    apiAction: UserActionEnum.deleted, // Mark as deleted
                     srAction: SRApprovalStatusEnum.Pending,
                   };
                 }
                 return participant;
               },
-            ),
-          };
-        }
-        return notation;
-      });
+            );
 
-      setFormData(updatedPartics);
-      dispatch(setupNotationDataForSaving(trackNotatn));
+            return {
+              ...notation,
+              notationParticipant: updatedNotationParticipant,
+            };
+          }
+          return notation;
+        });
+      };
+
+      // Update both formData and trackNotation
+      const updatedPartics = updateNotations(formData);
+      const updatedTrackNotatn = updateNotations(trackNotation);
+
+      // Filter out participants based on selectedRows for formData
+      const filteredPartics = updatedPartics.map((notation: any) => ({
+        ...notation,
+        notationParticipant: notation.notationParticipant.filter(
+          (participant: any) =>
+            !selectedRows.some(
+              (row) =>
+                row.id === notation.id &&
+                row.participantId === participant.eventParticId,
+            ),
+        ),
+      }));
+
+      setFormData(filteredPartics);
+      dispatch(updateSiteNotation(filteredPartics));
+      dispatch(setupNotationDataForSaving(updatedTrackNotatn));
 
       const tracker = new ChangeTracker(
         IChangeType.Deleted,
@@ -547,7 +528,7 @@ const Notations = () => {
           ...prevSelectedRows,
           ...rows.map((row: any) => ({
             id,
-            participantId: row.guid,
+            participantId: row.eventParticId,
           })),
         ]);
       } else {
@@ -556,101 +537,92 @@ const Notations = () => {
             (selectedRow) =>
               !rows.some(
                 (row: any) =>
-                  selectedRow.participantId === row.guid &&
+                  selectedRow.participantId === row.eventParticId &&
                   selectedRow.id === id,
               ),
           ),
         );
       }
     } else {
-      const updateNotationParticipant = formData.map((notation) => {
-        if (notation.id === id) {
-          const updatedNotationParticipant = notation.notationParticipant.map(
-            (participant: any) => {
-              if (participant.guid === event.row.guid) {
-                if (
-                  typeof event.value === 'object' &&
-                  event.value !== null &&
-                  event.property === 'psnorgId'
-                ) {
-                  // Parameters for the update
-                  let params: UpdateDisplayTypeParams = {
-                    indexToUpdate: notationColumnInternal.findIndex(
-                      (item) =>
-                        item.displayType?.graphQLPropertyName === 'psnorgId',
-                    ),
-                    updates: {
-                      isLoading: RequestStatus.success,
-                      options: [...options, event.value],
-                      filteredOptions: [],
-                      handleSearch: handleSearch,
-                      customInfoMessage: <></>,
-                    },
-                  };
-                  setInternalTableColumn(
-                    updateTableColumn(internalTableColumn, params),
-                  );
-                  return {
-                    ...participant,
-                    [event.property]: event.value.key,
-                    ['displayName']: event.value.value,
-                    apiAction: participant?.apiAction ?? UserActionEnum.updated,
-                    srAction: SRApprovalStatusEnum.Pending,
-                  };
+      const updateParticipants = (
+        notations: any,
+        id: any,
+        event: any,
+        updateParams = false,
+      ) => {
+        return notations.map((notation: any) => {
+          if (notation.id === id) {
+            const updatedNotationParticipant = notation.notationParticipant.map(
+              (participant: any) => {
+                if (participant.eventParticId === event.row.eventParticId) {
+                  const isPsnorgId =
+                    typeof event.value === 'object' &&
+                    event.value !== null &&
+                    event.property === 'psnorgId';
+
+                  const updatedParticipant = isPsnorgId
+                    ? {
+                        ...participant,
+                        [event.property]: event.value.key,
+                        ['displayName']: event.value.value,
+                        apiAction:
+                          participant?.apiAction ?? UserActionEnum.updated,
+                        srAction: SRApprovalStatusEnum.Pending,
+                      }
+                    : {
+                        ...participant,
+                        [event.property]: event.value,
+                        apiAction:
+                          participant?.apiAction ?? UserActionEnum.updated,
+                        srAction: SRApprovalStatusEnum.Pending,
+                      };
+
+                  if (isPsnorgId && updateParams) {
+                    const params: UpdateDisplayTypeParams = {
+                      indexToUpdate: notationColumnInternal.findIndex(
+                        (item) =>
+                          item.displayType?.graphQLPropertyName === 'psnorgId',
+                      ),
+                      updates: {
+                        isLoading: RequestStatus.success,
+                        options,
+                        filteredOptions:
+                          resultCache[searchSiteParticipant] ?? [],
+                        handleSearch,
+                        customInfoMessage: <></>,
+                      },
+                    };
+                    setInternalTableColumn(
+                      updateTableColumn(internalTableColumn, params),
+                    );
+                  }
+
+                  return updatedParticipant;
                 }
-                return {
-                  ...participant,
-                  [event.property]: event.value,
-                  apiAction: participant?.apiAction ?? UserActionEnum.updated,
-                  srAction: SRApprovalStatusEnum.Pending,
-                };
-              }
-              return participant;
-            },
-          );
-          return {
-            ...notation,
-            notationParticipant: updatedNotationParticipant,
-          };
-        }
-        return notation;
-      });
+                return participant;
+              },
+            );
+
+            return {
+              ...notation,
+              notationParticipant: updatedNotationParticipant,
+            };
+          }
+          return notation;
+        });
+      };
+
+      // Update formData with parameters
+      const updateNotationParticipant = updateParticipants(
+        formData,
+        id,
+        event,
+        true,
+      );
       setFormData(updateNotationParticipant);
-      const trackNotatn = trackNotation.map((notation: any) => {
-        if (notation.id === id) {
-          const updatedNotatnParticipant = notation.notationParticipant.map(
-            (participant: any) => {
-              if (participant.guid === event.row.guid) {
-                if (
-                  typeof event.value === 'object' &&
-                  event.value !== null &&
-                  event.property === 'psnorgId'
-                ) {
-                  return {
-                    ...participant,
-                    [event.property]: event.value.key,
-                    ['displayName']: event.value.value,
-                    apiAction: participant?.apiAction ?? UserActionEnum.updated,
-                    srAction: SRApprovalStatusEnum.Pending,
-                  };
-                }
-                return {
-                  ...participant,
-                  [event.property]: event.value,
-                  apiAction: participant?.apiAction ?? UserActionEnum.updated,
-                  srAction: SRApprovalStatusEnum.Pending,
-                };
-              }
-              return participant;
-            },
-          );
-          return {
-            ...notation,
-            notationParticipant: updatedNotatnParticipant,
-          };
-        }
-        return notation;
-      });
+      dispatch(updateSiteNotation(updateNotationParticipant));
+      // Update trackNotation without parameters
+      const trackNotatn = updateParticipants(trackNotation, id, event, false);
       dispatch(setupNotationDataForSaving(trackNotatn));
 
       const currLabel =
@@ -662,8 +634,6 @@ const Notations = () => {
         IChangeType.Modified,
         'Notation Participant: ' + currLabel?.displayName,
       );
-
-      dispatch(updateSiteNotation(updateNotationParticipant));
     }
   };
 
@@ -721,9 +691,7 @@ const Notations = () => {
           eprCode: '',
           psnorgId: '',
           eventId: '',
-          // spId:'',
-          guid: v4(),
-          // userAction: UserActionEnum.added,
+          eventParticId: v4(),
           apiAction: UserActionEnum.added,
           srAction: SRApprovalStatusEnum.Pending,
         },
@@ -732,6 +700,7 @@ const Notations = () => {
 
     // Add the new notation to formData
     setFormData((prevData) => [newNotation, ...prevData]);
+    dispatch(updateSiteNotation([newNotation, ...formData]));
     dispatch(setupNotationDataForSaving([newNotation, ...trackNotation]));
     const tracker = new ChangeTracker(IChangeType.Added, 'New Notation Added');
     dispatch(trackChanges(tracker.toPlainObject()));
@@ -743,47 +712,38 @@ const Notations = () => {
       eventId: '',
       eprCode: '',
       psnorgId: '',
-      guid: v4(),
+      eventParticId: v4(),
       apiAction: UserActionEnum.added,
       srAction: SRApprovalStatusEnum.Pending,
     };
-    const updatedPartics = formData.map((notation) => {
-      if (notation.id === id) {
-        const updatedNotationParticipant = [
-          newParticipant,
-          ...notation.notationParticipant.map((participant: any) =>
-            participant.apiAction === UserActionEnum.deleted
-              ? { ...participant } // Ensure deleted participants are kept
-              : participant,
-          ),
-        ];
-        return {
-          ...notation,
-          notationParticipant: updatedNotationParticipant,
-        };
-      }
-      return notation;
-    });
 
-    const trackSiteNotation = trackNotation.map((notation: any) => {
-      if (notation.id === id) {
-        return {
-          ...notation,
-          notationParticipant: [
+    const updateNotations = (notations: any, id: any) => {
+      return notations.map((notation: any) => {
+        if (notation.id === id) {
+          const updatedNotationParticipant = [
             newParticipant,
             ...notation.notationParticipant.map((participant: any) =>
               participant.apiAction === UserActionEnum.deleted
-                ? { ...participant }
+                ? { ...participant } // Ensure deleted participants are kept
                 : participant,
             ),
-          ],
-        };
-      }
-      return notation;
-    });
-    setFormData(updatedPartics);
-    dispatch(setupNotationDataForSaving(trackSiteNotation));
+          ];
+          return {
+            ...notation,
+            notationParticipant: updatedNotationParticipant,
+          };
+        }
+        return notation;
+      });
+    };
 
+    // Update both formData and trackNotation in one call
+    const updatedParticipants = updateNotations(formData, id);
+    const updatedTrackParticipants = updateNotations(trackNotation, id);
+
+    setFormData(updatedParticipants);
+    dispatch(updateSiteNotation(updatedParticipants));
+    dispatch(setupNotationDataForSaving(updatedTrackParticipants));
     const tracker = new ChangeTracker(
       IChangeType.Added,
       'Notation Participant Added',
@@ -1068,7 +1028,7 @@ const Notations = () => {
                         viewMode === SiteDetailsMode.SRMode &&
                         userType === UserType.Internal
                       }
-                      primaryKeycolumnName="guid"
+                      primaryKeycolumnName="eventParticId"
                       sortHandler={(row, ascDir) => {
                         handleTableSort(row, ascDir, notation.id);
                       }}

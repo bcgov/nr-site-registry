@@ -33,7 +33,7 @@ export class DropdownResolver {
   @Query(() => DropdownResponse, { name: 'getParticipantRoleCd' })
   async getParticipantRoleCd() {
     const result = await this.dropdownService.getParticipantRoleCd();
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       return this.genericResponseProvider.createResponse(
         'Participants role code fetched successfully',
         200,
@@ -104,7 +104,7 @@ export class DropdownResolver {
   @Query(() => DropdownResponseWithMetaData, { name: 'getNotationTypeCd' })
   async getNotationTypeCd() {
     const result = await this.dropdownService.getNotationTypeCd();
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       return this.genericResponseProviderNotation.createResponse(
         'Notation Type fetched successfully',
         200,
@@ -131,7 +131,7 @@ export class DropdownResolver {
   @Query(() => DropdownResponse, { name: 'getNotationClassCd' })
   async getNotationClassCd() {
     const result = await this.dropdownService.getNotationClassCd();
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       return this.genericResponseProvider.createResponse(
         'Notation Class fetched successfully',
         200,
@@ -158,7 +158,7 @@ export class DropdownResolver {
   @Query(() => DropdownResponse, { name: 'getNotationParticipantRoleCd' })
   async getNotationParticipantRoleCd() {
     const result = await this.dropdownService.getNotationParticipantRoleCd();
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       return this.genericResponseProvider.createResponse(
         'Notation Paticipant Role fetched successfully',
         200,

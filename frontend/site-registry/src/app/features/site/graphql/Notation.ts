@@ -21,7 +21,7 @@ export const graphQLSiteNotationBySiteId = () => {
           eclsCode
           srAction
           notationParticipant {
-            guid
+            eventParticId
             eventId
             eprCode
             psnorgId

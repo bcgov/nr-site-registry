@@ -495,9 +495,7 @@ export const GetNotationConfig = () => {
         customMenuMessage: <span>Please select site participant name:</span>,
         filteredOptions: [],
         isLoading: RequestStatus.idle,
-        handleSearch: () => {
-          console.log('handleSearch click');
-        },
+        handleSearch: () => {},
       },
     },
     {
@@ -560,9 +558,7 @@ export const GetNotationConfig = () => {
         customMenuMessage: <span>Please select site participant name:</span>,
         filteredOptions: [],
         isLoading: RequestStatus.idle,
-        handleSearch: () => {
-          console.log('handleSearch click');
-        },
+        // handleSearch: () => {},
       },
     },
   ];

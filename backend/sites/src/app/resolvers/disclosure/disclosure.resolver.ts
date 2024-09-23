@@ -32,7 +32,7 @@ export class DisclosureResolver {
   ) {
     const result =
       await this.dsiclosureService.getSiteDisclosureBySiteId(siteId);
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       return this.genericResponseProvider.createResponse(
         'Site Disclosure fetched successfully',
         200,

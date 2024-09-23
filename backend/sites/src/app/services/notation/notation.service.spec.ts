@@ -130,7 +130,7 @@ describe('NotationService', () => {
       expect(result[0].id).toEqual(mockEvents[0].id);
       expect(result[0].siteId).toEqual(mockEvents[0].siteId);
       expect(result[0].notationParticipant).toHaveLength(1);
-      expect(result[0].notationParticipant[0].guid).toEqual(
+      expect(result[0].notationParticipant[0].eventParticId).toEqual(
         mockEvents[0].eventPartics[0].id,
       );
     });
@@ -380,7 +380,7 @@ describe('NotationService', () => {
       expect(result[0].id).toEqual(mockEvents[0].id);
       expect(result[0].siteId).toEqual(mockEvents[0].siteId);
       expect(result[0].notationParticipant).toHaveLength(1);
-      expect(result[0].notationParticipant[0].guid).toEqual(
+      expect(result[0].notationParticipant[0].eventParticId).toEqual(
         mockEvents[0].eventPartics[0].id,
       );
     });

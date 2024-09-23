@@ -65,7 +65,7 @@ describe('NotationResolver', () => {
         userAction: 'pending',
         notationParticipant: [
           {
-            guid: 'GUID001',
+            eventParticId: 'GUID001',
             eprCode: 'EPR001',
             psnorgId: 'PSNORG123',
             displayName: 'John Doe',
@@ -74,7 +74,7 @@ describe('NotationResolver', () => {
             eventId: '',
           },
           {
-            guid: 'GUID002',
+            eventParticId: 'GUID002',
             eprCode: 'EPR002',
             psnorgId: 'PSNORG456',
             displayName: 'Jane Smith',

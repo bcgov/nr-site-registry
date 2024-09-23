@@ -143,7 +143,10 @@ export const getSiteDetailsToBeSaved = (state: any) => {
       UserActionEnum.updated,
       UserActionEnum.deleted,
     ]),
-    siteParticipants: state.siteDetails.siteParticipantData,
+    siteParticipants: deepFilterByUserAction(
+      state.siteDetails.siteParticipantData,
+      [UserActionEnum.added, UserActionEnum.updated, UserActionEnum.deleted],
+    ),
     documents: state.siteDetails.documentsData,
     siteAssociations: state.siteDetails.siteAssociations,
     subDivisions: state.siteDetails.subDivisions,
@@ -157,6 +160,8 @@ export const getSiteDetailsToBeSaved = (state: any) => {
 export const saveRequestStatus = (state: any) =>
   state.siteDetails.saveRequestStatus;
 export const trackSiteNotation = (state: any) => state.siteDetails.notationData;
+export const trackSiteParticipant = (state: any) =>
+  state.siteDetails.siteParticipantData;
 export const {
   resetSaveSiteDetailsRequestStatus,
   resetSaveSiteDetails,

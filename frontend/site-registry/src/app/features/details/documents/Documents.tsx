@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { GetDocumentsConfig } from './DocumentsConfig';
 import { AppDispatch } from '../../../Store';
 import {
   documents,
@@ -48,13 +47,14 @@ import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
 import { print } from 'graphql';
 import infoIcon from '../../../images/info-icon.png';
 import { RequestStatus } from '../../../helpers/requests/status';
+import { GetDocumentsConfig } from './DocumentsConfig';
 
 const Documents = () => {
   const {
     documentFirstChildFormRowsForExternal,
     documentFirstChildFormRows,
     documentFormRows,
-  } = GetDocumentsConfig() || {};
+  } = GetDocumentsConfig();
   const loggedInUser = getUser();
   const { id } = useParams();
   const { siteDocuments: siteDocuments, status } = useSelector(documents);
@@ -328,9 +328,11 @@ const Documents = () => {
     graphQLPropertyName: any,
     value: any,
   ) => {
+    console.log(id, graphQLPropertyName, value);
     if (viewMode === SiteDetailsMode.SRMode) {
       console.log({ [graphQLPropertyName]: value, id });
     } else {
+      debugger;
       const updatedDoc = formData.map((document) => {
         if (document.id === id) {
           if (graphQLPropertyName === 'psnorgId') {
@@ -341,7 +343,7 @@ const Documents = () => {
               ),
               updates: {
                 isLoading: RequestStatus.success,
-                options: options,
+                options: [options, { ...value }],
                 filteredOptions: [],
                 handleSearch: handleSearch,
                 customInfoMessage: <></>,
@@ -356,13 +358,13 @@ const Documents = () => {
               indexToUpdate: indexToUpdateExt,
               updates: {
                 isLoading: RequestStatus.success,
-                options: options,
+                options: [options, { ...value }],
                 filteredOptions: [],
                 handleSearch: handleSearch,
                 customInfoMessage: <></>,
               },
             };
-            setExternalRow(updateFields(externalRow, paramsExt));
+            // setExternalRow(updateFields(externalRow, paramsExt));
             setInternalRow(updateFields(internalRow, params));
             return {
               ...document,
@@ -389,45 +391,49 @@ const Documents = () => {
   };
 
   useEffect(() => {
-    if (status === RequestStatus.success) {
-      if (siteDocuments) {
-        const psnOrgs = siteDocuments.map((item: any) => ({
-          key: item.psnorgId,
-          value: item.displayName,
-        }));
-        setOptions(psnOrgs);
-        // Parameters for the update
-        let params: UpdateDisplayTypeParams = {
-          indexToUpdate: documentFormRows.findIndex((row) =>
-            row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-          ),
-          updates: {
-            isLoading: RequestStatus.success,
-            options: psnOrgs,
-            filteredOptions: [],
-            handleSearch: handleSearch,
-            customInfoMessage: <></>,
-          },
-        };
+    if (status === RequestStatus.success && siteDocuments) {
+      // if (siteDocuments) {
+      const uniquePsnOrgs: any = Array.from(
+        new Map(
+          siteDocuments.map((item: any) => [
+            item.psnorgId,
+            { key: item.psnorgId, value: item.displayName },
+          ]),
+        ).values(),
+      );
+      console.log('uniquePsnOrgs --> ', uniquePsnOrgs);
+      setOptions(uniquePsnOrgs);
+      // Parameters for the update
+      let params: UpdateDisplayTypeParams = {
+        indexToUpdate: documentFormRows.findIndex((row) =>
+          row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+        ),
+        updates: {
+          isLoading: RequestStatus.success,
+          options: uniquePsnOrgs,
+          filteredOptions: [],
+          handleSearch: handleSearch,
+          customInfoMessage: <></>,
+        },
+      };
 
-        const indexToUpdateExt =
-          documentFirstChildFormRowsForExternal.findIndex((row) =>
-            row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-          );
+      const indexToUpdateExt = documentFirstChildFormRowsForExternal.findIndex(
+        (row) => row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+      );
 
-        let paramsExt: UpdateDisplayTypeParams = {
-          indexToUpdate: indexToUpdateExt,
-          updates: {
-            isLoading: RequestStatus.success,
-            options: psnOrgs,
-            filteredOptions: [],
-            handleSearch: handleSearch,
-            customInfoMessage: <></>,
-          },
-        };
-        setExternalRow(updateFields(externalRow, paramsExt));
-        setInternalRow(updateFields(internalRow, params));
-      }
+      let paramsExt: UpdateDisplayTypeParams = {
+        indexToUpdate: indexToUpdateExt,
+        updates: {
+          isLoading: RequestStatus.success,
+          options: uniquePsnOrgs,
+          filteredOptions: [],
+          handleSearch: handleSearch,
+          customInfoMessage: <></>,
+        },
+      };
+      setExternalRow(updateFields(externalRow, paramsExt));
+      setInternalRow(updateFields(internalRow, params));
+      // }
       setFormData(siteDocuments);
     }
   }, [siteDocuments, status]);

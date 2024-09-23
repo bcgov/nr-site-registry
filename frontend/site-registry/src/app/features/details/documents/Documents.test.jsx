@@ -4,9 +4,8 @@ import { Provider, useSelector } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
-import { GetDocumentsConfig } from './DocumentsConfig';
 import { UserType } from '../../../helpers/requests/userType';
-import { RequestStatus } from '../../../helpers/requests/status';
+import { GetDocumentsConfig } from './DocumentsConfig';
 
 // Mocking the useSelector hook with the correct state structure
 jest.mock('react-redux', () => ({

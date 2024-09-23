@@ -572,11 +572,7 @@ export class SiteService {
       if (deleteSitePartics.length > 0) {
         await Promise.all(
           deleteSitePartics.map(({ id }) =>
-            transactionalEntityManager
-              .delete(SiteProfileOwners, { spId: id })
-              .then(() => {
-                transactionalEntityManager.delete(SitePartics, { id });
-              }),
+            transactionalEntityManager.delete(SitePartics, { id }),
           ),
         );
       }

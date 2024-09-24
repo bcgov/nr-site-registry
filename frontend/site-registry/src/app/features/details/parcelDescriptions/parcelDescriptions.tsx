@@ -18,7 +18,6 @@ import {
   setSortByInputValue,
 } from './parcelDescriptionsSlice';
 import { columns } from './parcelDescriptionsConfig';
-import './parcelDescriptions.css';
 import { useParams } from 'react-router-dom';
 
 const ParcelDescriptions = () => {

@@ -49,6 +49,7 @@ export class DropdownService {
       }
       sitesLogger.info('DropdownService.getParticipantRoleCd() end');
       sitesLogger.debug('DropdownService.getParticipantRoleCd() end');
+      return [];
     } catch (error) {
       sitesLogger.error(
         'Exception occured in DropdownService.getParticipantRoleCd() end' +

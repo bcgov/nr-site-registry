@@ -288,6 +288,7 @@ export class SiteService {
           events,
           eventsParticipants,
           siteParticipants,
+          documents,
           siteAssociations,
           subDivisions,
           landHistories,
@@ -330,6 +331,11 @@ export class SiteService {
                 );
               } else {
                 console.log('No changes To Site Participants');
+              }
+              if (documents && documents.length > 0) {
+                console.log(documents);
+              } else {
+                console.log('No changes To Site Documents');
               }
 
               if (siteAssociations) {

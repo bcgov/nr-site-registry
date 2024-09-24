@@ -433,9 +433,6 @@ const Participants = () => {
       };
 
       // Update both formData and trackNotation
-      // const updatedParticipants = updateParticipants(formData, event);
-
-      // Update both formData and trackNotation
       const updatedParticipants = updateParticipants(formData, event);
       const updatedTrackNotatn = updateParticipants(trackParticipant, event);
 

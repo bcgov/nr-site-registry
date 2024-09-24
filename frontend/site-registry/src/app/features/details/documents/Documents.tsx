@@ -10,13 +10,14 @@ import {
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import {
   flattenFormRows,
   getAxiosInstance,
   getUser,
+  resultCache,
   UpdateDisplayTypeParams,
   updateFields,
 } from '../../../helpers/utility';
@@ -48,6 +49,13 @@ import { print } from 'graphql';
 import infoIcon from '../../../images/info-icon.png';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { GetDocumentsConfig } from './DocumentsConfig';
+import {
+  saveRequestStatus,
+  setupDocumentsDataForSaving,
+  trackSiteDocuments,
+} from '../SaveSiteDetailsSlice';
+import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
+import { UserActionEnum } from '../../../common/userActionEnum';
 
 const Documents = () => {
   const {
@@ -60,6 +68,8 @@ const Documents = () => {
   const { siteDocuments: siteDocuments, status } = useSelector(documents);
   const mode = useSelector(siteDetailsMode);
   const resetDetails = useSelector(resetSiteDetails);
+  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
+  const trackDocuments = useSelector(trackSiteDocuments);
   const dispatch = useDispatch<AppDispatch>();
 
   const [userType, setUserType] = useState<UserType>(UserType.External);
@@ -85,42 +95,340 @@ const Documents = () => {
   const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 
-  useEffect(() => {
-    setViewMode(mode);
-  }, [mode]);
+  // Function to fetch notation participant
+  const fetchAuthors = useCallback(async (searchParam: string) => {
+    if (searchParam.trim()) {
+      try {
+        // Check cache first
+        if (resultCache[searchParam]) {
+          return resultCache[searchParam];
+        }
 
-  useEffect(() => {
-    if (resetDetails) {
-      setFormData(siteDocuments);
-    }
-  }, [resetDetails]);
+        const response = await getAxiosInstance().post(GRAPHQL, {
+          query: print(graphQLPeopleOrgsCd()),
+          variables: { searchParam },
+        });
 
-  useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
-      setUserType(UserType.External);
-    } else if (
-      loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
-    ) {
-      setUserType(UserType.Internal);
-    } else {
-      // not logged in
-      setUserType(UserType.External);
+        // Store result in cache if successful
+        if (response?.data?.data?.getPeopleOrgsCd?.success) {
+          resultCache[searchParam] = response.data.data.getPeopleOrgsCd.data;
+          return response.data.data.getPeopleOrgsCd;
+        }
+      } catch (error) {
+        console.error('Error fetching notation participant:', error);
+        return [];
+      }
     }
-    // setFormData(siteDocuments);
+    return [];
   }, []);
 
+  // Handle search action
+  const handleSearch = useCallback(
+    (value: any) => {
+      setSearchSiteParticipant(value.trim());
+      setInternalRow((prev) =>
+        updateFields(prev, {
+          indexToUpdate: prev.findIndex((row) =>
+            row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+          ),
+          updates: {
+            isLoading: RequestStatus.loading,
+            filteredOptions: [],
+            handleSearch,
+            customInfoMessage: <></>,
+          },
+        }),
+      );
+    },
+    [options],
+  );
+
+  // Update form data when notations change
   useEffect(() => {
-    if (id) {
-      dispatch(fetchDocuments(id ?? ''))
-        .then(() => {
-          setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
-        })
-        .catch((error) => {
-          setLoading(RequestStatus.failed);
-          console.error('Error fetching data:', error);
-        });
+    if (status === RequestStatus.success && siteDocuments) {
+      const uniquePsnOrgs: any = Array.from(
+        new Map(
+          siteDocuments.map((item: any) => [
+            item.psnorgId,
+            { key: item.psnorgId, value: item.displayName },
+          ]),
+        ).values(),
+      );
+      setOptions(uniquePsnOrgs);
+
+      setInternalRow((prev) =>
+        updateFields(prev, {
+          indexToUpdate: prev.findIndex((row) =>
+            row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+          ),
+          updates: {
+            isLoading: RequestStatus.success,
+            options: uniquePsnOrgs,
+            filteredOptions: [],
+            handleSearch,
+            customInfoMessage: <></>,
+          },
+        }),
+      );
+      setExternalRow((prev) =>
+        updateFields(prev, {
+          indexToUpdate: prev.findIndex((row) =>
+            row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+          ),
+          updates: {
+            isLoading: RequestStatus.success,
+            options: uniquePsnOrgs,
+            filteredOptions: [],
+            handleSearch,
+            customInfoMessage: <></>,
+          },
+        }),
+      );
+      setFormData(siteDocuments);
     }
-  }, [id]);
+  }, [siteDocuments, status]);
+
+  // Search participant effect with debounce
+  useEffect(() => {
+    if (searchSiteParticipant) {
+      const timeoutId = setTimeout(async () => {
+        const res = await fetchAuthors(searchSiteParticipant);
+        const indexToUpdate = internalRow.findIndex((row) =>
+          row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+        );
+        const infoMsg = !res.success ? (
+          <div className="px-2">
+            <img
+              src={infoIcon}
+              alt="info"
+              aria-hidden="true"
+              role="img"
+              aria-label="User image"
+            />
+            <span
+              aria-label={'info-message'}
+              className="text-wrap px-2 custom-not-found"
+            >
+              No results found.
+            </span>
+          </div>
+        ) : (
+          <></>
+        );
+
+        setInternalRow((prev) =>
+          updateFields(prev, {
+            indexToUpdate,
+            updates: {
+              isLoading: RequestStatus.success,
+              options,
+              filteredOptions:
+                res.data ?? resultCache[searchSiteParticipant] ?? [],
+              customInfoMessage: infoMsg,
+              handleSearch,
+            },
+          }),
+        );
+      }, 300);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchSiteParticipant, options]);
+
+  // useEffect(() => {
+  //   if (searchSiteParticipant) {
+  //     const timeoutId = setTimeout(async () => {
+  //       try {
+  //         fetchNotationParticipant(searchSiteParticipant).then((res) => {
+  //           const indexToUpdate = documentFormRows.findIndex((row) =>
+  //             row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+  //           );
+
+  //           let infoMsg = <></>;
+  //           if (!res.success) {
+  //             infoMsg = (
+  //               <div className="px-2">
+  //                 <img
+  //                   src={infoIcon}
+  //                   alt="info"
+  //                   aria-hidden="true"
+  //                   role="img"
+  //                   aria-label="User image"
+  //                 />
+  //                 <span
+  //                   aria-label={'info-message'}
+  //                   className="text-wrap px-2 custom-not-found"
+  //                 >
+  //                   No results found.
+  //                 </span>
+  //               </div>
+  //             );
+  //           }
+  //           let params: UpdateDisplayTypeParams = {
+  //             indexToUpdate: indexToUpdate,
+  //             updates: {
+  //               isLoading: RequestStatus.success,
+  //               options: options,
+  //               filteredOptions: res.data,
+  //               customInfoMessage: infoMsg,
+  //               handleSearch: handleSearch,
+  //             },
+  //           };
+
+  //           const indexToUpdateExt =
+  //             documentFirstChildFormRowsForExternal.findIndex((row) =>
+  //               row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+  //             );
+
+  //           let paramsExt: UpdateDisplayTypeParams = {
+  //             indexToUpdate: indexToUpdateExt,
+  //             updates: {
+  //               isLoading: RequestStatus.success,
+  //               options: options,
+  //               filteredOptions: res.data,
+  //               customInfoMessage: infoMsg,
+  //               handleSearch: handleSearch,
+  //             },
+  //           };
+  //           setExternalRow(updateFields(externalRow, paramsExt));
+  //           setInternalRow(updateFields(internalRow, params));
+  //         });
+  //       } catch (error) {
+  //         throw new Error('Invalid searchParam');
+  //       }
+  //     }, 300);
+  //     return () => clearTimeout(timeoutId);
+  //   }
+  // }, [searchSiteParticipant]);
+
+  // useEffect(() => {
+  //   if (status === RequestStatus.success && siteDocuments) {
+  //     // if (siteDocuments) {
+  //     const uniquePsnOrgs: any = Array.from(
+  //       new Map(
+  //         siteDocuments.map((item: any) => [
+  //           item.psnorgId,
+  //           { key: item.psnorgId, value: item.displayName },
+  //         ]),
+  //       ).values(),
+  //     );
+  //     console.log('uniquePsnOrgs --> ', uniquePsnOrgs);
+  //     setOptions(uniquePsnOrgs);
+  //     // Parameters for the update
+  //     let params: UpdateDisplayTypeParams = {
+  //       indexToUpdate: documentFormRows.findIndex((row) =>
+  //         row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+  //       ),
+  //       updates: {
+  //         isLoading: RequestStatus.success,
+  //         options: uniquePsnOrgs,
+  //         filteredOptions: [],
+  //         handleSearch: handleSearch,
+  //         customInfoMessage: <></>,
+  //       },
+  //     };
+
+  //     const indexToUpdateExt = documentFirstChildFormRowsForExternal.findIndex(
+  //       (row) => row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+  //     );
+
+  //     let paramsExt: UpdateDisplayTypeParams = {
+  //       indexToUpdate: indexToUpdateExt,
+  //       updates: {
+  //         isLoading: RequestStatus.success,
+  //         options: uniquePsnOrgs,
+  //         filteredOptions: [],
+  //         handleSearch: handleSearch,
+  //         customInfoMessage: <></>,
+  //       },
+  //     };
+  //     setExternalRow(updateFields(externalRow, paramsExt));
+  //     setInternalRow(updateFields(internalRow, params));
+  //     // }
+  //     setFormData(siteDocuments);
+  //   }
+  // }, [siteDocuments, status]);
+
+  // Handle user type based on username
+
+  useEffect(() => {
+    if (loggedInUser?.profile.preferred_username?.includes('bceid')) {
+      setUserType(UserType.External);
+    } else if (loggedInUser?.profile.preferred_username?.includes('idir')) {
+      setUserType(UserType.Internal);
+    } else {
+      setUserType(UserType.External);
+    }
+  }, [loggedInUser]);
+
+  // Handle view mode changes
+  useEffect(() => {
+    setViewMode(mode);
+    dispatch(setupDocumentsDataForSaving(siteDocuments));
+  }, [mode]);
+
+  // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
+  // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
+  useEffect(() => {
+    if (resetDetails) {
+      // dispatch(fetchDocuments(id ?? ''))
+    }
+  }, [resetDetails, saveSiteDetailsRequestStatus]);
+
+  // const handleSearch = (value: any) => {
+  //   setSearchSiteParticipant(value.trim());
+  //   let params: UpdateDisplayTypeParams = {
+  //     indexToUpdate: documentFormRows.findIndex((row) =>
+  //       row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+  //     ),
+  //     updates: {
+  //       isLoading: RequestStatus.loading,
+  //       options: options,
+  //       filteredOptions: [],
+  //       handleSearch: handleSearch,
+  //       customInfoMessage: <></>,
+  //     },
+  //   };
+  //   // setExternalRow(updateFields(externalRow, params));
+  //   setInternalRow(updateFields(internalRow, params));
+  // };
+
+  // useEffect(() => {
+  //   setViewMode(mode);
+  // }, [mode]);
+
+  // useEffect(() => {
+  //   if (resetDetails) {
+  //     setFormData(siteDocuments);
+  //   }
+  // }, [resetDetails]);
+
+  // useEffect(() => {
+  //   if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
+  //     setUserType(UserType.External);
+  //   } else if (
+  //     loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
+  //   ) {
+  //     setUserType(UserType.Internal);
+  //   } else {
+  //     // not logged in
+  //     setUserType(UserType.External);
+  //   }
+  //   // setFormData(siteDocuments);
+  // }, []);
+
+  // useEffect(() => {
+  //   if (id) {
+  //     dispatch(fetchDocuments(id ?? ''))
+  //       .then(() => {
+  //         setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
+  //       })
+  //       .catch((error) => {
+  //         setLoading(RequestStatus.failed);
+  //         console.error('Error fetching data:', error);
+  //       });
+  //   }
+  // }, [id]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value;
@@ -332,52 +640,94 @@ const Documents = () => {
     if (viewMode === SiteDetailsMode.SRMode) {
       console.log({ [graphQLPropertyName]: value, id });
     } else {
-      debugger;
-      const updatedDoc = formData.map((document) => {
-        if (document.id === id) {
-          if (graphQLPropertyName === 'psnorgId') {
-            // Parameters for the update
-            let params: UpdateDisplayTypeParams = {
-              indexToUpdate: documentFormRows.findIndex((row) =>
-                row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-              ),
-              updates: {
-                isLoading: RequestStatus.success,
-                options: [options, { ...value }],
-                filteredOptions: [],
-                handleSearch: handleSearch,
-                customInfoMessage: <></>,
-              },
-            };
-            const indexToUpdateExt =
-              documentFirstChildFormRowsForExternal.findIndex((row) =>
-                row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-              );
-
-            let paramsExt: UpdateDisplayTypeParams = {
-              indexToUpdate: indexToUpdateExt,
-              updates: {
-                isLoading: RequestStatus.success,
-                options: [options, { ...value }],
-                filteredOptions: [],
-                handleSearch: handleSearch,
-                customInfoMessage: <></>,
-              },
-            };
-            // setExternalRow(updateFields(externalRow, paramsExt));
-            setInternalRow(updateFields(internalRow, params));
-            return {
+      const updateDocuments = (documents: any) => {
+        return documents.map((document: any) => {
+          if (document.id === id) {
+            const isPsnorgId =
+              typeof value === 'object' &&
+              value !== null &&
+              graphQLPropertyName === 'psnorgId';
+            if (isPsnorgId) {
+              let params: UpdateDisplayTypeParams = {
+                indexToUpdate: documentFormRows.findIndex((row) =>
+                  row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+                ),
+                updates: {
+                  isLoading: RequestStatus.success,
+                  options,
+                  filteredOptions: [],
+                  handleSearch,
+                  customInfoMessage: <></>,
+                },
+              };
+              setInternalRow(updateFields(internalRow, params));
+            }
+            let updatedDocument = {
               ...document,
-              [graphQLPropertyName]: value.key,
-              ['displayName']: value.value,
+              [graphQLPropertyName]: isPsnorgId ? value.key : value,
+              displayName: isPsnorgId ? value.value : document.displayName,
+              apiAction: documents?.apiAction ?? UserActionEnum.updated,
+              srAction: SRApprovalStatusEnum.Pending,
             };
+            return updatedDocument;
           }
-          return { ...document, [graphQLPropertyName]: value };
-        }
-        return document;
-      });
-      setFormData(updatedDoc);
-      dispatch(updateSiteDocument(updatedDoc));
+          return document;
+        });
+      };
+
+      // Update both formData and trackNotation
+      const updatedDocuments = updateDocuments(formData);
+      const updatedTrackDocuments = updateDocuments(trackDocuments);
+      setFormData(updatedDocuments);
+      dispatch(updateSiteDocument(updatedDocuments));
+      dispatch(setupDocumentsDataForSaving(updatedTrackDocuments));
+
+      // const updatedDoc = formData.map((document) => {
+      //   if (document.id === id) {
+      //     if (graphQLPropertyName === 'psnorgId') {
+      //       // Parameters for the update
+      //       let params: UpdateDisplayTypeParams = {
+      //         indexToUpdate: documentFormRows.findIndex((row) =>
+      //           row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+      //         ),
+      //         updates: {
+      //           isLoading: RequestStatus.success,
+      //           options,
+      //           filteredOptions: [],
+      //           handleSearch,
+      //           customInfoMessage: <></>,
+      //         },
+      //       };
+      //       const indexToUpdateExt =
+      //         documentFirstChildFormRowsForExternal.findIndex((row) =>
+      //           row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+      //         );
+
+      //       let paramsExt: UpdateDisplayTypeParams = {
+      //         indexToUpdate: indexToUpdateExt,
+      //         updates: {
+      //           isLoading: RequestStatus.success,
+      //           options: [options, { ...value }],
+      //           filteredOptions: [],
+      //           handleSearch: handleSearch,
+      //           customInfoMessage: <></>,
+      //         },
+      //       };
+      //       // setExternalRow(updateFields(externalRow, paramsExt));
+      //       setInternalRow(updateFields(internalRow, params));
+      //       return {
+      //         ...document,
+      //         [graphQLPropertyName]: value.key,
+      //         ['displayName']: value.value,
+      //       };
+      //     }
+      //     return { ...document, [graphQLPropertyName]: value };
+      //   }
+      //   return document;
+      // });
+
+      // setFormData(updatedDoc);
+      // dispatch(updateSiteDocument(updatedDoc));
     }
     const flattedArr = flattenFormRows(documentFormRows);
     const currLabel =
@@ -390,172 +740,40 @@ const Documents = () => {
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
-  useEffect(() => {
-    if (status === RequestStatus.success && siteDocuments) {
-      // if (siteDocuments) {
-      const uniquePsnOrgs: any = Array.from(
-        new Map(
-          siteDocuments.map((item: any) => [
-            item.psnorgId,
-            { key: item.psnorgId, value: item.displayName },
-          ]),
-        ).values(),
-      );
-      console.log('uniquePsnOrgs --> ', uniquePsnOrgs);
-      setOptions(uniquePsnOrgs);
-      // Parameters for the update
-      let params: UpdateDisplayTypeParams = {
-        indexToUpdate: documentFormRows.findIndex((row) =>
-          row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-        ),
-        updates: {
-          isLoading: RequestStatus.success,
-          options: uniquePsnOrgs,
-          filteredOptions: [],
-          handleSearch: handleSearch,
-          customInfoMessage: <></>,
-        },
-      };
+  // const fetchNotationParticipant = async (searchParam: string) => {
+  //   try {
+  //     if (
+  //       searchParam !== null &&
+  //       searchParam !== undefined &&
+  //       searchParam !== ''
+  //     ) {
+  //       const response = await getAxiosInstance().post(GRAPHQL, {
+  //         query: print(graphQLPeopleOrgsCd()),
+  //         variables: {
+  //           searchParam: searchParam,
+  //         },
+  //       });
+  //       return response.data.data.getPeopleOrgsCd;
+  //     } else {
+  //       return [];
+  //     }
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // };
 
-      const indexToUpdateExt = documentFirstChildFormRowsForExternal.findIndex(
-        (row) => row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-      );
-
-      let paramsExt: UpdateDisplayTypeParams = {
-        indexToUpdate: indexToUpdateExt,
-        updates: {
-          isLoading: RequestStatus.success,
-          options: uniquePsnOrgs,
-          filteredOptions: [],
-          handleSearch: handleSearch,
-          customInfoMessage: <></>,
-        },
-      };
-      setExternalRow(updateFields(externalRow, paramsExt));
-      setInternalRow(updateFields(internalRow, params));
-      // }
-      setFormData(siteDocuments);
-    }
-  }, [siteDocuments, status]);
-
-  const fetchNotationParticipant = async (searchParam: string) => {
-    try {
-      if (
-        searchParam !== null &&
-        searchParam !== undefined &&
-        searchParam !== ''
-      ) {
-        const response = await getAxiosInstance().post(GRAPHQL, {
-          query: print(graphQLPeopleOrgsCd()),
-          variables: {
-            searchParam: searchParam,
-          },
-        });
-        return response.data.data.getPeopleOrgsCd;
-      } else {
-        return [];
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const handleSearch = (value: any) => {
-    setSearchSiteParticipant(value.trim());
-    let params: UpdateDisplayTypeParams = {
-      indexToUpdate: documentFormRows.findIndex((row) =>
-        row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-      ),
-      updates: {
-        isLoading: RequestStatus.loading,
-        options: options,
-        filteredOptions: [],
-        handleSearch: handleSearch,
-        customInfoMessage: <></>,
-      },
-    };
-    // setExternalRow(updateFields(externalRow, params));
-    setInternalRow(updateFields(internalRow, params));
-  };
-
-  useEffect(() => {
-    if (searchSiteParticipant) {
-      const timeoutId = setTimeout(async () => {
-        try {
-          fetchNotationParticipant(searchSiteParticipant).then((res) => {
-            const indexToUpdate = documentFormRows.findIndex((row) =>
-              row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-            );
-
-            let infoMsg = <></>;
-            if (!res.success) {
-              infoMsg = (
-                <div className="px-2">
-                  <img
-                    src={infoIcon}
-                    alt="info"
-                    aria-hidden="true"
-                    role="img"
-                    aria-label="User image"
-                  />
-                  <span
-                    aria-label={'info-message'}
-                    className="text-wrap px-2 custom-not-found"
-                  >
-                    No results found.
-                  </span>
-                </div>
-              );
-            }
-            let params: UpdateDisplayTypeParams = {
-              indexToUpdate: indexToUpdate,
-              updates: {
-                isLoading: RequestStatus.success,
-                options: options,
-                filteredOptions: res.data,
-                customInfoMessage: infoMsg,
-                handleSearch: handleSearch,
-              },
-            };
-
-            const indexToUpdateExt =
-              documentFirstChildFormRowsForExternal.findIndex((row) =>
-                row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-              );
-
-            let paramsExt: UpdateDisplayTypeParams = {
-              indexToUpdate: indexToUpdateExt,
-              updates: {
-                isLoading: RequestStatus.success,
-                options: options,
-                filteredOptions: res.data,
-                customInfoMessage: infoMsg,
-                handleSearch: handleSearch,
-              },
-            };
-            setExternalRow(updateFields(externalRow, paramsExt));
-            setInternalRow(updateFields(internalRow, params));
-          });
-        } catch (error) {
-          throw new Error('Invalid searchParam');
-        }
-      }, 300);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [searchSiteParticipant]);
-
-  if (loading === RequestStatus.loading) {
-    return (
-      <div className="document-loading-overlay">
-        <div className="document-spinner-container">
-          <SpinnerIcon
-            data-testid="loading-spinner"
-            className="document-fa-spin"
-          />
-        </div>
-      </div>
-    );
-  }
+  // if (loading === RequestStatus.loading) {
+  //   return (
+  //     <div className="document-loading-overlay">
+  //       <div className="document-spinner-container">
+  //         <SpinnerIcon
+  //           data-testid="loading-spinner"
+  //           className="document-fa-spin"
+  //         />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="px-2">

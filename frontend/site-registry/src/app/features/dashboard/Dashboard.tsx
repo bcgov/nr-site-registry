@@ -78,12 +78,14 @@ const Dashboard = () => {
       // not logged in
       setUserType(UserType.External);
     }
-
-    setName(
-      loggedInUser?.profile.given_name +
-        ' ' +
-        loggedInUser?.profile.family_name,
-    );
+    console.log(loggedInUser);
+    if (loggedInUser) {
+      setName(
+        loggedInUser?.profile.given_name +
+          ' ' +
+          loggedInUser?.profile.family_name,
+      );
+    }
   }, [loggedInUser]);
 
   useEffect(() => {
@@ -102,7 +104,7 @@ const Dashboard = () => {
 
   return (
     <PageContainer role="Dashboard">
-      <h1 className="dashboard-title">Welcome, {name}</h1>
+      {name && <h1 className="dashboard-title">{`Welcome, ${name}`}</h1>}
       <DashboardTableWidget
         title="Recently Viewed"
         columns={recentViewedColumns}

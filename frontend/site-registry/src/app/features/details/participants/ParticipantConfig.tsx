@@ -11,7 +11,7 @@ export const GetConfig = () => {
       displayName: 'Participant Name',
       active: true,
       graphQLPropertyName: 'psnorgId',
-      columnSize: ColumnSize.Double,
+      columnSize: ColumnSize.Small,
       displayType: {
         type: FormFieldType.DropDownWithSearch,
         label: '',

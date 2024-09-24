@@ -86,7 +86,7 @@ export class LandHistoryService {
         const whereClause = { lutCode: arg.originalLandUseCode, siteId };
         const data = {
           lutCode: arg.landUseCode || arg.originalLandUseCode,
-          note: arg.note || undefined,
+          note: arg.note ?? undefined,
           whoUpdated: user.name,
           whenUpdated: new Date(),
         };

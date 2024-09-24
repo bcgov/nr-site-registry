@@ -1,8 +1,10 @@
 import { ReactNode } from 'react';
+import { RequestStatus } from '../../helpers/requests/status';
 
 export enum FormFieldType {
   Text = 'text',
   TextArea = 'textarea',
+  Search = 'search',
   DropDown = 'dropdown',
   DropDownWithSearch = 'dropdownWithSearch',
   Date = 'date',
@@ -28,7 +30,8 @@ export interface IFormField {
     | FormFieldType.TextArea
     | FormFieldType.DropDownWithSearch
     | FormFieldType.DeleteIcon
-    | FormFieldType.IconButton;
+    | FormFieldType.IconButton
+    | FormFieldType.Search;
   label: string;
   isLabel?: boolean;
   placeholder?: string;
@@ -37,9 +40,14 @@ export interface IFormField {
   customEditLabelCss?: string;
   customInputTextCss?: string;
   customEditInputTextCss?: string;
+  customPlaceholderCss?: string;
+  customLeftIconCss?: string;
+  customRightIconCss?: string;
+  customErrorCss?: string;
   graphQLPropertyName?: string;
   allowNumbersOnly?: boolean;
   options?: { key: string; value: string; imageUrl?: any }[];
+  filteredOptions?: { key: string; value: string }[];
   value?: any;
   customLinkValue?: any;
   customIcon?: ReactNode;
@@ -50,6 +58,9 @@ export interface IFormField {
   isDisabled?: boolean;
   suffix?: string;
   isImage?: boolean;
+  isLoading?: RequestStatus;
+  customInfoMessage?: ReactNode;
+  customMenuMessage?: ReactNode;
   validation?: {
     required?: boolean;
     minLength?: number;
@@ -62,4 +73,5 @@ export interface IFormField {
   href?: string;
   textAreaRow?: number;
   textAreaColoum?: number;
+  handleSearch?: (event: any) => void;
 }

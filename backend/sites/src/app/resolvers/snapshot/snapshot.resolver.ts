@@ -5,15 +5,13 @@ import {
   RoleMatchingMode,
   Roles,
 } from 'nest-keycloak-connect';
-import {
-  CreateSnapshotDto,
-  SnapshotDto,
-  SnapshotResponse,
-} from '../../dto/snapshot.dto';
+import { CreateSnapshotDto, SnapshotResponse } from '../../dto/snapshot.dto';
+import { BannerTypeResponse } from '../../dto/response/bannerTypeResponse';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { SnapshotsService } from '../../services/snapshot/snapshot.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
+import { CustomRoles } from '../../common/role';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sitesLogger = require('../../logger/logging');
 
@@ -26,7 +24,14 @@ export class SnapshotsResolver {
     >,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => SnapshotResponse, { name: 'getSnapshots' })
   async getSnapshots() {
     sitesLogger.info('SnapshotsResolver.getSnapshots() start');
@@ -50,7 +55,14 @@ export class SnapshotsResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => SnapshotResponse, { name: 'getSnapshotsByUserId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSnapshotsByUserId(
@@ -79,7 +91,14 @@ export class SnapshotsResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => SnapshotResponse, { name: 'getSnapshotsBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSnapshotsBySiteId(
@@ -113,7 +132,14 @@ export class SnapshotsResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => SnapshotResponse, { name: 'getSnapshotsById' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSnapshotsById(@Args('id', { type: () => Int }) id: number) {
@@ -140,34 +166,14 @@ export class SnapshotsResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
-  @Mutation(() => SnapshotResponse, { name: 'createSnapshot' })
-  async createSnapshot(
-    @Args('snapshot', { type: () => SnapshotDto }, new ValidationPipe())
-    snapshot: SnapshotDto,
-  ) {
-    sitesLogger.info(
-      'SnapshotsResolver.createSnapshot() start snapshot:' +
-        ' ' +
-        JSON.stringify(snapshot),
-    );
-    const message = await this.snapshotsService.createSnapshot(snapshot);
-
-    if (message) {
-      sitesLogger.info('SnapshotsResolver.createSnapshot() RES:201 end');
-      return this.genericResponseProvider.createResponse(message, 201, true);
-    } else {
-      sitesLogger.info('SnapshotsResolver.createSnapshot() RES:400 end');
-      return this.genericResponseProvider.createResponse(
-        `Snapshot failed to insert.`,
-        400,
-        false,
-        null,
-      );
-    }
-  }
-
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Mutation(() => SnapshotResponse, { name: 'createSnapshotForSites' })
   async createSnapshotForSites(
     @Args('inputDto', { type: () => [CreateSnapshotDto] }, new ValidationPipe())
@@ -215,11 +221,42 @@ export class SnapshotsResolver {
         );
       }
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in SnapshotsResolver.createSnapshotForSites() end' +
-          ' ' +
-          JSON.stringify(error),
+      console.log('Error at createSnapshotForSites', error);
+      throw new Error('System Error, Please try again.');
+    }
+  }
+
+  @Roles({
+    roles: [CustomRoles.External],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => BannerTypeResponse, { name: 'getBannerType' })
+  async getBannerType(
+    @Args('siteId', { type: () => String }) siteId: string,
+    @AuthenticatedUser() user: any,
+  ): Promise<BannerTypeResponse> {
+    try {
+      const bannerType = await this.snapshotsService.getBannerType(
+        siteId,
+        user.sub,
       );
+
+      if (bannerType && bannerType.length > 0) {
+        return {
+          httpStatusCode: 200,
+          message: 'Banner type fetched successfully',
+          data: {
+            bannerType: bannerType,
+          },
+        };
+      } else {
+        return {
+          httpStatusCode: 404,
+          message: `Failed to determine banner type for site id ${siteId}`,
+          data: null,
+        };
+      }
+    } catch (error) {
       throw new Error('System Error, Please try again.');
     }
   }

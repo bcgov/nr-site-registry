@@ -38,6 +38,7 @@ import { getUser } from '../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import AddToFolio from '../folios/AddToFolio';
+import { downloadCSV } from '../../helpers/csvExport/csvExport';
 
 const Search = () => {
   const auth = useAuth();
@@ -107,7 +108,6 @@ const Search = () => {
   });
 
   const pageChange = (pageRequested: number, resultsCount: number) => {
-    console.log(pageRequested, resultsCount);
     dispatch(
       updatePageSizeSetting({
         currentPage: pageRequested,
@@ -161,7 +161,6 @@ const Search = () => {
 
   const handleAddToShoppingCart = () => {
     const loggedInUser = getUser();
-    console.log(selectedRows);
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
@@ -182,7 +181,6 @@ const Search = () => {
   const [selectedRows, SetSelectedRows] = useState<any[]>([]);
 
   const changeHandler = (event: any) => {
-    console.log('handle', event);
     if (event && event.property === 'select_row') {
       if (event.value) {
         const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
@@ -222,11 +220,13 @@ const Search = () => {
     }
   };
 
-  useEffect(() => {
-    console.log('selectedRows', selectedRows);
-  }, [selectedRows]);
-
   const [showAddToFolio, SetShowAddToFolio] = useState(false);
+
+  const handleExport = () => {
+    if (selectedRows.length > 0) {
+      downloadCSV(selectedRows);
+    }
+  };
 
   return (
     <PageContainer role="Search">
@@ -409,7 +409,7 @@ const Search = () => {
                 />
               )}
 
-              <div className="search-result-actions-btn">
+              <div className="search-result-actions-btn" onClick={handleExport}>
                 <FileExportIcon />
                 <span>Export Results As File</span>
               </div>

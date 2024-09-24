@@ -15,6 +15,7 @@ import {
   DropdownSearchInput,
   DeleteIcon,
   IconButton,
+  SearchCustomInput,
 } from '../../input-controls/InputControls';
 import { ChangeTracker } from '../../common/IChangeType';
 import { get } from '../utils';
@@ -149,8 +150,11 @@ const TableBody: FC<TableBodyProps> = ({
       value: value,
     };
 
-    if (isDeleteRow) rowDeleteHandler(changeRecord);
-    else changeHandler(changeRecord);
+    if (isDeleteRow) {
+      rowDeleteHandler(changeRecord);
+    } else {
+      changeHandler(changeRecord);
+    }
   };
 
   const getTableCellHtml = (
@@ -161,15 +165,18 @@ const TableBody: FC<TableBodyProps> = ({
     href: string,
     changeHandler: any,
     editMode: boolean,
+    columnIndex: number,
   ) => {
     if (field.type === FormFieldType.Text) {
       return (
         <TextInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
           customEditLabelCss={field.customEditLabelCss}
           customEditInputTextCss={field.customEditInputTextCss}
+          customPlaceholderCss={field.customPlaceholderCss}
           placeholder={field.placeholder}
           value={value}
           onChange={(value) =>
@@ -183,9 +190,37 @@ const TableBody: FC<TableBodyProps> = ({
           stickyCol={field.stickyCol}
         />
       );
+    } else if (field.type === FormFieldType.Search) {
+      return (
+        <SearchCustomInput
+          key={columnIndex}
+          label={field.label}
+          customLabelCss={field.customLabelCss}
+          customInputTextCss={field.customInputTextCss}
+          customEditLabelCss={field.customEditLabelCss}
+          customEditInputTextCss={field.customEditInputTextCss}
+          placeholder={field.placeholder}
+          value={value}
+          options={field.options || []}
+          onChange={(value) =>
+            tableRecordChangeHandler(rowKey, field.graphQLPropertyName, value)
+          }
+          type={FormFieldType.Text}
+          validation={field.validation}
+          allowNumbersOnly={field.allowNumbersOnly}
+          isEditing={editMode ?? true}
+          tableMode={field.tableMode ?? false}
+          stickyCol={field.stickyCol}
+          customPlaceholderCss={field.customPlaceholderCss}
+          isLoading={field.isLoading}
+          customInfoMessage={field.customInfoMessage}
+          customMenuMessage={field.customMenuMessage}
+        />
+      );
     } else if (field.type === FormFieldType.Label) {
       return (
         <Label
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -207,6 +242,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Link) {
       return (
         <Link
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -231,11 +267,13 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.DropDown) {
       return (
         <DropdownInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
           customEditLabelCss={field.customEditLabelCss}
           customEditInputTextCss={field.customEditInputTextCss}
+          customPlaceholderCss={field.customPlaceholderCss}
           placeholder={field.placeholder}
           value={value}
           onChange={(value) =>
@@ -254,11 +292,13 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Checkbox) {
       return (
         <CheckBoxInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
           customEditLabelCss={field.customEditLabelCss}
           customEditInputTextCss={field.customEditInputTextCss}
+          customPlaceholderCss={field.customPlaceholderCss}
           placeholder={field.placeholder}
           isChecked={value === 'true' ? true : false}
           // value={value}
@@ -279,11 +319,13 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.Date) {
       return (
         <DateInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
           customEditLabelCss={field.customEditLabelCss}
           customEditInputTextCss={field.customEditInputTextCss}
+          customPlaceholderCss={field.customPlaceholderCss}
           placeholder={field.placeholder}
           value={value}
           onChange={(value) =>
@@ -298,11 +340,13 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.TextArea) {
       return (
         <TextAreaInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
           customEditLabelCss={field.customEditLabelCss}
           customEditInputTextCss={field.customEditInputTextCss}
+          customPlaceholderCss={field.customPlaceholderCss}
           placeholder={field.placeholder}
           value={value}
           onChange={(value) =>
@@ -321,11 +365,13 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.DropDownWithSearch) {
       return (
         <DropdownSearchInput
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
           customEditLabelCss={field.customEditLabelCss}
           customEditInputTextCss={field.customEditInputTextCss}
+          customPlaceholderCss={field.customPlaceholderCss}
           placeholder={field.placeholder}
           options={field.options || []}
           value={value}
@@ -336,11 +382,16 @@ const TableBody: FC<TableBodyProps> = ({
           isEditing={editMode ?? true}
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
+          handleSearch={field.handleSearch}
+          filteredOptions={field.filteredOptions || []}
+          isLoading={field.isLoading}
+          customInfoMessage={field.customInfoMessage}
         />
       );
     } else if (field.type === FormFieldType.DeleteIcon) {
       return (
         <DeleteIcon
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -366,6 +417,7 @@ const TableBody: FC<TableBodyProps> = ({
     } else if (field.type === FormFieldType.IconButton) {
       return (
         <IconButton
+          key={columnIndex}
           label={field.label}
           customLabelCss={field.customLabelCss}
           customInputTextCss={field.customInputTextCss}
@@ -422,6 +474,7 @@ const TableBody: FC<TableBodyProps> = ({
       column.linkRedirectionURL ?? '',
       changeHandler,
       editMode,
+      columnIndex,
     );
   };
 
@@ -430,8 +483,8 @@ const TableBody: FC<TableBodyProps> = ({
     const rowChecked = isChecked(checkboxId);
 
     return (
-      <React.Fragment>
-        <tr>
+      <React.Fragment key={rowIndex}>
+        <tr data-testid="table-row" key={rowIndex}>
           {allowRowsSelect && (
             <td className="table-border-light content-text positionSticky align-content-center">
               <input
@@ -446,7 +499,7 @@ const TableBody: FC<TableBodyProps> = ({
                     rowIndex,
                   );
                 }}
-                checked={rowChecked}
+                checked={rowChecked || false}
               />
             </td>
           )}

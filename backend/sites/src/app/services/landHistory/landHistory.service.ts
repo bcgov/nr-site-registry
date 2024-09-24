@@ -1,3 +1,4 @@
+import { v4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets } from 'typeorm';
 import { LandHistories } from '../../entities/landHistories.entity';
@@ -43,7 +44,10 @@ export class LandHistoryService {
         query.orderBy('when_created', sortDirection);
       }
 
-      const result = await query.getMany();
+      const result = (await query.getMany()).map((landHistory) => ({
+        ...landHistory,
+        guid: v4(),
+      }));
       sitesLogger.info('LandHistoryService.getLandHistoriesForSite() end');
       sitesLogger.debug('LandHistoryService.getLandHistoriesForSite() end');
       return result;

@@ -46,11 +46,7 @@ export class SiteParticRoles {
   rwmFlag: number;
 
   @Field(() => ParticRoleCd)
-  @ManyToOne(
-    () => ParticRoleCd,
-    (particRoleCd) => particRoleCd.siteParticRoles,
-    { eager: true },
-  )
+  @ManyToOne(() => ParticRoleCd, (particRoleCd) => particRoleCd.siteParticRoles)
   @JoinColumn([{ name: 'pr_code', referencedColumnName: 'code' }])
   prCode2: ParticRoleCd;
 

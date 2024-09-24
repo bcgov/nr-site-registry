@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux';
 import { DropdownItem } from '../../../components/action/IActions';
 import {
   FormFieldType,
@@ -6,20 +5,9 @@ import {
 } from '../../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
-import {
-  notationClassDrpdown,
-  notationParticipantRoleDrpdown,
-  participantNameDrpdown,
-} from '../dropdowns/DropdownSlice';
+import { RequestStatus } from '../../../helpers/requests/status';
 
 export const GetNotationConfig = () => {
-  const participantName = useSelector(participantNameDrpdown);
-  const ministryContact = participantName.data
-    .filter((items: any) => items.metaData === 'EMP')
-    .flatMap((items: any) => items.dropdownDto);
-  const notationParticipantRole = useSelector(notationParticipantRoleDrpdown);
-  const notationClass = useSelector(notationClassDrpdown);
-
   const notationFormRowsInternal: IFormField[][] = [
     [
       {
@@ -45,7 +33,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -57,7 +46,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
     ],
 
@@ -67,7 +57,7 @@ export const GetNotationConfig = () => {
         label: 'Notation Class',
         placeholder: 'Notation Class',
         graphQLPropertyName: 'eclsCode',
-        options: notationClass.data,
+        options: [],
         value: '',
         colSize: 'col-lg-5 col-md-6 col-sm-12',
         customLabelCss: 'custom-notation-lbl-text',
@@ -92,7 +82,7 @@ export const GetNotationConfig = () => {
         label: 'Ministry Contact',
         placeholder: 'Ministry Contact',
         graphQLPropertyName: 'psnorgId',
-        options: ministryContact,
+        options: [],
         value: '',
         isImage: true,
         colSize: 'col-lg-4 col-md-12 col-sm-12',
@@ -156,7 +146,7 @@ export const GetNotationConfig = () => {
         label: 'Notation Class',
         placeholder: 'Notation Class',
         graphQLPropertyName: 'eclsCode',
-        options: notationClass.data,
+        options: [],
         value: '',
         colSize: 'col-lg-12 col-md-12 col-sm-12',
         customLabelCss: 'custom-notation-lbl-text',
@@ -176,19 +166,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
-      },
-      {
-        type: FormFieldType.Date,
-        label: 'Completed Date',
-        placeholder: 'MM/DD/YY',
-        graphQLPropertyName: 'completionDate',
-        value: '',
-        colSize: 'col-lg-4 col-md-4 col-sm-12',
-        customLabelCss: 'custom-notation-lbl-text',
-        customInputTextCss: 'custom-notation-input-text',
-        customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -200,7 +179,21 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
+      },
+      {
+        type: FormFieldType.Date,
+        label: 'Completed Date',
+        placeholder: 'MM/DD/YY',
+        graphQLPropertyName: 'completionDate',
+        value: '',
+        colSize: 'col-lg-4 col-md-4 col-sm-12',
+        customLabelCss: 'custom-notation-lbl-text',
+        customInputTextCss: 'custom-notation-input-text',
+        customEditLabelCss: 'custom-notation-edit-label',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
     ],
     [
@@ -237,7 +230,7 @@ export const GetNotationConfig = () => {
         label: 'Ministry Contact',
         placeholder: 'Ministry Contact',
         graphQLPropertyName: 'psnorgId',
-        options: ministryContact,
+        options: [],
         value: '',
         isImage: true,
         colSize: 'col-lg-12 col-md-12 col-sm-12',
@@ -273,7 +266,7 @@ export const GetNotationConfig = () => {
         label: 'Notation Class',
         placeholder: 'Notation Class',
         graphQLPropertyName: 'eclsCode',
-        options: notationClass.data,
+        options: [],
         value: '',
         colSize: 'col-xxl-6 col-xl-6 col-lg-12 col-md-12 col-sm-12 col-xs-12',
         customLabelCss: 'custom-notation-lbl-text',
@@ -291,7 +284,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -303,7 +297,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -315,7 +310,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
     ],
 
@@ -348,14 +344,13 @@ export const GetNotationConfig = () => {
         customEditInputTextCss: 'custom-notation-edit-input',
       },
     ],
-
     [
       {
         type: FormFieldType.DropDown,
         label: 'Ministry Contact',
         placeholder: 'Ministry Contact',
         graphQLPropertyName: 'psnorgId',
-        options: ministryContact,
+        options: [],
         value: '',
         isImage: true,
         colSize: 'col-lg-4 col-md-6 col-sm-12',
@@ -392,7 +387,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -405,7 +401,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
     ],
   ];
@@ -435,7 +432,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
       {
         type: FormFieldType.Date,
@@ -448,7 +446,8 @@ export const GetNotationConfig = () => {
         customLabelCss: 'custom-notation-lbl-text',
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-dateInput',
+        customEditInputTextCss:
+          'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
       },
     ],
   ];
@@ -464,7 +463,7 @@ export const GetNotationConfig = () => {
         label: 'Text',
         graphQLPropertyName: 'eprCode',
         value: '',
-        options: notationParticipantRole.data,
+        options: [],
         allowNumbersOnly: true,
         colSize: 'col-lg-6 col-md-6 col-sm-12',
         customInputTextCss: 'custom-notation-participant-input-text',
@@ -487,11 +486,18 @@ export const GetNotationConfig = () => {
         graphQLPropertyName: 'psnorgId',
         placeholder: 'Please enter participant name.',
         value: '',
-        options: participantName.data.flatMap((item: any) => item.dropdownDto),
+        options: [],
         colSize: 'col-lg-6 col-md-6 col-sm-12',
         customInputTextCss: 'custom-notation-participant-input-text',
         customEditInputTextCss: 'custom-notation-participant-input-text',
+        customPlaceholderCss: 'custom-notation-search-placeholder',
         tableMode: true,
+        customMenuMessage: <span>Please select site participant name:</span>,
+        filteredOptions: [],
+        isLoading: RequestStatus.idle,
+        handleSearch: () => {
+          console.log('handleSearch click');
+        },
       },
     },
     {
@@ -522,7 +528,7 @@ export const GetNotationConfig = () => {
         label: 'Text',
         graphQLPropertyName: 'eprCode',
         value: '',
-        options: notationParticipantRole.data,
+        options: [],
         allowNumbersOnly: true,
         colSize: 'col-lg-6 col-md-6 col-sm-12',
         customInputTextCss: 'custom-notation-participant-input-text',
@@ -545,11 +551,18 @@ export const GetNotationConfig = () => {
         graphQLPropertyName: 'psnorgId',
         placeholder: 'Please enter participant name.',
         value: '',
-        options: participantName.data.flatMap((item: any) => item.dropdownDto),
+        options: [],
         colSize: 'col-lg-6 col-md-6 col-sm-12',
         customInputTextCss: 'custom-notation-participant-input-text',
         customEditInputTextCss: 'custom-notation-participant-input-text',
+        customPlaceholderCss: 'custom-notation-search-placeholder',
         tableMode: true,
+        customMenuMessage: <span>Please select site participant name:</span>,
+        filteredOptions: [],
+        isLoading: RequestStatus.idle,
+        handleSearch: () => {
+          console.log('handleSearch click');
+        },
       },
     },
   ];

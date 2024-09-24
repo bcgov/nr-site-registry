@@ -1,19 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { plainToInstance } from 'class-transformer';
-import { CreateSnapshotDto, SnapshotDto } from '../../dto/snapshot.dto';
+import { CreateSnapshotDto } from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { Repository } from 'typeorm';
-import { validateOrReject } from 'class-validator';
-import { Sites } from 'src/app/entities/sites.entity';
-import { EventPartics } from 'src/app/entities/eventPartics.entity';
-import { SitePartics } from 'src/app/entities/sitePartics.entity';
-import { SiteDocs } from 'src/app/entities/siteDocs.entity';
-import { SiteAssocs } from 'src/app/entities/siteAssocs.entity';
-import { LandHistories } from 'src/app/entities/landHistories.entity';
-import { SiteSubdivisions } from 'src/app/entities/siteSubdivisions.entity';
-import { SiteProfiles } from 'src/app/entities/siteProfiles.entity';
-import { SnapshotSiteContent } from 'src/app/dto/snapshotSiteContent';
+import { Sites } from '../../entities/sites.entity';
+import { EventPartics } from '../../entities/eventPartics.entity';
+import { SitePartics } from '../../entities/sitePartics.entity';
+import { SiteDocs } from '../../entities/siteDocs.entity';
+import { SiteAssocs } from '../../entities/siteAssocs.entity';
+import { LandHistories } from '../../entities/landHistories.entity';
+import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
+import { SiteProfiles } from '../../entities/siteProfiles.entity';
+import { SnapshotSiteContent } from '../../dto/snapshotSiteContent';
 import { Events } from '../../entities/events.entity';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sitesLogger = require('../../logger/logging');
@@ -103,6 +101,19 @@ export class SnapshotsService {
     }
   }
 
+  async getMostRecentSnapshot(siteId: string, userId: string) {
+    try {
+      const result = await this.snapshotRepository.findOne({
+        where: { siteId, userId },
+        order: { whenCreated: 'DESC' },
+      });
+
+      return result;
+    } catch (error) {
+      throw new Error('Failed to retrieve the most recent snapshot.');
+    }
+  }
+
   async getSnapshotsById(id: number) {
     sitesLogger.info('SnapshotsService.getSnapshotsById() start');
     sitesLogger.debug('SnapshotsService.getSnapshotsById() start');
@@ -122,25 +133,14 @@ export class SnapshotsService {
   }
 
   async createSnapshot(snapshotDto: SnapshotDto) {
-    sitesLogger.info('SnapshotsService.createSnapshot() start');
-    sitesLogger.debug('SnapshotsService.createSnapshot() start');
     try {
       await validateOrReject(snapshotDto);
       const snapshot = plainToInstance(Snapshots, snapshotDto);
       const result = await this.snapshotRepository.save(snapshot);
       if (result) {
-        sitesLogger.info('SnapshotsService.createSnapshot() end');
-        sitesLogger.debug('SnapshotsService.createSnapshot() end');
         return 'Record is inserted successfully.';
       }
-      sitesLogger.info('SnapshotsService.createSnapshot() end');
-      sitesLogger.debug('SnapshotsService.createSnapshot() end');
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in SnapshotsService.createSnapshot() end' +
-          ' ' +
-          JSON.stringify(error),
-      );
       throw new Error('Failed to insert snapshot.');
     }
   }
@@ -237,6 +237,74 @@ export class SnapshotsService {
           JSON.stringify(error),
       );
       throw error;
+    }
+  }
+
+  async getBannerType(siteId: string, userId: string): Promise<string> {
+    try {
+      const query = `
+        WITH Combined AS (
+        SELECT id as site_id, sr_action, when_updated FROM sites.sites
+        WHERE id = $1 AND sr_action <> 'private'
+        UNION ALL
+        SELECT site_id, sr_action, when_updated FROM sites.events
+        WHERE site_id = $1  AND sr_action <> 'private'
+        UNION ALL
+        SELECT e.site_id, ep.sr_action, ep.when_updated FROM sites.event_partics ep
+        INNER JOIN sites.events e ON ep.event_id = e.id
+        WHERE e.site_id = $1 AND ep.sr_action <> 'private'
+        UNION ALL
+        SELECT site_id, sr_action, when_updated FROM sites.site_partics
+        WHERE site_id = $1 AND sr_action <> 'private'
+        UNION ALL
+        SELECT site_id, sr_action, when_updated FROM sites.site_docs
+        WHERE site_id = $1 AND sr_action <> 'private'
+        UNION ALL
+        SELECT site_id, sr_action, when_updated FROM sites.site_assocs
+        WHERE site_id = $1 AND sr_action <> 'private'
+        UNION ALL
+        SELECT site_id, sr_action, when_updated FROM sites.land_histories
+        WHERE site_id = $1 AND sr_action <> 'private'
+        UNION ALL
+        SELECT site_id, sr_action, when_updated FROM sites.site_subdivisions
+        WHERE site_id = $1 AND sr_action <> 'private'
+        UNION ALL
+        SELECT site_id, sr_action, when_updated FROM sites.site_profiles
+        WHERE site_id = $1 AND sr_action <> 'private'
+      ),
+      LatestSnapshot AS (
+      SELECT s.site_id, s.user_id, MAX(s.when_created ) AS latest_created_date
+      FROM sites.snapshots s
+      WHERE s.site_id = $1 AND s.user_id = $2
+      GROUP BY s.site_id, s.user_id
+    ),
+      StatusCheck AS (
+        SELECT
+          c.site_id,
+          COALESCE(MAX(CASE
+            WHEN EXISTS (
+              SELECT 1 FROM Combined c2 WHERE c2.sr_action = 'pending' AND c2.site_id = $1
+            ) THEN 'pending'
+            WHEN EXISTS (
+              SELECT 1
+              FROM Combined c2
+              INNER JOIN LatestSnapshot ls ON c2.site_id = ls.site_id
+              WHERE c2.sr_action = 'public' AND c2.when_updated > ls.latest_created_date AND c2.site_id = $1
+            ) THEN 'outdated'
+            ELSE 'current'
+          END), 'current') AS bannertype
+        FROM Combined c
+        RIGHT JOIN LatestSnapshot ls ON c.site_id = ls.site_id 
+        GROUP BY c.site_id
+      )
+      SELECT DISTINCT bannertype FROM StatusCheck;
+      `;
+
+      const entityManager = this.snapshotRepository.manager;
+      const result = await entityManager.query(query, [siteId, userId]);
+      return result.length > 0 ? result[0].bannertype : 'unknown';
+    } catch (error) {
+      throw new Error('Failed to determine banner type.');
     }
   }
 }

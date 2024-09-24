@@ -6,6 +6,7 @@ import { GRAPHQL } from '../../../helpers/endpoints';
 import {
   createSnapshotForSitesQL,
   graphQLSnapshotBySiteId,
+  graphQLGetBannerType,
 } from '../../site/graphql/Snapshot';
 import { print } from 'graphql';
 
@@ -16,6 +17,7 @@ const initialState: ISnapshotState = {
   error: '',
   firstSnapshotCreatedDate: null,
   createSnapshotRequest: RequestStatus.idle,
+  bannerType: '',
 };
 
 // Define the asynchronous thunk to fetch site participants from the backend
@@ -50,6 +52,32 @@ export const createSnapshotForSites = createAsyncThunk(
   },
 );
 
+// Define the asynchronous thunk to fetch site participants from the backend
+export const getBannerType = createAsyncThunk(
+  'snapshots/getBannerType',
+  async (siteId: string) => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(graphQLGetBannerType()),
+        variables: {
+          siteId: siteId,
+        },
+      });
+
+      if (
+        !response.data ||
+        response.data.errors ||
+        !response.data.data.getBannerType.data
+      ) {
+        throw new Error('Invalid response or banner type not found');
+      }
+      return response.data.data.getBannerType.data.bannerType;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
+
 // Define the recent views slice
 const snapshotsSlice = createSlice({
   name: 'snapshots',
@@ -75,9 +103,13 @@ const snapshotsSlice = createSlice({
         state.snapshot = action.payload;
         state.error = '';
         // Check if there's at least one snapshot and set its createdDate
-        if (action.payload && action.payload.length > 0) {
-          return (state.firstSnapshotCreatedDate =
-            action.payload[0].whenCreated);
+        if (
+          action.payload &&
+          action.payload.httpStatusCode === ResponseCode.success &&
+          action.payload.data &&
+          action.payload.data.length > 0
+        ) {
+          state.firstSnapshotCreatedDate = action.payload.data[0].whenCreated;
         }
       })
       .addCase(fetchSnapshots.rejected, (state, action) => {
@@ -95,8 +127,23 @@ const snapshotsSlice = createSlice({
         else state.createSnapshotRequest = RequestStatus.failed;
       })
       .addCase(createSnapshotForSites.rejected, (state, action) => {
-        console.log('error', action);
         state.createSnapshotRequest = RequestStatus.failed;
+      })
+      .addCase(getBannerType.pending, (state) => {
+        state.status = RequestStatus.loading;
+      })
+      .addCase(getBannerType.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.status = RequestStatus.success;
+          state.bannerType = action.payload;
+        } else {
+          state.status = RequestStatus.failed;
+          state.error = 'Failed to fetch banner type';
+        }
+      })
+      .addCase(getBannerType.rejected, (state, action) => {
+        state.status = RequestStatus.failed;
+        state.error = action.error.message ?? '';
       });
   },
 });
@@ -111,5 +158,7 @@ export const createSnapshotForSitesStatus = (state: any) =>
   state.snapshots.createSnapshotRequest;
 
 export const { resetCreateSnapshotForSitesStatus } = snapshotsSlice.actions;
+
+export const selectBannerType = (state: any) => state.snapshots.bannerType;
 
 export default snapshotsSlice.reducer;

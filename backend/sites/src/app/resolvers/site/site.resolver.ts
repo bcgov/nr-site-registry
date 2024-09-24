@@ -1,16 +1,24 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
-import { Resource, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  AuthenticatedUser,
+  Resource,
+  RoleMatchingMode,
+  Roles,
+} from 'nest-keycloak-connect';
 import {
   FetchSiteDetail,
   FetchSiteResponse,
+  SaveSiteDetailsResponse,
   SearchSiteResponse,
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteService } from '../../services/site/site.service';
-import { DropdownDto, DropdownResponse } from 'src/app/dto/dropdown.dto';
-import { GenericResponseProvider } from 'src/app/dto/response/genericResponseProvider';
+import { DropdownDto, DropdownResponse } from '../../dto/dropdown.dto';
+import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { UsePipes } from '@nestjs/common';
-import { GenericValidationPipe } from 'src/app/utils/validations/genericValidationPipe';
+import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
+import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
+import { CustomRoles } from '../../common/role';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sitesLogger = require('../../logger/logging');
 /**
@@ -24,12 +32,20 @@ export class SiteResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       DropdownDto[]
     >,
+    private readonly genericResponseProviderForSave: GenericResponseProvider<SaveSiteDetailsResponse>,
   ) {}
 
   /**
    * Find All Sites
    */
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => FetchSiteResponse, { name: 'sites' })
   findAll() {
     return this.siteService.findAll();
@@ -42,7 +58,14 @@ export class SiteResolver {
    * @param pageSize size of the page
    * @returns sites where id or address matches the search param along with pagination params
    */
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => SearchSiteResponse, { name: 'searchSites' })
   async searchSites(
     @Args('searchParam', { type: () => String }) searchParam: string,
@@ -106,7 +129,14 @@ export class SiteResolver {
     );
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => FetchSiteDetail, { name: 'findSiteBySiteId' })
   findSiteBySiteId(@Args('siteId', { type: () => String }) siteId: string) {
     sitesLogger.info(
@@ -115,7 +145,14 @@ export class SiteResolver {
     return this.siteService.findSiteBySiteId(siteId);
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => DropdownResponse, { name: 'searchSiteIds' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async searchSiteIds(
@@ -138,6 +175,41 @@ export class SiteResolver {
       return this.genericResponseProvider.createResponse(
         `Notation Paticipant Role not found`,
         404,
+        false,
+      );
+    }
+  }
+
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Mutation(() => SaveSiteDetailsResponse, { name: 'updateSiteDetails' })
+  async updateSiteDetails(
+    @Args('siteDetailsDTO', { type: () => SaveSiteDetailsDTO })
+    siteDetailsDTO: SaveSiteDetailsDTO,
+    @AuthenticatedUser()
+    user: any,
+  ) {
+    const saveResult = await this.siteService.saveSiteDetails(
+      siteDetailsDTO,
+      user,
+    );
+
+    if (saveResult) {
+      return this.genericResponseProviderForSave.createResponse(
+        `Successfully saved site details.`,
+        200,
+        true,
+      );
+    } else {
+      return this.genericResponseProviderForSave.createResponse(
+        `Failed to save site details.`,
+        422,
         false,
       );
     }

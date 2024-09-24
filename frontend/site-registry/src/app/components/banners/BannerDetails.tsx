@@ -8,10 +8,14 @@ import {
 import Banner from './Banner';
 
 interface BannerDetailsProps {
+  bannerType: string;
   snapshotDate?: string;
 }
 
-const BannerDetails: React.FC<BannerDetailsProps> = ({ snapshotDate }) => {
+const BannerDetails: React.FC<BannerDetailsProps> = ({
+  bannerType,
+  snapshotDate,
+}) => {
   let type = '';
   let bannerLabel = '';
   let iconType = <></>;
@@ -19,8 +23,7 @@ const BannerDetails: React.FC<BannerDetailsProps> = ({ snapshotDate }) => {
   let customClassForIcon = '';
   let detailMessageNode = <></>;
 
-  type = BannerMessages.current; //Business Logic to decide what status needs to be sent is pending, hardcoding for UI purpose
-  switch (type) {
+  switch (bannerType) {
     case BannerMessages.outdated:
       bannerLabel = BannerMessages.outdatedLabel;
       iconType = <ExclamationCircle />;

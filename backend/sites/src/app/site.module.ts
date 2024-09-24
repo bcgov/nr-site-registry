@@ -11,6 +11,7 @@ import { SiteDocs } from './entities/siteDocs.entity';
 import { SitePartics } from './entities/sitePartics.entity';
 import { SiteProfiles } from './entities/siteProfiles.entity';
 import { SiteSubdivisions } from './entities/siteSubdivisions.entity';
+import { Subdivisions } from './entities/subdivisions.entity';
 import { BceRegionCd } from './entities/bceRegionCd.entity';
 import { ClassificationCd } from './entities/classificationCd.entity';
 import { SiteRiskCd } from './entities/siteRiskCd.entity';
@@ -77,6 +78,11 @@ import { User } from './entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { AssociatedSiteResolver } from './resolvers/associatedSite/associatedSite.resolver';
 import { AssociatedSiteService } from './services/associatedSite/associatedSite.service';
+import { LandUseCodeResolver } from './resolvers/landUseCode/landUseCode.resolver';
+import { LandUseCodeService } from './services/landUseCode/landUseCode.service';
+import { HistoryLog } from './entities/siteHistoryLog.entity';
+import { ParcelDescriptionResolver } from './resolvers/parcelDescription/parcelDescription.resolver';
+import { ParcelDescriptionsService } from './services/parcelDescriptions/parcelDescriptions.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -93,6 +99,7 @@ import { AssociatedSiteService } from './services/associatedSite/associatedSite.
       SitePartics,
       SiteProfiles,
       SiteSubdivisions,
+      Subdivisions,
       BceRegionCd,
       ClassificationCd,
       SiteRiskCd,
@@ -136,6 +143,7 @@ import { AssociatedSiteService } from './services/associatedSite/associatedSite.
       Folio,
       FolioContents,
       User,
+      HistoryLog,
     ]),
   ],
   providers: [
@@ -145,6 +153,8 @@ import { AssociatedSiteService } from './services/associatedSite/associatedSite.
     DashboardService,
     SnapshotsResolver,
     SnapshotsService,
+    ParcelDescriptionResolver,
+    ParcelDescriptionsService,
     ParticipantResolver,
     ParticipantService,
     DropdownResolver,
@@ -156,6 +166,8 @@ import { AssociatedSiteService } from './services/associatedSite/associatedSite.
     CartService,
     LandHistoryResolver,
     LandHistoryService,
+    LandUseCodeResolver,
+    LandUseCodeService,
     NotationResolver,
     NotationService,
     DocumentResolver,

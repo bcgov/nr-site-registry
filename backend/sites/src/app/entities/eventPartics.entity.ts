@@ -1,29 +1,43 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { EventParticRoleCd } from './eventParticRoleCd.entity';
 import { Events } from './events.entity';
 import { PeopleOrgs } from './peopleOrgs.entity';
 import { SitePartics } from './sitePartics.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
 
 @ObjectType()
-@Index('event_partics_pkey', ['eprCode', 'eventId', 'spId'], { unique: true })
+@Index('event_partics_pkey', ['eprCode', 'eventId', 'psnorgId'], {
+  unique: true,
+})
 @Index('ep_classified_by_frgn', ['eprCode'], {})
 @Index('ep_playing_a_role_i_frgn', ['eventId'], {})
 @Index('ep_psnorg_frgn', ['psnorgId'], {})
 @Index('ep_rwm_flag', ['rwmFlag'], {})
 @Index('ep_played_by_frgn', ['spId'], {})
+@Index('ep_id', ['id'], {})
 @Entity('event_partics')
-export class EventPartics {
+export class EventPartics extends ChangeAuditEntity {
+  @PrimaryGeneratedColumn('uuid', { name: 'id' })
+  id: string;
+
   @Field()
-  @Column('bigint', { primary: true, name: 'event_id' })
+  @Column('bigint', { name: 'event_id' })
   eventId: string;
 
   @Field()
-  @Column('bigint', { primary: true, name: 'sp_id' })
-  spId: string;
+  @Column('bigint', { name: 'sp_id', nullable: true })
+  spId: string | null;
 
   @Field()
-  @Column('character varying', { primary: true, name: 'epr_code', length: 6 })
+  @Column('character varying', { name: 'epr_code', length: 6 })
   eprCode: string;
 
   @Field()
@@ -71,15 +85,15 @@ export class EventPartics {
   event: Events;
 
   @Field(() => PeopleOrgs, { nullable: true })
-  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.eventPartics, {
-    eager: true,
-  })
+  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.eventPartics)
   @JoinColumn([{ name: 'psnorg_id', referencedColumnName: 'id' }])
   psnorg: PeopleOrgs;
 
-  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.eventPartics, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn([{ name: 'sp_id', referencedColumnName: 'id' }])
-  sp: SitePartics;
+  // Remove this relationship because event participant is no longer depend on site participant.
+  //  In case there will migration issue we can uncomment this code
+  // @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.eventPartics, {
+  //   onDelete: 'CASCADE',
+  // })
+  // @JoinColumn([{ name: 'sp_id', referencedColumnName: 'id' }])
+  // sp: SitePartics;
 }

@@ -51,23 +51,24 @@ import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
 import { fetchNotationParticipants } from './notations/NotationSlice';
 import { fetchDocuments } from './documents/DocumentsSlice';
-import { DropdownSearchInput } from '../../components/input-controls/InputControls';
-import Form from '../../components/form/Form';
 import SearchInput from '../../components/search/SearchInput';
 import {
   addSiteToFolio,
   addSiteToFolioRequest,
   fetchFolioItems,
   folioItems,
-} from '../folios/FolioSlice';
+} from '../folios/redux/FolioSlice';
 import { Folio, FolioContentDTO } from '../folios/dto/Folio';
 import {
   fetchSnapshots,
   snapshots,
   getFirstSnapshotCreatedDate,
+  selectBannerType,
+  getBannerType,
 } from './snapshot/SnapshotSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 import {
+  fetchMinistryContact,
   fetchNotationClassCd,
   fetchNotationParticipantRoleCd,
   fetchNotationTypeCd,
@@ -79,6 +80,14 @@ import {
   IFormField,
 } from '../../components/input-controls/IFormField';
 import BannerDetails from '../../components/banners/BannerDetails';
+import {
+  resetSaveSiteDetails,
+  resetSaveSiteDetailsRequestStatus,
+  saveRequestStatus,
+  saveSiteDetails,
+  setupSiteIdForSaving,
+} from './SaveSiteDetailsSlice';
+import { fetchAssociatedSites } from './associates/AssociateSlice';
 
 const SiteDetails = () => {
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
@@ -91,7 +100,6 @@ const SiteDetails = () => {
     let selectedFolio = folioDetails.filter(
       (x: any) => x.folioId === folioId,
     )[0];
-    console.log('selectedFolio', selectedFolio);
     let dto: FolioContentDTO = {
       siteId: details.id,
       folioId: selectedFolio.id + '',
@@ -137,6 +145,7 @@ const SiteDetails = () => {
   const [isVisible, setIsVisible] = useState(false);
   const snapshot = useSelector(snapshots);
   const snapshotTakenDate = useSelector(getFirstSnapshotCreatedDate);
+  const bannerType = useSelector(selectBannerType);
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
@@ -145,6 +154,32 @@ const SiteDetails = () => {
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
+
+  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
+
+  useEffect(() => {
+    if (
+      saveSiteDetailsRequestStatus === RequestStatus.success ||
+      saveSiteDetailsRequestStatus === RequestStatus.failed
+    ) {
+      if (saveSiteDetailsRequestStatus === RequestStatus.success) {
+        dispatch(resetSaveSiteDetails(null));
+        dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+        setEdit(false);
+      } else {
+        // dont close edit mode
+      }
+
+      showNotification(
+        saveSiteDetailsRequestStatus,
+        'Successfully saved site details',
+        'Failed To save site details',
+      );
+      dispatch(resetSaveSiteDetailsRequestStatus(null));
+    } else {
+      // do nothing
+    }
+  }, [saveSiteDetailsRequestStatus]);
 
   const navigate = useNavigate();
   const onClickBackButton = () => {
@@ -159,7 +194,7 @@ const SiteDetails = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
+      if (window.scrollY > 50) {
         // Adjust the scroll position as needed
         setIsVisible(true);
       } else {
@@ -174,20 +209,6 @@ const SiteDetails = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  // useEffect(() => {
-  //   if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
-  //     setUserType(UserType.External);
-  //   } else if (
-  //     loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
-  //   ) {
-  //     setUserType(UserType.Internal);
-  //   } else {
-  //     // not logged in
-  //     setUserType(UserType.External);
-  //   }
-  //   dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ""));
-  // }, [loggedInUser]);
 
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
@@ -210,24 +231,24 @@ const SiteDetails = () => {
     setViewMode(mode);
   }, [mode]);
 
+  // NEEDS TO FETCH DATA BASED ON CONDITION WHEATHER IT IS EXTERNAL USER OR INTERNAL USER
+  // BY DOING THIS WE CAN STOP UNNECCESSARY CALL TO DATABASE
+  // THERE ARE SOME CALLS WHICH MAY NOT REQUIRED ON DETAILS PAGE.
   useEffect(() => {
     setIsLoading(true); // Set loading state to true before starting API calls
     if (id) {
+      dispatch(resetSaveSiteDetails(null));
+      dispatch(setupSiteIdForSaving(id));
       Promise.all([
-        dispatch(fetchPeopleOrgsCd()),
-        dispatch(fetchParticipantRoleCd()),
+        dispatch(fetchSnapshots(id ?? '')),
+        dispatch(getBannerType(id ?? '')),
+        dispatch(fetchMinistryContact('EMP')),
         dispatch(fetchNotationClassCd()),
         dispatch(fetchNotationTypeCd()),
         dispatch(fetchNotationParticipantRoleCd()),
-        // Calling snapshot for the implementation of snapshot string on top
-        // This will change in future based on condition of User type.
-        dispatch(fetchSnapshots(id ?? '')),
+        dispatch(fetchNotationParticipants(id ?? '')),
         // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '' })),
-        dispatch(fetchNotationParticipants(id ?? '')),
-        dispatch(fetchSiteParticipants(id ?? '')),
-        dispatch(fetchDocuments(id ?? '')),
-        dispatch(fetchSiteDisclosure(id ?? '')),
       ])
         .then(() => {
           setIsLoading(false); // Set loading state to false after all API calls are resolved
@@ -437,8 +458,7 @@ const SiteDetails = () => {
             closeHandler={(response) => {
               setSave(false);
               if (response) {
-                dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
-                setEdit(false);
+                dispatch(saveSiteDetails(null)).unwrap();
               }
             }}
           >
@@ -567,13 +587,16 @@ const SiteDetails = () => {
           </div>
         )}
         <div className="section-details-header row">
-          {UserType.External === userType && (
-            <div>
-              <BannerDetails
-                snapshotDate={`Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`}
-              />
-            </div>
-          )}
+          {UserType.External === userType &&
+            snapshot.status === RequestStatus.success &&
+            snapshot.snapshot.data !== null && (
+              <div>
+                <BannerDetails
+                  bannerType={bannerType}
+                  snapshotDate={`Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`}
+                />
+              </div>
+            )}
 
           {!isVisible && (
             <>

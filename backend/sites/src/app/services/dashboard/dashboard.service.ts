@@ -14,28 +14,49 @@ export class DashboardService {
     private recentViewsRepository: Repository<RecentViews>,
   ) {}
 
+  /**
+   * Retrieves recent views for a given user ID.
+   *
+   * @param userId - The ID of the user whose recent views are to be fetched.
+   * @returns An array of RecentViews entities for the specified user.
+   * @throws Error if there is an issue retrieving the data.
+   */
   async getRecentViewsByUserId(userId: string): Promise<RecentViews[]> {
     sitesLogger.info('DashboardService.getRecentViewsByUserId() start');
     sitesLogger.debug('DashboardService.getRecentViewsByUserId() start');
     try {
+      // Fetch recent views based on the provided userId
       const result = await this.recentViewsRepository.find({
         where: { userId },
       });
       if (result) {
-        return result;
+        return result; // Return the fetched recent views
+      } else {
+        return []; // Return an empty array if no recent views are found
       }
       sitesLogger.info('DashboardService.getRecentViewsByUserId() end');
       sitesLogger.debug('DashboardService.getRecentViewsByUserId() end');
     } catch (error) {
+      // Log or handle the error as necessary
       sitesLogger.error(
         'Exception occured in DashboardService.getRecentViewsByUserId() end' +
           ' ' +
           JSON.stringify(error),
       );
-      throw error;
+      throw new Error(
+        `Failed to retrieve recent views for userId ${userId}: ${error.message}`,
+      );
     }
   }
 
+  /**
+   * Adds a recent view record or updates an existing record for a user.
+   * If the user has reached the maximum number of recent views, the oldest view is deleted.
+   *
+   * @param recentViewDto - DTO containing the recent view data to be added or updated.
+   * @returns A message indicating whether the record was inserted or updated successfully.
+   * @throws Error if there is an issue inserting or updating the record.
+   */
   async addRecentView(recentViewDto: RecentViewDto) {
     sitesLogger.info('DashboardService.addRecentView() start');
     sitesLogger.debug('DashboardService.addRecentView() start');

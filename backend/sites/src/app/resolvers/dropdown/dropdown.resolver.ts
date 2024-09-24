@@ -8,6 +8,7 @@ import {
 } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { DropdownService } from '../../services/dropdown/dropdown.service';
+import { CustomRoles } from '../../common/role';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sitesLogger = require('../../logger/logging');
 
@@ -23,7 +24,14 @@ export class DropdownResolver {
     >,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => DropdownResponse, { name: 'getParticipantRoleCd' })
   async getParticipantRoleCd() {
     sitesLogger.info('DropdownResolver.getParticipantRoleCd() start');
@@ -47,30 +55,57 @@ export class DropdownResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
-  @Query(() => DropdownResponseWithMetaData, { name: 'getPeopleOrgsCd' })
-  async getPeopleOrgsCd() {
-    sitesLogger.info('DropdownResolver.getPeopleOrgsCd() start');
-    const result = await this.dropdownService.getPeopleOrgsCd();
-    if (result.length > 0) {
-      sitesLogger.info('DropdownResolver.getPeopleOrgsCd() RES:200 end');
-      return this.genericResponseProvider.createResponse(
-        'People Organization fetched successfully',
-        200,
-        true,
-        result,
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => DropdownResponse, { name: 'getPeopleOrgsCd' })
+  async getPeopleOrgsCd(
+    @Args('searchParam', { type: () => String, nullable: true })
+    searchParam?: string,
+    @Args('entityType', { type: () => String, nullable: true })
+    entityType?: string,
+  ) {
+    try {
+      const result = await this.dropdownService.getPeopleOrgsCd(
+        searchParam,
+        entityType,
       );
-    } else {
-      sitesLogger.info('DropdownResolver.getPeopleOrgsCd() RES:404 end');
+      if (result && result.length > 0) {
+        return this.genericResponseProvider.createResponse(
+          'People Organization fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        return this.genericResponseProvider.createResponse(
+          `People Organization not found`,
+          404,
+          false,
+        );
+      }
+    } catch (error) {
       return this.genericResponseProvider.createResponse(
-        `People Organization not found`,
-        404,
+        'Failed to fetch People Organization',
+        500,
         false,
       );
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => DropdownResponseWithMetaData, { name: 'getNotationTypeCd' })
   async getNotationTypeCd() {
     sitesLogger.info('DropdownResolver.getNotationTypeCd() start');
@@ -93,7 +128,14 @@ export class DropdownResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => DropdownResponse, { name: 'getNotationClassCd' })
   async getNotationClassCd() {
     sitesLogger.info('DropdownResolver.getNotationClassCd() start');
@@ -116,7 +158,14 @@ export class DropdownResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => DropdownResponse, { name: 'getNotationParticipantRoleCd' })
   async getNotationParticipantRoleCd() {
     sitesLogger.info('DropdownResolver.getNotationParticipantRoleCd() start');

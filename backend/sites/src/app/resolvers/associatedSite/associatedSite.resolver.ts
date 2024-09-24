@@ -9,6 +9,7 @@ import {
   AssociatedSiteDto,
   AssociatedSiteResponse,
 } from '../../dto/associatedSite.dto';
+import { CustomRoles } from '../../common/role';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sitesLogger = require('../../logger/logging');
 
@@ -21,7 +22,14 @@ export class AssociatedSiteResolver {
     >,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => AssociatedSiteResponse, { name: 'getAssociatedSitesBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getAssociatedSitesBySiteId(

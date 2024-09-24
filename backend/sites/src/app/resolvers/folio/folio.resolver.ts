@@ -15,6 +15,7 @@ import {
   FolioContentResponse,
 } from 'src/app/dto/folioContent.dto';
 import { FolioContents } from 'src/app/entities/folioContents.entity';
+import { CustomRoles } from '../../common/role';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sitesLogger = require('../../logger/logging');
 
@@ -28,7 +29,7 @@ export class FolioResolver {
     >,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Query(() => FolioResponse, { name: 'getFolioItemsForUser' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getFolioItemsForUser(
@@ -69,7 +70,7 @@ export class FolioResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Query(() => FolioContentResponse, { name: 'getSitesForFolio' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSitesForFolio(
@@ -113,7 +114,7 @@ export class FolioResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => FolioResponse, { name: 'addFolioItem' })
   async addFolioItem(
     @Args('folioDTO', { type: () => FolioDTO }, new ValidationPipe())
@@ -154,7 +155,7 @@ export class FolioResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => FolioResponse, { name: 'addSiteToFolio' })
   async addSiteToFolio(
     @Args('folioDTO', { type: () => [FolioContentDTO] }, new ValidationPipe())
@@ -198,7 +199,7 @@ export class FolioResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => FolioResponse, { name: 'updateFolioItem' })
   async updateFolioItem(
     @Args('folioDTO', { type: () => [FolioDTO] }, new ValidationPipe())
@@ -239,7 +240,7 @@ export class FolioResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => FolioResponse, { name: 'deleteFolioItem' })
   async deleteFolio(
     @Args('folioId', new ValidationPipe())
@@ -278,7 +279,7 @@ export class FolioResolver {
     }
   }
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => FolioResponse, { name: 'deleteSitesInFolio' })
   async deleteSitesInFolio(
     @Args('folioDTO', { type: () => [FolioContentDTO] }, new ValidationPipe())

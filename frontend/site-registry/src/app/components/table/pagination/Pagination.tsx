@@ -199,6 +199,7 @@ const Pagination: React.FC<PaginationProps> = ({
         <div className="result-options-section">
           <span>Results per page</span>
           <select
+            data-testid="results-per-page-select"
             className="reslect-options-select"
             onChange={(e) => {
               changeResultsPerPage?.(parseInt(e.target.value));
@@ -215,6 +216,7 @@ const Pagination: React.FC<PaginationProps> = ({
         <div className="result-options-section">
           <span>Jump To</span>
           <select
+            data-testId="pagination-control-select"
             className="reslect-options-select"
             value={currentPage}
             onChange={(e) => {

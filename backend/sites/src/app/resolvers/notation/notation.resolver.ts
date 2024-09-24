@@ -6,6 +6,7 @@ import { GenericValidationPipe } from '../../utils/validations/genericValidation
 import { Events } from '../../entities/events.entity';
 import { NotationService } from '../../services/notation/notation.service';
 import { NotationDto, NotationResponse } from '../../dto/notation.dto';
+import { CustomRoles } from '../../common/role';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sitesLogger = require('../../logger/logging');
 
@@ -18,7 +19,14 @@ export class NotationResolver {
     >,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => NotationResponse, { name: 'getSiteNotationBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSiteNotationBySiteId(

@@ -42,7 +42,7 @@ const TableHeader: FC<TableHeaderProps> = ({
             type="checkbox"
             className="checkbox-color"
             checked={isCurrentPageSelected}
-            onClick={(event) => {
+            onChange={(event) => {
               selectAllRowsHandler(event, !currentPageAllRowsSelected);
             }}
           />
@@ -51,6 +51,7 @@ const TableHeader: FC<TableHeaderProps> = ({
       {columns &&
         columns.map((item, index) => (
           <HeaderCell
+            key={index}
             item={item}
             index={index}
             sortHandler={sortHandler}

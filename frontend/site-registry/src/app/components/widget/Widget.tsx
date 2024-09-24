@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { IWidget } from './IWidget';
 import Table from '../table/Table';
 import './Widget.css';
@@ -19,11 +19,17 @@ const Widget: React.FC<IWidget> = ({
   editMode,
   srMode,
   primaryKeycolumnName,
+  currentPage,
   changeHandler,
   handleCheckBoxChange,
   sortHandler,
 }) => {
   let widgetSortHandler = sortHandler ?? (() => {});
+  const [widgetData, setWidgetData] = useState(tableData);
+  useEffect(() => {
+    setWidgetData(tableData);
+  }, [tableData]);
+
   return (
     <div className={`d-flex flex-column widget-container`}>
       {!hideTitle && title && (
@@ -44,14 +50,16 @@ const Widget: React.FC<IWidget> = ({
       )}
       {children && <div>{children}</div>}
       {!hideTable && (
-        <div className="overflow-auto" style={{ maxHeight: '700px' }}>
+        <div
+          className={`${widgetData && widgetData.length > 12 ? 'widget-table-container' : ''}`}
+        >
           {/* <div> */}
           <div className="me-1">
             <Table
               label={title ?? ''}
               isLoading={tableIsLoading ?? RequestStatus.idle}
               columns={tableColumns ?? []}
-              data={tableData}
+              data={widgetData}
               showPageOptions={false}
               allowRowsSelect={allowRowsSelect}
               changeHandler={changeHandler ?? (() => {})}
@@ -59,6 +67,7 @@ const Widget: React.FC<IWidget> = ({
               srMode={srMode ?? false}
               idColumnName={primaryKeycolumnName ?? ''}
               sortHandler={widgetSortHandler}
+              currentPage={currentPage}
             />
           </div>
         </div>

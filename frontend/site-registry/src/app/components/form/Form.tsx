@@ -9,14 +9,18 @@ import {
   DropdownInput,
   DropdownSearchInput,
   GroupInput,
+  SearchCustomInput,
   TextAreaInput,
   TextInput,
 } from '../input-controls/InputControls';
+import { RequestStatus } from '../../helpers/requests/status';
+import { v4 } from 'uuid';
 
 interface IFormRendererProps {
   formRows: IFormField[][]; // Define the type of formRows according to your application
   formData: { [key: string]: any | [Date, Date] };
   editMode?: boolean;
+  isLoading?: RequestStatus;
   srMode?: boolean;
   handleInputChange: (
     graphQLPropertyName: any,
@@ -29,6 +33,7 @@ const Form: React.FC<IFormRendererProps> = ({
   formData,
   editMode,
   srMode,
+  isLoading,
   handleInputChange,
 }) => {
   return (
@@ -44,6 +49,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   customInputTextCss={field.customInputTextCss}
                   customEditLabelCss={field.customEditLabelCss}
                   customEditInputTextCss={field.customEditInputTextCss}
+                  customPlaceholderCss={field.customPlaceholderCss}
                   placeholder={field.placeholder}
                   value={formData[field.graphQLPropertyName ?? ''] || ''}
                   onChange={(value) =>
@@ -54,6 +60,32 @@ const Form: React.FC<IFormRendererProps> = ({
                   allowNumbersOnly={field.allowNumbersOnly}
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
+                  customInfoMessage={field.customInfoMessage}
+                  customMenuMessage={field.customMenuMessage}
+                />
+              )}
+              {field.type === FormFieldType.Search && (
+                <SearchCustomInput
+                  label={field.label}
+                  customLabelCss={field.customLabelCss}
+                  customInputTextCss={field.customInputTextCss}
+                  customEditLabelCss={field.customEditLabelCss}
+                  customEditInputTextCss={field.customEditInputTextCss}
+                  customPlaceholderCss={field.customPlaceholderCss}
+                  placeholder={field.placeholder}
+                  value={formData[field.graphQLPropertyName ?? ''] || ''}
+                  onChange={(value) =>
+                    handleInputChange(field.graphQLPropertyName, value)
+                  }
+                  options={field.options || []}
+                  type={FormFieldType.Text}
+                  validation={field.validation}
+                  allowNumbersOnly={field.allowNumbersOnly}
+                  isEditing={editMode ?? true}
+                  srMode={srMode ?? false}
+                  isLoading={isLoading}
+                  customInfoMessage={field.customInfoMessage}
+                  customMenuMessage={field.customMenuMessage}
                 />
               )}
               {field.type === FormFieldType.TextArea && (
@@ -63,6 +95,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   customInputTextCss={field.customInputTextCss}
                   customEditLabelCss={field.customEditLabelCss}
                   customEditInputTextCss={field.customEditInputTextCss}
+                  customPlaceholderCss={field.customPlaceholderCss}
                   placeholder={field.placeholder}
                   value={formData[field.graphQLPropertyName ?? ''] || ''}
                   onChange={(value) =>
@@ -84,6 +117,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   customInputTextCss={field.customInputTextCss}
                   customEditLabelCss={field.customEditLabelCss}
                   customEditInputTextCss={field.customEditInputTextCss}
+                  customPlaceholderCss={field.customPlaceholderCss}
                   placeholder={field.placeholder}
                   options={field.options || []}
                   value={formData[field.graphQLPropertyName ?? ''] || ''}
@@ -112,6 +146,11 @@ const Form: React.FC<IFormRendererProps> = ({
                   type={field.type}
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
+                  customPlaceholderCss={field.customPlaceholderCss}
+                  handleSearch={field.handleSearch}
+                  filteredOptions={field.filteredOptions || []}
+                  isLoading={field.isLoading}
+                  customInfoMessage={field.customInfoMessage}
                 />
               )}
               {field.type === FormFieldType.DateRange && (
@@ -121,6 +160,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   customInputTextCss={field.customInputTextCss}
                   customEditLabelCss={field.customEditLabelCss}
                   customEditInputTextCss={field.customEditInputTextCss}
+                  customPlaceholderCss={field.customPlaceholderCss}
                   placeholder={field.placeholder}
                   value={formData[field.graphQLPropertyName ?? ''] || []}
                   onChange={(value) =>
@@ -138,6 +178,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   customInputTextCss={field.customInputTextCss}
                   customEditLabelCss={field.customEditLabelCss}
                   customEditInputTextCss={field.customEditInputTextCss}
+                  customPlaceholderCss={field.customPlaceholderCss}
                   placeholder={field.placeholder}
                   value={formData[field.graphQLPropertyName ?? '']}
                   onChange={(value) =>
@@ -175,6 +216,8 @@ const Form: React.FC<IFormRendererProps> = ({
                   customInputTextCss={field.customInputTextCss}
                   customEditLabelCss={field.customEditLabelCss}
                   customEditInputTextCss={field.customEditInputTextCss}
+                  customPlaceholderCss={field.customPlaceholderCss}
+                  customInfoMessage={field.customInfoMessage}
                 />
               )}
               {field.type === FormFieldType.Checkbox && (
@@ -185,6 +228,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   customLabelCss={field.customLabelCss}
                   customEditLabelCss={field.customEditLabelCss}
                   customEditInputTextCss={field.customEditInputTextCss}
+                  customPlaceholderCss={field.customPlaceholderCss}
                   isEditing={editMode ?? true}
                   isChecked={formData[field.graphQLPropertyName ?? ''] || false}
                   onChange={(value) =>

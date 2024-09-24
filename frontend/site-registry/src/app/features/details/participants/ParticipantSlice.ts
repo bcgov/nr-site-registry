@@ -61,7 +61,7 @@ const siteParticipantSlice = createSlice({
 
 export const siteParticipants = (state: {
   siteParticipant: IParticipantState;
-}) => state.siteParticipant.siteParticipants;
+}) => state.siteParticipant;
 export const { updateSiteParticipants } = siteParticipantSlice.actions;
 
 export default siteParticipantSlice.reducer;

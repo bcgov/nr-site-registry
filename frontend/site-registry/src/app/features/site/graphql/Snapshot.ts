@@ -24,3 +24,17 @@ export const createSnapshotForSitesQL = () => gql`
     }
   }
 `;
+
+export const graphQLGetBannerType = () => {
+  return gql`
+    query getBannerType($siteId: String!) {
+      getBannerType(siteId: $siteId) {
+        httpStatusCode
+        message
+        data {
+          bannerType
+        }
+      }
+    }
+  `;
+};

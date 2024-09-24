@@ -21,6 +21,22 @@ export class FetchSiteResponse extends BaseHttpResponse {
   }
 }
 
+@ObjectType()
+export class SaveSiteDetailsResponse extends BaseHttpResponse {
+  @Field(() => [Sites])
+  data: Sites[];
+
+  constructor(
+    message?: string,
+    httpStatusCode?: number,
+    success?: boolean,
+    data?: Sites[] | null,
+  ) {
+    super(message, httpStatusCode, success);
+    this.data = data;
+  }
+}
+
 /**
  * Class for returing fetch site response from graphql services
  */
@@ -68,5 +84,25 @@ export class GenericResponse<T> extends BaseHttpResponse {
   ) {
     super(message, httpStatusCode, success);
     this.data = data;
+  }
+}
+
+export class GenericPagedResponse<T> extends GenericResponse<T> {
+  count?: number;
+  page?: number;
+  pageSize: number;
+  constructor(
+    message?: string,
+    httpStatusCode?: number,
+    success?: boolean,
+    data?: T | null,
+    count?: number,
+    page?: number,
+    pageSize?: number,
+  ) {
+    super(message, httpStatusCode, success, data);
+    this.count = count;
+    this.page = page;
+    this.pageSize = pageSize;
   }
 }

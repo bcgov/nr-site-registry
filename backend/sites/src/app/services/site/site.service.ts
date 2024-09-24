@@ -8,7 +8,6 @@ import {
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteUtil } from '../../utils/site.util';
-import { RecentViews } from '../../entities/recentViews.entity';
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { Events } from '../../entities/events.entity';
 import { EventPartics } from '../../entities/eventPartics.entity';
@@ -20,11 +19,10 @@ import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { Subdivisions } from '../../entities/subdivisions.entity';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
-import { DropdownResponse } from '../../dto/dropdown.dto';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
-import { SiteProfileOwners } from '../../entities/siteProfileOwners.entity';
+
 /**
  * Nestjs Service For Region Entity
  */
@@ -421,7 +419,7 @@ export class SiteService {
         id: string;
         changes: Partial<SiteParticRoles>;
       }[] = [];
-      const deleteSiteParticRoles: { id: string }[] = [];
+      // const deleteSiteParticRoles: { id: string }[] = [];
 
       // Main processing loop for site participants
       const siteParticsPromises = siteParticipants.map(async (participant) => {
@@ -521,9 +519,8 @@ export class SiteService {
 
           case UserActionEnum.DELETED:
             // Handle deletion if necessary
-            // need to confirm for deletion as in meeting there some confusion for deleting site participant and notation participant.
             deleteSitePartics.push({ id: participantId });
-            deleteSiteParticRoles.push({ id: partiRoleId });
+            // deleteSiteParticRoles.push({ id: partiRoleId });
             break;
 
           default:
@@ -562,13 +559,13 @@ export class SiteService {
       }
 
       // Delete existing site participants and site participant roles in bulk
-      if (deleteSiteParticRoles.length > 0) {
-        await Promise.all(
-          deleteSiteParticRoles.map(({ id }) =>
-            transactionalEntityManager.delete(SiteParticRoles, { id }),
-          ),
-        );
-      }
+      // if (deleteSiteParticRoles.length > 0) {
+      //   await Promise.all(
+      //     deleteSiteParticRoles.map(({ id }) =>
+      //       transactionalEntityManager.delete(SiteParticRoles, { id }),
+      //     ),
+      //   );
+      // }
       if (deleteSitePartics.length > 0) {
         await Promise.all(
           deleteSitePartics.map(({ id }) =>

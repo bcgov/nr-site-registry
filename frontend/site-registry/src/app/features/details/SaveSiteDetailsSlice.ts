@@ -149,6 +149,9 @@ export const getSiteDetailsToBeSaved = (state: any) => {
 export const saveRequestStatus = (state: any) =>
   state.siteDetails.saveRequestStatus;
 
+export const currentSiteId = (state: any) =>
+  state.siteDetails.siteId;
+
 export const {
   resetSaveSiteDetailsRequestStatus,
   resetSaveSiteDetails,

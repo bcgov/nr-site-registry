@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { SiteAssocs } from '../../entities/siteAssocs.entity';
 import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
+import { UserActionEnum } from 'src/app/common/userActionEnum';
 
 @Injectable()
 export class AssociatedSiteService {
@@ -13,11 +14,20 @@ export class AssociatedSiteService {
     private assocSiteRepository: Repository<SiteAssocs>,
   ) {}
 
-  async getAssociatedSitesBySiteId(siteId: string) {
+  async getAssociatedSitesBySiteId(siteId: string, showPending: boolean) {
     try {
-      const result = await this.assocSiteRepository.find({
-        where: { siteId },
-      });
+      let result: SiteAssocs[] = [];
+
+      if (showPending) {
+        result = await this.assocSiteRepository.find({
+          where: { siteId , userAction: UserActionEnum.updated  },
+        });
+      } else {
+        result = await this.assocSiteRepository.find({
+          where: { siteId },
+        });
+      }
+
       if (result) {
         const transformedObjects = result.map((assocs) => {
           return {

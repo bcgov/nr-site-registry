@@ -8,6 +8,8 @@ import { FormFieldType } from '../../../components/input-controls/IFormField';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
 import useDebouncedValue from '../../../helpers/useDebouncedValue';
+import { IComponentProps } from '../navigation/NavigationPillsConfig';
+import LandUseTable from './LandUseTable';
 
 const columns = [
   {
@@ -36,7 +38,14 @@ const columns = [
   },
 ];
 
-const LandUses: FC = () => {
+
+export const ColumnConfigForLandUses = ()=>{
+  return columns;
+}
+
+
+
+const LandUses: React.FC<IComponentProps> = ({ showPending = false }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { id: siteId } = useParams();
 
@@ -57,6 +66,7 @@ const LandUses: FC = () => {
           siteId,
           searchTerm: debouncedSearchTerm,
           sortDirection,
+          showPending:false
         }),
       );
     }
@@ -83,15 +93,10 @@ const LandUses: FC = () => {
           />
         </div>
       </div>
-      <Table
-        label="Search Results"
-        isLoading={fetchRequestStatus}
+      <LandUseTable
+        fetchRequestStatus={fetchRequestStatus}
         columns={columns}
-        data={landUsesData}
-        totalResults={landUsesData.length}
-        changeHandler={() => {}}
-        editMode={false}
-        idColumnName="id"
+        landUsesData={landUsesData}
       />
     </div>
   );

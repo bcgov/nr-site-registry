@@ -29,9 +29,11 @@ export class DisclosureResolver {
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSiteDisclosureBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
   ) {
     const result =
-      await this.dsiclosureService.getSiteDisclosureBySiteId(siteId);
+      await this.dsiclosureService.getSiteDisclosureBySiteId(siteId, showPending);
     if (result.length > 0) {
       return this.genericResponseProvider.createResponse(
         'Site Disclosure fetched successfully',

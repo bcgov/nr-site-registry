@@ -5,6 +5,7 @@ import { Events } from '../../entities/events.entity';
 import { NotationDto } from '../../dto/notation.dto';
 import { plainToInstance } from 'class-transformer';
 import { v4 } from 'uuid';
+import { UserActionEnum } from 'src/app/common/userActionEnum';
 
 @Injectable()
 export class NotationService {
@@ -13,9 +14,20 @@ export class NotationService {
     private notationRepository: Repository<Events>,
   ) {}
 
-  async getSiteNotationBySiteId(siteId: string) {
+  async getSiteNotationBySiteId(siteId: string,showPending: boolean) {
     try {
-      const result = await this.notationRepository.find({ where: { siteId } });
+      
+      let result:Events[] = [];
+      
+      if(showPending)
+      {
+        result =  await this.notationRepository.find({ where: { siteId , userAction: UserActionEnum.updated } });
+      }
+      else
+      {
+        result =  await this.notationRepository.find({ where: { siteId } });
+      }
+     
       if (result) {
         const transformedObjects = result.map((item) => {
           const obj = {

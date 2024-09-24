@@ -32,9 +32,12 @@ export class AssociatedSiteResolver {
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getAssociatedSitesBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
+    
   ) {
     const result =
-      await this.associatedSiteService.getAssociatedSitesBySiteId(siteId);
+      await this.associatedSiteService.getAssociatedSitesBySiteId(siteId,showPending);
     if (result && result.length > 0) {
       return this.genericResponseProvider.createResponse(
         'Associated sites fetched successfully',

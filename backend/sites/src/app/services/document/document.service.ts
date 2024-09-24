@@ -4,6 +4,7 @@ import { SiteDocs } from '../../entities/siteDocs.entity';
 import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { DocumentDto } from '../../dto/document.dto';
+import { UserActionEnum } from 'src/app/common/userActionEnum';
 
 @Injectable()
 export class DocumentService {
@@ -12,9 +13,18 @@ export class DocumentService {
     private siteDocsRepository: Repository<SiteDocs>,
   ) {}
 
-  async getSiteDocumentsBySiteId(siteId: string) {
+  async getSiteDocumentsBySiteId(siteId: string,showPending : boolean) {
     try {
-      const result = await this.siteDocsRepository.find({ where: { siteId } });
+      let result: SiteDocs[] = [];
+      if(showPending)
+      {
+        result = await this.siteDocsRepository.find({ where: { siteId , userAction: UserActionEnum.updated  }  });
+      }
+      else
+      {
+        result = await this.siteDocsRepository.find({ where: { siteId } });
+      }
+      
       if (result) {
         const response = result
           .map((res) => {

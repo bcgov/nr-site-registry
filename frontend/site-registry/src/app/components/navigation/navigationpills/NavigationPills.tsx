@@ -87,7 +87,7 @@ const NavigationPills: React.FC<INavigationPills> = ({
       </div>
       <div className="mt-4">
         {components &&
-          components?.map((component, index) =>
+          components?.map((component:JSX.Element, index:number) =>
             index === activeIndex ? <div key={index}>{component}</div> : null,
           )}
       </div>

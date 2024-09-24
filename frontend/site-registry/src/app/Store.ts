@@ -14,6 +14,7 @@ import snapshotsReducer from './features/details/snapshot/SnapshotSlice';
 import folioReducer from './features/folios/redux/FolioSlice';
 import siteDetailsReducer from './features/details/SaveSiteDetailsSlice';
 import associatedSitesReducer from './features/details/associates/AssociateSlice';
+import srUpdatesReducer from './features/details/srUpdates/srUpdatesSlice';
 
 const persistedStore: any = loadFromLocalStorage();
 
@@ -33,6 +34,7 @@ export const store = configureStore({
     snapshots: snapshotsReducer,
     associatedSites: associatedSitesReducer,
     siteDetails: siteDetailsReducer,
+    srUpdates: srUpdatesReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

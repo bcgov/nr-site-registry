@@ -10,18 +10,19 @@ import { graphQLSiteNotationBySiteId } from '../../site/graphql/Notation';
 const initialState: INotationState = {
   siteNotation: [],
   status: RequestStatus.idle,
-  error: '',
+  error: '', 
 };
 
 // Define the asynchronous thunk to fetch site participants from the backend
 export const fetchNotationParticipants = createAsyncThunk(
   'notationParticipant/fetchNotationParticipants',
-  async (siteId: string) => {
+  async ( args: {siteId: string, showPending: Boolean}) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphQLSiteNotationBySiteId()),
         variables: {
-          siteId: siteId,
+          siteId: args.siteId,
+          pending: args.showPending
         },
       });
       return response.data.data.getSiteNotationBySiteId.data;

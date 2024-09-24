@@ -54,8 +54,8 @@ query searchSites($searchParam: String!,  $page: String!, $pageSize: String!, ${
 
 export const graphqlSiteDetailsQuery = () => {
   return gql`
-    query findSiteBySiteId($siteId: String!) {
-      findSiteBySiteId(siteId: $siteId) {
+    query findSiteBySiteId($siteId: String!, $pending: Boolean) {
+      findSiteBySiteId(siteId: $siteId, pending: $pending) {
         data {
           id
           commonName

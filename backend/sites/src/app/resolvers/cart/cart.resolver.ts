@@ -45,7 +45,7 @@ export class CartResolver {
       } else {
         return this.genericResponseProvider.createResponse(
           `Cart items not found for user id: ${userId}`,
-          422,
+          200,
           true,
           [],
         );

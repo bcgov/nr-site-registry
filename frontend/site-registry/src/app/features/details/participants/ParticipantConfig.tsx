@@ -7,6 +7,7 @@ import { participantRoleDrpdown } from '../dropdowns/DropdownSlice';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { siteParticipants } from './ParticipantSlice';
 import { useEffect } from 'react';
+import { TickIcon, XmarkIcon } from '../../../components/common/icon';
 
 export const GetConfig = () => {
   const participantColumnInternal: TableColumn[] = [
@@ -141,6 +142,7 @@ export const GetConfig = () => {
       // dynamicColumn: true,
       stickyCol: true,
     },
+    
   ];
 
   const participantColumnExternal: TableColumn[] = [
@@ -256,7 +258,7 @@ export const GetConfig = () => {
         customEditInputTextCss: 'custom-participant-edit-input',
         tableMode: true,
       },
-    },
+    },  
   ];
 
   const srVisibilityParcticConfig: DropdownItem[] = [

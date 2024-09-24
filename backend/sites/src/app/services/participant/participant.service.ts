@@ -5,6 +5,7 @@ import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { SitePartics } from '../../entities/sitePartics.entity';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
+import { UserActionEnum } from 'src/app/common/userActionEnum';
 @Injectable()
 export class ParticipantService {
   constructor(
@@ -12,11 +13,20 @@ export class ParticipantService {
     private siteParticsRepository: Repository<SitePartics>,
   ) {}
 
-  async getSiteParticipantsBySiteId(siteId: string) {
+  async getSiteParticipantsBySiteId(siteId: string, showPending: boolean) {
     try {
-      const result = await this.siteParticsRepository.find({
+
+      let result = [];
+
+      if(showPending)
+      result = await this.siteParticsRepository.find({
+        where: { siteId, userAction: UserActionEnum.updated },
+      });
+      else
+      result = await this.siteParticsRepository.find({
         where: { siteId },
       });
+
       if (result) {
         const transformedObjects = result
           .map((item) => {

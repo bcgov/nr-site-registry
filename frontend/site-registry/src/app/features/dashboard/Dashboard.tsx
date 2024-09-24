@@ -110,25 +110,7 @@ const Dashboard = () => {
         data={data ?? []}
         allowRowsSelect={true}
       />
-      <DashboardTableWidget
-        title={
-          userType === UserType.External
-            ? 'Recently Modified Folios'
-            : 'Sites from Applications recently assigned to me'
-        }
-        buttonText={
-          userType === UserType.External ? 'View All Folios' : 'View All'
-        }
-        columns={
-          userType === UserType.External
-            ? recentFoliosColumns
-            : recentAssignedColumn
-        }
-        loading={loading}
-        data={data ?? []}
-        onButtonClick={handleButtonClick}
-        allowRowsSelect={userType === UserType.Internal}
-      />
+      
     </PageContainer>
   );
 };

@@ -22,9 +22,9 @@ import {
 import { AppDispatch } from '../../Store';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
 import {
-  dropDownNavItems,
-  navComponents,
-  navItems,
+  getDropDownNavItems,
+  getNavComponents,
+  getNavItems,
 } from './navigation/NavigationPillsConfig';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import {
@@ -43,6 +43,7 @@ import {
   formatDateWithNoTimzoneName,
   getUser,
   showNotification,
+  useUser,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import { fetchSiteParticipants } from './participants/ParticipantSlice';
@@ -87,6 +88,18 @@ import {
 import { fetchAssociatedSites } from './associates/AssociateSlice';
 
 const SiteDetails = () => {
+  const [navItems, SetNavItems] = useState<string[]|undefined>();
+  const [navComponents, SetNavComponents] = useState<JSX.Element[]>();
+  const [dropDownNavItems, SetDropDownNavItems] = useState<{ label: string; value: string; }[]>();
+
+  const user = useUser();
+
+  useEffect(() => {    
+    SetNavComponents(getNavComponents());
+    SetNavItems(getNavItems());
+    SetDropDownNavItems(getDropDownNavItems());
+  }, [user]);
+
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
 
   const folioDetails = useSelector(folioItems);
@@ -228,13 +241,19 @@ const SiteDetails = () => {
   }, [mode]);
 
   useEffect(() => {
+    console.log("Calling From Site Details")
     setIsLoading(true); // Set loading state to true before starting API calls
     if (id) {
       dispatch(resetSaveSiteDetails(null));
       dispatch(setupSiteIdForSaving(id));
       Promise.all([
         dispatch(fetchSnapshots(id ?? '')),
-        dispatch(fetchSitesDetails({ siteId: id ?? '' })),
+
+        dispatch(fetchSitesDetails({ siteId: id ?? '', showPending :false })),
+        dispatch(fetchNotationClassCd()),
+        dispatch(fetchNotationTypeCd()),
+        dispatch(fetchNotationParticipantRoleCd()),
+        // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
       ])
         .then(() => {
           setIsLoading(false); // Set loading state to false after all API calls are resolved
@@ -597,7 +616,7 @@ const SiteDetails = () => {
           )}
         </div>
         <NavigationPills
-          items={navItems}
+          items={navItems ?? []}
           components={navComponents}
           dropdownItems={dropDownNavItems}
           isDisable={

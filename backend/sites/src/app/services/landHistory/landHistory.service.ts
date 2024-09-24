@@ -1,6 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets } from 'typeorm';
 import { LandHistories } from '../../entities/landHistories.entity';
+import { UserActionEnum } from 'src/app/common/userActionEnum';
 
 export class LandHistoryService {
   constructor(
@@ -12,6 +13,7 @@ export class LandHistoryService {
     siteId: string,
     searchTerm: string,
     sortDirection: 'ASC' | 'DESC',
+    showPending: boolean
   ): Promise<LandHistories[]> {
     try {
       const query = this.landHistoryRepository
@@ -31,6 +33,17 @@ export class LandHistoryService {
             }).orWhere('land_use_cd.description ILIKE :searchTerm', {
               searchTerm: `%${searchTerm}%`,
             });
+          }),
+        );
+      }
+
+      if(showPending)
+      {
+        query.andWhere(
+          new Brackets((qb) => {
+            qb.where('landHistory.user_action = :status', {
+              status: `${UserActionEnum.updated}`,
+            })
           }),
         );
       }

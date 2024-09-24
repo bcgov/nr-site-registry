@@ -22,6 +22,7 @@ import { Subdivisions } from '../../entities/subdivisions.entity';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { DropdownResponse } from '../../dto/dropdown.dto';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
+import { UserActionEnum } from 'src/app/common/userActionEnum';
 /**
  * Nestjs Service For Region Entity
  */
@@ -240,14 +241,27 @@ export class SiteService {
    * @param siteId site Id
    * @returns a single site matching the site ID
    */
-  async findSiteBySiteId(siteId: string) {
+  async findSiteBySiteId(siteId: string, pending:boolean) {
     const response = new FetchSiteDetail();
 
     response.httpStatusCode = 200;
 
-    response.data = await this.siteRepository.findOneOrFail({
-      where: { id: siteId },
-    });
+    if(pending)
+    {
+      const result = await this.siteRepository.findOne({
+        where: { id: siteId , userAction: UserActionEnum.updated },
+      });
+      
+      response.data = result ? result : null;
+    }
+    else
+    {
+      const result = await this.siteRepository.findOne({
+        where: { id: siteId  },
+      });
+
+      response.data = result ? result : null;
+    }    
 
     return response;
   }

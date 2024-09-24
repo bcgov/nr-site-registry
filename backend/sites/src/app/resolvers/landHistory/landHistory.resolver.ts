@@ -27,11 +27,15 @@ export class LandHistoryResolver {
 
     @Args('sortDirection', { nullable: true })
     sortDirection: SortDirection,
+
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
   ) {
     const result = await this.landHistoryService.getLandHistoriesForSite(
       siteId,
       searchTerm,
       sortDirection,
+      showPending
     );
     if (result.length > 0) {
       return this.genericResponseProvider.createResponse(

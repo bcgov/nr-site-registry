@@ -4,5 +4,5 @@ export interface INavigationPills {
   items: string[];
   dropdownItems?: any;
   isDisable?: boolean;
-  components?: JSX.Element[];
+  components?: any;
 }

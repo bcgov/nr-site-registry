@@ -110,7 +110,7 @@ const Dashboard = () => {
         data={data ?? []}
         allowRowsSelect={true}
       />
-      <DashboardTableWidget
+      {/* <DashboardTableWidget
         title={
           userType === UserType.External
             ? 'Recently Modified Folios'
@@ -128,7 +128,7 @@ const Dashboard = () => {
         data={data ?? []}
         onButtonClick={handleButtonClick}
         allowRowsSelect={userType === UserType.Internal}
-      />
+      /> */}
     </PageContainer>
   );
 };

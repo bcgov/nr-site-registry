@@ -35,6 +35,7 @@ export class ProfileSubmissions {
   @ManyToOne(
     () => SiteProfiles,
     (siteProfiles) => siteProfiles.profileSubmissions,
+    { onDelete: 'CASCADE' },
   )
   @JoinColumn([
     { name: 'sprof_site_id', referencedColumnName: 'siteId' },

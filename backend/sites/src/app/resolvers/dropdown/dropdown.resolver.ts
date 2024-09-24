@@ -70,12 +70,14 @@ export class DropdownResolver {
     @Args('entityType', { type: () => String, nullable: true })
     entityType?: string,
   ) {
+    sitesLogger.info('DropdownResolver.getPeopleOrgsCd() start');
     try {
       const result = await this.dropdownService.getPeopleOrgsCd(
         searchParam,
         entityType,
       );
       if (result && result.length > 0) {
+        sitesLogger.info('DropdownResolver.getPeopleOrgsCd() RES:200 end');
         return this.genericResponseProvider.createResponse(
           'People Organization fetched successfully',
           200,
@@ -83,6 +85,7 @@ export class DropdownResolver {
           result,
         );
       } else {
+        sitesLogger.info('DropdownResolver.getPeopleOrgsCd() RES:404 end');
         return this.genericResponseProvider.createResponse(
           `People Organization not found`,
           404,
@@ -90,6 +93,11 @@ export class DropdownResolver {
         );
       }
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in DropdownResolver.getPeopleOrgsCd() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       return this.genericResponseProvider.createResponse(
         'Failed to fetch People Organization',
         500,

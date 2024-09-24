@@ -235,6 +235,12 @@ export class SnapshotsResolver {
     @Args('siteId', { type: () => String }) siteId: string,
     @AuthenticatedUser() user: any,
   ): Promise<BannerTypeResponse> {
+    sitesLogger.info(
+      'SnapshotsResolver.getBannerType() start siteId: ' +
+        siteId +
+        ' user:' +
+        user.sub,
+    );
     try {
       const bannerType = await this.snapshotsService.getBannerType(
         siteId,
@@ -242,6 +248,7 @@ export class SnapshotsResolver {
       );
 
       if (bannerType && bannerType.length > 0) {
+        sitesLogger.info('SnapshotsResolver.getBannerType() RES:200 end');
         return {
           httpStatusCode: 200,
           message: 'Banner type fetched successfully',
@@ -250,6 +257,7 @@ export class SnapshotsResolver {
           },
         };
       } else {
+        sitesLogger.info('SnapshotsResolver.getBannerType() RES:404 end');
         return {
           httpStatusCode: 404,
           message: `Failed to determine banner type for site id ${siteId}`,
@@ -257,6 +265,11 @@ export class SnapshotsResolver {
         };
       }
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in SnapshotsResolver.getBannerType() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw new Error('System Error, Please try again.');
     }
   }

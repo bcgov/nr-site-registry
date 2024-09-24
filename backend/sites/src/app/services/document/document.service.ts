@@ -63,6 +63,8 @@ export class DocumentService {
       });
 
       // Convert plain objects to DocumentDto instances
+      sitesLogger.info('DocumentService.getSiteDocumentsBySiteId() end');
+      sitesLogger.debug('DocumentService.getSiteDocumentsBySiteId() end');
       return plainToInstance(DocumentDto, response);
     } catch (error) {
       sitesLogger.error(

@@ -68,6 +68,8 @@ export class DropdownService {
    * @throws Error if there is an issue retrieving the data.
    */
   async getPeopleOrgsCd(searchParam: string, entityType: string) {
+    sitesLogger.info('DropdownService.getPeopleOrgsCd() start');
+    sitesLogger.debug('DropdownService.getPeopleOrgsCd() start');
     try {
       const queryBuilder =
         this.peopleOrgsRepository.createQueryBuilder('people_orgs');
@@ -91,6 +93,8 @@ export class DropdownService {
 
       const result = await queryBuilder.getMany();
 
+      sitesLogger.info('DropdownService.getPeopleOrgsCd() end');
+      sitesLogger.debug('DropdownService.getPeopleOrgsCd() end');
       return (
         result.map((obj: PeopleOrgs) => ({
           key: obj.id,
@@ -119,6 +123,8 @@ export class DropdownService {
     try {
       const result = await this.eventTypeCdRepository.find();
       if (result) {
+        sitesLogger.info('DropdownService.getNotationTypeCd() end');
+        sitesLogger.debug('DropdownService.getNotationTypeCd() end');
         return result.reduce(
           (acc, item: EventTypeCd) => {
             const existingMetaData = acc.find(
@@ -144,6 +150,8 @@ export class DropdownService {
           }[],
         );
       }
+      sitesLogger.info('DropdownService.getNotationTypeCd() end');
+      sitesLogger.debug('DropdownService.getNotationTypeCd() end');
       return [];
     } catch (error) {
       sitesLogger.error(
@@ -167,11 +175,15 @@ export class DropdownService {
     try {
       const result = await this.eventClassCdRepository.find();
       if (result) {
+        sitesLogger.info('DropdownService.getNotationClassCd() end');
+        sitesLogger.debug('DropdownService.getNotationClassCd() end');
         return result.map((obj: EventClassCd) => ({
           key: obj.code,
           value: obj.description,
         }));
       }
+      sitesLogger.info('DropdownService.getNotationClassCd() end');
+      sitesLogger.debug('DropdownService.getNotationClassCd() end');
       return [];
     } catch (error) {
       sitesLogger.error(
@@ -202,6 +214,8 @@ export class DropdownService {
           value: obj.description,
         }));
       }
+      sitesLogger.info('DropdownService.getNotationParticipantRoleCd() end');
+      sitesLogger.debug('DropdownService.getNotationParticipantRoleCd() end');
       return [];
     } catch (error) {
       sitesLogger.error(

@@ -92,6 +92,8 @@ export class NotationService {
         };
       });
 
+      sitesLogger.info('NotationService.getSiteNotationBySiteId() end');
+      sitesLogger.debug('NotationService.getSiteNotationBySiteId() end');
       // Transform plain objects into NotationDto instances
       return plainToInstance(NotationDto, transformedObjects);
     } catch (error) {

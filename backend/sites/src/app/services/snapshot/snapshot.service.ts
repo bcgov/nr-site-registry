@@ -102,14 +102,23 @@ export class SnapshotsService {
   }
 
   async getMostRecentSnapshot(siteId: string, userId: string) {
+    sitesLogger.info('SnapshotsService.getMostRecentSnapshot() start');
+    sitesLogger.debug('SnapshotsService.getMostRecentSnapshot() start');
     try {
       const result = await this.snapshotRepository.findOne({
         where: { siteId, userId },
         order: { whenCreated: 'DESC' },
       });
 
+      sitesLogger.info('SnapshotsService.getMostRecentSnapshot() end');
+      sitesLogger.debug('SnapshotsService.getMostRecentSnapshot() end');
       return result;
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in SnapshotsService.getMostRecentSnapshot() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw new Error('Failed to retrieve the most recent snapshot.');
     }
   }
@@ -129,19 +138,6 @@ export class SnapshotsService {
           JSON.stringify(error),
       );
       throw error;
-    }
-  }
-
-  async createSnapshot(snapshotDto: SnapshotDto) {
-    try {
-      await validateOrReject(snapshotDto);
-      const snapshot = plainToInstance(Snapshots, snapshotDto);
-      const result = await this.snapshotRepository.save(snapshot);
-      if (result) {
-        return 'Record is inserted successfully.';
-      }
-    } catch (error) {
-      throw new Error('Failed to insert snapshot.');
     }
   }
 

@@ -4,6 +4,8 @@ import { SiteDocs } from '../../entities/siteDocs.entity';
 import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { DocumentDto } from '../../dto/document.dto';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Injectable()
 export class DocumentService {
@@ -19,6 +21,8 @@ export class DocumentService {
    * @throws Error if there is an issue retrieving the data.
    */
   async getSiteDocumentsBySiteId(siteId: string) {
+    sitesLogger.info('DocumentService.getSiteDocumentsBySiteId() start');
+    sitesLogger.debug('DocumentService.getSiteDocumentsBySiteId() start');
     try {
       // Fetch documents for the given site ID
       const result = await this.siteDocsRepository.find({
@@ -59,8 +63,15 @@ export class DocumentService {
       });
 
       // Convert plain objects to DocumentDto instances
+      sitesLogger.info('DocumentService.getSiteDocumentsBySiteId() end');
+      sitesLogger.debug('DocumentService.getSiteDocumentsBySiteId() end');
       return plainToInstance(DocumentDto, response);
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in DocumentService.getSiteDocumentsBySiteId() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       // Provide more context in the error message
       throw new Error('Failed to retrieve site documents by site id.');
     }

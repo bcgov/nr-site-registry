@@ -9,6 +9,8 @@ import {
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { DropdownService } from '../../services/dropdown/dropdown.service';
 import { CustomRoles } from '../../common/role';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Resolver(() => DropdownDto)
 export class DropdownResolver {
@@ -32,8 +34,10 @@ export class DropdownResolver {
   })
   @Query(() => DropdownResponse, { name: 'getParticipantRoleCd' })
   async getParticipantRoleCd() {
+    sitesLogger.info('DropdownResolver.getParticipantRoleCd() start');
     const result = await this.dropdownService.getParticipantRoleCd();
     if (result.length > 0) {
+      sitesLogger.info('DropdownResolver.getParticipantRoleCd() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Participants role code fetched successfully',
         200,
@@ -41,6 +45,7 @@ export class DropdownResolver {
         result,
       );
     } else {
+      sitesLogger.info('DropdownResolver.getParticipantRoleCd() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Participants role code not found`,
         404,
@@ -65,12 +70,14 @@ export class DropdownResolver {
     @Args('entityType', { type: () => String, nullable: true })
     entityType?: string,
   ) {
+    sitesLogger.info('DropdownResolver.getPeopleOrgsCd() start');
     try {
       const result = await this.dropdownService.getPeopleOrgsCd(
         searchParam,
         entityType,
       );
       if (result && result.length > 0) {
+        sitesLogger.info('DropdownResolver.getPeopleOrgsCd() RES:200 end');
         return this.genericResponseProvider.createResponse(
           'People Organization fetched successfully',
           200,
@@ -78,6 +85,7 @@ export class DropdownResolver {
           result,
         );
       } else {
+        sitesLogger.info('DropdownResolver.getPeopleOrgsCd() RES:404 end');
         return this.genericResponseProvider.createResponse(
           `People Organization not found`,
           404,
@@ -85,6 +93,11 @@ export class DropdownResolver {
         );
       }
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in DropdownResolver.getPeopleOrgsCd() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       return this.genericResponseProvider.createResponse(
         'Failed to fetch People Organization',
         500,
@@ -103,8 +116,10 @@ export class DropdownResolver {
   })
   @Query(() => DropdownResponseWithMetaData, { name: 'getNotationTypeCd' })
   async getNotationTypeCd() {
+    sitesLogger.info('DropdownResolver.getNotationTypeCd() start');
     const result = await this.dropdownService.getNotationTypeCd();
     if (result.length > 0) {
+      sitesLogger.info('DropdownResolver.getNotationTypeCd() RES:200 end');
       return this.genericResponseProviderNotation.createResponse(
         'Notation Type fetched successfully',
         200,
@@ -112,6 +127,7 @@ export class DropdownResolver {
         result,
       );
     } else {
+      sitesLogger.info('DropdownResolver.getNotationTypeCd() RES:404 end');
       return this.genericResponseProviderNotation.createResponse(
         `Notation Type not found`,
         404,
@@ -130,8 +146,10 @@ export class DropdownResolver {
   })
   @Query(() => DropdownResponse, { name: 'getNotationClassCd' })
   async getNotationClassCd() {
+    sitesLogger.info('DropdownResolver.getNotationClassCd() start');
     const result = await this.dropdownService.getNotationClassCd();
     if (result.length > 0) {
+      sitesLogger.info('DropdownResolver.getNotationClassCd() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Notation Class fetched successfully',
         200,
@@ -139,6 +157,7 @@ export class DropdownResolver {
         result,
       );
     } else {
+      sitesLogger.info('DropdownResolver.getNotationClassCd() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Notation Class not found`,
         404,
@@ -157,8 +176,12 @@ export class DropdownResolver {
   })
   @Query(() => DropdownResponse, { name: 'getNotationParticipantRoleCd' })
   async getNotationParticipantRoleCd() {
+    sitesLogger.info('DropdownResolver.getNotationParticipantRoleCd() start');
     const result = await this.dropdownService.getNotationParticipantRoleCd();
     if (result.length > 0) {
+      sitesLogger.info(
+        'DropdownResolver.getNotationParticipantRoleCd() RES:200 end',
+      );
       return this.genericResponseProvider.createResponse(
         'Notation Paticipant Role fetched successfully',
         200,
@@ -166,6 +189,9 @@ export class DropdownResolver {
         result,
       );
     } else {
+      sitesLogger.info(
+        'DropdownResolver.getNotationParticipantRoleCd() RES:404 end',
+      );
       return this.genericResponseProvider.createResponse(
         `Notation Paticipant Role not found`,
         404,

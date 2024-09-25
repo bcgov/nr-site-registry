@@ -10,6 +10,8 @@ import {
   AssociatedSiteResponse,
 } from '../../dto/associatedSite.dto';
 import { CustomRoles } from '../../common/role';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Resolver(() => SiteAssocs)
 export class AssociatedSiteResolver {
@@ -33,9 +35,17 @@ export class AssociatedSiteResolver {
   async getAssociatedSitesBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
   ) {
+    sitesLogger.info(
+      'AssociatedSiteResolver.getAssociatedSitesBySiteId() start siteID:' +
+        ' ' +
+        siteId,
+    );
     const result =
       await this.associatedSiteService.getAssociatedSitesBySiteId(siteId);
     if (result && result.length > 0) {
+      sitesLogger.info(
+        'AssociatedSiteResolver.getAssociatedSitesBySiteId() RES:200 end',
+      );
       return this.genericResponseProvider.createResponse(
         'Associated sites fetched successfully',
         200,
@@ -43,6 +53,9 @@ export class AssociatedSiteResolver {
         result,
       );
     } else {
+      sitesLogger.info(
+        'AssociatedSiteResolver.getAssociatedSitesBySiteId()  RES:404 end',
+      );
       return this.genericResponseProvider.createResponse(
         `Associated sites data not found for site id: ${siteId}`,
         404,

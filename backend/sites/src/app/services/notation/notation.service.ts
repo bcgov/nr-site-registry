@@ -7,6 +7,8 @@ import { plainToInstance } from 'class-transformer';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { EventPartics } from '../../entities/eventPartics.entity';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Injectable()
 export class NotationService {
@@ -25,6 +27,8 @@ export class NotationService {
    * @throws Error if there's an issue retrieving the data.
    */
   async getSiteNotationBySiteId(siteId: string) {
+    sitesLogger.info('NotationService.getSiteNotationBySiteId() start');
+    sitesLogger.debug('NotationService.getSiteNotationBySiteId() start');
     try {
       // Retrieve events associated with the given siteId
       const events = await this.notationRepository.find({ where: { siteId } });
@@ -89,10 +93,17 @@ export class NotationService {
           };
         });
 
+        sitesLogger.info('NotationService.getSiteNotationBySiteId() end');
+        sitesLogger.debug('NotationService.getSiteNotationBySiteId() end');
         // Transform plain objects into NotationDto instances
         return plainToInstance(NotationDto, transformedObjects);
       }
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in NotationService.getSiteNotationBySiteId() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       // Handle or log the error as needed
       throw new Error(`Failed to get site notation.`);
     }

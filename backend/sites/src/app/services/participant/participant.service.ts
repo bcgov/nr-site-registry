@@ -6,6 +6,9 @@ import { SitePartics } from '../../entities/sitePartics.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid'; // Import uuid function for generating unique IDs
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
+
 @Injectable()
 export class ParticipantService {
   constructor(
@@ -21,6 +24,8 @@ export class ParticipantService {
    * @throws Error if there is an issue retrieving the data.
    */
   async getSiteParticipantsBySiteId(siteId: string): Promise<SiteParticsDto[]> {
+    sitesLogger.info('ParticipantService.getSiteParticipantsBySiteId() start');
+    sitesLogger.debug('ParticipantService.getSiteParticipantsBySiteId() start');
     try {
       // Fetch site participants based on the given siteId
       const result = await this.siteParticsRepository.find({
@@ -48,8 +53,17 @@ export class ParticipantService {
       );
 
       // Convert the transformed objects into DTOs
-      return plainToInstance(SiteParticsDto, transformedObjects);
+      const sitePartics = plainToInstance(SiteParticsDto, transformedObjects);
+
+      sitesLogger.info('ParticipantService.getSiteParticipantsBySiteId() end');
+      sitesLogger.debug('ParticipantService.getSiteParticipantsBySiteId() end');
+      return sitePartics;
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in ParticipantService.getSiteParticipantsBySiteId() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       // Log or handle the error as necessary
       throw new Error(
         `Failed to retrieve site participants by siteId: ${error.message}`,

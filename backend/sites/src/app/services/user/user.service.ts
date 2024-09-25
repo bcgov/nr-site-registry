@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../entities/user.entity';
 import { Repository } from 'typeorm';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Injectable()
 export class UserService {
@@ -17,6 +19,8 @@ export class UserService {
     firstName: string,
     lastName: string,
   ) {
+    sitesLogger.info('UserService.createUserIfNotFound() start');
+    //sitesLogger.debug('UserService.createUserIfNotFound() start')
     try {
       let user = await this.usersRepository.findOne({ where: { email } });
       const whoCreated = 'system';
@@ -31,12 +35,19 @@ export class UserService {
           whoCreated,
           whenCreated,
         });
+        sitesLogger.info('UserService.createUserIfNotFound() end');
+        //sitesLogger.debug('UserService.createUserIfNotFound() end')
         return this.usersRepository.save(user);
       } else {
-        console.log('User already exits', user.userId);
+        sitesLogger.info('User already exits', user.userId);
       }
     } catch (error) {
-      console.log('Error in createUserIfNotFound ', error);
+      sitesLogger.error(
+        'Exception occured in UserService.createUserIfNotFound() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
+      throw error;
     }
   }
 }

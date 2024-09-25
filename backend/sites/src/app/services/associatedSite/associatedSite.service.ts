@@ -5,6 +5,8 @@ import { plainToInstance } from 'class-transformer';
 import { v4 } from 'uuid';
 import { SiteAssocs } from '../../entities/siteAssocs.entity';
 import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Injectable()
 export class AssociatedSiteService {
@@ -24,6 +26,12 @@ export class AssociatedSiteService {
     siteId: string,
   ): Promise<AssociatedSiteDto[]> {
     try {
+      sitesLogger.info(
+        'AssociatedSiteService.getAssociatedSitesBySiteId() start',
+      );
+      sitesLogger.debug(
+        'AssociatedSiteService.getAssociatedSitesBySiteId() start',
+      );
       // Fetch associated sites based on the provided siteId
       const result = await this.assocSiteRepository.find({
         where: { siteId },
@@ -40,8 +48,20 @@ export class AssociatedSiteService {
       }));
 
       // Convert the transformed objects into DTOs
-      return plainToInstance(AssociatedSiteDto, transformedObjects);
+      const siteAssocs = plainToInstance(AssociatedSiteDto, transformedObjects);
+      sitesLogger.info(
+        'AssociatedSiteService.getAssociatedSitesBySiteId() end',
+      );
+      sitesLogger.debug(
+        'AssociatedSiteService.getAssociatedSitesBySiteId() end',
+      );
+      return siteAssocs;
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in AssociatedSiteService.getAssociatedSitesBySiteId() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       // Log or handle the error as necessary
       throw new Error(
         `Failed to retrieve associated sites by site ID: ${siteId}`,

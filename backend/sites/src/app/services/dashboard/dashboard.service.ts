@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { RecentViews } from '../../entities/recentViews.entity';
 import { RecentViewDto } from '../../dto/recentView.dto';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Injectable()
 export class DashboardService {
@@ -20,6 +22,8 @@ export class DashboardService {
    * @throws Error if there is an issue retrieving the data.
    */
   async getRecentViewsByUserId(userId: string): Promise<RecentViews[]> {
+    sitesLogger.info('DashboardService.getRecentViewsByUserId() start');
+    sitesLogger.debug('DashboardService.getRecentViewsByUserId() start');
     try {
       // Fetch recent views based on the provided userId
       const result = await this.recentViewsRepository.find({
@@ -30,8 +34,15 @@ export class DashboardService {
       } else {
         return []; // Return an empty array if no recent views are found
       }
+      sitesLogger.info('DashboardService.getRecentViewsByUserId() end');
+      sitesLogger.debug('DashboardService.getRecentViewsByUserId() end');
     } catch (error) {
       // Log or handle the error as necessary
+      sitesLogger.error(
+        'Exception occured in DashboardService.getRecentViewsByUserId() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw new Error(
         `Failed to retrieve recent views for userId ${userId}: ${error.message}`,
       );
@@ -47,6 +58,8 @@ export class DashboardService {
    * @throws Error if there is an issue inserting or updating the record.
    */
   async addRecentView(recentViewDto: RecentViewDto) {
+    sitesLogger.info('DashboardService.addRecentView() start');
+    sitesLogger.debug('DashboardService.addRecentView() start');
     const { userId, siteId } = recentViewDto;
     const maxRecentViews = 5; // Maximum allowed recent views per user
 
@@ -70,6 +83,8 @@ export class DashboardService {
           await this.recentViewsRepository.save(existingRecentView);
 
         if (result) {
+          sitesLogger.info('DashboardService.addRecentView() end');
+          sitesLogger.debug('DashboardService.addRecentView() end');
           return 'Record is updated successfully.';
         }
       } else {
@@ -91,10 +106,17 @@ export class DashboardService {
         const result = await this.recentViewsRepository.save(newRecentView);
 
         if (result) {
+          sitesLogger.info('DashboardService.addRecentView() end');
+          sitesLogger.debug('DashboardService.addRecentView() end');
           return 'Record is inserted successfully.';
         }
       }
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in DashboardService.addRecentView() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw new Error('Failed to insert or update recent view.');
     }
   }

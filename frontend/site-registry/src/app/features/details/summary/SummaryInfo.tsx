@@ -40,7 +40,7 @@ const SummaryInfo: React.FC<ISummaryInfo> = ({
       secondChild={
         <div className="row w-100">
           <div className="col-12 col-lg-6">
-            <Map callback={() => {}} initLocation={location} readOnly={true} />
+            {/* <Map callback={() => {}} initLocation={location} readOnly={true} /> */}
           </div>
           <div className="col-12 col-lg-6">
             {siteData != null && (

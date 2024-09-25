@@ -227,11 +227,11 @@ const SRUpdates = () => {
         }),
       );
   
-      dispatch(fetchPendingDocumentsForApproval({ siteId, showPending: false }));
+      dispatch(fetchPendingDocumentsForApproval({ siteId, showPending: true }));
   
-      dispatch(fetchPendingSiteDisclosure({ siteId, showPending: false }));
+      dispatch(fetchPendingSiteDisclosure({ siteId, showPending: true }));
   
-      dispatch(fetchPendingAssociatedSites({ siteId, showPending: false }));
+      dispatch(fetchPendingAssociatedSites({ siteId, showPending: true }));
     }
   }, [updateRequestStatusFromState]);
 
@@ -270,11 +270,11 @@ const SRUpdates = () => {
       }),
     );
 
-    dispatch(fetchPendingDocumentsForApproval({ siteId, showPending: false }));
+    dispatch(fetchPendingDocumentsForApproval({ siteId, showPending: true }));
 
-    dispatch(fetchPendingSiteDisclosure({ siteId, showPending: false }));
+    dispatch(fetchPendingSiteDisclosure({ siteId, showPending: true }));
 
-    dispatch(fetchPendingAssociatedSites({ siteId, showPending: false }));
+    dispatch(fetchPendingAssociatedSites({ siteId, showPending: true }));
   }
   }, [siteId]);
 
@@ -407,10 +407,11 @@ const SRUpdates = () => {
         </ApproveReject>
       )}
 
-      <ApproveReject name="Notations">
+      
         {notationData &&
           notationData.map((notation: any, index: number) => {
             return (
+              <ApproveReject name="Notations">
               <Notation
                 index={index}
                 notation={notation}
@@ -436,12 +437,12 @@ const SRUpdates = () => {
                 handleItemClick={handleChange}
                 showApproveRejectSection={true}
               />
+              </ApproveReject>
             );
           })}
-      </ApproveReject>
+      
 
-      <ApproveReject name="Participants">
-        {siteParticipantData && (
+      {siteParticipantData && siteParticipantData.length > 0 && (<ApproveReject name="Participants">        
           <ParticipantTable
             handleTableChange={handleChange}
             handleWidgetCheckBox={handleChange}
@@ -459,13 +460,15 @@ const SRUpdates = () => {
             handleItemClick={handleChange}
             showApproveRejectSection={true}
           />
+          </ApproveReject>
         )}
-      </ApproveReject>
+      
 
-      <ApproveReject name="Documents">
+     
         {documentsData &&
           documentsData.map((document: any, index: number) => {
             return (
+              <ApproveReject name="Documents">
               <Document
                 index={index}
                 userType={UserType.Internal}
@@ -484,11 +487,12 @@ const SRUpdates = () => {
                 internalRow={documentFormRows}
                 showApproveRejectSection={true}
               />
+               </ApproveReject>
             );
           })}
-      </ApproveReject>
+     
 
-      {associatedSitesData && (
+      {associatedSitesData && associatedSitesData.length > 0 && (
         <ApproveReject name="Site Associations">
           <AssociateSiteComponent
             handleTableChange={handleChange}
@@ -522,7 +526,7 @@ const SRUpdates = () => {
         </ApproveReject>
       )}
 
-      <ApproveReject name="Parcel Description">pending</ApproveReject>
+      {/* <ApproveReject name="Parcel Description">pending</ApproveReject> */}
 
       {disclosureData && (
         <ApproveReject name="Disclosure">
@@ -553,19 +557,6 @@ const SRUpdates = () => {
         </ApproveReject>
       )}
 
-      
-
-
-      {
-        //  <Summary></Summary>
-        // <Notations showPending={true}/>
-        // <Participants showPending={true}/>
-        // <Documents showPending={true}/>
-        // <Associate showPending={true}/>
-        // <LandUses showPending={true}/>
-        // <Disclosure showPending={true}/>
-        //
-      }
     </div>
   );
 };

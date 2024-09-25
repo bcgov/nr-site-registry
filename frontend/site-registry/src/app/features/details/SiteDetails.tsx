@@ -58,6 +58,7 @@ import {
   addSiteToFolioRequest,
   fetchFolioItems,
   folioItems,
+  resetFolioItemAddedStatus,
 } from '../folios/redux/FolioSlice';
 import { Folio, FolioContentDTO } from '../folios/dto/Folio';
 import {
@@ -86,6 +87,7 @@ import {
   setupSiteIdForSaving,
 } from './SaveSiteDetailsSlice';
 import { fetchAssociatedSites } from './associates/AssociateSlice';
+import { updateRequestStatus } from './srUpdates/srUpdatesSlice';
 
 const SiteDetails = () => {
   const [navItems, SetNavItems] = useState<string[]|undefined>();
@@ -121,11 +123,15 @@ const SiteDetails = () => {
   };
 
   useEffect(() => {
+    if(addSiteToFolioRequestStatus === RequestStatus.success)
+    {
+      //dispatch(resetFolioItemAddedStatus(null));
     showNotification(
       addSiteToFolioRequestStatus,
       'Successfully added site to folio',
       'Unable to add to folio',
     );
+  }
   }, [addSiteToFolioRequestStatus]);
 
   const folioDropdown: IFormField = {
@@ -163,6 +169,8 @@ const SiteDetails = () => {
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
+
+  const srUpdateRequestStatus = useSelector(updateRequestStatus);
 
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
 
@@ -263,6 +271,25 @@ const SiteDetails = () => {
         });
     }
   }, [id]);
+
+
+  useEffect(()=>{
+    if(srUpdateRequestStatus === RequestStatus.success)
+    {
+      if (id) {        
+        Promise.all([
+          dispatch(fetchSitesDetails({ siteId: id ?? '', showPending :false })),       
+      
+        ])
+          .then(() => {
+            setIsLoading(false); // Set loading state to false after all API calls are resolved
+          })
+          .catch((error) => {
+            console.error('Error fetching data:', error);
+          });
+      }
+    }
+  },[srUpdateRequestStatus])
 
   useEffect(() => {
     if (details && details.id === id) {
@@ -592,7 +619,8 @@ const SiteDetails = () => {
           </div>
         )}
         <div className="section-details-header row">
-          {UserType.External === userType && (
+          {UserType.External === userType && snapshot.status === RequestStatus.success &&
+            snapshot.snapshot.data !== null && (
             <div>
               <BannerDetails
                 snapshotDate={`Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`}

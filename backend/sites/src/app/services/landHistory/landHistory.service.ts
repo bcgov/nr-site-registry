@@ -131,7 +131,7 @@ export class LandHistoryService {
       return updatedRecords;
     } catch (e) {
       console.log('Error updating land histories', e);
-      return [];
+      throw e;
     }
   }
 }

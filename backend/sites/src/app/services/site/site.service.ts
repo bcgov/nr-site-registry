@@ -19,6 +19,8 @@ import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { Subdivisions } from '../../entities/subdivisions.entity';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
+import { LandHistoryService } from '../landHistory/landHistory.service';
+import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { LoggerService } from 'src/app/logger/logger.service';
 
@@ -50,6 +52,9 @@ export class SiteService {
     private readonly entityManager: EntityManager,
     @InjectRepository(HistoryLog)
     private historyLogRepository: Repository<HistoryLog>,
+
+    private readonly landHistoryService: LandHistoryService,
+    private transactionManagerService: TransactionManagerService,
     private readonly sitesLogger: LoggerService,
   ) {}
 
@@ -302,6 +307,7 @@ export class SiteService {
         return false;
       } else {
         const {
+          siteId,
           sitesSummary,
           events,
           eventsParticipants,
@@ -314,6 +320,10 @@ export class SiteService {
 
         const transactionResult = await this.entityManager.transaction(
           async (transactionalEntityManager: EntityManager) => {
+            this.transactionManagerService.setEntityManager(
+              transactionalEntityManager,
+            );
+
             try {
               if (sitesSummary) {
                 await transactionalEntityManager.save(Sites, sitesSummary);
@@ -368,9 +378,10 @@ export class SiteService {
               }
 
               if (landHistories) {
-                await transactionalEntityManager.save(
-                  LandHistories,
+                await this.landHistoryService.updateLandHistoriesForSite(
+                  siteId,
                   landHistories,
+                  userInfo,
                 );
               } else {
                 console.log('No changes To Site LandHistories');

@@ -384,6 +384,7 @@ export class SiteService {
                 await this.landHistoryService.updateLandHistoriesForSite(
                   siteId,
                   landHistories,
+                  userInfo,
                 );
               } else {
                 console.log('No changes To Site LandHistories');

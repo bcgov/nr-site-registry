@@ -98,6 +98,7 @@ describe('LandHistoryService', () => {
       await landHistoryService.updateLandHistoriesForSite(
         siteId,
         landHistoriesInput,
+        mockUser,
       );
 
       expect(entityManagerMock.save).toHaveBeenCalledWith(
@@ -134,6 +135,7 @@ describe('LandHistoryService', () => {
       await landHistoryService.updateLandHistoriesForSite(
         siteId,
         landHistoriesInput,
+        mockUser,
       );
 
       expect(entityManagerMock.update).toHaveBeenCalledWith(
@@ -166,6 +168,7 @@ describe('LandHistoryService', () => {
       await landHistoryService.updateLandHistoriesForSite(
         siteId,
         landHistoriesInput,
+        mockUser,
       );
 
       expect(entityManagerMock.delete).toHaveBeenCalledWith(LandHistories, {

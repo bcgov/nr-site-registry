@@ -27,9 +27,8 @@ const initialState: SaveSiteDetails = {
 
 export const saveSiteDetails = createAsyncThunk(
   'saveSiteDetails',
-  async (siteId: string, { getState }) => {
+  async (_, { getState }) => {
     const saveDTO = getSiteDetailsToBeSaved(getState());
-    saveDTO.siteId = siteId;
     const request = await getAxiosInstance().post(GRAPHQL, {
       query: print(updateSiteDetails()),
       variables: {

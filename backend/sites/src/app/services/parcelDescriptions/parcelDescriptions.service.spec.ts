@@ -1,11 +1,15 @@
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ParcelDescriptionsService } from './parcelDescriptions.service';
+import { getInternalUserQueries } from './parcelDescriptions.queryBuilder';
+
+jest.mock('./parcelDescriptions.queryBuilder');
 
 describe('SiteSubdivisionsService', () => {
   let siteSubdivisionService: ParcelDescriptionsService;
   let entityManager: EntityManager;
   let queryMock: jest.Mock;
+  let getInternalUserQueriesMock: jest.Mock;
 
   let siteId: number;
   let page: number;
@@ -13,6 +17,11 @@ describe('SiteSubdivisionsService', () => {
   let searchParam: string;
   let sortBy: string;
   let sortByDir: string;
+
+  let queryText: string;
+  let queryParams: string[];
+  let countQueryText: string;
+  let countQueryParams: string[];
 
   let returnCount: number;
   let returnId: number;
@@ -31,6 +40,11 @@ describe('SiteSubdivisionsService', () => {
     searchParam = 'searchParam';
     sortBy = 'date_noted';
     sortByDir = 'DESC';
+
+    queryText = 'query';
+    queryParams = ['queryParam1', 'queryParam2', 'queryParam3', 'queryParam4'];
+    countQueryText = 'countQuery';
+    countQueryParams = ['countQueryParam1', 'countQueryParam2'];
 
     returnCount = 1;
     returnId = 1;
@@ -59,6 +73,14 @@ describe('SiteSubdivisionsService', () => {
     );
     entityManager = testingModule.get<EntityManager>(EntityManager);
 
+    getInternalUserQueriesMock = jest
+      .mocked(getInternalUserQueries)
+      .mockReturnValue([
+        queryText,
+        queryParams,
+        countQueryText,
+        countQueryParams,
+      ]);
     queryMock = jest
       .fn()
       .mockReturnValueOnce([{ count: returnCount }])
@@ -90,75 +112,12 @@ describe('SiteSubdivisionsService', () => {
         sortByDir,
       );
 
+      expect(getInternalUserQueriesMock).toHaveBeenCalled();
       expect(queryMock).toHaveBeenCalledTimes(2);
       expect(queryMock).toHaveBeenNthCalledWith(
         1,
-        expect.stringMatching(/.*COUNT.*/),
-        expect.anything(),
-      );
-    });
-
-    it('Does not sort the count query.', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        1,
-        expect.stringMatching(/.*(?!OFFSET).*/),
-        expect.anything(),
-      );
-      expect(queryMock).toHaveBeenNthCalledWith(
-        1,
-        expect.stringMatching(/.*(?!LIMIT).*/),
-        expect.anything(),
-      );
-    });
-
-    it('Does not page the count query.', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        1,
-        expect.stringMatching(/.*(?!OFFSET).*/),
-        expect.anything(),
-      );
-    });
-
-    it('Passes in the site id and search param for the count query.', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        1,
-        expect.anything(),
-        expect.arrayContaining([String(siteId)]),
-      );
-      expect(queryMock).toHaveBeenNthCalledWith(
-        1,
-        expect.anything(),
-        expect.arrayContaining([searchParam]),
+        countQueryText,
+        countQueryParams,
       );
     });
 
@@ -172,88 +131,9 @@ describe('SiteSubdivisionsService', () => {
         sortByDir,
       );
 
+      expect(getInternalUserQueriesMock).toHaveBeenCalled();
       expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(/.*(?!COUNT).*/),
-        expect.anything(),
-      );
-    });
-
-    it('Sorts the main query', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(
-          new RegExp(`ORDER BY parcel_descriptions.${sortBy} ${sortByDir}`),
-        ),
-        expect.anything(),
-      );
-    });
-
-    it('Pages the main query', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(/.*OFFSET.*/),
-        expect.anything(),
-      );
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(/.*LIMIT.*/),
-        expect.anything(),
-      );
-    });
-
-    it('Passes the site id, search param, and paging paramters to the main query', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.anything(),
-        expect.arrayContaining([String(siteId)]),
-      );
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.anything(),
-        expect.arrayContaining([searchParam]),
-      );
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.anything(),
-        expect.arrayContaining([String((page - 1) * pageSize)]),
-      );
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.anything(),
-        expect.arrayContaining([String(pageSize)]),
-      );
+      expect(queryMock).toHaveBeenNthCalledWith(2, queryText, queryParams);
     });
 
     it('returns the correct results.', async () => {
@@ -284,54 +164,6 @@ describe('SiteSubdivisionsService', () => {
           httpStatusCode: 200,
           message: 'Parcel Descriptions fetched successfully.',
         }),
-      );
-    });
-  });
-
-  describe('when the sortParam is invalid', () => {
-    it('defaults to sorting by id', async () => {
-      sortBy = 'invalid_parameter';
-
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(
-          new RegExp(`ORDER BY parcel_descriptions.id ${sortByDir}`),
-        ),
-        expect.anything(),
-      );
-    });
-  });
-
-  describe('when the sortDir is invalid', () => {
-    it('defaults to ascending', async () => {
-      sortByDir = 'turnwise';
-
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(
-          new RegExp(`ORDER BY parcel_descriptions.${sortBy} ASC`),
-        ),
-        expect.anything(),
       );
     });
   });

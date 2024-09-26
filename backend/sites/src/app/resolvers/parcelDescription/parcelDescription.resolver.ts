@@ -4,6 +4,7 @@ import { Subdivisions } from '../../entities/subdivisions.entity';
 import { ParcelDescriptionsService } from '../../services/parcelDescriptions/parcelDescriptions.service';
 import { CustomRoles } from '../../common/role';
 import { ParcelDescriptionsResponse } from '../../dto/parcelDescription.dto';
+import { LoggerService } from '../../logger/logger.service';
 
 /**
  * Resolver for Parcel Description
@@ -13,6 +14,7 @@ import { ParcelDescriptionsResponse } from '../../dto/parcelDescription.dto';
 export class ParcelDescriptionResolver {
   constructor(
     private readonly parcelDescriptionService: ParcelDescriptionsService,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   /**
@@ -40,6 +42,11 @@ export class ParcelDescriptionResolver {
     @Args('sortBy', { type: () => String }) sortBy: string,
     @Args('sortByDir', { type: () => String }) sortByDir: string,
   ) {
+    this.sitesLogger.log(
+      'ParcelDescriptionResolver.getParcelDescriptionsBySiteId() start siteID:' +
+        ' ' +
+        siteId,
+    );
     const response =
       await this.parcelDescriptionService.getParcelDescriptionsBySiteId(
         siteId,
@@ -49,6 +56,10 @@ export class ParcelDescriptionResolver {
         sortBy,
         sortByDir,
       );
+
+    this.sitesLogger.log(
+      'ParcelDescriptionResolver.getParcelDescriptionsBySiteId() end',
+    );
 
     return response;
   }

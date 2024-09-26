@@ -3,11 +3,13 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { ParcelDescriptionDto } from '../../dto/parcelDescription.dto';
 import { GenericPagedResponse } from '../../dto/response/genericResponse';
+import { LoggerService } from 'src/app/logger/logger.service';
 
 @Injectable()
 export class ParcelDescriptionsService {
   constructor(
     @InjectEntityManager() private readonly entityManager: EntityManager,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   /**
@@ -28,6 +30,12 @@ export class ParcelDescriptionsService {
     sortParam: string,
     sortDir: string,
   ): Promise<GenericPagedResponse<ParcelDescriptionDto[]>> {
+    this.sitesLogger.log(
+      'ParcelDescriptionsService.getParcelDescriptionsBySiteId() start',
+    );
+    this.sitesLogger.debug(
+      'ParcelDescriptionsService.getParcelDescriptionsBySiteId() start',
+    );
     // Sanitize the query parameters.
     const filterTerm = searchParam ? searchParam : '';
     const orderBy = [
@@ -105,8 +113,8 @@ export class ParcelDescriptionsService {
     let rawResults: any;
     let results: ParcelDescriptionDto[] = [];
     let count: number;
-    let responsePage = page;
-    let responsePageSize = pageSize;
+    const responsePage = page;
+    const responsePageSize = pageSize;
 
     try {
       countResult = await this.entityManager.query(
@@ -116,6 +124,10 @@ export class ParcelDescriptionsService {
       rawResults = await this.entityManager.query(query, queryParams);
       count = countResult.length > 0 ? countResult[0]?.count : 0;
     } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in ParcelDescriptionsService.getParcelDescriptionsBySiteId() end',
+        JSON.stringify(error),
+      );
       return new GenericPagedResponse<ParcelDescriptionDto[]>(
         'There was an error communicating with the database. Try again later.',
         500,
@@ -136,6 +148,13 @@ export class ParcelDescriptionsService {
         rawResult.land_description,
       );
     });
+
+    this.sitesLogger.log(
+      'ParcelDescriptionsService.getParcelDescriptionsBySiteId() end',
+    );
+    this.sitesLogger.debug(
+      'ParcelDescriptionsService.getParcelDescriptionsBySiteId() end',
+    );
 
     return new GenericPagedResponse<ParcelDescriptionDto[]>(
       'Parcel Descriptions fetched successfully.',

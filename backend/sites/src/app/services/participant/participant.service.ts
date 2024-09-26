@@ -5,15 +5,13 @@ import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { SitePartics } from '../../entities/sitePartics.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid'; // Import uuid function for generating unique IDs
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
-
+import { LoggerService } from 'src/app/logger/logger.service';
 @Injectable()
 export class ParticipantService {
   constructor(
     @InjectRepository(SitePartics)
     private readonly siteParticsRepository: Repository<SitePartics>,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   /**
@@ -24,8 +22,12 @@ export class ParticipantService {
    * @throws Error if there is an issue retrieving the data.
    */
   async getSiteParticipantsBySiteId(siteId: string): Promise<SiteParticsDto[]> {
-    sitesLogger.info('ParticipantService.getSiteParticipantsBySiteId() start');
-    sitesLogger.debug('ParticipantService.getSiteParticipantsBySiteId() start');
+    this.sitesLogger.log(
+      'ParticipantService.getSiteParticipantsBySiteId() start',
+    );
+    this.sitesLogger.debug(
+      'ParticipantService.getSiteParticipantsBySiteId() start',
+    );
     try {
       // Fetch site participants based on the given siteId
       const result = await this.siteParticsRepository.find({
@@ -55,14 +57,17 @@ export class ParticipantService {
       // Convert the transformed objects into DTOs
       const sitePartics = plainToInstance(SiteParticsDto, transformedObjects);
 
-      sitesLogger.info('ParticipantService.getSiteParticipantsBySiteId() end');
-      sitesLogger.debug('ParticipantService.getSiteParticipantsBySiteId() end');
+      this.sitesLogger.log(
+        'ParticipantService.getSiteParticipantsBySiteId() end',
+      );
+      this.sitesLogger.debug(
+        'ParticipantService.getSiteParticipantsBySiteId() end',
+      );
       return sitePartics;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in ParticipantService.getSiteParticipantsBySiteId() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in ParticipantService.getSiteParticipantsBySiteId() end',
+        JSON.stringify(error),
       );
       // Log or handle the error as necessary
       throw new Error(

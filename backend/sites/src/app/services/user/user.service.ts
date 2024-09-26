@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../entities/user.entity';
 import { Repository } from 'typeorm';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from 'src/app/logger/logger.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   async createUserIfNotFound(
@@ -19,8 +19,8 @@ export class UserService {
     firstName: string,
     lastName: string,
   ) {
-    sitesLogger.info('UserService.createUserIfNotFound() start');
-    //sitesLogger.debug('UserService.createUserIfNotFound() start')
+    this.sitesLogger.log('UserService.createUserIfNotFound() start');
+    this.sitesLogger.debug('UserService.createUserIfNotFound() start');
     try {
       let user = await this.usersRepository.findOne({ where: { email } });
       const whoCreated = 'system';
@@ -35,17 +35,16 @@ export class UserService {
           whoCreated,
           whenCreated,
         });
-        sitesLogger.info('UserService.createUserIfNotFound() end');
-        //sitesLogger.debug('UserService.createUserIfNotFound() end')
+        this.sitesLogger.log('UserService.createUserIfNotFound() end');
+        this.sitesLogger.debug('UserService.createUserIfNotFound() end');
         return this.usersRepository.save(user);
       } else {
-        sitesLogger.info('User already exits', user.userId);
+        this.sitesLogger.log('User already exits userid:' + user.userId);
       }
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in UserService.createUserIfNotFound() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in UserService.createUserIfNotFound() end',
+        JSON.stringify(error),
       );
       throw error;
     }

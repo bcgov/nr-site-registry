@@ -7,8 +7,7 @@ import { RecentViewDto, RecentViewResponse } from '../../dto/recentView.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { CustomRoles } from '../../common/role';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => RecentViews)
 export class DashboardResolver {
@@ -17,6 +16,7 @@ export class DashboardResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       RecentViews[]
     >,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   @Roles({
@@ -32,12 +32,12 @@ export class DashboardResolver {
   async getRecentViewsByUserId(
     @Args('userId', { type: () => String }) userId: string,
   ) {
-    sitesLogger.info(
+    this.sitesLogger.log(
       'DashboardResolver.getRecentViewsByUserId() start userId:' + ' ' + userId,
     );
     const result = await this.dashboardService.getRecentViewsByUserId(userId);
     if (result.length > 0) {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'DashboardResolver.getRecentViewsByUserId() RES:200 end',
       );
       return this.genericResponseProvider.createResponse(
@@ -47,7 +47,7 @@ export class DashboardResolver {
         result,
       );
     } else {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'DashboardResolver.getRecentViewsByUserId() RES:404 end',
       );
       return this.genericResponseProvider.createResponse(
@@ -72,7 +72,7 @@ export class DashboardResolver {
     @Args('recentView', { type: () => RecentViewDto }, new ValidationPipe())
     recentView: RecentViewDto,
   ) {
-    sitesLogger.info(
+    this.sitesLogger.log(
       'DashboardResolver.addRecentView() start recentViewDTO:' +
         ' ' +
         JSON.stringify(RecentViewDto),
@@ -80,10 +80,10 @@ export class DashboardResolver {
     const message = await this.dashboardService.addRecentView(recentView);
 
     if (message) {
-      sitesLogger.info('DashboardResolver.addRecentView() RES:201 end');
+      this.sitesLogger.log('DashboardResolver.addRecentView() RES:201 end');
       return this.genericResponseProvider.createResponse(message, 201, true);
     } else {
-      sitesLogger.info('DashboardResolver.addRecentView() RES:404 end');
+      this.sitesLogger.log('DashboardResolver.addRecentView() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Recent views failed to insert or update recent view. `,
         400,

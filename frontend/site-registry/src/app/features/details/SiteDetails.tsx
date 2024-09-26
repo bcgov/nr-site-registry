@@ -587,16 +587,19 @@ const SiteDetails = () => {
           </div>
         )}
         <div className="section-details-header row">
-          {UserType.External === userType &&
-            snapshot.status === RequestStatus.success &&
-            snapshot.snapshot.data !== null && (
-              <div>
-                <BannerDetails
-                  bannerType={bannerType}
-                  snapshotDate={`Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`}
-                />
-              </div>
-            )}
+          {UserType.External === userType && (
+            <div>
+              <BannerDetails
+                bannerType={bannerType}
+                snapshotDate={
+                  snapshot.status === RequestStatus.success &&
+                  snapshot.snapshot.data !== null
+                    ? `Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`
+                    : ''
+                }
+              />
+            </div>
+          )}
 
           {!isVisible && (
             <>

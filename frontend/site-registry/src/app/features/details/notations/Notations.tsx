@@ -61,9 +61,9 @@ import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
 import GetNotationConfig from './NotationsConfig';
 import infoIcon from '../../../images/info-icon.png';
 import {
+  getSiteNoatations,
   saveRequestStatus,
   setupNotationDataForSaving,
-  trackSiteNotation,
 } from '../SaveSiteDetailsSlice';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
@@ -90,7 +90,7 @@ const Notations = () => {
   const loggedInUser = getUser();
   const resetDetails = useSelector(resetSiteDetails);
   const { id: siteId } = useParams();
-  const trackNotation = useSelector(trackSiteNotation);
+  const trackNotation = useSelector(getSiteNoatations);
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
 
   const [userType, setUserType] = useState('');

@@ -50,9 +50,9 @@ import infoIcon from '../../../images/info-icon.png';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { GetDocumentsConfig } from './DocumentsConfig';
 import {
+  getSiteDocuments,
   saveRequestStatus,
   setupDocumentsDataForSaving,
-  trackSiteDocuments,
 } from '../SaveSiteDetailsSlice';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { UserActionEnum } from '../../../common/userActionEnum';
@@ -69,7 +69,7 @@ const Documents = () => {
   const mode = useSelector(siteDetailsMode);
   const resetDetails = useSelector(resetSiteDetails);
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
-  const trackDocuments = useSelector(trackSiteDocuments);
+  const trackDocuments = useSelector(getSiteDocuments);
   const dispatch = useDispatch<AppDispatch>();
 
   const [userType, setUserType] = useState<UserType>(UserType.External);
@@ -91,11 +91,10 @@ const Documents = () => {
   const [externalRow, setExternalRow] = useState(
     documentFirstChildFormRowsForExternal,
   );
-  const [searchSiteParticipant, setSearchSiteParticipant] = useState('');
+  const [searchAuthors, setSearchAuthors] = useState('');
   const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
-  const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 
-  // Function to fetch notation participant
+  // Function to fetch author
   const fetchAuthors = useCallback(async (searchParam: string) => {
     if (searchParam.trim()) {
       try {
@@ -115,7 +114,7 @@ const Documents = () => {
           return response.data.data.getPeopleOrgsCd;
         }
       } catch (error) {
-        console.error('Error fetching notation participant:', error);
+        console.error('Error fetching author:', error);
         return [];
       }
     }
@@ -125,7 +124,7 @@ const Documents = () => {
   // Handle search action
   const handleSearch = useCallback(
     (value: any) => {
-      setSearchSiteParticipant(value.trim());
+      setSearchAuthors(value.trim());
       setInternalRow((prev) =>
         updateFields(prev, {
           indexToUpdate: prev.findIndex((row) =>
@@ -155,7 +154,7 @@ const Documents = () => {
         ).values(),
       );
       setOptions(uniquePsnOrgs);
-
+      console.log(siteDocuments);
       setInternalRow((prev) =>
         updateFields(prev, {
           indexToUpdate: prev.findIndex((row) =>
@@ -188,11 +187,11 @@ const Documents = () => {
     }
   }, [siteDocuments, status]);
 
-  // Search participant effect with debounce
+  // Search author effect with debounce
   useEffect(() => {
-    if (searchSiteParticipant) {
+    if (searchAuthors) {
       const timeoutId = setTimeout(async () => {
-        const res = await fetchAuthors(searchSiteParticipant);
+        const res = await fetchAuthors(searchAuthors);
         const indexToUpdate = internalRow.findIndex((row) =>
           row.some((field) => field.graphQLPropertyName === 'psnorgId'),
         );
@@ -222,8 +221,7 @@ const Documents = () => {
             updates: {
               isLoading: RequestStatus.success,
               options,
-              filteredOptions:
-                res.data ?? resultCache[searchSiteParticipant] ?? [],
+              filteredOptions: res.data ?? resultCache[searchAuthors] ?? [],
               customInfoMessage: infoMsg,
               handleSearch,
             },
@@ -233,124 +231,9 @@ const Documents = () => {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [searchSiteParticipant, options]);
-
-  // useEffect(() => {
-  //   if (searchSiteParticipant) {
-  //     const timeoutId = setTimeout(async () => {
-  //       try {
-  //         fetchNotationParticipant(searchSiteParticipant).then((res) => {
-  //           const indexToUpdate = documentFormRows.findIndex((row) =>
-  //             row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-  //           );
-
-  //           let infoMsg = <></>;
-  //           if (!res.success) {
-  //             infoMsg = (
-  //               <div className="px-2">
-  //                 <img
-  //                   src={infoIcon}
-  //                   alt="info"
-  //                   aria-hidden="true"
-  //                   role="img"
-  //                   aria-label="User image"
-  //                 />
-  //                 <span
-  //                   aria-label={'info-message'}
-  //                   className="text-wrap px-2 custom-not-found"
-  //                 >
-  //                   No results found.
-  //                 </span>
-  //               </div>
-  //             );
-  //           }
-  //           let params: UpdateDisplayTypeParams = {
-  //             indexToUpdate: indexToUpdate,
-  //             updates: {
-  //               isLoading: RequestStatus.success,
-  //               options: options,
-  //               filteredOptions: res.data,
-  //               customInfoMessage: infoMsg,
-  //               handleSearch: handleSearch,
-  //             },
-  //           };
-
-  //           const indexToUpdateExt =
-  //             documentFirstChildFormRowsForExternal.findIndex((row) =>
-  //               row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-  //             );
-
-  //           let paramsExt: UpdateDisplayTypeParams = {
-  //             indexToUpdate: indexToUpdateExt,
-  //             updates: {
-  //               isLoading: RequestStatus.success,
-  //               options: options,
-  //               filteredOptions: res.data,
-  //               customInfoMessage: infoMsg,
-  //               handleSearch: handleSearch,
-  //             },
-  //           };
-  //           setExternalRow(updateFields(externalRow, paramsExt));
-  //           setInternalRow(updateFields(internalRow, params));
-  //         });
-  //       } catch (error) {
-  //         throw new Error('Invalid searchParam');
-  //       }
-  //     }, 300);
-  //     return () => clearTimeout(timeoutId);
-  //   }
-  // }, [searchSiteParticipant]);
-
-  // useEffect(() => {
-  //   if (status === RequestStatus.success && siteDocuments) {
-  //     // if (siteDocuments) {
-  //     const uniquePsnOrgs: any = Array.from(
-  //       new Map(
-  //         siteDocuments.map((item: any) => [
-  //           item.psnorgId,
-  //           { key: item.psnorgId, value: item.displayName },
-  //         ]),
-  //       ).values(),
-  //     );
-  //     console.log('uniquePsnOrgs --> ', uniquePsnOrgs);
-  //     setOptions(uniquePsnOrgs);
-  //     // Parameters for the update
-  //     let params: UpdateDisplayTypeParams = {
-  //       indexToUpdate: documentFormRows.findIndex((row) =>
-  //         row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-  //       ),
-  //       updates: {
-  //         isLoading: RequestStatus.success,
-  //         options: uniquePsnOrgs,
-  //         filteredOptions: [],
-  //         handleSearch: handleSearch,
-  //         customInfoMessage: <></>,
-  //       },
-  //     };
-
-  //     const indexToUpdateExt = documentFirstChildFormRowsForExternal.findIndex(
-  //       (row) => row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-  //     );
-
-  //     let paramsExt: UpdateDisplayTypeParams = {
-  //       indexToUpdate: indexToUpdateExt,
-  //       updates: {
-  //         isLoading: RequestStatus.success,
-  //         options: uniquePsnOrgs,
-  //         filteredOptions: [],
-  //         handleSearch: handleSearch,
-  //         customInfoMessage: <></>,
-  //       },
-  //     };
-  //     setExternalRow(updateFields(externalRow, paramsExt));
-  //     setInternalRow(updateFields(internalRow, params));
-  //     // }
-  //     setFormData(siteDocuments);
-  //   }
-  // }, [siteDocuments, status]);
+  }, [searchAuthors, options]);
 
   // Handle user type based on username
-
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.includes('bceid')) {
       setUserType(UserType.External);
@@ -371,64 +254,9 @@ const Documents = () => {
   // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
   useEffect(() => {
     if (resetDetails) {
-      // dispatch(fetchDocuments(id ?? ''))
+      dispatch(fetchDocuments(id ?? ''));
     }
   }, [resetDetails, saveSiteDetailsRequestStatus]);
-
-  // const handleSearch = (value: any) => {
-  //   setSearchSiteParticipant(value.trim());
-  //   let params: UpdateDisplayTypeParams = {
-  //     indexToUpdate: documentFormRows.findIndex((row) =>
-  //       row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-  //     ),
-  //     updates: {
-  //       isLoading: RequestStatus.loading,
-  //       options: options,
-  //       filteredOptions: [],
-  //       handleSearch: handleSearch,
-  //       customInfoMessage: <></>,
-  //     },
-  //   };
-  //   // setExternalRow(updateFields(externalRow, params));
-  //   setInternalRow(updateFields(internalRow, params));
-  // };
-
-  // useEffect(() => {
-  //   setViewMode(mode);
-  // }, [mode]);
-
-  // useEffect(() => {
-  //   if (resetDetails) {
-  //     setFormData(siteDocuments);
-  //   }
-  // }, [resetDetails]);
-
-  // useEffect(() => {
-  //   if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
-  //     setUserType(UserType.External);
-  //   } else if (
-  //     loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
-  //   ) {
-  //     setUserType(UserType.Internal);
-  //   } else {
-  //     // not logged in
-  //     setUserType(UserType.External);
-  //   }
-  //   // setFormData(siteDocuments);
-  // }, []);
-
-  // useEffect(() => {
-  //   if (id) {
-  //     dispatch(fetchDocuments(id ?? ''))
-  //       .then(() => {
-  //         setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
-  //       })
-  //       .catch((error) => {
-  //         setLoading(RequestStatus.failed);
-  //         console.error('Error fetching data:', error);
-  //       });
-  //   }
-  // }, [id]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value;
@@ -534,18 +362,22 @@ const Documents = () => {
         // For example, upload it to a server or process it further
 
         const newDocument = {
-          id: v4(), // Generate a unique ID for the new participant
+          id: v4(), // Generate a unique ID for the new document
+          docParticId: v4(),
           siteId: id,
           psnorgId: '',
+          dprCode: 'ATH',
           submissionDate: new Date(),
-          documentDate: file.lastModified,
+          documentDate: new Date(file.lastModified),
           title: file.name.split('.pdf')[0].trim(),
           displayName: '',
-          sr: false,
+          apiAction: UserActionEnum.added,
+          srAction: SRApprovalStatusEnum.Pending,
         };
-        const addDoc = [newDocument, ...formData];
-        setFormData(addDoc);
-        // dispatch(updateSiteDocument(addDoc));
+        const updatedDocuments = [newDocument, ...formData];
+        setFormData(updatedDocuments);
+        dispatch(updateSiteDocument(updatedDocuments));
+        dispatch(setupDocumentsDataForSaving([newDocument, ...trackDocuments]));
         const tracker = new ChangeTracker(
           IChangeType.Added,
           'New Site Document',
@@ -576,28 +408,57 @@ const Documents = () => {
         if (file && file.type === 'application/pdf') {
           // You can perform additional actions here with the selected file
           // For example, upload it to a server or process it further
-          const updatedDoc = formData.map((document) => {
-            if (document.id === doc.id) {
-              const replacedDoc = {
-                ...doc,
-                submissionDate: new Date(),
-                documentDate: file.lastModified,
-                title: file.name.split('.pdf')[0].trim(),
-              };
-              return { ...document, ...replacedDoc };
-            }
-            return document;
-          });
-          setFormData(updatedDoc);
-          //   dispatch(updateSiteDocument(updatedDoc));
+
+          const updateDocuments = (documents: any) => {
+            return documents.map((document: any) => {
+              if (document.id === doc.id) {
+                let replacedDocument = {
+                  ...doc,
+                  submissionDate: new Date(),
+                  documentDate: new Date(file.lastModified),
+                  title: file.name.split('.pdf')[0].trim(),
+                  apiAction: UserActionEnum.updated,
+                  srAction: SRApprovalStatusEnum.Pending,
+                };
+                return { ...document, ...replacedDocument };
+              }
+              return document;
+            });
+          };
+
+          // Update both formData and trackNotation
+          const updatedDocuments = updateDocuments(formData);
+          const updatedTrackedDocuments = updateDocuments(trackDocuments);
+
+          // Replace document
+          setFormData(updatedDocuments);
+          dispatch(updateSiteDocument(updatedDocuments));
+          dispatch(setupDocumentsDataForSaving(updatedTrackedDocuments));
           const tracker = new ChangeTracker(
-            IChangeType.Added,
+            IChangeType.Modified,
             'Replace Site Document',
           );
           dispatch(trackChanges(tracker.toPlainObject()));
           setCurrentDocument({});
           setCurrentFile({});
           setIsReplace(false);
+
+          // const updatedDoc = formData.map((document) => {
+          //   if (document.id === doc.id) {
+          //     const replacedDoc = {
+          //       ...doc,
+          //       submissionDate: new Date(),
+          //       documentDate: file.lastModified,
+          //       title: file.name.split('.pdf')[0].trim(),
+          //       apiAction: UserActionEnum.updated,
+          //       srAction: SRApprovalStatusEnum.Pending,
+          //     };
+          //     return { ...document, ...replacedDoc };
+          //   }
+          //   return document;
+          // });
+          // setFormData(updatedDoc);
+          //   dispatch(updateSiteDocument(updatedDoc));
         }
       } else {
         alert('Please select a valid PDF file.');
@@ -614,17 +475,46 @@ const Documents = () => {
 
   const handleFileDelete = (document: any, docIsDelete: boolean = false) => {
     if (docIsDelete) {
-      const nonDeletedDoc = formData.filter((doc) => {
+      const updateDocuments = (documents: any) => {
+        return documents.map((doc: any) => {
+          if (doc.id === document.id) {
+            return {
+              ...document,
+              apiAction: UserActionEnum.deleted, // Mark as deleted
+              srAction: SRApprovalStatusEnum.Pending,
+            };
+          }
+          return doc;
+        });
+      };
+
+      // Update both formData and trackDocument
+      const updatedDocuments = updateDocuments(formData);
+      const updatedTrackedDocuments = updateDocuments(trackDocuments);
+
+      // Filter out document for formData
+      const filteredDocuments = updatedDocuments.filter((doc: any) => {
         if (doc.id !== document.id) {
           return doc;
         }
       });
-      setFormData(nonDeletedDoc);
-      // dispatch(updateSiteDocument(nonDeletedDoc));
+
+      setFormData(filteredDocuments);
+      dispatch(updateSiteDocument(filteredDocuments));
+      dispatch(setupDocumentsDataForSaving(updatedTrackedDocuments));
+
       const tracker = new ChangeTracker(IChangeType.Deleted, 'Document Delete');
       dispatch(trackChanges(tracker.toPlainObject()));
       setCurrentDocument({});
       setIsDelete(false);
+
+      // const nonDeletedDoc = formData.filter((doc) => {
+      //   if (doc.id !== document.id) {
+      //     return doc;
+      //   }
+      // });
+      // setFormData(nonDeletedDoc);
+      // dispatch(updateSiteDocument(nonDeletedDoc));
     } else {
       setCurrentDocument(document);
       setIsDelete(true);
@@ -666,7 +556,7 @@ const Documents = () => {
               ...document,
               [graphQLPropertyName]: isPsnorgId ? value.key : value,
               displayName: isPsnorgId ? value.value : document.displayName,
-              apiAction: documents?.apiAction ?? UserActionEnum.updated,
+              apiAction: document?.apiAction ?? UserActionEnum.updated,
               srAction: SRApprovalStatusEnum.Pending,
             };
             return updatedDocument;

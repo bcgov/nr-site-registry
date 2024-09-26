@@ -4,6 +4,7 @@ import { DocParticRoleCd } from './docParticRoleCd.entity';
 import { PeopleOrgs } from './peopleOrgs.entity';
 import { SiteDocs } from './siteDocs.entity';
 import { SitePartics } from './sitePartics.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
 
 @ObjectType()
 @Index('sdp_classified_by_frgn', ['dprCode'], {})
@@ -18,7 +19,7 @@ import { SitePartics } from './sitePartics.entity';
 @Index('sdp_playing_a_role_i_frgn', ['sdocId'], {})
 @Index('sdp_played_by_frgn', ['spId'], {})
 @Entity('site_doc_partics')
-export class SiteDocPartics {
+export class SiteDocPartics extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'id' })
   id: string;
@@ -32,7 +33,7 @@ export class SiteDocPartics {
   sdocId: string;
 
   @Field()
-  @Column('bigint', { name: 'sp_id' })
+  @Column('bigint', { name: 'sp_id', nullable: true })
   spId: string;
 
   @Field()

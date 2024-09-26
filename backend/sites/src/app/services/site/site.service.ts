@@ -22,6 +22,7 @@ import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
+import { SiteDocPartics } from '../../entities/siteDocPartics.entity';
 
 /**
  * Nestjs Service For Region Entity
@@ -41,6 +42,8 @@ export class SiteService {
     private siteParticipantRolesRepo: Repository<SiteParticRoles>,
     @InjectRepository(SiteDocs)
     private siteDocumentsRepo: Repository<SiteDocs>,
+    @InjectRepository(SiteDocPartics)
+    private siteDocumentParticsRepo: Repository<SiteDocPartics>,
     @InjectRepository(SiteAssocs)
     private siteAssociationsRepo: Repository<SiteAssocs>,
     @InjectRepository(LandHistories)
@@ -332,8 +335,13 @@ export class SiteService {
               } else {
                 console.log('No changes To Site Participants');
               }
+
               if (documents && documents.length > 0) {
-                console.log(documents);
+                await this.processDocuments(
+                  documents,
+                  userInfo,
+                  transactionalEntityManager,
+                );
               } else {
                 console.log('No changes To Site Documents');
               }
@@ -402,13 +410,184 @@ export class SiteService {
   }
 
   /**
+   * Processes and saves site documents based on the provided actions.
+   * @param documents - Array of documents data including actions to be performed.
+   * @param userInfo - Information about the user performing the actions.
+   * @param transactionalEntityManager - Entity manager for handling transactions.
+   */
+  async processDocuments(
+    documents: any[],
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    if (documents && documents.length > 0) {
+      const newDocuments: SiteDocs[] = [];
+      const updateDocuments: { id: string; changes: Partial<SiteDocs> }[] = [];
+      const deleteDocuments: { id: string }[] = [];
+      const newDocumentParticipants: SiteDocPartics[] = [];
+      const updateDocumentParticipants: {
+        id: string;
+        changes: Partial<SiteDocPartics>;
+      }[] = [];
+
+      const siteDocuments = documents.map(async (document) => {
+        const {
+          displayName,
+          psnorgId,
+          dprCode,
+          docParticId,
+          apiAction,
+          ...siteDocumentData
+        } = document;
+
+        // Validate participant ID
+        let documentId = document.id || ''; // Ensure it's a string
+
+        let siteDocument = { ...new SiteDocs(), ...siteDocumentData };
+        let siteDocumentParticipant = { ...new SiteDocPartics(), psnorgId };
+
+        switch (apiAction) {
+          case UserActionEnum.ADDED:
+            //Generate new id for new document
+            const newDocId = await this.siteDocumentsRepo
+              .createQueryBuilder()
+              .select('Max(id)', 'maxid')
+              .getRawOne()
+              .then((result) => (Number(result.maxid) || 0) + 1);
+
+            //Get the Id of newly created document
+            documentId = newDocId.toString();
+            newDocuments.push({
+              ...siteDocument,
+              id: documentId,
+              rwmFlag: 0,
+              userAction: UserActionEnum.ADDED,
+              srAction: SRApprovalStatusEnum.PENDING,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+
+            //Generate new id for new document participant.
+            const newDocParticId = await this.siteDocumentParticsRepo
+              .createQueryBuilder()
+              .select('Max(id)', 'maxid')
+              .getRawOne()
+              .then((result) => (Number(result.maxid) || 0) + 1);
+
+            newDocumentParticipants.push({
+              ...siteDocumentParticipant,
+              id: newDocParticId.toString(),
+              sdocId: documentId,
+              rwmFlag: 0,
+              dprCode: dprCode ?? 'ATH',
+              userAction: UserActionEnum.ADDED,
+              srAction: SRApprovalStatusEnum.PENDING,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+
+            break;
+          case UserActionEnum.UPDATED:
+            const existingDocument =
+              await this.siteDocumentsRepo.findOneByOrFail({ id: documentId });
+            if (existingDocument) {
+              updateDocuments.push({
+                id: documentId,
+                changes: {
+                  ...existingDocument,
+                  ...siteDocument,
+                  userAction: UserActionEnum.UPDATED,
+                  srAction: SRApprovalStatusEnum.PENDING,
+                  whenUpdated: new Date(),
+                  whoUpdated: userInfo ? userInfo.givenName : '',
+                },
+              });
+
+              const existingDocumentParticipant =
+                await this.siteDocumentParticsRepo.findOneByOrFail({
+                  id: docParticId,
+                });
+              if (existingDocumentParticipant) {
+                updateDocumentParticipants.push({
+                  id: docParticId,
+                  changes: {
+                    ...existingDocumentParticipant,
+                    ...siteDocumentParticipant,
+                    userAction: UserActionEnum.UPDATED,
+                    srAction: SRApprovalStatusEnum.PENDING,
+                    whenUpdated: new Date(),
+                    whoUpdated: userInfo ? userInfo.givenName : '',
+                  },
+                });
+              } else {
+                console.log(
+                  `There is no document participant in database againts id : ${docParticId}`,
+                );
+              }
+            } else {
+              console.log(
+                `There is no document in database againts document id : ${documentId}`,
+              );
+            }
+            break;
+          case UserActionEnum.DELETED:
+            deleteDocuments.push({ id: documentId });
+            break;
+          default:
+            console.warn('Unknown action for document:', apiAction);
+        }
+      });
+
+      await Promise.all(siteDocuments);
+
+      // Save new site documents and site document participants in bulk
+      if (newDocuments.length > 0) {
+        await transactionalEntityManager.save(SiteDocs, newDocuments);
+      }
+
+      if (newDocumentParticipants.length > 0) {
+        await transactionalEntityManager.save(
+          SiteDocPartics,
+          newDocumentParticipants,
+        );
+      }
+
+      // Update existing site documents and site document participants in bulk
+      if (updateDocuments.length > 0) {
+        await Promise.all(
+          updateDocuments.map(({ id, changes }) =>
+            transactionalEntityManager.update(SiteDocs, { id }, changes),
+          ),
+        );
+      }
+
+      if (updateDocumentParticipants.length > 0) {
+        await Promise.all(
+          updateDocumentParticipants.map(({ id, changes }) =>
+            transactionalEntityManager.update(SiteDocPartics, { id }, changes),
+          ),
+        );
+      }
+
+      // Delete existing site documents and site document participants in bulk
+      if (deleteDocuments.length > 0) {
+        await Promise.all(
+          deleteDocuments.map(({ id }) =>
+            transactionalEntityManager.delete(SiteDocs, { id }),
+          ),
+        );
+      }
+    }
+  }
+
+  /**
    * Processes and saves site participants based on the provided actions.
-   * @param siteParticipants - Array of event data including actions to be performed.
+   * @param siteParticipants - Array of site participant data including actions to be performed.
    * @param userInfo - Information about the user performing the actions.
    * @param transactionalEntityManager - Entity manager for handling transactions.
    */
   async processSiteParticipants(
-    siteParticipants: any[], // Replace 'any' with actual type if possible
+    siteParticipants: any[],
     userInfo: any,
     transactionalEntityManager: EntityManager,
   ) {
@@ -453,14 +632,14 @@ export class SiteService {
 
         switch (apiAction) {
           case UserActionEnum.ADDED:
-            // Generate new ID for the new event
+            // Generate new ID for the new participant
             const newId = await this.siteParticipantsRepo
               .createQueryBuilder()
               .select('MAX(id)', 'maxid')
               .getRawOne()
               .then((result) => (Number(result.maxid) || 0) + 1);
 
-            // Get the ID of the newly created event
+            // Get the ID of the newly created participant
             participantId = newId.toString();
 
             newSitePartics.push({
@@ -490,37 +669,47 @@ export class SiteService {
               await this.siteParticipantsRepo.findOneByOrFail({
                 id: participantId,
               });
-            updatedSitePartics.push({
-              id: participantId,
-              changes: {
-                ...new SitePartics(),
-                ...existingSitePartic,
-                ...sitePartic,
-                userAction: UserActionEnum.UPDATED,
-                srAction: SRApprovalStatusEnum.PENDING,
-                whenUpdated: new Date(),
-                whoUpdated: userInfo ? userInfo.givenName : '',
-              },
-            });
 
             if (existingSitePartic) {
-              const existingSitePartic =
-                await this.siteParticipantRolesRepo.findOneByOrFail({
-                  id: partiRoleId,
-                });
-              updatedSiteParticRoles.push({
-                id: partiRoleId,
+              updatedSitePartics.push({
+                id: participantId,
                 changes: {
+                  ...new SitePartics(),
                   ...existingSitePartic,
-                  ...siteParticRole,
+                  ...sitePartic,
                   userAction: UserActionEnum.UPDATED,
                   srAction: SRApprovalStatusEnum.PENDING,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },
               });
-            }
 
+              const existingSiteParticRole =
+                await this.siteParticipantRolesRepo.findOneByOrFail({
+                  id: partiRoleId,
+                });
+              if (existingSiteParticRole) {
+                updatedSiteParticRoles.push({
+                  id: partiRoleId,
+                  changes: {
+                    ...existingSiteParticRole,
+                    ...siteParticRole,
+                    userAction: UserActionEnum.UPDATED,
+                    srAction: SRApprovalStatusEnum.PENDING,
+                    whenUpdated: new Date(),
+                    whoUpdated: userInfo ? userInfo.givenName : '',
+                  },
+                });
+              } else {
+                console.log(
+                  `There is no site participant role in database againts id : ${partiRoleId}`,
+                );
+              }
+            } else {
+              console.log(
+                `There is no site participant in database againts id : ${participantId}`,
+              );
+            }
             break;
 
           case UserActionEnum.DELETED:
@@ -530,7 +719,7 @@ export class SiteService {
             break;
 
           default:
-            console.warn('Unknown action for event:', apiAction);
+            console.warn('Unknown action for participant:', apiAction);
         }
       });
 
@@ -589,7 +778,7 @@ export class SiteService {
    * @param transactionalEntityManager - Entity manager for handling transactions.
    */
   async processEvents(
-    events: any[], // Replace 'any' with actual type if possible
+    events: any[],
     userInfo: any,
     transactionalEntityManager: EntityManager,
   ) {
@@ -696,17 +885,24 @@ export class SiteService {
               await this.eventsRepositoryRepo.findOneByOrFail({
                 id: notation.id,
               });
-            updatedEvents.push({
-              id: notation.id,
-              changes: {
-                ...new Events(),
-                ...existingEvent,
-                ...event,
-                userAction: UserActionEnum.UPDATED,
-                whenUpdated: new Date(),
-                whoUpdated: userInfo ? userInfo.givenName : '',
-              },
-            });
+
+            if (existingEvent) {
+              updatedEvents.push({
+                id: notation.id,
+                changes: {
+                  ...new Events(),
+                  ...existingEvent,
+                  ...event,
+                  userAction: UserActionEnum.UPDATED,
+                  whenUpdated: new Date(),
+                  whoUpdated: userInfo ? userInfo.givenName : '',
+                },
+              });
+            } else {
+              console.log(
+                `There is no event in database againts event id : ${notation.id}`,
+              );
+            }
             break;
 
           case UserActionEnum.DELETED:

@@ -42,9 +42,9 @@ import { GRAPHQL } from '../../../helpers/endpoints';
 import { print } from 'graphql';
 import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
 import {
+  getSiteParticipants,
   saveRequestStatus,
   setupSiteParticipantDataForSaving,
-  trackSiteParticipant,
 } from '../SaveSiteDetailsSlice';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
@@ -58,7 +58,7 @@ const Participants = () => {
   const particRoleDropdwn = useSelector(participantRoleDrpdown);
   const { siteParticipants: siteParticipant, status } =
     useSelector(siteParticipants);
-  const trackParticipant = useSelector(trackSiteParticipant);
+  const trackParticipant = useSelector(getSiteParticipants);
   const dispatch = useDispatch<AppDispatch>();
   const resetDetails = useSelector(resetSiteDetails);
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);

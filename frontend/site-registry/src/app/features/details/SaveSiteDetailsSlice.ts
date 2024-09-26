@@ -163,10 +163,9 @@ export const getSiteDetailsToBeSaved = (state: any) => {
 
 export const saveRequestStatus = (state: any) =>
   state.siteDetails.saveRequestStatus;
-export const trackSiteNotation = (state: any) => state.siteDetails.notationData;
-export const trackSiteDocuments = (state: any) =>
-  state.siteDetails.documentsData;
-export const trackSiteParticipant = (state: any) =>
+export const getSiteNoatations = (state: any) => state.siteDetails.notationData;
+export const getSiteDocuments = (state: any) => state.siteDetails.documentsData;
+export const getSiteParticipants = (state: any) =>
   state.siteDetails.siteParticipantData;
 export const {
   resetSaveSiteDetailsRequestStatus,

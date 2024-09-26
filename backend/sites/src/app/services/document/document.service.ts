@@ -43,6 +43,8 @@ export class DocumentService {
         if (res.siteDocPartics.length > 0) {
           return res.siteDocPartics.map((sdp) => ({
             ...document,
+            docParticId: sdp.id,
+            dprCode: sdp.dprCode,
             psnorgId: sdp.psnorgId,
             displayName: sdp.psnorg.displayName,
           }));

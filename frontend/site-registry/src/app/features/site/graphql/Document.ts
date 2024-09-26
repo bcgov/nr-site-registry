@@ -10,8 +10,10 @@ export const graphQLSiteDocumentsBySiteId = () => {
         timestamp
         data {
           id
+          docParticId
           siteId
           psnorgId
+          dprCode
           submissionDate
           documentDate
           title

@@ -45,6 +45,10 @@ export class SiteDocs extends ChangeAuditEntity {
   @Column('character varying', { name: 'note', nullable: true, length: 255 })
   note: string | null;
 
+  @Field({ nullable: true })
+  @Column('character varying', { name: 'filePath' })
+  filePath: string | null;
+
   @Field()
   @Column('character varying', { name: 'who_created', length: 30 })
   whoCreated: string;
@@ -77,7 +81,9 @@ export class SiteDocs extends ChangeAuditEntity {
   rwmNoteFlag: number | null;
 
   @Field(() => [SiteDocPartics])
-  @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sdoc)
+  @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sdoc, {
+    cascade: true,
+  })
   siteDocPartics: SiteDocPartics[];
 
   @ManyToOne(() => Sites, (sites) => sites.siteDocs, { onDelete: 'CASCADE' })

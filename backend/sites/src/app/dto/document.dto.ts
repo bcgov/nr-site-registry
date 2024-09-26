@@ -18,6 +18,10 @@ export class DocumentDto {
 
   @Field()
   @IsString()
+  docParticId: string;
+
+  @Field()
+  @IsString()
   psnorgId: string;
 
   @Field()
@@ -46,6 +50,10 @@ export class DocumentInputDTO extends ChangeAuditEntityDTO {
   @Field()
   @IsString()
   id: string;
+
+  @Field()
+  @IsString()
+  docParticId: string;
 
   @Field()
   @IsString()

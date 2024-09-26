@@ -41,6 +41,42 @@ const internalUserQuery = `
   )
 `;
 
+const externalUserQuery = `
+  SELECT
+    parcel_descriptions.id,
+    parcel_descriptions.description_type,
+    parcel_descriptions.id_pin_number,
+    parcel_descriptions.date_noted,
+    parcel_descriptions.land_description
+  FROM (
+    SELECT
+      sites.subdivisions.id AS id,
+      CASE
+        WHEN sites.subdivisions.pid IS NOT NULL THEN 'Parcel ID'
+        WHEN sites.subdivisions.pin IS NOT NULL THEN 'Crown Land PIN'
+        WHEN sites.subdivisions.crown_lands_file_no IS NOT NULL THEN 'Crown Land File Number'
+        ELSE 'Unknown'
+      END AS description_type,
+      CASE
+        WHEN sites.subdivisions.pid IS NOT NULL THEN sites.subdivisions.pid
+        WHEN sites.subdivisions.pin IS NOT NULL THEN sites.subdivisions.pin
+        WHEN sites.subdivisions.crown_lands_file_no IS NOT NULL THEN sites.subdivisions.crown_lands_file_no
+        ELSE NULL
+      END AS id_pin_number,
+      sites.subdivisions.date_noted AS date_noted,
+      sites.subdivisions.legal_description AS land_description
+    FROM sites.site_subdivisions
+    LEFT JOIN sites.subdivisions 
+      ON sites.site_subdivisions.subdiv_id = sites.subdivisions.id
+    WHERE sites.site_subdivisions.site_subdiv_id = ANY ($1)
+  ) parcel_descriptions
+  WHERE (
+    LOWER(parcel_descriptions.description_type) ~* $2
+    OR LOWER(parcel_descriptions.id_pin_number) ~* $2
+    OR LOWER(CAST(parcel_descriptions.date_noted AS TEXT)) ~* $2
+    OR LOWER(parcel_descriptions.land_description) ~* $2
+  )
+`;
 const getSanitizedSiteId = (siteId: number) => {
   return String(siteId);
 };
@@ -67,6 +103,15 @@ const getSanitizedOrderBy = (orderBy: string) => {
   ].includes(orderBy)
     ? `parcel_descriptions.${orderBy}`
     : `parcel_descriptions.id`;
+};
+
+const getSanitizedSiteSubdivisionsIds = (siteSubdivisionsIds: string[]) => {
+  // Formatting the ids as a postgres array and passing it as a parameter to
+  // an ANY clause in the query is a workaround for a TypeORM bug where the
+  // driver wont recognize that the query is expecting an array and attempt
+  // to cast the input parameter as a bigint rather than bigint[] which will
+  // always cause an exception.
+  return `{${String(siteSubdivisionsIds)}}`;
 };
 
 const getSanitizedOrderByDir = (orderByDir: string) => {
@@ -104,5 +149,43 @@ export const getInternalUserQueries = (
     sanitizedPageSize,
   ];
   const countQueryParams: string[] = [sanitizedSiteId, sanitizedFilterTerm];
+  return [query, queryParams, countQuery, countQueryParams];
+};
+
+export const getExternalUserQueries = (
+  siteSubdivisionsIds: string[],
+  filterTerm: string,
+  limit: number,
+  pageSize: number,
+  orderBy: string,
+  orderByDir: string,
+): [string, string[], string, string[]] => {
+  const sanitizedSiteSubdivisionIds =
+    getSanitizedSiteSubdivisionsIds(siteSubdivisionsIds);
+  const sanitizedFilterTerm = getSanitizedFilterTerm(filterTerm);
+  const sanitizedOffset = getSanitizedOffset(limit);
+  const sanitizedPageSize = getSanitizedPageSize(pageSize);
+  const sanitizedOrderBy = getSanitizedOrderBy(orderBy);
+  const sanitizedOrderByDir = getSanitizedOrderByDir(orderByDir);
+
+  let query: string = externalUserQuery;
+  const countQuery: string = `SELECT COUNT(*) FROM ( ${query} ) AS subquery`;
+  // Add sorting and pagination. Including sorting here is a minor
+  // optimization so that it isn't included in the count query.
+  query += `
+    ORDER BY ${sanitizedOrderBy} ${sanitizedOrderByDir}
+    OFFSET $3
+    LIMIT $4 
+  `;
+  const queryParams: string[] = [
+    sanitizedSiteSubdivisionIds,
+    sanitizedFilterTerm,
+    sanitizedOffset,
+    sanitizedPageSize,
+  ];
+  const countQueryParams: string[] = [
+    sanitizedSiteSubdivisionIds,
+    sanitizedFilterTerm,
+  ];
   return [query, queryParams, countQuery, countQueryParams];
 };

@@ -1,5 +1,10 @@
 import { Args, Int, Query, Resolver } from '@nestjs/graphql';
-import { Resource, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import {
+  AuthenticatedUser,
+  Resource,
+  RoleMatchingMode,
+  Roles,
+} from 'nest-keycloak-connect';
 import { Subdivisions } from '../../entities/subdivisions.entity';
 import { ParcelDescriptionsService } from '../../services/parcelDescriptions/parcelDescriptions.service';
 import { CustomRoles } from '../../common/role';
@@ -26,7 +31,11 @@ export class ParcelDescriptionResolver {
    * @returns parcel descriptions (subdivisions) belonging to the given site.
    */
   @Roles({
-    roles: [CustomRoles.Internal, CustomRoles.SiteRegistrar],
+    roles: [
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+      CustomRoles.External,
+    ],
     mode: RoleMatchingMode.ANY,
   })
   @Query(() => ParcelDescriptionsResponse, {
@@ -39,6 +48,7 @@ export class ParcelDescriptionResolver {
     @Args('searchParam', { type: () => String }) searchParam: string,
     @Args('sortBy', { type: () => String }) sortBy: string,
     @Args('sortByDir', { type: () => String }) sortByDir: string,
+    @AuthenticatedUser() user: any,
   ) {
     const response =
       await this.parcelDescriptionService.getParcelDescriptionsBySiteId(
@@ -48,6 +58,7 @@ export class ParcelDescriptionResolver {
         searchParam,
         sortBy,
         sortByDir,
+        user,
       );
 
     return response;

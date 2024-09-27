@@ -5,6 +5,7 @@ import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { SitePartics } from '../../entities/sitePartics.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid'; // Import uuid function for generating unique IDs
+import { LoggerService } from 'src/app/logger/logger.service';
 import { UserActionEnum } from 'src/app/common/userActionEnum';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sitesLogger = require('../../logger/logging');
@@ -14,6 +15,7 @@ export class ParticipantService {
   constructor(
     @InjectRepository(SitePartics)
     private readonly siteParticsRepository: Repository<SitePartics>,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
    /**
@@ -23,12 +25,18 @@ export class ParticipantService {
    * @returns An array of SiteParticsDto objects containing participant details.
    * @throws Error if there is an issue retrieving the data.
    */
-  async getSiteParticipantsBySiteId(siteId: string, showPending: boolean) {
-    sitesLogger.info('ParticipantService.getSiteParticipantsBySiteId() start');
-    sitesLogger.debug('ParticipantService.getSiteParticipantsBySiteId() start');
-         // Fetch site participants based on the given siteId
+  async getSiteParticipantsBySiteId(siteId: string, showPending: boolean): Promise<SiteParticsDto[]> {
+
     try {
 
+      this.sitesLogger.log(
+        'ParticipantService.getSiteParticipantsBySiteId() start',
+      );
+      this.sitesLogger.debug(
+        'ParticipantService.getSiteParticipantsBySiteId() start',
+      );
+
+      // Fetch site participants based on the given siteId
       let result = [];
 
       if(showPending)
@@ -41,7 +49,7 @@ export class ParticipantService {
         where: { siteId },
         relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
       });
-     
+      
       if (!result.length) {
         return [];
       }
@@ -64,15 +72,18 @@ export class ParticipantService {
       // Convert the transformed objects into DTOs
       const sitePartics = plainToInstance(SiteParticsDto, transformedObjects);
 
-      sitesLogger.info('ParticipantService.getSiteParticipantsBySiteId() end');
-      sitesLogger.debug('ParticipantService.getSiteParticipantsBySiteId() end');
+      this.sitesLogger.log(
+        'ParticipantService.getSiteParticipantsBySiteId() end',
+      );
+      this.sitesLogger.debug(
+        'ParticipantService.getSiteParticipantsBySiteId() end',
+      );
       return sitePartics;
       
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in ParticipantService.getSiteParticipantsBySiteId() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in ParticipantService.getSiteParticipantsBySiteId() end',
+        JSON.stringify(error),
       );
       // Log or handle the error as necessary
       throw new Error(

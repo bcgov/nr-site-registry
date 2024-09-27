@@ -7,21 +7,20 @@ import { plainToInstance } from 'class-transformer';
 import { FolioContentsService } from './folioContents.service';
 import { FolioContentDTO } from '../../dto/folioContent.dto';
 import { FolioContents } from '../../entities/folioContents.entity';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from 'src/app/logger/logger.service';
 
 @Injectable()
 export class FolioService {
   constructor(
     @InjectRepository(Folio)
     private folioRepository: Repository<Folio>,
-
     private folioContentService: FolioContentsService,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   async getFoliosForUser(userInfo: any): Promise<Folio[]> {
-    sitesLogger.info('FolioService.getFoliosForUser() start');
-    sitesLogger.debug('FolioService.getFoliosForUser() start');
+    this.sitesLogger.log('FolioService.getFoliosForUser() start');
+    this.sitesLogger.debug('FolioService.getFoliosForUser() start');
     try {
       const userId = userInfo.sub;
       const folio = await this.folioRepository.find({
@@ -29,14 +28,13 @@ export class FolioService {
         where: { userId },
         order: { id: 'ASC' },
       });
-      sitesLogger.info('FolioService.getFoliosForUser() end');
-      sitesLogger.debug('FolioService.getFoliosForUser() end');
+      this.sitesLogger.log('FolioService.getFoliosForUser() end');
+      this.sitesLogger.debug('FolioService.getFoliosForUser() end');
       return folio;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in FolioService.getFoliosForUser() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in FolioService.getFoliosForUser() end',
+        JSON.stringify(error),
       );
       throw error;
     }
@@ -46,8 +44,8 @@ export class FolioService {
     input: FolioMinDTO,
     userInfo: any,
   ): Promise<FolioContents[] | null> {
-    sitesLogger.info('FolioService.getSitesForFolio() start');
-    sitesLogger.debug('FolioService.getSitesForFolio() start');
+    this.sitesLogger.log('FolioService.getSitesForFolio() start');
+    this.sitesLogger.debug('FolioService.getSitesForFolio() start');
     try {
       const userId = userInfo.sub;
       const { id } = input;
@@ -56,27 +54,26 @@ export class FolioService {
       });
 
       if (folio) {
-        sitesLogger.info('FolioService.getSitesForFolio() end');
-        sitesLogger.debug('FolioService.getSitesForFolio() end');
+        this.sitesLogger.log('FolioService.getSitesForFolio() end');
+        this.sitesLogger.debug('FolioService.getSitesForFolio() end');
         return this.folioContentService.getSiteForFolio(folio.id.toString());
       } else {
-        sitesLogger.info('FolioService.getSitesForFolio() end');
-        sitesLogger.debug('FolioService.getSitesForFolio() end');
+        this.sitesLogger.log('FolioService.getSitesForFolio() end');
+        this.sitesLogger.debug('FolioService.getSitesForFolio() end');
         return null;
       }
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in FolioService.getSitesForFolio() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in FolioService.getSitesForFolio() end',
+        JSON.stringify(error),
       );
       throw error;
     }
   }
 
   async addFolio(inputDTO: FolioDTO, userInfo: any): Promise<boolean> {
-    sitesLogger.info('FolioService.addFolio() start');
-    sitesLogger.debug('FolioService.addFolio() start');
+    this.sitesLogger.log('FolioService.addFolio() start');
+    this.sitesLogger.debug('FolioService.addFolio() start');
     try {
       const { folioId } = inputDTO;
 
@@ -93,31 +90,30 @@ export class FolioService {
         const result = await this.folioRepository.save(folio);
 
         if (result) {
-          sitesLogger.info('FolioService.addFolio() end');
-          sitesLogger.debug('FolioService.addFolio() end');
+          this.sitesLogger.log('FolioService.addFolio() end');
+          this.sitesLogger.debug('FolioService.addFolio() end');
           return true;
         } else {
-          sitesLogger.info('FolioService.addFolio() end');
-          sitesLogger.debug('FolioService.addFolio() end');
+          this.sitesLogger.log('FolioService.addFolio() end');
+          this.sitesLogger.debug('FolioService.addFolio() end');
           return false;
         }
       }
-      sitesLogger.info('FolioService.addFolio() end');
-      sitesLogger.debug('FolioService.addFolio() end');
+      this.sitesLogger.log('FolioService.addFolio() end');
+      this.sitesLogger.debug('FolioService.addFolio() end');
       return false;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in FolioService.addFolio() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in FolioService.addFolio() end',
+        JSON.stringify(error),
       );
       throw error;
     }
   }
 
   async updateFolio(inputArr: FolioDTO[], userInfo: any): Promise<boolean> {
-    sitesLogger.info('FolioService.updateFolio() start');
-    sitesLogger.debug('FolioService.updateFolio() start');
+    this.sitesLogger.log('FolioService.updateFolio() start');
+    this.sitesLogger.debug('FolioService.updateFolio() start');
     try {
       const userId = userInfo.sub;
       const updatePromises = inputArr.map(async (inputDTO) => {
@@ -135,20 +131,25 @@ export class FolioService {
           const result = await this.folioRepository.save(existingRecord);
 
           if (!result) {
-            sitesLogger.error(`Failed to save record with id ${id}`);
+            this.sitesLogger.error(
+              `Failed to save record with id `,
+              `folioid: ${id}`,
+            );
           }
         } else {
-          sitesLogger.error(`Unable to find existing record for ${id} `);
+          this.sitesLogger.error(
+            `Unable to find existing record for `,
+            `folioid: ${id}`,
+          );
         }
       });
-      sitesLogger.info('FolioService.updateFolio() end');
-      sitesLogger.debug('FolioService.updateFolio() end');
+      this.sitesLogger.log('FolioService.updateFolio() end');
+      this.sitesLogger.debug('FolioService.updateFolio() end');
       await Promise.all(updatePromises);
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in FolioService.updateFolio() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in FolioService.updateFolio() end',
+        JSON.stringify(error),
       );
       throw error;
     }
@@ -157,8 +158,8 @@ export class FolioService {
   }
 
   async deleteFolio(id: number, userInfo: any): Promise<boolean> {
-    sitesLogger.info('FolioService.deleteFolio() start');
-    sitesLogger.debug('FolioService.deleteFolio() start');
+    this.sitesLogger.log('FolioService.deleteFolio() start');
+    this.sitesLogger.debug('FolioService.deleteFolio() start');
     try {
       if (id <= 0) {
         return false;
@@ -173,21 +174,23 @@ export class FolioService {
       if (savedFolio != null) {
         await this.folioContentService.deleteAllSitesInFolio(id.toString());
         const result = await this.folioRepository.delete({ id });
-        sitesLogger.info('FolioService.deleteFolio() end');
-        sitesLogger.debug('FolioService.deleteFolio() end');
+        this.sitesLogger.log('FolioService.deleteFolio() end');
+        this.sitesLogger.debug('FolioService.deleteFolio() end');
         return result.affected > 0;
       } else {
-        sitesLogger.error(`unable to find saved folio for ${id}`);
+        this.sitesLogger.error(
+          `unable to find saved folio for `,
+          `folioid: ${id}`,
+        );
       }
 
-      sitesLogger.info('FolioService.deleteFolio() end');
-      sitesLogger.debug('FolioService.deleteFolio() end');
+      this.sitesLogger.log('FolioService.deleteFolio() end');
+      this.sitesLogger.debug('FolioService.deleteFolio() end');
       return false;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in FolioService.deleteFolio() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in FolioService.deleteFolio() end',
+        JSON.stringify(error),
       );
       throw error;
     }
@@ -197,8 +200,8 @@ export class FolioService {
     inputDTO: [FolioContentDTO],
     userInfo: any,
   ): Promise<boolean> {
-    sitesLogger.info('FolioService.addSiteToFolio() start');
-    sitesLogger.debug('FolioService.addSiteToFolio() start');
+    this.sitesLogger.log('FolioService.addSiteToFolio() start');
+    this.sitesLogger.debug('FolioService.addSiteToFolio() start');
     try {
       if (inputDTO.length > 0) {
         inputDTO.forEach((item) => {
@@ -217,14 +220,13 @@ export class FolioService {
         });
       }
 
-      sitesLogger.info('FolioService.addSiteToFolio() end');
-      sitesLogger.debug('FolioService.addSiteToFolio() end');
+      this.sitesLogger.log('FolioService.addSiteToFolio() end');
+      this.sitesLogger.debug('FolioService.addSiteToFolio() end');
       return true;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in FolioService.addSiteToFolio() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in FolioService.addSiteToFolio() end',
+        JSON.stringify(error),
       );
       throw error;
     }
@@ -234,8 +236,8 @@ export class FolioService {
     inputDTO: [FolioContentDTO],
     userInfo: any,
   ): Promise<boolean> {
-    sitesLogger.info('FolioService.deleteSitesInFolio() start');
-    sitesLogger.debug('FolioService.deleteSitesInFolio() start');
+    this.sitesLogger.log('FolioService.deleteSitesInFolio() start');
+    this.sitesLogger.debug('FolioService.deleteSitesInFolio() start');
     try {
       if (inputDTO.length > 0) {
         inputDTO.forEach((item) => {
@@ -256,14 +258,13 @@ export class FolioService {
           }
         });
       }
-      sitesLogger.info('FolioService.deleteSitesInFolio() end');
-      sitesLogger.debug('FolioService.deleteSitesInFolio() end');
+      this.sitesLogger.log('FolioService.deleteSitesInFolio() end');
+      this.sitesLogger.debug('FolioService.deleteSitesInFolio() end');
       return true;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in FolioService.deleteSitesInFolio() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in FolioService.deleteSitesInFolio() end',
+        JSON.stringify(error),
       );
       throw error;
     }

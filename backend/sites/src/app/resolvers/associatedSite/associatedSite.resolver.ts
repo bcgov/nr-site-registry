@@ -10,8 +10,7 @@ import {
   AssociatedSiteResponse,
 } from '../../dto/associatedSite.dto';
 import { CustomRoles } from '../../common/role';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => SiteAssocs)
 export class AssociatedSiteResolver {
@@ -20,6 +19,7 @@ export class AssociatedSiteResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       AssociatedSiteDto[]
     >,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   @Roles({
@@ -38,7 +38,7 @@ export class AssociatedSiteResolver {
     showPending: boolean,
     
   ) {
-    sitesLogger.info(
+    this.sitesLogger.log(
       'AssociatedSiteResolver.getAssociatedSitesBySiteId() start siteID:' +
         ' ' +
         siteId,
@@ -46,7 +46,7 @@ export class AssociatedSiteResolver {
     const result =
       await this.associatedSiteService.getAssociatedSitesBySiteId(siteId,showPending);
     if (result && result.length > 0) {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'AssociatedSiteResolver.getAssociatedSitesBySiteId() RES:200 end',
       );
       return this.genericResponseProvider.createResponse(
@@ -56,7 +56,7 @@ export class AssociatedSiteResolver {
         result,
       );
     } else {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'AssociatedSiteResolver.getAssociatedSitesBySiteId()  RES:404 end',
       );
       return this.genericResponseProvider.createResponse(

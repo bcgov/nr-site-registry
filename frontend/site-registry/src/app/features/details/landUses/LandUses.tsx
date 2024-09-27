@@ -27,12 +27,66 @@ import {
 } from '../../../components/common/IChangeType';
 import { get, set } from '../../../components/table/utils';
 import './LandUses.css';
+import { setupLandHistoriesDataForSaving } from '../SaveSiteDetailsSlice';
+import { UserActionEnum } from '../../../common/userActionEnum';
+import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import LandUseTable from './LandUseTable';
 import { getLandUseColumns } from './LandUseColumnConfiguration';
 
 type createdAtSortDirection = 'newToOld' | 'oldTonew';
 
+const getColumns = (landUseCodes: any[] = [], editMode = false) => {
+  const landUseCodeColumns = editMode
+    ? {
+        id: 1,
+        displayName: 'Land Use',
+        active: true,
+        graphQLPropertyName: 'landUse.code',
+        displayType: {
+          type: FormFieldType.DropDown,
+          label: 'Land Use',
+          options: landUseCodes.map(({ description, code }) => {
+            return { value: description, key: code };
+          }),
+          graphQLPropertyName: 'landUse.code',
+          tableMode: true,
+          placeholder: 'Please enter land use',
+        },
+      }
+    : {
+        id: 1,
+        displayName: 'Land Use',
+        active: true,
+        graphQLPropertyName: 'landUse.description',
+        displayType: {
+          type: FormFieldType.Text,
+          label: 'Land Use',
+          graphQLPropertyName: 'landUse.code',
+          tableMode: true,
+          placeholder: 'Please enter land use note.',
+        },
+      };
 
+  const noteColumn = {
+    id: 2,
+    displayName: 'Notes',
+    active: true,
+    graphQLPropertyName: 'note',
+    displayType: {
+      type: FormFieldType.Text,
+      label: 'Notes',
+      graphQLPropertyName: 'note',
+      tableMode: true,
+    },
+  };
+  return [landUseCodeColumns, noteColumn];
+};
+
+interface LandUseUpdateInput {
+  originalLandUseCode?: string | null;
+  shouldDelete?: boolean;
+  [key: string]: string | boolean | null | undefined;
+}
 
 const LandUses: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -54,6 +108,10 @@ const LandUses: FC = () => {
   const [tableData, setTableData] = useState<{ [key: string]: any }[]>([]);
   const [selectedRowIds, setSelectedRowIds] = useState(new Set<string>());
 
+  const [editLandUsesData, setEditLandUsesData] = useState(
+    new Map<string, LandUseUpdateInput>(),
+  );
+
   const editModeEnabled = viewMode === SiteDetailsMode.EditMode;
   const tableColumns = useMemo(() => {
     return getLandUseColumns(landUseCodes, editModeEnabled);
@@ -67,14 +125,19 @@ const LandUses: FC = () => {
 
   useEffect(() => {
     setTableData(landUsesData);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [siteId, resetDetails, landUsesFetchRequestStatus]);
+  }, [siteId, resetDetails, landUsesFetchRequestStatus, landUsesData]);
 
   useEffect(() => {
     if (editModeEnabled) {
       dispatch(fetchLandUseCodes());
     }
   }, [dispatch, editModeEnabled]);
+
+  useEffect(() => {
+    dispatch(
+      setupLandHistoriesDataForSaving(Array.from(editLandUsesData.values())),
+    );
+  }, [dispatch, editLandUsesData]);
 
   const tableLoading =
     landUseCodesFetchRequestStatus === RequestStatus.loading ||
@@ -87,8 +150,10 @@ const LandUses: FC = () => {
   };
 
   const onTableChange = (event: any) => {
+    const editedRowId = event.row.guid;
+
     if (event.property.includes('select_row')) {
-      handleRowSelect(event.row.guid);
+      handleRowSelect(editedRowId);
       return;
     }
 
@@ -100,7 +165,7 @@ const LandUses: FC = () => {
     }
 
     const updatedLandUses = tableData.map((landUse) => {
-      if (landUse.guid === event.row.guid) {
+      if (landUse.guid === editedRowId) {
         // Create a deep copy of the landUse object
         const updatedLandUse = JSON.parse(JSON.stringify(landUse));
 
@@ -113,6 +178,31 @@ const LandUses: FC = () => {
         return updatedLandUse;
       }
       return landUse;
+    });
+
+    // generate input for update
+    const existingLandUse = landUsesData.find((landUse: any) => {
+      return landUse.guid === editedRowId;
+    });
+
+    const landUseUpdateInput: LandUseUpdateInput = {
+      originalLandUseCode: existingLandUse
+        ? existingLandUse.landUse.code
+        : null,
+      [event.property === 'landUse.code' ? 'landUseCode' : event.property]:
+        event.value,
+    };
+
+    setEditLandUsesData((prev) => {
+      const data = new Map(prev);
+
+      data.set(editedRowId, {
+        ...(data.get(editedRowId) ?? {}),
+        ...landUseUpdateInput,
+        userAction: UserActionEnum.updated,
+        srAction: SRApprovalStatusEnum.Pending,
+      });
+      return data;
     });
 
     const tableColumn = tableColumns.find(
@@ -143,6 +233,27 @@ const LandUses: FC = () => {
   };
 
   const handleRemoveLandUse = () => {
+    setEditLandUsesData((prev) => {
+      const data = new Map(prev);
+
+      selectedRowIds.forEach((rowId) => {
+        const existingLandUse = landUsesData.find((landUse: any) => {
+          return landUse.guid === rowId;
+        });
+
+        data.set(rowId, {
+          originalLandUseCode: existingLandUse
+            ? existingLandUse.landUse.code
+            : null,
+          shouldDelete: true,
+          userAction: UserActionEnum.deleted,
+          srAction: SRApprovalStatusEnum.Pending,
+        });
+      });
+
+      return data;
+    });
+
     setTableData((prevData) => {
       const updatedData = prevData.filter(
         (landUse) => !selectedRowIds.has(landUse.guid),

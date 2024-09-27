@@ -7,8 +7,7 @@ import { plainToInstance } from 'class-transformer';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { EventPartics } from '../../entities/eventPartics.entity';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from 'src/app/logger/logger.service';
 
 @Injectable()
 export class NotationService {
@@ -17,6 +16,7 @@ export class NotationService {
     private notationRepository: Repository<Events>,
     @InjectRepository(EventPartics)
     private notationParticRepository: Repository<EventPartics>,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
     /**
@@ -27,12 +27,12 @@ export class NotationService {
    * @throws Error if there's an issue retrieving the data.
    */
   async getSiteNotationBySiteId(siteId: string,showPending: boolean) {
-  
+
+    this.sitesLogger.log('NotationService.getSiteNotationBySiteId() start');
+    this.sitesLogger.debug('NotationService.getSiteNotationBySiteId() start');
+
     try {
-
-      sitesLogger.info('NotationService.getSiteNotationBySiteId() start');
-      sitesLogger.debug('NotationService.getSiteNotationBySiteId() start');
-
+      // Retrieve events associated with the given siteId
       let events:Events[] = [];
       
       if(showPending)
@@ -43,8 +43,9 @@ export class NotationService {
       {
         events =  await this.notationRepository.find({ where: { siteId } });
       }
-       // If no events are found, return an empty array
-       if (!events.length) {
+
+      // If no events are found, return an empty array
+      if (!events.length) {
         return [];
       }
 
@@ -102,15 +103,14 @@ export class NotationService {
         };
       });
 
-      sitesLogger.info('NotationService.getSiteNotationBySiteId() end');
-      sitesLogger.debug('NotationService.getSiteNotationBySiteId() end');
+      this.sitesLogger.log('NotationService.getSiteNotationBySiteId() end');
+      this.sitesLogger.debug('NotationService.getSiteNotationBySiteId() end');
       // Transform plain objects into NotationDto instances
       return plainToInstance(NotationDto, transformedObjects);
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in NotationService.getSiteNotationBySiteId() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in NotationService.getSiteNotationBySiteId() end',
+        JSON.stringify(error),
       );
       // Handle or log the error as needed
       throw new Error(`Failed to get site notation.`);

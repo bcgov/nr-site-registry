@@ -4,8 +4,7 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { LandHistories } from '../../entities/landHistories.entity';
 import { LandHistoryResponse } from '../../dto/landHistory.dto';
 import { LandHistoryService } from '../../services/landHistory/landHistory.service';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from '../../logger/logger.service';
 type SortDirection = 'ASC' | 'DESC';
 
 @Resolver(() => LandHistories)
@@ -15,6 +14,7 @@ export class LandHistoryResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       LandHistories[]
     >,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
@@ -32,7 +32,7 @@ export class LandHistoryResolver {
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
   ) {
-    sitesLogger.info(
+    this.sitesLogger.log(
       'LandHistoryResolver.getLandHistoriesForSite() start siteId:' +
         ' ' +
         siteId +
@@ -51,7 +51,7 @@ export class LandHistoryResolver {
       showPending
     );
     if (result.length > 0) {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'LandHistoryResolver.getLandHistoriesForSite() RES:200 end',
       );
       return this.genericResponseProvider.createResponse(
@@ -61,7 +61,7 @@ export class LandHistoryResolver {
         result,
       );
     } else {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'LandHistoryResolver.getLandHistoriesForSite() RES:404 end',
       );
       return this.genericResponseProvider.createResponse(

@@ -6,8 +6,7 @@ import { Repository } from 'typeorm';
 import { EventClassCd } from '../../entities/eventClassCd.entity';
 import { EventTypeCd } from '../../entities/eventTypeCd.entity';
 import { EventParticRoleCd } from '../../entities/eventParticRoleCd.entity';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class DropdownService {
@@ -26,6 +25,8 @@ export class DropdownService {
 
     @InjectRepository(EventParticRoleCd)
     private eventParticRoleCdRepository: Repository<EventParticRoleCd>,
+
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   /**
@@ -35,26 +36,25 @@ export class DropdownService {
    * @throws Error if there is an issue retrieving the data.
    */
   async getParticipantRoleCd() {
-    sitesLogger.info('DropdownService.getParticipantRoleCd() start');
-    sitesLogger.debug('DropdownService.getParticipantRoleCd() start');
+    this.sitesLogger.log('DropdownService.getParticipantRoleCd() start');
+    this.sitesLogger.debug('DropdownService.getParticipantRoleCd() start');
     try {
       const result = await this.particRoleRepository.find();
       if (result) {
-        sitesLogger.info('DropdownService.getParticipantRoleCd() end');
-        sitesLogger.debug('DropdownService.getParticipantRoleCd() end');
+        this.sitesLogger.log('DropdownService.getParticipantRoleCd() end');
+        this.sitesLogger.debug('DropdownService.getParticipantRoleCd() end');
         return result.map((obj: any) => ({
           key: obj.code,
           value: obj.description,
         }));
       }
-      sitesLogger.info('DropdownService.getParticipantRoleCd() end');
-      sitesLogger.debug('DropdownService.getParticipantRoleCd() end');
+      this.sitesLogger.log('DropdownService.getParticipantRoleCd() end');
+      this.sitesLogger.debug('DropdownService.getParticipantRoleCd() end');
       return [];
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in DropdownService.getParticipantRoleCd() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in DropdownService.getParticipantRoleCd() end',
+        JSON.stringify(error),
       );
       throw new Error('Failed to retrieve participants role code.');
     }
@@ -69,8 +69,8 @@ export class DropdownService {
    * @throws Error if there is an issue retrieving the data.
    */
   async getPeopleOrgsCd(searchParam: string, entityType: string) {
-    sitesLogger.info('DropdownService.getPeopleOrgsCd() start');
-    sitesLogger.debug('DropdownService.getPeopleOrgsCd() start');
+    this.sitesLogger.log('DropdownService.getPeopleOrgsCd() start');
+    this.sitesLogger.debug('DropdownService.getPeopleOrgsCd() start');
     try {
       const queryBuilder =
         this.peopleOrgsRepository.createQueryBuilder('people_orgs');
@@ -94,8 +94,8 @@ export class DropdownService {
 
       const result = await queryBuilder.getMany();
 
-      sitesLogger.info('DropdownService.getPeopleOrgsCd() end');
-      sitesLogger.debug('DropdownService.getPeopleOrgsCd() end');
+      this.sitesLogger.log('DropdownService.getPeopleOrgsCd() end');
+      this.sitesLogger.debug('DropdownService.getPeopleOrgsCd() end');
       return (
         result.map((obj: PeopleOrgs) => ({
           key: obj.id,
@@ -103,10 +103,9 @@ export class DropdownService {
         })) || []
       );
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in DropdownService.getPeopleOrgsCd() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in DropdownService.getPeopleOrgsCd() end',
+        JSON.stringify(error),
       );
       throw new Error('Failed to retrieve people orgs.');
     }
@@ -119,13 +118,13 @@ export class DropdownService {
    * @throws Error if there is an issue retrieving the data.
    */
   async getNotationTypeCd() {
-    sitesLogger.info('DropdownService.getNotationTypeCd() start');
-    sitesLogger.debug('DropdownService.getNotationTypeCd() start');
+    this.sitesLogger.log('DropdownService.getNotationTypeCd() start');
+    this.sitesLogger.debug('DropdownService.getNotationTypeCd() start');
     try {
       const result = await this.eventTypeCdRepository.find();
       if (result) {
-        sitesLogger.info('DropdownService.getNotationTypeCd() end');
-        sitesLogger.debug('DropdownService.getNotationTypeCd() end');
+        this.sitesLogger.log('DropdownService.getNotationTypeCd() end');
+        this.sitesLogger.debug('DropdownService.getNotationTypeCd() end');
         return result.reduce(
           (acc, item: EventTypeCd) => {
             const existingMetaData = acc.find(
@@ -151,14 +150,13 @@ export class DropdownService {
           }[],
         );
       }
-      sitesLogger.info('DropdownService.getNotationTypeCd() end');
-      sitesLogger.debug('DropdownService.getNotationTypeCd() end');
+      this.sitesLogger.log('DropdownService.getNotationTypeCd() end');
+      this.sitesLogger.debug('DropdownService.getNotationTypeCd() end');
       return [];
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in DropdownService.getNotationTypeCd() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in DropdownService.getNotationTypeCd() end',
+        JSON.stringify(error),
       );
       throw new Error('Failed to retrieve notation type codes.');
     }
@@ -171,26 +169,25 @@ export class DropdownService {
    * @throws Error if there is an issue retrieving the data.
    */
   async getNotationClassCd() {
-    sitesLogger.info('DropdownService.getNotationClassCd() start');
-    sitesLogger.debug('DropdownService.getNotationClassCd() start');
+    this.sitesLogger.log('DropdownService.getNotationClassCd() start');
+    this.sitesLogger.debug('DropdownService.getNotationClassCd() start');
     try {
       const result = await this.eventClassCdRepository.find();
       if (result) {
-        sitesLogger.info('DropdownService.getNotationClassCd() end');
-        sitesLogger.debug('DropdownService.getNotationClassCd() end');
+        this.sitesLogger.log('DropdownService.getNotationClassCd() end');
+        this.sitesLogger.debug('DropdownService.getNotationClassCd() end');
         return result.map((obj: EventClassCd) => ({
           key: obj.code,
           value: obj.description,
         }));
       }
-      sitesLogger.info('DropdownService.getNotationClassCd() end');
-      sitesLogger.debug('DropdownService.getNotationClassCd() end');
+      this.sitesLogger.log('DropdownService.getNotationClassCd() end');
+      this.sitesLogger.debug('DropdownService.getNotationClassCd() end');
       return [];
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in DropdownService.getNotationClassCd() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in DropdownService.getNotationClassCd() end',
+        JSON.stringify(error),
       );
       throw new Error('Failed to retrieve notation class codes.');
     }
@@ -203,26 +200,37 @@ export class DropdownService {
    * @throws Error if there is an issue retrieving the data.
    */
   async getNotationParticipantRoleCd() {
-    sitesLogger.info('DropdownService.getNotationParticipantRoleCd() start');
-    sitesLogger.debug('DropdownService.getNotationParticipantRoleCd() start');
+    this.sitesLogger.log(
+      'DropdownService.getNotationParticipantRoleCd() start',
+    );
+    this.sitesLogger.debug(
+      'DropdownService.getNotationParticipantRoleCd() start',
+    );
     try {
       const result = await this.eventParticRoleCdRepository.find();
       if (result) {
-        sitesLogger.info('DropdownService.getNotationParticipantRoleCd() end');
-        sitesLogger.debug('DropdownService.getNotationParticipantRoleCd() end');
+        this.sitesLogger.log(
+          'DropdownService.getNotationParticipantRoleCd() end',
+        );
+        this.sitesLogger.debug(
+          'DropdownService.getNotationParticipantRoleCd() end',
+        );
         return result.map((obj: EventParticRoleCd) => ({
           key: obj.code,
           value: obj.description,
         }));
       }
-      sitesLogger.info('DropdownService.getNotationParticipantRoleCd() end');
-      sitesLogger.debug('DropdownService.getNotationParticipantRoleCd() end');
+      this.sitesLogger.log(
+        'DropdownService.getNotationParticipantRoleCd() end',
+      );
+      this.sitesLogger.debug(
+        'DropdownService.getNotationParticipantRoleCd() end',
+      );
       return [];
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in DropdownService.getNotationParticipantRoleCd() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in DropdownService.getNotationParticipantRoleCd() end',
+        JSON.stringify(error),
       );
       throw new Error('Failed to retrieve notation participant role codes.');
     }

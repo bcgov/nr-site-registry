@@ -3,11 +3,19 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { ParcelDescriptionDto } from '../../dto/parcelDescription.dto';
 import { GenericPagedResponse } from '../../dto/response/genericResponse';
+import {
+  getExternalUserQueries,
+  getInternalUserQueries,
+} from './parcelDescriptions.queryBuilder';
+import { SnapshotsService } from '../snapshot/snapshot.service';
+import { LoggerService } from 'src/app/logger/logger.service';
 
 @Injectable()
 export class ParcelDescriptionsService {
   constructor(
     @InjectEntityManager() private readonly entityManager: EntityManager,
+    private snapshotService: SnapshotsService,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   /**
@@ -27,9 +35,31 @@ export class ParcelDescriptionsService {
     searchParam: string,
     sortParam: string,
     sortDir: string,
-    showPending: boolean
+    showPending: boolean,
+    user: any,
   ): Promise<GenericPagedResponse<ParcelDescriptionDto[]>> {
-    // Sanitize the query parameters.
+    this.sitesLogger.log(
+      'ParcelDescriptionsService.getParcelDescriptionsBySiteId() start',
+    );
+    this.sitesLogger.debug(
+      'ParcelDescriptionsService.getParcelDescriptionsBySiteId() start',
+    );
+    
+    const userId: string = user?.sub ? user.sub : '';
+    const internalUser: boolean = user?.identity_provider === 'idir';
+
+    // Fail fast if the user is invalid
+    if (userId.length === 0) {
+      return new GenericPagedResponse<ParcelDescriptionDto[]>(
+        'User id is invalid.',
+        500,
+        false,
+        [],
+        0,
+        0,
+        0,
+      );
+    }
     const filterTerm = searchParam ? searchParam : '';
     const orderBy = [
       'id',
@@ -42,8 +72,8 @@ export class ParcelDescriptionsService {
       : `parcel_descriptions.id`;
     const orderByDir = sortDir == 'DESC' ? 'DESC' : 'ASC';
     const offset = (page - 1) * pageSize;
-    const countQueryParams: string[] = [String(siteId), filterTerm];
-    const queryParams: string[] = [
+    let countQueryParams: string[] = [String(siteId), filterTerm];
+    let queryParams: string[] = [
       String(siteId),
       filterTerm,
       String(offset),
@@ -99,7 +129,7 @@ export class ParcelDescriptionsService {
       OR LOWER(parcel_descriptions.land_description) ~* $2
     )
   `
-    const countQuery = `SELECT COUNT(*) FROM ( ${query} ) AS subquery`;
+    let countQuery = `SELECT COUNT(*) FROM ( ${query} ) AS subquery`;
 
     // Add sorting and pagination. Including sorting here is a minor
     // optimization so that it isn't included in the count query.
@@ -116,6 +146,51 @@ export class ParcelDescriptionsService {
     const responsePage = page;
     const responsePageSize = pageSize;
 
+
+    if (internalUser) {
+      [query, queryParams, countQuery, countQueryParams] =
+        getInternalUserQueries(
+          siteId,
+          searchParam,
+          offset,
+          pageSize,
+          sortParam,
+          sortDir,
+        );
+    } else {
+      const snapshot = await this.snapshotService.getMostRecentSnapshot(
+        String(siteId),
+        userId,
+      );
+      if (!snapshot) {
+        return new GenericPagedResponse<ParcelDescriptionDto[]>(
+          'Parcel Descriptions fetched successfully.',
+          200,
+          true,
+          [],
+          0,
+          0,
+          0,
+        );
+      }
+      const siteSubdivisionsIds = snapshot.snapshotData.subDivisions.map(
+        (siteSubdivision) => {
+          return siteSubdivision.siteSubdivId;
+        },
+      );
+      [query, queryParams, countQuery, countQueryParams] =
+        getExternalUserQueries(
+          siteSubdivisionsIds,
+          searchParam,
+          offset,
+          pageSize,
+          sortParam,
+          sortDir,
+        );
+    }
+
+ 
+
     try {
       countResult = await this.entityManager.query(
         countQuery,
@@ -124,6 +199,10 @@ export class ParcelDescriptionsService {
       rawResults = await this.entityManager.query(combinedQuery, queryParams);
       count = countResult.length > 0 ? countResult[0]?.count : 0;
     } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in ParcelDescriptionsService.getParcelDescriptionsBySiteId() end',
+        JSON.stringify(error),
+      );
       return new GenericPagedResponse<ParcelDescriptionDto[]>(
         'There was an error communicating with the database. Try again later.',
         500,
@@ -144,6 +223,13 @@ export class ParcelDescriptionsService {
         rawResult.land_description,
       );
     });
+
+    this.sitesLogger.log(
+      'ParcelDescriptionsService.getParcelDescriptionsBySiteId() end',
+    );
+    this.sitesLogger.debug(
+      'ParcelDescriptionsService.getParcelDescriptionsBySiteId() end',
+    );
 
     return new GenericPagedResponse<ParcelDescriptionDto[]>(
       'Parcel Descriptions fetched successfully.',

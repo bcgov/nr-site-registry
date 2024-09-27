@@ -7,12 +7,14 @@ import { DocumentDto } from '../../dto/document.dto';
 import { UserActionEnum } from 'src/app/common/userActionEnum';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sitesLogger = require('../../logger/logging');
+import { LoggerService } from 'src/app/logger/logger.service';
 
 @Injectable()
 export class DocumentService {
   constructor(
     @InjectRepository(SiteDocs)
     private siteDocsRepository: Repository<SiteDocs>,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
    /**
@@ -24,8 +26,8 @@ export class DocumentService {
   async getSiteDocumentsBySiteId(siteId: string,showPending : boolean) {
     
     try {
-      sitesLogger.info('DocumentService.getSiteDocumentsBySiteId() start');
-      sitesLogger.debug('DocumentService.getSiteDocumentsBySiteId() start');
+      this.sitesLogger.log('DocumentService.getSiteDocumentsBySiteId() start');
+      this.sitesLogger.debug('DocumentService.getSiteDocumentsBySiteId() start');
       let result: SiteDocs[] = [];
       if(showPending)
       {
@@ -71,15 +73,14 @@ export class DocumentService {
       ];
     });
 
-    // Convert plain objects to DocumentDto instances
-    sitesLogger.info('DocumentService.getSiteDocumentsBySiteId() end');
-    sitesLogger.debug('DocumentService.getSiteDocumentsBySiteId() end');
-    return plainToInstance(DocumentDto, response);
+      // Convert plain objects to DocumentDto instances
+      this.sitesLogger.log('DocumentService.getSiteDocumentsBySiteId() end');
+      this.sitesLogger.debug('DocumentService.getSiteDocumentsBySiteId() end');
+      return plainToInstance(DocumentDto, response);
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in DocumentService.getSiteDocumentsBySiteId() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in DocumentService.getSiteDocumentsBySiteId() end',
+        JSON.stringify(error),
       );
       // Provide more context in the error message
       throw new Error('Failed to retrieve site documents by site id.');

@@ -501,7 +501,7 @@ const SiteDetails = () => {
             closeHandler={(response) => {
               setSave(false);
               if (response) {
-                dispatch(saveSiteDetails(null)).unwrap();
+                dispatch(saveSiteDetails()).unwrap();
               }
             }}
           >

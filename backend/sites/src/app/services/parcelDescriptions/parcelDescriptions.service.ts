@@ -3,13 +3,18 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { ParcelDescriptionDto } from '../../dto/parcelDescription.dto';
 import { GenericPagedResponse } from '../../dto/response/genericResponse';
-import { getInternalUserQueries } from './parcelDescriptions.queryBuilder';
+import {
+  getExternalUserQueries,
+  getInternalUserQueries,
+} from './parcelDescriptions.queryBuilder';
+import { SnapshotsService } from '../snapshot/snapshot.service';
 import { LoggerService } from 'src/app/logger/logger.service';
 
 @Injectable()
 export class ParcelDescriptionsService {
   constructor(
     @InjectEntityManager() private readonly entityManager: EntityManager,
+    private snapshotService: SnapshotsService,
     private readonly sitesLogger: LoggerService,
   ) {}
 
@@ -30,6 +35,7 @@ export class ParcelDescriptionsService {
     searchParam: string,
     sortParam: string,
     sortDir: string,
+    user: any,
   ): Promise<GenericPagedResponse<ParcelDescriptionDto[]>> {
     this.sitesLogger.log(
       'ParcelDescriptionsService.getParcelDescriptionsBySiteId() start',
@@ -37,28 +43,76 @@ export class ParcelDescriptionsService {
     this.sitesLogger.debug(
       'ParcelDescriptionsService.getParcelDescriptionsBySiteId() start',
     );
-    // Sanitize the query parameters.
     const offset = (page - 1) * pageSize;
+    const userId: string = user?.sub ? user.sub : '';
+    const internalUser: boolean = user?.identity_provider === 'idir';
+
+    // Fail fast if the user is invalid
+    if (userId.length === 0) {
+      return new GenericPagedResponse<ParcelDescriptionDto[]>(
+        'User id is invalid.',
+        500,
+        false,
+        [],
+        0,
+        0,
+        0,
+      );
+    }
+
+    let results: ParcelDescriptionDto[] = [];
+    let count: number;
+    let responsePage = page;
+    let responsePageSize = pageSize;
+
     let query: string;
     let queryParams: string[];
     let countQuery: string;
     let countQueryParams: string[];
-
-    [query, queryParams, countQuery, countQueryParams] = getInternalUserQueries(
-      siteId,
-      searchParam,
-      offset,
-      pageSize,
-      sortParam,
-      sortDir,
-    );
+    if (internalUser) {
+      [query, queryParams, countQuery, countQueryParams] =
+        getInternalUserQueries(
+          siteId,
+          searchParam,
+          offset,
+          pageSize,
+          sortParam,
+          sortDir,
+        );
+    } else {
+      const snapshot = await this.snapshotService.getMostRecentSnapshot(
+        String(siteId),
+        userId,
+      );
+      if (!snapshot) {
+        return new GenericPagedResponse<ParcelDescriptionDto[]>(
+          'Parcel Descriptions fetched successfully.',
+          200,
+          true,
+          [],
+          0,
+          0,
+          0,
+        );
+      }
+      const siteSubdivisionsIds = snapshot.snapshotData.subDivisions.map(
+        (siteSubdivision) => {
+          return siteSubdivision.siteSubdivId;
+        },
+      );
+      [query, queryParams, countQuery, countQueryParams] =
+        getExternalUserQueries(
+          siteSubdivisionsIds,
+          searchParam,
+          offset,
+          pageSize,
+          sortParam,
+          sortDir,
+        );
+    }
 
     let countResult: any;
     let rawResults: any;
-    let results: ParcelDescriptionDto[] = [];
-    let count: number;
-    const responsePage = page;
-    const responsePageSize = pageSize;
 
     try {
       countResult = await this.entityManager.query(

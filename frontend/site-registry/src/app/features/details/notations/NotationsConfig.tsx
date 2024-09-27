@@ -502,7 +502,7 @@ export const GetNotationConfig = () => {
       id: 3,
       displayName: 'SR',
       active: true,
-      graphQLPropertyName: 'sr',
+      graphQLPropertyName: 'srAction',
       displayType: {
         type: FormFieldType.Checkbox,
         label: 'SR',

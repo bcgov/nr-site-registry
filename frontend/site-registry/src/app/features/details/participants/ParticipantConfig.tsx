@@ -121,7 +121,7 @@ export const GetConfig = () => {
       id: 6,
       displayName: 'SR',
       active: true,
-      graphQLPropertyName: 'sr',
+      graphQLPropertyName: 'srAction',
       displayType: {
         type: FormFieldType.Checkbox,
         label: 'SR',

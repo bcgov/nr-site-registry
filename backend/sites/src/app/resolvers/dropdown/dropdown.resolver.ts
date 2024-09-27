@@ -183,7 +183,7 @@ export class DropdownResolver {
       'DropdownResolver.getNotationParticipantRoleCd() start',
     );
     const result = await this.dropdownService.getNotationParticipantRoleCd();
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       this.sitesLogger.log(
         'DropdownResolver.getNotationParticipantRoleCd() RES:200 end',
       );

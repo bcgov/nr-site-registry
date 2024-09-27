@@ -45,14 +45,13 @@ const TableHeader: FC<TableHeaderProps> = ({
             onChange={(event) => {
               selectAllRowsHandler(event, !currentPageAllRowsSelected);
             }}
-            
           />
         </th>
       )}
       {columns &&
         columns.map((item, index) => (
           <HeaderCell
-          key={index}
+            key={index}
             item={item}
             index={index}
             sortHandler={sortHandler}

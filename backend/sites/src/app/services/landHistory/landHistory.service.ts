@@ -1,6 +1,9 @@
+import { v4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets } from 'typeorm';
 import { LandHistories } from '../../entities/landHistories.entity';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 import { UserActionEnum } from 'src/app/common/userActionEnum';
 
 export class LandHistoryService {
@@ -15,6 +18,8 @@ export class LandHistoryService {
     sortDirection: 'ASC' | 'DESC',
     showPending: boolean
   ): Promise<LandHistories[]> {
+    sitesLogger.info('LandHistoryService.getLandHistoriesForSite() start');
+    sitesLogger.debug('LandHistoryService.getLandHistoriesForSite() start');
     try {
       const query = this.landHistoryRepository
         .createQueryBuilder('landHistory')
@@ -42,7 +47,7 @@ export class LandHistoryService {
         query.andWhere(
           new Brackets((qb) => {
             qb.where('landHistory.user_action = :status', {
-              status: `${UserActionEnum.updated}`,
+              status: `${UserActionEnum.UPDATED}`,
             })
           }),
         );
@@ -52,9 +57,19 @@ export class LandHistoryService {
         query.orderBy('when_created', sortDirection);
       }
 
-      const result = await query.getMany();
+      const result = (await query.getMany()).map((landHistory) => ({
+        ...landHistory,
+        guid: v4(),
+      }));
+      sitesLogger.info('LandHistoryService.getLandHistoriesForSite() end');
+      sitesLogger.debug('LandHistoryService.getLandHistoriesForSite() end');
       return result;
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in LandHistoryService.getLandHistoriesForSite() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw error;
     }
   }

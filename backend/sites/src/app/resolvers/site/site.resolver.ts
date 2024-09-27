@@ -19,7 +19,8 @@ import { UsePipes } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { CustomRoles } from '../../common/role';
-
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 /**
  * Resolver for Region
  */
@@ -102,6 +103,7 @@ export class SiteResolver {
     @Args('whenUpdated', { type: () => String, nullable: true })
     whenUpdated?: Date,
   ) {
+    sitesLogger.info('SiteResolver.searchSites() start ');
     return await this.siteService.searchSites(
       searchParam,
       page,
@@ -141,6 +143,9 @@ export class SiteResolver {
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
   ) {
+    sitesLogger.info(
+      'SiteResolver.findSiteBySiteId() start siteId:' + ' ' + siteId,
+    );
     return this.siteService.findSiteBySiteId(siteId, showPending);
   }
 
@@ -157,8 +162,12 @@ export class SiteResolver {
   async searchSiteIds(
     @Args('searchParam', { type: () => String }) searchParam: string,
   ) {
+    sitesLogger.info(
+      'SiteResolver.searchSiteIds() start searchParam:' + ' ' + searchParam,
+    );
     const result = await this.siteService.searchSiteIds(searchParam);
     if (result && result.length > 0) {
+      sitesLogger.info('SiteResolver.searchSiteIds() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Notation Paticipant Role fetched successfully',
         200,
@@ -166,6 +175,7 @@ export class SiteResolver {
         result,
       );
     } else {
+      sitesLogger.info('SiteResolver.searchSiteIds() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Notation Paticipant Role not found`,
         404,
@@ -198,7 +208,7 @@ export class SiteResolver {
       return this.genericResponseProviderForSave.createResponse(
         `Successfully saved site details.`,
         200,
-        false,
+        true,
       );
     } else {
       return this.genericResponseProviderForSave.createResponse(

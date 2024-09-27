@@ -38,7 +38,7 @@ const ApproveReject: React.FC<IApproveReject> = ({ name, children }) => {
          View</Link>
         </div>
       </div>
-      {isOpen && <div>{children}</div>}
+      {isOpen && <div>{children}</div>}      
     </div>
   );
 };

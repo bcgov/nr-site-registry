@@ -93,6 +93,7 @@ type LandHistories {
   userAction: String!
   srAction: String!
   siteId: String!
+  guid: String!
   lutCode: String!
   note: String
   whoCreated: String!
@@ -489,6 +490,8 @@ type NotationResponse {
 }
 
 type NotationDto {
+  userAction: String!
+  srAction: String!
   id: String!
   psnorgId: String!
   siteId: String!
@@ -503,7 +506,10 @@ type NotationDto {
 }
 
 type NotationParticipantDto {
+  userAction: String!
+  srAction: String!
   guid: String!
+  eventId: String!
   eprCode: String!
   psnorgId: String!
   displayName: String!
@@ -589,6 +595,16 @@ type SnapshotResponse {
   data: [Snapshots!]
 }
 
+type BannerTypeData {
+  bannerType: String!
+}
+
+type BannerTypeResponse {
+  httpStatusCode: Int!
+  message: String!
+  data: BannerTypeData
+}
+
 type DisclosureResponse {
   message: String
   httpStatusCode: Int
@@ -645,6 +661,33 @@ type AssociatedSiteDto {
   note: String
 }
 
+type LandUseCodeResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [LandUseCd!]!
+}
+
+type ParcelDescriptionsResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  count: Float
+  page: Float
+  pageSize: Float
+  data: [ParcelDescriptionDto!]
+}
+
+type ParcelDescriptionDto {
+  id: Float!
+  descriptionType: String!
+  idPinNumber: String!
+  dateNoted: DateTime!
+  landDescription: String!
+}
+
 type Query {
   sites: FetchSiteResponse!
   searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
@@ -655,6 +698,8 @@ type Query {
   getSnapshotsByUserId(userId: String!): SnapshotResponse!
   getSnapshotsBySiteId(siteId: String!): SnapshotResponse!
   getSnapshotsById(id: Int!): SnapshotResponse!
+  getBannerType(siteId: String!): BannerTypeResponse!
+  getParcelDescriptionsBySiteId(siteId: Int!, page: Int!, pageSize: Int!, searchParam: String!, sortBy: String!, sortByDir: String!, pending: Boolean): ParcelDescriptionsResponse!
   getSiteParticipantBySiteId(siteId: String!, pending: Boolean): SiteParticsResponse!
   getParticipantRoleCd: DropdownResponse!
   getPeopleOrgsCd(searchParam: String, entityType: String): DropdownResponse!
@@ -664,6 +709,7 @@ type Query {
   getSiteDisclosureBySiteId(siteId: String!, pending: Boolean): DisclosureResponse!
   getCartItemsForUser(userId: String!): CartResponse!
   getLandHistoriesForSite(siteId: String!, searchTerm: String, sortDirection: String, pending: Boolean): LandHistoryResponse!
+  getLandUseCodes: LandUseCodeResponse!
   getSiteNotationBySiteId(siteId: String!, pending: Boolean): NotationResponse!
   getSiteDocumentsBySiteId(siteId: String!, pending: Boolean): DocumentResponse!
   getFolioItemsForUser(userId: String!): FolioResponse!
@@ -704,7 +750,8 @@ input SaveSiteDetailsDTO {
 }
 
 input SiteSummaryDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   id: String!
   bcerCode: String
@@ -743,7 +790,8 @@ input SiteSummaryDTO {
 }
 
 input NotationIputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   id: String!
   psnorgId: String!
@@ -759,16 +807,19 @@ input NotationIputDTO {
 }
 
 input NotationParticipantInputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   guid: String!
+  eventId: String!
   eprCode: String!
   psnorgId: String!
   displayName: String!
 }
 
 input SiteParticsInputDto {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   guid: String!
   id: String!
@@ -782,7 +833,8 @@ input SiteParticsInputDto {
 }
 
 input DocumentInputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   id: String!
   psnorgId: String!
@@ -794,7 +846,8 @@ input DocumentInputDTO {
 }
 
 input SiteAssociationsInputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   siteId: String!
   siteIdAssociatedWith: String!
@@ -810,7 +863,8 @@ input SiteAssociationsInputDTO {
 }
 
 input SubDivisionsInputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   id: String!
   dateNoted: DateTime!
@@ -835,7 +889,8 @@ input SubDivisionsInputDTO {
 }
 
 input LandHistoriesInputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   siteId: String!
   lutCode: String!
@@ -851,7 +906,8 @@ input LandHistoriesInputDTO {
 }
 
 input SiteProfilesInputDTO {
-  userAction: String!
+  userAction: String
+  apiAction: String
   srAction: String!
   siteId: String!
   dateCompleted: DateTime!

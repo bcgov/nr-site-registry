@@ -22,7 +22,9 @@ import { Subdivisions } from '../../entities/subdivisions.entity';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { DropdownResponse } from '../../dto/dropdown.dto';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
-import { UserActionEnum } from 'src/app/common/userActionEnum';
+import { UserActionEnum } from '../../common/userActionEnum';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 /**
  * Nestjs Service For Region Entity
  */
@@ -58,12 +60,16 @@ export class SiteService {
    * @returns FetchSiteResponse -- returns sites
    */
   async findAll() {
+    sitesLogger.info('SiteService.findAll() start');
+    sitesLogger.debug('SiteService.findAll() start');
     const response = new FetchSiteResponse();
 
     response.httpStatusCode = 200;
 
     response.data = await this.siteRepository.find();
 
+    sitesLogger.info('SiteService.findAll() end');
+    sitesLogger.debug('SiteService.findAll() end');
     return response;
   }
 
@@ -95,6 +101,8 @@ export class SiteService {
     whenCreated?: Date,
     whenUpdated?: Date,
   ) {
+    sitesLogger.info('SiteService.searchSites() start');
+    sitesLogger.debug('SiteService.searchSites() start');
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
 
@@ -232,7 +240,8 @@ export class SiteService {
     response.count = result[1] ? result[1] : 0;
     response.page = page;
     response.pageSize = pageSize;
-
+    sitesLogger.info('SiteService.searchSites() end');
+    sitesLogger.debug('SiteService.searchSites() end');
     return response;
   }
 
@@ -242,6 +251,8 @@ export class SiteService {
    * @returns a single site matching the site ID
    */
   async findSiteBySiteId(siteId: string, pending:boolean) {
+    sitesLogger.info('SiteService.findSiteBySiteId() start');
+    sitesLogger.debug('SiteService.findSiteBySiteId() start');
     const response = new FetchSiteDetail();
 
     response.httpStatusCode = 200;
@@ -249,7 +260,7 @@ export class SiteService {
     if(pending)
     {
       const result = await this.siteRepository.findOne({
-        where: { id: siteId , userAction: UserActionEnum.updated },
+        where: { id: siteId , userAction: UserActionEnum.UPDATED },
       });
       
       response.data = result ? result : null;
@@ -262,11 +273,14 @@ export class SiteService {
 
       response.data = result ? result : null;
     }    
-
+    sitesLogger.info('SiteService.findSiteBySiteId() end');
+    sitesLogger.debug('SiteService.findSiteBySiteId() end');
     return response;
   }
 
   async searchSiteIds(searchParam: string) {
+    sitesLogger.info('SiteService.searchSiteIds() start');
+    sitesLogger.debug('SiteService.searchSiteIds() start');
     try {
       // Use query builder to type cast the 'id' field to a string
       const queryBuilder = this.siteRepository
@@ -277,11 +291,20 @@ export class SiteService {
         .orderBy('sites.id', 'ASC'); // Ordering by 'id' in ascending order;
       const result = await queryBuilder.getMany();
       if (result) {
+        sitesLogger.info('SiteService.searchSiteIds() end');
+        sitesLogger.debug('SiteService.searchSiteIds() end');
         return result.map((obj: any) => ({ key: obj.id, value: obj.id }));
       } else {
+        sitesLogger.info('SiteService.searchSiteIds() end');
+        sitesLogger.debug('SiteService.searchSiteIds() end');
         return []; // Return an empty array if no results
       }
     } catch (error) {
+      sitesLogger.error(
+        'Exception occured in SiteService.searchSiteIds() end' +
+          ' ' +
+          JSON.stringify(error),
+      );
       throw new Error('Failed to retrieve site ids.');
     }
   }
@@ -314,8 +337,12 @@ export class SiteService {
                 console.log('No changes To Site Summary');
               }
 
-              if (events) {
-                await transactionalEntityManager.save(Events, events);
+              if (events && events.length > 0) {
+                await this.processEvents(
+                  events,
+                  userInfo,
+                  transactionalEntityManager,
+                );
               } else {
                 console.log('No changes To Site Events');
               }
@@ -398,6 +425,174 @@ export class SiteService {
     } catch (error) {
       console.log('Save site details error', error);
       throw error;
+    }
+  }
+
+  /**
+   * Processes and saves events and participants based on the provided actions.
+   * @param events - Array of event data including actions to be performed.
+   * @param userInfo - Information about the user performing the actions.
+   * @param transactionalEntityManager - Entity manager for handling transactions.
+   */
+  async processEvents(
+    events: any[], // Replace 'any' with actual type if possible
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    if (events && events.length > 0) {
+      // Arrays to store new and updated entities
+      const newEvents: Events[] = [];
+      const updatedEvents: { id: string; changes: Partial<Events> }[] = [];
+      const newEventPartics: EventPartics[] = [];
+      const updatedEventPartics: {
+        id: string;
+        changes: Partial<EventPartics>;
+      }[] = [];
+
+      // Process participants based on their action
+      const processParticipants = async (
+        eventId: string,
+        participants: any[],
+      ) => {
+        const participantPromises = participants.map(async (partic) => {
+          const { guid, displayName, apiAction, ...particData } = partic;
+          switch (apiAction) {
+            case UserActionEnum.ADDED:
+              return {
+                ...particData,
+                eventId,
+                rwmFlag: 50,
+                userAction: UserActionEnum.ADDED,
+                whenCreated: new Date(),
+                whoCreated: userInfo ? userInfo.givenName : '',
+              };
+            case UserActionEnum.UPDATED:
+              const existingPartic =
+                await this.eventsParticipantsRepo.findOneByOrFail({ id: guid });
+              return {
+                id: guid,
+                changes: {
+                  ...existingPartic,
+                  ...particData,
+                  userAction: (partic.srAction === SRApprovalStatusEnum.PUBLIC || partic.srAction === SRApprovalStatusEnum.PRIVATE) ? UserActionEnum.DEFAULT : UserActionEnum.UPDATED,
+                  whenUpdated: new Date(),
+                  whoUpdated: userInfo ? userInfo.givenName : '',
+                },
+              };
+            case UserActionEnum.DELETED:
+              await transactionalEntityManager.delete(EventPartics, {
+                id: guid,
+              });
+              return null;
+            default:
+              console.warn('Unknown action for event participant:', apiAction);
+              return null;
+          }
+        });
+        const participantResults = await Promise.all(participantPromises);
+
+        participantResults.forEach((result) => {
+          if (result) {
+            if (result.eventId) {
+              newEventPartics.push(result);
+            } else if (result.id) {
+              updatedEventPartics.push(result);
+            }
+          }
+        });
+      };
+
+      // Main processing loop for events
+      const eventPromises = events.map(async (notation) => {
+        const { notationParticipant, apiAction, ...eventData } = notation;
+        let notationId = notation.id;
+        let event: Events = {
+          ...new Events(),
+          ...eventData,
+        };
+        switch (apiAction) {
+          case UserActionEnum.ADDED:
+            // Generate new ID for the new event
+            const newId = await this.eventsRepositoryRepo
+              .createQueryBuilder()
+              .select('MAX(id)', 'maxid')
+              .getRawOne()
+              .then((result) => (Number(result.maxid) || 0) + 1);
+
+            // Get the ID of the newly created event
+            notationId = newId.toString();
+
+            newEvents.push({
+              ...event,
+              id: notationId,
+              eventDate: new Date(),
+              rwmFlag: 50,
+              rwmNoteFlag: 50,
+              userAction: UserActionEnum.ADDED,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+            break;
+
+          case UserActionEnum.UPDATED:
+            const existingEvent =
+              await this.eventsRepositoryRepo.findOneByOrFail({
+                id: notation.id,
+              });
+            updatedEvents.push({
+              id: notation.id,
+              changes: {
+                ...new Events(),
+                ...existingEvent,
+                ...event,
+                userAction: (notation.srAction === SRApprovalStatusEnum.PUBLIC || notation.srAction === SRApprovalStatusEnum.PRIVATE) ? UserActionEnum.DEFAULT : UserActionEnum.UPDATED,
+                whenUpdated: new Date(),
+                whoUpdated: userInfo ? userInfo.givenName : '',
+              },
+            });
+            break;
+
+          case UserActionEnum.DELETED:
+            // Handle deletion if necessary
+            break;
+
+          default:
+            console.warn('Unknown action for event:', apiAction);
+        }
+
+        // Process related participants regardless of event action
+        if (notationParticipant && notationParticipant.length > 0) {
+          await processParticipants(notationId, notationParticipant);
+        }
+      });
+
+      await Promise.all(eventPromises);
+
+      // Save new events and event participants in bulk
+      if (newEvents.length > 0) {
+        await transactionalEntityManager.save(Events, newEvents);
+      }
+
+      if (newEventPartics.length > 0) {
+        await transactionalEntityManager.save(EventPartics, newEventPartics);
+      }
+
+      // Update existing events and participants in bulk
+      if (updatedEvents.length > 0) {
+        await Promise.all(
+          updatedEvents.map(({ id, changes }) =>
+            transactionalEntityManager.update(Events, { id }, changes),
+          ),
+        );
+      }
+
+      if (updatedEventPartics.length > 0) {
+        await Promise.all(
+          updatedEventPartics.map(({ id, changes }) =>
+            transactionalEntityManager.update(EventPartics, { id }, changes),
+          ),
+        );
+      }
     }
   }
 }

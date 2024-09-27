@@ -4,6 +4,7 @@ import Disclosure from '../disclosure/Disclosure';
 import Documents from '../documents/Documents';
 import LandUses from '../landUses/LandUses';
 import Notations from '../notations/Notations';
+import ParcelDescriptions from '../parcelDescriptions/parcelDescriptions';
 import Participants from '../participants/Participant';
 import SRUpdates from '../srUpdates/srUpdates';
 
@@ -38,7 +39,7 @@ const mainNavComponents = [
   <Documents />,
   <Associate />,
   <LandUses />,
-  <></>,
+  <ParcelDescriptions />,
   <Disclosure />,
 ];
 

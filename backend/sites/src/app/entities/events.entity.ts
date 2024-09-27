@@ -51,8 +51,8 @@ export class Events extends ChangeAuditEntity {
   psnorgId: string;
 
   @Field()
-  @Column('bigint', { name: 'sp_id' })
-  spId: string;
+  @Column('bigint', { name: 'sp_id', nullable: true })
+  spId: string | null;
 
   @Field({ nullable: true })
   @Column('character varying', {
@@ -146,21 +146,15 @@ export class Events extends ChangeAuditEntity {
   requirementReceivedDate: Date | null;
 
   @Field(() => [ConditionsText], { nullable: true })
-  @OneToMany(() => ConditionsText, (conditionsText) => conditionsText.event, {
-    eager: true,
-  })
+  @OneToMany(() => ConditionsText, (conditionsText) => conditionsText.event)
   conditionsTexts: ConditionsText[];
 
   @Field(() => [EventPartics], { nullable: true })
-  @OneToMany(() => EventPartics, (eventPartics) => eventPartics.event, {
-    eager: true,
-  })
+  @OneToMany(() => EventPartics, (eventPartics) => eventPartics.event)
   eventPartics: EventPartics[];
 
   @Field(() => EventTypeCd)
-  @ManyToOne(() => EventTypeCd, (eventTypeCd) => eventTypeCd.events, {
-    eager: true,
-  })
+  @ManyToOne(() => EventTypeCd, (eventTypeCd) => eventTypeCd.events)
   @JoinColumn([
     { name: 'etyp_code', referencedColumnName: 'code' },
     { name: 'ecls_code', referencedColumnName: 'eclsCode' },

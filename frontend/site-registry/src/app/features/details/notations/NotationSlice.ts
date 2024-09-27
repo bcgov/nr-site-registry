@@ -48,6 +48,7 @@ const notationParticipantSlice = createSlice({
         state.status = RequestStatus.loading;
       })
       .addCase(fetchNotationParticipants.fulfilled, (state, action) => {
+        console.log("fetchNotationParticipants",action.payload)
         state.status = RequestStatus.success;
         state.siteNotation = action.payload;
       })

@@ -14,13 +14,26 @@ export const getLandHistoriesForSiteQuery = gql`
       pending: $pending
     ) {
       data {
+        guid
         siteId
         lutCode
         note
+        whenCreated
         landUse {
           code
           description
         }
+      }
+    }
+  }
+`;
+
+export const getLandUseCodesQuery = gql`
+  {
+    getLandUseCodes {
+      data {
+        description
+        code
       }
     }
   }

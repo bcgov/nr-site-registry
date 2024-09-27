@@ -7,6 +7,8 @@ import { GenericValidationPipe } from '../../utils/validations/genericValidation
 import { UsePipes } from '@nestjs/common';
 import { DocumentDto, DocumentResponse } from '../../dto/document.dto';
 import { CustomRoles } from '../../common/role';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const sitesLogger = require('../../logger/logging');
 
 @Resolver(() => SiteDocs)
 export class DocumentResolver {
@@ -32,11 +34,21 @@ export class DocumentResolver {
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
   ) {
+
+    sitesLogger.info(
+      'DocumentResolver.getSiteDocumentsBySiteId() start siteId:' +
+        ' ' +
+        siteId,
+    );
+
     const response = await this.documentService.getSiteDocumentsBySiteId(
       siteId,
       showPending,
     );
     if (response && response.length > 0) {
+      sitesLogger.info(
+        'DocumentResolver.getSiteDocumentsBySiteId() RES:200 end',
+      );
       return this.genericResponseProvider.createResponse(
         'Documents fetched successfully.',
         200,
@@ -44,6 +56,9 @@ export class DocumentResolver {
         response,
       );
     } else {
+      sitesLogger.info(
+        'DocumentResolver.getSiteDocumentsBySiteId() RES:404 end',
+      );
       return this.genericResponseProvider.createResponse(
         `Documents not found for site id ${siteId}`,
         404,

@@ -19,11 +19,14 @@ export const graphQLSiteNotationBySiteId = () => {
           note
           etypCode
           eclsCode
+          srAction
           notationParticipant {
             guid
+            eventId
             eprCode
             psnorgId
             displayName
+            srAction
           }
         }
       }

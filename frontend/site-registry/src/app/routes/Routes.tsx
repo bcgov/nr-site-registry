@@ -77,7 +77,6 @@ const createRoutesForRole = (role: string) => [
 ];
 
 const userType = getLoggedInUserType();
-console.log('userType', userType, createRoutesForRole(userType));
 const siteRouter = createBrowserRouter(createRoutesForRole(userType));
 
 // const AppRoutes = () => {

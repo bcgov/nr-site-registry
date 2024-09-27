@@ -1,9 +1,7 @@
-import { useSelector } from 'react-redux';
 import { DropdownItem } from '../../../components/action/IActions';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
-import { participantRoleDrpdown } from '../dropdowns/DropdownSlice';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { siteParticipants } from './ParticipantSlice';
 import { useEffect } from 'react';

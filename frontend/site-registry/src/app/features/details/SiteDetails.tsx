@@ -65,9 +65,12 @@ import {
   fetchSnapshots,
   snapshots,
   getFirstSnapshotCreatedDate,
+  selectBannerType,
+  getBannerType,
 } from './snapshot/SnapshotSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 import {
+  fetchMinistryContact,
   fetchNotationClassCd,
   fetchNotationParticipantRoleCd,
   fetchNotationTypeCd,
@@ -161,6 +164,7 @@ const SiteDetails = () => {
   const [isVisible, setIsVisible] = useState(false);
   const snapshot = useSelector(snapshots);
   const snapshotTakenDate = useSelector(getFirstSnapshotCreatedDate);
+  const bannerType = useSelector(selectBannerType);
   const [edit, setEdit] = useState(false);
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
@@ -248,6 +252,9 @@ const SiteDetails = () => {
     setViewMode(mode);
   }, [mode]);
 
+  // NEEDS TO FETCH DATA BASED ON CONDITION WHEATHER IT IS EXTERNAL USER OR INTERNAL USER
+  // BY DOING THIS WE CAN STOP UNNECCESSARY CALL TO DATABASE
+  // THERE ARE SOME CALLS WHICH MAY NOT REQUIRED ON DETAILS PAGE.
   useEffect(() => {
     console.log("Calling From Site Details")
     setIsLoading(true); // Set loading state to true before starting API calls
@@ -256,11 +263,15 @@ const SiteDetails = () => {
       dispatch(setupSiteIdForSaving(id));
       Promise.all([
         dispatch(fetchSnapshots(id ?? '')),
-
-        dispatch(fetchSitesDetails({ siteId: id ?? '', showPending :false })),
+        dispatch(getBannerType(id ?? '')),
+        dispatch(fetchMinistryContact('EMP')),
         dispatch(fetchNotationClassCd()),
         dispatch(fetchNotationTypeCd()),
         dispatch(fetchNotationParticipantRoleCd()),
+        console.log("Calling fetchNotationParticipants"),
+        dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending :false })),
+        // should be based on condition for External and Internal User.
+        dispatch(fetchSitesDetails({ siteId: id ?? '', showPending :false })),
         // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
       ])
         .then(() => {
@@ -619,14 +630,16 @@ const SiteDetails = () => {
           </div>
         )}
         <div className="section-details-header row">
-          {UserType.External === userType && snapshot.status === RequestStatus.success &&
+          {UserType.External === userType &&
+            snapshot.status === RequestStatus.success &&
             snapshot.snapshot.data !== null && (
-            <div>
-              <BannerDetails
-                snapshotDate={`Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`}
-              />
-            </div>
-          )}
+              <div>
+                <BannerDetails
+                  bannerType={bannerType}
+                  snapshotDate={`Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`}
+                />
+              </div>
+            )}
 
           {!isVisible && (
             <>

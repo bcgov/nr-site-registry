@@ -1,5 +1,6 @@
 import { FC, ReactNode, useState } from 'react';
 import { ChevronDown, ChevronUp } from '../common/icon';
+import { ApproveRejectButtons } from '../approve/ApproveReject';
 
 interface PanelWithUpDownProps {
   label?: string;
@@ -66,8 +67,9 @@ const PanelWithUpDown: FC<PanelWithUpDownProps> = ({
             //  </div>
           )}
         </div>
-      )}
+      )}     
     </div>
+    
   );
 };
 

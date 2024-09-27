@@ -5,6 +5,7 @@ import { CreateSnapshotDto, SnapshotResponse } from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { sampleSites } from '../../mockData/site.mockData';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
+import { BannerTypeResponse } from 'src/app/dto/response/bannerTypeResponse';
 
 describe('SnapshotResolver', () => {
   let resolver: SnapshotsResolver;
@@ -23,6 +24,7 @@ describe('SnapshotResolver', () => {
             getSnapshotsBySiteId: jest.fn(),
             getSnapshotsById: jest.fn(),
             createSnapshotForSites: jest.fn(),
+            getBannerType: jest.fn(),
           },
         },
         {
@@ -95,7 +97,6 @@ describe('SnapshotResolver', () => {
               whoUpdated: 'ABC',
               rwmFlag: 1,
               rwmNoteFlag: 1,
-              eventPartics: null,
               psnorg: null,
               site: sampleSites[0],
               siteDocPartics: null,
@@ -121,6 +122,8 @@ describe('SnapshotResolver', () => {
                   },
                 },
               ],
+              userAction: '',
+              srAction: '',
             },
           ],
         },
@@ -191,7 +194,6 @@ describe('SnapshotResolver', () => {
               whoUpdated: 'ABC',
               rwmFlag: 1,
               rwmNoteFlag: 1,
-              eventPartics: null,
               psnorg: null,
               site: sampleSites[0],
               siteDocPartics: null,
@@ -217,6 +219,8 @@ describe('SnapshotResolver', () => {
                   },
                 },
               ],
+              userAction: '',
+              srAction: '',
             },
           ],
         },
@@ -291,7 +295,6 @@ describe('SnapshotResolver', () => {
               whoUpdated: 'ABC',
               rwmFlag: 1,
               rwmNoteFlag: 1,
-              eventPartics: null,
               psnorg: null,
               site: sampleSites[0],
               siteDocPartics: null,
@@ -317,6 +320,8 @@ describe('SnapshotResolver', () => {
                   },
                 },
               ],
+              userAction: '',
+              srAction: '',
             },
           ],
         },
@@ -392,7 +397,6 @@ describe('SnapshotResolver', () => {
               whoUpdated: 'ABC',
               rwmFlag: 1,
               rwmNoteFlag: 1,
-              eventPartics: null,
               psnorg: null,
               site: sampleSites[0],
               siteDocPartics: null,
@@ -418,6 +422,8 @@ describe('SnapshotResolver', () => {
                   },
                 },
               ],
+              userAction: '',
+              srAction: '',
             },
           ],
         },
@@ -483,6 +489,41 @@ describe('SnapshotResolver', () => {
       const result = await resolver.createSnapshotForSites([snapshotDto], '');
 
       expect(result.httpStatusCode).toEqual(201);
+    });
+  });
+
+  describe('getBannerType', () => {
+    const bannerType = {
+      bannerType: 'banner type',
+    };
+    it('should return a success response with HTTP status 200', async () => {
+      const userId = '1';
+      const siteId = '1';
+      const mockResponse: BannerTypeResponse = {
+        httpStatusCode: 200,
+        message: 'Banner type fetched successfully',
+        data: bannerType,
+      };
+      jest
+        .spyOn(service, 'getBannerType')
+        .mockResolvedValueOnce(bannerType.bannerType);
+      const result = await resolver.getBannerType(siteId, userId);
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should return a not found response with HTTP status 404', async () => {
+      const userId = '1';
+      const siteId = '1';
+      const mockResponse: BannerTypeResponse = {
+        httpStatusCode: 404,
+        message: `Failed to determine banner type for site id ${siteId}`,
+        data: null,
+      };
+      jest.spyOn(service, 'getSnapshotsBySiteId').mockResolvedValueOnce(null);
+
+      const result = await resolver.getBannerType(siteId, userId);
+
+      expect(result).toEqual(mockResponse);
     });
   });
 });

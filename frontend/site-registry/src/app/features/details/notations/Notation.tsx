@@ -28,7 +28,7 @@ interface INotationProps
     handleWidgetCheckBox: (event: any) => void,
     internalTableColumn: TableColumn[],
     externalTableColumn: TableColumn[],
-    loading: RequestStatus.idle | RequestStatus.success | RequestStatus.failed | RequestStatus.pending,
+    loading: RequestStatus,
     handleTableSort: (row: any, ascDir: any, id: any) => void,
     handleAddParticipant: (id: any) => void,
     isAnyParticipantSelected: (id: any) => boolean,

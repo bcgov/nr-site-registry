@@ -143,7 +143,7 @@ export const fetchPendingSitesDetailsFprApproval = createAsyncThunk(
   );
 
   export const fetchPendingSiteNotationBySiteId = createAsyncThunk(
-    'notationParticipant/fetchNotationParticipants',
+    'notationParticipant/fetchPendingSiteNotationBySiteId',
     async ( args: {siteId: string, showPending: Boolean}) => {
       try {
         const response = await getAxiosInstance().post(GRAPHQL, {

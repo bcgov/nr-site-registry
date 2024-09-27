@@ -12,6 +12,7 @@ import { RequestStatus } from './requests/status';
 import { notifyError, notifySuccess } from '../components/alert/Alert';
 import { useEffect, useState } from 'react';
 import { TableColumn } from '../components/table/TableColumn';
+import { UserActionEnum } from '../common/userActionEnum';
 
 export interface UpdateDisplayTypeParams {
   indexToUpdate: number;
@@ -298,4 +299,51 @@ export const updateFields = (
     updatedRow,
     ...fieldArray.slice(indexToUpdate + 1),
   ];
+};
+
+// Type for user actions
+type UserAction = UserActionEnum;
+
+export const deepFilterByUserAction = (
+  data: any,
+  actions: UserAction[],
+): any[] => {
+  const filterRecursive = (item: any): any => {
+    // Check if the input is an array
+    if (Array.isArray(item)) {
+      const filteredArray = item.map(filterRecursive).filter(Boolean); // Remove undefined values
+
+      // If the array contains any valid items, return the filtered array
+      return filteredArray.length > 0 ? filteredArray : undefined;
+    }
+
+    // Check if the input is an object
+    else if (item && typeof item === 'object') {
+      // Recursively filter nested objects and arrays
+      const filteredObject = Object.keys(item).reduce(
+        (acc: any, key: string) => {
+          const filteredValue = filterRecursive(item[key]);
+          if (filteredValue !== undefined) {
+            acc[key] = filteredValue;
+          }
+          return acc;
+        },
+        {},
+      );
+
+      // Check if the current object has a apiAction that matches
+      const hasUserAction = item.apiAction && actions.includes(item.apiAction);
+
+      // If current object has a userAction that matches, include it
+      // Include the filteredObject only if it has at least one valid property or it has a matching userAction
+      return Object.keys(filteredObject).length > 0 || hasUserAction
+        ? { ...item, ...filteredObject }
+        : undefined;
+    }
+
+    // If the data is neither an object nor an array, return undefined
+    return undefined;
+  };
+
+  return filterRecursive(data) || [];
 };

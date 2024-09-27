@@ -7,8 +7,7 @@ import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { DisclosureResponse } from '../../dto/disclosure.dto';
 import { DisclosureService } from '../../services/disclosure/disclosure.service';
 import { CustomRoles } from '../../common/role';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => SiteProfiles)
 export class DisclosureResolver {
@@ -17,6 +16,7 @@ export class DisclosureResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       SiteProfiles[]
     >,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   @Roles({
@@ -32,7 +32,7 @@ export class DisclosureResolver {
   async getSiteDisclosureBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
   ) {
-    sitesLogger.info(
+    this.sitesLogger.log(
       'DisclosureResolver.getSiteDisclosureBySiteId() start siteId:' +
         ' ' +
         siteId,
@@ -40,7 +40,7 @@ export class DisclosureResolver {
     const result =
       await this.dsiclosureService.getSiteDisclosureBySiteId(siteId);
     if (result && result.length > 0) {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'DisclosureResolver.getSiteDisclosureBySiteId() RES:200 end',
       );
       return this.genericResponseProvider.createResponse(
@@ -50,7 +50,7 @@ export class DisclosureResolver {
         result,
       );
     } else {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'DisclosureResolver.getSiteDisclosureBySiteId() RES:404 end',
       );
       return this.genericResponseProvider.createResponse(

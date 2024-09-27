@@ -5,14 +5,14 @@ import { plainToInstance } from 'class-transformer';
 import { v4 } from 'uuid';
 import { SiteAssocs } from '../../entities/siteAssocs.entity';
 import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class AssociatedSiteService {
   constructor(
     @InjectRepository(SiteAssocs)
     private readonly assocSiteRepository: Repository<SiteAssocs>,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   /**
@@ -26,10 +26,10 @@ export class AssociatedSiteService {
     siteId: string,
   ): Promise<AssociatedSiteDto[]> {
     try {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'AssociatedSiteService.getAssociatedSitesBySiteId() start',
       );
-      sitesLogger.debug(
+      this.sitesLogger.debug(
         'AssociatedSiteService.getAssociatedSitesBySiteId() start',
       );
       // Fetch associated sites based on the provided siteId
@@ -49,18 +49,17 @@ export class AssociatedSiteService {
 
       // Convert the transformed objects into DTOs
       const siteAssocs = plainToInstance(AssociatedSiteDto, transformedObjects);
-      sitesLogger.info(
+      this.sitesLogger.log(
         'AssociatedSiteService.getAssociatedSitesBySiteId() end',
       );
-      sitesLogger.debug(
+      this.sitesLogger.debug(
         'AssociatedSiteService.getAssociatedSitesBySiteId() end',
       );
       return siteAssocs;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in AssociatedSiteService.getAssociatedSitesBySiteId() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in AssociatedSiteService.getAssociatedSitesBySiteId() end',
+        JSON.stringify(error),
       );
       // Log or handle the error as necessary
       throw new Error(

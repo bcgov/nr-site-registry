@@ -8,40 +8,39 @@ import {
   CartDeleteDTOWithSiteID,
   CartDTO,
 } from '../../dto/cart.dto';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from 'src/app/logger/logger.service';
 
 @Injectable()
 export class CartService {
   constructor(
     @InjectRepository(Cart)
     private cartRepository: Repository<Cart>,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   async getCartItemsForUser(userId: string): Promise<Cart[]> {
-    sitesLogger.info('CartService.getCartItemsForUser() start');
-    sitesLogger.debug('CartService.getCartItemsForUser() start');
+    this.sitesLogger.log('CartService.getCartItemsForUser() start');
+    this.sitesLogger.debug('CartService.getCartItemsForUser() start');
     try {
       const cartItems = await this.cartRepository.find({
         relations: { site: true },
         where: { userId },
       });
-      sitesLogger.info('CartService.getCartItemsForUser() end');
-      sitesLogger.debug('CartService.getCartItemsForUser() end');
+      this.sitesLogger.log('CartService.getCartItemsForUser() end');
+      this.sitesLogger.debug('CartService.getCartItemsForUser() end');
       return cartItems;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in CartService.getCartItemsForUser() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in CartService.getCartItemsForUser() end',
+        JSON.stringify(error),
       );
       throw error;
     }
   }
 
   async addCartItem(list: CartDTO[], userId: string): Promise<boolean> {
-    sitesLogger.info('CartService.addCartItem() start');
-    sitesLogger.debug('CartService.addCartItem() start');
+    this.sitesLogger.log('CartService.addCartItem() start');
+    this.sitesLogger.debug('CartService.addCartItem() start');
     try {
       const cartItemsToInsert = [];
       const existingRecords = await this.cartRepository.find({
@@ -74,14 +73,13 @@ export class CartService {
       } else if (cartItemsToInsert?.length === 0) {
         return true;
       }
-      sitesLogger.info('CartService.addCartItem() end');
-      sitesLogger.debug('CartService.addCartItem() end');
+      this.sitesLogger.log('CartService.addCartItem() end');
+      this.sitesLogger.debug('CartService.addCartItem() end');
       return false;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in CartService.addCartItem() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in CartService.addCartItem() end',
+        JSON.stringify(error),
       );
       throw error;
     }
@@ -91,8 +89,8 @@ export class CartService {
     cartDeleteList: CartDeleteDTO[],
     userId: string,
   ): Promise<boolean> {
-    sitesLogger.info('CartService.deleteCartItem() start');
-    sitesLogger.debug('CartService.deleteCartItem() start');
+    this.sitesLogger.log('CartService.deleteCartItem() start');
+    this.sitesLogger.debug('CartService.deleteCartItem() start');
     try {
       const cartIds = cartDeleteList
         .filter((item) => item.cartId !== '')
@@ -111,14 +109,13 @@ export class CartService {
         if (deleteResult.affected > 0) return true;
         else return false;
       }
-      sitesLogger.info('CartService.deleteCartItem() end');
-      sitesLogger.debug('CartService.deleteCartItem() end');
+      this.sitesLogger.log('CartService.deleteCartItem() end');
+      this.sitesLogger.debug('CartService.deleteCartItem() end');
       return false;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in CartService.deleteCartItem() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in CartService.deleteCartItem() end',
+        JSON.stringify(error),
       );
       throw error;
     }
@@ -128,8 +125,8 @@ export class CartService {
     cartDeleteList: CartDeleteDTOWithSiteID[],
     userId: string,
   ): Promise<boolean> {
-    sitesLogger.info('CartService.deleteCartWithSiteId() start');
-    sitesLogger.debug('CartService.deleteCartWithSiteId() start');
+    this.sitesLogger.log('CartService.deleteCartWithSiteId() start');
+    this.sitesLogger.debug('CartService.deleteCartWithSiteId() start');
     try {
       const siteIds = cartDeleteList
         .filter((item) => item.siteId !== '')
@@ -145,8 +142,8 @@ export class CartService {
           .andWhere('userId = :userId', { userId: userId })
           .execute();
 
-        sitesLogger.info('CartService.deleteCartWithSiteId() end');
-        sitesLogger.debug('CartService.deleteCartWithSiteId() end');
+        this.sitesLogger.log('CartService.deleteCartWithSiteId() end');
+        this.sitesLogger.debug('CartService.deleteCartWithSiteId() end');
 
         if (deleteResult.affected > 0) return true;
 
@@ -154,10 +151,9 @@ export class CartService {
       }
       return false;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in CartService.deleteCartWithSiteId() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in CartService.deleteCartWithSiteId() end',
+        JSON.stringify(error),
       );
       throw error;
     }

@@ -84,6 +84,7 @@ import { HistoryLog } from './entities/siteHistoryLog.entity';
 import { ParcelDescriptionResolver } from './resolvers/parcelDescription/parcelDescription.resolver';
 import { ParcelDescriptionsService } from './services/parcelDescriptions/parcelDescriptions.service';
 import { TransactionManagerService } from './services/transactionManager/transactionManager.service';
+import { LoggerService } from './logger/logger.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -181,6 +182,7 @@ import { TransactionManagerService } from './services/transactionManager/transac
     AssociatedSiteResolver,
     AssociatedSiteService,
     TransactionManagerService,
+    LoggerService,
   ],
   controllers: [SiteController],
 })

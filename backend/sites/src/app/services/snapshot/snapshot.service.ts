@@ -13,8 +13,7 @@ import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { SnapshotSiteContent } from '../../dto/snapshotSiteContent';
 import { Events } from '../../entities/events.entity';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from 'src/app/logger/logger.service';
 
 @Injectable()
 export class SnapshotsService {
@@ -39,103 +38,99 @@ export class SnapshotsService {
     private siteSubDivisionsRepo: Repository<SiteSubdivisions>,
     @InjectRepository(SiteProfiles)
     private siteProfilesRepo: Repository<SiteProfiles>,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   async getSnapshots() {
-    sitesLogger.info('SnapshotsService.getSnapshots() start');
-    sitesLogger.debug('SnapshotsService.getSnapshots() start');
+    this.sitesLogger.log('SnapshotsService.getSnapshots() start');
+    this.sitesLogger.debug('SnapshotsService.getSnapshots() start');
     try {
       const result = await this.snapshotRepository.find();
-      sitesLogger.info('SnapshotsService.getSnapshots() end');
-      sitesLogger.debug('SnapshotsService.getSnapshots() end');
+      this.sitesLogger.log('SnapshotsService.getSnapshots() end');
+      this.sitesLogger.debug('SnapshotsService.getSnapshots() end');
       return result;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in SnapshotsService.getSnapshots() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in SnapshotsService.getSnapshots() end',
+        JSON.stringify(error),
       );
       throw new Error('Failed to retrieve snapshots.');
     }
   }
 
   async getSnapshotsByUserId(userId: string) {
-    sitesLogger.info('SnapshotsService.getSnapshotsByUserId() start');
-    sitesLogger.debug('SnapshotsService.getSnapshotsByUserId() start');
+    this.sitesLogger.log('SnapshotsService.getSnapshotsByUserId() start');
+    this.sitesLogger.debug('SnapshotsService.getSnapshotsByUserId() start');
     try {
       const result = await this.snapshotRepository.find({
         where: { userId },
         order: { whenCreated: 'DESC' },
       });
-      sitesLogger.info('SnapshotsService.getSnapshotsByUserId() end');
-      sitesLogger.debug('SnapshotsService.getSnapshotsByUserId() end');
+      this.sitesLogger.log('SnapshotsService.getSnapshotsByUserId() end');
+      this.sitesLogger.debug('SnapshotsService.getSnapshotsByUserId() end');
       return result;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in SnapshotsService.getSnapshotsByUserId() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in SnapshotsService.getSnapshotsByUserId() end',
+        JSON.stringify(error),
       );
       throw new Error('Failed to retrieve snapshots by userId.');
     }
   }
 
   async getSnapshotsBySiteId(siteId: string, userId: string) {
-    sitesLogger.info('SnapshotsService.getSnapshotsBySiteId() start');
-    sitesLogger.debug('SnapshotsService.getSnapshotsBySiteId() start');
+    this.sitesLogger.log('SnapshotsService.getSnapshotsBySiteId() start');
+    this.sitesLogger.debug('SnapshotsService.getSnapshotsBySiteId() start');
     try {
       const result = await this.snapshotRepository.find({
         where: { siteId, userId },
         order: { whenCreated: 'DESC' },
       });
-      sitesLogger.info('SnapshotsService.getSnapshotsBySiteId() end');
-      sitesLogger.debug('SnapshotsService.getSnapshotsBySiteId() end');
+      this.sitesLogger.log('SnapshotsService.getSnapshotsBySiteId() end');
+      this.sitesLogger.debug('SnapshotsService.getSnapshotsBySiteId() end');
       return result;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in SnapshotsService.getSnapshotsBySiteId() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in SnapshotsService.getSnapshotsBySiteId() end',
+        JSON.stringify(error),
       );
       throw new Error('Failed to retrieve snapshots by userId and siteId.');
     }
   }
 
   async getMostRecentSnapshot(siteId: string, userId: string) {
-    sitesLogger.info('SnapshotsService.getMostRecentSnapshot() start');
-    sitesLogger.debug('SnapshotsService.getMostRecentSnapshot() start');
+    this.sitesLogger.log('SnapshotsService.getMostRecentSnapshot() start');
+    this.sitesLogger.debug('SnapshotsService.getMostRecentSnapshot() start');
     try {
       const result = await this.snapshotRepository.findOne({
         where: { siteId, userId },
         order: { whenCreated: 'DESC' },
       });
 
-      sitesLogger.info('SnapshotsService.getMostRecentSnapshot() end');
-      sitesLogger.debug('SnapshotsService.getMostRecentSnapshot() end');
+      this.sitesLogger.log('SnapshotsService.getMostRecentSnapshot() end');
+      this.sitesLogger.debug('SnapshotsService.getMostRecentSnapshot() end');
       return result;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in SnapshotsService.getMostRecentSnapshot() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in SnapshotsService.getMostRecentSnapshot() end',
+        JSON.stringify(error),
       );
       throw new Error('Failed to retrieve the most recent snapshot.');
     }
   }
 
   async getSnapshotsById(id: number) {
-    sitesLogger.info('SnapshotsService.getSnapshotsById() start');
-    sitesLogger.debug('SnapshotsService.getSnapshotsById() start');
+    this.sitesLogger.log('SnapshotsService.getSnapshotsById() start');
+    this.sitesLogger.debug('SnapshotsService.getSnapshotsById() start');
     try {
       const result = await this.snapshotRepository.find({ where: { id } });
-      sitesLogger.info('SnapshotsService.getSnapshotsById() end');
-      sitesLogger.debug('SnapshotsService.getSnapshotsById() end');
+      this.sitesLogger.log('SnapshotsService.getSnapshotsById() end');
+      this.sitesLogger.debug('SnapshotsService.getSnapshotsById() end');
       return result;
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in SnapshotsService.getSnapshotsById() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in SnapshotsService.getSnapshotsById() end',
+        JSON.stringify(error),
       );
       throw error;
     }
@@ -145,8 +140,8 @@ export class SnapshotsService {
     inputDto: CreateSnapshotDto[],
     userInfo: any,
   ): Promise<boolean> {
-    sitesLogger.info('SnapshotsService.createSnapshotForSites() start');
-    sitesLogger.debug('SnapshotsService.createSnapshotForSites() start');
+    this.sitesLogger.log('SnapshotsService.createSnapshotForSites() start');
+    this.sitesLogger.debug('SnapshotsService.createSnapshotForSites() start');
     try {
       const snapShotsToBeSaved = [];
 
@@ -218,19 +213,18 @@ export class SnapshotsService {
       const saveResult = await this.snapshotRepository.save(snapShotsToBeSaved);
 
       if (saveResult.length > 0) {
-        sitesLogger.info('SnapshotsService.createSnapshotForSites() end');
-        sitesLogger.debug('SnapshotsService.createSnapshotForSites() end');
+        this.sitesLogger.log('SnapshotsService.createSnapshotForSites() end');
+        this.sitesLogger.debug('SnapshotsService.createSnapshotForSites() end');
         return true;
       } else {
-        sitesLogger.info('SnapshotsService.createSnapshotForSites() end');
-        sitesLogger.debug('SnapshotsService.createSnapshotForSites() end');
+        this.sitesLogger.log('SnapshotsService.createSnapshotForSites() end');
+        this.sitesLogger.debug('SnapshotsService.createSnapshotForSites() end');
         return false;
       }
     } catch (error) {
-      sitesLogger.error(
-        'Exception occured in SnapshotsService.createSnapshotForSites() end' +
-          ' ' +
-          JSON.stringify(error),
+      this.sitesLogger.error(
+        'Exception occured in SnapshotsService.createSnapshotForSites() end',
+        JSON.stringify(error),
       );
       throw error;
     }

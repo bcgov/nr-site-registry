@@ -7,8 +7,7 @@ import { Events } from '../../entities/events.entity';
 import { NotationService } from '../../services/notation/notation.service';
 import { NotationDto, NotationResponse } from '../../dto/notation.dto';
 import { CustomRoles } from '../../common/role';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => Events)
 export class NotationResolver {
@@ -17,6 +16,7 @@ export class NotationResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       NotationDto[]
     >,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   @Roles({
@@ -32,12 +32,12 @@ export class NotationResolver {
   async getSiteNotationBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
   ) {
-    sitesLogger.info(
+    this.sitesLogger.log(
       'NotationResolver.getSiteNotationBySiteId() start siteId:' + ' ' + siteId,
     );
     const result = await this.notationService.getSiteNotationBySiteId(siteId);
     if (result && result.length > 0) {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'NotationResolver.getSiteNotationBySiteId() RES:200 end',
       );
       return this.genericResponseProvider.createResponse(
@@ -47,7 +47,7 @@ export class NotationResolver {
         result,
       );
     } else {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'NotationResolver.getSiteNotationBySiteId() RES:404 end',
       );
       return this.genericResponseProvider.createResponse(

@@ -437,14 +437,19 @@ export class SiteService {
           dprCode,
           docParticId,
           apiAction,
+          srAction,
           ...siteDocumentData
         } = document;
 
         // Validate participant ID
         let documentId = document.id || ''; // Ensure it's a string
 
-        let siteDocument = { ...new SiteDocs(), ...siteDocumentData };
-        let siteDocumentParticipant = { ...new SiteDocPartics(), psnorgId };
+        let siteDocument = { ...new SiteDocs(), ...siteDocumentData, srAction };
+        let siteDocumentParticipant = {
+          ...new SiteDocPartics(),
+          psnorgId,
+          srAction,
+        };
 
         switch (apiAction) {
           case UserActionEnum.ADDED:
@@ -462,7 +467,7 @@ export class SiteService {
               id: documentId,
               rwmFlag: 0,
               userAction: UserActionEnum.ADDED,
-              srAction: SRApprovalStatusEnum.PENDING,
+              // srAction: SRApprovalStatusEnum.PENDING,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -481,7 +486,7 @@ export class SiteService {
               rwmFlag: 0,
               dprCode: dprCode ?? 'ATH',
               userAction: UserActionEnum.ADDED,
-              srAction: SRApprovalStatusEnum.PENDING,
+              // srAction: SRApprovalStatusEnum.PENDING,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -497,7 +502,7 @@ export class SiteService {
                   ...existingDocument,
                   ...siteDocument,
                   userAction: UserActionEnum.UPDATED,
-                  srAction: SRApprovalStatusEnum.PENDING,
+                  // srAction: SRApprovalStatusEnum.PENDING,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },
@@ -514,7 +519,7 @@ export class SiteService {
                     ...existingDocumentParticipant,
                     ...siteDocumentParticipant,
                     userAction: UserActionEnum.UPDATED,
-                    srAction: SRApprovalStatusEnum.PENDING,
+                    // srAction: SRApprovalStatusEnum.PENDING,
                     whenUpdated: new Date(),
                     whoUpdated: userInfo ? userInfo.givenName : '',
                   },
@@ -614,6 +619,7 @@ export class SiteService {
           prCode,
           apiAction,
           partiRoleId,
+          srAction,
           ...siteParticsData
         } = participant;
 
@@ -623,11 +629,13 @@ export class SiteService {
         let sitePartic: SitePartics = {
           ...new SitePartics(),
           ...siteParticsData,
+          srAction,
         };
 
         let siteParticRole: SiteParticRoles = {
           ...new SiteParticRoles(),
           prCode,
+          srAction,
         };
 
         switch (apiAction) {
@@ -648,7 +656,7 @@ export class SiteService {
               rwmFlag: 0,
               rwmNoteFlag: 0,
               userAction: UserActionEnum.ADDED,
-              srAction: SRApprovalStatusEnum.PENDING,
+              // srAction: srAction,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -658,7 +666,7 @@ export class SiteService {
               spId: participantId,
               rwmFlag: 0,
               userAction: UserActionEnum.ADDED,
-              srAction: SRApprovalStatusEnum.PENDING,
+              // srAction: srAction,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -678,7 +686,7 @@ export class SiteService {
                   ...existingSitePartic,
                   ...sitePartic,
                   userAction: UserActionEnum.UPDATED,
-                  srAction: SRApprovalStatusEnum.PENDING,
+                  // srAction: srAction,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },
@@ -695,7 +703,7 @@ export class SiteService {
                     ...existingSiteParticRole,
                     ...siteParticRole,
                     userAction: UserActionEnum.UPDATED,
-                    srAction: SRApprovalStatusEnum.PENDING,
+                    // srAction: srAction,
                     whenUpdated: new Date(),
                     whoUpdated: userInfo ? userInfo.givenName : '',
                   },

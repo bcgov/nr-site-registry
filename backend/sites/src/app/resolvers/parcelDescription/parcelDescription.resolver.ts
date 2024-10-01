@@ -1,9 +1,15 @@
 import { Args, Int, Query, Resolver } from '@nestjs/graphql';
-import { Resource, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import {
+  AuthenticatedUser,
+  Resource,
+  RoleMatchingMode,
+  Roles,
+} from 'nest-keycloak-connect';
 import { Subdivisions } from '../../entities/subdivisions.entity';
 import { ParcelDescriptionsService } from '../../services/parcelDescriptions/parcelDescriptions.service';
 import { CustomRoles } from '../../common/role';
 import { ParcelDescriptionsResponse } from '../../dto/parcelDescription.dto';
+import { LoggerService } from '../../logger/logger.service';
 
 /**
  * Resolver for Parcel Description
@@ -13,6 +19,7 @@ import { ParcelDescriptionsResponse } from '../../dto/parcelDescription.dto';
 export class ParcelDescriptionResolver {
   constructor(
     private readonly parcelDescriptionService: ParcelDescriptionsService,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   /**
@@ -26,7 +33,11 @@ export class ParcelDescriptionResolver {
    * @returns parcel descriptions (subdivisions) belonging to the given site.
    */
   @Roles({
-    roles: [CustomRoles.Internal, CustomRoles.SiteRegistrar],
+    roles: [
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+      CustomRoles.External,
+    ],
     mode: RoleMatchingMode.ANY,
   })
   @Query(() => ParcelDescriptionsResponse, {
@@ -39,7 +50,13 @@ export class ParcelDescriptionResolver {
     @Args('searchParam', { type: () => String }) searchParam: string,
     @Args('sortBy', { type: () => String }) sortBy: string,
     @Args('sortByDir', { type: () => String }) sortByDir: string,
+    @AuthenticatedUser() user: any,
   ) {
+    this.sitesLogger.log(
+      'ParcelDescriptionResolver.getParcelDescriptionsBySiteId() start siteID:' +
+        ' ' +
+        siteId,
+    );
     const response =
       await this.parcelDescriptionService.getParcelDescriptionsBySiteId(
         siteId,
@@ -48,7 +65,12 @@ export class ParcelDescriptionResolver {
         searchParam,
         sortBy,
         sortByDir,
+        user,
       );
+
+    this.sitesLogger.log(
+      'ParcelDescriptionResolver.getParcelDescriptionsBySiteId() end',
+    );
 
     return response;
   }

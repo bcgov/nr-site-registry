@@ -19,7 +19,7 @@ import { UsePipes } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { CustomRoles } from '../../common/role';
-
+import { LoggerService } from '../../logger/logger.service';
 /**
  * Resolver for Region
  */
@@ -32,6 +32,7 @@ export class SiteResolver {
       DropdownDto[]
     >,
     private readonly genericResponseProviderForSave: GenericResponseProvider<SaveSiteDetailsResponse>,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   /**
@@ -102,6 +103,7 @@ export class SiteResolver {
     @Args('whenUpdated', { type: () => String, nullable: true })
     whenUpdated?: Date,
   ) {
+    this.sitesLogger.log('SiteResolver.searchSites() start ');
     return await this.siteService.searchSites(
       searchParam,
       page,
@@ -137,6 +139,9 @@ export class SiteResolver {
   })
   @Query(() => FetchSiteDetail, { name: 'findSiteBySiteId' })
   findSiteBySiteId(@Args('siteId', { type: () => String }) siteId: string) {
+    this.sitesLogger.log(
+      'SiteResolver.findSiteBySiteId() start siteId:' + ' ' + siteId,
+    );
     return this.siteService.findSiteBySiteId(siteId);
   }
 
@@ -153,8 +158,12 @@ export class SiteResolver {
   async searchSiteIds(
     @Args('searchParam', { type: () => String }) searchParam: string,
   ) {
+    this.sitesLogger.log(
+      'SiteResolver.searchSiteIds() start searchParam:' + ' ' + searchParam,
+    );
     const result = await this.siteService.searchSiteIds(searchParam);
     if (result && result.length > 0) {
+      this.sitesLogger.log('SiteResolver.searchSiteIds() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Notation Paticipant Role fetched successfully',
         200,
@@ -162,6 +171,7 @@ export class SiteResolver {
         result,
       );
     } else {
+      this.sitesLogger.log('SiteResolver.searchSiteIds() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Notation Paticipant Role not found`,
         404,

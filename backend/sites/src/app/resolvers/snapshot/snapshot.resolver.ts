@@ -12,6 +12,7 @@ import { SnapshotsService } from '../../services/snapshot/snapshot.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { CustomRoles } from '../../common/role';
+import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => Snapshots)
 export class SnapshotsResolver {
@@ -20,6 +21,7 @@ export class SnapshotsResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       Snapshots[]
     >,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   @Roles({
@@ -32,8 +34,10 @@ export class SnapshotsResolver {
   })
   @Query(() => SnapshotResponse, { name: 'getSnapshots' })
   async getSnapshots() {
+    this.sitesLogger.log('SnapshotsResolver.getSnapshots() start');
     const result = await this.snapshotsService.getSnapshots();
     if (result && result.length > 0) {
+      this.sitesLogger.log('SnapshotsResolver.getSnapshots() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
         200,
@@ -41,6 +45,7 @@ export class SnapshotsResolver {
         result,
       );
     } else {
+      this.sitesLogger.log('SnapshotsResolver.getSnapshots() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Snapshot not found.`,
         404,
@@ -63,8 +68,14 @@ export class SnapshotsResolver {
   async getSnapshotsByUserId(
     @Args('userId', { type: () => String }) userId: string,
   ) {
+    this.sitesLogger.log(
+      'SnapshotsResolver.getSnapshotsByUserId() start userId:' + ' ' + userId,
+    );
     const result = await this.snapshotsService.getSnapshotsByUserId(userId);
     if (result && result.length > 0) {
+      this.sitesLogger.log(
+        'SnapshotsResolver.getSnapshotsByUserId() RES:200 end',
+      );
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
         200,
@@ -72,6 +83,9 @@ export class SnapshotsResolver {
         result,
       );
     } else {
+      this.sitesLogger.log(
+        'SnapshotsResolver.getSnapshotsByUserId() RES:404 end',
+      );
       return this.genericResponseProvider.createResponse(
         `Snapshot not found for user id: ${userId}`,
         404,
@@ -96,11 +110,17 @@ export class SnapshotsResolver {
     @AuthenticatedUser()
     user: any,
   ) {
+    this.sitesLogger.log(
+      'SnapshotsResolver.getSnapshotsBySiteId() start siteId:' + ' ' + siteId,
+    );
     const result = await this.snapshotsService.getSnapshotsBySiteId(
       siteId,
       user.sub,
     );
     if (result && result.length > 0) {
+      this.sitesLogger.log(
+        'SnapshotsResolver.getSnapshotsBySiteId() RES:200 end',
+      );
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
         200,
@@ -108,6 +128,9 @@ export class SnapshotsResolver {
         result,
       );
     } else {
+      this.sitesLogger.log(
+        'SnapshotsResolver.getSnapshotsBySiteId() RES:404 end',
+      );
       return this.genericResponseProvider.createResponse(
         `Snapshot not found for site id ${siteId}`,
         404,
@@ -128,8 +151,12 @@ export class SnapshotsResolver {
   @Query(() => SnapshotResponse, { name: 'getSnapshotsById' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSnapshotsById(@Args('id', { type: () => Int }) id: number) {
+    this.sitesLogger.log(
+      'SnapshotsResolver.getSnapshotsById() start snapshotId:' + ' ' + id,
+    );
     const result = await this.snapshotsService.getSnapshotsById(id);
     if (result && result.length > 0) {
+      this.sitesLogger.log('SnapshotsResolver.getSnapshotsById() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
         200,
@@ -137,6 +164,7 @@ export class SnapshotsResolver {
         result,
       );
     } else {
+      this.sitesLogger.log('SnapshotsResolver.getSnapshotsById() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Snapshot not found for snapshot id: ${id}`,
         404,
@@ -160,6 +188,11 @@ export class SnapshotsResolver {
     inputDto: CreateSnapshotDto[],
     @AuthenticatedUser() user: any,
   ) {
+    this.sitesLogger.log(
+      'SnapshotsResolver.createSnapshotForSites() start inputDto:' +
+        ' ' +
+        JSON.stringify(inputDto),
+    );
     try {
       if (inputDto) {
         const isSaved = this.snapshotsService.createSnapshotForSites(
@@ -167,12 +200,18 @@ export class SnapshotsResolver {
           user,
         );
         if (isSaved) {
+          this.sitesLogger.log(
+            'SnapshotsResolver.createSnapshotForSites() RES:201 end',
+          );
           return this.genericResponseProvider.createResponse(
             'Successfully created snapshots.',
             201,
             true,
           );
         } else {
+          this.sitesLogger.log(
+            'SnapshotsResolver.createSnapshotForSites() RES:422 end',
+          );
           return this.genericResponseProvider.createResponse(
             `Failed to create snapshots. `,
             422,
@@ -180,6 +219,9 @@ export class SnapshotsResolver {
           );
         }
       } else {
+        this.sitesLogger.log(
+          'SnapshotsResolver.createSnapshotForSites() RES:422 end',
+        );
         return this.genericResponseProvider.createResponse(
           `Please provide valid input to create snapshots`,
           422,
@@ -201,6 +243,12 @@ export class SnapshotsResolver {
     @Args('siteId', { type: () => String }) siteId: string,
     @AuthenticatedUser() user: any,
   ): Promise<BannerTypeResponse> {
+    this.sitesLogger.log(
+      'SnapshotsResolver.getBannerType() start siteId: ' +
+        siteId +
+        ' user:' +
+        user.sub,
+    );
     try {
       const bannerType = await this.snapshotsService.getBannerType(
         siteId,
@@ -208,6 +256,7 @@ export class SnapshotsResolver {
       );
 
       if (bannerType && bannerType.length > 0) {
+        this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:200 end');
         return {
           httpStatusCode: 200,
           message: 'Banner type fetched successfully',
@@ -216,6 +265,7 @@ export class SnapshotsResolver {
           },
         };
       } else {
+        this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:404 end');
         return {
           httpStatusCode: 404,
           message: `Failed to determine banner type for site id ${siteId}`,
@@ -223,6 +273,10 @@ export class SnapshotsResolver {
         };
       }
     } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SnapshotsResolver.getBannerType() end',
+        JSON.stringify(error),
+      );
       throw new Error('System Error, Please try again.');
     }
   }

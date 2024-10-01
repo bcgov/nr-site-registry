@@ -4,7 +4,7 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { LandHistories } from '../../entities/landHistories.entity';
 import { LandHistoryResponse } from '../../dto/landHistory.dto';
 import { LandHistoryService } from '../../services/landHistory/landHistory.service';
-
+import { LoggerService } from '../../logger/logger.service';
 type SortDirection = 'ASC' | 'DESC';
 
 @Resolver(() => LandHistories)
@@ -14,6 +14,7 @@ export class LandHistoryResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       LandHistories[]
     >,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
@@ -28,12 +29,27 @@ export class LandHistoryResolver {
     @Args('sortDirection', { nullable: true })
     sortDirection: SortDirection,
   ) {
+    this.sitesLogger.log(
+      'LandHistoryResolver.getLandHistoriesForSite() start siteId:' +
+        ' ' +
+        siteId +
+        ' searchTerm: ' +
+        ' ' +
+        searchTerm +
+        ' sortDirection: ' +
+        ' ' +
+        sortDirection,
+    );
+
     const result = await this.landHistoryService.getLandHistoriesForSite(
       siteId,
       searchTerm,
       sortDirection,
     );
     if (result.length > 0) {
+      this.sitesLogger.log(
+        'LandHistoryResolver.getLandHistoriesForSite() RES:200 end',
+      );
       return this.genericResponseProvider.createResponse(
         'Land uses fetched successfully',
         200,
@@ -41,6 +57,9 @@ export class LandHistoryResolver {
         result,
       );
     } else {
+      this.sitesLogger.log(
+        'LandHistoryResolver.getLandHistoriesForSite() RES:404 end',
+      );
       return this.genericResponseProvider.createResponse(
         `Land uses data not found for site id: ${siteId}`,
         404,

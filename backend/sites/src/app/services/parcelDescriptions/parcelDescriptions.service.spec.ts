@@ -1,11 +1,22 @@
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ParcelDescriptionsService } from './parcelDescriptions.service';
+import {
+  getExternalUserQueries,
+  getInternalUserQueries,
+} from './parcelDescriptions.queryBuilder';
+import { SnapshotsService } from '../snapshot/snapshot.service';
+
+jest.mock('./parcelDescriptions.queryBuilder');
 
 describe('SiteSubdivisionsService', () => {
   let siteSubdivisionService: ParcelDescriptionsService;
   let entityManager: EntityManager;
+  let snapshotsService: SnapshotsService;
   let queryMock: jest.Mock;
+  let getMostRecentSnapshotMock: jest.Mock;
+  let getInternalUserQueriesMock: jest.Mock;
+  let getExternalUserQueriesMock: jest.Mock;
 
   let siteId: number;
   let page: number;
@@ -13,6 +24,12 @@ describe('SiteSubdivisionsService', () => {
   let searchParam: string;
   let sortBy: string;
   let sortByDir: string;
+  let user: any;
+
+  let queryText: string;
+  let queryParams: string[];
+  let countQueryText: string;
+  let countQueryParams: string[];
 
   let returnCount: number;
   let returnId: number;
@@ -31,6 +48,15 @@ describe('SiteSubdivisionsService', () => {
     searchParam = 'searchParam';
     sortBy = 'date_noted';
     sortByDir = 'DESC';
+    user = {
+      sub: '1',
+      identity_provider: 'idir',
+    };
+
+    queryText = 'query';
+    queryParams = ['queryParam1', 'queryParam2', 'queryParam3', 'queryParam4'];
+    countQueryText = 'countQuery';
+    countQueryParams = ['countQueryParam1', 'countQueryParam2'];
 
     returnCount = 1;
     returnId = 1;
@@ -51,6 +77,12 @@ describe('SiteSubdivisionsService', () => {
             query: jest.fn(),
           },
         },
+        {
+          provide: SnapshotsService,
+          useValue: {
+            getMostRecentSnapshot: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -58,7 +90,24 @@ describe('SiteSubdivisionsService', () => {
       ParcelDescriptionsService,
     );
     entityManager = testingModule.get<EntityManager>(EntityManager);
+    snapshotsService = testingModule.get<SnapshotsService>(SnapshotsService);
 
+    getInternalUserQueriesMock = jest
+      .mocked(getInternalUserQueries)
+      .mockReturnValue([
+        queryText,
+        queryParams,
+        countQueryText,
+        countQueryParams,
+      ]);
+    getExternalUserQueriesMock = jest
+      .mocked(getExternalUserQueries)
+      .mockReturnValue([
+        queryText,
+        queryParams,
+        countQueryText,
+        countQueryParams,
+      ]);
     queryMock = jest
       .fn()
       .mockReturnValueOnce([{ count: returnCount }])
@@ -71,268 +120,210 @@ describe('SiteSubdivisionsService', () => {
           land_description: returnLandDescription,
         },
       ]);
-
     entityManager.query = queryMock;
+
+    getMostRecentSnapshotMock = jest.fn().mockReturnValue({
+      snapshotData: {
+        subDivisions: [{ siteSubdivId: 1 }],
+      },
+    });
+    snapshotsService.getMostRecentSnapshot = getMostRecentSnapshotMock;
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('when everything is correct.', () => {
-    it('Runs a count query.', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        1,
-        expect.stringMatching(/.*COUNT.*/),
-        expect.anything(),
-      );
+  describe('when the user is an internal user', () => {
+    beforeEach(async () => {
+      user = {
+        sub: '1',
+        identity_provider: 'idir',
+      };
     });
 
-    it('Does not sort the count query.', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
+    describe('when everything is correct.', () => {
+      it('Runs a count query.', async () => {
+        await siteSubdivisionService.getParcelDescriptionsBySiteId(
+          siteId,
+          page,
+          pageSize,
+          searchParam,
+          sortBy,
+          sortByDir,
+          user,
+        );
 
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        1,
-        expect.stringMatching(/.*(?!OFFSET).*/),
-        expect.anything(),
-      );
-      expect(queryMock).toHaveBeenNthCalledWith(
-        1,
-        expect.stringMatching(/.*(?!LIMIT).*/),
-        expect.anything(),
-      );
-    });
+        expect(getInternalUserQueriesMock).toHaveBeenCalled();
+        expect(queryMock).toHaveBeenCalledTimes(2);
+        expect(queryMock).toHaveBeenNthCalledWith(
+          1,
+          countQueryText,
+          countQueryParams,
+        );
+      });
 
-    it('Does not page the count query.', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
+      it('Makes the main query to the database.', async () => {
+        await siteSubdivisionService.getParcelDescriptionsBySiteId(
+          siteId,
+          page,
+          pageSize,
+          searchParam,
+          sortBy,
+          sortByDir,
+          user,
+        );
 
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        1,
-        expect.stringMatching(/.*(?!OFFSET).*/),
-        expect.anything(),
-      );
-    });
+        expect(getInternalUserQueriesMock).toHaveBeenCalled();
+        expect(queryMock).toHaveBeenCalledTimes(2);
+        expect(queryMock).toHaveBeenNthCalledWith(2, queryText, queryParams);
+      });
 
-    it('Passes in the site id and search param for the count query.', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
+      it('returns the correct results.', async () => {
+        let response =
+          await siteSubdivisionService.getParcelDescriptionsBySiteId(
+            siteId,
+            page,
+            pageSize,
+            searchParam,
+            sortBy,
+            sortByDir,
+            user,
+          );
 
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        1,
-        expect.anything(),
-        expect.arrayContaining([String(siteId)]),
-      );
-      expect(queryMock).toHaveBeenNthCalledWith(
-        1,
-        expect.anything(),
-        expect.arrayContaining([searchParam]),
-      );
-    });
-
-    it('Makes the main query to the database.', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(/.*(?!COUNT).*/),
-        expect.anything(),
-      );
-    });
-
-    it('Sorts the main query', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(
-          new RegExp(`ORDER BY parcel_descriptions.${sortBy} ${sortByDir}`),
-        ),
-        expect.anything(),
-      );
-    });
-
-    it('Pages the main query', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(/.*OFFSET.*/),
-        expect.anything(),
-      );
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(/.*LIMIT.*/),
-        expect.anything(),
-      );
-    });
-
-    it('Passes the site id, search param, and paging paramters to the main query', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.anything(),
-        expect.arrayContaining([String(siteId)]),
-      );
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.anything(),
-        expect.arrayContaining([searchParam]),
-      );
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.anything(),
-        expect.arrayContaining([String((page - 1) * pageSize)]),
-      );
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.anything(),
-        expect.arrayContaining([String(pageSize)]),
-      );
-    });
-
-    it('returns the correct results.', async () => {
-      let response = await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(response).toEqual(
-        expect.objectContaining({
-          data: expect.arrayContaining([
-            expect.objectContaining({
-              id: returnId,
-              descriptionType: returnDescriptionType,
-              idPinNumber: returnIdPinNumber,
-              dateNoted: new Date(returnDateNoted),
-              landDescription: returnLandDescription,
-            }),
-          ]),
-          count: returnCount,
-          page: page,
-          pageSize: pageSize,
-          success: returnSuccess,
-          httpStatusCode: 200,
-          message: 'Parcel Descriptions fetched successfully.',
-        }),
-      );
+        expect(response).toEqual(
+          expect.objectContaining({
+            data: expect.arrayContaining([
+              expect.objectContaining({
+                id: returnId,
+                descriptionType: returnDescriptionType,
+                idPinNumber: returnIdPinNumber,
+                dateNoted: new Date(returnDateNoted),
+                landDescription: returnLandDescription,
+              }),
+            ]),
+            count: returnCount,
+            page: page,
+            pageSize: pageSize,
+            success: returnSuccess,
+            httpStatusCode: 200,
+            message: 'Parcel Descriptions fetched successfully.',
+          }),
+        );
+      });
     });
   });
 
-  describe('when the sortParam is invalid', () => {
-    it('defaults to sorting by id', async () => {
-      sortBy = 'invalid_parameter';
-
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
-
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(
-          new RegExp(`ORDER BY parcel_descriptions.id ${sortByDir}`),
-        ),
-        expect.anything(),
-      );
+  describe('when the user is an external user', () => {
+    beforeEach(async () => {
+      user = {
+        sub: '1',
+        identity_provider: 'bceid',
+      };
     });
-  });
 
-  describe('when the sortDir is invalid', () => {
-    it('defaults to ascending', async () => {
-      sortByDir = 'turnwise';
+    describe('when everything is correct.', () => {
+      it('Runs a count query.', async () => {
+        await siteSubdivisionService.getParcelDescriptionsBySiteId(
+          siteId,
+          page,
+          pageSize,
+          searchParam,
+          sortBy,
+          sortByDir,
+          user,
+        );
 
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-      );
+        expect(getMostRecentSnapshotMock).toHaveBeenCalled();
+        expect(getExternalUserQueriesMock).toHaveBeenCalled();
+        expect(queryMock).toHaveBeenCalledTimes(2);
+        expect(queryMock).toHaveBeenNthCalledWith(
+          1,
+          countQueryText,
+          countQueryParams,
+        );
+      });
 
-      expect(queryMock).toHaveBeenCalledTimes(2);
-      expect(queryMock).toHaveBeenNthCalledWith(
-        2,
-        expect.stringMatching(
-          new RegExp(`ORDER BY parcel_descriptions.${sortBy} ASC`),
-        ),
-        expect.anything(),
-      );
+      it('Makes the main query to the database.', async () => {
+        await siteSubdivisionService.getParcelDescriptionsBySiteId(
+          siteId,
+          page,
+          pageSize,
+          searchParam,
+          sortBy,
+          sortByDir,
+          user,
+        );
+
+        expect(getMostRecentSnapshotMock).toHaveBeenCalled();
+        expect(getExternalUserQueriesMock).toHaveBeenCalled();
+        expect(queryMock).toHaveBeenCalledTimes(2);
+        expect(queryMock).toHaveBeenNthCalledWith(2, queryText, queryParams);
+      });
+
+      it('Returns the correct results.', async () => {
+        let response =
+          await siteSubdivisionService.getParcelDescriptionsBySiteId(
+            siteId,
+            page,
+            pageSize,
+            searchParam,
+            sortBy,
+            sortByDir,
+            user,
+          );
+
+        expect(response).toEqual(
+          expect.objectContaining({
+            data: expect.arrayContaining([
+              expect.objectContaining({
+                id: returnId,
+                descriptionType: returnDescriptionType,
+                idPinNumber: returnIdPinNumber,
+                dateNoted: new Date(returnDateNoted),
+                landDescription: returnLandDescription,
+              }),
+            ]),
+            count: returnCount,
+            page: page,
+            pageSize: pageSize,
+            success: returnSuccess,
+            httpStatusCode: 200,
+            message: 'Parcel Descriptions fetched successfully.',
+          }),
+        );
+      });
+    });
+
+    describe('When there is not snapshot data for the user', () => {
+      beforeEach(async () => {
+        getMostRecentSnapshotMock.mockReturnValue(null);
+      });
+
+      it('Returns an empty response', async () => {
+        let response =
+          await siteSubdivisionService.getParcelDescriptionsBySiteId(
+            siteId,
+            page,
+            pageSize,
+            searchParam,
+            sortBy,
+            sortByDir,
+            user,
+          );
+
+        expect(response).toEqual(
+          expect.objectContaining({
+            data: [],
+            httpStatusCode: 200,
+            count: 0,
+            page: 0,
+            pageSize: 0,
+            success: true,
+            message: 'Parcel Descriptions fetched successfully.',
+          }),
+        );
+      });
     });
   });
 
@@ -353,6 +344,7 @@ describe('SiteSubdivisionsService', () => {
         searchParam,
         sortBy,
         sortByDir,
+        user,
       );
 
       expect(response).toEqual(

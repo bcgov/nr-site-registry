@@ -7,6 +7,7 @@ import { plainToInstance } from 'class-transformer';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { EventPartics } from '../../entities/eventPartics.entity';
+import { LoggerService } from 'src/app/logger/logger.service';
 
 @Injectable()
 export class NotationService {
@@ -15,6 +16,7 @@ export class NotationService {
     private notationRepository: Repository<Events>,
     @InjectRepository(EventPartics)
     private notationParticRepository: Repository<EventPartics>,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   /**
@@ -25,6 +27,8 @@ export class NotationService {
    * @throws Error if there's an issue retrieving the data.
    */
   async getSiteNotationBySiteId(siteId: string) {
+    this.sitesLogger.log('NotationService.getSiteNotationBySiteId() start');
+    this.sitesLogger.debug('NotationService.getSiteNotationBySiteId() start');
     try {
       // Retrieve events associated with the given siteId
       const events = await this.notationRepository.find({ where: { siteId } });
@@ -89,10 +93,16 @@ export class NotationService {
           };
         });
 
+        this.sitesLogger.log('NotationService.getSiteNotationBySiteId() end');
+        this.sitesLogger.debug('NotationService.getSiteNotationBySiteId() end');
         // Transform plain objects into NotationDto instances
         return plainToInstance(NotationDto, transformedObjects);
       }
     } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in NotationService.getSiteNotationBySiteId() end',
+        JSON.stringify(error),
+      );
       // Handle or log the error as needed
       throw new Error(`Failed to get site notation.`);
     }

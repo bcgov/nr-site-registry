@@ -3,36 +3,15 @@ import { ChangeAuditEntityDTO } from './changeAuditEntity.dto';
 
 @InputType()
 export class LandHistoriesInputDTO extends ChangeAuditEntityDTO {
-  @Field()
-  siteId: string;
+  @Field({ nullable: true })
+  originalLandUseCode: string;
 
-  @Field()
-  lutCode: string;
+  @Field({ nullable: true })
+  landUseCode: string;
 
-  @Field()
-  note: string | null;
+  @Field({ nullable: true })
+  note: string;
 
-  @Field()
-  whoCreated: string;
-
-  @Field()
-  whoUpdated: string | null;
-
-  @Field()
-  whenCreated: Date;
-
-  @Field()
-  whenUpdated: Date | null;
-
-  @Field()
-  rwmFlag: number;
-
-  @Field()
-  rwmNoteFlag: number;
-
-  @Field()
-  siteProfile: string | null;
-
-  @Field()
-  profileDateReceived: Date | null;
+  @Field({ defaultValue: false })
+  shouldDelete: boolean;
 }

@@ -4,12 +4,13 @@ import { plainToInstance } from 'class-transformer';
 import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { SitePartics } from '../../entities/sitePartics.entity';
 import { Repository } from 'typeorm';
-
+import { LoggerService } from 'src/app/logger/logger.service';
 @Injectable()
 export class ParticipantService {
   constructor(
     @InjectRepository(SitePartics)
     private readonly siteParticsRepository: Repository<SitePartics>,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   /**
@@ -20,6 +21,12 @@ export class ParticipantService {
    * @throws Error if there is an issue retrieving the data.
    */
   async getSiteParticipantsBySiteId(siteId: string): Promise<SiteParticsDto[]> {
+    this.sitesLogger.log(
+      'ParticipantService.getSiteParticipantsBySiteId() start',
+    );
+    this.sitesLogger.debug(
+      'ParticipantService.getSiteParticipantsBySiteId() start',
+    );
     try {
       // Fetch site participants based on the given siteId
       const result = await this.siteParticsRepository.find({
@@ -47,9 +54,21 @@ export class ParticipantService {
         );
 
         // Convert the transformed objects into DTOs
-        return plainToInstance(SiteParticsDto, transformedObjects);
+        const sitePartics = plainToInstance(SiteParticsDto, transformedObjects);
+
+        this.sitesLogger.log(
+          'ParticipantService.getSiteParticipantsBySiteId() end',
+        );
+        this.sitesLogger.debug(
+          'ParticipantService.getSiteParticipantsBySiteId() end',
+        );
+        return sitePartics;
       }
     } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in ParticipantService.getSiteParticipantsBySiteId() end',
+        JSON.stringify(error),
+      );
       // Log or handle the error as necessary
       throw new Error(
         `Failed to retrieve site participants by siteId: ${error.message}`,

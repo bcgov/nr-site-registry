@@ -15,6 +15,8 @@ import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { Events } from '../../entities/events.entity';
 import { SiteDocs } from '../../entities/siteDocs.entity';
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
+import { LandHistoryService } from '../landHistory/landHistory.service';
+import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
 
 describe('SiteService', () => {
@@ -35,6 +37,14 @@ describe('SiteService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SiteService,
+        {
+          provide: LandHistoryService,
+          useValue: {},
+        },
+        {
+          provide: TransactionManagerService,
+          useValue: {},
+        },
         {
           provide: getRepositoryToken(Sites),
           useValue: {

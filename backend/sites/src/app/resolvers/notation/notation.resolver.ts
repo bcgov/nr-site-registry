@@ -7,6 +7,7 @@ import { Events } from '../../entities/events.entity';
 import { NotationService } from '../../services/notation/notation.service';
 import { NotationDto, NotationResponse } from '../../dto/notation.dto';
 import { CustomRoles } from '../../common/role';
+import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => Events)
 export class NotationResolver {
@@ -15,6 +16,7 @@ export class NotationResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       NotationDto[]
     >,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   @Roles({
@@ -30,8 +32,14 @@ export class NotationResolver {
   async getSiteNotationBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
   ) {
+    this.sitesLogger.log(
+      'NotationResolver.getSiteNotationBySiteId() start siteId:' + ' ' + siteId,
+    );
     const result = await this.notationService.getSiteNotationBySiteId(siteId);
     if (result && result.length > 0) {
+      this.sitesLogger.log(
+        'NotationResolver.getSiteNotationBySiteId() RES:200 end',
+      );
       return this.genericResponseProvider.createResponse(
         'Site Notation fetched successfully',
         200,
@@ -39,6 +47,9 @@ export class NotationResolver {
         result,
       );
     } else {
+      this.sitesLogger.log(
+        'NotationResolver.getSiteNotationBySiteId() RES:404 end',
+      );
       return this.genericResponseProvider.createResponse(
         `Site Notation data not found for site id: ${siteId}`,
         404,

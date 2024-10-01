@@ -7,6 +7,7 @@ import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { DisclosureResponse } from '../../dto/disclosure.dto';
 import { DisclosureService } from '../../services/disclosure/disclosure.service';
 import { CustomRoles } from '../../common/role';
+import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => SiteProfiles)
 export class DisclosureResolver {
@@ -15,6 +16,7 @@ export class DisclosureResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       SiteProfiles[]
     >,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   @Roles({
@@ -30,9 +32,17 @@ export class DisclosureResolver {
   async getSiteDisclosureBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
   ) {
+    this.sitesLogger.log(
+      'DisclosureResolver.getSiteDisclosureBySiteId() start siteId:' +
+        ' ' +
+        siteId,
+    );
     const result =
       await this.dsiclosureService.getSiteDisclosureBySiteId(siteId);
     if (result && result.length > 0) {
+      this.sitesLogger.log(
+        'DisclosureResolver.getSiteDisclosureBySiteId() RES:200 end',
+      );
       return this.genericResponseProvider.createResponse(
         'Site Disclosure fetched successfully',
         200,
@@ -40,6 +50,9 @@ export class DisclosureResolver {
         result,
       );
     } else {
+      this.sitesLogger.log(
+        'DisclosureResolver.getSiteDisclosureBySiteId() RES:404 end',
+      );
       return this.genericResponseProvider.createResponse(
         `Site Disclosure data not found for site id: ${siteId}`,
         404,

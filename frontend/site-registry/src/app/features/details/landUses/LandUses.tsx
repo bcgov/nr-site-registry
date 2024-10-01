@@ -134,6 +134,7 @@ const LandUses: FC = () => {
   }, [dispatch, editModeEnabled]);
 
   useEffect(() => {
+ 
     dispatch(
       setupLandHistoriesDataForSaving(Array.from(editLandUsesData.values())),
     );
@@ -150,6 +151,7 @@ const LandUses: FC = () => {
   };
 
   const onTableChange = (event: any) => {
+ 
     const editedRowId = event.row.guid;
 
     if (event.property.includes('select_row')) {
@@ -351,7 +353,8 @@ const LandUses: FC = () => {
         viewMode={viewMode} 
         handleTableSort={handleTableSort}
         selectedRowIds={selectedRowIds}
-        handleRemoveLandUse={handleRemoveLandUse} handleAddLandUse={handleAddLandUse}
+        handleRemoveLandUse={handleRemoveLandUse} 
+        handleAddLandUse={handleAddLandUse}
       ></LandUseTable>
     </div>
   );

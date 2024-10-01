@@ -8,6 +8,7 @@ import ParcelDescriptions from '../parcelDescriptions/parcelDescriptions';
 import Participants from '../participants/Participant';
 import SRUpdates from '../srUpdates/srUpdates';
 
+
 import Summary from '../summary/Summary';
 
 const mainNavItems = [
@@ -33,7 +34,7 @@ export interface IComponentProps
 export const getNavItems= () =>  isUserOfType(UserRoleType.SR)? ['Updates',...mainNavItems] : mainNavItems;
 
 const mainNavComponents = [
-  <Summary />,
+   <Summary />,
   <Notations />,
   <Participants />,
   <Documents />,

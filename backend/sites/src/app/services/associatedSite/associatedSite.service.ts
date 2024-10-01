@@ -6,8 +6,7 @@ import { v4 } from 'uuid';
 import { SiteAssocs } from '../../entities/siteAssocs.entity';
 import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
 import { LoggerService } from '../../logger/logger.service';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+
 import { UserActionEnum } from 'src/app/common/userActionEnum';
 
 @Injectable()

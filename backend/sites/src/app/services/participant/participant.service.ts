@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid'; // Import uuid function for generating uniq
 import { LoggerService } from 'src/app/logger/logger.service';
 import { UserActionEnum } from 'src/app/common/userActionEnum';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+
 
 @Injectable()
 export class ParticipantService {

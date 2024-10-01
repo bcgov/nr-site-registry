@@ -5,8 +5,6 @@ import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { DocumentDto } from '../../dto/document.dto';
 import { UserActionEnum } from 'src/app/common/userActionEnum';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
 import { LoggerService } from 'src/app/logger/logger.service';
 
 @Injectable()

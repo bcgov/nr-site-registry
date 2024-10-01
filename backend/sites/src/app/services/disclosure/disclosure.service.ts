@@ -4,8 +4,7 @@ import { Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { LoggerService } from 'src/app/logger/logger.service';
 import { UserActionEnum } from 'src/app/common/userActionEnum';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+
 
 @Injectable()
 export class DisclosureService {

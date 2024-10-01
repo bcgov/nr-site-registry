@@ -44,7 +44,10 @@ import {
   updateFields,
   updateTableColumn,
 } from '../../../helpers/utility';
-import { FormFieldType, IFormField } from '../../../components/input-controls/IFormField';
+import {
+  FormFieldType,
+  IFormField,
+} from '../../../components/input-controls/IFormField';
 import ParticipantTable from '../participants/ParticipantTable';
 import GetConfig from '../participants/ParticipantConfig';
 import Document from '../documents/Document';
@@ -59,15 +62,17 @@ import {
 import AssociateSiteComponent from '../associates/AssociateSiteComponent';
 import { GetAssociateConfig } from '../associates/AssociateConfig';
 import { useParams } from 'react-router-dom';
-import "./srUpdates.css"
+import './srUpdates.css';
 import { TickIcon, XmarkIcon } from '../../../components/common/icon';
 import { ColumnSize } from '../../../components/table/TableColumn';
 import LandUseTable from '../landUses/LandUseTable';
-import { fetchLandUseCodes, selectLandUseCodes } from '../landUses/LandUsesSlice';
+import {
+  fetchLandUseCodes,
+  selectLandUseCodes,
+} from '../landUses/LandUsesSlice';
 import { getLandUseColumns } from '../landUses/LandUseColumnConfiguration';
 
 const SRUpdates = () => {
-
   const siteSummaryData = useSelector(selectSiteSummary);
   const notationData = useSelector(selectNotationData);
   const siteParticipantData = useSelector(selectSiteParticipants);
@@ -92,8 +97,6 @@ const SRUpdates = () => {
     participantColumnExternal,
     srVisibilityParcticConfig,
   } = GetConfig();
-
-
 
   const {
     associateColumnExternal,
@@ -122,9 +125,9 @@ const SRUpdates = () => {
         graphQLPropertyName: 'psnorgId',
         value: '',
         tableMode: true,
-        customIcon: <TickIcon/>,
+        customIcon: <TickIcon />,
         customLinkValue: 'Approve',
-        customInputTextCss:'approve-tick-icon'
+        customInputTextCss: 'approve-tick-icon',
       },
     },
     {
@@ -140,13 +143,12 @@ const SRUpdates = () => {
         graphQLPropertyName: 'psnorgId',
         value: '',
         tableMode: true,
-        customIcon: <XmarkIcon/>,
+        customIcon: <XmarkIcon />,
         customLinkValue: 'Not Public',
-        customInputTextCss:'close-tick-icon'
+        customInputTextCss: 'close-tick-icon',
       },
-    }
+    },
   ]);
-
 
   useEffect(() => {
     if (particRoleDropdwn) {
@@ -158,19 +160,12 @@ const SRUpdates = () => {
         updates: {
           options: particRoleDropdwn.data,
         },
-      };    
+      };
       setInternalRow(updateTableColumn(internalRow, params));
     }
   }, [particRoleDropdwn]);
 
-
-  
-
-
-
   const [externalRow, setExternalRow] = useState(participantColumnExternal);
-
-  
 
   const {
     notationFormRowsInternal,
@@ -185,16 +180,13 @@ const SRUpdates = () => {
   const [notationFormRowsInternalLocal, SetNotationFormRowsInternalLocal] =
     useState(notationFormRowsInternal);
 
-  const [notationColumnInternalLocal, SetNotationColumnInternalLocal] = useState(notationColumnInternal);
+  const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
+    useState(notationColumnInternal);
 
   const notationClass = useSelector(notationClassDrpdown);
 
   useEffect(() => {
     console.log('notationTypeDropdownData', notationTypeDropdownData);
-
-
-
-
 
     const indexToUpdateExt = notationFormRowsInternal.findIndex((row) =>
       row.some((field) => field.graphQLPropertyName === 'etypCode'),
@@ -213,8 +205,9 @@ const SRUpdates = () => {
         },
       };
 
-      SetNotationColumnInternalLocal((prev) => updateTableColumn(prev, updateParams));
-
+      SetNotationColumnInternalLocal((prev) =>
+        updateTableColumn(prev, updateParams),
+      );
     }
 
     let paramsExt: UpdateDisplayTypeParams = {
@@ -229,11 +222,8 @@ const SRUpdates = () => {
     );
   }, [notationTypeDropdownData]);
 
-
-  useEffect(()=>{
-
-    if(notationData)
-    {
+  useEffect(() => {
+    if (notationData) {
       const psnOrgs = notationData.flatMap((item: any) =>
         Array.isArray(item.notationParticipant)
           ? item.notationParticipant.map((participant: any) => ({
@@ -260,28 +250,49 @@ const SRUpdates = () => {
         }),
       );
     }
+  }, [notationData]);
 
-  },[notationData])
 
+  
+  useEffect(() => {
+    if (siteParticipantData) {
+      const uniquePsnOrgs:any = Array.from(
+        new Map(
+          siteParticipantData.map((item: any) => [
+            item.psnorgId,
+            { key: item.psnorgId, value: item.displayName },
+          ]),
+        ).values(),
+      );
+     
+      let params: UpdateDisplayTypeParams = {
+        indexToUpdate: participantColumnInternal.findIndex(
+          (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
+        ),
+        updates: {
+          isLoading: RequestStatus.success,
+          options: uniquePsnOrgs,     
+        },
+      };      
+      setInternalRow(updateTableColumn(internalRow, params));
+   
+    }
+  }, [siteParticipantData]);
 
 
   const dispatch = useDispatch<AppDispatch>();
   const { id } = useParams();
-  const [siteId,SetSiteId] = useState<string>('');
+  const [siteId, SetSiteId] = useState<string>('');
 
-  useEffect(()=>{
-    if(id!== undefined)
-    SetSiteId(id);
-  },[id])
-
-
+  useEffect(() => {
+    if (id !== undefined) SetSiteId(id);
+  }, [id]);
 
   //console.log("notationParticipantRole",notationParticipantRole)
 
   useEffect(() => {
-    console.log('updateRequestStatusFromState',updateRequestStatusFromState)
+    console.log('updateRequestStatusFromState', updateRequestStatusFromState);
     if (updateRequestStatusFromState === RequestStatus.success) {
-
       showNotification(
         updateRequestStatusFromState,
         'Successfully updated',
@@ -322,45 +333,38 @@ const SRUpdates = () => {
     console.log('associatedSitesData', associatedSitesData);
   }, [associatedSitesData]);
 
-
-  useEffect(()=>{
-    console.log('saveRequestStatusFromState',saveRequestStatusFromState)
-
-
-  },[saveRequestStatusFromState])
-
+  useEffect(() => {
+    console.log('saveRequestStatusFromState', saveRequestStatusFromState);
+  }, [saveRequestStatusFromState]);
 
   useEffect(() => {
+    if (siteId !== '') {
+      dispatch(
+        fetchPendingSitesDetailsFprApproval({ siteId, showPending: true }),
+      );
 
-    if(siteId !== "")
-    {
+      dispatch(fetchPendingSiteNotationBySiteId({ siteId, showPending: true }));
+      dispatch(
+        fetchPendingSiteParticipantsForApproval({ siteId, showPending: true }),
+      );
 
-    dispatch(
-      fetchPendingSitesDetailsFprApproval({ siteId, showPending: true }),
-    );
+      dispatch(
+        fetchPendingLandUses({
+          siteId,
+          searchTerm: '',
+          sortDirection: 'ASC',
+          showPending: true,
+        }),
+      );
 
-    dispatch(fetchPendingSiteNotationBySiteId({ siteId, showPending: true }));
-    dispatch(
-      fetchPendingSiteParticipantsForApproval({ siteId, showPending: true }),
-    );
+      dispatch(fetchPendingDocumentsForApproval({ siteId, showPending: true }));
 
-    dispatch(
-      fetchPendingLandUses({
-        siteId,
-        searchTerm: '',
-        sortDirection: 'ASC',
-        showPending: true,
-      }),
-    );
+      dispatch(fetchPendingSiteDisclosure({ siteId, showPending: true }));
 
-    dispatch(fetchPendingDocumentsForApproval({ siteId, showPending: true }));
+      dispatch(fetchPendingAssociatedSites({ siteId, showPending: true }));
 
-    dispatch(fetchPendingSiteDisclosure({ siteId, showPending: true }));
-
-    dispatch(fetchPendingAssociatedSites({ siteId, showPending: true }));
-
-    dispatch(fetchLandUseCodes());
-  }
+      dispatch(fetchLandUseCodes());
+    }
   }, [siteId]);
 
   const handleChange = (event: any) => {
@@ -385,18 +389,55 @@ const SRUpdates = () => {
     };
   };
 
-  const {landUseCodes} = useSelector(selectLandUseCodes);
+  const { landUseCodes } = useSelector(selectLandUseCodes);
 
   const [landUseTableColumn, SetLandUseTableColumns] = useState<any>();
 
-  useEffect(()=>{
+  useEffect(() => {
+    let tableConfiguration = getLandUseColumns(landUseCodes, false);
 
-    let tableConfiguration = getLandUseColumns(landUseCodes,false)
+    let updatedTableConfiguration = [
+      ...tableConfiguration,
+      {
+        id: 7,
+        displayName: '',
+        active: true,
+        graphQLPropertyName: 'approved',
+        columnSize: ColumnSize.Default,
+        displayType: {
+          type: FormFieldType.IconButton,
+          label: '',
+          placeholder: 'Approve',
+          graphQLPropertyName: SRApprovalStatusEnum.Public,
+          value: '',
+          tableMode: true,
+          customIcon: <TickIcon />,
+          customLinkValue: 'Approve',
+          customInputTextCss: 'approve-tick-icon',
+        },
+      },
+      {
+        id: 8,
+        displayName: '',
+        active: true,
+        graphQLPropertyName: 'private',
+        columnSize: ColumnSize.Default,
+        displayType: {
+          type: FormFieldType.IconButton,
+          label: '',
+          placeholder: 'Not Public',
+          graphQLPropertyName: SRApprovalStatusEnum.Private,
+          value: '',
+          tableMode: true,
+          customIcon: <XmarkIcon />,
+          customLinkValue: 'Not Public',
+          customInputTextCss: 'close-tick-icon',
+        },
+      },
+    ];
 
-    SetLandUseTableColumns(tableConfiguration);
-
-
-  },[landUseCodes]);
+    SetLandUseTableColumns(updatedTableConfiguration);
+  }, [landUseCodes]);
 
   const summaryApproveRejectHandler = (approved: boolean) => {
     let saveDTO = null;
@@ -411,8 +452,6 @@ const SRUpdates = () => {
         ...getDefaultObjectForSaving(),
         sitesSummary: updatedSummaryEntity,
       };
-
-
     } else {
       const updatedSummaryEntity = {
         ...siteSummaryData,
@@ -423,11 +462,37 @@ const SRUpdates = () => {
         ...getDefaultObjectForSaving(),
         sitesSummary: updatedSummaryEntity,
       };
-
-
     }
 
     dispatch(updateSiteDetailsForApproval(saveDTO));
+  };
+
+  const approveRejectHandlerForLandUses = (event: any) => {
+   
+    let saveDTO = null;
+    let landUseRecord = event?.row;
+    let updatedLandUseRecord = null;
+    if (event && event.property === SRApprovalStatusEnum.Public) {
+      updatedLandUseRecord = {
+        originalLandUseCode: landUseRecord ? landUseRecord.landUse.code : null,
+        userAction: UserActionEnum.default,
+        srAction: SRApprovalStatusEnum.Public,
+      };
+    } else if (event && event.property === SRApprovalStatusEnum.Private) {
+      updatedLandUseRecord = {
+        originalLandUseCode: landUseRecord ? landUseRecord.landUse.code : null,
+        userAction: UserActionEnum.default,
+        srAction: SRApprovalStatusEnum.Private,
+      };
+    }
+
+    saveDTO = {
+      ...getDefaultObjectForSaving(),
+      landHistories: [updatedLandUseRecord],
+    };
+
+    dispatch(updateSiteDetailsForApproval(saveDTO));
+
   };
 
   const updateOptionsBasedOnMetaData = (
@@ -488,39 +553,40 @@ const SRUpdates = () => {
     }
   };
 
-
-  const handleNotationApproveRejectHandler = ( notation: any, isApproved : boolean) =>
-  {
-
-
-    const updatePartipantsInNotation = notation && notation?.notationParticipant.map((participant:any)=>{
-
-      return {
-        ...participant,
-        srAction: isApproved ? SRApprovalStatusEnum.Public : SRApprovalStatusEnum.Private,
-        apiAction: UserActionEnum.updated,
-      }
-
-    })
+  const handleNotationApproveRejectHandler = (
+    notation: any,
+    isApproved: boolean,
+  ) => {
+    const updatePartipantsInNotation =
+      notation &&
+      notation?.notationParticipant.map((participant: any) => {
+        return {
+          ...participant,
+          srAction: isApproved
+            ? SRApprovalStatusEnum.Public
+            : SRApprovalStatusEnum.Private,
+          apiAction: UserActionEnum.updated,
+        };
+      });
 
     const updatedNotation = {
       ...notation,
       notationParticipant: updatePartipantsInNotation,
-      srAction: isApproved ? SRApprovalStatusEnum.Public : SRApprovalStatusEnum.Private,
+      srAction: isApproved
+        ? SRApprovalStatusEnum.Public
+        : SRApprovalStatusEnum.Private,
       apiAction: UserActionEnum.updated,
     };
 
-    console.log("handleNotationApproveRejectHandler",updatedNotation,isApproved)
+ 
 
     let saveDTO = {
       ...getDefaultObjectForSaving(),
       events: updatedNotation,
     };
 
-    dispatch(updateSiteDetailsForApproval(saveDTO))
-
-
-  }
+    dispatch(updateSiteDetailsForApproval(saveDTO));
+  };
 
   const [location] = useState([48.46762, -123.25458]);
 
@@ -540,11 +606,10 @@ const SRUpdates = () => {
         </ApproveReject>
       )}
 
-
-        {notationData &&
-          notationData.map((notation: any, index: number) => {
-            return (
-              <ApproveReject name="Notations">
+      {notationData &&
+        notationData.map((notation: any, index: number) => {
+          return (
+            <ApproveReject name="Notations">
               <Notation
                 index={index}
                 notation={notation}
@@ -569,14 +634,16 @@ const SRUpdates = () => {
                 srVisibilityConfig={srVisibilityConfig}
                 handleItemClick={handleChange}
                 showApproveRejectSection={true}
-                approveRejectHandler={(value)=>handleNotationApproveRejectHandler(notation,value)}
+                approveRejectHandler={(value) =>
+                  handleNotationApproveRejectHandler(notation, value)
+                }
               />
-              </ApproveReject>
-            );
-          })}
+            </ApproveReject>
+          );
+        })}
 
-
-      {siteParticipantData && siteParticipantData.length > 0 && (<ApproveReject name="Participants">
+      {siteParticipantData && siteParticipantData.length > 0 && (
+        <ApproveReject name="Participants">
           <ParticipantTable
             handleTableChange={handleChange}
             handleWidgetCheckBox={handleChange}
@@ -594,15 +661,13 @@ const SRUpdates = () => {
             handleItemClick={handleChange}
             showApproveRejectSection={true}
           />
-          </ApproveReject>
-        )}
+        </ApproveReject>
+      )}
 
-
-
-        {documentsData &&
-          documentsData.map((document: any, index: number) => {
-            return (
-              <ApproveReject name="Documents">
+      {documentsData &&
+        documentsData.map((document: any, index: number) => {
+          return (
+            <ApproveReject name="Documents">
               <Document
                 index={index}
                 userType={UserType.Internal}
@@ -621,10 +686,9 @@ const SRUpdates = () => {
                 internalRow={documentFormRows}
                 showApproveRejectSection={true}
               />
-               </ApproveReject>
-            );
-          })}
-
+            </ApproveReject>
+          );
+        })}
 
       {associatedSitesData && associatedSitesData.length > 0 && (
         <ApproveReject name="Site Associations">
@@ -634,14 +698,16 @@ const SRUpdates = () => {
             userType={UserType.Internal}
             viewMode={SiteDetailsMode.ViewOnlyMode}
             internalRow={internalRow}
-            associateColumnInternalSRandViewMode={associateColumnInternalSRandViewMode}
+            associateColumnInternalSRandViewMode={
+              associateColumnInternalSRandViewMode
+            }
             associateColumnExternal={associateColumnExternal}
             formData={associatedSitesData}
             loading={RequestStatus.success}
             handleTableSort={handleChange}
             handleAddAssociate={handleChange}
             selectedRows={[]}
-            handleRemoveAssociate={()=>{}}
+            handleRemoveAssociate={() => {}}
             srVisibilityAssocConfig={srVisibilityAssocConfig}
             handleItemClick={handleChange}
             showApproveRejectSection={true}
@@ -651,10 +717,10 @@ const SRUpdates = () => {
 
       {landUsesData && (
         <ApproveReject name="LandUses">
-            <LandUseTable
-            onTableChange={handleChange}
+          <LandUseTable
+            onTableChange={approveRejectHandlerForLandUses}
             tableColumns={landUseTableColumn}
-            dataWithTextSearchApplied={[]}
+            dataWithTextSearchApplied={landUsesData}
             editModeEnabled={false}
             tableLoading={RequestStatus.success}
             viewMode={SiteDetailsMode.ViewOnlyMode}
@@ -666,7 +732,7 @@ const SRUpdates = () => {
         </ApproveReject>
       )}
 
-     <ApproveReject name="Parcel Description">pending</ApproveReject>
+      <ApproveReject name="Parcel Description">pending</ApproveReject>
 
       {disclosureData && (
         <ApproveReject name="Disclosure">
@@ -687,7 +753,9 @@ const SRUpdates = () => {
             loading={RequestStatus.success}
             handleTableSort={handleChange}
             handleAddDisclosureSchedule={handleChange}
-            isAnyDisclosureScheduleSelected={(event:any)=>{return false}}
+            isAnyDisclosureScheduleSelected={(event: any) => {
+              return false;
+            }}
             handleRemoveDisclosureSchedule={handleChange}
             srVisibilityConfig={srVisibilityConfig}
             handleItemClick={handleChange}
@@ -696,12 +764,8 @@ const SRUpdates = () => {
           />
         </ApproveReject>
       )}
-
     </div>
   );
 };
 
-
-export default SRUpdates
-
-
+export default SRUpdates;

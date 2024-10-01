@@ -7,8 +7,9 @@ import { GenericValidationPipe } from '../../utils/validations/genericValidation
 import { UsePipes } from '@nestjs/common';
 import { DocumentDto, DocumentResponse } from '../../dto/document.dto';
 import { CustomRoles } from '../../common/role';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const sitesLogger = require('../../logger/logging');
+import { LoggerService } from 'src/app/logger/logger.service';
+
+
 
 @Resolver(() => SiteDocs)
 export class DocumentResolver {
@@ -17,6 +18,7 @@ export class DocumentResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       DocumentDto[]
     >,
+    private readonly sitesLogger: LoggerService
   ) {}
 
   @Roles({
@@ -35,7 +37,7 @@ export class DocumentResolver {
     showPending: boolean,
   ) {
 
-    sitesLogger.info(
+    this.sitesLogger.log(
       'DocumentResolver.getSiteDocumentsBySiteId() start siteId:' +
         ' ' +
         siteId,
@@ -46,7 +48,7 @@ export class DocumentResolver {
       showPending,
     );
     if (response && response.length > 0) {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'DocumentResolver.getSiteDocumentsBySiteId() RES:200 end',
       );
       return this.genericResponseProvider.createResponse(
@@ -56,7 +58,7 @@ export class DocumentResolver {
         response,
       );
     } else {
-      sitesLogger.info(
+      this.sitesLogger.log(
         'DocumentResolver.getSiteDocumentsBySiteId() RES:404 end',
       );
       return this.genericResponseProvider.createResponse(

@@ -268,7 +268,8 @@ const SiteDetails = () => {
         dispatch(fetchNotationClassCd()),
         dispatch(fetchNotationTypeCd()),
         dispatch(fetchNotationParticipantRoleCd()),
-        console.log("Calling fetchNotationParticipants"),
+        dispatch(fetchParticipantRoleCd()),
+        dispatch(fetchSiteParticipants({ siteId: id ?? '', showPending :false })),
         dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending :false })),
         // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '', showPending :false })),

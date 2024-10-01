@@ -155,7 +155,7 @@ const Participants = () => {
     [options],
   );
 
-  // Update form data when notations change
+  // Update form data when site participant change
   useEffect(() => {
     if (status === RequestStatus.success && siteParticipant) {
       const uniquePsnOrgs = Array.from(

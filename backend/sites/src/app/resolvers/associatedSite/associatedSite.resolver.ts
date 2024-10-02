@@ -41,8 +41,7 @@ export class AssociatedSiteResolver {
     this.sitesLogger.log(
       'AssociatedSiteResolver.getAssociatedSitesBySiteId() start siteID:' +
         ' ' +
-        siteId,
-    );
+        siteId  +' showPending = '+ showPending );
     const result =
       await this.associatedSiteService.getAssociatedSitesBySiteId(siteId,showPending);
     if (result && result.length > 0) {

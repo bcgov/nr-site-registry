@@ -35,8 +35,7 @@ export class NotationResolver {
     showPending: boolean,
   ) {
     this.sitesLogger.log(
-      'NotationResolver.getSiteNotationBySiteId() start siteId:' + ' ' + siteId,
-    );
+      'NotationResolver.getSiteNotationBySiteId() start siteId:' + ' ' + siteId  +' showPending = '+ showPending );
    
     const result = await this.notationService.getSiteNotationBySiteId(
       siteId,

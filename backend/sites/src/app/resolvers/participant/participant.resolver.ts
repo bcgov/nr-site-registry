@@ -36,8 +36,8 @@ export class ParticipantResolver {
     this.sitesLogger.log(
       'ParticipantResolver.getSiteParticipantsBySiteId() start siteId:' +
         ' ' +
-        siteId,
-    );
+        siteId  +' showPending = '+ showPending );
+        
     const result =
       await this.participantService.getSiteParticipantsBySiteId(siteId,showPending);
     if (result.length > 0) {

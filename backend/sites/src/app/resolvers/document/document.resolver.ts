@@ -40,8 +40,7 @@ export class DocumentResolver {
     this.sitesLogger.log(
       'DocumentResolver.getSiteDocumentsBySiteId() start siteId:' +
         ' ' +
-        siteId,
-    );
+        siteId  +' showPending = '+ showPending );
 
     const response = await this.documentService.getSiteDocumentsBySiteId(
       siteId,

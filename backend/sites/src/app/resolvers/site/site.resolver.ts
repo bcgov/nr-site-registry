@@ -143,8 +143,9 @@ export class SiteResolver {
   showPending: boolean,
 ) {
     this.sitesLogger.log(
-      'SiteResolver.findSiteBySiteId() start siteId:' + ' ' + siteId,
-    );
+      'SiteResolver.findSiteBySiteId() start siteId:' + ' ' +  siteId  +' showPending = '+ showPending );
+
+
     return this.siteService.findSiteBySiteId(siteId, showPending);
   }
 

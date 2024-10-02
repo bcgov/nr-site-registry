@@ -79,11 +79,9 @@ const Dashboard = () => {
       setUserType(UserType.External);
     }
 
-    setName(
-      loggedInUser?.profile.given_name +
-        ' ' +
-        loggedInUser?.profile.family_name,
-    );
+    loggedInUser
+      ? setName(', ' + loggedInUser?.profile.given_name + ' ')
+      : setName('');
   }, [loggedInUser]);
 
   useEffect(() => {
@@ -102,7 +100,7 @@ const Dashboard = () => {
 
   return (
     <PageContainer role="Dashboard">
-      <h1 className="dashboard-title">Welcome, {name}</h1>
+      <h1 className="dashboard-title">Welcome{name}</h1>
       <DashboardTableWidget
         title="Recently Viewed"
         columns={recentViewedColumns}

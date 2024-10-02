@@ -48,8 +48,10 @@ import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
 import { print } from 'graphql';
 import infoIcon from '../../../images/info-icon.png';
 import { RequestStatus } from '../../../helpers/requests/status';
+import { IComponentProps } from '../navigation/NavigationPillsConfig';
+import Document from './Document';
 
-const Documents = () => {
+const Documents :React.FC<IComponentProps> = ({showPending = false}) => {
   const {
     documentFirstChildFormRowsForExternal,
     documentFirstChildFormRows,
@@ -111,7 +113,7 @@ const Documents = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchDocuments(id ?? ''))
+      dispatch(fetchDocuments( {siteId :id ?? '',showPending: false}))
         .then(() => {
           setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
         })
@@ -631,125 +633,22 @@ const Documents = () => {
                     srMode={viewMode === SiteDetailsMode.SRMode}
                   />
                 )}
-
-              <PanelWithUpDown
-                firstChild={
-                  <div className="w-100" key={index}>
-                    <Form
-                      formRows={
-                        userType === UserType.Internal
-                          ? mode === SiteDetailsMode.EditMode
-                            ? documentFirstChildFormRows
-                            : externalRow
-                          : externalRow
-                      }
-                      formData={document}
-                      editMode={viewMode === SiteDetailsMode.EditMode}
-                      srMode={viewMode === SiteDetailsMode.SRMode}
-                      handleInputChange={(graphQLPropertyName, value) =>
-                        handleInputChange(
-                          document.id,
-                          graphQLPropertyName,
-                          value,
-                        )
-                      }
-                      aria-label="Document collasped form"
-                    />
-                    {userType === UserType.Internal && (
-                      <span className="sr-time-stamp">{srTimeStamp}</span>
-                    )}
-                  </div>
-                }
-                secondChild={
-                  <div className="w-100 custom-second-child" key={index}>
-                    <div
-                      className="d-flex py-2 mb-3 gap-2 flex-wrap flex-column flex-sm-row"
-                      key={index}
-                    >
-                      <button
-                        id="view-online"
-                        className={`d-flex align-items-center justify-content-center ${viewMode === SiteDetailsMode.SRMode ? 'document-btn-disable' : 'btn-upload-document'} `}
-                        disabled={viewMode === SiteDetailsMode.SRMode}
-                        onClick={handleViewOnline}
-                        aria-label="View Online"
-                      >
-                        <div className="d-flex align-items-center gap-2">
-                          <ViewOnlyIcon className="btn-document-icon " />
-                          <span>View Online</span>
-                        </div>
-                      </button>
-                      <button
-                        id="download-pdf"
-                        className={`d-flex align-items-center justify-content-center  ${viewMode === SiteDetailsMode.SRMode ? 'document-btn-disable' : 'document-btn '} `}
-                        disabled={viewMode === SiteDetailsMode.SRMode}
-                        type="button"
-                        onClick={handleDownload}
-                        aria-label={'Download'}
-                      >
-                        <DownloadPdfIcon className="btn-document-icon" />
-                        <span>Download (PDF)</span>
-                      </button>
-                      {viewMode === SiteDetailsMode.EditMode &&
-                        userType === UserType.Internal && (
-                          <>
-                            <button
-                              id="replace-pdf"
-                              className=" d-flex align-items-center justify-content-center document-btn "
-                              type="button"
-                              aria-label={'File replace'}
-                              data-testid="replace-file"
-                            >
-                              <label
-                                htmlFor={`replace-file_${index}`}
-                                className="d-flex align-items-center gap-2"
-                              >
-                                <ReplaceIcon className="btn-document-icon cursor-pointer" />
-                                <span className="cursor-pointer">
-                                  Replace File
-                                </span>
-                              </label>
-                              <input
-                                type="file"
-                                id={`replace-file_${index}`}
-                                accept=".pdf"
-                                style={{ display: 'none' }}
-                                onChange={(e) => handleFileReplace(e, document)}
-                                key={key}
-                              />
-                            </button>
-                            <button
-                              id="delete-pdf"
-                              className=" d-flex align-items-center justify-content-center document-btn "
-                              type="button"
-                              onClick={() => handleFileDelete(document)}
-                              aria-label={'File delete'}
-                              data-testid="delete-file"
-                            >
-                              <TrashCanIcon className="btn-document-icon" />
-                              <span>Delete</span>
-                            </button>
-                          </>
-                        )}
-                    </div>
-                    <Form
-                      formRows={internalRow}
-                      formData={document}
-                      editMode={viewMode === SiteDetailsMode.EditMode}
-                      srMode={viewMode === SiteDetailsMode.SRMode}
-                      handleInputChange={(graphQLPropertyName, value) =>
-                        handleInputChange(
-                          document.id,
-                          graphQLPropertyName,
-                          value,
-                        )
-                      }
-                      aria-label="Sort Notation Form"
-                    />
-                    {userType === UserType.Internal && (
-                      <p className="sr-time-stamp">{srTimeStamp}</p>
-                    )}
-                  </div>
-                }
+              <Document
+                index = {index}
+                userType = {userType}
+                mode = {mode}
+                documentFirstChildFormRows = {documentFirstChildFormRows}
+                externalRow = {externalRow}
+                viewMode = {viewMode}
+                handleInputChange = {handleInputChange}
+                document = {document}
+                srTimeStamp = {srTimeStamp}
+                handleViewOnline = {handleViewOnline}
+                handleDownload = {handleDownload}
+                handleFileReplace ={handleFileReplace}
+                handleFileDelete = {handleFileDelete}
+                key ={key}
+                internalRow = {internalRow}
               />
             </div>
           ))}

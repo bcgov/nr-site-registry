@@ -6,6 +6,10 @@ import { SitePartics } from '../../entities/sitePartics.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid'; // Import uuid function for generating unique IDs
 import { LoggerService } from 'src/app/logger/logger.service';
+import { UserActionEnum } from 'src/app/common/userActionEnum';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+
+
 @Injectable()
 export class ParticipantService {
   constructor(
@@ -14,27 +18,38 @@ export class ParticipantService {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  /**
+   /**
    * Retrieves site participants for a given site ID and transforms the data into DTOs.
    *
    * @param siteId - The ID of the site for which participants are to be fetched.
    * @returns An array of SiteParticsDto objects containing participant details.
    * @throws Error if there is an issue retrieving the data.
    */
-  async getSiteParticipantsBySiteId(siteId: string): Promise<SiteParticsDto[]> {
-    this.sitesLogger.log(
-      'ParticipantService.getSiteParticipantsBySiteId() start',
-    );
-    this.sitesLogger.debug(
-      'ParticipantService.getSiteParticipantsBySiteId() start',
-    );
-    try {
-      // Fetch site participants based on the given siteId
-      const result = await this.siteParticsRepository.find({
-        where: { siteId },
-        relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'], // Ensure related entities are loaded
-      });
+  async getSiteParticipantsBySiteId(siteId: string, showPending: boolean): Promise<SiteParticsDto[]> {
 
+    try {
+
+      this.sitesLogger.log(
+        'ParticipantService.getSiteParticipantsBySiteId() start',
+      );
+      this.sitesLogger.debug(
+        'ParticipantService.getSiteParticipantsBySiteId() start',
+      );
+
+      // Fetch site participants based on the given siteId
+      let result = [];
+
+      if(showPending)
+      result = await this.siteParticsRepository.find({
+        where: { siteId, userAction: UserActionEnum.UPDATED },
+        relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
+      });
+      else
+      result = await this.siteParticsRepository.find({
+        where: { siteId },
+        relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
+      });
+      
       if (!result.length) {
         return [];
       }
@@ -64,6 +79,7 @@ export class ParticipantService {
         'ParticipantService.getSiteParticipantsBySiteId() end',
       );
       return sitePartics;
+      
     } catch (error) {
       this.sitesLogger.error(
         'Exception occured in ParticipantService.getSiteParticipantsBySiteId() end',

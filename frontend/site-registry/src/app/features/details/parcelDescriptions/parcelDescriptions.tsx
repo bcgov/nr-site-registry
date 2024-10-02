@@ -19,6 +19,7 @@ import {
 } from './parcelDescriptionsSlice';
 import { columns } from './parcelDescriptionsConfig';
 import { useParams } from 'react-router-dom';
+import ParcelDescriptionTable from './ParcelDescriptionTable';
 
 const ParcelDescriptions = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -110,6 +111,7 @@ const ParcelDescriptions = () => {
       searchParam: searchParam,
       sortBy: sortBy,
       sortByDir: sortByDir,
+      showPending: false
     };
     dispatch(fetchParcelDescriptions(params));
   }, [currentPage, resultsPerPage, searchParam, sortBy, sortByDir]);
@@ -139,23 +141,18 @@ const ParcelDescriptions = () => {
       <div className="row">
         <h2>Parcel Description</h2>
         <hr />
-        <Table
-          showPageOptions={true}
-          label="Search Results"
-          isLoading={requestStatus}
-          columns={columns}
-          data={data}
-          totalResults={totalResults}
-          selectPage={handleSelectPage}
-          changeResultsPerPage={handleChangeResultsPerPage}
-          currentPage={currentPage}
-          resultsPerPage={resultsPerPage}
-          allowRowsSelect={false}
-          changeHandler={() => {}}
-          editMode={false}
-          idColumnName="id"
-          sortHandler={handleTableSortChange}
-        ></Table>
+          <ParcelDescriptionTable 
+            requestStatus={requestStatus} 
+            columns={columns} 
+            data={data} 
+            totalResults={totalResults}
+            handleSelectPage={handleSelectPage}
+            handleChangeResultsPerPage={handleChangeResultsPerPage} 
+            currentPage={currentPage} 
+            resultsPerPage={resultsPerPage} 
+            handleTableSortChange={handleTableSortChange} />
+
+          
       </div>
     </div>
   );

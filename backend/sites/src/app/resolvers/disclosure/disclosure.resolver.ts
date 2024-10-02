@@ -31,14 +31,16 @@ export class DisclosureResolver {
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSiteDisclosureBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
   ) {
     this.sitesLogger.log(
       'DisclosureResolver.getSiteDisclosureBySiteId() start siteId:' +
         ' ' +
-        siteId,
-    );
+        siteId  +' showPending = '+ showPending );
+        
     const result =
-      await this.dsiclosureService.getSiteDisclosureBySiteId(siteId);
+      await this.dsiclosureService.getSiteDisclosureBySiteId(siteId, showPending);
     if (result.length > 0) {
       this.sitesLogger.log(
         'DisclosureResolver.getSiteDisclosureBySiteId() RES:200 end',

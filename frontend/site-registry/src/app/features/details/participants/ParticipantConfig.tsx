@@ -3,6 +3,9 @@ import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import { RequestStatus } from '../../../helpers/requests/status';
+import { siteParticipants } from './ParticipantSlice';
+import { useEffect } from 'react';
+import { TickIcon, XmarkIcon } from '../../../components/common/icon';
 
 export const GetConfig = () => {
   const participantColumnInternal: TableColumn[] = [
@@ -137,6 +140,7 @@ export const GetConfig = () => {
       // dynamicColumn: true,
       stickyCol: true,
     },
+    
   ];
 
   const participantColumnExternal: TableColumn[] = [
@@ -252,7 +256,7 @@ export const GetConfig = () => {
         customEditInputTextCss: 'custom-participant-edit-input',
         tableMode: true,
       },
-    },
+    },  
   ];
 
   const srVisibilityParcticConfig: DropdownItem[] = [

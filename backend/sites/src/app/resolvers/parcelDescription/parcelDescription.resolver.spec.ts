@@ -36,12 +36,12 @@ describe('ParcelDescriptionResolver', () => {
   });
 
   it('calls the site subdivision service with the expected parameters.', async () => {
-    let siteId = 123;
-    let page = 1;
-    let pageSize = 10;
-    let searchParam = 'searchParam';
-    let sortBy = 'sortBy';
-    let sortByDir = 'sortByDir';
+    const siteId = 123;
+    const page = 1;
+    const pageSize = 10;
+    const searchParam = 'searchParam';
+    const sortBy = 'sortBy';
+    const sortByDir = 'sortByDir';
     parcelDescriptionsServiceResult.mockReturnValue(
       new GenericPagedResponse<ParcelDescriptionDto[]>(),
     );
@@ -53,6 +53,7 @@ describe('ParcelDescriptionResolver', () => {
       searchParam,
       sortBy,
       sortByDir,
+      false
     );
     expect(
       parcelDescriptionService.getParcelDescriptionsBySiteId,
@@ -67,16 +68,16 @@ describe('ParcelDescriptionResolver', () => {
   });
 
   it('returns the result provided by the parcel description service.', async () => {
-    let siteId = 123;
-    let page = 1;
-    let pageSize = 10;
-    let searchParam = 'searchParam';
-    let sortBy = 'sortBy';
-    let sortByDir = 'sortByDir';
-    let expectedResponse = new GenericPagedResponse<ParcelDescriptionDto[]>();
+    const siteId = 123;
+    const page = 1;
+    const pageSize = 10;
+    const searchParam = 'searchParam';
+    const sortBy = 'sortBy';
+    const sortByDir = 'sortByDir';
+    const expectedResponse = new GenericPagedResponse<ParcelDescriptionDto[]>();
     parcelDescriptionsServiceResult.mockReturnValue(expectedResponse);
 
-    let response =
+    const response =
       await parcelDescriptionResolver.getParcelDescriptionsBySiteId(
         siteId,
         page,
@@ -84,6 +85,7 @@ describe('ParcelDescriptionResolver', () => {
         searchParam,
         sortBy,
         sortByDir,
+        false
       );
     expect(response).toEqual(expect.objectContaining(expectedResponse));
   });

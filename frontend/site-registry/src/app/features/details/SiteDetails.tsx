@@ -22,9 +22,9 @@ import {
 import { AppDispatch } from '../../Store';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
 import {
-  dropDownNavItems,
-  navComponents,
-  navItems,
+  getDropDownNavItems,
+  getNavComponents,
+  getNavItems,
 } from './navigation/NavigationPillsConfig';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import {
@@ -43,6 +43,7 @@ import {
   formatDateWithNoTimzoneName,
   getUser,
   showNotification,
+  useUser,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import { fetchSiteParticipants } from './participants/ParticipantSlice';
@@ -57,6 +58,7 @@ import {
   addSiteToFolioRequest,
   fetchFolioItems,
   folioItems,
+  resetFolioItemAddedStatus,
 } from '../folios/redux/FolioSlice';
 import { Folio, FolioContentDTO } from '../folios/dto/Folio';
 import {
@@ -88,8 +90,21 @@ import {
   setupSiteIdForSaving,
 } from './SaveSiteDetailsSlice';
 import { fetchAssociatedSites } from './associates/AssociateSlice';
+import { updateRequestStatus } from './srUpdates/srUpdatesSlice';
 
 const SiteDetails = () => {
+  const [navItems, SetNavItems] = useState<string[]|undefined>();
+  const [navComponents, SetNavComponents] = useState<JSX.Element[]>();
+  const [dropDownNavItems, SetDropDownNavItems] = useState<{ label: string; value: string; }[]>();
+
+  const user = useUser();
+
+  useEffect(() => {    
+    SetNavComponents(getNavComponents());
+    SetNavItems(getNavItems());
+    SetDropDownNavItems(getDropDownNavItems());
+  }, [user]);
+
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
 
   const folioDetails = useSelector(folioItems);
@@ -111,11 +126,15 @@ const SiteDetails = () => {
   };
 
   useEffect(() => {
+    if(addSiteToFolioRequestStatus === RequestStatus.success)
+    {
+      //dispatch(resetFolioItemAddedStatus(null));
     showNotification(
       addSiteToFolioRequestStatus,
       'Successfully added site to folio',
       'Unable to add to folio',
     );
+  }
   }, [addSiteToFolioRequestStatus]);
 
   const folioDropdown: IFormField = {
@@ -154,6 +173,8 @@ const SiteDetails = () => {
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
+
+  const srUpdateRequestStatus = useSelector(updateRequestStatus);
 
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
 
@@ -235,6 +256,7 @@ const SiteDetails = () => {
   // BY DOING THIS WE CAN STOP UNNECCESSARY CALL TO DATABASE
   // THERE ARE SOME CALLS WHICH MAY NOT REQUIRED ON DETAILS PAGE.
   useEffect(() => {
+    console.log("Calling From Site Details")
     setIsLoading(true); // Set loading state to true before starting API calls
     if (id) {
       dispatch(resetSaveSiteDetails(null));
@@ -246,9 +268,12 @@ const SiteDetails = () => {
         dispatch(fetchNotationClassCd()),
         dispatch(fetchNotationTypeCd()),
         dispatch(fetchNotationParticipantRoleCd()),
-        dispatch(fetchNotationParticipants(id ?? '')),
+        dispatch(fetchParticipantRoleCd()),
+        dispatch(fetchSiteParticipants({ siteId: id ?? '', showPending :false })),
+        dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending :false })),
         // should be based on condition for External and Internal User.
-        dispatch(fetchSitesDetails({ siteId: id ?? '' })),
+        dispatch(fetchSitesDetails({ siteId: id ?? '', showPending :false })),
+        // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
       ])
         .then(() => {
           setIsLoading(false); // Set loading state to false after all API calls are resolved
@@ -258,6 +283,25 @@ const SiteDetails = () => {
         });
     }
   }, [id]);
+
+
+  useEffect(()=>{
+    if(srUpdateRequestStatus === RequestStatus.success)
+    {
+      if (id) {        
+        Promise.all([
+          dispatch(fetchSitesDetails({ siteId: id ?? '', showPending :false })),       
+      
+        ])
+          .then(() => {
+            setIsLoading(false); // Set loading state to false after all API calls are resolved
+          })
+          .catch((error) => {
+            console.error('Error fetching data:', error);
+          });
+      }
+    }
+  },[srUpdateRequestStatus])
 
   useEffect(() => {
     if (details && details.id === id) {
@@ -617,7 +661,7 @@ const SiteDetails = () => {
           )}
         </div>
         <NavigationPills
-          items={navItems}
+          items={navItems ?? []}
           components={navComponents}
           dropdownItems={dropDownNavItems}
           isDisable={

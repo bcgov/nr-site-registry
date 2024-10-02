@@ -16,12 +16,13 @@ const initialState: IAssociateState = {
 // Define the asynchronous thunk to fetch site associated from the backend
 export const fetchAssociatedSites = createAsyncThunk(
   'associatedSites/fetchAssociatedSites',
-  async (siteId: string) => {
+  async ({siteId,showPending}:{siteId: string, showPending: boolean}) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphQLAssociatedSitesBySiteId()),
         variables: {
           siteId: siteId,
+          pending: showPending
         },
       });
       return response.data.data.getAssociatedSitesBySiteId.data;

@@ -28,6 +28,9 @@ export class LandHistoryResolver {
 
     @Args('sortDirection', { nullable: true })
     sortDirection: SortDirection,
+
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
   ) {
     this.sitesLogger.log(
       'LandHistoryResolver.getLandHistoriesForSite() start siteId:' +
@@ -45,6 +48,7 @@ export class LandHistoryResolver {
       siteId,
       searchTerm,
       sortDirection,
+      showPending
     );
     if (result.length > 0) {
       this.sitesLogger.log(

@@ -31,11 +31,16 @@ export class NotationResolver {
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSiteNotationBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
   ) {
     this.sitesLogger.log(
-      'NotationResolver.getSiteNotationBySiteId() start siteId:' + ' ' + siteId,
+      'NotationResolver.getSiteNotationBySiteId() start siteId:' + ' ' + siteId  +' showPending = '+ showPending );
+   
+    const result = await this.notationService.getSiteNotationBySiteId(
+      siteId,
+      showPending,
     );
-    const result = await this.notationService.getSiteNotationBySiteId(siteId);
     if (result && result.length > 0) {
       this.sitesLogger.log(
         'NotationResolver.getSiteNotationBySiteId() RES:200 end',

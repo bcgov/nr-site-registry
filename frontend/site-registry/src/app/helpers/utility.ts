@@ -189,6 +189,7 @@ export enum UserRoleType {
 
 export const isUserOfType = (roleType: UserRoleType) => {
   const user = getUser();
+ 
   if (user !== null) {
     const userRoles: any = user.profile?.role;
     switch (roleType) {
@@ -218,10 +219,10 @@ export const isUserOfType = (roleType: UserRoleType) => {
         }
       case 'sr':
         const srUserRole =
-          process.env.REACT_APP_SITE_REGISTRAR_USER_ROLE ||
-          ((window as any)._env_ &&
-            (window as any)._env_.REACT_APP_SITE_REGISTRAR_USER_ROLE) ||
-          'site-registrar';
+        //  process.env?.REACT_APP_SITE_REGISTRAR_USER_ROLE 
+        // ?? ((window as any)?._env_?.REACT_APP_SITE_REGISTRAR_USER_ROLE) ?? 
+        'site-site-registrar';
+    
         if (userRoles.includes(srUserRole)) {
           return true;
         } else {

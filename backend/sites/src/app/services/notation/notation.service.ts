@@ -19,19 +19,30 @@ export class NotationService {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  /**
+    /**
    * Fetches notations for a given site ID, including related participants.
    *
    * @param siteId - The ID of the site for which notations are to be fetched.
    * @returns An array of NotationDto objects, each containing event and participant details.
    * @throws Error if there's an issue retrieving the data.
    */
-  async getSiteNotationBySiteId(siteId: string) {
+  async getSiteNotationBySiteId(siteId: string,showPending: boolean) {
+
     this.sitesLogger.log('NotationService.getSiteNotationBySiteId() start');
     this.sitesLogger.debug('NotationService.getSiteNotationBySiteId() start');
+
     try {
       // Retrieve events associated with the given siteId
-      const events = await this.notationRepository.find({ where: { siteId } });
+      let events:Events[] = [];
+      
+      if(showPending)
+      {
+        events =  await this.notationRepository.find({ where: { siteId , userAction: UserActionEnum.UPDATED } });
+      }
+      else
+      {
+        events =  await this.notationRepository.find({ where: { siteId } });
+      }
 
       // If no events are found, return an empty array
       if (!events.length) {

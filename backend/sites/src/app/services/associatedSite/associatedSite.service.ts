@@ -7,6 +7,8 @@ import { SiteAssocs } from '../../entities/siteAssocs.entity';
 import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
 import { LoggerService } from '../../logger/logger.service';
 
+import { UserActionEnum } from 'src/app/common/userActionEnum';
+
 @Injectable()
 export class AssociatedSiteService {
   constructor(
@@ -15,16 +17,14 @@ export class AssociatedSiteService {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  /**
+    /**
    * Retrieves associated sites for a given site ID and transforms the data into DTOs.
    *
    * @param siteId - The ID of the site for which associated sites are to be fetched.
    * @returns An array of AssociatedSiteDto objects containing details of associated sites.
    * @throws Error if there is an issue retrieving the data.
    */
-  async getAssociatedSitesBySiteId(
-    siteId: string,
-  ): Promise<AssociatedSiteDto[]> {
+  async getAssociatedSitesBySiteId(siteId: string, showPending: boolean) {
     try {
       this.sitesLogger.log(
         'AssociatedSiteService.getAssociatedSitesBySiteId() start',
@@ -32,11 +32,18 @@ export class AssociatedSiteService {
       this.sitesLogger.debug(
         'AssociatedSiteService.getAssociatedSitesBySiteId() start',
       );
-      // Fetch associated sites based on the provided siteId
-      const result = await this.assocSiteRepository.find({
-        where: { siteId },
-        // Optionally, specify relations if needed
-      });
+
+      let result: SiteAssocs[] = [];
+
+      if (showPending) {
+        result = await this.assocSiteRepository.find({
+          where: { siteId , userAction: UserActionEnum.UPDATED  },
+        });
+      } else {
+        result = await this.assocSiteRepository.find({
+          where: { siteId },
+        });
+      }
 
       // Transform the fetched data into the desired format
       const transformedObjects = result.map((assocs) => ({

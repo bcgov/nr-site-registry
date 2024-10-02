@@ -9,6 +9,7 @@ export const graphQLParcelDescriptionBySiteId = () => {
       $searchParam: String!
       $sortBy: String!
       $sortByDir: String!
+      $pending: Boolean
     ) {
       getParcelDescriptionsBySiteId(
         siteId: $siteId
@@ -17,6 +18,7 @@ export const graphQLParcelDescriptionBySiteId = () => {
         searchParam: $searchParam
         sortBy: $sortBy
         sortByDir: $sortByDir
+        pending: $pending
       ) {
         message
         httpStatusCode

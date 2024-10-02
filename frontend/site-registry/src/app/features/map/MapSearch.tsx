@@ -2,7 +2,6 @@ import { Autocomplete, Box, Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-import { HorizontalScroller } from './HorizontalScroller';
 import {
   MAP_CONTROLS_RIGHT_LG,
   MAP_CONTROLS_RIGHT_SM,

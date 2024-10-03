@@ -46,7 +46,7 @@ export class SiteDocs extends ChangeAuditEntity {
   note: string | null;
 
   @Field({ nullable: true })
-  @Column('character varying', { name: 'filePath' })
+  @Column('character varying', { name: 'filePath', nullable: true })
   filePath: string | null;
 
   @Field()

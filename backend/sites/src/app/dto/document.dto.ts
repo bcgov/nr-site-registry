@@ -2,7 +2,10 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { ResponseDto } from './response/response.dto';
 import { SiteDocs } from '../entities/siteDocs.entity';
 import { IsString } from 'class-validator';
-import { ChangeAuditEntityDTO } from './changeAuditEntity.dto';
+import {
+  ChangeAuditEntityDTO,
+  ChangeAuditObjectTypeDTO,
+} from './changeAuditEntity.dto';
 
 @ObjectType()
 export class DocumentResponse extends ResponseDto {
@@ -11,7 +14,7 @@ export class DocumentResponse extends ResponseDto {
 }
 
 @ObjectType()
-export class DocumentDto {
+export class DocumentDto extends ChangeAuditObjectTypeDTO {
   @Field()
   @IsString()
   id: string;
@@ -23,6 +26,9 @@ export class DocumentDto {
   @Field()
   @IsString()
   psnorgId: string;
+
+  @Field()
+  dprCode: string;
 
   @Field()
   @IsString()

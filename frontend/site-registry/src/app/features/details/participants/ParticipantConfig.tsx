@@ -126,7 +126,7 @@ export const GetConfig = () => {
         type: FormFieldType.Checkbox,
         label: 'SR',
         placeholder: '',
-        graphQLPropertyName: 'sr',
+        graphQLPropertyName: 'srAction',
         value: false,
         tableMode: true,
         stickyCol: true,

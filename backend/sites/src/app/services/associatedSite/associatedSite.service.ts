@@ -6,6 +6,7 @@ import { v4 } from 'uuid';
 import { SiteAssocs } from '../../entities/siteAssocs.entity';
 import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
 import { LoggerService } from '../../logger/logger.service';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 @Injectable()
 export class AssociatedSiteService {
@@ -45,7 +46,8 @@ export class AssociatedSiteService {
         siteIdAssociatedWith: assocs.siteIdAssociatedWith,
         effectiveDate: assocs.effectiveDate.toISOString(),
         note: assocs.note ? assocs.note.trim() : null, // Ensure note is trimmed
-        srAction: assocs.srAction,
+        srAction:
+          assocs.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
       }));
 
       // Convert the transformed objects into DTOs

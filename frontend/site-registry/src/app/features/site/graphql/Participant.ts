@@ -19,6 +19,7 @@ export const graphQLSiteParticipantsBySiteId = () => {
           displayName
           prCode
           description
+          srAction
         }
       }
     }

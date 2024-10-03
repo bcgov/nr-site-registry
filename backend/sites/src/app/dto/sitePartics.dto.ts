@@ -1,7 +1,10 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { ResponseDto } from './response/response.dto';
 import { IsDate, IsString } from 'class-validator';
-import { ChangeAuditEntityDTO } from './changeAuditEntity.dto';
+import {
+  ChangeAuditEntityDTO,
+  ChangeAuditObjectTypeDTO,
+} from './changeAuditEntity.dto';
 
 @ObjectType()
 export class SiteParticsResponse extends ResponseDto {
@@ -10,7 +13,7 @@ export class SiteParticsResponse extends ResponseDto {
 }
 
 @ObjectType()
-export class SiteParticsDto {
+export class SiteParticsDto extends ChangeAuditObjectTypeDTO {
   @Field()
   partiRoleId: string;
 

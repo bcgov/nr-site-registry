@@ -52,6 +52,7 @@ describe('DocumentResolver', () => {
     const mockDocuments: DocumentDto[] = [
       {
         id: '1',
+        docParticId: '1',
         siteId: 'SITE456',
         title: 'Document 1',
         psnorgId: '1',

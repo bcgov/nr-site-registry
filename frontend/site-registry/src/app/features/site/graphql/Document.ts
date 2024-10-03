@@ -13,7 +13,6 @@ export const graphQLSiteDocumentsBySiteId = () => {
           docParticId
           siteId
           psnorgId
-          dprCode
           submissionDate
           documentDate
           title

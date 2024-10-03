@@ -242,7 +242,7 @@ const SiteDetails = () => {
       dispatch(setupSiteIdForSaving(id));
       Promise.all([
         dispatch(fetchSnapshots(id ?? '')),
-        dispatch(getBannerType(id ?? '')),
+        // dispatch(getBannerType(id ?? '')),
         dispatch(fetchMinistryContact('EMP')),
         dispatch(fetchNotationClassCd()),
         dispatch(fetchNotationTypeCd()),
@@ -251,6 +251,7 @@ const SiteDetails = () => {
         dispatch(fetchParticipantRoleCd()),
         dispatch(fetchSiteParticipants(id ?? '')),
         dispatch(fetchDocuments(id ?? '')),
+        dispatch(fetchAssociatedSites(id ?? '')),
         // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '' })),
       ])

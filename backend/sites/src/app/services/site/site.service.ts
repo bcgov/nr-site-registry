@@ -379,11 +379,12 @@ export class SiteService {
                 console.log('No changes To Site Documents');
               }
 
-              if (siteAssociations) {
-                await transactionalEntityManager.save(
-                  SiteAssocs,
-                  siteAssociations,
-                );
+              if (siteAssociations && siteAssociations.length > 0) {
+                console.log(siteAssociations);
+                // await transactionalEntityManager.save(
+                //   SiteAssocs,
+                //   siteAssociations,
+                // );
               } else {
                 console.log('No changes To Site Associations');
               }
@@ -985,6 +986,95 @@ export class SiteService {
         await Promise.all(
           updatedEventPartics.map(({ id, changes }) =>
             transactionalEntityManager.update(EventPartics, { id }, changes),
+          ),
+        );
+      }
+    }
+  }
+
+  /**
+   * Processes and saves associated sites based on the provided actions.
+   * @param siteAccociated - Array of associated sites data including actions to be performed.
+   * @param userInfo - Information about the user performing the actions.
+   * @param transactionalEntityManager - Entity manager for handling transactions.
+   */
+  async processSiteAssociated(
+    siteAccociated: any[],
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    if (siteAccociated && siteAccociated.length > 0) {
+      const newSiteAssociates: SiteAssocs[] = [];
+      const updatedSiteAssociates: {
+        id: string;
+        changes: Partial<SiteAssocs>;
+      }[] = [];
+      const deleteSiteAssociates: { id: string }[] = [];
+
+      const siteAssociatePromises = siteAccociated.map(async (asscos) => {
+        const { apiAction, ...siteAssocsData } = asscos;
+        let siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
+        switch (apiAction) {
+          case UserActionEnum.ADDED:
+            newSiteAssociates.push({
+              ...siteAssoc,
+              rwmFlag: 0,
+              rwmNoteFlag: 0,
+              commonPid: 'N',
+              userAction: UserActionEnum.ADDED,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+            break;
+          case UserActionEnum.UPDATED:
+            const existingSiteAssoc =
+              await this.siteAssociationsRepo.findOneByOrFail({
+                id: asscos.id,
+              });
+            if (existingSiteAssoc) {
+              updatedSiteAssociates.push({
+                id: asscos.id,
+                changes: {
+                  ...existingSiteAssoc,
+                  ...siteAssoc,
+                  userAction: UserActionEnum.UPDATED,
+                  whenUpdated: new Date(),
+                  whoUpdated: userInfo ? userInfo.givenName : '',
+                },
+              });
+            } else {
+              console.log(
+                `There is no site associated in database againts id : ${asscos.id}`,
+              );
+            }
+            break;
+          case UserActionEnum.DELETED:
+            // Handle deletion if necessary
+            deleteSiteAssociates.push({ id: asscos.id });
+            break;
+        }
+      });
+
+      await Promise.all(siteAssociatePromises);
+
+      // Save new site associates in bulk
+      if (newSiteAssociates.length > 0) {
+        await transactionalEntityManager.save(SiteAssocs, newSiteAssociates);
+      }
+
+      // Update existing site participants and site participant roles in bulk
+      if (updatedSiteAssociates.length > 0) {
+        await Promise.all(
+          updatedSiteAssociates.map(({ id, changes }) =>
+            transactionalEntityManager.update(SiteAssocs, { id }, changes),
+          ),
+        );
+      }
+
+      if (deleteSiteAssociates.length > 0) {
+        await Promise.all(
+          deleteSiteAssociates.map(({ id }) =>
+            transactionalEntityManager.delete(SiteAssocs, { id }),
           ),
         );
       }

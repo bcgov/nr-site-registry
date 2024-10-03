@@ -126,7 +126,7 @@ const Participants = () => {
           return response.data.data.getPeopleOrgsCd;
         }
       } catch (error) {
-        console.error('Error fetching notation participant:', error);
+        console.error('Error fetching participant:', error);
         return [];
       }
     }
@@ -328,7 +328,7 @@ const Participants = () => {
         });
       };
 
-      // Update both formData and trackNotation
+      // Update both formData and trackParticipant
       const updatedPartics = updateParticipant(formData);
       const updatedTrackNotatn = updateParticipant(trackParticipant);
 

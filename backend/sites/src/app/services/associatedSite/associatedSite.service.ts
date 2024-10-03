@@ -40,11 +40,12 @@ export class AssociatedSiteService {
 
       // Transform the fetched data into the desired format
       const transformedObjects = result.map((assocs) => ({
-        guid: v4(), // Generate a unique identifier for each entry
+        id: assocs.id,
         siteId: assocs.siteId,
-        effectiveDate: assocs.effectiveDate.toISOString(),
         siteIdAssociatedWith: assocs.siteIdAssociatedWith,
+        effectiveDate: assocs.effectiveDate.toISOString(),
         note: assocs.note ? assocs.note.trim() : null, // Ensure note is trimmed
+        srAction: assocs.srAction,
       }));
 
       // Convert the transformed objects into DTOs

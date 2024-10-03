@@ -1,7 +1,11 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { ResponseDto } from './response/response.dto';
 import { SiteAssocs } from '../entities/siteAssocs.entity';
 import { IsDate, IsString } from 'class-validator';
+import {
+  ChangeAuditEntityDTO,
+  ChangeAuditObjectTypeDTO,
+} from './changeAuditEntity.dto';
 
 @ObjectType()
 export class AssociatedSiteResponse extends ResponseDto {
@@ -10,9 +14,9 @@ export class AssociatedSiteResponse extends ResponseDto {
 }
 
 @ObjectType()
-export class AssociatedSiteDto {
+export class AssociatedSiteDto extends ChangeAuditObjectTypeDTO {
   @Field()
-  guid: string;
+  id: string;
 
   @Field()
   @IsString()
@@ -28,5 +32,23 @@ export class AssociatedSiteDto {
 
   @Field({ nullable: true })
   @IsString()
+  note: string | null;
+}
+
+@InputType()
+export class SiteAssociationsInputDTO extends ChangeAuditEntityDTO {
+  @Field()
+  id: string;
+
+  @Field()
+  siteId: string;
+
+  @Field()
+  siteIdAssociatedWith: string;
+
+  @Field()
+  effectiveDate: Date;
+
+  @Field({ nullable: true })
   note: string | null;
 }

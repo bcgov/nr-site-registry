@@ -380,11 +380,11 @@ export class SiteService {
               }
 
               if (siteAssociations && siteAssociations.length > 0) {
-                console.log(siteAssociations);
-                // await transactionalEntityManager.save(
-                //   SiteAssocs,
-                //   siteAssociations,
-                // );
+                await this.processSiteAssociated(
+                  siteAssociations,
+                  userInfo,
+                  transactionalEntityManager,
+                );
               } else {
                 console.log('No changes To Site Associations');
               }
@@ -1012,7 +1012,7 @@ export class SiteService {
       const deleteSiteAssociates: { id: string }[] = [];
 
       const siteAssociatePromises = siteAccociated.map(async (asscos) => {
-        const { apiAction, ...siteAssocsData } = asscos;
+        const { id, apiAction, ...siteAssocsData } = asscos;
         let siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
         switch (apiAction) {
           case UserActionEnum.ADDED:

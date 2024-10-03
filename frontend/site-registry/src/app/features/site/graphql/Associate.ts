@@ -9,11 +9,12 @@ export const graphQLAssociatedSitesBySiteId = () => {
         message
         timestamp
         data {
-          guid
+          id
           siteId
           siteIdAssociatedWith
           effectiveDate
           note
+          srAction
         }
       }
     }

@@ -80,7 +80,7 @@ const Associate = () => {
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
   const [selectedRows, setSelectedRows] = useState<
-    { siteId: String; siteIdAssociatedWith: string; guid: string }[]
+    { siteId: String; siteIdAssociatedWith: string; id: string }[]
   >([]);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
   const [searchParam, setSearchParam] = useState('');
@@ -179,7 +179,7 @@ const Associate = () => {
   useEffect(() => {
     if (Object.keys(isRecordExist).length > 0) {
       const updatedAssocs = formData.map((associate) =>
-        associate.guid === currentRecordId
+        associate.id === currentRecordId
           ? { ...associate, siteIdAssociatedWith: '' }
           : associate,
       );
@@ -271,183 +271,10 @@ const Associate = () => {
 
     return () => clearTimeout(timeoutId);
   }, [searchParam]);
-  // useEffect(() => {
-  //   if (searchParam) {
-  //     const indexToUpdate = associateColumnInternal.findIndex((item) => item.displayType?.graphQLPropertyName === 'siteIdAssociatedWith');
-  //     const timeoutId = setTimeout(async () => {
-  //       try {
-  //         const response = await fetchSiteIds(searchParam);
-  //         let result = [];
-  //         let infoMsg = <></>;
-  //         let params = {
-  //           indexToUpdate,
-  //           updates: {
-  //             isLoading: RequestStatus.success,
-  //             options: [],
-  //             customInfoMessage: infoMsg,
-  //           },
-  //         };
-
-  //         if (!response?.success) {
-  //           infoMsg = (
-  //             <div className="text-wrap ">
-  //               <img
-  //                 src={infoIcon}
-  //                 alt="info"
-  //                 aria-hidden="true"
-  //                 role="img"
-  //                 aria-label="User image"
-  //               />
-  //               <span
-  //                 aria-label={'info-message'}
-  //                 className="px-2 custom-not-found"
-  //               >
-  //                 No results found.
-  //               </span>
-  //             </div>
-  //           );
-  //           params = {
-  //             ...params,
-  //             updates: {
-  //               ...params.updates,
-  //               isLoading: RequestStatus.idle,
-  //               customInfoMessage: infoMsg,
-  //             },
-  //           };
-  //         } else {
-  //           const siteIds = formData.map((obj) => obj.siteIdAssociatedWith);
-  //           if (response.data.length === 0) {
-  //             infoMsg = (
-  //               <div>
-  //                 <img
-  //                   src={infoIcon}
-  //                   alt="info"
-  //                   aria-hidden="true"
-  //                   role="img"
-  //                   aria-label="User image"
-  //                 />
-  //                 <span
-  //                   aria-label={'info-message'}
-  //                   className="text-wrap px-2 custom-not-found"
-  //                 >
-  //                   No results found.
-  //                 </span>
-  //               </div>
-  //             );
-  //             setIsInfoMsg(false);
-  //           } else if (Object.keys(isRecordExist).length > 0) {
-  //             result = response.data.filter(
-  //               (item: any) => !siteIds.includes(item.value.toString()),
-  //             );
-  //             infoMsg = (
-  //               <div className="py-2">
-  //                 <img
-  //                   src={infoIcon}
-  //                   alt="info"
-  //                   aria-hidden="true"
-  //                   role="img"
-  //                   aria-label="User image"
-  //                 />
-  //                 <span
-  //                   aria-label={'info-message'}
-  //                   className="text-wrap p-2 custom-not-found"
-  //                 >
-  //                   Site ID: {isRecordExist.value} is already
-  //                   selected.
-  //                 </span>
-  //               </div>
-  //             );
-  //             setIsInfoMsg(true);
-  //           } else {
-  //             result = response.data;
-  //             infoMsg = <></>;
-  //             setIsInfoMsg(false);
-  //           }
-  //           params = {
-  //             ...params,
-  //             updates: {
-  //               ...params.updates,
-  //               options: result,
-  //               customInfoMessage: infoMsg,
-  //             },
-  //           };
-  //         }
-
-  //         setInternalRow(updateTableColumn(associateColumnInternal, params));
-  //       } catch {
-  //         throw new Error('Invalid searchParam');
-  //       }
-  //     }, 300);
-
-  //     return () => clearTimeout(timeoutId);
-  //   }
-  // }, [searchParam]);
-
-  // useEffect(() => {
-  //   const userType = loggedInUser?.profile.preferred_username?.includes('bceid')
-  //     ? UserType.External
-  //     : loggedInUser?.profile.preferred_username?.includes('idir')
-  //       ? UserType.Internal
-  //       : UserType.External;
-  //   setUserType(userType);
-  // }, [loggedInUser]);
-
-  // useEffect(() => {
-  //   setViewMode(mode);
-  // }, [mode]);
-
-  // useEffect(() => {
-  //   if (resetDetails) {
-  //     setFormData(sitesAssociated);
-  //     // need some updated array on click of save button on top
-  //     setUpdateForm(sitesAssociated);
-  //   }
-  // }, [resetDetails]);
-
-  // useEffect(() => {
-  //   if (sitesAssociated && sitesAssociated.length > 0) {
-  //     setFormData(sitesAssociated);
-  //     // need some updated array on click of save button on top
-  //     setUpdateForm(sitesAssociated);
-  //   } else {
-  //     setLoading(RequestStatus.loading);
-  //   }
-  // }, [sitesAssociated]);
-
-  // useEffect(() => {
-  //   if (id) {
-  //     dispatch(fetchAssociatedSites(id ?? ''))
-  //       .then(() => {
-  //         setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
-  //       })
-  //       .catch((error) => {
-  //         setLoading(RequestStatus.failed);
-  //         console.error('Error fetching data:', error);
-  //       });
-  //   }
-  // }, [id]);
-
-  // useEffect(() => {
-  //   // Parameters for the update
-  //   let params: UpdateDisplayTypeParams = {
-  //     indexToUpdate: associateColumnInternal.findIndex(
-  //       (item) =>
-  //         item.displayType?.graphQLPropertyName === 'siteIdAssociatedWith',
-  //     ),
-  //     updates: {
-  //       isLoading: RequestStatus.loading,
-  //       options: [],
-  //       customInfoMessage: <></>,
-  //     },
-  //   };
-  //   setInternalRow(updateTableColumn(internalRow, params));
-  // }, [saveSiteDetailsRequestStatus]);
 
   const clearSearch = useCallback(() => {
     setSearchTerm('');
     setFormData(sitesAssociated);
-    // need some updated array on click of save button on top
-    // setUpdateForm(sitesAssociated);
   }, [sitesAssociated]);
 
   const handleSearchChange = useCallback(
@@ -464,7 +291,7 @@ const Associate = () => {
 
   const deepSearch = (obj: any, searchTerm: string): boolean => {
     for (const key in obj) {
-      if (key !== 'guid') {
+      if (key !== 'id') {
         const value = obj[key];
         if (typeof value === 'object') {
           if (deepSearch(value, searchTerm)) {
@@ -541,10 +368,6 @@ const Associate = () => {
     alert(event);
   };
 
-  useEffect(() => {
-    console.log('existingSiteIds', existingSiteIds);
-  }, [existingSiteIds]);
-
   const handleTableChange = (event: any) => {
     if (
       event.property.includes('select_all') ||
@@ -560,7 +383,7 @@ const Associate = () => {
           ...rows.map((row: any) => ({
             siteId: row.siteId,
             siteIdAssociatedWith: row.siteIdAssociatedWith,
-            guid: row.guid,
+            id: row.id,
           })),
         ]);
       } else {
@@ -572,7 +395,7 @@ const Associate = () => {
                   selectedRow.siteId === row.siteId &&
                   selectedRow.siteIdAssociatedWith ===
                     row.siteIdAssociatedWith &&
-                  selectedRow.guid === row.guid,
+                  selectedRow.id === row.id,
               ),
           ),
         );
@@ -580,7 +403,7 @@ const Associate = () => {
     } else {
       const updateAssocSites = (siteAssociated: any, event: any) => {
         return siteAssociated.map((assoc: any) => {
-          if (assoc.guid === event.row.guid) {
+          if (assoc.id === event.row.id) {
             const isSiteAssoc = event.property === 'siteIdAssociatedWith';
             const recordExist = isSiteAssoc
               ? existingSiteIds.find(
@@ -601,7 +424,6 @@ const Associate = () => {
             };
             if (isSiteAssoc) {
               setInternalRow((prev) => updateTableColumn(prev, params));
-              // setInternalRow(updateTableColumn(internalRow, params));
               setExistingSiteIds((prev) => [
                 ...prev,
                 { key: event.value, value: event.value },
@@ -611,16 +433,6 @@ const Associate = () => {
             if (recordExist !== undefined) {
               setIsRecordExist(recordExist);
               setCurrentRecordId(event.row.guid);
-              // let infoMsg = createInfoMessage(`Site ID: ${isRecordExist.value} is already selected.`);
-              // params = {
-              //   ...params,
-              //   updates: {
-              //     ...params.updates,
-              //     isLoading: RequestStatus.success,
-              //     customInfoMessage: infoMsg,
-              //   },
-              // };
-              // setInternalRow(updateTableColumn(associateColumnInternal, params));
             } else {
               setIsRecordExist({});
               setCurrentRecordId('');
@@ -635,83 +447,6 @@ const Associate = () => {
           return assoc;
         });
       };
-
-      // if (event.property === 'siteIdAssociatedWith') {
-      //   // Parameters for the update
-      //   let params: UpdateDisplayTypeParams = {
-      //     indexToUpdate: associateColumnInternal.findIndex(
-      //       (item) =>
-      //         item.displayType?.graphQLPropertyName === 'siteIdAssociatedWith',
-      //     ),
-      //     updates: {
-      //       isLoading: RequestStatus.loading,
-      //       options: [],
-      //       customInfoMessage: <></>,
-      //     },
-      //   };
-      //   setInternalRow(updateTableColumn(internalRow, params));
-      //   const recordExist = existingSiteIds.find((associate: any) => associate.value === event.value.trim());
-      //   console.log(recordExist, event)
-      //   if (recordExist !== undefined)
-      //   {
-      //     setIsRecordExist(recordExist);
-      //     setCurrentRecordId(event.row.guid);
-      //     console.log('dddd')
-      //     let infoMsg = createInfoMessage(`Site ID: ${isRecordExist.value} is already selected.`);
-      //     // let infoMsg = (
-      //     //   <div className="py-2">
-      //     //     <img
-      //     //       src={infoIcon}
-      //     //       alt="info"
-      //     //       aria-hidden="true"
-      //     //       role="img"
-      //     //       aria-label="User image"
-      //     //     />
-      //     //     <span
-      //     //       aria-label={'info-message'}
-      //     //       className="text-wrap p-2 custom-not-found"
-      //     //     >
-      //     //       Site ID: {event.value.trim()} is already selected.
-      //     //     </span>
-      //     //   </div>
-      //     // );
-      //     params = {
-      //       ...params,
-      //       updates: {
-      //         ...params.updates,
-      //         isLoading: RequestStatus.success,
-      //         customInfoMessage: infoMsg,
-      //       },
-      //     };
-      //     setInternalRow(updateTableColumn(associateColumnInternal, params));
-      //   }
-      //   else
-      //   {
-      //     // need some updated array on click of save button on top
-      //     // setUpdateForm(formData);
-      //     setIsRecordExist({});
-      //     setCurrentRecordId('');
-      //   }
-      //   setSearchParam(event.value.trim());
-      // }
-      // const updatedAssociatedSites = formData.map((associate) =>
-      //   associate.guid === event.row.guid
-      //     ? { ...associate, [event.property]: event.value }
-      //     : associate,
-      // );
-      // setFormData(updatedAssociatedSites);
-      // setExistingSiteIds(prev => [...prev, {key: event.value, value: event.value}])
-      // dispatch(updateAssociatedSites(updatedAssociatedSites));
-
-      // if (selectedRows.some((row) => row.guid === event.row.guid)) {
-      //   setSelectedRows((prev) =>
-      //     prev.map((row) =>
-      //       row.guid === event.row.guid
-      //         ? { ...row, [event.property]: event.value }
-      //         : row,
-      //     ),
-      //   );
-      // }
 
       // Update both formData and trackAssociatedSites
       const updatedAssocs = updateAssocSites(formData, event);
@@ -774,14 +509,14 @@ const Associate = () => {
   const handleRemoveAssociate = (assocIsDelete: boolean = false) => {
     if (assocIsDelete) {
       // Remove selected rows from formData state
-      const updateAssociatedSites = (siteAssociated: any) => {
+      const updateAssocites = (siteAssociated: any) => {
         return siteAssociated.map((assoc: any) => {
           if (
             selectedRows.some(
               (row) =>
                 row.siteId === assoc.siteId &&
                 row.siteIdAssociatedWith === assoc.siteIdAssociatedWith &&
-                row.guid === assoc.guid,
+                row.id === assoc.id,
             )
           ) {
             return {
@@ -795,8 +530,8 @@ const Associate = () => {
       };
 
       // Update both formData and trackAssociatedSites
-      const updatedAssocs = updateAssociatedSites(formData);
-      const updatedTrackAssocSite = updateAssociatedSites(trackAssociatedSite);
+      const updatedAssocs = updateAssocites(formData);
+      const updatedTrackAssocSite = updateAssocites(trackAssociatedSite);
 
       // Filter out assocs based on selectedRows for formData
       const filteredPartics = updatedAssocs.filter(
@@ -805,33 +540,14 @@ const Associate = () => {
             (row) =>
               row.siteId === assoc.siteId &&
               row.siteIdAssociatedWith === assoc.siteIdAssociatedWith &&
-              row.guid === assoc.guid,
+              row.id === assoc.id,
           ),
       );
       setFormData(filteredPartics);
       dispatch(updateAssociatedSites(filteredPartics));
       dispatch(setupSiteAssociationDataForSaving(updatedTrackAssocSite));
-
-      // setFormData((prevData) =>
-      //   prevData.filter(
-      //     (assoc) =>
-      //       !selectedRows.some(
-      //         (row) =>
-      //           row.siteId === assoc.siteId &&
-      //           row.siteIdAssociatedWith === assoc.siteIdAssociatedWith &&
-      //           row.guid === assoc.guid,
-      //       ),
-      //   ),
-      // );
-
-      dispatch(
-        trackChanges(
-          new ChangeTracker(
-            IChangeType.Deleted,
-            'Associated Site',
-          ).toPlainObject(),
-        ),
-      );
+      const tracker = new ChangeTracker(IChangeType.Deleted, 'Associated Site');
+      dispatch(trackChanges(tracker.toPlainObject()));
       setSelectedRows([]);
       setIsDelete(false);
     } else {
@@ -841,7 +557,7 @@ const Associate = () => {
 
   const handleAddAssociate = () => {
     const newAssoc = {
-      guid: v4(),
+      id: v4(),
       siteId: id,
       siteIdAssociatedWith: '',
       effectiveDate: '',
@@ -864,18 +580,6 @@ const Associate = () => {
     );
   };
 
-  // if (loading === RequestStatus.loading) {
-  //   return (
-  //     <div className="participant-loading-overlay">
-  //       <div className="participant-spinner-container">
-  //         <SpinnerIcon
-  //           data-testid="loading-spinner"
-  //           className="participant-fa-spin"
-  //         />
-  //       </div>
-  //     </div>
-  //   );
-  // }
   return (
     <div
       className="row"
@@ -928,7 +632,7 @@ const Associate = () => {
               viewMode === SiteDetailsMode.SRMode &&
               userType === UserType.Internal
             }
-            primaryKeycolumnName="guid"
+            primaryKeycolumnName="id"
             sortHandler={(row: any, ascDir: any) => {
               handleTableSort(row, ascDir);
             }}

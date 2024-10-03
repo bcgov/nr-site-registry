@@ -550,14 +550,35 @@ type DocumentResponse {
 }
 
 type DocumentDto {
+  userAction: String!
+  srAction: String!
   id: String!
   docParticId: String!
   psnorgId: String!
+  dprCode: String!
   displayName: String!
   siteId: String!
   submissionDate: String!
   documentDate: String
   title: String!
+}
+
+type AssociatedSiteResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [AssociatedSiteDto!]
+}
+
+type AssociatedSiteDto {
+  userAction: String!
+  srAction: String!
+  id: String!
+  siteId: String!
+  siteIdAssociatedWith: String!
+  effectiveDate: DateTime!
+  note: String
 }
 
 type RecentViewResponse {
@@ -650,22 +671,6 @@ type FolioContentResponse {
   success: Boolean
   timestamp: String
   data: [FolioContents!]
-}
-
-type AssociatedSiteResponse {
-  message: String
-  httpStatusCode: Int
-  success: Boolean
-  timestamp: String
-  data: [AssociatedSiteDto!]
-}
-
-type AssociatedSiteDto {
-  guid: String!
-  siteId: String!
-  siteIdAssociatedWith: String!
-  effectiveDate: DateTime!
-  note: String
 }
 
 type LandUseCodeResponse {
@@ -858,17 +863,11 @@ input SiteAssociationsInputDTO {
   userAction: String
   apiAction: String
   srAction: String!
+  id: String!
   siteId: String!
   siteIdAssociatedWith: String!
   effectiveDate: DateTime!
-  note: String!
-  whoCreated: String!
-  whoUpdated: String!
-  whenCreated: DateTime!
-  whenUpdated: DateTime!
-  rwmFlag: Float!
-  rwmNoteFlag: Float!
-  commonPid: String!
+  note: String
 }
 
 input SubDivisionsInputDTO {

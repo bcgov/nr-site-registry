@@ -38,6 +38,7 @@ import {
   FaArrowsRotate,
   FaRegFloppyDisk,
   FaPencil,
+  FaCaretRight,
 } from 'react-icons/fa6';
 
 import {
@@ -92,3 +93,4 @@ export const ExclamationCircle = BsExclamationCircle;
 export const ExclamationTriangle = BsExclamationTriangle;
 export const RegFloppyDisk = FaRegFloppyDisk;
 export const PencilIcon = FaPencil;
+export const CaretRightIcon = FaCaretRight;

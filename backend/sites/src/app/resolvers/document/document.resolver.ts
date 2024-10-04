@@ -33,14 +33,21 @@ export class DocumentResolver {
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSiteDocumentsBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
   ) {
     this.sitesLogger.log(
       'DocumentResolver.getSiteDocumentsBySiteId() start siteId:' +
         ' ' +
-        siteId,
+        siteId +
+        ' showPending = ' +
+        showPending,
     );
-    const response =
-      await this.documentService.getSiteDocumentsBySiteId(siteId);
+
+    const response = await this.documentService.getSiteDocumentsBySiteId(
+      siteId,
+      showPending,
+    );
     if (response && response.length > 0) {
       this.sitesLogger.log(
         'DocumentResolver.getSiteDocumentsBySiteId() RES:200 end',

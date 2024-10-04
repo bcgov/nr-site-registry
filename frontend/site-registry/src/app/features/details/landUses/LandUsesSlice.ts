@@ -21,15 +21,17 @@ export const fetchLandUses = createAsyncThunk(
     siteId,
     searchTerm,
     sortDirection,
+    showPending,
   }: {
     siteId: string;
     searchTerm?: string;
     sortDirection?: string;
+    showPending: boolean;
   }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(getLandHistoriesForSiteQuery),
-        variables: { siteId, searchTerm, sortDirection },
+        variables: { siteId, searchTerm, sortDirection, pending: showPending },
       });
 
       return response.data.data.getLandHistoriesForSite.data;
@@ -89,6 +91,7 @@ const landUsesSlice = createSlice({
 });
 
 export const landUses = (state: any) => state.landUses;
+export const selectLandUseCodes = (state: any) => state.landUses.landUseCodes;
 export const { updateLandUses } = landUsesSlice.actions;
 
 export default landUsesSlice.reducer;

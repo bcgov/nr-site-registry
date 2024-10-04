@@ -48,10 +48,10 @@ export class CartResolver {
           result,
         );
       } else {
-        this.sitesLogger.log('CartResolver.getCartItemsForUser() RES:422 end');
+        this.sitesLogger.log('CartResolver.getCartItemsForUser() RES:200 end');
         return this.genericResponseProvider.createResponse(
           `Cart items not found for user id: ${userId}`,
-          422,
+          200,
           true,
           [],
         );

@@ -1,4 +1,4 @@
-import { DropdownItem } from '../../../components/action/IActions';
+import { isUserOfType, UserRoleType } from '../../../helpers/utility';
 import Associate from '../associates/Associate';
 import Disclosure from '../disclosure/Disclosure';
 import Documents from '../documents/Documents';
@@ -6,10 +6,11 @@ import LandUses from '../landUses/LandUses';
 import Notations from '../notations/Notations';
 import ParcelDescriptions from '../parcelDescriptions/parcelDescriptions';
 import Participants from '../participants/Participant';
+import SRUpdates from '../srUpdates/srUpdates';
 
 import Summary from '../summary/Summary';
 
-export const navItems: string[] = [
+const mainNavItems = [
   'Summary',
   'Notations',
   'Site Participants',
@@ -20,7 +21,14 @@ export const navItems: string[] = [
   'Site Disclosure',
 ];
 
-export const navComponents: JSX.Element[] = [
+export interface IComponentProps {
+  showPending?: boolean;
+}
+
+export const getNavItems = () =>
+  isUserOfType(UserRoleType.SR) ? ['Updates', ...mainNavItems] : mainNavItems;
+
+const mainNavComponents = [
   <Summary />,
   <Notations />,
   <Participants />,
@@ -31,7 +39,12 @@ export const navComponents: JSX.Element[] = [
   <Disclosure />,
 ];
 
-export const dropDownNavItems: DropdownItem[] = [
+export const getNavComponents = () =>
+  isUserOfType(UserRoleType.SR)
+    ? [<SRUpdates />, ...mainNavComponents]
+    : mainNavComponents;
+
+export const mainDropDownNavItems = [
   {
     label: 'Summary',
     value: 'Summary',
@@ -65,3 +78,14 @@ export const dropDownNavItems: DropdownItem[] = [
     value: 'Site Disclosure',
   },
 ];
+
+export const getDropDownNavItems = () =>
+  isUserOfType(UserRoleType.SR)
+    ? [
+        {
+          label: 'Updated',
+          value: 'SRUpdates',
+        },
+        ...mainDropDownNavItems,
+      ]
+    : mainDropDownNavItems;

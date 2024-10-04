@@ -7,6 +7,8 @@ import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
 import { LoggerService } from '../../logger/logger.service';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
+import { UserActionEnum } from 'src/app/common/userActionEnum';
+
 @Injectable()
 export class AssociatedSiteService {
   constructor(
@@ -22,9 +24,7 @@ export class AssociatedSiteService {
    * @returns An array of AssociatedSiteDto objects containing details of associated sites.
    * @throws Error if there is an issue retrieving the data.
    */
-  async getAssociatedSitesBySiteId(
-    siteId: string,
-  ): Promise<AssociatedSiteDto[]> {
+  async getAssociatedSitesBySiteId(siteId: string, showPending: boolean) {
     try {
       this.sitesLogger.log(
         'AssociatedSiteService.getAssociatedSitesBySiteId() start',
@@ -32,11 +32,18 @@ export class AssociatedSiteService {
       this.sitesLogger.debug(
         'AssociatedSiteService.getAssociatedSitesBySiteId() start',
       );
-      // Fetch associated sites based on the provided siteId
-      const result = await this.assocSiteRepository.find({
-        where: { siteId },
-        // Optionally, specify relations if needed
-      });
+
+      let result: SiteAssocs[] = [];
+
+      if (showPending) {
+        result = await this.assocSiteRepository.find({
+          where: { siteId, userAction: UserActionEnum.UPDATED },
+        });
+      } else {
+        result = await this.assocSiteRepository.find({
+          where: { siteId },
+        });
+      }
 
       // Transform the fetched data into the desired format
       const transformedObjects = result.map((assocs) => ({

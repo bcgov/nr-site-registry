@@ -180,7 +180,11 @@ export const getSiteDetailsToBeSaved = (state: any) => {
 
 export const saveRequestStatus = (state: any) =>
   state.siteDetails.saveRequestStatus;
+
 export const getSiteNoatations = (state: any) => state.siteDetails.notationData;
+
+export const currentSiteId = (state: any) => state.siteDetails.siteId;
+
 export const getSiteDocuments = (state: any) => state.siteDetails.documentsData;
 export const getSiteParticipants = (state: any) =>
   state.siteDetails.siteParticipantData;

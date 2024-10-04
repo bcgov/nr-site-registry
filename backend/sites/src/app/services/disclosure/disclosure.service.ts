@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { LoggerService } from '../../logger/logger.service';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 @Injectable()
 export class DisclosureService {
@@ -19,16 +20,31 @@ export class DisclosureService {
    * @returns A promise that resolves to an array of SiteProfiles entities.
    * @throws Error if there is an issue retrieving the data.
    */
-  async getSiteDisclosureBySiteId(siteId: string): Promise<SiteProfiles[]> {
-    this.sitesLogger.log('DisclosureService.getSiteDisclosureBySiteId() start');
-    this.sitesLogger.debug(
-      'DisclosureService.getSiteDisclosureBySiteId() start',
-    );
+  async getSiteDisclosureBySiteId(
+    siteId: string,
+    showPending: boolean,
+  ): Promise<SiteProfiles[]> {
     try {
+      this.sitesLogger.log(
+        'DisclosureService.getSiteDisclosureBySiteId() start',
+      );
+      this.sitesLogger.debug(
+        'DisclosureService.getSiteDisclosureBySiteId() start',
+      );
+
       // Fetch site profiles based on the provided siteId
-      const result = await this.disclosureRepository.find({
-        where: { siteId },
-      });
+      let result: SiteProfiles[] = [];
+
+      if (showPending) {
+        result = await this.disclosureRepository.find({
+          where: { siteId, userAction: UserActionEnum.UPDATED },
+        });
+      } else {
+        result = await this.disclosureRepository.find({
+          where: { siteId },
+        });
+      }
+
       this.sitesLogger.log('DisclosureService.getSiteDisclosureBySiteId() end');
       this.sitesLogger.debug(
         'DisclosureService.getSiteDisclosureBySiteId() end',

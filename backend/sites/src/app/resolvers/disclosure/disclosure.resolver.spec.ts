@@ -85,7 +85,7 @@ describe('DisclosureResolver', () => {
         .spyOn(disclosureService, 'getSiteDisclosureBySiteId')
         .mockResolvedValueOnce(mockSiteProfile);
 
-      const result = await resolver.getSiteDisclosureBySiteId(siteId);
+      const result = await resolver.getSiteDisclosureBySiteId(siteId, false);
 
       expect(result).toEqual(expectedResponse);
       expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
@@ -110,7 +110,7 @@ describe('DisclosureResolver', () => {
         .spyOn(disclosureService, 'getSiteDisclosureBySiteId')
         .mockResolvedValueOnce([]);
 
-      const result = await resolver.getSiteDisclosureBySiteId(siteId);
+      const result = await resolver.getSiteDisclosureBySiteId(siteId, false);
 
       expect(result).toEqual(expectedResponse);
       expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(

@@ -16,12 +16,13 @@ const initialState: IDocumentsState = {
 // Define the asynchronous thunk to fetch site documents from the backend
 export const fetchDocuments = createAsyncThunk(
   'documents/fetchDocuments',
-  async (siteId: string) => {
+  async ({ siteId, showPending }: { siteId: string; showPending: boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphQLSiteDocumentsBySiteId()),
         variables: {
           siteId: siteId,
+          pending: showPending,
         },
       });
       return response.data.data.getSiteDocumentsBySiteId.data;

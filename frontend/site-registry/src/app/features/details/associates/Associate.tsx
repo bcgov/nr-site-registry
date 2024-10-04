@@ -49,10 +49,12 @@ import {
   saveRequestStatus,
   setupSiteAssociationDataForSaving,
 } from '../SaveSiteDetailsSlice';
+import { IComponentProps } from '../navigation/NavigationPillsConfig';
+import AssociateSiteComponent from './AssociateSiteComponent';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 
-const Associate = () => {
+const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   const {
     associateColumnExternal,
     associateColumnInternal,
@@ -685,6 +687,25 @@ const Associate = () => {
                 />
               )}
           </Widget>
+          <AssociateSiteComponent
+            handleTableChange={handleTableChange}
+            handleWidgetCheckBox={handleWidgetCheckBox}
+            userType={userType}
+            viewMode={viewMode}
+            internalRow={internalRow}
+            associateColumnInternalSRandViewMode={
+              associateColumnInternalSRandViewMode
+            }
+            associateColumnExternal={associateColumnExternal}
+            formData={formData}
+            loading={loading}
+            handleTableSort={handleTableSort}
+            handleAddAssociate={handleAddAssociate}
+            selectedRows={selectedRows}
+            handleRemoveAssociate={handleRemoveAssociate}
+            srVisibilityAssocConfig={srVisibilityAssocConfig}
+            handleItemClick={handleItemClick}
+          />
         </div>
       </div>
       {isDelete && (

@@ -4,6 +4,7 @@ import { SiteDocs } from '../../entities/siteDocs.entity';
 import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { DocumentDto } from '../../dto/document.dto';
+import { UserActionEnum } from '../../common/userActionEnum';
 import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
@@ -20,15 +21,24 @@ export class DocumentService {
    * @returns A promise that resolves to an array of DocumentDto objects.
    * @throws Error if there is an issue retrieving the data.
    */
-  async getSiteDocumentsBySiteId(siteId: string) {
-    this.sitesLogger.log('DocumentService.getSiteDocumentsBySiteId() start');
-    this.sitesLogger.debug('DocumentService.getSiteDocumentsBySiteId() start');
+  async getSiteDocumentsBySiteId(siteId: string, showPending: boolean) {
     try {
-      // Fetch documents for the given site ID
-      const result = await this.siteDocsRepository.find({
-        where: { siteId },
-        relations: ['siteDocPartics', 'siteDocPartics.psnorg'], // Fetch related entities
-      });
+      this.sitesLogger.log('DocumentService.getSiteDocumentsBySiteId() start');
+      this.sitesLogger.debug(
+        'DocumentService.getSiteDocumentsBySiteId() start',
+      );
+      let result: SiteDocs[] = [];
+      if (showPending) {
+        result = await this.siteDocsRepository.find({
+          where: { siteId, userAction: UserActionEnum.UPDATED },
+          relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
+        });
+      } else {
+        result = await this.siteDocsRepository.find({
+          where: { siteId },
+          relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
+        });
+      }
 
       // Process and format the documents
       const response = result.flatMap((res) => {

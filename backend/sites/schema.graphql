@@ -476,7 +476,7 @@ type FetchSiteDetail {
   httpStatusCode: Int
   success: Boolean
   timestamp: String
-  data: Sites!
+  data: Sites
 }
 
 type SearchSiteResponse {
@@ -705,7 +705,7 @@ type ParcelDescriptionDto {
 type Query {
   sites: FetchSiteResponse!
   searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
-  findSiteBySiteId(siteId: String!): FetchSiteDetail!
+  findSiteBySiteId(siteId: String!, pending: Boolean): FetchSiteDetail!
   searchSiteIds(searchParam: String!): DropdownResponse!
   getRecentViewsByUserId(userId: String!): RecentViewResponse!
   getSnapshots: SnapshotResponse!
@@ -713,22 +713,22 @@ type Query {
   getSnapshotsBySiteId(siteId: String!): SnapshotResponse!
   getSnapshotsById(id: Int!): SnapshotResponse!
   getBannerType(siteId: String!): BannerTypeResponse!
-  getParcelDescriptionsBySiteId(siteId: Int!, page: Int!, pageSize: Int!, searchParam: String!, sortBy: String!, sortByDir: String!): ParcelDescriptionsResponse!
-  getSiteParticipantBySiteId(siteId: String!): SiteParticsResponse!
+  getParcelDescriptionsBySiteId(siteId: Int!, page: Int!, pageSize: Int!, searchParam: String!, sortBy: String!, sortByDir: String!, pending: Boolean): ParcelDescriptionsResponse!
+  getSiteParticipantBySiteId(siteId: String!, pending: Boolean): SiteParticsResponse!
   getParticipantRoleCd: DropdownResponse!
   getPeopleOrgsCd(searchParam: String, entityType: String): DropdownResponse!
   getNotationTypeCd: DropdownResponseWithMetaData!
   getNotationClassCd: DropdownResponse!
   getNotationParticipantRoleCd: DropdownResponse!
-  getSiteDisclosureBySiteId(siteId: String!): DisclosureResponse!
+  getSiteDisclosureBySiteId(siteId: String!, pending: Boolean): DisclosureResponse!
   getCartItemsForUser(userId: String!): CartResponse!
-  getLandHistoriesForSite(siteId: String!, searchTerm: String, sortDirection: String): LandHistoryResponse!
+  getLandHistoriesForSite(siteId: String!, searchTerm: String, sortDirection: String, pending: Boolean): LandHistoryResponse!
   getLandUseCodes: LandUseCodeResponse!
-  getSiteNotationBySiteId(siteId: String!): NotationResponse!
-  getSiteDocumentsBySiteId(siteId: String!): DocumentResponse!
+  getSiteNotationBySiteId(siteId: String!, pending: Boolean): NotationResponse!
+  getSiteDocumentsBySiteId(siteId: String!, pending: Boolean): DocumentResponse!
   getFolioItemsForUser(userId: String!): FolioResponse!
   getSitesForFolio(folioDTO: FolioMinDTO!): FolioContentResponse!
-  getAssociatedSitesBySiteId(siteId: String!): AssociatedSiteResponse!
+  getAssociatedSitesBySiteId(siteId: String!, pending: Boolean): AssociatedSiteResponse!
 }
 
 input FolioMinDTO {

@@ -233,62 +233,63 @@ export class SnapshotsService {
   async getBannerType(siteId: string, userId: string): Promise<string> {
     try {
       const query = `
-        WITH Combined AS (
-        SELECT id as site_id, sr_action, when_updated FROM sites.sites
-        WHERE id = $1 AND sr_action <> 'private'
-        UNION ALL
-        SELECT site_id, sr_action, when_updated FROM sites.events
-        WHERE site_id = $1  AND sr_action <> 'private'
-        UNION ALL
-        SELECT e.site_id, ep.sr_action, ep.when_updated FROM sites.event_partics ep
-        INNER JOIN sites.events e ON ep.event_id = e.id
-        WHERE e.site_id = $1 AND ep.sr_action <> 'private'
-        UNION ALL
-        SELECT site_id, sr_action, when_updated FROM sites.site_partics
-        WHERE site_id = $1 AND sr_action <> 'private'
-        UNION ALL
-        SELECT site_id, sr_action, when_updated FROM sites.site_docs
-        WHERE site_id = $1 AND sr_action <> 'private'
-        UNION ALL
-        SELECT site_id, sr_action, when_updated FROM sites.site_assocs
-        WHERE site_id = $1 AND sr_action <> 'private'
-        UNION ALL
-        SELECT site_id, sr_action, when_updated FROM sites.land_histories
-        WHERE site_id = $1 AND sr_action <> 'private'
-        UNION ALL
-        SELECT site_id, sr_action, when_updated FROM sites.site_subdivisions
-        WHERE site_id = $1 AND sr_action <> 'private'
-        UNION ALL
-        SELECT site_id, sr_action, when_updated FROM sites.site_profiles
-        WHERE site_id = $1 AND sr_action <> 'private'
-      ),
-      LatestSnapshot AS (
-      SELECT s.site_id, s.user_id, MAX(s.when_created ) AS latest_created_date
-      FROM sites.snapshots s
-      WHERE s.site_id = $1 AND s.user_id = $2
-      GROUP BY s.site_id, s.user_id
-    ),
-      StatusCheck AS (
-        SELECT
-          c.site_id,
-          COALESCE(MAX(CASE
-            WHEN EXISTS (
-              SELECT 1 FROM Combined c2 WHERE c2.sr_action = 'pending' AND c2.site_id = $1
-            ) THEN 'pending'
-            WHEN EXISTS (
-              SELECT 1
-              FROM Combined c2
-              INNER JOIN LatestSnapshot ls ON c2.site_id = ls.site_id
-              WHERE c2.sr_action = 'public' AND c2.when_updated > ls.latest_created_date AND c2.site_id = $1
-            ) THEN 'outdated'
-            ELSE 'current'
-          END), 'current') AS bannertype
-        FROM Combined c
-        RIGHT JOIN LatestSnapshot ls ON c.site_id = ls.site_id 
-        GROUP BY c.site_id
-      )
-      SELECT DISTINCT bannertype FROM StatusCheck;
-      `;
+          WITH Combined AS (
+            SELECT id as site_id, sr_action, when_updated FROM sites.sites
+            WHERE id = $1 AND sr_action <> 'private'
+            UNION ALL
+            SELECT site_id, sr_action, when_updated FROM sites.events
+            WHERE site_id = $1  AND sr_action <> 'private'
+            UNION ALL
+            SELECT e.site_id, ep.sr_action, ep.when_updated FROM sites.event_partics ep
+            INNER JOIN sites.events e ON ep.event_id = e.id
+            WHERE e.site_id = $1 AND ep.sr_action <> 'private'
+            UNION ALL
+            SELECT site_id, sr_action, when_updated FROM sites.site_partics
+            WHERE site_id = $1 AND sr_action <> 'private'
+            UNION ALL
+            SELECT site_id, sr_action, when_updated FROM sites.site_docs
+            WHERE site_id = $1 AND sr_action <> 'private'
+            UNION ALL
+            SELECT site_id, sr_action, when_updated FROM sites.site_assocs
+            WHERE site_id = $1 AND sr_action <> 'private'
+            UNION ALL
+            SELECT site_id, sr_action, when_updated FROM sites.land_histories
+            WHERE site_id = $1 AND sr_action <> 'private'
+            UNION ALL
+            SELECT site_id, sr_action, when_updated FROM sites.site_subdivisions
+            WHERE site_id = $1 AND sr_action <> 'private'
+            UNION ALL
+            SELECT site_id, sr_action, when_updated FROM sites.site_profiles
+            WHERE site_id = $1 AND sr_action <> 'private'
+          ),
+          PendingCheck AS (
+            SELECT 'pending' AS bannertype
+            FROM Combined
+            WHERE sr_action = 'pending' AND site_id = $1
+            LIMIT 1
+          ),
+          LatestSnapshot AS (
+            SELECT s.site_id, s.user_id, MAX(s.when_created) AS latest_created_date
+            FROM sites.snapshots s
+            WHERE s.site_id = $1 AND s.user_id = $2
+            GROUP BY s.site_id, s.user_id
+          ),
+          StatusCheck AS (
+            SELECT
+              COALESCE(MAX(CASE
+                WHEN c.sr_action = 'public' AND c.when_updated > ls.latest_created_date THEN 'outdated'
+                ELSE 'current'
+              END), 'current') AS bannertype
+            FROM Combined c
+            RIGHT JOIN LatestSnapshot ls ON c.site_id = ls.site_id
+            WHERE NOT EXISTS (SELECT 1 FROM PendingCheck)
+            GROUP BY c.site_id
+          )
+          SELECT bannertype FROM PendingCheck
+          UNION ALL
+          SELECT DISTINCT bannertype FROM StatusCheck
+          LIMIT 1;
+        `;
 
       const entityManager = this.snapshotRepository.manager;
       const result = await entityManager.query(query, [siteId, userId]);

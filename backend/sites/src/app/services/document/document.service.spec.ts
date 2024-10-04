@@ -110,7 +110,7 @@ describe('DocumentService', () => {
         .spyOn(siteDocsRepository, 'find')
         .mockResolvedValueOnce(mockSiteDocs);
 
-      const result = await service.getSiteDocumentsBySiteId(siteId);
+      const result = await service.getSiteDocumentsBySiteId(siteId, false);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -129,7 +129,7 @@ describe('DocumentService', () => {
       const siteId = 'nonExistentSite';
       jest.spyOn(siteDocsRepository, 'find').mockResolvedValueOnce([]);
 
-      const result = await service.getSiteDocumentsBySiteId(siteId);
+      const result = await service.getSiteDocumentsBySiteId(siteId, false);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -143,9 +143,9 @@ describe('DocumentService', () => {
       );
       jest.spyOn(siteDocsRepository, 'find').mockRejectedValueOnce(mockError);
 
-      await expect(service.getSiteDocumentsBySiteId(siteId)).rejects.toThrow(
-        mockError,
-      );
+      await expect(
+        service.getSiteDocumentsBySiteId(siteId, false),
+      ).rejects.toThrow(mockError);
     });
   });
 
@@ -221,7 +221,7 @@ describe('DocumentService', () => {
     ];
     jest.spyOn(siteDocsRepository, 'find').mockResolvedValueOnce(mockSiteDocs);
 
-    const result = await service.getSiteDocumentsBySiteId(siteId);
+    const result = await service.getSiteDocumentsBySiteId(siteId, false);
 
     expect(result).toBeDefined();
     expect(Array.isArray(result)).toBeTruthy();

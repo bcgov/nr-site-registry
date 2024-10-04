@@ -30,6 +30,7 @@ export interface IFetchParcelDescriptionParams {
   searchParam: string;
   sortBy: string;
   sortByDir: string;
+  showPending: boolean;
 }
 
 const defaultValues = {
@@ -73,6 +74,7 @@ export const fetchParcelDescriptions = createAsyncThunk(
           searchParam: params.searchParam,
           sortBy: params.sortBy,
           sortByDir: params.sortByDir,
+          pending: params.showPending,
         },
       });
     } catch (error) {

@@ -5,6 +5,9 @@ import { LandHistories } from '../../entities/landHistories.entity';
 import { LandHistoriesInputDTO } from 'src/app/dto/landHistoriesInput.dto';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 import { LoggerService } from 'src/app/logger/logger.service';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+
+import { UserActionEnum } from 'src/app/common/userActionEnum';
 
 export class LandHistoryService {
   constructor(
@@ -18,6 +21,7 @@ export class LandHistoryService {
     siteId: string,
     searchTerm: string,
     sortDirection: 'ASC' | 'DESC',
+    showPending: boolean,
   ): Promise<LandHistories[]> {
     this.sitesLogger.log('LandHistoryService.getLandHistoriesForSite() start');
     this.sitesLogger.debug(
@@ -40,6 +44,16 @@ export class LandHistoryService {
               searchTerm: `%${searchTerm}%`,
             }).orWhere('land_use_cd.description ILIKE :searchTerm', {
               searchTerm: `%${searchTerm}%`,
+            });
+          }),
+        );
+      }
+
+      if (showPending) {
+        query.andWhere(
+          new Brackets((qb) => {
+            qb.where('landHistory.user_action = :status', {
+              status: `${UserActionEnum.UPDATED}`,
             });
           }),
         );
@@ -87,6 +101,8 @@ export class LandHistoryService {
           whenCreated: new Date(),
           rwmFlag: 0,
           rwmNoteFlag: 0,
+          userAction: arg.userAction,
+          srAction: arg.srAction,
         };
       });
 
@@ -99,6 +115,8 @@ export class LandHistoryService {
           note: arg.note ?? undefined,
           whoUpdated: curentUser.name,
           whenUpdated: new Date(),
+          userAction: arg.userAction,
+          srAction: arg.srAction,
         };
 
         return [whereClause, data];

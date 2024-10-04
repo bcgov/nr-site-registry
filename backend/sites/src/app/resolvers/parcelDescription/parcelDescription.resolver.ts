@@ -50,6 +50,8 @@ export class ParcelDescriptionResolver {
     @Args('searchParam', { type: () => String }) searchParam: string,
     @Args('sortBy', { type: () => String }) sortBy: string,
     @Args('sortByDir', { type: () => String }) sortByDir: string,
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
     @AuthenticatedUser() user: any,
   ) {
     this.sitesLogger.log(
@@ -65,6 +67,7 @@ export class ParcelDescriptionResolver {
         searchParam,
         sortBy,
         sortByDir,
+        showPending,
         user,
       );
 

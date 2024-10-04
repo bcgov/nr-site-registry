@@ -2,8 +2,8 @@ import gql from 'graphql-tag';
 
 export const graphQLAssociatedSitesBySiteId = () => {
   return gql`
-    query getAssociatedSitesBySiteId($siteId: String!) {
-      getAssociatedSitesBySiteId(siteId: $siteId) {
+    query getAssociatedSitesBySiteId($siteId: String!, $pending: Boolean) {
+      getAssociatedSitesBySiteId(siteId: $siteId, pending: $pending) {
         httpStatusCode
         success
         message

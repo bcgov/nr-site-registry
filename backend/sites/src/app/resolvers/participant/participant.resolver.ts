@@ -30,14 +30,21 @@ export class ParticipantResolver {
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSiteParticipantsBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
   ) {
     this.sitesLogger.log(
       'ParticipantResolver.getSiteParticipantsBySiteId() start siteId:' +
         ' ' +
-        siteId,
+        siteId +
+        ' showPending = ' +
+        showPending,
     );
-    const result =
-      await this.participantService.getSiteParticipantsBySiteId(siteId);
+
+    const result = await this.participantService.getSiteParticipantsBySiteId(
+      siteId,
+      showPending,
+    );
     if (result.length > 0) {
       this.sitesLogger.log(
         'ParticipantResolver.getSiteParticipantsBySiteId() RES:200 end',
@@ -56,6 +63,7 @@ export class ParticipantResolver {
         `Participants data not found for site id: ${siteId}`,
         404,
         false,
+        result,
       );
     }
   }

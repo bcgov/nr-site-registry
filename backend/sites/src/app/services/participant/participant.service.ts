@@ -5,6 +5,9 @@ import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { SitePartics } from '../../entities/sitePartics.entity';
 import { Repository } from 'typeorm';
 import { LoggerService } from 'src/app/logger/logger.service';
+import { UserActionEnum } from 'src/app/common/userActionEnum';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+
 @Injectable()
 export class ParticipantService {
   constructor(
@@ -20,19 +23,31 @@ export class ParticipantService {
    * @returns An array of SiteParticsDto objects containing participant details.
    * @throws Error if there is an issue retrieving the data.
    */
-  async getSiteParticipantsBySiteId(siteId: string): Promise<SiteParticsDto[]> {
-    this.sitesLogger.log(
-      'ParticipantService.getSiteParticipantsBySiteId() start',
-    );
-    this.sitesLogger.debug(
-      'ParticipantService.getSiteParticipantsBySiteId() start',
-    );
+  async getSiteParticipantsBySiteId(
+    siteId: string,
+    showPending: boolean,
+  ): Promise<SiteParticsDto[]> {
     try {
+      this.sitesLogger.log(
+        'ParticipantService.getSiteParticipantsBySiteId() start',
+      );
+      this.sitesLogger.debug(
+        'ParticipantService.getSiteParticipantsBySiteId() start',
+      );
+
       // Fetch site participants based on the given siteId
-      const result = await this.siteParticsRepository.find({
-        where: { siteId },
-        relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'], // Ensure related entities are loaded
-      });
+      let result = [];
+
+      if (showPending)
+        result = await this.siteParticsRepository.find({
+          where: { siteId, userAction: UserActionEnum.UPDATED },
+          relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
+        });
+      else
+        result = await this.siteParticsRepository.find({
+          where: { siteId },
+          relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
+        });
 
       if (result && !result.length) {
         return [];

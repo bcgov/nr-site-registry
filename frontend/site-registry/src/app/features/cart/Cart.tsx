@@ -11,6 +11,7 @@ import { AppDispatch } from '../../Store';
 import {
   cartItems,
   deleteCartItem,
+  deleteCartItemWithSiteId,
   deleteRequestStatus,
   fetchCartItems,
   resetCartItemDeleteStatus,
@@ -54,12 +55,31 @@ const Cart = () => {
   }, [createSnapshotRequestStatus]);
 
   useEffect(() => {
-    dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
+    if (deleteStatus === RequestStatus.success)
+      dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
   }, [deleteStatus]);
 
   useEffect(() => {
     setCartIdToDelete('');
   }, [cartItemsArr]);
+
+  const handleDeleteFromShoppingCart = () => {
+    const loggedInUser = getUser();
+    console.log(cartItemsArr);
+    if (loggedInUser === null) {
+      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+    } else {
+      const cartItemsToDelete = cartItemsArr.map((cart: any) => {
+        return {
+          userId: loggedInUser.profile.sub,
+          siteId: cart.siteId,
+        };
+      });
+
+      dispatch(resetCartItemDeleteStatus(null));
+      dispatch(deleteCartItemWithSiteId(cartItemsToDelete)).unwrap();
+    }
+  };
 
   const handleCartItemDelete = (cartId: string) => {
     // eslint-disable-next-line no-restricted-globals

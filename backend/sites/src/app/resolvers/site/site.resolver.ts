@@ -138,11 +138,20 @@ export class SiteResolver {
     mode: RoleMatchingMode.ANY,
   })
   @Query(() => FetchSiteDetail, { name: 'findSiteBySiteId' })
-  findSiteBySiteId(@Args('siteId', { type: () => String }) siteId: string) {
+  findSiteBySiteId(
+    @Args('siteId', { type: () => String }) siteId: string,
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
+  ) {
     this.sitesLogger.log(
-      'SiteResolver.findSiteBySiteId() start siteId:' + ' ' + siteId,
+      'SiteResolver.findSiteBySiteId() start siteId:' +
+        ' ' +
+        siteId +
+        ' showPending = ' +
+        showPending,
     );
-    return this.siteService.findSiteBySiteId(siteId);
+
+    return this.siteService.findSiteBySiteId(siteId, showPending);
   }
 
   @Roles({

@@ -21,6 +21,7 @@ const roleBasedRoutes: any = {
     { path: '/', element: <Dashboard /> },
     { path: '/dashboard', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
+    { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/dashboard/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
     { path: '/folios', element: <Folios /> },
@@ -28,11 +29,13 @@ const roleBasedRoutes: any = {
     { path: '/map', element: <MapSearch /> },
     { path: '/map/:id', element: <MapSearch /> },
     { path: '/site/cart', element: <Cart /> },
+    { path: '/site/cart/site/details/:id', element: <SiteDetails /> },
   ],
   internal: [
     { path: '/', element: <Dashboard /> },
     { path: '/dashboard', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
+    { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/dashboard/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
     { path: '/folios', element: <Folios /> },
@@ -43,6 +46,7 @@ const roleBasedRoutes: any = {
   sr: [
     { path: '/', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
+    { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
     { path: '/map', element: <MapSearch /> },
     { path: '/map/:id', element: <MapSearch /> },
@@ -50,6 +54,7 @@ const roleBasedRoutes: any = {
   public: [
     { path: '/', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
+    { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
     { path: '/map', element: <MapSearch /> },
     { path: '/map/:id', element: <MapSearch /> },

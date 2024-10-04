@@ -15,6 +15,7 @@ import folioReducer from './features/folios/redux/FolioSlice';
 import siteDetailsReducer from './features/details/SaveSiteDetailsSlice';
 import associatedSitesReducer from './features/details/associates/AssociateSlice';
 import parcelDescriptionsReducer from './features/details/parcelDescriptions/parcelDescriptionsSlice';
+import srUpdatesReducer from './features/details/srUpdates/srUpdatesSlice';
 
 const persistedStore: any = loadFromLocalStorage();
 
@@ -35,6 +36,7 @@ export const store = configureStore({
     associatedSites: associatedSitesReducer,
     siteDetails: siteDetailsReducer,
     parcelDescriptions: parcelDescriptionsReducer,
+    srUpdates: srUpdatesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

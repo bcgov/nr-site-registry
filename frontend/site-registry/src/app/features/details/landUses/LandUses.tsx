@@ -30,6 +30,8 @@ import './LandUses.css';
 import { setupLandHistoriesDataForSaving } from '../SaveSiteDetailsSlice';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
+import LandUseTable from './LandUseTable';
+import { getLandUseColumns } from './LandUseColumnConfiguration';
 
 type createdAtSortDirection = 'newToOld' | 'oldTonew';
 
@@ -112,12 +114,12 @@ const LandUses: FC = () => {
 
   const editModeEnabled = viewMode === SiteDetailsMode.EditMode;
   const tableColumns = useMemo(() => {
-    return getColumns(landUseCodes, editModeEnabled);
+    return getLandUseColumns(landUseCodes, editModeEnabled);
   }, [editModeEnabled, landUseCodes]);
 
   useEffect(() => {
     if (siteId) {
-      dispatch(fetchLandUses({ siteId }));
+      dispatch(fetchLandUses({ siteId, showPending: false }));
     }
   }, [dispatch, siteId]);
 
@@ -340,44 +342,18 @@ const LandUses: FC = () => {
           />
         </div>
       </div>
-      <Widget
-        currentPage={1}
-        changeHandler={onTableChange}
-        title={'Suspect Land Uses'}
+      <LandUseTable
+        onTableChange={onTableChange}
         tableColumns={tableColumns}
-        tableData={dataWithTextSearchApplied}
-        allowRowsSelect={editModeEnabled}
-        tableIsLoading={tableLoading}
-        editMode={editModeEnabled}
-        srMode={viewMode === SiteDetailsMode.SRMode}
-        primaryKeycolumnName="guid"
-        sortHandler={handleTableSort}
-      >
-        {editModeEnabled && (
-          <div className="d-flex gap-2 flex-wrap ">
-            <button
-              className="d-flex align-items-center land-uses-btn"
-              type="button"
-              onClick={handleAddLandUse}
-              aria-label={'Add Land Use'}
-            >
-              <Plus />
-              <span className="land-uses-lbl">Add Land Use</span>
-            </button>
-
-            <button
-              className={`d-flex align-items-center land-uses-btn ${selectedRowIds.size <= 0 && 'land-uses-btn-disabled'}`}
-              disabled={selectedRowIds.size <= 0}
-              type="button"
-              onClick={handleRemoveLandUse}
-              aria-label={'Remove Land Use'}
-            >
-              <Minus />
-              <span>Remove Land Use</span>
-            </button>
-          </div>
-        )}
-      </Widget>
+        dataWithTextSearchApplied={dataWithTextSearchApplied}
+        editModeEnabled={editModeEnabled}
+        tableLoading={tableLoading}
+        viewMode={viewMode}
+        handleTableSort={handleTableSort}
+        selectedRowIds={selectedRowIds}
+        handleRemoveLandUse={handleRemoveLandUse}
+        handleAddLandUse={handleAddLandUse}
+      ></LandUseTable>
     </div>
   );
 };

@@ -69,7 +69,7 @@ describe('AssociatedSiteResolver', () => {
         },
       );
 
-      const result = await resolver.getAssociatedSitesBySiteId(siteId);
+      const result = await resolver.getAssociatedSitesBySiteId(siteId, false);
 
       expect(result.message).toBe('Associated sites fetched successfully');
       expect(result.httpStatusCode).toBe(200);
@@ -91,7 +91,7 @@ describe('AssociatedSiteResolver', () => {
         },
       );
 
-      const result = await resolver.getAssociatedSitesBySiteId(siteId);
+      const result = await resolver.getAssociatedSitesBySiteId(siteId, false);
 
       expect(result.message).toBe(
         `Associated sites data not found for site id: ${siteId}`,

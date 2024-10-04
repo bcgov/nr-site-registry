@@ -5,11 +5,13 @@ export const getLandHistoriesForSiteQuery = gql`
     $siteId: String!
     $searchTerm: String
     $sortDirection: String
+    $pending: Boolean
   ) {
     getLandHistoriesForSite(
       siteId: $siteId
       searchTerm: $searchTerm
       sortDirection: $sortDirection
+      pending: $pending
     ) {
       data {
         guid

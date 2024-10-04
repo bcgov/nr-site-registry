@@ -78,14 +78,10 @@ const Dashboard = () => {
       // not logged in
       setUserType(UserType.External);
     }
-    console.log(loggedInUser);
-    if (loggedInUser) {
-      setName(
-        loggedInUser?.profile.given_name +
-          ' ' +
-          loggedInUser?.profile.family_name,
-      );
-    }
+
+    loggedInUser
+      ? setName(', ' + loggedInUser?.profile.given_name + ' ')
+      : setName('');
   }, [loggedInUser]);
 
   useEffect(() => {
@@ -104,7 +100,7 @@ const Dashboard = () => {
 
   return (
     <PageContainer role="Dashboard">
-      {name && <h1 className="dashboard-title">{`Welcome, ${name}`}</h1>}
+      <h1 className="dashboard-title">Welcome{name}</h1>
       <DashboardTableWidget
         title="Recently Viewed"
         columns={recentViewedColumns}
@@ -112,25 +108,6 @@ const Dashboard = () => {
         data={data ?? []}
         allowRowsSelect={true}
       />
-      {/* <DashboardTableWidget
-        title={
-          userType === UserType.External
-            ? 'Recently Modified Folios'
-            : 'Sites from Applications recently assigned to me'
-        }
-        buttonText={
-          userType === UserType.External ? 'View All Folios' : 'View All'
-        }
-        columns={
-          userType === UserType.External
-            ? recentFoliosColumns
-            : recentAssignedColumn
-        }
-        loading={loading}
-        data={data ?? []}
-        onButtonClick={handleButtonClick}
-        allowRowsSelect={userType === UserType.Internal}
-      /> */}
     </PageContainer>
   );
 };

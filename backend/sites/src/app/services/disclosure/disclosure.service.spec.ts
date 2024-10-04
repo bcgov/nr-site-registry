@@ -40,7 +40,7 @@ describe('DisclosureService', () => {
       const mockSiteProfile = generateMockSiteProfile(siteId, dateCompleted);
       jest.spyOn(repository, 'find').mockResolvedValueOnce(mockSiteProfile);
 
-      const result = await service.getSiteDisclosureBySiteId(siteId);
+      const result = await service.getSiteDisclosureBySiteId(siteId, false);
 
       expect(result).toEqual(mockSiteProfile);
       expect(repository.find).toBeCalledWith({ where: { siteId } });
@@ -53,9 +53,9 @@ describe('DisclosureService', () => {
       );
       jest.spyOn(repository, 'find').mockRejectedValueOnce(error);
 
-      await expect(service.getSiteDisclosureBySiteId(siteId)).rejects.toThrow(
-        error,
-      );
+      await expect(
+        service.getSiteDisclosureBySiteId(siteId, false),
+      ).rejects.toThrow(error);
     });
   });
 });

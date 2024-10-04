@@ -42,8 +42,8 @@ export class SaveSiteDetailsResponse extends BaseHttpResponse {
  */
 @ObjectType()
 export class FetchSiteDetail extends BaseHttpResponse {
-  @Field(() => Sites)
-  data: Sites;
+  @Field(() => Sites, { nullable: true })
+  data?: Sites;
 
   constructor(
     message?: string,

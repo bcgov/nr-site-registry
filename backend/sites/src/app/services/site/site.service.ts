@@ -258,16 +258,26 @@ export class SiteService {
    * @param siteId site Id
    * @returns a single site matching the site ID
    */
-  async findSiteBySiteId(siteId: string) {
+  async findSiteBySiteId(siteId: string, pending: boolean) {
     this.sitesLogger.log('SiteService.findSiteBySiteId() start');
     this.sitesLogger.debug('SiteService.findSiteBySiteId() start');
     const response = new FetchSiteDetail();
 
     response.httpStatusCode = 200;
 
-    response.data = await this.siteRepository.findOneOrFail({
-      where: { id: siteId },
-    });
+    if (pending) {
+      const result = await this.siteRepository.findOne({
+        where: { id: siteId, userAction: UserActionEnum.UPDATED },
+      });
+
+      response.data = result ? result : null;
+    } else {
+      const result = await this.siteRepository.findOne({
+        where: { id: siteId },
+      });
+
+      response.data = result ? result : null;
+    }
     this.sitesLogger.log('SiteService.findSiteBySiteId() end');
     this.sitesLogger.debug('SiteService.findSiteBySiteId() end');
     return response;
@@ -659,7 +669,11 @@ export class SiteService {
                 changes: {
                   ...existingPartic,
                   ...particData,
-                  userAction: UserActionEnum.UPDATED,
+                  userAction:
+                    partic.srAction === SRApprovalStatusEnum.PUBLIC ||
+                    partic.srAction === SRApprovalStatusEnum.PRIVATE
+                      ? UserActionEnum.DEFAULT
+                      : UserActionEnum.UPDATED,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },
@@ -730,7 +744,11 @@ export class SiteService {
                 ...new Events(),
                 ...existingEvent,
                 ...event,
-                userAction: UserActionEnum.UPDATED,
+                userAction:
+                  notation.srAction === SRApprovalStatusEnum.PUBLIC ||
+                  notation.srAction === SRApprovalStatusEnum.PRIVATE
+                    ? UserActionEnum.DEFAULT
+                    : UserActionEnum.UPDATED,
                 whenUpdated: new Date(),
                 whoUpdated: userInfo ? userInfo.givenName : '',
               },

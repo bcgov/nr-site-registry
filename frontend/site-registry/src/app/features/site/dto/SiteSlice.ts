@@ -35,14 +35,15 @@ const initialState: SiteState = {
 
 export const fetchSitesDetails = createAsyncThunk(
   'sites/fetchSitesDetails',
-  async (args: { siteId: string }) => {
+  async (args: { siteId: string; showPending: Boolean }) => {
     try {
       const { siteId } = args;
 
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphqlSiteDetailsQuery()),
         variables: {
-          siteId: siteId,
+          siteId: args.siteId,
+          pending: args.showPending,
         },
       });
       return response.data.data.findSiteBySiteId.data;

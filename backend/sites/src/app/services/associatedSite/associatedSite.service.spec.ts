@@ -52,7 +52,7 @@ describe('AssociatedSiteService', () => {
         .spyOn(assocSiteRepository, 'find')
         .mockResolvedValueOnce(mockSiteAssocs as SiteAssocs[]);
 
-      const result = await service.getAssociatedSitesBySiteId(siteId);
+      const result = await service.getAssociatedSitesBySiteId(siteId, false);
 
       const expectedTransformedObjects = mockSiteAssocs.map((item) => ({
         guid: v4(),
@@ -79,7 +79,7 @@ describe('AssociatedSiteService', () => {
       jest.spyOn(assocSiteRepository, 'find').mockRejectedValueOnce(error);
 
       await expect(
-        service.getAssociatedSitesBySiteId(siteId),
+        service.getAssociatedSitesBySiteId(siteId, false),
       ).rejects.toThrowError(
         `Failed to retrieve associated sites by site ID: ${siteId}`,
       );

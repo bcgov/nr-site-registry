@@ -67,7 +67,7 @@ describe('ParticipantService', () => {
         .spyOn(siteParticsRepository, 'find')
         .mockResolvedValueOnce(mockSitePartics as SitePartics[]);
 
-      const result = await service.getSiteParticipantsBySiteId(siteId);
+      const result = await service.getSiteParticipantsBySiteId(siteId, false);
 
       const expectedTransformedObjects = mockSitePartics.flatMap((item) =>
         item.siteParticRoles.map((role) => ({
@@ -96,7 +96,7 @@ describe('ParticipantService', () => {
       jest.spyOn(siteParticsRepository, 'find').mockRejectedValueOnce(error);
 
       await expect(
-        service.getSiteParticipantsBySiteId(siteId),
+        service.getSiteParticipantsBySiteId(siteId, false),
       ).rejects.toThrowError(
         'Failed to retrieve site participants by siteId: Database connection error',
       );

@@ -40,8 +40,10 @@ import ModalDialog from '../../../components/modaldialog/ModalDialog';
 import { GetAssociateConfig } from './AssociateConfig';
 import infoIcon from '../../../images/info-icon.png';
 import { saveRequestStatus } from '../SaveSiteDetailsSlice';
+import { IComponentProps } from '../navigation/NavigationPillsConfig';
+import AssociateSiteComponent from './AssociateSiteComponent';
 
-const Associate = () => {
+const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   const {
     associateColumnExternal,
     associateColumnInternal,
@@ -111,7 +113,7 @@ const Associate = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchAssociatedSites(id ?? ''))
+      dispatch(fetchAssociatedSites({ siteId: id ?? '', showPending: false }))
         .then(() => {
           setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
         })
@@ -626,88 +628,25 @@ const Associate = () => {
           />
         </div>
         <div>
-          <Widget
-            currentPage={1}
-            changeHandler={handleTableChange}
-            handleCheckBoxChange={(event: any) => handleWidgetCheckBox(event)}
-            title={'Associated Sites'}
-            tableColumns={
-              userType === UserType.Internal
-                ? viewMode == SiteDetailsMode.EditMode
-                  ? internalRow
-                  : associateColumnInternalSRandViewMode
-                : associateColumnExternal
+          <AssociateSiteComponent
+            handleTableChange={handleTableChange}
+            handleWidgetCheckBox={handleWidgetCheckBox}
+            userType={userType}
+            viewMode={viewMode}
+            internalRow={internalRow}
+            associateColumnInternalSRandViewMode={
+              associateColumnInternalSRandViewMode
             }
-            tableData={formData ?? []}
-            tableIsLoading={
-              formData && formData.length < 0 ? loading : RequestStatus.idle
-            }
-            allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
-            aria-label="Associated Sites Widget"
-            customLabelCss="custom-associate-widget-lbl"
-            hideTable={false}
-            hideTitle={false}
-            editMode={
-              viewMode === SiteDetailsMode.EditMode &&
-              userType === UserType.Internal
-            }
-            srMode={
-              viewMode === SiteDetailsMode.SRMode &&
-              userType === UserType.Internal
-            }
-            primaryKeycolumnName="guid"
-            sortHandler={(row: any, ascDir: any) => {
-              handleTableSort(row, ascDir);
-            }}
-          >
-            {viewMode === SiteDetailsMode.EditMode &&
-              userType === UserType.Internal && (
-                <div className="d-flex gap-2 flex-wrap ">
-                  <button
-                    id="add-associate-btn"
-                    className=" d-flex align-items-center associate-btn"
-                    type="button"
-                    onClick={handleAddAssociate}
-                    aria-label={'Add Associated Site'}
-                  >
-                    <UserPlus className="btn-user-icon" />
-                    <span className="associate-btn-lbl">
-                      {'Add Associated Site'}
-                    </span>
-                  </button>
-
-                  <button
-                    id="delete-associate-btn"
-                    className={`d-flex align-items-center ${selectedRows.length > 0 ? `associate-btn` : `associate-btn-disable`}`}
-                    disabled={selectedRows.length <= 0}
-                    type="button"
-                    onClick={() => handleRemoveAssociate()}
-                    aria-label={'Remove Associated Site'}
-                  >
-                    <UserMinus
-                      className={`${selectedRows.length > 0 ? `btn-user-icon` : `btn-user-icon-disabled`}`}
-                    />
-                    <span
-                      className={`${selectedRows.length > 0 ? `associate-btn-lbl` : `associate-btn-lbl-disabled`}`}
-                    >
-                      {'Remove Associated Site'}
-                    </span>
-                  </button>
-                </div>
-              )}
-            {viewMode === SiteDetailsMode.SRMode &&
-              userType === UserType.Internal && (
-                <Actions
-                  label="Set SR Visibility"
-                  items={srVisibilityAssocConfig}
-                  onItemClick={handleItemClick}
-                  customCssToggleBtn={
-                    false ? `associate-sr-btn` : `associate-sr-btn-disable`
-                  }
-                  disable={viewMode === SiteDetailsMode.SRMode}
-                />
-              )}
-          </Widget>
+            associateColumnExternal={associateColumnExternal}
+            formData={formData}
+            loading={loading}
+            handleTableSort={handleTableSort}
+            handleAddAssociate={handleAddAssociate}
+            selectedRows={selectedRows}
+            handleRemoveAssociate={handleRemoveAssociate}
+            srVisibilityAssocConfig={srVisibilityAssocConfig}
+            handleItemClick={handleItemClick}
+          />
         </div>
       </div>
       {isDelete && (

@@ -95,7 +95,7 @@ describe('NotationResolver', () => {
       .spyOn(notationService, 'getSiteNotationBySiteId')
       .mockResolvedValueOnce(mockNotations);
 
-    const result = await resolver.getSiteNotationBySiteId(siteId);
+    const result = await resolver.getSiteNotationBySiteId(siteId, false);
 
     expect(result).toEqual(expectedResult);
     expect(mockNotations[0].id).toEqual('1');
@@ -128,7 +128,7 @@ describe('NotationResolver', () => {
       .spyOn(notationService, 'getSiteNotationBySiteId')
       .mockResolvedValueOnce(mockEmptyNotations);
 
-    const result = await resolver.getSiteNotationBySiteId(siteId);
+    const result = await resolver.getSiteNotationBySiteId(siteId, false);
 
     expect(result).toEqual(expectedResult);
     expect(notationService.getSiteNotationBySiteId).toHaveBeenCalledWith(
@@ -150,7 +150,7 @@ describe('NotationResolver', () => {
       .spyOn(notationService, 'getSiteNotationBySiteId')
       .mockResolvedValueOnce(mockEmptyNotations);
 
-    const result = await resolver.getSiteNotationBySiteId(siteId as any);
+    const result = await resolver.getSiteNotationBySiteId(siteId as any, false);
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
@@ -163,7 +163,7 @@ describe('NotationResolver', () => {
     const siteId = '';
     const mockEmptyNotations: NotationDto[] = [];
 
-    const result = await resolver.getSiteNotationBySiteId(siteId);
+    const result = await resolver.getSiteNotationBySiteId(siteId, false);
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
@@ -199,7 +199,7 @@ describe('NotationResolver', () => {
       .spyOn(notationService, 'getSiteNotationBySiteId')
       .mockResolvedValueOnce(mockLargeNotations);
 
-    const result = await resolver.getSiteNotationBySiteId(siteId);
+    const result = await resolver.getSiteNotationBySiteId(siteId, false);
 
     expect(result.success).toEqual(true);
     expect(result.data).toHaveLength(1000);

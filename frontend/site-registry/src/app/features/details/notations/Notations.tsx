@@ -67,8 +67,11 @@ import {
 } from '../SaveSiteDetailsSlice';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
+import { IComponentProps } from '../navigation/NavigationPillsConfig';
+import Notation from './Notation';
+import { currentSiteId } from '../SaveSiteDetailsSlice';
 
-const Notations = () => {
+const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   const {
     notationColumnInternal,
     notationFormRowsInternal,
@@ -309,7 +312,12 @@ const Notations = () => {
   // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
   useEffect(() => {
     if (resetDetails) {
-      dispatch(fetchNotationParticipants(siteId ?? ''));
+      dispatch(
+        fetchNotationParticipants({
+          siteId: siteId ?? '',
+          showPending: showPending,
+        }),
+      );
     }
   }, [resetDetails, saveSiteDetailsRequestStatus]);
 
@@ -882,52 +890,54 @@ const Notations = () => {
 
   return (
     <div className="px-2">
-      <div
-        className="row pe-2"
-        id="notations-component"
-        data-testid="notations-component"
-      >
-        {userType === UserType.Internal &&
-          (viewMode === SiteDetailsMode.EditMode ||
-            viewMode === SiteDetailsMode.SRMode) && (
-            <div className="col-lg-6 col-md-12 py-4">
-              <button
-                className={`d-flex align-items-center ${viewMode === SiteDetailsMode.EditMode ? `btn-add-notation` : `btn-add-notation-disable`} `}
-                disabled={viewMode === SiteDetailsMode.SRMode}
-                onClick={handleOnAddNotation}
-                aria-label="Add Notation"
-              >
-                <Plus className="btn-notation-icon" />
-                <span>Add Notation</span>
-              </button>
-            </div>
-          )}
+      {!showPending && (
         <div
-          className={`${userType === UserType.Internal && (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode) ? `col-lg-6 col-md-12` : `col-lg-12`}`}
+          className="row pe-2"
+          id="notations-component"
+          data-testid="notations-component"
         >
-          <div className="row justify-content-between p-0">
-            <div
-              className={`mb-3 ${userType === UserType.Internal ? (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode ? `col` : `col-lg-8 col-md-12`) : `col-xxl-8 col-xl-8 col-lg-8 col-md-12 col-sm-12 col-xs-12`}`}
-            >
-              <SearchInput
-                label={'Search'}
-                searchTerm={searchTerm}
-                clearSearch={clearSearch}
-                handleSearchChange={handleSearchChange}
-              />
-            </div>
-            <div
-              className={`${userType === UserType.Internal ? (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode ? `col` : `col-lg-4 col-md-12`) : `col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12`}`}
-            >
-              <Sort
-                formData={sortByValue}
-                editMode={true}
-                handleSortChange={handleSortChange}
-              />
+          {userType === UserType.Internal &&
+            (viewMode === SiteDetailsMode.EditMode ||
+              viewMode === SiteDetailsMode.SRMode) && (
+              <div className="col-lg-6 col-md-12 py-4">
+                <button
+                  className={`d-flex align-items-center ${viewMode === SiteDetailsMode.EditMode ? `btn-add-notation` : `btn-add-notation-disable`} `}
+                  disabled={viewMode === SiteDetailsMode.SRMode}
+                  onClick={handleOnAddNotation}
+                  aria-label="Add Notation"
+                >
+                  <Plus className="btn-notation-icon" />
+                  <span>Add Notation</span>
+                </button>
+              </div>
+            )}
+          <div
+            className={`${userType === UserType.Internal && (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode) ? `col-lg-6 col-md-12` : `col-lg-12`}`}
+          >
+            <div className="row justify-content-between p-0">
+              <div
+                className={`mb-3 ${userType === UserType.Internal ? (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode ? `col` : `col-lg-8 col-md-12`) : `col-xxl-8 col-xl-8 col-lg-8 col-md-12 col-sm-12 col-xs-12`}`}
+              >
+                <SearchInput
+                  label={'Search'}
+                  searchTerm={searchTerm}
+                  clearSearch={clearSearch}
+                  handleSearchChange={handleSearchChange}
+                />
+              </div>
+              <div
+                className={`${userType === UserType.Internal ? (viewMode === SiteDetailsMode.EditMode || viewMode === SiteDetailsMode.SRMode ? `col` : `col-lg-4 col-md-12`) : `col-xxl-4 col-xl-4 col-lg-4 col-md-12 col-sm-12 col-xs-12`}`}
+              >
+                <Sort
+                  formData={sortByValue}
+                  editMode={true}
+                  handleSortChange={handleSortChange}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       <div
         data-testid="notation-rows"
         className={`col-lg-12 overflow-auto p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`}
@@ -936,7 +946,8 @@ const Notations = () => {
         {formData &&
           formData.map((notation, index) => (
             <div key={index}>
-              {viewMode === SiteDetailsMode.SRMode &&
+              {!showPending &&
+                viewMode === SiteDetailsMode.SRMode &&
                 userType === UserType.Internal && (
                   <CheckBoxInput
                     type={FormFieldType.Checkbox}
@@ -948,149 +959,29 @@ const Notations = () => {
                     srMode={viewMode === SiteDetailsMode.SRMode}
                   />
                 )}
-              <PanelWithUpDown
-                firstChild={
-                  <div className="w-100" key={index}>
-                    <Form
-                      formRows={handleNotationFormRowFirstChild(notation)}
-                      formData={notation}
-                      editMode={viewMode === SiteDetailsMode.EditMode}
-                      srMode={viewMode === SiteDetailsMode.SRMode}
-                      handleInputChange={(graphQLPropertyName, value) =>
-                        handleInputChange(
-                          notation.id,
-                          graphQLPropertyName,
-                          value,
-                        )
-                      }
-                      aria-label="Sort Notation Form"
-                    />
-                    {userType === UserType.Internal && (
-                      <span className="sr-time-stamp">
-                        {notation.srTimeStamp}
-                      </span>
-                    )}
-                  </div>
+              <Notation
+                index={index}
+                notation={notation}
+                handleNotationFormRowFirstChild={
+                  handleNotationFormRowFirstChild
                 }
-                secondChild={
-                  <div className="w-100">
-                    <Form
-                      formRows={
-                        userType === UserType.External
-                          ? handleNotationFormRowExternal(notation)
-                          : viewMode === SiteDetailsMode.EditMode
-                            ? handleChangeNotationFormRow(notation)
-                            : viewMode === SiteDetailsMode.SRMode
-                              ? handleNotationFormRowExternal(notation)
-                              : handleNotationFormRowsInternal(notation)
-                      }
-                      formData={notation}
-                      editMode={viewMode === SiteDetailsMode.EditMode}
-                      srMode={viewMode === SiteDetailsMode.SRMode}
-                      handleInputChange={(graphQLPropertyName, value) =>
-                        handleInputChange(
-                          notation.id,
-                          graphQLPropertyName,
-                          value,
-                        )
-                      }
-                      aria-label="Sort Notation Form"
-                    />
-                    <Widget
-                      changeHandler={(event) =>
-                        handleTableChange(notation.id, event)
-                      }
-                      handleCheckBoxChange={(event) =>
-                        handleWidgetCheckBox(event)
-                      }
-                      title={'Notation Participants'}
-                      currentPage={1}
-                      tableColumns={
-                        userType === UserType.Internal
-                          ? internalTableColumn
-                          : externalTableColumn
-                      }
-                      tableData={notation.notationParticipant}
-                      tableIsLoading={
-                        notation.notationParticipant.length > 0
-                          ? loading
-                          : RequestStatus.idle
-                      }
-                      allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
-                      aria-label="Notation Widget"
-                      hideTable={false}
-                      hideTitle={false}
-                      editMode={
-                        viewMode === SiteDetailsMode.EditMode &&
-                        userType === UserType.Internal
-                      }
-                      srMode={
-                        viewMode === SiteDetailsMode.SRMode &&
-                        userType === UserType.Internal
-                      }
-                      primaryKeycolumnName="eventParticId"
-                      sortHandler={(row, ascDir) => {
-                        handleTableSort(row, ascDir, notation.id);
-                      }}
-                    >
-                      {viewMode === SiteDetailsMode.EditMode &&
-                        userType === UserType.Internal && (
-                          <div
-                            className="d-flex gap-2 flex-wrap "
-                            key={notation.id}
-                          >
-                            <button
-                              id="add-participant-btn"
-                              className=" d-flex align-items-center notation-btn"
-                              type="button"
-                              onClick={() => handleAddParticipant(notation.id)}
-                              aria-label={'Add Participant'}
-                            >
-                              <UserPlus className="btn-user-icon" />
-                              <span className="notation-btn-lbl">
-                                {'Add Participant'}
-                              </span>
-                            </button>
-
-                            <button
-                              id="delete-participant-btn"
-                              className={`d-flex align-items-center ${isAnyParticipantSelected(notation.id) ? `notation-btn` : `notation-btn-disable`}`}
-                              disabled={!isAnyParticipantSelected(notation.id)}
-                              type="button"
-                              onClick={() => handleRemoveParticipant(notation)}
-                              aria-label={'Remove Participant'}
-                            >
-                              <UserMinus
-                                className={`${isAnyParticipantSelected(notation.id) ? `btn-user-icon` : `btn-user-icon-disabled`}`}
-                              />
-                              <span
-                                className={`${isAnyParticipantSelected(notation.id) ? `notation-btn-lbl` : `notation-btn-lbl-disabled`}`}
-                              >
-                                {'Remove Participant'}
-                              </span>
-                            </button>
-                          </div>
-                        )}
-                      {viewMode === SiteDetailsMode.SRMode &&
-                        userType === UserType.Internal && (
-                          <Actions
-                            label="Set SR Visibility"
-                            items={srVisibilityConfig}
-                            onItemClick={handleItemClick}
-                            customCssToggleBtn={
-                              false
-                                ? `notation-sr-btn`
-                                : `notation-sr-btn-disable`
-                            }
-                            disable={viewMode === SiteDetailsMode.SRMode}
-                          />
-                        )}
-                    </Widget>
-                    {userType === UserType.Internal && (
-                      <p className="sr-time-stamp">{notation.srTimeStamp}</p>
-                    )}
-                  </div>
-                }
+                viewMode={viewMode}
+                handleInputChange={handleInputChange}
+                userType={userType}
+                handleNotationFormRowExternal={handleNotationFormRowExternal}
+                handleChangeNotationFormRow={handleChangeNotationFormRow}
+                handleNotationFormRowsInternal={handleNotationFormRowsInternal}
+                handleTableChange={handleTableChange}
+                handleWidgetCheckBox={handleWidgetCheckBox}
+                internalTableColumn={internalTableColumn}
+                externalTableColumn={externalTableColumn}
+                loading={loading}
+                handleTableSort={handleTableSort}
+                handleAddParticipant={handleAddParticipant}
+                isAnyParticipantSelected={isAnyParticipantSelected}
+                handleRemoveParticipant={handleRemoveParticipant}
+                srVisibilityConfig={srVisibilityConfig}
+                handleItemClick={handleItemClick}
               />
             </div>
           ))}

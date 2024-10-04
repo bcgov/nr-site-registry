@@ -69,7 +69,7 @@ describe('ParticipantResolver', () => {
         },
       );
 
-      const result = await resolver.getSiteParticipantsBySiteId(siteId);
+      const result = await resolver.getSiteParticipantsBySiteId(siteId, false);
 
       expect(result.message).toBe('Participants fetched successfully');
       expect(result.httpStatusCode).toBe(200);
@@ -90,7 +90,7 @@ describe('ParticipantResolver', () => {
         },
       );
 
-      const result = await resolver.getSiteParticipantsBySiteId(siteId);
+      const result = await resolver.getSiteParticipantsBySiteId(siteId, false);
 
       expect(result.message).toBe(
         `Participants data not found for site id: ${siteId}`,

@@ -16,6 +16,10 @@ const BannerDetails: React.FC<BannerDetailsProps> = ({
   bannerType,
   snapshotDate,
 }) => {
+  if (!snapshotDate && bannerType !== BannerMessages.pending) {
+    return null;
+  }
+
   let type = '';
   let bannerLabel = '';
   let iconType = <></>;

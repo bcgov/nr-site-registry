@@ -70,7 +70,7 @@ describe('DocumentResolver', () => {
       .spyOn(documentService, 'getSiteDocumentsBySiteId')
       .mockResolvedValueOnce(mockDocuments);
 
-    const result = await resolver.getSiteDocumentsBySiteId(siteId);
+    const result = await resolver.getSiteDocumentsBySiteId(siteId, false);
 
     expect(result).toEqual(expectedResult);
     expect(mockDocuments[0].id).toEqual('1');
@@ -100,7 +100,7 @@ describe('DocumentResolver', () => {
       .spyOn(documentService, 'getSiteDocumentsBySiteId')
       .mockResolvedValueOnce(mockEmptyDocuments);
 
-    const result = await resolver.getSiteDocumentsBySiteId(siteId);
+    const result = await resolver.getSiteDocumentsBySiteId(siteId, false);
 
     expect(result).toEqual(expectedResult);
     expect(documentService.getSiteDocumentsBySiteId).toHaveBeenCalledWith(
@@ -122,7 +122,10 @@ describe('DocumentResolver', () => {
       .spyOn(documentService, 'getSiteDocumentsBySiteId')
       .mockResolvedValueOnce(mockEmptyDocuments);
 
-    const result = await resolver.getSiteDocumentsBySiteId(siteId as any);
+    const result = await resolver.getSiteDocumentsBySiteId(
+      siteId as any,
+      false,
+    );
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
@@ -135,7 +138,7 @@ describe('DocumentResolver', () => {
     const siteId = '';
     const mockEmptyDocuments: DocumentDto[] = [];
 
-    const result = await resolver.getSiteDocumentsBySiteId(siteId);
+    const result = await resolver.getSiteDocumentsBySiteId(siteId, false);
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
@@ -158,7 +161,7 @@ describe('DocumentResolver', () => {
       .spyOn(documentService, 'getSiteDocumentsBySiteId')
       .mockResolvedValueOnce(mockLargeDocuments);
 
-    const result = await resolver.getSiteDocumentsBySiteId(siteId);
+    const result = await resolver.getSiteDocumentsBySiteId(siteId, false);
 
     expect(result.success).toEqual(true);
     expect(result.data).toHaveLength(1000);

@@ -41,6 +41,8 @@ import infoIcon from '../../../images/info-icon.png';
 import { GRAPHQL } from '../../../helpers/endpoints';
 import { print } from 'graphql';
 import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
+import { IComponentProps } from '../navigation/NavigationPillsConfig';
+import ParticipantTable from './ParticipantTable';
 import {
   saveRequestStatus,
   setupSiteParticipantDataForSaving,
@@ -49,7 +51,7 @@ import {
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 
-const Participants = () => {
+const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   const {
     participantColumnInternal,
     participantColumnExternal,
@@ -102,7 +104,7 @@ const Participants = () => {
   // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
   useEffect(() => {
     if (resetDetails) {
-      dispatch(fetchSiteParticipants(id ?? ''));
+      dispatch(fetchSiteParticipants({ siteId: id ?? '', showPending: false }));
     }
   }, [resetDetails, saveSiteDetailsRequestStatus]);
 
@@ -558,103 +560,41 @@ const Participants = () => {
       id="participant-component"
       data-testid="participant-component"
     >
-      <div className="row">
-        <div className={`mb-3 col-lg-8`}>
-          <SearchInput
-            label={'Search'}
-            searchTerm={searchTerm}
-            clearSearch={clearSearch}
-            handleSearchChange={handleSearchChange}
-          />
+      {!showPending && (
+        <div className="row">
+          <div className={`mb-3 col-lg-8`}>
+            <SearchInput
+              label={'Search'}
+              searchTerm={searchTerm}
+              clearSearch={clearSearch}
+              handleSearchChange={handleSearchChange}
+            />
+          </div>
+          <div className={`col-lg-4`}>
+            <Sort
+              formData={sortByValue}
+              editMode={true}
+              handleSortChange={handleSortChange}
+            />
+          </div>
         </div>
-        <div className={`col-lg-4`}>
-          <Sort
-            formData={sortByValue}
-            editMode={true}
-            handleSortChange={handleSortChange}
-          />
-        </div>
-      </div>
-      <div>
-        <Widget
-          currentPage={1}
-          changeHandler={handleTableChange}
-          handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
-          title={'Site Participants'}
-          tableColumns={
-            userType === UserType.Internal ? internalRow : externalRow
-          }
-          tableData={formData}
-          tableIsLoading={status ?? RequestStatus.idle}
-          allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
-          aria-label="Site Participant Widget"
-          customLabelCss="custom-participant-widget-lbl"
-          hideTable={false}
-          hideTitle={false}
-          editMode={
-            viewMode === SiteDetailsMode.EditMode &&
-            userType === UserType.Internal
-          }
-          srMode={
-            viewMode === SiteDetailsMode.SRMode &&
-            userType === UserType.Internal
-          }
-          primaryKeycolumnName="partiRoleId"
-          sortHandler={(row, ascDir) => {
-            handleTableSort(row, ascDir);
-          }}
-        >
-          {viewMode === SiteDetailsMode.EditMode &&
-            userType === UserType.Internal && (
-              <div className="d-flex gap-2 flex-wrap ">
-                <button
-                  id="add-participant-btn"
-                  className=" d-flex align-items-center participant-btn"
-                  type="button"
-                  onClick={handleAddParticipant}
-                  aria-label={'Add Participant'}
-                >
-                  <UserPlus className="btn-user-icon" />
-                  <span className="participant-btn-lbl">
-                    {'Add Participant'}
-                  </span>
-                </button>
-
-                <button
-                  id="delete-participant-btn"
-                  className={`d-flex align-items-center ${selectedRows.length > 0 ? `participant-btn` : `participant-btn-disable`}`}
-                  disabled={selectedRows.length <= 0}
-                  type="button"
-                  onClick={() => {
-                    handleRemoveParticipant();
-                  }}
-                  aria-label={'Remove Participant'}
-                >
-                  <UserMinus
-                    className={`${selectedRows.length > 0 ? `btn-user-icon` : `btn-user-icon-disabled`}`}
-                  />
-                  <span
-                    className={`${selectedRows.length > 0 ? `participant-btn-lbl` : `participant-btn-lbl-disabled`}`}
-                  >
-                    {'Remove Participant'}
-                  </span>
-                </button>
-              </div>
-            )}
-          {viewMode === SiteDetailsMode.SRMode &&
-            userType === UserType.Internal && (
-              <Actions
-                label="Set SR Visibility"
-                items={srVisibilityParcticConfig}
-                onItemClick={handleItemClick}
-                customCssToggleBtn={
-                  false ? `participant-sr-btn` : `participant-sr-btn-disable`
-                }
-                disable={viewMode === SiteDetailsMode.SRMode}
-              />
-            )}
-        </Widget>
-      </div>
+      )}
+      <ParticipantTable
+        handleTableChange={handleTableChange}
+        handleWidgetCheckBox={handleWidgetCheckBox}
+        internalRow={internalRow}
+        externalRow={externalRow}
+        userType={userType}
+        formData={formData}
+        status={status}
+        viewMode={viewMode}
+        handleTableSort={handleTableSort}
+        handleAddParticipant={handleAddParticipant}
+        selectedRows={selectedRows}
+        handleRemoveParticipant={handleRemoveParticipant}
+        srVisibilityParcticConfig={srVisibilityParcticConfig}
+        handleItemClick={handleItemClick}
+      />
       {isDelete && (
         <ModalDialog
           key={v4()}

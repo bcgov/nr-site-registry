@@ -350,14 +350,14 @@ export class SiteService {
                 console.log('No changes To Site Events');
               }
 
-              if (eventsParticipants) {
-                await transactionalEntityManager.save(
-                  EventPartics,
-                  eventsParticipants,
-                );
-              } else {
-                console.log('No changes To Site Event Participants');
-              }
+              // if (eventsParticipants) {
+              //   await transactionalEntityManager.save(
+              //     EventPartics,
+              //     eventsParticipants,
+              //   );
+              // } else {
+              //   console.log('No changes To Site Event Participants');
+              // }
 
               if (siteParticipants && siteParticipants.length > 0) {
                 await this.processSiteParticipants(
@@ -1020,6 +1020,7 @@ export class SiteService {
               ...siteAssoc,
               rwmFlag: 0,
               rwmNoteFlag: 0,
+              // Need to know common pid relation as it is non-nullable field in DB and we don't and visibility in our design for same.
               commonPid: 'N',
               userAction: UserActionEnum.ADDED,
               whenCreated: new Date(),

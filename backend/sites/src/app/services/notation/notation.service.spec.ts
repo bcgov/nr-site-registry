@@ -5,16 +5,19 @@ import { Repository } from 'typeorm';
 import { NotationService } from './notation.service';
 import { Events } from '../../entities/events.entity';
 import { EventPartics } from '../../entities/eventPartics.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('NotationService', () => {
   let service: NotationService;
   let notationRepository: Repository<Events>;
   let notationParticRepository: Repository<EventPartics>;
+  let sitesLogger: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NotationService,
+        LoggerService,
         {
           provide: getRepositoryToken(Events),
           useClass: Repository,
@@ -27,6 +30,7 @@ describe('NotationService', () => {
     }).compile();
 
     service = module.get<NotationService>(NotationService);
+    sitesLogger = module.get<LoggerService>(LoggerService);
     notationRepository = module.get<Repository<Events>>(
       getRepositoryToken(Events),
     );

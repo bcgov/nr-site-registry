@@ -7,6 +7,7 @@ import { SitePartics } from '../../entities/sitePartics.entity';
 import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { plainToInstance } from 'class-transformer';
 import { v4 } from 'uuid';
+import { LoggerService } from '../../logger/logger.service';
 
 // Mock SitePartics entity and its Repository
 jest.mock('../../entities/sitePartics.entity');
@@ -14,11 +15,13 @@ jest.mock('../../entities/sitePartics.entity');
 describe('ParticipantService', () => {
   let service: ParticipantService;
   let siteParticsRepository: Repository<SitePartics>;
+  let sitesLogger: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ParticipantService,
+        LoggerService,
         {
           provide: getRepositoryToken(SitePartics),
           useClass: Repository,
@@ -27,6 +30,7 @@ describe('ParticipantService', () => {
     }).compile();
 
     service = module.get<ParticipantService>(ParticipantService);
+    sitesLogger = module.get<LoggerService>(LoggerService);
     siteParticsRepository = module.get<Repository<SitePartics>>(
       getRepositoryToken(SitePartics),
     );

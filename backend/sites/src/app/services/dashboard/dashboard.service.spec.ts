@@ -6,15 +6,17 @@ import { RecentViewDto } from '../../dto/recentView.dto';
 import { plainToClass } from 'class-transformer';
 import { sampleSites } from '../../mockData/site.mockData';
 import { RecentViews } from '../../entities/recentViews.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('DashboardService', () => {
   let service: DashboardService;
   let recentViewsRepository: Repository<RecentViews>;
-
+  let sitesLogger: LoggerService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DashboardService,
+        LoggerService,
         {
           provide: getRepositoryToken(RecentViews),
           useClass: Repository,
@@ -23,6 +25,7 @@ describe('DashboardService', () => {
     }).compile();
 
     service = module.get<DashboardService>(DashboardService);
+    sitesLogger = module.get<LoggerService>(LoggerService);
     recentViewsRepository = module.get<Repository<RecentViews>>(
       getRepositoryToken(RecentViews),
     );

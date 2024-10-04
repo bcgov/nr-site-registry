@@ -4,7 +4,7 @@ import { SiteDocs } from '../../entities/siteDocs.entity';
 import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { DocumentDto } from '../../dto/document.dto';
-import { LoggerService } from 'src/app/logger/logger.service';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class DocumentService {

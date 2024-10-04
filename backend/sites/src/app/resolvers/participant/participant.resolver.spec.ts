@@ -2,14 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ParticipantResolver } from './participant.resolver';
 import { ParticipantService } from '../../services/participant/participant.service';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { SiteParticsDto, SiteParticsResponse } from '../../dto/sitePartics.dto';
-import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
+import { SiteParticsDto } from '../../dto/sitePartics.dto';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('ParticipantResolver', () => {
   let resolver: ParticipantResolver;
   let participantService: ParticipantService;
   let genericResponseProvider: GenericResponseProvider<SiteParticsDto[]>;
-
+  let loggerService: LoggerService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -18,6 +18,15 @@ describe('ParticipantResolver', () => {
           provide: ParticipantService,
           useValue: {
             getSiteParticipantsBySiteId: jest.fn(),
+          },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
           },
         },
         {
@@ -31,6 +40,7 @@ describe('ParticipantResolver', () => {
 
     resolver = module.get<ParticipantResolver>(ParticipantResolver);
     participantService = module.get<ParticipantService>(ParticipantService);
+    loggerService = module.get<LoggerService>(LoggerService);
     genericResponseProvider = module.get<
       GenericResponseProvider<SiteParticsDto[]>
     >(GenericResponseProvider);
@@ -55,6 +65,8 @@ describe('ParticipantResolver', () => {
           prCode: 'PR123',
           description: 'Participant description',
           siteId: '1',
+          srAction: 'pending',
+          userAction: 'pending',
         },
       ];
       (

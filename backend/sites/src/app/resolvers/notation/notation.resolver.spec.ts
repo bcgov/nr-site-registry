@@ -3,11 +3,13 @@ import { NotationResolver } from './notation.resolver';
 import { NotationService } from '../../services/notation/notation.service';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { NotationDto, NotationResponse } from '../../dto/notation.dto';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('NotationResolver', () => {
   let resolver: NotationResolver;
   let notationService: NotationService;
   let genericResponseProvider: GenericResponseProvider<NotationDto[]>;
+  let loggerService: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,6 +19,15 @@ describe('NotationResolver', () => {
           provide: NotationService,
           useValue: {
             getSiteNotationBySiteId: jest.fn(),
+          },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
           },
         },
         {
@@ -42,6 +53,7 @@ describe('NotationResolver', () => {
 
     resolver = module.get<NotationResolver>(NotationResolver);
     notationService = module.get<NotationService>(NotationService);
+    loggerService = module.get<LoggerService>(LoggerService);
     genericResponseProvider = module.get<
       GenericResponseProvider<NotationDto[]>
     >(GenericResponseProvider);

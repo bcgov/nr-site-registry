@@ -16,6 +16,7 @@ import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { SnapshotSiteContent } from '../../dto/snapshotSiteContent';
 import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('SnapshotService', () => {
   let service: SnapshotsService;
@@ -30,11 +31,13 @@ describe('SnapshotService', () => {
   let siteSubdivisionsRepository: Repository<SiteSubdivisions>;
   let siteProfilesRepository: Repository<SiteProfiles>;
   let siteParticipantRolesRepo: Repository<SiteParticRoles>;
+  let sitesLogger: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SnapshotsService,
+        LoggerService,
         {
           provide: getRepositoryToken(Snapshots),
           useValue: {
@@ -237,6 +240,7 @@ describe('SnapshotService', () => {
     }).compile();
 
     service = module.get<SnapshotsService>(SnapshotsService);
+    sitesLogger = module.get<LoggerService>(LoggerService);
     snapshotRepository = module.get<Repository<Snapshots>>(
       getRepositoryToken(Snapshots),
     );

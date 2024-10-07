@@ -261,30 +261,56 @@ const SiteDetails = () => {
     if (id) {
       dispatch(resetSaveSiteDetails(null));
       dispatch(setupSiteIdForSaving(id));
-      Promise.all([
-        dispatch(fetchSnapshots(id ?? '')),
-        dispatch(getBannerType(id ?? '')),
-        dispatch(fetchMinistryContact('EMP')),
-        dispatch(fetchNotationClassCd()),
-        dispatch(fetchNotationTypeCd()),
-        dispatch(fetchNotationParticipantRoleCd()),
-        dispatch(fetchParticipantRoleCd()),
-        dispatch(
-          fetchSiteParticipants({ siteId: id ?? '', showPending: false }),
-        ),
-        dispatch(
-          fetchNotationParticipants({ siteId: id ?? '', showPending: false }),
-        ),
-        // should be based on condition for External and Internal User.
-        dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
-        // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
-      ])
-        .then(() => {
-          setIsLoading(false); // Set loading state to false after all API calls are resolved
-        })
-        .catch((error) => {
-          console.error('Error fetching data:', error);
-        });
+      if (userType === UserType.External) {
+        Promise.all([
+          dispatch(fetchSnapshots(id ?? '')),
+          dispatch(getBannerType(id ?? '')),
+          dispatch(fetchMinistryContact('EMP')),
+          dispatch(fetchNotationClassCd()),
+          dispatch(fetchNotationTypeCd()),
+          dispatch(fetchNotationParticipantRoleCd()),
+          dispatch(fetchParticipantRoleCd()),
+          dispatch(
+            fetchSiteParticipants({ siteId: id ?? '', showPending: false }),
+          ),
+          dispatch(
+            fetchNotationParticipants({ siteId: id ?? '', showPending: false }),
+          ),
+          // should be based on condition for External and Internal User.
+          dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
+          // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
+        ])
+          .then(() => {
+            setIsLoading(false); // Set loading state to false after all API calls are resolved
+          })
+          .catch((error) => {
+            console.error('Error fetching data:', error);
+          });
+      } else {
+        Promise.all([
+          dispatch(fetchSnapshots(id ?? '')),
+          dispatch(fetchMinistryContact('EMP')),
+          dispatch(fetchNotationClassCd()),
+          dispatch(fetchNotationTypeCd()),
+          dispatch(fetchNotationParticipantRoleCd()),
+          dispatch(fetchParticipantRoleCd()),
+          dispatch(
+            fetchSiteParticipants({ siteId: id ?? '', showPending: false }),
+          ),
+          dispatch(
+            fetchNotationParticipants({ siteId: id ?? '', showPending: false }),
+          ),
+          // should be based on condition for External and Internal User.
+          dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
+          // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
+        ])
+          .then(() => {
+            setIsLoading(false); // Set loading state to false after all API calls are resolved
+          })
+          .catch((error) => {
+            console.error('Error fetching data:', error);
+          });
+      }
     }
   }, [id]);
 

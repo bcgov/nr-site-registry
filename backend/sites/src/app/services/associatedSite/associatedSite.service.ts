@@ -7,7 +7,7 @@ import { SiteAssocs } from '../../entities/siteAssocs.entity';
 import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
 import { LoggerService } from '../../logger/logger.service';
 
-import { UserActionEnum } from 'src/app/common/userActionEnum';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 @Injectable()
 export class AssociatedSiteService {
@@ -17,7 +17,7 @@ export class AssociatedSiteService {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-    /**
+  /**
    * Retrieves associated sites for a given site ID and transforms the data into DTOs.
    *
    * @param siteId - The ID of the site for which associated sites are to be fetched.
@@ -37,7 +37,7 @@ export class AssociatedSiteService {
 
       if (showPending) {
         result = await this.assocSiteRepository.find({
-          where: { siteId , userAction: UserActionEnum.UPDATED  },
+          where: { siteId, userAction: UserActionEnum.UPDATED },
         });
       } else {
         result = await this.assocSiteRepository.find({

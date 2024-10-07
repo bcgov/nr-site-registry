@@ -72,7 +72,7 @@ describe('ParcelDescriptionResolver', () => {
       user,
     );
 
-    expect(logMock).toHaveBeenCalled();
+    expect(logMock).toHaveBeenCalledTimes(2);
   });
 
   it('calls the site subdivision service with the expected parameters.', async () => {

@@ -11,6 +11,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
     let limit: number = 5;
     let orderBy: string = 'id';
     let orderByDir: string = 'DESC';
+    let showPending: boolean = false;
 
     describe('when everything is correct.', () => {
       it('Returns the main query', () => {
@@ -22,6 +23,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(query).toEqual(
           expect.stringMatching(/.*sites\.site_subdivisions\.site_id = \$1.*/),
@@ -38,6 +40,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(query).toEqual(
           expect.stringMatching(/.*ORDER BY parcel_descriptions\.id DESC.*/),
@@ -53,6 +56,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(query).toEqual(expect.stringMatching(/.*OFFSET.*/));
         expect(query).toEqual(expect.stringMatching(/.*LIMIT.*/));
@@ -67,6 +71,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(queryParams).toEqual(expect.arrayContaining([String(siteId)]));
         expect(queryParams).toEqual(expect.arrayContaining([filterTerm]));
@@ -83,6 +88,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(countQuery).toEqual(
           expect.stringMatching(/.*sites\.site_subdivisions\.site_id = \$1.*/),
@@ -99,6 +105,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(countQuery).not.toEqual(
           expect.stringMatching(/.*ORDER BY parcel_descriptions\.id DESC.*/),
@@ -114,6 +121,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(countQuery).not.toEqual(expect.stringMatching(/.*OFFSET.*/));
         expect(countQuery).not.toEqual(expect.stringMatching(/.*LIMIT.*/));
@@ -128,11 +136,52 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(countQueryParams).toEqual(
           expect.arrayContaining([String(siteId)]),
         );
         expect(countQueryParams).toEqual(expect.arrayContaining([filterTerm]));
+      });
+
+      describe('When showPending is true', () => {
+        let showPending = true;
+
+        it('Adds the correct condition to the main query.', () => {
+          const [query, _queryParams, _countQuery, _countQueryParams] =
+            getInternalUserQueries(
+              siteId,
+              filterTerm,
+              offset,
+              limit,
+              orderBy,
+              orderByDir,
+              showPending,
+            );
+          expect(query).toEqual(
+            expect.stringMatching(
+              /.*AND sites\.site_subdivisions\.user_action = 'updated'.*/,
+            ),
+          );
+        });
+
+        it('Adds the correct condition to the count query.', () => {
+          const [_query, _queryParams, countQuery, _countQueryParams] =
+            getInternalUserQueries(
+              siteId,
+              filterTerm,
+              offset,
+              limit,
+              orderBy,
+              orderByDir,
+              showPending,
+            );
+          expect(countQuery).toEqual(
+            expect.stringMatching(
+              /.*AND sites\.site_subdivisions\.user_action = 'updated'.*/,
+            ),
+          );
+        });
       });
     });
 
@@ -147,6 +196,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(query).not.toEqual(expect.stringMatching(/blunderbuss/));
         expect(query).toEqual(
@@ -166,6 +216,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(query).not.toEqual(expect.stringMatching(/turnwuse/));
         expect(query).toEqual(
@@ -182,6 +233,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
     let limit: number = 5;
     let orderBy: string = 'id';
     let orderByDir: string = 'DESC';
+    let showPending: boolean = false;
 
     describe('when everything is correct.', () => {
       it('Returns the main query', () => {
@@ -193,6 +245,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(query).toEqual(
           expect.stringMatching(
@@ -211,6 +264,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(query).toEqual(
           expect.stringMatching(/.*ORDER BY parcel_descriptions\.id DESC.*/),
@@ -226,6 +280,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(query).toEqual(expect.stringMatching(/.*OFFSET.*/));
         expect(query).toEqual(expect.stringMatching(/.*LIMIT.*/));
@@ -240,6 +295,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(queryParams).toEqual(
           expect.arrayContaining([`{${String(siteSubdivisionIds)}}`]),
@@ -258,6 +314,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(countQuery).toEqual(
           expect.stringMatching(
@@ -276,6 +333,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(countQuery).not.toEqual(
           expect.stringMatching(/.*ORDER BY parcel_descriptions\.id DESC.*/),
@@ -291,6 +349,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(countQuery).not.toEqual(expect.stringMatching(/.*OFFSET.*/));
         expect(countQuery).not.toEqual(expect.stringMatching(/.*LIMIT.*/));
@@ -305,11 +364,52 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(countQueryParams).toEqual(
           expect.arrayContaining([`{${String(siteSubdivisionIds)}}`]),
         );
         expect(countQueryParams).toEqual(expect.arrayContaining([filterTerm]));
+      });
+
+      describe('When showPending is true', () => {
+        let showPending = true;
+
+        it('Adds the correct condition to the main query.', () => {
+          const [query, _queryParams, _countQuery, _countQueryParams] =
+            getExternalUserQueries(
+              siteSubdivisionIds,
+              filterTerm,
+              offset,
+              limit,
+              orderBy,
+              orderByDir,
+              showPending,
+            );
+          expect(query).toEqual(
+            expect.stringMatching(
+              /.*AND sites\.site_subdivisions\.user_action = 'updated'.*/,
+            ),
+          );
+        });
+
+        it('Adds the correct condition to the count query.', () => {
+          const [_query, _queryParams, countQuery, _countQueryParams] =
+            getExternalUserQueries(
+              siteSubdivisionIds,
+              filterTerm,
+              offset,
+              limit,
+              orderBy,
+              orderByDir,
+              showPending,
+            );
+          expect(countQuery).toEqual(
+            expect.stringMatching(
+              /.*AND sites\.site_subdivisions\.user_action = 'updated'.*/,
+            ),
+          );
+        });
       });
     });
 
@@ -324,6 +424,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(query).not.toEqual(expect.stringMatching(/blunderbuss/));
         expect(query).toEqual(
@@ -343,6 +444,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             limit,
             orderBy,
             orderByDir,
+            showPending,
           );
         expect(query).not.toEqual(expect.stringMatching(/turnwuse/));
         expect(query).toEqual(

@@ -148,6 +148,8 @@ export class ParcelDescriptionsService {
         rawResult.id_pin_number,
         new Date(rawResult.date_noted),
         rawResult.land_description,
+        rawResult.user_action,
+        rawResult.sr_action,
       );
     });
 

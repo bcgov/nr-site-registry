@@ -1,0 +1,93 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  annotations:
+    description: Deployment template for a adjudication api service.
+    tags: "${API_NAME}"
+  name: "${API_NAME}-deploy"
+objects:
+- kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    name: ${API_NAME}
+    labels:
+      app: "${API_NAME}"
+      app-group: "${APP_GROUP}"
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: "${API_NAME}"
+    template:
+      metadata:
+        labels:
+          app: "${API_NAME}"
+      spec:
+        containers:
+          - name: ${API_NAME}-container
+            image: ${IMAGE_STREAM_NAME_FULL} 
+            ports:
+              - containerPort: 8080
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${API_NAME}"
+    creationTimestamp: 
+    labels:
+      app: "${API_NAME}"
+      app-group: "${APP_GROUP}"
+      template: "${API_NAME}-deploy"
+  spec:
+    ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    selector:
+      deployment: "${API_NAME}"
+    type: ClusterIP
+    sessionAffinity: None
+  # status:
+  #   loadBalancer: {}
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: "${API_NAME}"
+    labels:
+      app: "${API_NAME}"
+      app-group: "${APP_GROUP}"
+      template: "${API_NAME}-deploy"
+  spec:
+    to:
+      kind: Service
+      name: "${API_NAME}"
+      weight: 100
+    port:
+      targetPort: 8080-tcp
+    tls:
+      termination: edge
+    wildcardPolicy: None
+    host: "${API_NAME}-${TAG_NAME}.apps.silver.devops.gov.bc.ca"
+parameters:
+- name: API_NAME
+  displayName: Name
+  description: The name assigned to all of the OpenShift resources associated to the
+    server instance.
+  required: true
+  value: site-registry-frontend
+- name: APP_GROUP
+  displayName: App Group
+  description: The name assigned to all of the deployments in this project.
+  required: true
+  value: site-registry
+- name: TAG_NAME
+  displayName: Environment TAG name
+  description: The TAG name for this environment, e.g., dev, test, prod
+  required: true
+  value: dev
+- name: IMAGE_STREAM_NAME_FULL
+  displayName: Full image stream name (eg "frontend:dev")
+  description: Includes ImageStream name and tag
+  required: true
+  value: image-registry.openshift-image-registry.svc:5000/c6a6e5-tools/site-registry-frontend:dev

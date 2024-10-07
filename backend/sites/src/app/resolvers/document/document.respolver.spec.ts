@@ -52,12 +52,16 @@ describe('DocumentResolver', () => {
     const mockDocuments: DocumentDto[] = [
       {
         id: '1',
+        docParticId: '1',
+        // dprCode:'ABC',
         siteId: 'SITE456',
         title: 'Document 1',
         psnorgId: '1',
         displayName: 'Display Name',
         submissionDate: new Date('2024-07-17').toISOString(),
         documentDate: new Date('2024-07-17').toISOString(),
+        srAction: 'pending',
+        userAction: 'pending',
       },
     ];
     const expectedResult: DocumentResponse = {

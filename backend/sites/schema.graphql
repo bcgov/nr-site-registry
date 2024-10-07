@@ -64,6 +64,7 @@ type SiteDocs {
   documentDate: DateTime
   title: String!
   note: String
+  filePath: String
   whoCreated: String!
   whoUpdated: String
   whenCreated: DateTime!
@@ -184,6 +185,8 @@ type SitePartics {
 }
 
 type SiteDocPartics {
+  userAction: String!
+  srAction: String!
   id: String!
   dprCode: String!
   sdocId: String!
@@ -547,9 +550,13 @@ type DocumentResponse {
 }
 
 type DocumentDto {
+  userAction: String!
+  srAction: String!
   id: String!
-  psnorgId: String!
-  displayName: String!
+  docParticId: String
+  psnorgId: String
+  dprCode: String
+  displayName: String
   siteId: String!
   submissionDate: String!
   documentDate: String
@@ -841,6 +848,7 @@ input DocumentInputDTO {
   apiAction: String
   srAction: String!
   id: String!
+  docParticId: String!
   psnorgId: String!
   displayName: String!
   siteId: String!

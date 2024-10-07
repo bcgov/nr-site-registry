@@ -19,18 +19,19 @@ export class DocumentDto extends ChangeAuditObjectTypeDTO {
   @IsString()
   id: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsString()
   docParticId: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsString()
   psnorgId: string;
 
-  @Field()
-  dprCode: string;
+  // No need f dprCode because this will be Author always as per stand up discussion
+  // @Field({nullable: true})
+  // dprCode: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsString()
   displayName: string;
 

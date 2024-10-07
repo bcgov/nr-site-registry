@@ -478,7 +478,7 @@ export class SiteService {
         const {
           displayName,
           psnorgId,
-          dprCode,
+          // dprCode,
           docParticId,
           apiAction,
           srAction,
@@ -528,7 +528,8 @@ export class SiteService {
               id: newDocParticId.toString(),
               sdocId: documentId,
               rwmFlag: 0,
-              dprCode: dprCode ?? 'ATH',
+              dprCode: 'ATH',
+              // dprCode: dprCode ?? 'ATH',
               userAction: UserActionEnum.ADDED,
               // srAction: SRApprovalStatusEnum.PENDING,
               whenCreated: new Date(),
@@ -553,9 +554,10 @@ export class SiteService {
               });
 
               const existingDocumentParticipant =
-                await this.siteDocumentParticsRepo.findOneByOrFail({
+                docParticId &&
+                (await this.siteDocumentParticsRepo.findOneByOrFail({
                   id: docParticId,
-                });
+                }));
               if (existingDocumentParticipant) {
                 updateDocumentParticipants.push({
                   id: docParticId,

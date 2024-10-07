@@ -78,6 +78,7 @@ describe('DocumentService', () => {
           rwmNoteFlag: null,
           userAction: 'pending',
           srAction: 'pending',
+          filePath: '',
           siteDocPartics: [
             {
               id: '1',
@@ -94,6 +95,8 @@ describe('DocumentService', () => {
               psnorg: mockPeopleOrgs[0], // Assigning PeopleOrgs entity
               sdoc: null, // Assigning SiteDocs entity
               sp: null, // Assuming SitePartics entity is null for now
+              userAction: 'pending',
+              srAction: 'pending',
             },
           ],
           site: sampleSites[0],
@@ -188,6 +191,7 @@ describe('DocumentService', () => {
         rwmNoteFlag: null,
         userAction: 'pending',
         srAction: 'pending',
+        filePath: '',
         siteDocPartics: [
           {
             id: '1',
@@ -204,6 +208,8 @@ describe('DocumentService', () => {
             psnorg: mockPeopleOrgs[0], // Assigning PeopleOrgs entity
             sdoc: null, // Assigning SiteDocs entity
             sp: null, // Assuming SitePartics entity is null for now
+            srAction: 'pending',
+            userAction: 'pending',
           },
         ],
         site: sampleSites[0],

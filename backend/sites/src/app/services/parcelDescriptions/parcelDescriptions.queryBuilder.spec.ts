@@ -31,6 +31,40 @@ describe('ParcelDescriptionsQueryBuilder', () => {
         expect(query).not.toEqual(expect.stringMatching(/.*COUNT.*/));
       });
 
+      it('Queries all of the expected values.', () => {
+        const [query, _queryParams, _countQuery, _countQueryParams] =
+          getInternalUserQueries(
+            siteId,
+            filterTerm,
+            offset,
+            limit,
+            orderBy,
+            orderByDir,
+            showPending,
+          );
+        expect(query).toEqual(
+          expect.stringMatching(/.*parcel_descriptions\.id*/),
+        );
+        expect(query).toEqual(
+          expect.stringMatching(/.*parcel_descriptions\.description_type*/),
+        );
+        expect(query).toEqual(
+          expect.stringMatching(/.*parcel_descriptions\.id_pin_number*/),
+        );
+        expect(query).toEqual(
+          expect.stringMatching(/.*parcel_descriptions\.date_noted*/),
+        );
+        expect(query).toEqual(
+          expect.stringMatching(/.*parcel_descriptions\.land_description*/),
+        );
+        expect(query).toEqual(
+          expect.stringMatching(/.*parcel_descriptions\.user_action*/),
+        );
+        expect(query).toEqual(
+          expect.stringMatching(/.*parcel_descriptions\.sr_action*/),
+        );
+      });
+
       it('Sorts the main query', () => {
         const [query, _queryParams, _countQuery, _countQueryParams] =
           getInternalUserQueries(

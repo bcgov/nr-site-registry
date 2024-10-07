@@ -3,10 +3,13 @@ import { ParcelDescriptionsService } from '../../services/parcelDescriptions/par
 import { ParcelDescriptionResolver } from './parcelDescription.resolver';
 import { ParcelDescriptionDto } from '../../dto/parcelDescription.dto';
 import { GenericPagedResponse } from '../../dto/response/genericResponse';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('ParcelDescriptionResolver', () => {
   let parcelDescriptionResolver: ParcelDescriptionResolver;
   let parcelDescriptionService: ParcelDescriptionsService;
+  let loggerService: LoggerService;
+  let logMock: jest.Mock;
 
   const parcelDescriptionsServiceResult = jest.fn();
 
@@ -20,6 +23,12 @@ describe('ParcelDescriptionResolver', () => {
             getParcelDescriptionsBySiteId: parcelDescriptionsServiceResult,
           },
         },
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -29,19 +38,25 @@ describe('ParcelDescriptionResolver', () => {
     parcelDescriptionService = testingModule.get<ParcelDescriptionsService>(
       ParcelDescriptionsService,
     );
+    loggerService = testingModule.get<LoggerService>(LoggerService);
+
+    logMock = jest.fn();
+    loggerService.log = logMock;
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('calls the site subdivision service with the expected parameters.', async () => {
+  it('Logs the call to the resolver', async () => {
     const siteId = 123;
     const page = 1;
     const pageSize = 10;
     const searchParam = 'searchParam';
     const sortBy = 'sortBy';
     const sortByDir = 'sortByDir';
+    const showPending = false;
+    const user = {};
     parcelDescriptionsServiceResult.mockReturnValue(
       new GenericPagedResponse<ParcelDescriptionDto[]>(),
     );
@@ -53,7 +68,35 @@ describe('ParcelDescriptionResolver', () => {
       searchParam,
       sortBy,
       sortByDir,
-      false
+      showPending,
+      user,
+    );
+
+    expect(logMock).toHaveBeenCalled();
+  });
+
+  it('calls the site subdivision service with the expected parameters.', async () => {
+    const siteId = 123;
+    const page = 1;
+    const pageSize = 10;
+    const searchParam = 'searchParam';
+    const sortBy = 'sortBy';
+    const sortByDir = 'sortByDir';
+    const showPending = false;
+    const user = {};
+    parcelDescriptionsServiceResult.mockReturnValue(
+      new GenericPagedResponse<ParcelDescriptionDto[]>(),
+    );
+
+    await parcelDescriptionResolver.getParcelDescriptionsBySiteId(
+      siteId,
+      page,
+      pageSize,
+      searchParam,
+      sortBy,
+      sortByDir,
+      showPending,
+      user,
     );
     expect(
       parcelDescriptionService.getParcelDescriptionsBySiteId,
@@ -64,6 +107,8 @@ describe('ParcelDescriptionResolver', () => {
       searchParam,
       sortBy,
       sortByDir,
+      showPending,
+      user,
     );
   });
 
@@ -74,6 +119,8 @@ describe('ParcelDescriptionResolver', () => {
     const searchParam = 'searchParam';
     const sortBy = 'sortBy';
     const sortByDir = 'sortByDir';
+    const showPending = false;
+    const user = {};
     const expectedResponse = new GenericPagedResponse<ParcelDescriptionDto[]>();
     parcelDescriptionsServiceResult.mockReturnValue(expectedResponse);
 
@@ -85,7 +132,8 @@ describe('ParcelDescriptionResolver', () => {
         searchParam,
         sortBy,
         sortByDir,
-        false
+        showPending,
+        user,
       );
     expect(response).toEqual(expect.objectContaining(expectedResponse));
   });

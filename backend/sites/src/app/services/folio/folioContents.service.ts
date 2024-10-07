@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FolioContents } from '../../entities/folioContents.entity';
 import { Repository } from 'typeorm';
 import { FolioContentDTO } from '../../dto/folioContent.dto';
-import { LoggerService } from 'src/app/logger/logger.service';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class FolioContentsService {

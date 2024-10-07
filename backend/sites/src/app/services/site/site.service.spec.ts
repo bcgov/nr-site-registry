@@ -14,7 +14,7 @@ import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { Events } from '../../entities/events.entity';
 import { SiteDocs } from '../../entities/siteDocs.entity';
-import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
+import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { LandHistoryService } from '../landHistory/landHistory.service';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 

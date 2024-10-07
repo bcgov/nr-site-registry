@@ -22,8 +22,8 @@ import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { LandHistoryService } from '../landHistory/landHistory.service';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 import { UserActionEnum } from '../../common/userActionEnum';
-import { LoggerService } from 'src/app/logger/logger.service';
-import { SRApprovalStatusEnum } from 'src/app/common/srApprovalStatusEnum';
+import { LoggerService } from '../../logger/logger.service';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 /**
  * Nestjs Service For Region Entity
@@ -254,29 +254,26 @@ export class SiteService {
    * @param siteId site Id
    * @returns a single site matching the site ID
    */
-  async findSiteBySiteId(siteId: string, pending:boolean) {
+  async findSiteBySiteId(siteId: string, pending: boolean) {
     this.sitesLogger.log('SiteService.findSiteBySiteId() start');
     this.sitesLogger.debug('SiteService.findSiteBySiteId() start');
     const response = new FetchSiteDetail();
 
     response.httpStatusCode = 200;
 
-    if(pending)
-    {
+    if (pending) {
       const result = await this.siteRepository.findOne({
-        where: { id: siteId , userAction: UserActionEnum.UPDATED },
-      });
-      
-      response.data = result ? result : null;
-    }
-    else
-    {
-      const result = await this.siteRepository.findOne({
-        where: { id: siteId  },
+        where: { id: siteId, userAction: UserActionEnum.UPDATED },
       });
 
       response.data = result ? result : null;
-    }    
+    } else {
+      const result = await this.siteRepository.findOne({
+        where: { id: siteId },
+      });
+
+      response.data = result ? result : null;
+    }
     this.sitesLogger.log('SiteService.findSiteBySiteId() end');
     this.sitesLogger.debug('SiteService.findSiteBySiteId() end');
     return response;
@@ -483,7 +480,11 @@ export class SiteService {
                 changes: {
                   ...existingPartic,
                   ...particData,
-                  userAction: (partic.srAction === SRApprovalStatusEnum.PUBLIC || partic.srAction === SRApprovalStatusEnum.PRIVATE) ? UserActionEnum.DEFAULT : UserActionEnum.UPDATED,
+                  userAction:
+                    partic.srAction === SRApprovalStatusEnum.PUBLIC ||
+                    partic.srAction === SRApprovalStatusEnum.PRIVATE
+                      ? UserActionEnum.DEFAULT
+                      : UserActionEnum.UPDATED,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },
@@ -554,7 +555,11 @@ export class SiteService {
                 ...new Events(),
                 ...existingEvent,
                 ...event,
-                userAction: (notation.srAction === SRApprovalStatusEnum.PUBLIC || notation.srAction === SRApprovalStatusEnum.PRIVATE) ? UserActionEnum.DEFAULT : UserActionEnum.UPDATED,
+                userAction:
+                  notation.srAction === SRApprovalStatusEnum.PUBLIC ||
+                  notation.srAction === SRApprovalStatusEnum.PRIVATE
+                    ? UserActionEnum.DEFAULT
+                    : UserActionEnum.UPDATED,
                 whenUpdated: new Date(),
                 whoUpdated: userInfo ? userInfo.givenName : '',
               },

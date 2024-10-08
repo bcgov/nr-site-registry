@@ -410,7 +410,7 @@ describe('SiteSubdivisionsService', () => {
       expect(errorMock).toHaveBeenCalled();
     });
 
-    it('Produces the correct result', async () => {
+    it('Produces the correct response', async () => {
       let response = await siteSubdivisionService.getParcelDescriptionsBySiteId(
         siteId,
         page,
@@ -432,6 +432,55 @@ describe('SiteSubdivisionsService', () => {
           success: false,
           message:
             'There was an error communicating with the database. Try again later.',
+        }),
+      );
+    });
+  });
+
+  describe('when the user is invalid', () => {
+    beforeEach(async () => {
+      user = {
+        sub: '',
+        identity_provider: '',
+      };
+    });
+
+    it('Logs the error', async () => {
+      await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        siteId,
+        page,
+        pageSize,
+        searchParam,
+        sortBy,
+        sortByDir,
+        showPending,
+        user,
+      );
+
+      expect(errorMock).toHaveBeenCalled();
+    });
+
+    it('Produces the correct response.', async () => {
+      let response = await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        siteId,
+        page,
+        pageSize,
+        searchParam,
+        sortBy,
+        sortByDir,
+        showPending,
+        user,
+      );
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          data: [],
+          httpStatusCode: 500,
+          count: 0,
+          page: 0,
+          pageSize: 0,
+          success: false,
+          message: 'User id is invalid.',
         }),
       );
     });

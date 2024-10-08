@@ -50,6 +50,10 @@ export class ParcelDescriptionsService {
 
     // Fail fast if the user is invalid
     if (userId.length === 0) {
+      this.sitesLogger.error(
+        'An invalid user was passed into ParcelDescriptionsService.getParcelDescriptionsBySiteId() end',
+        '',
+      );
       return new GenericPagedResponse<ParcelDescriptionDto[]>(
         'User id is invalid.',
         500,

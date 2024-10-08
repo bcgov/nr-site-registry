@@ -43,6 +43,8 @@ describe('SiteSubdivisionsService', () => {
   let returnIdPinNumber: string;
   let returnDateNoted: string;
   let returnLandDescription: string;
+  let returnUserAction: string;
+  let returnSrAction: string;
 
   let returnSuccess: boolean;
 
@@ -69,6 +71,8 @@ describe('SiteSubdivisionsService', () => {
     returnIdPinNumber = '123456';
     returnDateNoted = '2024-08-07T00:00:00.000Z';
     returnLandDescription = 'A parcel of land';
+    returnUserAction = 'updated';
+    returnSrAction = 'approved'; // I don't actually know if this is a real-world value it could assume.
 
     returnSuccess = true;
 
@@ -131,6 +135,8 @@ describe('SiteSubdivisionsService', () => {
           id_pin_number: returnIdPinNumber,
           date_noted: returnDateNoted,
           land_description: returnLandDescription,
+          user_action: returnUserAction,
+          sr_action: returnSrAction,
         },
       ]);
     entityManager.query = queryMock;
@@ -239,6 +245,8 @@ describe('SiteSubdivisionsService', () => {
                 idPinNumber: returnIdPinNumber,
                 dateNoted: new Date(returnDateNoted),
                 landDescription: returnLandDescription,
+                userAction: returnUserAction,
+                srAction: returnSrAction,
               }),
             ]),
             count: returnCount,
@@ -340,6 +348,8 @@ describe('SiteSubdivisionsService', () => {
                 idPinNumber: returnIdPinNumber,
                 dateNoted: new Date(returnDateNoted),
                 landDescription: returnLandDescription,
+                userAction: returnUserAction,
+                srAction: returnSrAction,
               }),
             ]),
             count: returnCount,

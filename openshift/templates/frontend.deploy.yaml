@@ -45,7 +45,7 @@ objects:
       port: 8080
       targetPort: 8080
     selector:
-      deployment: "${API_NAME}"
+      app: "${API_NAME}"
     type: ClusterIP
     sessionAffinity: None
   # status:

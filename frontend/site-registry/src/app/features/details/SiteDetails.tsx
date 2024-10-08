@@ -263,7 +263,9 @@ const SiteDetails = () => {
       dispatch(setupSiteIdForSaving(id));
       Promise.all([
         dispatch(fetchSnapshots(id ?? '')),
-        dispatch(getBannerType(id ?? '')),
+        userType === UserType.External
+          ? dispatch(getBannerType(id ?? ''))
+          : Promise.resolve(),
         dispatch(fetchMinistryContact('EMP')),
         dispatch(fetchNotationClassCd()),
         dispatch(fetchNotationTypeCd()),

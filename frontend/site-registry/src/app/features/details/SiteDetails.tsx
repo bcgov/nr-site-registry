@@ -43,7 +43,6 @@ import {
   formatDateWithNoTimzoneName,
   getUser,
   showNotification,
-  useUser,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import { fetchSiteParticipants } from './participants/ParticipantSlice';
@@ -98,13 +97,13 @@ const SiteDetails = () => {
   const [dropDownNavItems, SetDropDownNavItems] =
     useState<{ label: string; value: string }[]>();
 
-  const user = useUser();
+  const auth = useAuth();
 
   useEffect(() => {
     SetNavComponents(getNavComponents());
     SetNavItems(getNavItems());
     SetDropDownNavItems(getDropDownNavItems());
-  }, [user]);
+  }, [auth.user]);
 
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
 
@@ -156,8 +155,6 @@ const SiteDetails = () => {
   const arr: IFormField[] = [folioDropdown];
 
   const arr2: IFormField[][] = [arr];
-
-  const auth = useAuth();
 
   const [addToFolioVisible, SetAddToFolioVisible] = useState(false);
 

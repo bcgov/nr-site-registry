@@ -5,6 +5,7 @@ import { AnglesLeftIcon } from '../common/icon';
 import { AnglesRightIcon } from '../common/icon';
 import { Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useAuth } from 'react-oidc-context';
 import {
   cartItems,
   addCartItemRequestStatus,
@@ -12,11 +13,7 @@ import {
   fetchCartItems,
 } from '../../features/cart/CartSlice';
 import { AppDispatch } from '../../Store';
-import {
-  getLoggedInUserType,
-  showNotification,
-  useUser,
-} from '../../helpers/utility';
+import { getLoggedInUserType, showNotification } from '../../helpers/utility';
 
 function SideBar() {
   let userCartItems = useSelector(cartItems);
@@ -27,16 +24,11 @@ function SideBar() {
   let cartItemAdded = useSelector(addCartItemRequestStatus);
   let cartItemDeleted = useSelector(deleteRequestStatus);
 
-  const user = useUser();
-
-  // useEffect(() => {
-  //   console.log('user updated');
-  //   SetNavList(getSideBarNavList(getLoggedInUserType()));
-  // }, [user]);
+  const { user } = useAuth();
 
   useEffect(() => {
     SetNavList(getSideBarNavList(getLoggedInUserType()));
-  }, []);
+  }, [user]);
 
   const cartItemsArr = useSelector(cartItems);
 

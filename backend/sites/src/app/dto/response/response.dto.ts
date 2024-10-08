@@ -14,5 +14,17 @@ export class ResponseDto {
   success?: boolean;
 
   @Field(() => String, { nullable: true })
-  timestamp?: String;
+  timestamp?: string;
+}
+
+@ObjectType()
+export class PagedResponseDto extends ResponseDto {
+  @Field(() => Number, { nullable: true })
+  count?: number;
+
+  @Field(() => Number, { nullable: true })
+  page?: number;
+
+  @Field(() => Number, { nullable: true })
+  pageSize?: number;
 }

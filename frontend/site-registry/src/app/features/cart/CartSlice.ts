@@ -1,11 +1,17 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RequestStatus } from '../../helpers/requests/status';
-import { Cart, CartState } from './dto/Cart';
+import {
+  Cart,
+  CartDeleteDTO,
+  CartDeleteDTOWithSiteId,
+  CartState,
+} from './dto/Cart';
 import { getAxiosInstance } from '../../helpers/utility';
 import { GRAPHQL } from '../../helpers/endpoints';
 import {
   addCartItemQL,
   deleteCartItemQL,
+  deleteCartWithSiteIdItemQL,
   getCartItemsForUserQL,
 } from './graphql/Cart';
 import { print } from 'graphql';
@@ -27,7 +33,7 @@ export const fetchCartItems = createAsyncThunk(
           userId: userId,
         },
       });
-      return response.data.data.getCartItemsForUser.data;
+      return response.data;
     } catch (error) {
       throw error;
     }
@@ -36,7 +42,7 @@ export const fetchCartItems = createAsyncThunk(
 
 export const addCartItem = createAsyncThunk(
   'addCartItem',
-  async (cartInputDTO: Cart) => {
+  async (cartInputDTO: Cart[]) => {
     const request = await getAxiosInstance().post(GRAPHQL, {
       query: print(addCartItemQL()),
       variables: {
@@ -49,11 +55,24 @@ export const addCartItem = createAsyncThunk(
 
 export const deleteCartItem = createAsyncThunk(
   'deleteCartItem',
-  async (cartId: string) => {
+  async (cartDeleteDTO: CartDeleteDTO[]) => {
     const request = await getAxiosInstance().post(GRAPHQL, {
       query: print(deleteCartItemQL()),
       variables: {
-        cartId: cartId,
+        cartDeleteDTO: cartDeleteDTO,
+      },
+    });
+    return request.data;
+  },
+);
+
+export const deleteCartItemWithSiteId = createAsyncThunk(
+  'deleteCartItemWithSiteId',
+  async (cartDeleteDTO: CartDeleteDTOWithSiteId[]) => {
+    const request = await getAxiosInstance().post(GRAPHQL, {
+      query: print(deleteCartWithSiteIdItemQL()),
+      variables: {
+        cartDeleteDTO: cartDeleteDTO,
       },
     });
     return request.data;
@@ -86,16 +105,30 @@ const cartSlice = createSlice({
         state.fetchRequestStatus = RequestStatus.loading;
       })
       .addCase(fetchCartItems.fulfilled, (state, action) => {
-        state.fetchRequestStatus = RequestStatus.success;
-        state.cartItems = action.payload;
+        if (
+          action?.payload?.data?.getCartItemsForUser?.httpStatusCode === 200
+        ) {
+          state.fetchRequestStatus = RequestStatus.success;
+          state.cartItems = action.payload.data.getCartItemsForUser.data;
+        } else {
+          state.fetchRequestStatus = RequestStatus.failed;
+        }
       })
       .addCase(fetchCartItems.rejected, (state, action) => {
         state.fetchRequestStatus = RequestStatus.failed;
       })
       .addCase(addCartItem.fulfilled, (state, action) => {
-        state.addRequestStatus = RequestStatus.success;
+        console.log('action.payload', action.payload);
+        if (action?.payload?.data?.addCartItem?.httpStatusCode === 201)
+          state.addRequestStatus = RequestStatus.success;
+        else state.addRequestStatus = RequestStatus.failed;
       })
       .addCase(deleteCartItem.fulfilled, (state, action) => {
+        if (action?.payload?.data?.deleteCartItem?.httpStatusCode === 200)
+          state.deleteRequestStatus = RequestStatus.success;
+        else state.deleteRequestStatus = RequestStatus.failed;
+      })
+      .addCase(deleteCartItemWithSiteId.fulfilled, (state, action) => {
         state.deleteRequestStatus = RequestStatus.success;
       });
   },

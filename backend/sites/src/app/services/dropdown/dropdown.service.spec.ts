@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DropdownService } from './dropdown.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ParticRoleCd } from '../../entities/particRoleCd.entity';
 import { PeopleOrgs } from '../../entities/peopleOrgs.entity';
 import { EventClassCd } from '../../entities/eventClassCd.entity';
@@ -48,11 +48,21 @@ describe('DropdownService', () => {
     }).compile();
 
     service = module.get<DropdownService>(DropdownService);
-    particRoleRepository = module.get<Repository<ParticRoleCd>>(getRepositoryToken(ParticRoleCd));
-    peopleOrgsRepository = module.get<Repository<PeopleOrgs>>(getRepositoryToken(PeopleOrgs));
-    eventClassCdRepository = module.get<Repository<EventClassCd>>(getRepositoryToken(EventClassCd));
-    eventTypeCdRepository = module.get<Repository<EventTypeCd>>(getRepositoryToken(EventTypeCd));
-    eventParticRoleCdRepository = module.get<Repository<EventParticRoleCd>>(getRepositoryToken(EventParticRoleCd));
+    particRoleRepository = module.get<Repository<ParticRoleCd>>(
+      getRepositoryToken(ParticRoleCd),
+    );
+    peopleOrgsRepository = module.get<Repository<PeopleOrgs>>(
+      getRepositoryToken(PeopleOrgs),
+    );
+    eventClassCdRepository = module.get<Repository<EventClassCd>>(
+      getRepositoryToken(EventClassCd),
+    );
+    eventTypeCdRepository = module.get<Repository<EventTypeCd>>(
+      getRepositoryToken(EventTypeCd),
+    );
+    eventParticRoleCdRepository = module.get<Repository<EventParticRoleCd>>(
+      getRepositoryToken(EventParticRoleCd),
+    );
   });
 
   afterEach(() => {
@@ -86,7 +96,7 @@ describe('DropdownService', () => {
       jest.spyOn(particRoleRepository, 'find').mockRejectedValueOnce(error);
 
       await expect(service.getParticipantRoleCd()).rejects.toThrowError(
-        'Failed to retrieve participants role code.',
+        'Failed to retrieve participant role codes.',
       );
     });
   });
@@ -98,22 +108,44 @@ describe('DropdownService', () => {
         { id: 'org1', displayName: 'Organization 1' },
         { id: 'org2', displayName: 'Organization 2' },
       ];
+
+      const mockQueryBuilder = {
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValueOnce(expectedOrgs),
+      } as unknown as SelectQueryBuilder<PeopleOrgs>;
+
       jest
-        .spyOn(peopleOrgsRepository, 'find')
-        .mockResolvedValueOnce(expectedOrgs as PeopleOrgs[]);
+        .spyOn(peopleOrgsRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder);
 
-      const result = await service.getPeopleOrgsCd();
+      const result = await service.getPeopleOrgsCd('org', '');
 
-      expect(result[0].dropdownDto).toEqual(expectedOrgs.map(org => ({ key: org.id, value: org.displayName })));
-      expect(peopleOrgsRepository.find).toHaveBeenCalled();
+      expect(result).toEqual(
+        expectedOrgs.map((org) => ({ key: org.id, value: org.displayName })),
+      );
+      expect(peopleOrgsRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'people_orgs',
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalled();
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalled();
+      expect(mockQueryBuilder.getMany).toHaveBeenCalled();
     });
 
-    it('should throw an error when repository find fails', async () => {
+    it('should throw an error when query fails', async () => {
       const error = new Error('Database connection error');
-      jest.spyOn(peopleOrgsRepository, 'find').mockRejectedValueOnce(error);
+      const mockQueryBuilder = {
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockRejectedValueOnce(error),
+      } as unknown as SelectQueryBuilder<PeopleOrgs>;
 
-      await expect(service.getPeopleOrgsCd()).rejects.toThrowError(
-        'Failed to retrieve people orgs.',
+      jest
+        .spyOn(peopleOrgsRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder);
+
+      await expect(service.getPeopleOrgsCd('', '')).rejects.toThrowError(
+        'Failed to retrieve people organizations.',
       );
     });
   });

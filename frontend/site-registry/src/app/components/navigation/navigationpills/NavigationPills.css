@@ -9,6 +9,11 @@
   text-decoration: none;
 }
 
+.custom-nav-pill.default:first-child {
+  background: var(--surface-primary-default, #053662);
+  color: var(--typography-color-primary-invert, #ffffff);
+}
+
 .custom-nav-pill.active {
   background: var(--surface-primary-default, #053662);
   color: var(--typography-color-primary-invert, #ffffff);
@@ -16,6 +21,10 @@
 
 .custom-nav-pill.disabled {
   color: var(--typography-color-disabled);
+}
+
+.custom-nav-pill.enabled {
+  color: var(--typography-color-primary, #2d2d2d) !important;
 }
 
 .custom-nav-btn {

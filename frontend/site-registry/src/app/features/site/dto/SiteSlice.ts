@@ -35,16 +35,17 @@ const initialState: SiteState = {
 
 export const fetchSitesDetails = createAsyncThunk(
   'sites/fetchSitesDetails',
-  async (args: { siteId: string }) => {
+  async (args: { siteId: string, showPending: Boolean }) => {
     try {
       const { siteId } = args;
 
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphqlSiteDetailsQuery()),
         variables: {
-          siteId: siteId,
+          siteId: args.siteId,
+          pending: args.showPending
         },
-      });
+      });     
       return response.data.data.findSiteBySiteId.data;
     } catch (error) {
       throw error;
@@ -235,6 +236,7 @@ const siteSlice = createSlice({
         return newState;
       })
       .addCase(fetchSitesDetails.fulfilled, (state, action) => {
+        
         const newState = { ...state };
         newState.siteDetails = action.payload;
         newState.siteDetailsFetchStatus = RequestStatus.success;
@@ -251,6 +253,7 @@ const siteSlice = createSlice({
 export const selectAllSites = (state: any) => state.sites.sites;
 export const loadingState = (state: any) => state.sites.fetchStatus;
 export const currentPageSelection = (state: any) => state.sites.currentPage;
+export const currentPageSize = (state: any) => state.sites.pageSize;
 export const resultsCount = (state: any) => state.sites.resultsCount;
 export const siteDetailsLoadingState = (state: any) =>
   state.sites.fetchSitesDetails;

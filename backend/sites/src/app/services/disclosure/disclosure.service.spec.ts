@@ -48,7 +48,9 @@ describe('DisclosureService', () => {
 
     it('should throw an error when repository find fails', async () => {
       const siteId = 'site123';
-      const error = new Error('Database connection error');
+      const error = new Error(
+        `Failed to retrieve site disclosures for siteId ${siteId}`,
+      );
       jest.spyOn(repository, 'find').mockRejectedValueOnce(error);
 
       await expect(service.getSiteDisclosureBySiteId(siteId)).rejects.toThrow(

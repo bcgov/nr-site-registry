@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SiteService } from './services/site/site.service';
 import { SiteController } from './controllers/site.controller';
@@ -11,6 +11,7 @@ import { SiteDocs } from './entities/siteDocs.entity';
 import { SitePartics } from './entities/sitePartics.entity';
 import { SiteProfiles } from './entities/siteProfiles.entity';
 import { SiteSubdivisions } from './entities/siteSubdivisions.entity';
+import { Subdivisions } from './entities/subdivisions.entity';
 import { BceRegionCd } from './entities/bceRegionCd.entity';
 import { ClassificationCd } from './entities/classificationCd.entity';
 import { SiteRiskCd } from './entities/siteRiskCd.entity';
@@ -60,8 +61,30 @@ import { DisclosureResolver } from './resolvers/disclosure/disclosure.resolver';
 import { CartResolver } from './resolvers/cart/cart.resolver';
 import { CartService } from './services/cart/cart.service';
 import { Cart } from './entities/cart.entity';
+import { LandHistoryResolver } from './resolvers/landHistory/landHistory.resolver';
+import { LandHistoryService } from './services/landHistory/landHistory.service';
 import { NotationResolver } from './resolvers/notation/notation.resolver';
 import { NotationService } from './services/notation/notation.service';
+import { DocumentResolver } from './resolvers/document/document.resolver';
+import { DocumentService } from './services/document/document.service';
+import { Folio } from './entities/folio.entity';
+import { FolioContents } from './entities/folioContents.entity';
+import { FolioResolver } from './resolvers/folio/folio.resolver';
+import { FolioService } from './services/folio/folio.service';
+import { FolioContentsService } from './services/folio/folioContents.service';
+import { UserJWTTokenDecoderMiddleware } from './middleware/userJwtTokenDecoder';
+import { UserService } from './services/user/user.service';
+import { User } from './entities/user.entity';
+import { JwtService } from '@nestjs/jwt';
+import { AssociatedSiteResolver } from './resolvers/associatedSite/associatedSite.resolver';
+import { AssociatedSiteService } from './services/associatedSite/associatedSite.service';
+import { LandUseCodeResolver } from './resolvers/landUseCode/landUseCode.resolver';
+import { LandUseCodeService } from './services/landUseCode/landUseCode.service';
+import { HistoryLog } from './entities/siteHistoryLog.entity';
+import { ParcelDescriptionResolver } from './resolvers/parcelDescription/parcelDescription.resolver';
+import { ParcelDescriptionsService } from './services/parcelDescriptions/parcelDescriptions.service';
+import { TransactionManagerService } from './services/transactionManager/transactionManager.service';
+import { LoggerService } from './logger/logger.service';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -78,6 +101,7 @@ import { NotationService } from './services/notation/notation.service';
       SitePartics,
       SiteProfiles,
       SiteSubdivisions,
+      Subdivisions,
       BceRegionCd,
       ClassificationCd,
       SiteRiskCd,
@@ -118,6 +142,10 @@ import { NotationService } from './services/notation/notation.service';
       RecentViews,
       Snapshots,
       Cart,
+      Folio,
+      FolioContents,
+      User,
+      HistoryLog,
     ]),
   ],
   providers: [
@@ -127,6 +155,8 @@ import { NotationService } from './services/notation/notation.service';
     DashboardService,
     SnapshotsResolver,
     SnapshotsService,
+    ParcelDescriptionResolver,
+    ParcelDescriptionsService,
     ParticipantResolver,
     ParticipantService,
     DropdownResolver,
@@ -136,9 +166,28 @@ import { NotationService } from './services/notation/notation.service';
     GenericResponseProvider,
     CartResolver,
     CartService,
+    LandHistoryResolver,
+    LandHistoryService,
+    LandUseCodeResolver,
+    LandUseCodeService,
     NotationResolver,
-    NotationService
+    NotationService,
+    DocumentResolver,
+    DocumentService,
+    FolioResolver,
+    FolioService,
+    FolioContentsService,
+    UserService,
+    JwtService,
+    AssociatedSiteResolver,
+    AssociatedSiteService,
+    TransactionManagerService,
+    LoggerService,
   ],
   controllers: [SiteController],
 })
-export class SiteModule {}
+export class SiteModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(UserJWTTokenDecoderMiddleware).forRoutes('*'); // Apply to all routes or specific routes
+  }
+}

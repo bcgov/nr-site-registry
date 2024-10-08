@@ -6,6 +6,8 @@ import { GenericValidationPipe } from '../../utils/validations/genericValidation
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { DisclosureResponse } from '../../dto/disclosure.dto';
 import { DisclosureService } from '../../services/disclosure/disclosure.service';
+import { CustomRoles } from '../../common/role';
+import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => SiteProfiles)
 export class DisclosureResolver {
@@ -14,17 +16,35 @@ export class DisclosureResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       SiteProfiles[]
     >,
+    private readonly sitesLogger: LoggerService,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => DisclosureResponse, { name: 'getSiteDisclosureBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSiteDisclosureBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
   ) {
+    this.sitesLogger.log(
+      'DisclosureResolver.getSiteDisclosureBySiteId() start siteId:' +
+        ' ' +
+        siteId  +' showPending = '+ showPending );
+        
     const result =
-      await this.dsiclosureService.getSiteDisclosureBySiteId(siteId);
+      await this.dsiclosureService.getSiteDisclosureBySiteId(siteId, showPending);
     if (result.length > 0) {
+      this.sitesLogger.log(
+        'DisclosureResolver.getSiteDisclosureBySiteId() RES:200 end',
+      );
       return this.genericResponseProvider.createResponse(
         'Site Disclosure fetched successfully',
         200,
@@ -32,6 +52,9 @@ export class DisclosureResolver {
         result,
       );
     } else {
+      this.sitesLogger.log(
+        'DisclosureResolver.getSiteDisclosureBySiteId() RES:404 end',
+      );
       return this.genericResponseProvider.createResponse(
         `Site Disclosure data not found for site id: ${siteId}`,
         404,

@@ -1,11 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { ParticRoleCd } from "../../entities/particRoleCd.entity";
-import { PeopleOrgs } from "../../entities/peopleOrgs.entity";
-import { Repository } from "typeorm";
-import { EventClassCd } from "../../entities/eventClassCd.entity";
-import { EventTypeCd } from "../../entities/eventTypeCd.entity";
-import { EventParticRoleCd } from "../../entities/eventParticRoleCd.entity";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ParticRoleCd } from '../../entities/particRoleCd.entity';
+import { PeopleOrgs } from '../../entities/peopleOrgs.entity';
+import { Repository } from 'typeorm';
+import { EventClassCd } from '../../entities/eventClassCd.entity';
+import { EventTypeCd } from '../../entities/eventTypeCd.entity';
+import { EventParticRoleCd } from '../../entities/eventParticRoleCd.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class DropdownService {
@@ -13,147 +14,225 @@ export class DropdownService {
     @InjectRepository(ParticRoleCd)
     private particRoleRepository: Repository<ParticRoleCd>,
 
-        @InjectRepository(PeopleOrgs)
-        private peopleOrgsRepository: Repository<PeopleOrgs>,
+    @InjectRepository(PeopleOrgs)
+    private peopleOrgsRepository: Repository<PeopleOrgs>,
 
-        @InjectRepository(EventClassCd)
-        private eventClassCdRepository: Repository<EventClassCd>,
+    @InjectRepository(EventClassCd)
+    private eventClassCdRepository: Repository<EventClassCd>,
 
-        @InjectRepository(EventTypeCd)
-        private eventTypeCdRepository: Repository<EventTypeCd>,
+    @InjectRepository(EventTypeCd)
+    private eventTypeCdRepository: Repository<EventTypeCd>,
 
-        @InjectRepository(EventParticRoleCd)
-        private eventParticRoleCdRepository: Repository<EventParticRoleCd>,
-    ){}
+    @InjectRepository(EventParticRoleCd)
+    private eventParticRoleCdRepository: Repository<EventParticRoleCd>,
 
+    private readonly sitesLogger: LoggerService,
+  ) {}
 
+  /**
+   * Retrieves participant role codes from the repository.
+   *
+   * @returns A promise that resolves to an array of objects with `key` and `value` properties.
+   * @throws Error if there is an issue retrieving the data.
+   */
   async getParticipantRoleCd() {
+    this.sitesLogger.log('DropdownService.getParticipantRoleCd() start');
+    this.sitesLogger.debug('DropdownService.getParticipantRoleCd() start');
     try {
       const result = await this.particRoleRepository.find();
       if (result) {
+        this.sitesLogger.log('DropdownService.getParticipantRoleCd() end');
+        this.sitesLogger.debug('DropdownService.getParticipantRoleCd() end');
         return result.map((obj: any) => ({
           key: obj.code,
           value: obj.description,
         }));
       }
+      this.sitesLogger.log('DropdownService.getParticipantRoleCd() end');
+      this.sitesLogger.debug('DropdownService.getParticipantRoleCd() end');
+      return [];
     } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DropdownService.getParticipantRoleCd() end',
+        JSON.stringify(error),
+      );
       throw new Error('Failed to retrieve participants role code.');
     }
   }
 
-    async getPeopleOrgsCd() {
-        try
-        {
-            const result = await this.peopleOrgsRepository.find()
-            if(result)
-                {
-                    return result.reduce((acc, item) => {
-                        const existingMetaData = acc.find(meta => meta.metaData === item.entityType);
-                        const dropdownItem = {
-                            key: item.id,
-                            value: item.displayName
-                          };
-                          if (existingMetaData) {
-                            existingMetaData.dropdownDto.push(dropdownItem);
-                          } else {
-                            acc.push({
-                              metaData: item.entityType,
-                              dropdownDto: [dropdownItem]
-                            });
-                          }
-                      
-                        return acc;
-                }, []);
-                }
-    
-            // let result = [];
-            // if (entityTypes && entityTypes.length > 0)
-            // {
-            //     result = await this.peopleOrgsRepository
-            //     .createQueryBuilder('people_orgs') // Alias for the main entity
-            //     .where('people_orgs.entity_Type IN (:...entityTypes)', { entityTypes }) // Filtering by entityType
-            //     .getMany();
-            //     if(result)
-            //     {
-            //         return result.map((obj: any) => ({key: obj.id, value: obj.displayName}));
-            //     }
-            // }
-            // else
-            // {
-            //     result = await this.peopleOrgsRepository.find();
-            // }
+  /**
+   * Retrieves people organizations based on search parameters and entity type.
+   *
+   * @param searchParam - The search term to filter organizations by display name.
+   * @param entityType - The type of entity to filter organizations by.
+   * @returns A promise that resolves to an array of objects with `key` and `value` properties.
+   * @throws Error if there is an issue retrieving the data.
+   */
+  async getPeopleOrgsCd(searchParam: string, entityType: string) {
+    this.sitesLogger.log('DropdownService.getPeopleOrgsCd() start');
+    this.sitesLogger.debug('DropdownService.getPeopleOrgsCd() start');
+    try {
+      const queryBuilder =
+        this.peopleOrgsRepository.createQueryBuilder('people_orgs');
 
-           
+      if (searchParam) {
+        queryBuilder.andWhere(
+          'CAST(people_orgs.displayName AS TEXT) LIKE :searchParam',
+          {
+            searchParam: `%${searchParam.toUpperCase().trim()}%`,
+          },
+        );
+      }
 
-        }
-        catch (error)
-        {
-            throw new Error('Failed to retrieve people orgs.');
-        }
+      if (entityType) {
+        queryBuilder.andWhere('people_orgs.entityType = :entityType', {
+          entityType,
+        });
+      }
+
+      queryBuilder.orderBy('people_orgs.displayName', 'ASC');
+
+      const result = await queryBuilder.getMany();
+
+      this.sitesLogger.log('DropdownService.getPeopleOrgsCd() end');
+      this.sitesLogger.debug('DropdownService.getPeopleOrgsCd() end');
+      return (
+        result.map((obj: PeopleOrgs) => ({
+          key: obj.id,
+          value: obj.displayName,
+        })) || []
+      );
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DropdownService.getPeopleOrgsCd() end',
+        JSON.stringify(error),
+      );
+      throw new Error('Failed to retrieve people orgs.');
     }
+  }
 
-    async getNotationTypeCd() {
-        try
-        {
-            const result = await this.eventTypeCdRepository.find()
-            if(result)
-            {
-                return result.reduce((acc, item) => {
-                    const existingMetaData = acc.find(meta => meta.metaData === item.eclsCode);
-                    const dropdownItem = {
-                        key: item.code,
-                        value: item.description
-                      };
-                      if (existingMetaData) {
-                        existingMetaData.dropdownDto.push(dropdownItem);
-                      } else {
-                        acc.push({
-                          metaData: item.eclsCode,
-                          dropdownDto: [dropdownItem]
-                        });
-                      }
-                  
-                    return acc;
-            }, []);
+  /**
+   * Retrieves notation type codes and organizes them by metadata.
+   *
+   * @returns A promise that resolves to an array of objects with `metaData` and `dropdownDto` properties.
+   * @throws Error if there is an issue retrieving the data.
+   */
+  async getNotationTypeCd() {
+    this.sitesLogger.log('DropdownService.getNotationTypeCd() start');
+    this.sitesLogger.debug('DropdownService.getNotationTypeCd() start');
+    try {
+      const result = await this.eventTypeCdRepository.find();
+      if (result) {
+        this.sitesLogger.log('DropdownService.getNotationTypeCd() end');
+        this.sitesLogger.debug('DropdownService.getNotationTypeCd() end');
+        return result.reduce(
+          (acc, item: EventTypeCd) => {
+            const existingMetaData = acc.find(
+              (meta) => meta.metaData === item.eclsCode,
+            );
+            const dropdownItem = {
+              key: item.code,
+              value: item.description,
+            };
+            if (existingMetaData) {
+              existingMetaData.dropdownDto.push(dropdownItem);
+            } else {
+              acc.push({
+                metaData: item.eclsCode,
+                dropdownDto: [dropdownItem],
+              });
             }
-
-        }
-        catch (error)
-        {
-            throw new Error('Failed to retrieve notation type code.');
-        }
+            return acc;
+          },
+          [] as {
+            metaData: string;
+            dropdownDto: { key: string; value: string }[];
+          }[],
+        );
+      }
+      this.sitesLogger.log('DropdownService.getNotationTypeCd() end');
+      this.sitesLogger.debug('DropdownService.getNotationTypeCd() end');
+      return [];
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DropdownService.getNotationTypeCd() end',
+        JSON.stringify(error),
+      );
+      throw new Error('Failed to retrieve notation type codes.');
     }
+  }
 
-    async getNotationClassCd() {
-        try
-        {
-            const result = await this.eventClassCdRepository.find()
-            if(result)
-            {
-                return result.map((obj: any) => ({key: obj.code, value: obj.description}));
-            }
-
-        }
-        catch (error)
-        {
-            throw new Error('Failed to retrieve notation class code.');
-        }
+  /**
+   * Retrieves notation class codes from the repository.
+   *
+   * @returns A promise that resolves to an array of objects with `key` and `value` properties.
+   * @throws Error if there is an issue retrieving the data.
+   */
+  async getNotationClassCd() {
+    this.sitesLogger.log('DropdownService.getNotationClassCd() start');
+    this.sitesLogger.debug('DropdownService.getNotationClassCd() start');
+    try {
+      const result = await this.eventClassCdRepository.find();
+      if (result) {
+        this.sitesLogger.log('DropdownService.getNotationClassCd() end');
+        this.sitesLogger.debug('DropdownService.getNotationClassCd() end');
+        return result.map((obj: EventClassCd) => ({
+          key: obj.code,
+          value: obj.description,
+        }));
+      }
+      this.sitesLogger.log('DropdownService.getNotationClassCd() end');
+      this.sitesLogger.debug('DropdownService.getNotationClassCd() end');
+      return [];
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DropdownService.getNotationClassCd() end',
+        JSON.stringify(error),
+      );
+      throw new Error('Failed to retrieve notation class codes.');
     }
+  }
 
-    async getNotationParticipantRoleCd() {
-        try
-        {
-            const result = await this.eventParticRoleCdRepository.find()
-            if(result)
-            {
-                return result.map((obj: any) => ({key: obj.code, value: obj.description}));
-            }
-
-        }
-        catch (error)
-        {
-            throw new Error('Failed to retrieve notation participant role code.');
-        }
+  /**
+   * Retrieves notation participant role codes from the repository.
+   *
+   * @returns A promise that resolves to an array of objects with `key` and `value` properties.
+   * @throws Error if there is an issue retrieving the data.
+   */
+  async getNotationParticipantRoleCd() {
+    this.sitesLogger.log(
+      'DropdownService.getNotationParticipantRoleCd() start',
+    );
+    this.sitesLogger.debug(
+      'DropdownService.getNotationParticipantRoleCd() start',
+    );
+    try {
+      const result = await this.eventParticRoleCdRepository.find();
+      if (result) {
+        this.sitesLogger.log(
+          'DropdownService.getNotationParticipantRoleCd() end',
+        );
+        this.sitesLogger.debug(
+          'DropdownService.getNotationParticipantRoleCd() end',
+        );
+        return result.map((obj: EventParticRoleCd) => ({
+          key: obj.code,
+          value: obj.description,
+        }));
+      }
+      this.sitesLogger.log(
+        'DropdownService.getNotationParticipantRoleCd() end',
+      );
+      this.sitesLogger.debug(
+        'DropdownService.getNotationParticipantRoleCd() end',
+      );
+      return [];
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DropdownService.getNotationParticipantRoleCd() end',
+        JSON.stringify(error),
+      );
+      throw new Error('Failed to retrieve notation participant role codes.');
     }
-      
+  }
 }

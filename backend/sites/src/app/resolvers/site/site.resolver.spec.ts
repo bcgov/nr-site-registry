@@ -2,10 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SiteResolver } from './site.resolver';
 import { SiteService } from '../../services/site/site.service';
 import {
+  FetchSiteDetail,
   FetchSiteResponse,
   SearchSiteResponse,
 } from '../../dto/response/genericResponse';
 import { sampleSites } from '../../mockData/site.mockData';
+import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
+import { DropdownDto } from '../../dto/dropdown.dto';
 
 describe('SiteResolver', () => {
   let siteResolver: SiteResolver;
@@ -32,7 +35,31 @@ describe('SiteResolver', () => {
               result.count = 1;
               return result;
             }),
-            findSiteBySiteId: jest.fn(),
+            findSiteBySiteId: jest.fn(() => {
+              const result = new FetchSiteDetail();
+              result.httpStatusCode = 200;
+              result.data = sampleSites[0];
+              return result;
+            }),
+            searchSiteIds: jest.fn(),
+          },
+        },
+        {
+          provide: GenericResponseProvider,
+          useValue: {
+            createResponse: jest.fn(
+              (
+                message: string,
+                httpStatusCode: number,
+                success: boolean,
+                data: DropdownDto[],
+              ) => ({
+                message,
+                httpStatusCode,
+                success,
+                data,
+              }),
+            ),
           },
         },
       ],
@@ -201,7 +228,7 @@ describe('SiteResolver', () => {
   describe('findSiteBySiteId', () => {
     it('should call siteService.findSiteBySiteId with the provided siteId', () => {
       const siteId = '123';
-      siteResolver.findSiteBySiteId(siteId);
+      siteResolver.findSiteBySiteId(siteId,false);
       expect(siteService.findSiteBySiteId).toHaveBeenCalledWith(siteId);
     });
 
@@ -212,7 +239,7 @@ describe('SiteResolver', () => {
       (siteService.findSiteBySiteId as jest.Mock).mockResolvedValue(
         expectedResult,
       );
-      const result = await siteResolver.findSiteBySiteId(siteId);
+      const result = await siteResolver.findSiteBySiteId(siteId,false);
       expect(result).toEqual(expectedResult);
     });
 
@@ -223,7 +250,7 @@ describe('SiteResolver', () => {
       (siteService.findSiteBySiteId as jest.Mock).mockResolvedValue(
         expectedResult,
       );
-      const result = await siteResolver.findSiteBySiteId(siteId);
+      const result = await siteResolver.findSiteBySiteId(siteId,false);
       expect(result).toEqual(expectedResult);
     });
   });

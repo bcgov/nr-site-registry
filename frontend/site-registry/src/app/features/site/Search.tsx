@@ -12,7 +12,11 @@ import {
 } from './dto/SiteSlice';
 
 import { AppDispatch } from '../../Store';
-import { selectAllSites, currentPageSelection } from './dto/SiteSlice';
+import {
+  selectAllSites,
+  currentPageSelection,
+  currentPageSize,
+} from './dto/SiteSlice';
 import SearchResults from './SearchResults';
 import {
   ShoppingCartIcon,
@@ -30,13 +34,20 @@ import { TableColumn } from '../../components/table/TableColumn';
 import { getSiteSearchResultsColumns } from './dto/Columns';
 import SiteFilterForm from './filters/SiteFilterForm';
 import PageContainer from '../../components/simple/PageContainer';
+import { getUser } from '../../helpers/utility';
+import { useAuth } from 'react-oidc-context';
+import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
+import AddToFolio from '../folios/AddToFolio';
+import { downloadCSV } from '../../helpers/csvExport/csvExport';
 
 const Search = () => {
+  const auth = useAuth();
   const [searchText, setSearchText] = useState('');
   const dispatch = useDispatch<AppDispatch>();
   const sites = useSelector(selectAllSites);
   const currSearchVal = useSelector((state: any) => state.sites);
   const currentPageInState = useSelector(currentPageSelection);
+  const currentPageSizeInState = useSelector(currentPageSize);
   const totalRecords = useSelector(resultsCount);
   const [noUserAction, setUserAction] = useState(true);
   const [displayColumn, SetDisplayColumns] = useState(false);
@@ -66,6 +77,12 @@ const Search = () => {
       fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
     );
   }, [currentPageInState]);
+
+  useEffect(() => {
+    dispatch(
+      fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
+    );
+  }, [currentPageSizeInState]);
 
   const hideColumns = () => {
     SetDisplayColumns(false);
@@ -140,6 +157,75 @@ const Search = () => {
     position: 'absolute',
     color: 'grey',
     margin: '4px',
+  };
+
+  const handleAddToShoppingCart = () => {
+    const loggedInUser = getUser();
+    if (loggedInUser === null) {
+      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+    } else {
+      const cartItems = selectedRows.map((row) => {
+        return {
+          userId: loggedInUser.profile.sub,
+          siteId: row.id,
+          whoCreated: loggedInUser.profile.given_name ?? '',
+          price: 200.11,
+        };
+      });
+
+      dispatch(resetCartItemAddedStatus(null));
+      dispatch(addCartItem(cartItems)).unwrap();
+    }
+  };
+
+  const [selectedRows, SetSelectedRows] = useState<any[]>([]);
+
+  const changeHandler = (event: any) => {
+    if (event && event.property === 'select_row') {
+      if (event.value) {
+        const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
+        if (index === -1) {
+          SetSelectedRows([...selectedRows, event.row]);
+        } else {
+          // do nothing
+        }
+      } else {
+        SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
+      }
+
+      //const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
+      // if (index > -1 && !event.value) {
+      //   // If row is already selected, remove it
+      //   SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
+      // } else {
+      //   // If row is not selected, add it
+      //   SetSelectedRows([...selectedRows, event.row]);
+      // }
+    } else if (event && event.property === 'select_all') {
+      const newRows = event.value;
+      if (event.selected) {
+        SetSelectedRows((prevArray) => {
+          const existingIds = new Set(prevArray.map((obj) => obj.id));
+          const uniqueRows = newRows.filter(
+            (row: any) => !existingIds.has(row.id),
+          );
+          return [...prevArray, ...uniqueRows];
+        });
+      } else {
+        SetSelectedRows((prevArray) => {
+          const idsToRemove = new Set(newRows.map((row: any) => row.id));
+          return prevArray.filter((obj) => !idsToRemove.has(obj.id));
+        });
+      }
+    }
+  };
+
+  const [showAddToFolio, SetShowAddToFolio] = useState(false);
+
+  const handleExport = () => {
+    if (selectedRows.length > 0) {
+      downloadCSV(selectedRows);
+    }
   };
 
   return (
@@ -300,15 +386,30 @@ const Search = () => {
               </div>
             ) : null}
             <div className="search-result-actions">
-              <div className="search-result-actions-btn">
+              <div
+                className="search-result-actions-btn"
+                onClick={() => handleAddToShoppingCart()}
+              >
                 <ShoppingCartIcon />
                 <span>Add Selected To Cart</span>
               </div>
-              <div className="search-result-actions-btn">
+              <div
+                className="search-result-actions-btn"
+                onClick={() => {
+                  SetShowAddToFolio(!showAddToFolio);
+                }}
+              >
                 <FolderPlusIcon />
                 <span>Add Selected To Folio</span>
               </div>
-              <div className="search-result-actions-btn">
+              {showAddToFolio && (
+                <AddToFolio
+                  className="pos-absolute-search"
+                  selectedRows={selectedRows}
+                />
+              )}
+
+              <div className="search-result-actions-btn" onClick={handleExport}>
                 <FileExportIcon />
                 <span>Export Results As File</span>
               </div>
@@ -321,6 +422,7 @@ const Search = () => {
                 data={search(searchText)}
                 columns={columnsToDisplay.filter((x) => x.isChecked === true)}
                 totalRecords={totalRecords}
+                changeHandler={changeHandler}
               />
             </div>
           </div>

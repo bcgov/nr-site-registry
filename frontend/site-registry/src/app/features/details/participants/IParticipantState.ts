@@ -1,3 +1,5 @@
+import { RequestStatus } from '../../../helpers/requests/status';
+
 export interface IParticipant {
   guid: string;
   id: string;
@@ -13,5 +15,5 @@ export interface IParticipant {
 export interface IParticipantState {
   siteParticipants: IParticipant[];
   error?: string;
-  status: string;
+  status: RequestStatus;
 }

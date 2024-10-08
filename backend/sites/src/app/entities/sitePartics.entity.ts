@@ -14,6 +14,7 @@ import { PeopleOrgs } from './peopleOrgs.entity';
 import { Sites } from './sites.entity';
 import { SiteProfileOwners } from './siteProfileOwners.entity';
 import { SiteProfiles } from './siteProfiles.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
 
 @ObjectType()
 @Index('site_partics_pkey', ['id'], { unique: true })
@@ -21,7 +22,7 @@ import { SiteProfiles } from './siteProfiles.entity';
 @Index('sp_rwm_flag', ['rwmFlag'], {})
 @Index('sp_identified_by2_frgn', ['siteId'], {})
 @Entity('site_partics')
-export class SitePartics {
+export class SitePartics extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'id' })
   id: string;
@@ -73,22 +74,20 @@ export class SitePartics {
   @Column('smallint', { name: 'rwm_note_flag' })
   rwmNoteFlag: number;
 
-  @OneToMany(() => EventPartics, (eventPartics) => eventPartics.sp)
-  eventPartics: EventPartics[];
+  //Commented this as event participant is no longer depends on site participant
+  //Uncomment the code in cases there will be migartion issue from oracle
+  // @OneToMany(() => EventPartics, (eventPartics) => eventPartics.sp)
+  // eventPartics: EventPartics[];
 
   @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sp)
   siteDocPartics: SiteDocPartics[];
 
   @Field(() => [SiteParticRoles])
-  @OneToMany(() => SiteParticRoles, (siteParticRoles) => siteParticRoles.sp, {
-    eager: true,
-  })
+  @OneToMany(() => SiteParticRoles, (siteParticRoles) => siteParticRoles.sp)
   siteParticRoles: SiteParticRoles[];
 
   @Field(() => PeopleOrgs)
-  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.sitePartics, {
-    eager: true,
-  })
+  @ManyToOne(() => PeopleOrgs, (peopleOrgs) => peopleOrgs.sitePartics)
   @JoinColumn([{ name: 'psnorg_id', referencedColumnName: 'id' }])
   psnorg: PeopleOrgs;
 

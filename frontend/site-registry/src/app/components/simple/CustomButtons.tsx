@@ -4,6 +4,8 @@ import './CustomButtons.css';
 
 interface ButtonProps {
   clickHandler: (event: React.MouseEvent<HTMLDivElement>) => void;
+  label?: string;
+  showIcon?: boolean;
 }
 
 interface ButtonWithLabelProps {
@@ -11,20 +13,44 @@ interface ButtonWithLabelProps {
   label: string | number;
 }
 
-export const SaveButton: React.FC<ButtonProps> = ({ clickHandler }) => {
+export const SaveButton: React.FC<ButtonProps> = ({
+  clickHandler,
+  label,
+  showIcon,
+}) => {
+  showIcon = showIcon ?? true;
   return (
     <div className="custom-save-btn" onClick={clickHandler}>
-      <FloppyDisk />
-      Save
+      {showIcon && <FloppyDisk />}
+      {label && label !== '' ? label : 'Save'}
     </div>
   );
 };
 
-export const CancelButton: React.FC<ButtonProps> = ({ clickHandler }) => {
+export const CancelButton: React.FC<ButtonProps> = ({
+  clickHandler,
+  label,
+  showIcon,
+}) => {
+  showIcon = showIcon ?? true;
   return (
     <div className="custom-cancel-btn" onClick={(e) => clickHandler(e)}>
-      <XmarkIcon />
-      Cancel
+      {showIcon && <XmarkIcon />}
+      {label && label !== '' ? label : 'Cancel'}
+    </div>
+  );
+};
+
+export const DiscardButton: React.FC<ButtonProps> = ({
+  clickHandler,
+  label,
+  showIcon,
+}) => {
+  showIcon = showIcon ?? true;
+  return (
+    <div className="discard-button-border" onClick={(e) => clickHandler(e)}>
+      {showIcon && <XmarkIcon />}
+      {label && label !== '' ? label : 'Dicard Changes'}
     </div>
   );
 };

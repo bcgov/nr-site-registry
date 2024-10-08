@@ -32,8 +32,9 @@ export class SiteController {
    */
   @Get('/:siteId') async getSiteBySiteId(
     @Param('siteId') siteId,
+    @Param('showPending') showPending
   ): Promise<FetchSiteDetail> {
-    const site = await this.siteService.findSiteBySiteId(siteId);
+    const site = await this.siteService.findSiteBySiteId(siteId,showPending);
 
     if (!site) {
       return Promise.reject({

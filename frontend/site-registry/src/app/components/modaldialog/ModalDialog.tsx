@@ -1,19 +1,35 @@
 import React, { Children, ReactNode, useState } from 'react';
 import './ModalDialog.css';
 import { XmarkIcon, FloppyDisk } from '../common/icon';
-import { CancelButton, SaveButton } from '../simple/CustomButtons';
+import {
+  CancelButton,
+  DiscardButton,
+  SaveButton,
+} from '../simple/CustomButtons';
 
 interface ModalDialogCloseHandlerProps {
-  closeHandler: (save: boolean) => void;
+  closeHandler: (save: any) => void;
   children?: ReactNode;
   label?: string;
+  saveBtnLabel?: string;
+  cancelBtnLabel?: string;
+  dicardBtnLabel?: string;
+  discardOption?: boolean;
 }
 
 const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
   closeHandler,
   children,
   label,
+  saveBtnLabel,
+  cancelBtnLabel,
+  dicardBtnLabel,
+  discardOption,
 }) => {
+  saveBtnLabel = saveBtnLabel ?? '';
+  cancelBtnLabel = cancelBtnLabel ?? '';
+  dicardBtnLabel = dicardBtnLabel ?? '';
+
   const [open, setOpen] = useState<boolean>(true);
   const displayLabel =
     label ?? 'Are you sure you want to commit changes to this site?';
@@ -21,6 +37,11 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
   const handleClose = () => {
     setOpen(false);
     closeHandler(false);
+  };
+
+  const handleDiscard = () => {
+    setOpen(false);
+    closeHandler('discard');
   };
 
   const handleSave = () => {
@@ -42,10 +63,29 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
               ></XmarkIcon>
             </div>
             {children && <div className="custom-modal-data">{children}</div>}
-            <div className="custom-modal-actions-footer">
-              <CancelButton clickHandler={handleClose} />
-              <SaveButton clickHandler={handleSave} />
-            </div>
+            {!discardOption && (
+              <div className="custom-modal-actions-footer">
+                <CancelButton
+                  clickHandler={handleClose}
+                  label={cancelBtnLabel}
+                />
+                <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
+              </div>
+            )}
+            {discardOption && (
+              <div className="custom-modal-actions-footer">
+                <CancelButton
+                  clickHandler={handleClose}
+                  label={cancelBtnLabel}
+                />
+                <DiscardButton
+                  clickHandler={handleDiscard}
+                  label={dicardBtnLabel}
+                  showIcon={false}
+                />
+                <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -1,6 +1,5 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsNotEmpty, IsString } from 'class-validator';
-import GraphQLJSON from 'graphql-type-json';
 import { ResponseDto } from './response/response.dto';
 import { Snapshots } from '../entities/snapshots.entity';
 
@@ -11,22 +10,9 @@ export class SnapshotResponse extends ResponseDto {
 }
 
 @InputType()
-export class SnapshotDto {
-  @Field()
-  @IsNotEmpty()
-  @IsString()
-  userId: string;
-
+export class CreateSnapshotDto {
   @Field()
   @IsNotEmpty()
   @IsString()
   siteId: string;
-
-  @Field()
-  @IsNotEmpty()
-  @IsString()
-  transactionId: string;
-
-  @Field(() => GraphQLJSON)
-  snapshotData: any;
 }

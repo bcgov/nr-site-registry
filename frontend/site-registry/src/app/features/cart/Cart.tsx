@@ -11,14 +11,21 @@ import { AppDispatch } from '../../Store';
 import {
   cartItems,
   deleteCartItem,
+  deleteCartItemWithSiteId,
   deleteRequestStatus,
   fetchCartItems,
   resetCartItemDeleteStatus,
 } from './CartSlice';
 import { useAuth } from 'react-oidc-context';
-import { getUser } from '../../helpers/utility';
+import { getUser, showNotification } from '../../helpers/utility';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import { AngleRight } from '../../components/common/icon';
+import {
+  createSnapshotForSites,
+  createSnapshotForSitesStatus,
+  resetCreateSnapshotForSitesStatus,
+} from '../details/snapshot/SnapshotSlice';
+import { CreateSnapshotInputDto } from '../details/snapshot/ISnapshotState';
 
 const Cart = () => {
   const auth = useAuth();
@@ -33,24 +40,61 @@ const Cart = () => {
 
   const cartItemsArr = useSelector(cartItems);
 
-  const delteStatus = useSelector(deleteRequestStatus);
+  const deleteStatus = useSelector(deleteRequestStatus);
+
+  const createSnapshotRequestStatus = useSelector(createSnapshotForSitesStatus);
 
   useEffect(() => {
+    if (createSnapshotRequestStatus === RequestStatus.success) {
+      showNotification(
+        createSnapshotRequestStatus,
+        'Successfully created snapshot',
+      );
+      dispatch(resetCreateSnapshotForSitesStatus(null));
+    }
+  }, [createSnapshotRequestStatus]);
+
+  useEffect(() => {
+    if(deleteStatus===RequestStatus.success)
     dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
-  }, [delteStatus]);
+  }, [deleteStatus]);
 
   useEffect(() => {
     setCartIdToDelete('');
   }, [cartItemsArr]);
 
+  const handleDeleteFromShoppingCart = () => {
+    const loggedInUser = getUser();
+    console.log(cartItemsArr);
+    if (loggedInUser === null) {
+      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+    } else {
+      const cartItemsToDelete = cartItemsArr.map((cart:any) => {
+        return {
+          userId: loggedInUser.profile.sub,
+          siteId: cart.siteId,
+        };
+      });
+
+      dispatch(resetCartItemDeleteStatus(null));
+      dispatch(deleteCartItemWithSiteId(cartItemsToDelete)).unwrap();
+    }
+  };
+
   const handleCartItemDelete = (cartId: string) => {
     // eslint-disable-next-line no-restricted-globals
     setDeleteConfirm(true);
     setCartIdToDelete(cartId);
-    // if(confirm("Are you sure to delete ?"))
-    //   {
+  };
 
-    //   }
+  const handlePayment = () => {
+    const inputDto: CreateSnapshotInputDto[] = cartItemsArr.map((item: any) => {
+      return {
+        siteId: item.siteId,
+      };
+    });
+
+    dispatch(createSnapshotForSites(inputDto)).unwrap();
   };
 
   return (
@@ -60,7 +104,7 @@ const Cart = () => {
       </div>
       <div className="col-12">
         <Table
-          label="Search Results"
+          label="Cart"
           isLoading={RequestStatus.success}
           columns={CartTableColumns}
           data={cartItemsArr.map((x: any) => {
@@ -88,7 +132,7 @@ const Cart = () => {
       {cartItemsArr.length > 0 && (
         <div className="cart-actions">
           <div className="continue-payment">
-            <span className="payment-text">
+            <span className="payment-text" onClick={() => handlePayment()}>
               Continue to Payment
               <AngleRight />
             </span>
@@ -111,7 +155,11 @@ const Cart = () => {
           closeHandler={(response) => {
             if (response) {
               dispatch(resetCartItemDeleteStatus(null));
-              dispatch(deleteCartItem(cartIdToDelte)).unwrap();
+              dispatch(
+                deleteCartItem([
+                  { cartId: cartIdToDelte, userId: user?.profile.sub ?? '' },
+                ]),
+              ).unwrap();
             }
             setDeleteConfirm(false);
           }}

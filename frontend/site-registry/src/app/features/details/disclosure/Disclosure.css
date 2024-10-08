@@ -115,3 +115,48 @@
   gap: var(--layout-margin-small) !important;
   background: var(--surface-primary-disabled, #edebe9) !important;
 }
+
+.custom-disclosure-edit-input
+  .rs-input-group.rs-input-group-inside
+  .rs-input-group-addon {
+  top: 0;
+  background: none;
+  border: none;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.custom-disclosure-edit-input .rs-input {
+  padding: 10px 11px !important;
+}
+
+.disclosure-fa-spin {
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.disclosure-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050; /* Ensure it appears above other content */
+}
+
+.disclosure-spinner-container {
+  text-align: center;
+}

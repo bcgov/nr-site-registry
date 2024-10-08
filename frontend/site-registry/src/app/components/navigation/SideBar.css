@@ -18,6 +18,7 @@
     var(--layout-padding-large) var(--layout-padding-medium);
   justify-content: space-between;
   min-height: calc(100vh - 65px) !important;
+  border-right: 1px solid var(--surface-border-light, #d8d8d8);
 }
 
 .side-bar:hover {

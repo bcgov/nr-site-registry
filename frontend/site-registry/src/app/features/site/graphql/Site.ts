@@ -52,103 +52,10 @@ query searchSites($searchParam: String!,  $page: String!, $pageSize: String!, ${
 `;
 };
 
-// export const graphqlSiteDetailsQuery = () => {
-//   return (gql`
-//   query findSiteBySiteId($siteId: String!){
-//         findSiteBySiteId(siteId: $siteId) {
-//          data
-//          {
-//           id,
-//           commonName,
-//           addrLine_1,
-//           addrLine_2,
-//           addrLine_3,
-//           addrLine_4,
-//           longDegrees,
-//           longMinutes,
-//           longMinutes,
-//           latDegrees,
-//           latMinutes,
-//           latSeconds,
-//           city,
-//           generalDescription,
-//           siteRiskCode
-//           events
-//           {
-//             id
-//             siteId
-//             eventDate
-//     				completionDate
-//             etypCode
-//  						note
-//   					requirementDueDate
-//         		siteId
-//             eventDate
-//     				completionDate
-//             etypCode
-//  						note
-//   					requirementDueDate
-//             psnorgId
-//             spId
-//             siteId
-//             eventDate
-//             completionDate
-//             etypCode
-//             note
-//             requirementDueDate
-//             regionAppFlag
-//             regionUserid
-//             regionDate
-//             whoCreated
-//             whoUpdated
-//             whenCreated
-//             whenUpdated
-//             rwmFlag
-//             rwmNoteFlag
-//             rwmApprovalDate
-//             eclsCode
-//             siteId
-//             eventDate
-//             completionDate
-//             etypCode
-//    					note
-//   					requirementDueDate
-//             requirementReceivedDate
-//             eventPartics
-//             {
-//                 eventId
-//                 spId
-//                 eprCode
-//                 psnorgId
-//                 whoCreated
-//                 whoUpdated
-//                 whenCreated
-//                 whenUpdated
-//                 rwmFlag
-//                 psnorg
-//                 {
-//                   id
-//                   firstName
-//                   lastName
-//                   location
-//                   mailUserid
-//                   whoCreated
-//                   whoUpdated
-//                   whenCreated
-//                 }
-//             }
-//           }
-//          }
-//          httpStatusCode
-//       }
-//     }
-//   `);
-// }
-
 export const graphqlSiteDetailsQuery = () => {
   return gql`
-    query findSiteBySiteId($siteId: String!) {
-      findSiteBySiteId(siteId: $siteId) {
+    query findSiteBySiteId($siteId: String!, $pending: Boolean) {
+      findSiteBySiteId(siteId: $siteId, pending: $pending) {
         data {
           id
           commonName

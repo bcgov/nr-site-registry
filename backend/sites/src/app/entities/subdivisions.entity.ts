@@ -1,11 +1,13 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, Index } from 'typeorm';
+import { Column, Entity, Index, OneToMany } from 'typeorm';
+import { SiteSubdivisions } from './siteSubdivisions.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
 
 @ObjectType()
 @Index('subdivisions_pkey', ['id'], { unique: true })
 @Index('subdivisions_pid_pin_key', ['pid', 'pin'], { unique: true })
 @Entity('subdivisions')
-export class Subdivisions {
+export class Subdivisions extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'id' })
   id: string;
@@ -138,4 +140,11 @@ export class Subdivisions {
   @Field()
   @Column('character', { name: 'valid_pid', nullable: true, length: 1 })
   validPid: string | null;
+
+  @Field(() => SiteSubdivisions)
+  @OneToMany(
+    () => SiteSubdivisions,
+    (siteSubdivisions) => siteSubdivisions.subdivision,
+  )
+  siteSubdivisions: SiteSubdivisions[];
 }

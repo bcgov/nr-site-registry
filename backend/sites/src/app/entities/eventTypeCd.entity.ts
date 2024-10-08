@@ -25,8 +25,8 @@ export class EventTypeCd {
   @Column('character varying', { primary: true, name: 'ecls_code', length: 6 })
   eclsCode: string;
 
-  @Field({nullable:true})
-  @Column("character varying", { name: "sst_code", nullable: true, length: 6 })
+  @Field({ nullable: true })
+  @Column('character varying', { name: 'sst_code', nullable: true, length: 6 })
   sstCode: string | null;
 
   @Field()

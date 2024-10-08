@@ -12,17 +12,19 @@ import {
 } from 'typeorm';
 import { Sites } from './sites.entity';
 import GraphQLJSON from 'graphql-type-json';
+import { SnapshotSiteContent } from '../dto/snapshotSiteContent';
+import { BaseAuditEntity } from './baseAuditEntity';
 
 @ObjectType()
 @Entity('snapshots')
 @Index('idx_snapshot_user_id', ['userId'])
 @Index('idx_snapshot', ['transactionId', 'userId', 'siteId'], { unique: true })
-export class Snapshots {
+export class Snapshots extends BaseAuditEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Field()
-  @Column('character varying', { name: 'user_id', length: 30 })
+  @Column('character varying', { name: 'user_id', length: 100 })
   userId: string;
 
   @Field()
@@ -35,13 +37,7 @@ export class Snapshots {
 
   @Field(() => GraphQLJSON)
   @Column('jsonb', { name: 'snapshot_data' })
-  snapshotData: any;
-
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created: Date;
-
-  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  updated: Date;
+  snapshotData: SnapshotSiteContent;
 
   @ManyToOne(() => Sites, (site) => site.snapshots)
   @JoinColumn({ name: 'site_id', referencedColumnName: 'id' })

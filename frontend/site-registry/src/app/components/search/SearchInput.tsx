@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { CircleXMarkIcon, MagnifyingGlassIcon } from '../common/icon';
 import { ISearchInput } from './ISearchInput';
 import './SearchInput.css';
+import React from 'react';
+import { v4 } from 'uuid';
 
 const SearchInput: React.FC<ISearchInput> = ({
   label,
@@ -12,18 +14,11 @@ const SearchInput: React.FC<ISearchInput> = ({
   optionSelectHandler,
   createNewLabel,
   createNewHandler,
+  placeHolderText,
 }) => {
-  const handler =
-    optionSelectHandler ??
-    ((e) => {
-      console.log('handle option select');
-    });
+  const handler = optionSelectHandler ?? ((e) => {});
 
-  const addNewHandler =
-    createNewHandler ??
-    ((e) => {
-      console.log('Handle create new from search');
-    });
+  const addNewHandler = createNewHandler ?? ((e) => {});
 
   const [createMode, SetCreateMode] = useState(false);
 
@@ -35,12 +30,14 @@ const SearchInput: React.FC<ISearchInput> = ({
       clearSearch();
     }
   };
-
+  const searchId = label
+    ? label.replace(/\s+/g, '_') + '_' + v4()
+    : 'search_' + v4();
   return (
     <div>
       {label && (
         <label
-          htmlFor={label}
+          htmlFor={searchId}
           className="form-label custom-search-label"
           aria-labelledby={label}
         >
@@ -48,28 +45,29 @@ const SearchInput: React.FC<ISearchInput> = ({
         </label>
       )}
       <div className="search-box-container">
-        <div className="d-flex align-items-center justify-content-center w-100 position-relative">
+        <div className="d-flex align-items-center justify-content-center w-100 position-relative search-box ">
+          {!createMode && searchTerm.trim().length < 1 && (
+            <span id="search-icon" className="custom-icon px-2">
+              <MagnifyingGlassIcon />
+            </span>
+          )}
           <input
-            id={label}
+            id={searchId}
+            data-testid={searchId}
             aria-label={label}
             onChange={(event) => {
               handleSearchChange(event);
             }}
+            placeholder={placeHolderText}
             value={searchTerm}
             type="text"
-            className={`form-control custom-search ${
-              searchTerm.length > 0 ? 'ps-2' : 'ps-5'
+            className={`no-border-shadow-outline form-control custom-search ${
+              searchTerm.length > 0 ? 'ps-2' : ''
             }`}
           />
-          {!createMode && searchTerm.trim().length < 1 ? (
+          {!createMode && searchTerm.trim().length < 1 ? null : (
             <span
-              id="search-icon"
-              className="search-icon custom-icon position-absolute px-2"
-            >
-              <MagnifyingGlassIcon />
-            </span>
-          ) : (
-            <span
+              data-testid="clear-icon"
               id="clear-icon"
               className="clear-icon custom-icon position-absolute px-2"
               onClick={handleClose}
@@ -80,9 +78,10 @@ const SearchInput: React.FC<ISearchInput> = ({
 
           {searchTerm && !createMode && options && options.length > 0 && (
             <div className="search-options">
-              {options.map((option) => {
+              {options.map((option, index) => {
                 return (
                   <div
+                    key={index}
                     className="search-option-item"
                     onClick={(e) => {
                       handler(option);
@@ -93,14 +92,16 @@ const SearchInput: React.FC<ISearchInput> = ({
                   </div>
                 );
               })}
-              <div
-                className="search-create-new-section"
-                onClick={(e) => {
-                  SetCreateMode(true);
-                }}
-              >
-                <span>+</span> <span>Create New {createNewLabel}</span>
-              </div>
+              {createNewLabel && (
+                <div
+                  className="search-create-new-section"
+                  onClick={(e) => {
+                    SetCreateMode(true);
+                  }}
+                >
+                  <span>+</span> <span>Create New {createNewLabel}</span>
+                </div>
+              )}
             </div>
           )}
         </div>

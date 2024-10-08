@@ -11,6 +11,7 @@ import { ConditionsText } from './conditionsText.entity';
 import { EventPartics } from './eventPartics.entity';
 import { EventTypeCd } from './eventTypeCd.entity';
 import { Sites } from './sites.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
 
 @ObjectType()
 @Index('event_described_by_frgn', ['eclsCode', 'etypCode'], {})
@@ -21,7 +22,7 @@ import { Sites } from './sites.entity';
 @Index('event_applicable_to_frgn', ['siteId'], {})
 @Index('event_responsibility_of_frgn', ['spId'], {})
 @Entity('events')
-export class Events {
+export class Events extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'id' })
   id: string;
@@ -34,9 +35,9 @@ export class Events {
   @Column('timestamp without time zone', { name: 'event_date' })
   eventDate: Date;
 
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "completion_date",
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'completion_date',
     nullable: true,
   })
   completionDate: Date | null;
@@ -50,36 +51,40 @@ export class Events {
   psnorgId: string;
 
   @Field()
-  @Column('bigint', { name: 'sp_id' })
-  spId: string;
+  @Column('bigint', { name: 'sp_id', nullable: true })
+  spId: string | null;
 
-  @Field({nullable: true})
-  @Column("character varying", { name: "required_action", nullable: true, length: 500 })
+  @Field({ nullable: true })
+  @Column('character varying', {
+    name: 'required_action',
+    nullable: true,
+    length: 500,
+  })
   requiredAction: string | null;
 
-  @Field({nullable: true})
-  @Column("character varying", { name: "note", nullable: true, length: 500 })
+  @Field({ nullable: true })
+  @Column('character varying', { name: 'note', nullable: true, length: 500 })
   note: string | null;
 
-  @Field({nullable: true})
-  @Column("character varying", {
-    name: "region_app_flag",
+  @Field({ nullable: true })
+  @Column('character varying', {
+    name: 'region_app_flag',
     nullable: true,
     length: 1,
   })
   regionAppFlag: string | null;
 
-  @Field({nullable: true})
-  @Column("character varying", {
-    name: "region_userid",
+  @Field({ nullable: true })
+  @Column('character varying', {
+    name: 'region_userid',
     nullable: true,
     length: 16,
   })
   regionUserid: string | null;
 
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "region_date",
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'region_date',
     nullable: true,
   })
   regionDate: Date | null;
@@ -88,9 +93,9 @@ export class Events {
   @Column('character varying', { name: 'who_created', length: 30 })
   whoCreated: string;
 
-  @Field({nullable: true})
-  @Column("character varying", {
-    name: "who_updated",
+  @Field({ nullable: true })
+  @Column('character varying', {
+    name: 'who_updated',
     nullable: true,
     length: 30,
   })
@@ -100,9 +105,9 @@ export class Events {
   @Column('timestamp without time zone', { name: 'when_created' })
   whenCreated: Date;
 
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "when_updated",
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'when_updated',
     nullable: true,
   })
   whenUpdated: Date | null;
@@ -115,9 +120,9 @@ export class Events {
   @Column('smallint', { name: 'rwm_note_flag' })
   rwmNoteFlag: number;
 
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "rwm_approval_date",
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'rwm_approval_date',
     nullable: true,
   })
   rwmApprovalDate: Date | null;
@@ -126,36 +131,30 @@ export class Events {
   @Column('character varying', { name: 'ecls_code', length: 6 })
   eclsCode: string;
 
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "requirement_due_date",
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'requirement_due_date',
     nullable: true,
   })
   requirementDueDate: Date | null;
 
-  @Field({nullable: true})
-  @Column("timestamp without time zone", {
-    name: "requirement_received_date",
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'requirement_received_date',
     nullable: true,
   })
   requirementReceivedDate: Date | null;
 
   @Field(() => [ConditionsText], { nullable: true })
-  @OneToMany(() => ConditionsText, (conditionsText) => conditionsText.event, {
-    eager: true,
-  })
+  @OneToMany(() => ConditionsText, (conditionsText) => conditionsText.event)
   conditionsTexts: ConditionsText[];
 
   @Field(() => [EventPartics], { nullable: true })
-  @OneToMany(() => EventPartics, (eventPartics) => eventPartics.event, {
-    eager: true,
-  })
+  @OneToMany(() => EventPartics, (eventPartics) => eventPartics.event)
   eventPartics: EventPartics[];
 
   @Field(() => EventTypeCd)
-  @ManyToOne(() => EventTypeCd, (eventTypeCd) => eventTypeCd.events, {
-    eager: true,
-  })
+  @ManyToOne(() => EventTypeCd, (eventTypeCd) => eventTypeCd.events)
   @JoinColumn([
     { name: 'etyp_code', referencedColumnName: 'code' },
     { name: 'ecls_code', referencedColumnName: 'eclsCode' },

@@ -1,6 +1,5 @@
-import React, { FC } from 'react';
-import { ColumnSize, TableColumn } from '../TableColumn';
-import { SortIcon } from '../../common/icon';
+import React, { FC, useEffect, useState } from 'react';
+import { TableColumn } from '../TableColumn';
 import './TableHeader.css';
 import HeaderCell from './HeaderCell';
 
@@ -8,17 +7,30 @@ interface TableHeaderProps {
   columns: TableColumn[];
   allowRowsSelect: boolean;
   sortHandler: (row: any, ascSort: boolean) => void;
+  currentSortColumn?: string;
+  selectAllRowsHandler: (event: any, checked: boolean) => void;
+  currentPageAllRowsSelected: boolean;
 }
 
 const TableHeader: FC<TableHeaderProps> = ({
   columns,
   allowRowsSelect,
   sortHandler,
+  currentSortColumn,
+  selectAllRowsHandler,
+  currentPageAllRowsSelected,
 }) => {
+  const [isCurrentPageSelected, SetIsCurrentPageSelected] = useState(
+    currentPageAllRowsSelected,
+  );
+
+  useEffect(() => {
+    SetIsCurrentPageSelected(currentPageAllRowsSelected);
+  }, [currentPageAllRowsSelected]);
+
   if (!columns || columns.length === 0) {
     return null;
   }
-
   return (
     <tr className="table-header">
       {allowRowsSelect && (
@@ -26,12 +38,25 @@ const TableHeader: FC<TableHeaderProps> = ({
           scope="col"
           className={`table-header-th checkbox-column positionSticky`}
         >
-          <input type="checkbox" className="checkbox-color" />
+          <input
+            type="checkbox"
+            className="checkbox-color"
+            checked={isCurrentPageSelected}
+            onChange={(event) => {
+              selectAllRowsHandler(event, !currentPageAllRowsSelected);
+            }}
+          />
         </th>
       )}
       {columns &&
         columns.map((item, index) => (
-          <HeaderCell item={item} index={index} sortHandler={sortHandler} />
+          <HeaderCell
+            key={index}
+            item={item}
+            index={index}
+            sortHandler={sortHandler}
+            currentSortColumn={currentSortColumn}
+          />
         ))}
     </tr>
   );

@@ -36,9 +36,7 @@ WORKDIR /app
 
 COPY --chown=node:node package*.json ./
 
-RUN npm config set unsafe-perm true \
-    && npm ci \
-    && npm config set unsafe-perm false
+RUN npm ci 
 
 COPY --chown=node:node . .
 

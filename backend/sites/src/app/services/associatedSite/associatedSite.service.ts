@@ -7,7 +7,7 @@ import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
 import { LoggerService } from '../../logger/logger.service';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
-import { UserActionEnum } from 'src/app/common/userActionEnum';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 @Injectable()
 export class AssociatedSiteService {

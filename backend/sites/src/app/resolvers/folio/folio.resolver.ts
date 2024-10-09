@@ -7,14 +7,14 @@ import {
 } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
-import { Folio } from 'src/app/entities/folio.entity';
+import { Folio } from '../../entities/folio.entity';
 import { FolioService } from '../../services/folio/folio.service';
-import { FolioDTO, FolioMinDTO, FolioResponse } from 'src/app/dto/folio.dto';
+import { FolioDTO, FolioMinDTO, FolioResponse } from '../../dto/folio.dto';
 import {
   FolioContentDTO,
   FolioContentResponse,
-} from 'src/app/dto/folioContent.dto';
-import { FolioContents } from 'src/app/entities/folioContents.entity';
+} from '../../dto/folioContent.dto';
+import { FolioContents } from '../../entities/folioContents.entity';
 import { CustomRoles } from '../../common/role';
 import { LoggerService } from '../../logger/logger.service';
 

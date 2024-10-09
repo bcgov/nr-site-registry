@@ -16,12 +16,16 @@ export class ParcelDescriptionDto {
     idPinNumber: string | null,
     dateNoted: Date | null,
     landDescription: string | null,
+    userAction: string | null,
+    srAction: string | null,
   ) {
     this.id = id ? id : 0;
     this.descriptionType = descriptionType ? descriptionType : 'Unknown';
     this.idPinNumber = idPinNumber ? idPinNumber : 'Unknown';
     this.dateNoted = dateNoted;
     this.landDescription = landDescription ? landDescription : '';
+    this.userAction = userAction ? userAction : '';
+    this.srAction = srAction ? srAction : '';
   }
   @Field()
   @IsInt()
@@ -42,4 +46,12 @@ export class ParcelDescriptionDto {
   @Field()
   @IsString()
   landDescription: string;
+
+  @Field()
+  @IsString()
+  userAction: string;
+
+  @Field()
+  @IsString()
+  srAction: string;
 }

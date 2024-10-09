@@ -18,14 +18,14 @@ import { LandHistories } from '../../entities/landHistories.entity';
 import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { Subdivisions } from '../../entities/subdivisions.entity';
-import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { LandHistoryService } from '../landHistory/landHistory.service';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 import { UserActionEnum } from '../../common/userActionEnum';
-import { LoggerService } from 'src/app/logger/logger.service';
 
 import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
+import { LoggerService } from '../../logger/logger.service';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { SiteDocPartics } from '../../entities/siteDocPartics.entity';
 
 /**

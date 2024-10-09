@@ -8,8 +8,6 @@ import { UsePipes } from '@nestjs/common';
 import { DocumentDto, DocumentResponse } from '../../dto/document.dto';
 import { CustomRoles } from '../../common/role';
 import { LoggerService } from '../../logger/logger.service';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-// const sitesLogger = require('../../logger/logging');
 
 @Resolver(() => SiteDocs)
 export class DocumentResolver {

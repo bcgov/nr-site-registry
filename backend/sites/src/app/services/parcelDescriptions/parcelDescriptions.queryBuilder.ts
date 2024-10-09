@@ -4,13 +4,15 @@
 // Based on briefly profiling this query this method is somewhat more
 // efficient than querying all the subdivisions for a site and performing
 // the sorting, filtering, and pagination in Node.
-const internalUserQuery = `
+const parcelDescriptionQueryHead = `
   SELECT
     parcel_descriptions.id,
     parcel_descriptions.description_type,
     parcel_descriptions.id_pin_number,
     parcel_descriptions.date_noted,
-    parcel_descriptions.land_description
+    parcel_descriptions.land_description,
+    parcel_descriptions.user_action,
+    parcel_descriptions.sr_action
   FROM (
     SELECT
       sites.subdivisions.id AS id,
@@ -27,11 +29,23 @@ const internalUserQuery = `
         ELSE NULL
       END AS id_pin_number,
       sites.subdivisions.date_noted AS date_noted,
-      sites.subdivisions.legal_description AS land_description
+      sites.subdivisions.legal_description AS land_description,
+      sites.site_subdivisions.user_action AS user_action,
+      sites.site_subdivisions.sr_action AS sr_action
     FROM sites.site_subdivisions
     LEFT JOIN sites.subdivisions 
       ON sites.site_subdivisions.subdiv_id = sites.subdivisions.id
-    WHERE sites.site_subdivisions.site_id = $1
+`;
+const internalUserCondition = `
+  WHERE sites.site_subdivisions.site_id = $1
+`;
+const externalUserCondition = `
+  WHERE sites.site_subdivisions.site_subdiv_id = ANY ($1)
+`;
+const showPendingCondition = `
+  AND sites.site_subdivisions.user_action = 'updated'
+`;
+const parcelDescriptionQueryTail = `
   ) parcel_descriptions
   WHERE (
     LOWER(parcel_descriptions.description_type) ~* $2
@@ -41,42 +55,14 @@ const internalUserQuery = `
   )
 `;
 
-const externalUserQuery = `
-  SELECT
-    parcel_descriptions.id,
-    parcel_descriptions.description_type,
-    parcel_descriptions.id_pin_number,
-    parcel_descriptions.date_noted,
-    parcel_descriptions.land_description
-  FROM (
-    SELECT
-      sites.subdivisions.id AS id,
-      CASE
-        WHEN sites.subdivisions.pid IS NOT NULL THEN 'Parcel ID'
-        WHEN sites.subdivisions.pin IS NOT NULL THEN 'Crown Land PIN'
-        WHEN sites.subdivisions.crown_lands_file_no IS NOT NULL THEN 'Crown Land File Number'
-        ELSE 'Unknown'
-      END AS description_type,
-      CASE
-        WHEN sites.subdivisions.pid IS NOT NULL THEN sites.subdivisions.pid
-        WHEN sites.subdivisions.pin IS NOT NULL THEN sites.subdivisions.pin
-        WHEN sites.subdivisions.crown_lands_file_no IS NOT NULL THEN sites.subdivisions.crown_lands_file_no
-        ELSE NULL
-      END AS id_pin_number,
-      sites.subdivisions.date_noted AS date_noted,
-      sites.subdivisions.legal_description AS land_description
-    FROM sites.site_subdivisions
-    LEFT JOIN sites.subdivisions 
-      ON sites.site_subdivisions.subdiv_id = sites.subdivisions.id
-    WHERE sites.site_subdivisions.site_subdiv_id = ANY ($1)
-  ) parcel_descriptions
-  WHERE (
-    LOWER(parcel_descriptions.description_type) ~* $2
-    OR LOWER(parcel_descriptions.id_pin_number) ~* $2
-    OR LOWER(CAST(parcel_descriptions.date_noted AS TEXT)) ~* $2
-    OR LOWER(parcel_descriptions.land_description) ~* $2
-  )
-`;
+const getPagingAndSortingQueryPart = (orderBy: string, orderByDir: string) => {
+  return `
+    ORDER BY ${orderBy} ${orderByDir}
+    OFFSET $3
+    LIMIT $4 
+  `;
+};
+
 const getSanitizedSiteId = (siteId: number) => {
   return String(siteId);
 };
@@ -125,6 +111,7 @@ export const getInternalUserQueries = (
   pageSize: number,
   orderBy: string,
   orderByDir: string,
+  showPending: boolean,
 ): [string, string[], string, string[]] => {
   const sanitizedSiteId = getSanitizedSiteId(siteId);
   const sanitizedFilterTerm = getSanitizedFilterTerm(filterTerm);
@@ -133,15 +120,18 @@ export const getInternalUserQueries = (
   const sanitizedOrderBy = getSanitizedOrderBy(orderBy);
   const sanitizedOrderByDir = getSanitizedOrderByDir(orderByDir);
 
-  let query: string = internalUserQuery;
+  let query: string = parcelDescriptionQueryHead + internalUserCondition;
+  if (showPending) {
+    query += showPendingCondition;
+  }
+  query += parcelDescriptionQueryTail;
+
   const countQuery: string = `SELECT COUNT(*) FROM ( ${query} ) AS subquery`;
+
   // Add sorting and pagination. Including sorting here is a minor
   // optimization so that it isn't included in the count query.
-  query += `
-    ORDER BY ${sanitizedOrderBy} ${sanitizedOrderByDir}
-    OFFSET $3
-    LIMIT $4 
-  `;
+  query += getPagingAndSortingQueryPart(sanitizedOrderBy, sanitizedOrderByDir);
+
   const queryParams: string[] = [
     sanitizedSiteId,
     sanitizedFilterTerm,
@@ -159,6 +149,7 @@ export const getExternalUserQueries = (
   pageSize: number,
   orderBy: string,
   orderByDir: string,
+  showPending: boolean,
 ): [string, string[], string, string[]] => {
   const sanitizedSiteSubdivisionIds =
     getSanitizedSiteSubdivisionsIds(siteSubdivisionsIds);
@@ -168,15 +159,18 @@ export const getExternalUserQueries = (
   const sanitizedOrderBy = getSanitizedOrderBy(orderBy);
   const sanitizedOrderByDir = getSanitizedOrderByDir(orderByDir);
 
-  let query: string = externalUserQuery;
+  let query: string = parcelDescriptionQueryHead + externalUserCondition;
+  if (showPending) {
+    query += showPendingCondition;
+  }
+  query += parcelDescriptionQueryTail;
+
   const countQuery: string = `SELECT COUNT(*) FROM ( ${query} ) AS subquery`;
+
   // Add sorting and pagination. Including sorting here is a minor
   // optimization so that it isn't included in the count query.
-  query += `
-    ORDER BY ${sanitizedOrderBy} ${sanitizedOrderByDir}
-    OFFSET $3
-    LIMIT $4 
-  `;
+  query += getPagingAndSortingQueryPart(sanitizedOrderBy, sanitizedOrderByDir);
+
   const queryParams: string[] = [
     sanitizedSiteSubdivisionIds,
     sanitizedFilterTerm,

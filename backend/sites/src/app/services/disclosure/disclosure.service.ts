@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
-import { LoggerService } from 'src/app/logger/logger.service';
-import { UserActionEnum } from 'src/app/common/userActionEnum';
+import { LoggerService } from '../../logger/logger.service';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 @Injectable()
 export class DisclosureService {
@@ -13,6 +13,7 @@ export class DisclosureService {
     private readonly sitesLogger: LoggerService,
   ) {}
 
+  /**
   /**
    * Retrieves site profiles for a given site ID.
    *

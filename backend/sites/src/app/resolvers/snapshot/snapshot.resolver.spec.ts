@@ -5,7 +5,7 @@ import { CreateSnapshotDto, SnapshotResponse } from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { sampleSites } from '../../mockData/site.mockData';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { BannerTypeResponse } from 'src/app/dto/response/bannerTypeResponse';
+import { BannerTypeResponse } from '../../dto/response/bannerTypeResponse';
 
 describe('SnapshotResolver', () => {
   let resolver: SnapshotsResolver;

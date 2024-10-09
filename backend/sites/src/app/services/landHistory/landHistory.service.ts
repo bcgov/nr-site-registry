@@ -2,12 +2,12 @@ import { v4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets, In } from 'typeorm';
 import { LandHistories } from '../../entities/landHistories.entity';
-import { LandHistoriesInputDTO } from 'src/app/dto/landHistoriesInput.dto';
+import { LandHistoriesInputDTO } from '../../dto/landHistoriesInput.dto';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
-import { LoggerService } from 'src/app/logger/logger.service';
+import { LoggerService } from '../../logger/logger.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 
-import { UserActionEnum } from 'src/app/common/userActionEnum';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 export class LandHistoryService {
   constructor(

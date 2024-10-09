@@ -4,8 +4,8 @@ import { SiteDocs } from '../../entities/siteDocs.entity';
 import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { DocumentDto } from '../../dto/document.dto';
-import { UserActionEnum } from 'src/app/common/userActionEnum';
-import { LoggerService } from 'src/app/logger/logger.service';
+import { UserActionEnum } from '../../common/userActionEnum';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class DocumentService {

@@ -7,7 +7,7 @@ import { GenericValidationPipe } from '../../utils/validations/genericValidation
 import { UsePipes } from '@nestjs/common';
 import { DocumentDto, DocumentResponse } from '../../dto/document.dto';
 import { CustomRoles } from '../../common/role';
-import { LoggerService } from 'src/app/logger/logger.service';
+import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => SiteDocs)
 export class DocumentResolver {

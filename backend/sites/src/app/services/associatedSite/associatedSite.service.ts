@@ -7,7 +7,7 @@ import { SiteAssocs } from '../../entities/siteAssocs.entity';
 import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
 import { LoggerService } from '../../logger/logger.service';
 
-import { UserActionEnum } from 'src/app/common/userActionEnum';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 @Injectable()
 export class AssociatedSiteService {

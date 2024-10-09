@@ -4,8 +4,9 @@ import { plainToInstance } from 'class-transformer';
 import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { SitePartics } from '../../entities/sitePartics.entity';
 import { Repository } from 'typeorm';
-import { LoggerService } from 'src/app/logger/logger.service';
-import { UserActionEnum } from 'src/app/common/userActionEnum';
+import { v4 as uuidv4 } from 'uuid'; // Import uuid function for generating unique IDs
+import { LoggerService } from '../../logger/logger.service';
+import { UserActionEnum } from '../../common/userActionEnum';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 
 @Injectable()

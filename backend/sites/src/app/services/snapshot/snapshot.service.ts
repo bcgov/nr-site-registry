@@ -13,7 +13,7 @@ import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { SnapshotSiteContent } from '../../dto/snapshotSiteContent';
 import { Events } from '../../entities/events.entity';
-import { LoggerService } from 'src/app/logger/logger.service';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class SnapshotsService {

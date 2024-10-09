@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import {
   FetchSiteDetail,
   FetchSiteResponse,
@@ -24,6 +24,7 @@ import { TransactionManagerService } from '../transactionManager/transactionMana
 import { UserActionEnum } from '../../common/userActionEnum';
 import { LoggerService } from 'src/app/logger/logger.service';
 import { SRApprovalStatusEnum } from 'src/app/common/srApprovalStatusEnum';
+import { BulkApproveRejectChangesDTO, QueryResultForPendingSites, SearchParams, SitePendingApprovalRecords } from 'src/app/dto/SitesPendingApproval.dto';
 
 /**
  * Nestjs Service For Region Entity
@@ -340,6 +341,8 @@ export class SiteService {
 
             try {
               if (sitesSummary) {
+                sitesSummary.whenUpdated = new Date();
+                sitesSummary.whoUpdated = userInfo?.givenName;
                 await transactionalEntityManager.save(Sites, sitesSummary);
               } else {
                 console.log('No changes To Site Summary');
@@ -602,6 +605,345 @@ export class SiteService {
           ),
         );
       }
+    }
+  }
+
+
+  async getSiteDetailsPendingSRApproval(
+    searchParam: SearchParams,
+    page: number,
+    pageSize: number) : Promise<QueryResultForPendingSites> {
+    try {
+
+      
+      this.sitesLogger.log('SiteService.getSiteDetailsPendingSRApproval() start');
+      this.sitesLogger.debug('SiteService.getSiteDetailsPendingSRApproval() start');
+
+      const query = `
+         WITH LatestUpdates AS (
+    SELECT site_id,
+           MAX(when_Updated) AS Latest_Update
+    FROM (
+        SELECT id AS site_id, when_Updated , addr_line_1,addr_line_2,addr_line_3
+        FROM sites.sites
+        WHERE sr_action = 'pending'
+        
+        UNION ALL
+        
+        SELECT site_id, when_Updated, '' , '', '' 
+        FROM sites.events
+        WHERE sr_action = 'pending'
+        
+        UNION ALL
+        
+        SELECT e.site_id, e.when_Updated, '' , '', '' 
+        FROM sites.event_partics ep
+        INNER JOIN sites.events e ON ep.event_id = e.id
+        WHERE e.sr_action = 'pending'
+        
+        UNION ALL
+        
+        SELECT site_id, when_Updated, '' , '', '' 
+        FROM sites.site_partics
+        WHERE sr_action = 'pending'
+        
+        UNION ALL
+        
+        SELECT site_id, when_Updated, '' , '', '' 
+        FROM sites.site_docs
+        WHERE sr_action = 'pending'
+        
+        UNION ALL
+        
+        SELECT site_id, when_Updated,  '' , '', '' 
+        FROM sites.site_assocs
+        WHERE sr_action = 'pending'
+        
+        UNION ALL
+        
+        SELECT site_id, when_Updated,  '' , '', '' 
+        FROM sites.land_histories
+        WHERE sr_action = 'pending'
+        
+        UNION ALL
+        
+        SELECT site_id, when_Updated,  '' , '', '' 
+        FROM sites.site_subdivisions
+        WHERE sr_action = 'pending'
+        
+        UNION ALL
+        
+        SELECT site_id, when_Updated,  '' , '', '' 
+        FROM sites.site_profiles
+        WHERE sr_action = 'pending'
+    ) AS updates
+    GROUP BY site_id
+)
+
+SELECT c.site_id, 
+       STRING_AGG(DISTINCT c.Change, ', ' ORDER BY c.Change) AS Changes,
+       lu.Latest_Update,
+       c.who_updated,
+	   c.addr_line_1,
+	   c.addr_line_2,
+	   c.addr_line_3
+FROM (
+    SELECT id AS site_id, 'summary' AS Change, when_Updated, who_updated ,addr_line_1,addr_line_2,addr_line_3 
+    FROM sites.sites
+    WHERE sr_action = 'pending'
+    
+    UNION ALL
+    
+    SELECT site_id, 'notation', when_Updated, who_updated , '' , '', '' 
+    FROM sites.events
+    WHERE sr_action = 'pending'
+    
+    UNION ALL
+    
+    SELECT e.site_id, 'notation participants' AS Change, e.when_Updated, e.who_updated , '' , '', '' 
+    FROM sites.event_partics ep
+    INNER JOIN sites.events e ON ep.event_id = e.id
+    WHERE e.sr_action = 'pending'
+    
+    UNION ALL
+    
+    SELECT site_id, 'site participants' AS Change, when_Updated, who_updated ,  '' , '', '' 
+    FROM sites.site_partics
+    WHERE sr_action = 'pending'
+    
+    UNION ALL
+    
+    SELECT site_id, 'documents' AS Change, when_Updated, who_updated,  '' , '', '' 
+    FROM sites.site_docs
+    WHERE sr_action = 'pending'
+    
+    UNION ALL
+    
+    SELECT site_id, 'associated sites' AS Change, when_Updated, who_updated,  '' , '', '' 
+    FROM sites.site_assocs
+    WHERE sr_action = 'pending'
+    
+    UNION ALL
+    
+    SELECT site_id, 'land histories' AS Change, when_Updated, who_updated,  '' , '', '' 
+    FROM sites.land_histories
+    WHERE sr_action = 'pending'
+    
+    UNION ALL
+    
+    SELECT site_id, 'parcel description' AS Change, when_Updated, who_updated,  '' , '', '' 
+    FROM sites.site_subdivisions
+    WHERE sr_action = 'pending'
+    
+    UNION ALL
+    
+    SELECT site_id, 'site profiles' AS Change, when_Updated, who_updated ,  '' , '', '' 
+    FROM sites.site_profiles
+    WHERE sr_action = 'pending'
+) AS c
+JOIN LatestUpdates lu ON c.site_id = lu.site_id AND c.when_Updated = lu.Latest_Update
+GROUP BY c.site_id, lu.Latest_Update, c.who_updated, c.addr_line_1,c.addr_line_2,c.addr_line_3
+        `;
+
+      const entityManager = this.siteRepository.manager;
+      const queryResult = await entityManager.query(query);
+
+     
+      let result: SitePendingApprovalRecords[] = [];
+
+      if(queryResult && queryResult.length > 0)
+      {
+        result = queryResult.map(res=>{
+          return  {
+            siteId: res.site_id,            
+            changes: res.changes,
+            whoUpdated: res.who_updated,
+            whenUpdated: res.latest_update,
+            address: res.addr_line_1+' '+ res.addr_line_2+ ' '+ res.addr_line_3
+          }
+        });
+      }
+
+
+      if(searchParam != null)
+      {
+        if(searchParam.whenUpdated != null && searchParam.whenUpdated != '')
+        {
+          const startDate = new Date(searchParam.whenUpdated.split(' - ')[0].replace(/(st|nd|rd|th)/, ''));
+          const endDate = new Date(searchParam.whenUpdated.split(' - ')[1].replace(/(st|nd|rd|th)/, ''));
+
+          result = result.filter(res => {
+            const whenUpdatedDate = new Date(res.whenUpdated);
+            return whenUpdatedDate >= startDate && whenUpdatedDate <= endDate;
+          });
+
+        }
+
+        if(searchParam.id != null && searchParam.id != '')
+        {
+          result = result.filter(res => {
+           
+            return res.siteId.indexOf(searchParam.id) !== -1
+          });
+        }
+
+        
+        if(searchParam.changes != null && searchParam.changes != '')
+          {
+            result = result.filter(res => {             
+              return res.changes.indexOf(searchParam.changes) !== -1
+            });
+          }
+
+          if(searchParam.addrLine!= null && searchParam.addrLine != '')
+            {
+              result = result.filter(res => {             
+                return res.address.indexOf(searchParam.addrLine) !== -1
+              });
+            }
+      }
+
+      const startIndex = (page - 1) * pageSize;
+
+      const paginatedRecords = result.slice(startIndex, startIndex + pageSize);
+
+      const resultDTO: QueryResultForPendingSites = {
+        data : paginatedRecords,
+        totalRecords : result.length
+      }
+
+
+      this.sitesLogger.log('SiteService.getSiteDetailsPendingSRApproval() end');
+      this.sitesLogger.debug('SiteService.getSiteDetailsPendingSRApproval() end');
+
+      return resultDTO;
+     
+    } catch (error) {
+      this.sitesLogger.log('SiteService.getSiteDetailsPendingSRApproval() error' + JSON.stringify(error));
+   
+      throw new Error('Failed to determine banner type.');
+    }
+  }
+
+
+  async bulkUpdateForSR(inputDTO: BulkApproveRejectChangesDTO, userInfo: any): Promise<boolean> {
+    try {
+      this.sitesLogger.log('SiteService.bulkUpdateForSR() start');
+      this.sitesLogger.debug('SiteService.bulkUpdateForSR() start');
+
+      if (!inputDTO) {
+        return false;
+      } else {
+      
+        const transactionResult = await this.entityManager.transaction(
+          async (transactionalEntityManager: EntityManager) => {
+
+            const {isApproved, siteIds} = inputDTO;
+           
+            try {
+
+              const sitesForUpdates = await transactionalEntityManager.find(Sites, {where: {id: In(siteIds)}});
+
+              sitesForUpdates.forEach(site => {
+                site.userAction = UserActionEnum.DEFAULT;
+                site.srAction = isApproved ? SRApprovalStatusEnum.PUBLIC : SRApprovalStatusEnum.PRIVATE;
+                site.whenUpdated = new Date();
+                site.whoUpdated = userInfo?.givenName;
+              })
+              
+              await transactionalEntityManager.save(Sites, sitesForUpdates);
+
+
+              const events = await transactionalEntityManager.find(Events, {where: {siteId: In(siteIds)}});
+
+              events.forEach(event => {
+                event.userAction = UserActionEnum.DEFAULT;
+                event.srAction = isApproved ? SRApprovalStatusEnum.PUBLIC : SRApprovalStatusEnum.PRIVATE;
+                event.whenUpdated = new Date();
+                event.whoUpdated = userInfo?.givenName;
+              })
+
+              await transactionalEntityManager.save(Events, events);
+
+              const eventIds = events.map(event => event.id);
+
+              const eventsParticipants = await transactionalEntityManager.find(EventPartics, {where: {eventId: In(eventIds)}});
+
+              eventsParticipants.forEach(eventsParticipant => {
+                eventsParticipant.userAction = UserActionEnum.DEFAULT;
+                eventsParticipant.srAction = isApproved ? SRApprovalStatusEnum.PUBLIC : SRApprovalStatusEnum.PRIVATE;
+                eventsParticipant.whenUpdated = new Date();
+                eventsParticipant.whoUpdated = userInfo?.givenName;
+              })
+
+              await transactionalEntityManager.save(EventPartics, eventsParticipants);
+
+
+              const siteParticipants = await transactionalEntityManager.find(SitePartics, {where: {siteId: In(siteIds)}});
+
+              siteParticipants.forEach(siteParticipant => {
+                siteParticipant.userAction = UserActionEnum.DEFAULT;
+                siteParticipant.srAction = isApproved ? SRApprovalStatusEnum.PUBLIC : SRApprovalStatusEnum.PRIVATE;
+                siteParticipant.whenUpdated = new Date();
+                siteParticipant.whoUpdated = userInfo?.givenName;
+              })
+
+              await transactionalEntityManager.save(SitePartics, siteParticipants);
+
+
+              const siteAssociations = await transactionalEntityManager.find(SiteAssocs, {where: {siteId: In(siteIds)}});
+
+              siteAssociations.forEach(siteAssociation => {
+                siteAssociation.userAction = UserActionEnum.DEFAULT;
+                siteAssociation.srAction = isApproved ? SRApprovalStatusEnum.PUBLIC : SRApprovalStatusEnum.PRIVATE;
+                siteAssociation.whenUpdated = new Date();
+                siteAssociation.whoUpdated = userInfo?.givenName;
+              })
+
+              await transactionalEntityManager.save(SiteAssocs, siteAssociations);
+
+
+              const landHistories = await transactionalEntityManager.find(LandHistories, {where: {siteId: In(siteIds)}});
+
+              landHistories.forEach(history => {
+                history.userAction = UserActionEnum.DEFAULT;
+                history.srAction = isApproved ? SRApprovalStatusEnum.PUBLIC : SRApprovalStatusEnum.PRIVATE;
+                history.whenUpdated = new Date();
+                history.whoUpdated = userInfo?.givenName;
+              })
+
+              await transactionalEntityManager.save(LandHistories, landHistories);
+
+
+              const profiles = await transactionalEntityManager.find(SiteProfiles, {where: {siteId: In(siteIds)}});
+
+              profiles.forEach(profile => {
+                profile.userAction = UserActionEnum.DEFAULT;
+                profile.srAction = isApproved ? SRApprovalStatusEnum.PUBLIC : SRApprovalStatusEnum.PRIVATE;
+                profile.whenUpdated = new Date();
+                profile.whoUpdated = userInfo?.givenName;
+              })
+
+              await transactionalEntityManager.save(SiteProfiles, profiles);
+
+              this.sitesLogger.log('SiteService.bulkUpdateForSR() end');
+              this.sitesLogger.debug('SiteService.bulkUpdateForSR() end');
+
+              return true;
+            } catch (error) {
+              this.sitesLogger.log('SiteService.bulkUpdateForSR() Transaction error' + JSON.stringify(error));
+              console.error('bulkUpdateForSR Transaction failed', error);
+              return false;
+            }
+          },
+        );
+
+        if (transactionResult) return true;
+        else return false;
+      }
+    } catch (error) {
+         this.sitesLogger.log('SiteService.bulkUpdateForSR() error' + JSON.stringify(error));
+      throw error;
     }
   }
 }

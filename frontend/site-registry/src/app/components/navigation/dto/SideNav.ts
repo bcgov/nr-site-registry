@@ -54,7 +54,7 @@ const getSideBarNavList = (userRole: any) => {
         '/',
         [
           new SideNav(1, 'Tools', false, toolsIcon, '/tools'),
-          new SideNav(2, 'Reference', false, referenceIcon, '/ref'),
+          new SideNav(2, 'Reference', false, referenceIcon, '/review'),
         ],
         false,
       ),

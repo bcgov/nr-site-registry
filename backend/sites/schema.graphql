@@ -587,6 +587,46 @@ type NotationDropdownDto {
   dropdownDto: [DropdownDto!]!
 }
 
+type SitePendingApprovalRecords {
+  siteId: String!
+  changes: String!
+  whoUpdated: String!
+  whenUpdated: DateTime!
+  address: String!
+}
+
+type SitePendingApprovalDTO {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+}
+
+type QueryResultForPendingSites {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  totalRecords: Float!
+  data: [SitePendingApprovalRecords!]
+}
+
+type QueryResultForPendingSitesResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: QueryResultForPendingSites!
+}
+
+type SRApproveRejectResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [SitePendingApprovalDTO!]
+}
+
 type SnapshotResponse {
   message: String
   httpStatusCode: Int
@@ -693,6 +733,7 @@ type Query {
   searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
   findSiteBySiteId(siteId: String!, pending: Boolean): FetchSiteDetail!
   searchSiteIds(searchParam: String!): DropdownResponse!
+  getPendingSiteForSRApproval(searchParam: SearchParams, page: String!, pageSize: String!): QueryResultForPendingSitesResponse!
   getRecentViewsByUserId(userId: String!): RecentViewResponse!
   getSnapshots: SnapshotResponse!
   getSnapshotsByUserId(userId: String!): SnapshotResponse!
@@ -717,6 +758,14 @@ type Query {
   getAssociatedSitesBySiteId(siteId: String!, pending: Boolean): AssociatedSiteResponse!
 }
 
+input SearchParams {
+  id: String
+  changes: String
+  whenUpdated: String
+  whoCreated: String
+  addrLine: String
+}
+
 input FolioMinDTO {
   id: Float!
   userId: String!
@@ -724,6 +773,7 @@ input FolioMinDTO {
 
 type Mutation {
   updateSiteDetails(siteDetailsDTO: SaveSiteDetailsDTO!): SaveSiteDetailsResponse!
+  bulkAproveRejectChanges(approveRejectDTO: BulkApproveRejectChangesDTO!): SRApproveRejectResponse!
   addRecentView(recentView: RecentViewDto!): RecentViewResponse!
   createSnapshotForSites(inputDto: [CreateSnapshotDto!]!): SnapshotResponse!
   addCartItem(cartDTO: [CartDTO!]!): CartResponse!
@@ -947,6 +997,11 @@ input SiteProfilesInputDTO {
   plannedActivityComment: String
   siteDisclosureComment: String
   govDocumentsComment: String
+}
+
+input BulkApproveRejectChangesDTO {
+  isApproved: Boolean!
+  siteIds: [String!]!
 }
 
 input RecentViewDto {

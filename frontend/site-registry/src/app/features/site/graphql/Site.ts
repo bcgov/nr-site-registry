@@ -79,3 +79,45 @@ export const graphqlSiteDetailsQuery = () => {
     }
   `;
 };
+
+export const graphQlGetPendingSiteForSRApproval = () => {
+  return gql`
+    query getPendingSiteForSRApproval(
+      $searchParam: SearchParams
+      $page: String!
+      $pageSize: String!    
+    ) {
+      getPendingSiteForSRApproval(
+        searchParam: $searchParam
+        page: $page
+        pageSize: $pageSize       
+      ) {
+       
+          httpStatusCode
+          message
+          data
+          {
+            totalRecords
+            data
+            {
+              changes
+              siteId
+              whoUpdated
+              whenUpdated
+              address
+            }
+          }
+      }
+    }
+  `;
+};
+
+
+export const bulkAproveRejectChangesQL = () => gql`
+  mutation bulkAproveRejectChanges($approveRejectDTO: BulkApproveRejectChangesDTO!) {
+    bulkAproveRejectChanges(approveRejectDTO: $approveRejectDTO) {      
+      httpStatusCode
+      success
+    }
+  }
+`;

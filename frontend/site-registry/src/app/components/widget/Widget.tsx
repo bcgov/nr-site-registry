@@ -23,6 +23,7 @@ const Widget: React.FC<IWidget> = ({
   changeHandler,
   handleCheckBoxChange,
   sortHandler,
+  showPageOptions
 }) => {
   let widgetSortHandler = sortHandler ?? (() => {});
   const [widgetData, setWidgetData] = useState(tableData);
@@ -60,14 +61,14 @@ const Widget: React.FC<IWidget> = ({
               isLoading={tableIsLoading ?? RequestStatus.idle}
               columns={tableColumns ?? []}
               data={widgetData}
-              showPageOptions={false}
+              showPageOptions={showPageOptions}
               allowRowsSelect={allowRowsSelect}
               changeHandler={changeHandler ?? ((event:any) => {console.log("not handled",changeHandler,event)})}
               editMode={editMode ?? false}
               srMode={srMode ?? false}
               idColumnName={primaryKeycolumnName ?? ''}
               sortHandler={widgetSortHandler}
-              currentPage={currentPage}
+              currentPage={currentPage}              
             />
           </div>
         </div>

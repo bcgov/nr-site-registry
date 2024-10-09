@@ -331,132 +331,17 @@ export class SiteService {
       if (!inputDTO) {
         return false;
       } else {
-        const {
-          siteId,
-          sitesSummary,
-          events,
-          eventsParticipants,
-          siteParticipants,
-          documents,
-          siteAssociations,
-          subDivisions,
-          landHistories,
-          profiles,
-        } = inputDTO;
-
         const transactionResult = await this.entityManager.transaction(
           async (transactionalEntityManager: EntityManager) => {
             this.transactionManagerService.setEntityManager(
               transactionalEntityManager,
             );
-
             try {
-              if (sitesSummary) {
-                sitesSummary.whenUpdated = new Date();
-                sitesSummary.whoUpdated = userInfo?.givenName;
-                await transactionalEntityManager.save(Sites, sitesSummary);
-              } else {               
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Summary',
-                );
-              }
-
-              if (events && events.length > 0) {
-                await this.processEvents(
-                  events,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Events',
-                );
-              }
-
-              // if (eventsParticipants) {
-              //   await transactionalEntityManager.save(
-              //     EventPartics,
-              //     eventsParticipants,
-              //   );
-              // } else {
-              //   console.log('No changes To Site Event Participants');
-              // }
-
-              if (siteParticipants && siteParticipants.length > 0) {
-                await this.processSiteParticipants(
-                  siteParticipants,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Participants',
-                );
-              }
-
-              if (documents && documents.length > 0) {
-                await this.processDocuments(
-                  documents,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Documents',
-                );
-              }
-
-              if (siteAssociations && siteAssociations.length > 0) {
-                await this.processSiteAssociated(
-                  siteAssociations,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Associations',
-                );
-              }
-
-              if (subDivisions) {
-                await transactionalEntityManager.save(
-                  Subdivisions,
-                  subDivisions,
-                );
-              } else {
-                console.log('No changes To Site subDivisions');
-              }
-
-              if (landHistories) {
-                await this.landHistoryService.updateLandHistoriesForSite(
-                  siteId,
-                  landHistories,
-                  userInfo,
-                );
-              } else {
-                console.log('No changes To Site LandHistories');
-              }
-
-              if (profiles) {
-                await transactionalEntityManager.save(SiteProfiles, profiles);
-              } else {
-                console.log('No changes To Site profiles');
-              }
-
-              const historyLog: HistoryLog = {
-                userId: userInfo ? userInfo.sub : '',
-                content: inputDTO,
-                id: null,
-                whoCreated: userInfo ? userInfo.givenName : '',
-                whenCreated: new Date(),
-                whenUpdated: new Date(),
-                whoUpdated: userInfo ? userInfo.givenName : '',
-                siteId: inputDTO.siteId,
-              };
-
-              await transactionalEntityManager.save(HistoryLog, historyLog);
-
-              return true;
+              return this.commitSiteDetails(
+                transactionalEntityManager,
+                inputDTO,
+                userInfo,
+              );
             } catch (error) {
               console.error('Save Site Details Transaction failed', error);
               return false;
@@ -474,6 +359,125 @@ export class SiteService {
       );
       throw error;
     }
+  }
+
+  async commitSiteDetails(
+    transactionalEntityManager: EntityManager,
+    inputDTO: SaveSiteDetailsDTO,
+    userInfo: any,
+  ): Promise<boolean> {
+    const {
+      siteId,
+      sitesSummary,
+      events,
+      eventsParticipants,
+      siteParticipants,
+      documents,
+      siteAssociations,
+      subDivisions,
+      landHistories,
+      profiles,
+    } = inputDTO;
+
+    if (sitesSummary) {
+      sitesSummary.whenUpdated = new Date();
+      sitesSummary.whoUpdated = userInfo?.givenName;
+      await transactionalEntityManager.save(Sites, sitesSummary);
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Summary',
+      );
+    }
+
+    if (events && events.length > 0) {
+      await this.processEvents(events, userInfo, transactionalEntityManager);
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Events',
+      );
+    }
+
+    // if (eventsParticipants) {
+    //   await transactionalEntityManager.save(
+    //     EventPartics,
+    //     eventsParticipants,
+    //   );
+    // } else {
+    //   console.log('No changes To Site Event Participants');
+    // }
+
+    if (siteParticipants && siteParticipants.length > 0) {
+      await this.processSiteParticipants(
+        siteParticipants,
+        userInfo,
+        transactionalEntityManager,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Participants',
+      );
+    }
+
+    if (documents && documents.length > 0) {
+      await this.processDocuments(
+        documents,
+        userInfo,
+        transactionalEntityManager,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Documents',
+      );
+    }
+
+    if (siteAssociations && siteAssociations.length > 0) {
+      await this.processSiteAssociated(
+        siteAssociations,
+        userInfo,
+        transactionalEntityManager,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Associations',
+      );
+    }
+
+    if (subDivisions) {
+      await transactionalEntityManager.save(Subdivisions, subDivisions);
+    } else {
+      console.log('No changes To Site subDivisions');
+    }
+
+    if (landHistories) {
+      await this.landHistoryService.updateLandHistoriesForSite(
+        siteId,
+        landHistories,
+        userInfo,
+      );
+    } else {
+      console.log('No changes To Site LandHistories');
+    }
+
+    if (profiles) {
+      await transactionalEntityManager.save(SiteProfiles, profiles);
+    } else {
+      console.log('No changes To Site profiles');
+    }
+
+    const historyLog: HistoryLog = {
+      userId: userInfo ? userInfo.sub : '',
+      content: inputDTO,
+      id: null,
+      whoCreated: userInfo ? userInfo.givenName : '',
+      whenCreated: new Date(),
+      whenUpdated: new Date(),
+      whoUpdated: userInfo ? userInfo.givenName : '',
+      siteId: inputDTO.siteId,
+    };
+
+    await transactionalEntityManager.save(HistoryLog, historyLog);
+
+    return true;
   }
 
   /**
@@ -1145,7 +1149,7 @@ export class SiteService {
         'SiteService.getSiteDetailsPendingSRApproval() start',
       );
 
-      // The following query fetches the sites with SR status as pending and group them by user and shows the last updated timestamp 
+      // The following query fetches the sites with SR status as pending and group them by user and shows the last updated timestamp
       const query = `
        select ROW_NUMBER() OVER (ORDER BY site_id) AS row_num,ResultInFo.site_id,ResultInFo.changes,ResultInFo.Latest_Update,ResultInFo.who as who_updated, SiteInfo.addr_line_1, SiteInfo.addr_line_2,SiteInfo.addr_line_3 from (WITH LatestUpdates AS (
           SELECT site_id,
@@ -1361,7 +1365,7 @@ export class SiteService {
 
       throw error;
     }
-    }
+  }
 
   /**
    * Bulk Approval/ Reject For Site Registry Approvals
@@ -1378,14 +1382,16 @@ export class SiteService {
       this.sitesLogger.debug('SiteService.bulkUpdateForSR() start');
 
       if (!inputDTO) {
-        this.sitesLogger.debug('SiteService.bulkUpdateForSR() inputDTO invalid returning false');
+        this.sitesLogger.debug(
+          'SiteService.bulkUpdateForSR() inputDTO invalid returning false',
+        );
         return false;
       } else {
         const { isApproved, sites } = inputDTO;
 
         sites.forEach(async (site: SiteRecordsForSRAction) => {
-        await this.entityManager.transaction(
-          async (transactionalEntityManager: EntityManager) => {            
+          await this.entityManager.transaction(
+            async (transactionalEntityManager: EntityManager) => {
               if (
                 (site != null && site.siteId === null) ||
                 site.siteId === undefined
@@ -1398,9 +1404,9 @@ export class SiteService {
                 isApproved,
                 userInfo,
               );
-            });
-          },
-        );
+            },
+          );
+        });
 
         return true;
       }
@@ -1422,7 +1428,9 @@ export class SiteService {
       this.sitesLogger.log('SiteService.processSRBulkUpdates() start');
 
       if ((site != null && site.siteId === null) || site.siteId === undefined) {
-        this.sitesLogger.log('SiteService.processSRBulkUpdates() site is empty');
+        this.sitesLogger.log(
+          'SiteService.processSRBulkUpdates() site is empty',
+        );
         return false;
       }
 
@@ -1436,8 +1444,7 @@ export class SiteService {
             this.setUpdatedStatus(site, isApproved, userInfo);
           });
           await transactionalEntityManager.save(Sites, sitesForUpdates);
-        }
-        else {
+        } else {
           this.sitesLogger.log(
             'SiteService.processSRBulkUpdates() no summary to process.',
           );

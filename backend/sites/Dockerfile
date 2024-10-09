@@ -36,4 +36,6 @@ RUN npm run build
 EXPOSE 4007
 
 # Start the API
-CMD ["sh", "start.sh"]
+# CMD ["sh", "start.sh"]
+
+CMD ["npm", "run", "start:prod"]

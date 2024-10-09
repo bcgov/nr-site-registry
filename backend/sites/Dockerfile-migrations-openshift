@@ -1,25 +1,80 @@
-FROM node:16.14.0-alpine
+# FROM node:16.14.0-alpine
 
-# Set npm cache directory
-ENV NPM_CONFIG_CACHE=/home/node/.npm
+# # Set npm cache directory
+# ENV NPM_CONFIG_CACHE=/home/node/.npm
 
-# Install packages, build, and keep only prod packages
+# # Install packages, build, and keep only prod packages
+# WORKDIR /app
+
+# # A wildcard is used to ensure both package.json AND package-lock.json are copied
+# COPY package*.json ./
+
+# # Install app dependencies using the `npm ci` command instead of `npm install`
+# RUN npm config set unsafe-perm true \
+#     && npm ci \
+#     && npm config set unsafe-perm false
+
+# # Bundle app source
+# COPY . .
+# #test
+
+# # Install postgresql-client
+# RUN apk add --no-cache postgresql-client
+
+# # Define the entrypoint
+# ENTRYPOINT [ "sh", "initDB.sh" ]
+
+
+
+###################
+# BUILD FOR LOCAL DEVELOPMENT
+###################
+
+FROM node:18-alpine As development
+
 WORKDIR /app
 
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package*.json ./
+COPY --chown=node:node package*.json ./
 
-# Install app dependencies using the `npm ci` command instead of `npm install`
 RUN npm config set unsafe-perm true \
     && npm ci \
     && npm config set unsafe-perm false
 
-# Bundle app source
-COPY . .
-#test
+COPY --chown=node:node . .
 
-# Install postgresql-client
 RUN apk add --no-cache postgresql-client
 
-# Define the entrypoint
+USER node
+
+###################
+# BUILD FOR PRODUCTION
+###################
+
+FROM node:18-alpine As build
+
+WORKDIR /app
+
+COPY --chown=node:node package*.json ./
+
+COPY --chown=node:node --from=development /app/node_modules ./node_modules
+
+COPY --chown=node:node . .
+
+RUN npm run build
+
+ENV NODE_ENV production
+
+RUN npm ci --only=production && npm cache clean --force
+
+USER node
+
+###################
+# PRODUCTION
+###################
+
+FROM node:18-alpine As production
+
+COPY --chown=node:node --from=build /app/node_modules ./node_modules
+COPY --chown=node:node --from=build /app/dist ./dist
+
 ENTRYPOINT [ "sh", "initDB.sh" ]

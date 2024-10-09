@@ -130,6 +130,7 @@ export const disclosureScheduleInternalConfig: TableColumn[] = [
     displayType: {
       type: FormFieldType.Text,
       label: 'Description',
+      isDisabled: true,
       placeholder: 'Enter Description.',
       graphQLPropertyName: 'discription',
       value: '',
@@ -188,6 +189,7 @@ export const disclosureScheduleExternalConfig: TableColumn[] = [
       label: 'Description',
       placeholder: 'Enter Description.',
       graphQLPropertyName: 'discription',
+      isDisabled: true,
       value: '',
       colSize: 'col-lg-6 col-md-6 col-sm-12',
       customInputTextCss: 'custom-disclosure-input-text-tbl',

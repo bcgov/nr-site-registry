@@ -49,6 +49,8 @@ import {
 import infoIcon from '../../../images/info-icon.png';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { UserActionEnum } from '../../../common/userActionEnum';
+import ModalDialog from '../../../components/modaldialog/ModalDialog';
+import { v4 } from 'uuid';
 
 // const disclosureData = {
 //         disclosureId:1,
@@ -94,6 +96,8 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [searchInternalContact, setSearchInternalContact] = useState('');
   const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
   const [internalRow, setInternalRow] = useState(disclosureStatementConfig);
+  const [isDelete, setIsDelete] = useState(false);
+  const [currentDisclosure, setCurrenDisclosure] = useState({});
 
   const dispatch = useDispatch<AppDispatch>();
   const mode = useSelector(siteDetailsMode);
@@ -254,7 +258,28 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       //     },
       //   }),
       // );
-      setFormData(disclosureData);
+
+      //this suppose to come as a single object with array of schedule to reference.
+      // setFormData(disclosureData);
+
+      //In order to show dummy data
+      setFormData({
+        ...disclosureData,
+        disclosureSchedule: [
+          // {
+          //     scheduleId:1,
+          //     reference:'F1',
+          //     discription:'Dummy Data -> PETROLEUM OR NATURAL GAS DRILLING',
+          //     srAction:true
+          // },
+          // {
+          //     scheduleId:2,
+          //     reference:'F2',
+          //     discription:'Dummy Data -> PETROLEUM OR NATURAL GAS PRODUCTION FACILITIES',
+          //     srAction:false,
+          // },
+        ],
+      });
     }
 
     // Commenting the below method because I am not sure which dropdown type
@@ -332,34 +357,48 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   /// not working yet as the actual source of table data is unknown.
   const handleTableChange = (disclosureId: any, event: any) => {
-    const isExist = formData.disclosureSchedule.some(
-      (item: any) => item.scheduleId === event.row.scheduleId,
-    );
-    if (isExist && event.property.includes('select_row')) {
+    debugger;
+    if (
+      event.property.includes('select_all') ||
+      event.property.includes('select_row')
+    ) {
+      let rows = event.property === 'select_row' ? [event.row] : event.value;
+      let isTrue =
+        event.property === 'select_row' ? event.value : event.selected;
       // Update selectedRows state based on checkbox selection
-      if (event.value) {
+      if (isTrue) {
         setSelectedRows((prevSelectedRows) => [
           ...prevSelectedRows,
-          { disclosureId, scheduleId: event.row.scheduleId },
+          ...rows.map((row: any) => ({
+            disclosureId,
+            scheduleId: row.scheduleId,
+          })),
         ]);
       } else {
         setSelectedRows((prevSelectedRows) =>
           prevSelectedRows.filter(
-            (row) =>
-              !(
-                row.disclosureId === disclosureId &&
-                row.scheduleId === event.row.scheduleId
+            (selectedRow) =>
+              !rows.some(
+                (row: any) =>
+                  selectedRow.disclosureId === disclosureId &&
+                  selectedRow.scheduleId === row.scheduleId,
               ),
           ),
         );
       }
     } else {
+      // this need to be tracked and also change once get actual source of data.
       setFormData((prevData) => {
         if (prevData.disclosureId === disclosureId) {
           const updatedDisclosureSchedule = prevData.disclosureSchedule.map(
             (schedule: any) => {
               if (schedule.scheduleId === event.row.scheduleId) {
-                return { ...schedule, [event.property]: event.value };
+                return {
+                  ...schedule,
+                  [event.property]: event.value,
+                  discription:
+                    'Dummy Data -> PETROLEUM OR NATURAL GAS DRILLING',
+                };
               }
               return schedule;
             },
@@ -396,26 +435,48 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     });
   };
 
+  // this need to be tracked and also change once get actual source of data.
   const handleAddDisclosureSchedule = (disclosureId: any) => {
     const newDisclosureSchedule = {
       scheduleId: Date.now(),
       reference: '',
       discription: '',
-      sr: false,
+      apiAction: UserActionEnum.added,
+      srAction: SRApprovalStatusEnum.Pending,
     };
 
-    setFormData((prevFormData) => {
-      if (prevFormData.disclosureId === disclosureId) {
-        // Create a new array with the updated notation object
-        return {
-          ...prevFormData,
-          disclosureSchedule: [
-            ...prevFormData.disclosureSchedule,
-            newDisclosureSchedule,
-          ],
-        };
-      }
-    });
+    const updateDisclosure = (disclosure: any) => {
+      return {
+        ...disclosure,
+        disclosureSchedule: [
+          newDisclosureSchedule,
+          ...disclosure.disclosureSchedule,
+        ],
+      };
+    };
+
+    const updatedFormData = updateDisclosure(formData);
+
+    //need to uncomment it once get the actual source of data
+    // const updatedTrackDisclosure = updateDisclosure(trackSiteDisclosure);
+
+    setFormData(updatedFormData);
+    // dispatch(updateSiteDisclosure(serializeDate(updatedFormData)));
+
+    //need to uncomment it once get the actual source of data
+    // dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
+    // setFormData((prevFormData) => {
+    //   if (prevFormData.disclosureId === disclosureId) {
+    //     // Create a new array with the updated notation object
+    //     return {
+    //       ...prevFormData,
+    //       disclosureSchedule: [
+    //         ...prevFormData.disclosureSchedule,
+    //         newDisclosureSchedule,
+    //       ],
+    //     };
+    //   }
+    // });
     const tracker = new ChangeTracker(
       IChangeType.Added,
       'Site Dosclosure Schedule',
@@ -423,33 +484,95 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
-  const handleRemoveDisclosureSchedule = (disclosureId: any) => {
-    // Remove selected rows from formData state
-    setFormData((prevData) => {
-      if (prevData.disclosureId === disclosureId) {
-        // Filter out selected rows from notationParticipant array
-        const updatedDisclosureSchedule = prevData.disclosureSchedule.filter(
+  // this need to be tracked and also change once get actual source of data.
+  const handleRemoveDisclosureSchedule = (
+    disclosure: any,
+    referenceIsDeleted: boolean = false,
+  ) => {
+    if (referenceIsDeleted) {
+      const updateReferences = (disclosures: any) => {
+        const updatedDisclosureSchedule = disclosures.disclosureSchedule.map(
+          (schedule: any) => {
+            if (
+              selectedRows.some(
+                (row: any) =>
+                  row.disclosureId === disclosures.id &&
+                  row.scheduleId === schedule.scheduleId,
+              )
+            ) {
+              // Modify the schedule as needed (marking as deleted and updating approval status)
+              return {
+                ...schedule,
+                apiAction: UserActionEnum.deleted,
+                srAction: SRApprovalStatusEnum.Pending,
+              };
+            }
+            return schedule; // Return the unchanged schedule if conditions aren't met
+          },
+        );
+
+        // Return the updated disclosure object with the modified disclosureSchedule array
+        return {
+          ...disclosures,
+          disclosureSchedule: updatedDisclosureSchedule,
+        };
+      };
+
+      // Update both formData and trackParticipant
+      const updatedFormData = updateReferences(formData);
+
+      //need to uncomment it once get the actual source of data
+      // const updatedTrackDisclosure = updateRefernces(trackSiteDisclosure);
+
+      // Filter out participants based on selectedRows for formData
+      const filteredDisclosure = {
+        ...updatedFormData,
+        disclosureSchedule: updatedFormData.disclosureSchedule.filter(
           (schedule: any) =>
             !selectedRows.some(
-              (row) =>
-                row.disclosureId === disclosureId &&
-                row.scheduleId === schedule.scheduleId,
+              (selectedRow) =>
+                selectedRow.disclosureId === disclosure.id &&
+                selectedRow.scheduleId === schedule.scheduleId,
             ),
-        );
-        return { ...prevData, disclosureSchedule: updatedDisclosureSchedule };
-      }
-    });
-    const tracker = new ChangeTracker(
-      IChangeType.Deleted,
-      'Site Disclosure Schedule',
-    );
-    dispatch(trackChanges(tracker.toPlainObject()));
-    // Clear selectedRows state
+        ),
+      };
+      setFormData(filteredDisclosure);
+      dispatch(updateSiteDisclosure(filteredDisclosure));
+      //need to uncomment it once get the actual source of data
+      // dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
 
-    const updateSelectedRows = selectedRows.filter(
-      (row) => row.disclosureId !== disclosureId,
-    );
-    setSelectedRows(updateSelectedRows);
+      // Clear selectedRows state
+      const updateSelectedRows = selectedRows.filter(
+        (row) => row.disclosureId !== disclosure.id,
+      );
+      setSelectedRows(updateSelectedRows);
+      setCurrenDisclosure({});
+      setIsDelete(false);
+      const tracker = new ChangeTracker(
+        IChangeType.Deleted,
+        'Site Disclosure Schedule',
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    } else {
+      setCurrenDisclosure(disclosure);
+      setIsDelete(true);
+    }
+
+    // Remove selected rows from formData state
+    // setFormData((prevData) => {
+    //   if (prevData.disclosureId === disclosureId) {
+    //     // Filter out selected rows from notationParticipant array
+    //     const updatedDisclosureSchedule = prevData.disclosureSchedule.filter(
+    //       (schedule: any) =>
+    //         !selectedRows.some(
+    //           (row) =>
+    //             row.disclosureId === disclosureId &&
+    //             row.scheduleId === schedule.scheduleId,
+    //         ),
+    //     );
+    //     return { ...prevData, disclosureSchedule: updatedDisclosureSchedule };
+    //   }
+    // });
   };
 
   const isAnyDisclosureScheduleSelected = (disclosureId: any) => {
@@ -473,27 +596,47 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     }
   };
 
+  useEffect(() => {
+    console.log('formData --> ', formData);
+  }, [formData]);
   return (
-    <DisclosureComponent
-      viewMode={viewMode}
-      userType={userType}
-      handleWidgetCheckBox={handleWidgetCheckBox}
-      formData={formData}
-      disclosureStatementConfig={internalRow}
-      handleInputChange={handleInputChange}
-      handleTableChange={handleTableChange}
-      disclosureScheduleInternalConfig={disclosureScheduleInternalConfig}
-      disclosureScheduleExternalConfig={disclosureScheduleExternalConfig}
-      loading={loading}
-      handleTableSort={handleTableSort}
-      handleAddDisclosureSchedule={handleAddDisclosureSchedule}
-      isAnyDisclosureScheduleSelected={isAnyDisclosureScheduleSelected}
-      handleRemoveDisclosureSchedule={handleRemoveDisclosureSchedule}
-      srVisibilityConfig={srVisibilityConfig}
-      handleItemClick={handleItemClick}
-      disclosureCommentsConfig={disclosureCommentsConfig}
-      srTimeStamp={srTimeStamp}
-    />
+    <>
+      <DisclosureComponent
+        viewMode={viewMode}
+        userType={userType}
+        handleWidgetCheckBox={handleWidgetCheckBox}
+        formData={formData}
+        disclosureStatementConfig={internalRow}
+        handleInputChange={handleInputChange}
+        handleTableChange={handleTableChange}
+        disclosureScheduleInternalConfig={disclosureScheduleInternalConfig}
+        disclosureScheduleExternalConfig={disclosureScheduleExternalConfig}
+        loading={loading}
+        handleTableSort={handleTableSort}
+        handleAddDisclosureSchedule={handleAddDisclosureSchedule}
+        isAnyDisclosureScheduleSelected={isAnyDisclosureScheduleSelected}
+        handleRemoveDisclosureSchedule={handleRemoveDisclosureSchedule}
+        srVisibilityConfig={srVisibilityConfig}
+        handleItemClick={handleItemClick}
+        disclosureCommentsConfig={disclosureCommentsConfig}
+        srTimeStamp={srTimeStamp}
+      />
+      {isDelete && (
+        <ModalDialog
+          key={v4()}
+          label={`Are you sure to delete schedule 2 refernce ?`}
+          closeHandler={(response) => {
+            if (response) {
+              if (isDelete) {
+                handleRemoveDisclosureSchedule(currentDisclosure, response);
+              }
+            }
+            setCurrenDisclosure({});
+            setIsDelete(false);
+          }}
+        />
+      )}
+    </>
   );
 };
 

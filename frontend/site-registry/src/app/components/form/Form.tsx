@@ -62,6 +62,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   srMode={srMode ?? false}
                   customInfoMessage={field.customInfoMessage}
                   customMenuMessage={field.customMenuMessage}
+                  isDisabled={field.isDisabled}
                 />
               )}
               {field.type === FormFieldType.Search && (

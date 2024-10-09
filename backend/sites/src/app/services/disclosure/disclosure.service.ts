@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { LoggerService } from '../../logger/logger.service';
 import { UserActionEnum } from '../../common/userActionEnum';
+import { SRApprovalStatusEnum } from 'src/app/common/srApprovalStatusEnum';
 
 @Injectable()
 export class DisclosureService {
@@ -44,12 +45,26 @@ export class DisclosureService {
           where: { siteId },
         });
       }
+      if (result && !result.length) {
+        return [];
+      } else {
+        const disclosure = result.map((res) => {
+          return {
+            ...res,
+            srAction:
+              res.srAction === SRApprovalStatusEnum.PUBLIC ? 'true' : 'false',
+          };
+        });
+        this.sitesLogger.log(
+          'DisclosureService.getSiteDisclosureBySiteId() end',
+        );
+        this.sitesLogger.debug(
+          'DisclosureService.getSiteDisclosureBySiteId() end',
+        );
+        return disclosure;
+      }
 
-      this.sitesLogger.log('DisclosureService.getSiteDisclosureBySiteId() end');
-      this.sitesLogger.debug(
-        'DisclosureService.getSiteDisclosureBySiteId() end',
-      );
-      return result; // Return the fetched site profiles
+      // return result; // Return the fetched site profiles
     } catch (error) {
       this.sitesLogger.error(
         'Exception occured in DisclosureService.getSiteDisclosureBySiteId() end',

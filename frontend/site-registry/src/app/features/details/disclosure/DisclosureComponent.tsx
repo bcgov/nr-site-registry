@@ -32,6 +32,7 @@ interface IDisclosureComponent {
   disclosureCommentsConfig: IFormField[][];
   approveRejectHandler?: (value: boolean) => void;
   showApproveRejectSection?: boolean;
+  srTimeStamp?: string;
 }
 
 const DisclosureComponent: React.FC<IDisclosureComponent> = ({
@@ -54,6 +55,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
   disclosureCommentsConfig,
   approveRejectHandler,
   showApproveRejectSection,
+  srTimeStamp,
 }) => {
   showApproveRejectSection = showApproveRejectSection ?? false;
 
@@ -256,7 +258,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
       </div>
       {userType === UserType.Internal && (
         <p className="sr-time-stamp">
-          {formData.srTimeStamp ?? 'Hard Code Value'}
+          {formData.srTimeStamp ?? srTimeStamp + ' Hard Code Value'}
         </p>
       )}
       {showApproveRejectSection && (

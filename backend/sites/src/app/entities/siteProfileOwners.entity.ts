@@ -42,16 +42,16 @@ export class SiteProfileOwners {
   })
   agentAuthorizedInd: string | null;
 
-  @ManyToOne(
-    () => SiteProfiles,
-    (siteProfiles) => siteProfiles.siteProfileOwners,
-    { onDelete: 'CASCADE' },
-  )
-  @JoinColumn([
-    { name: 'site_id', referencedColumnName: 'siteId' },
-    { name: 'date_completed', referencedColumnName: 'dateCompleted' },
-  ])
-  siteProfiles: SiteProfiles;
+  // @ManyToOne(
+  //   () => SiteProfiles,
+  //   (siteProfiles) => siteProfiles.siteProfileOwners,
+  //   { onDelete: 'CASCADE' },
+  // )
+  // @JoinColumn([
+  //   { name: 'site_id', referencedColumnName: 'siteId' },
+  //   { name: 'date_completed', referencedColumnName: 'dateCompleted' },
+  // ])
+  // siteProfiles: SiteProfiles;
 
   @ManyToOne(
     () => SitePartics,

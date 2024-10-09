@@ -5,6 +5,7 @@ import {
 } from '../../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
+import { RequestStatus } from '../../../helpers/requests/status';
 
 export const disclosureStatementConfig: IFormField[][] = [
   [
@@ -73,6 +74,29 @@ export const disclosureStatementConfig: IFormField[][] = [
       customEditInputTextCss:
         'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
     },
+
+    // Commenting the below method because I am not sure which dropdown type
+    // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
+
+    // {
+    //   type: FormFieldType.DropDownWithSearch,
+    //   label: 'Internal Contact',
+    //   isLabel: false,
+    //   graphQLPropertyName: 'psnorgId',
+    //   placeholder: 'Select Internal Contact.',
+    //   isLoading: RequestStatus.idle,
+    //   value: '',
+    //   options: [],
+    //   filteredOptions: [],
+    //   colSize: 'col-xxl-2 col-xl-3 col-lg-4 col-md-5 col-sm-12',
+    //   customLabelCss: 'custom-disclosure-lbl-text',
+    //   customInputTextCss: 'custom-disclosure-input-text',
+    //   customEditLabelCss: 'custom-disclosure-edit-label',
+    //   customEditInputTextCss: 'custom-disclosure-edit-input',
+    //   customPlaceholderCss: 'custom-disclosure-search-placeholder',
+    //   customMenuMessage: <span>Please select site participant name:</span>,
+    //   handleSearch: () => {},
+    // },
   ],
 ];
 
@@ -119,12 +143,12 @@ export const disclosureScheduleInternalConfig: TableColumn[] = [
     id: 3,
     displayName: 'SR',
     active: true,
-    graphQLPropertyName: 'sr',
+    graphQLPropertyName: 'srAction',
     displayType: {
       type: FormFieldType.Checkbox,
       label: 'SR',
       placeholder: '',
-      graphQLPropertyName: 'sr',
+      graphQLPropertyName: 'srAction',
       value: false,
       tableMode: true,
     },

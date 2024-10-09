@@ -418,8 +418,12 @@ export class SiteService {
                 console.log('No changes To Site LandHistories');
               }
 
-              if (profiles) {
-                await transactionalEntityManager.save(SiteProfiles, profiles);
+              if (profiles && profiles.length > 0) {
+                await this.processSiteDisclosure(
+                  profiles,
+                  userInfo,
+                  transactionalEntityManager,
+                );
               } else {
                 console.log('No changes To Site profiles');
               }
@@ -1097,6 +1101,57 @@ export class SiteService {
           ),
         );
       }
+    }
+  }
+
+  /**
+   * Processes and saves site disclosure based on the provided actions.
+   * @param siteDisclosure - Site disclosure data including actions to be performed.
+   * @param userInfo - Information about the user performing the actions.
+   * @param transactionalEntityManager - Entity manager for handling transactions.
+   */
+  async processSiteDisclosure(
+    siteDisclosure: any[],
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    if (siteDisclosure && siteDisclosure.length > 0) {
+      const { apiAction, id, ...disclosureData } = siteDisclosure[0];
+      let profile = {
+        ...new SiteProfiles(),
+        ...disclosureData,
+      };
+      switch (apiAction) {
+        case UserActionEnum.ADDED:
+          profile = {
+            ...profile,
+            userAction: UserActionEnum.ADDED,
+            whenCreated: new Date(),
+            whoCreated: userInfo ? userInfo.givenName : '',
+          };
+          break;
+        case UserActionEnum.UPDATED:
+          const isExist =
+            siteDisclosure[0].id &&
+            (await this.siteProfilesRepo.findOneByOrFail({
+              id: siteDisclosure[0].id,
+            }));
+          if (isExist) {
+            profile = {
+              ...isExist,
+              ...profile,
+              userAction: UserActionEnum.UPDATED,
+              whenUpdated: new Date(),
+              whoUpdated: userInfo ? userInfo.givenName : '',
+            };
+          } else {
+            console.log(
+              `There is no profile in database againts id : ${siteDisclosure[0].id}`,
+            );
+          }
+          break;
+      }
+      await transactionalEntityManager.save(SiteProfiles, profile);
     }
   }
 }

@@ -122,6 +122,13 @@ const siteDetailsSlice = createSlice({
       newState.siteAssociationsData = action.payload;
       return newState;
     },
+    setupSiteDisclosureDataForSaving: (state, action) => {
+      const newState = {
+        ...state,
+      };
+      newState.profilesData = action.payload;
+      return newState;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -172,7 +179,13 @@ export const getSiteDetailsToBeSaved = (state: any) => {
       ]),
     subDivisions: state.siteDetails.subDivisions,
     landHistories: state.siteDetails.landHistoriesData,
-    profiles: state.siteDetails.profiles,
+    profiles:
+      state.siteDetails.profilesData &&
+      deepFilterByUserAction(state.siteDetails.profilesData, [
+        UserActionEnum.added,
+        UserActionEnum.updated,
+        UserActionEnum.deleted,
+      ]),
     siteId: state.siteDetails.siteId,
     sitesSummary: state.siteDetails.sitesSummary,
   };
@@ -186,6 +199,7 @@ export const getSiteNoatations = (state: any) => state.siteDetails.notationData;
 export const currentSiteId = (state: any) => state.siteDetails.siteId;
 
 export const getSiteDocuments = (state: any) => state.siteDetails.documentsData;
+export const getSiteDisclosure = (state: any) => state.siteDetails.profilesData;
 export const getSiteParticipants = (state: any) =>
   state.siteDetails.siteParticipantData;
 export const getSiteAssociated = (state: any) =>
@@ -201,6 +215,7 @@ export const {
   setupSiteParticipantDataForSaving,
   setupSubDivisionsDataForSaving,
   setupSiteSummaryForSaving,
+  setupSiteDisclosureDataForSaving,
 } = siteDetailsSlice.actions;
 
 export default siteDetailsSlice.reducer;

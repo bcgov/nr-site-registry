@@ -32,16 +32,16 @@ export class ProfileSubmissions {
   @Column('bigint', { primary: true, name: 'sprof_site_id' })
   sprofSiteId: string;
 
-  @ManyToOne(
-    () => SiteProfiles,
-    (siteProfiles) => siteProfiles.profileSubmissions,
-    { onDelete: 'CASCADE' },
-  )
-  @JoinColumn([
-    { name: 'sprof_site_id', referencedColumnName: 'siteId' },
-    { name: 'sprof_date_completed', referencedColumnName: 'dateCompleted' },
-  ])
-  siteProfiles: SiteProfiles;
+  // @ManyToOne(
+  //   () => SiteProfiles,
+  //   (siteProfiles) => siteProfiles.profileSubmissions,
+  //   { onDelete: 'CASCADE' },
+  // )
+  // @JoinColumn([
+  //   { name: 'sprof_site_id', referencedColumnName: 'siteId' },
+  //   { name: 'sprof_date_completed', referencedColumnName: 'dateCompleted' },
+  // ])
+  // siteProfiles: SiteProfiles;
 
   @ManyToOne(
     () => SubmissionCd,

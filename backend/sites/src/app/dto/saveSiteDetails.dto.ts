@@ -5,8 +5,8 @@ import { DocumentInputDTO } from './document.dto';
 import { SiteSummaryDTO } from './siteSummary.dto';
 import { SubDivisionsInputDTO } from './subDivisionsInput.dto';
 import { LandHistoriesInputDTO } from './landHistoriesInput.dto';
-import { SiteProfilesInputDTO } from './siteProfilesInput.dto';
 import { SiteAssociationsInputDTO } from './associatedSite.dto';
+import { SiteProfilesInputDTO } from './disclosure.dto';
 
 @InputType()
 export class SaveSiteDetailsDTO {

@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
-import Form from '../../../components/form/Form';
-import Widget from '../../../components/widget/Widget';
+import { useCallback, useEffect, useState } from 'react';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import {
@@ -12,27 +10,25 @@ import {
 } from './DisclosureConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../Store';
-import { siteDetailsMode, trackChanges } from '../../site/dto/SiteSlice';
+import {
+  resetSiteDetails,
+  siteDetailsMode,
+  trackChanges,
+} from '../../site/dto/SiteSlice';
 import './Disclosure.css';
 import { RequestStatus } from '../../../helpers/requests/status';
-import {
-  Minus,
-  Plus,
-  SpinnerIcon,
-  UserMinus,
-  UserPlus,
-} from '../../../components/common/icon';
 import {
   ChangeTracker,
   IChangeType,
 } from '../../../components/common/IChangeType';
 import {
   flattenFormRows,
-  formatDate,
+  getAxiosInstance,
   getUser,
+  resultCache,
   serializeDate,
+  updateFields,
 } from '../../../helpers/utility';
-import Actions from '../../../components/action/Actions';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import {
   fetchSiteDisclosure,
@@ -42,6 +38,17 @@ import {
 import { useParams } from 'react-router-dom';
 import { IComponentProps } from '../navigation/NavigationPillsConfig';
 import DisclosureComponent from './DisclosureComponent';
+import { GRAPHQL } from '../../../helpers/endpoints';
+import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
+import { print } from 'graphql';
+import {
+  getSiteDisclosure,
+  saveRequestStatus,
+  setupSiteDisclosureDataForSaving,
+} from '../SaveSiteDetailsSlice';
+import infoIcon from '../../../images/info-icon.png';
+import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
+import { UserActionEnum } from '../../../common/userActionEnum';
 
 // const disclosureData = {
 //         disclosureId:1,
@@ -84,52 +91,203 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [srTimeStamp, setSRTimeStamp] = useState(
     'Sent to SR on June 2nd, 2013',
   );
+  const [searchInternalContact, setSearchInternalContact] = useState('');
+  const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
+  const [internalRow, setInternalRow] = useState(disclosureStatementConfig);
 
   const dispatch = useDispatch<AppDispatch>();
   const mode = useSelector(siteDetailsMode);
+  const resetDetails = useSelector(resetSiteDetails);
+  const trackSiteDisclosure = useSelector(getSiteDisclosure);
+  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
   const { siteDisclosure: disclosureData, status } =
     useSelector(siteDisclosure);
   const loggedInUser = getUser();
-  const { id } = useParams();
+  const { id: siteId } = useParams();
 
+  // Function to fetch internal contact
+  // Commenting the below method because I am not sure which dropdown type
+  // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
+
+  //  const fetchInternalContact = useCallback(async (searchParam: string) => {
+  //   if (searchParam.trim()) {
+  //     try {
+  //       // Check cache first
+  //       if (resultCache[searchParam]) {
+  //         return resultCache[searchParam];
+  //       }
+
+  //       const response = await getAxiosInstance().post(GRAPHQL, {
+  //         query: print(graphQLPeopleOrgsCd()),
+  //         variables: { searchParam,  entityType:'EMP' },
+  //       });
+
+  //       // Store result in cache if successful
+  //       if (response?.data?.data?.getPeopleOrgsCd?.success) {
+  //         resultCache[searchParam] = response.data.data.getPeopleOrgsCd.data;
+  //         return response.data.data.getPeopleOrgsCd;
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching notation participant:', error);
+  //       return [];
+  //     }
+  //   }
+  //   return [];
+  // }, []);
+
+  // Handle search action
+  // Commenting the below method because I am not sure which dropdown type
+  // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
+
+  // const handleSearch = useCallback(
+  //   (value: any) => {
+  //     setSearchInternalContact(value.trim());
+  //     setInternalRow((prev) =>
+  //       updateFields(prev, {
+  //         indexToUpdate: prev.findIndex((row) =>
+  //           row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+  //         ),
+  //         updates: {
+  //           isLoading: RequestStatus.loading,
+  //           filteredOptions: [],
+  //           handleSearch,
+  //           customInfoMessage: <></>,
+  //         },
+  //       }),
+  //     );
+  //   },
+  //   [options],
+  // );
+
+  // Handle user type based on username
   useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
+    if (loggedInUser?.profile.preferred_username?.includes('bceid')) {
       setUserType(UserType.External);
-    } else if (
-      loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
-    ) {
+    } else if (loggedInUser?.profile.preferred_username?.includes('idir')) {
       setUserType(UserType.Internal);
     } else {
-      // not logged in
       setUserType(UserType.External);
     }
-    // setFormData(disclosureData ?? {});
-  }, []);
+  }, [loggedInUser]);
 
+  // Handle view mode changes
   useEffect(() => {
     setViewMode(mode);
+    dispatch(setupSiteDisclosureDataForSaving(disclosureData));
   }, [mode]);
 
-  useEffect(() => {
-    if (id) {
-      dispatch(fetchSiteDisclosure({ siteId: id ?? '', showPending: false }))
-        .then(() => {
-          setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
-        })
-        .catch((error) => {
-          setLoading(RequestStatus.failed);
-          console.error('Error fetching data:', error);
-        });
-    }
-  }, [id]);
+  // Search internal contact effect with debounce
+  // Commenting the below method because I am not sure which dropdown type
+  // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
 
+  // useEffect(() => {
+  //   if (searchInternalContact) {
+  //     const timeoutId = setTimeout(async () => {
+  //       const res = await fetchInternalContact(searchInternalContact);
+  //       const indexToUpdate = internalRow.findIndex((row) =>
+  //         row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+  //       );
+  //       const infoMsg = !res.success ? (
+  //         <div className="px-2">
+  //           <img
+  //             src={infoIcon}
+  //             alt="info"
+  //             aria-hidden="true"
+  //             role="img"
+  //             aria-label="User image"
+  //           />
+  //           <span
+  //             aria-label={'info-message'}
+  //             className="text-wrap px-2 custom-not-found"
+  //           >
+  //             No results found.
+  //           </span>
+  //         </div>
+  //       ) : (
+  //         <></>
+  //       );
+
+  //       setInternalRow((prev) =>
+  //         updateFields(prev, {
+  //           indexToUpdate,
+  //           updates: {
+  //             isLoading: RequestStatus.success,
+  //             options,
+  //             filteredOptions: res.data ?? resultCache[searchInternalContact] ?? [],
+  //             customInfoMessage: infoMsg,
+  //             handleSearch,
+  //           },
+  //         }),
+  //       );
+  //     }, 300);
+
+  //     return () => clearTimeout(timeoutId);
+  //   }
+  // }, [searchInternalContact, options]);
+
+  // Update form data when notations change
   useEffect(() => {
-    if (status === RequestStatus.success) {
-      if (disclosureData) {
-        setFormData(disclosureData);
-      }
+    if (status === RequestStatus.success && disclosureData) {
+      // Commenting the below method because I am not sure which dropdown type
+      // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
+
+      // const uniquePsnOrgs: any = Array.from(
+      //   new Map(
+      //     [disclosureData].map((item: any) => [
+      //       item.psnorgId,
+      //       { key: item.psnorgId, value: item.displayName },
+      //     ]),
+      //   ).values(),
+      // );
+      // setOptions(uniquePsnOrgs);
+      // setInternalRow((prev) =>
+      //   updateFields(prev, {
+      //     indexToUpdate: prev.findIndex((row) =>
+      //       row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+      //     ),
+      //     updates: {
+      //       isLoading: RequestStatus.loading,
+      //       options: uniquePsnOrgs,
+      //       filteredOptions: [],
+      //       handleSearch,
+      //       customInfoMessage: <></>,
+      //     },
+      //   }),
+      // );
+      setFormData(disclosureData);
     }
+
+    // Commenting the below method because I am not sure which dropdown type
+    // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
+
+    // else
+    // {
+    //   setInternalRow((prev) =>
+    //     updateFields(prev, {
+    //       indexToUpdate: prev.findIndex((row) =>
+    //         row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+    //       ),
+    //       updates: {
+    //         isLoading: RequestStatus.loading,
+    //         options: [],
+    //         filteredOptions: [],
+    //         handleSearch,
+    //         customInfoMessage: <></>,
+    //       },
+    //     }),
+    //   );
+    // }
   }, [disclosureData, status]);
+
+  // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
+  // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
+  useEffect(() => {
+    if (resetDetails) {
+      dispatch(
+        fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending }),
+      );
+    }
+  }, [resetDetails, saveSiteDetailsRequestStatus]);
 
   const handleInputChange = (
     id: number,
@@ -139,20 +297,29 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     if (viewMode === SiteDetailsMode.SRMode) {
       console.log({ [graphQLPropertyName]: value, id });
     } else {
-      setFormData((preData) => {
-        return { ...preData, [graphQLPropertyName]: value };
-      });
-      //dispatch the updated site disclosure
-      dispatch(
-        updateSiteDisclosure(
-          serializeDate({
-            ...formData,
-            [graphQLPropertyName]: value,
-          }),
-        ),
-      );
+      const updatedDisclosure = (disclosure: any) => {
+        return {
+          ...disclosure,
+          [graphQLPropertyName]: value,
+          id: disclosure.id ?? '',
+          siteId: disclosure.siteId ?? siteId,
+          apiAction:
+            disclosure.id === '' || disclosure.id === undefined
+              ? UserActionEnum.added
+              : UserActionEnum.updated,
+          srAction: SRApprovalStatusEnum.Pending,
+        };
+      };
+      const updatedFormData = updatedDisclosure(formData);
+      const updatedTrackDisclosure = updatedDisclosure(trackSiteDisclosure);
+      setFormData(updatedFormData);
+      dispatch(updateSiteDisclosure(serializeDate(updatedFormData)));
+      dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
     }
-    const flattedArr = flattenFormRows(disclosureStatementConfig);
+    const flattedArr = flattenFormRows([
+      ...disclosureStatementConfig,
+      ...disclosureCommentsConfig,
+    ]);
     const currLabel =
       flattedArr &&
       flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
@@ -306,26 +473,13 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     }
   };
 
-  if (loading === RequestStatus.loading) {
-    return (
-      <div className="disclosure-loading-overlay">
-        <div className="disclosure-spinner-container">
-          <SpinnerIcon
-            data-testid="loading-spinner"
-            className="disclosure-fa-spin"
-          />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <DisclosureComponent
       viewMode={viewMode}
       userType={userType}
       handleWidgetCheckBox={handleWidgetCheckBox}
       formData={formData}
-      disclosureStatementConfig={disclosureStatementConfig}
+      disclosureStatementConfig={internalRow}
       handleInputChange={handleInputChange}
       handleTableChange={handleTableChange}
       disclosureScheduleInternalConfig={disclosureScheduleInternalConfig}
@@ -338,6 +492,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       srVisibilityConfig={srVisibilityConfig}
       handleItemClick={handleItemClick}
       disclosureCommentsConfig={disclosureCommentsConfig}
+      srTimeStamp={srTimeStamp}
     />
   );
 };

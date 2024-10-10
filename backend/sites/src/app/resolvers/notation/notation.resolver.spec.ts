@@ -117,6 +117,7 @@ describe('NotationResolver', () => {
     );
     expect(notationService.getSiteNotationBySiteId).toHaveBeenCalledWith(
       siteId,
+      false,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       'Site Notation fetched successfully',
@@ -145,6 +146,7 @@ describe('NotationResolver', () => {
     expect(result).toEqual(expectedResult);
     expect(notationService.getSiteNotationBySiteId).toHaveBeenCalledWith(
       siteId,
+      false,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       `Site Notation data not found for site id: ${siteId}`,

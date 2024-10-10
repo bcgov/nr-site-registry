@@ -32,6 +32,7 @@ export class SiteDocPartics extends ChangeAuditEntity {
   @Column('bigint', { name: 'sdoc_id', unique: true })
   sdocId: string;
 
+  //make it nullable in order todo  CRUD opertaions
   @Field()
   @Column('bigint', { name: 'sp_id', nullable: true })
   spId: string;

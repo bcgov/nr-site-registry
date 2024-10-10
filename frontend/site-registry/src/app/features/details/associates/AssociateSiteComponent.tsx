@@ -84,7 +84,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
         srMode={
           viewMode === SiteDetailsMode.SRMode && userType === UserType.Internal
         }
-        primaryKeycolumnName="guid"
+        primaryKeycolumnName="id"
         sortHandler={(row: any, ascDir: any) => {
           handleTableSort(row, ascDir);
         }}

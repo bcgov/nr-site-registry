@@ -11,12 +11,17 @@ import {
 import {
   getAxiosInstance,
   getUser,
+  resultCache,
   UpdateDisplayTypeParams,
   updateTableColumn,
 } from '../../../helpers/utility';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
-import { associatedSites, fetchAssociatedSites } from './AssociateSlice';
+import {
+  associatedSites,
+  fetchAssociatedSites,
+  updateAssociatedSites,
+} from './AssociateSlice';
 import {
   ChangeTracker,
   IChangeType,
@@ -39,9 +44,15 @@ import { graphqlSearchSiteIdsQuery } from '../../site/graphql/Associate';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';
 import { GetAssociateConfig } from './AssociateConfig';
 import infoIcon from '../../../images/info-icon.png';
-import { saveRequestStatus } from '../SaveSiteDetailsSlice';
+import {
+  getSiteAssociated,
+  saveRequestStatus,
+  setupSiteAssociationDataForSaving,
+} from '../SaveSiteDetailsSlice';
 import { IComponentProps } from '../navigation/NavigationPillsConfig';
 import AssociateSiteComponent from './AssociateSiteComponent';
+import { UserActionEnum } from '../../../common/userActionEnum';
+import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 
 const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   const {
@@ -50,17 +61,28 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     associateColumnInternalSRandViewMode,
     srVisibilityAssocConfig,
   } = GetAssociateConfig();
+  const { id } = useParams();
+  const dispatch = useDispatch<AppDispatch>();
+  const mode = useSelector(siteDetailsMode);
+  const { siteAssociate: sitesAssociated, status } =
+    useSelector(associatedSites);
+  const resetDetails = useSelector(resetSiteDetails);
+  const loggedInUser = getUser();
+  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
+  const trackAssociatedSite = useSelector(getSiteAssociated);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState<
     { [key: string]: any | [Date, Date] }[]
   >([]);
-  const [updateForm, setUpdateForm] =
-    useState<{ [key: string]: any | [Date, Date] }[]>(formData);
+  const [existingSiteIds, setExistingSiteIds] = useState<
+    { key: any; value: any }[]
+  >([]);
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
   const [selectedRows, setSelectedRows] = useState<
-    { siteId: String; siteIdAssociatedWith: string; guid: string }[]
+    { siteId: String; siteIdAssociatedWith: string; id: string }[]
   >([]);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
   const [searchParam, setSearchParam] = useState('');
@@ -72,62 +94,189 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [isInfoMsg, setIsInfoMsg] = useState(false);
   const [currentRecordId, setCurrentRecordId] = useState('');
 
-  const { id } = useParams();
-  const dispatch = useDispatch<AppDispatch>();
-  const mode = useSelector(siteDetailsMode);
-  const sitesAssociated = useSelector(associatedSites);
-  const resetDetails = useSelector(resetSiteDetails);
-  const loggedInUser = getUser();
-  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
-
+  // Handle user type based on username
   useEffect(() => {
-    const userType = loggedInUser?.profile.preferred_username?.includes('bceid')
-      ? UserType.External
-      : loggedInUser?.profile.preferred_username?.includes('idir')
-        ? UserType.Internal
-        : UserType.External;
-    setUserType(userType);
+    if (loggedInUser?.profile.preferred_username?.includes('bceid')) {
+      setUserType(UserType.External);
+    } else if (loggedInUser?.profile.preferred_username?.includes('idir')) {
+      setUserType(UserType.Internal);
+    } else {
+      setUserType(UserType.External);
+    }
   }, [loggedInUser]);
 
+  // Handle view mode changes
   useEffect(() => {
     setViewMode(mode);
+    dispatch(setupSiteAssociationDataForSaving(sitesAssociated));
   }, [mode]);
 
+  // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
+  // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
   useEffect(() => {
     if (resetDetails) {
-      setFormData(sitesAssociated);
-      // need some updated array on click of save button on top
-      setUpdateForm(sitesAssociated);
+      dispatch(fetchAssociatedSites({ siteId: id ?? '', showPending: false }));
+      setExistingSiteIds([]);
+      // Parameters for the update
+      let params: UpdateDisplayTypeParams = {
+        indexToUpdate: associateColumnInternal.findIndex(
+          (item) =>
+            item.displayType?.graphQLPropertyName === 'siteIdAssociatedWith',
+        ),
+        updates: {
+          isLoading: RequestStatus.loading,
+          options: [],
+          customInfoMessage: <></>,
+        },
+      };
+      setInternalRow((prev) => updateTableColumn(prev, params));
     }
-  }, [resetDetails]);
+  }, [resetDetails, saveSiteDetailsRequestStatus]);
+
+  const fetchSiteIds = useCallback(async (searchParam: string) => {
+    if (searchParam.trim()) {
+      try {
+        // Check cache first
+        if (resultCache[searchParam]) {
+          return resultCache[searchParam];
+        }
+        const response = await getAxiosInstance().post(GRAPHQL, {
+          query: print(graphqlSearchSiteIdsQuery()),
+          variables: { searchParam },
+        });
+
+        // Store result in cache if successful
+        if (response?.data?.data?.searchSiteIds?.success) {
+          resultCache[searchParam] = response.data.data.searchSiteIds;
+          return response.data.data.searchSiteIds;
+        }
+      } catch (error) {
+        console.error('Error fetching site ids:', error);
+        return [];
+      }
+    }
+    return [];
+  }, []);
 
   useEffect(() => {
-    if (sitesAssociated && sitesAssociated.length > 0) {
+    if (status === RequestStatus.success && sitesAssociated) {
+      const uniqueSiteIdAssociatedWith: any = Array.from(
+        new Map(
+          sitesAssociated.map((item: any) => [
+            item.siteIdAssociatedWith,
+            {
+              key: item.siteIdAssociatedWith,
+              value: item.siteIdAssociatedWith,
+            },
+          ]),
+        ).values(),
+      );
+      setExistingSiteIds(uniqueSiteIdAssociatedWith);
       setFormData(sitesAssociated);
-      // need some updated array on click of save button on top
-      setUpdateForm(sitesAssociated);
     } else {
       setLoading(RequestStatus.loading);
     }
-  }, [sitesAssociated]);
+  }, [sitesAssociated, status]);
 
   useEffect(() => {
-    if (id) {
-      dispatch(fetchAssociatedSites({ siteId: id ?? '', showPending: false }))
-        .then(() => {
-          setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
-        })
-        .catch((error) => {
-          setLoading(RequestStatus.failed);
-          console.error('Error fetching data:', error);
-        });
+    if (Object.keys(isRecordExist).length > 0) {
+      const updatedAssocs = formData.map((associate) =>
+        associate.id === currentRecordId
+          ? { ...associate, siteIdAssociatedWith: '' }
+          : associate,
+      );
+      setFormData(updatedAssocs);
+      dispatch(updateAssociatedSites(updatedAssocs));
+      setIsRecordExist({});
+      setCurrentRecordId('');
+      setIsInfoMsg(false);
     }
-  }, [id]);
+  }, [isInfoMsg]);
+
+  const createInfoMessage = (msg: string) => (
+    <div className="text-wrap">
+      <img
+        src={infoIcon}
+        alt="info"
+        aria-hidden="true"
+        role="img"
+        aria-label="User image"
+      />
+      <span aria-label={'info-message'} className="px-2 custom-not-found">
+        {msg}
+      </span>
+    </div>
+  );
+
+  useEffect(() => {
+    if (!searchParam) return;
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const indexToUpdate = associateColumnInternal.findIndex(
+          (item) =>
+            item.displayType?.graphQLPropertyName === 'siteIdAssociatedWith',
+        );
+        const response = await fetchSiteIds(searchParam);
+        let result: any = [];
+        let infoMsg = <></>;
+
+        if (!response?.success || response.data.length === 0) {
+          infoMsg = createInfoMessage('No results found.');
+          setIsInfoMsg(false);
+          if (!response?.success) {
+            setInternalRow((prev) =>
+              updateTableColumn(prev, {
+                indexToUpdate,
+                updates: {
+                  isLoading: RequestStatus.idle,
+                  options: [],
+                  customInfoMessage: infoMsg,
+                },
+              }),
+            );
+            return;
+          }
+        } else {
+          const siteIds = new Set(
+            formData.map((obj) => obj.siteIdAssociatedWith),
+          );
+          result = response.data.filter(
+            (item: any) => !siteIds.has(item.value.toString()),
+          );
+
+          if (Object.keys(isRecordExist).length > 0) {
+            infoMsg = createInfoMessage(
+              `Site ID: ${isRecordExist.value} is already selected.`,
+            );
+            setIsInfoMsg(true);
+          } else {
+            setIsInfoMsg(false);
+            result = response.data;
+          }
+        }
+
+        setInternalRow((prev) =>
+          updateTableColumn(prev, {
+            indexToUpdate,
+            updates: {
+              isLoading: RequestStatus.success,
+              options: result,
+              customInfoMessage: infoMsg,
+            },
+          }),
+        );
+      } catch (error) {
+        console.error('Error fetching site IDs:', error);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchParam]);
+
   const clearSearch = useCallback(() => {
     setSearchTerm('');
     setFormData(sitesAssociated);
-    // need some updated array on click of save button on top
-    setUpdateForm(sitesAssociated);
   }, [sitesAssociated]);
 
   const handleSearchChange = useCallback(
@@ -144,7 +293,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const deepSearch = (obj: any, searchTerm: string): boolean => {
     for (const key in obj) {
-      if (key !== 'guid') {
+      if (key !== 'id') {
         const value = obj[key];
         if (typeof value === 'object') {
           if (deepSearch(value, searchTerm)) {
@@ -221,174 +370,6 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     alert(event);
   };
 
-  const fetchSiteIds = async (searchParam: string) => {
-    try {
-      if (
-        searchParam !== null &&
-        searchParam !== undefined &&
-        searchParam !== ''
-      ) {
-        const response = await getAxiosInstance().post(GRAPHQL, {
-          query: print(graphqlSearchSiteIdsQuery()),
-          variables: {
-            searchParam: searchParam,
-          },
-        });
-        return response.data.data.searchSiteIds;
-      } else {
-        throw new Error('Invalid searchParam');
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  useEffect(() => {
-    if (Object.keys(isRecordExist).length > 0) {
-      setFormData((prev) =>
-        prev.map((associate) =>
-          associate.guid === currentRecordId
-            ? { ...associate, siteIdAssociatedWith: '' }
-            : associate,
-        ),
-      );
-      setIsRecordExist({});
-      setCurrentRecordId('');
-      setIsInfoMsg(false);
-    }
-  }, [isInfoMsg]);
-
-  useEffect(() => {
-    if (searchParam) {
-      const indexToUpdate = associateColumnInternal.findIndex(
-        (item) =>
-          item.displayType?.graphQLPropertyName === 'siteIdAssociatedWith',
-      );
-      const timeoutId = setTimeout(async () => {
-        try {
-          const response = await fetchSiteIds(searchParam);
-          let result = [];
-          let infoMsg = <></>;
-          let params = {
-            indexToUpdate,
-            updates: {
-              isLoading: RequestStatus.success,
-              options: [],
-              customInfoMessage: infoMsg,
-            },
-          };
-
-          if (!response?.success) {
-            infoMsg = (
-              <div className="text-wrap ">
-                <img
-                  src={infoIcon}
-                  alt="info"
-                  aria-hidden="true"
-                  role="img"
-                  aria-label="User image"
-                />
-                <span
-                  aria-label={'info-message'}
-                  className="px-2 custom-not-found"
-                >
-                  No results found.
-                </span>
-              </div>
-            );
-            params = {
-              ...params,
-              updates: {
-                ...params.updates,
-                isLoading: RequestStatus.idle,
-                customInfoMessage: infoMsg,
-              },
-            };
-          } else {
-            const siteIds = formData.map((obj) => obj.siteIdAssociatedWith);
-            if (response.data.length === 0) {
-              infoMsg = (
-                <div>
-                  <img
-                    src={infoIcon}
-                    alt="info"
-                    aria-hidden="true"
-                    role="img"
-                    aria-label="User image"
-                  />
-                  <span
-                    aria-label={'info-message'}
-                    className="text-wrap px-2 custom-not-found"
-                  >
-                    No results found.
-                  </span>
-                </div>
-              );
-              setIsInfoMsg(false);
-            } else if (Object.keys(isRecordExist).length > 0) {
-              result = response.data.filter(
-                (item: any) => !siteIds.includes(item.value.toString()),
-              );
-              infoMsg = (
-                <div className="py-2">
-                  <img
-                    src={infoIcon}
-                    alt="info"
-                    aria-hidden="true"
-                    role="img"
-                    aria-label="User image"
-                  />
-                  <span
-                    aria-label={'info-message'}
-                    className="text-wrap p-2 custom-not-found"
-                  >
-                    Site ID: {isRecordExist.siteIdAssociatedWith} is already
-                    selected.
-                  </span>
-                </div>
-              );
-              setIsInfoMsg(true);
-            } else {
-              result = response.data;
-              infoMsg = <></>;
-              setIsInfoMsg(false);
-            }
-            params = {
-              ...params,
-              updates: {
-                ...params.updates,
-                options: result,
-                customInfoMessage: infoMsg,
-              },
-            };
-          }
-
-          setInternalRow(updateTableColumn(associateColumnInternal, params));
-        } catch {
-          throw new Error('Invalid searchParam');
-        }
-      }, 300);
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [searchParam]);
-
-  useEffect(() => {
-    // Parameters for the update
-    let params: UpdateDisplayTypeParams = {
-      indexToUpdate: associateColumnInternal.findIndex(
-        (item) =>
-          item.displayType?.graphQLPropertyName === 'siteIdAssociatedWith',
-      ),
-      updates: {
-        isLoading: RequestStatus.loading,
-        options: [],
-        customInfoMessage: <></>,
-      },
-    };
-    setInternalRow(updateTableColumn(internalRow, params));
-  }, [saveSiteDetailsRequestStatus]);
-
   const handleTableChange = (event: any) => {
     if (
       event.property.includes('select_all') ||
@@ -404,7 +385,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
           ...rows.map((row: any) => ({
             siteId: row.siteId,
             siteIdAssociatedWith: row.siteIdAssociatedWith,
-            guid: row.guid,
+            id: row.id,
           })),
         ]);
       } else {
@@ -416,98 +397,80 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
                   selectedRow.siteId === row.siteId &&
                   selectedRow.siteIdAssociatedWith ===
                     row.siteIdAssociatedWith &&
-                  selectedRow.guid === row.guid,
+                  selectedRow.id === row.id,
               ),
           ),
         );
       }
     } else {
-      if (event.property === 'siteIdAssociatedWith') {
-        // Parameters for the update
-        let params: UpdateDisplayTypeParams = {
-          indexToUpdate: associateColumnInternal.findIndex(
-            (item) =>
-              item.displayType?.graphQLPropertyName === 'siteIdAssociatedWith',
-          ),
-          updates: {
-            isLoading: RequestStatus.loading,
-            options: [],
-            customInfoMessage: <></>,
-          },
-        };
-        setInternalRow(updateTableColumn(internalRow, params));
-        const recordExist = updateForm.find(
-          (associate: any) =>
-            associate.siteId === event.row.siteId &&
-            associate.siteIdAssociatedWith === event.value.trim() &&
-            associate.siteIdAssociatedWith !== '',
-        );
-        if (recordExist !== undefined) {
-          setIsRecordExist(recordExist);
-          setCurrentRecordId(event.row.guid);
-          let infoMsg = (
-            <div className="py-2">
-              <img
-                src={infoIcon}
-                alt="info"
-                aria-hidden="true"
-                role="img"
-                aria-label="User image"
-              />
-              <span
-                aria-label={'info-message'}
-                className="text-wrap p-2 custom-not-found"
-              >
-                Site ID: {event.value.trim()} is already selected.
-              </span>
-            </div>
-          );
-          params = {
-            ...params,
-            updates: {
-              ...params.updates,
-              isLoading: RequestStatus.success,
-              customInfoMessage: infoMsg,
-            },
-          };
-          setInternalRow(updateTableColumn(associateColumnInternal, params));
-        } else {
-          // need some updated array on click of save button on top
-          // setUpdateForm(formData);
-          setIsRecordExist({});
-          setCurrentRecordId('');
-        }
-        setSearchParam(event.value.trim());
-      }
-      const updatedAssociatedSites = formData.map((associate) =>
-        associate.guid === event.row.guid
-          ? { ...associate, [event.property]: event.value }
-          : associate,
-      );
-      setFormData(updatedAssociatedSites);
-      // dispatch(updateAssociatedSites(updatedAssociatedSites));
+      const updateAssocSites = (siteAssociated: any, event: any) => {
+        return siteAssociated.map((assoc: any) => {
+          if (assoc.id === event.row.id) {
+            const isSiteAssoc = event.property === 'siteIdAssociatedWith';
+            const recordExist = isSiteAssoc
+              ? existingSiteIds.find(
+                  (associate: any) => associate.value === event.value.trim(),
+                )
+              : undefined;
+            let params: UpdateDisplayTypeParams = {
+              indexToUpdate: associateColumnInternal.findIndex(
+                (item) =>
+                  item.displayType?.graphQLPropertyName ===
+                  'siteIdAssociatedWith',
+              ),
+              updates: {
+                isLoading: RequestStatus.loading,
+                options: [],
+                customInfoMessage: <></>,
+              },
+            };
+            if (isSiteAssoc) {
+              setInternalRow((prev) => updateTableColumn(prev, params));
+              setExistingSiteIds((prev) => [
+                ...prev,
+                { key: event.value, value: event.value },
+              ]);
+              setSearchParam(event.value.trim());
+            }
+            if (recordExist !== undefined) {
+              setIsRecordExist(recordExist);
+              setCurrentRecordId(event.row.guid);
+            } else {
+              setIsRecordExist({});
+              setCurrentRecordId('');
+            }
+            return {
+              ...assoc,
+              [event.property]: event.value,
+              apiAction: assoc?.apiAction ?? UserActionEnum.updated,
+              srAction: SRApprovalStatusEnum.Pending,
+            };
+          }
+          return assoc;
+        });
+      };
 
-      if (selectedRows.some((row) => row.guid === event.row.guid)) {
-        setSelectedRows((prev) =>
-          prev.map((row) =>
-            row.guid === event.row.guid
-              ? { ...row, [event.property]: event.value }
-              : row,
-          ),
-        );
-      }
+      // Update both formData and trackAssociatedSites
+      const updatedAssocs = updateAssocSites(formData, event);
+      const updatedTrackAssocSite = updateAssocSites(
+        trackAssociatedSite,
+        event,
+      );
+      setFormData(updatedAssocs);
+      dispatch(updateAssociatedSites(updatedAssocs));
+      dispatch(setupSiteAssociationDataForSaving(updatedTrackAssocSite));
+      const currLabel = associateColumnInternal.find(
+        (row) => row.graphQLPropertyName === event.property,
+      );
+      dispatch(
+        trackChanges(
+          new ChangeTracker(
+            IChangeType.Modified,
+            'Associated Sites: ' + currLabel?.displayName,
+          ).toPlainObject(),
+        ),
+      );
     }
-    const currLabel = associateColumnInternal.find(
-      (row) => row.graphQLPropertyName === event.property,
-    );
-    dispatch(
-      trackChanges(
-        new ChangeTracker(
-          IChangeType.Modified,
-          'Associated Sites: ' + currLabel?.displayName,
-        ).toPlainObject(),
-      ),
-    );
   };
 
   const handleTableSort = (row: any, ascDir: any) => {
@@ -547,25 +510,46 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const handleRemoveAssociate = (assocIsDelete: boolean = false) => {
     if (assocIsDelete) {
-      setFormData((prevData) =>
-        prevData.filter(
-          (assoc) =>
-            !selectedRows.some(
+      // Remove selected rows from formData state
+      const updateAssocites = (siteAssociated: any) => {
+        return siteAssociated.map((assoc: any) => {
+          if (
+            selectedRows.some(
               (row) =>
                 row.siteId === assoc.siteId &&
                 row.siteIdAssociatedWith === assoc.siteIdAssociatedWith &&
-                row.guid === assoc.guid,
-            ),
-        ),
+                row.id === assoc.id,
+            )
+          ) {
+            return {
+              ...assoc,
+              apiAction: UserActionEnum.deleted, // Mark as deleted
+              srAction: SRApprovalStatusEnum.Pending,
+            };
+          }
+          return assoc;
+        });
+      };
+
+      // Update both formData and trackAssociatedSites
+      const updatedAssocs = updateAssocites(formData);
+      const updatedTrackAssocSite = updateAssocites(trackAssociatedSite);
+
+      // Filter out assocs based on selectedRows for formData
+      const filteredPartics = updatedAssocs.filter(
+        (assoc: any) =>
+          !selectedRows.some(
+            (row) =>
+              row.siteId === assoc.siteId &&
+              row.siteIdAssociatedWith === assoc.siteIdAssociatedWith &&
+              row.id === assoc.id,
+          ),
       );
-      dispatch(
-        trackChanges(
-          new ChangeTracker(
-            IChangeType.Deleted,
-            'Associated Site',
-          ).toPlainObject(),
-        ),
-      );
+      setFormData(filteredPartics);
+      dispatch(updateAssociatedSites(filteredPartics));
+      dispatch(setupSiteAssociationDataForSaving(updatedTrackAssocSite));
+      const tracker = new ChangeTracker(IChangeType.Deleted, 'Associated Site');
+      dispatch(trackChanges(tracker.toPlainObject()));
       setSelectedRows([]);
       setIsDelete(false);
     } else {
@@ -575,14 +559,19 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const handleAddAssociate = () => {
     const newAssoc = {
-      guid: v4(),
+      id: v4(),
       siteId: id,
       siteIdAssociatedWith: '',
       effectiveDate: '',
       note: '',
-      sr: true,
+      apiAction: UserActionEnum.added,
+      srAction: SRApprovalStatusEnum.Pending,
     };
     setFormData((prevData) => [newAssoc, ...prevData]);
+    dispatch(updateAssociatedSites([newAssoc, ...formData]));
+    dispatch(
+      setupSiteAssociationDataForSaving([newAssoc, ...trackAssociatedSite]),
+    );
     dispatch(
       trackChanges(
         new ChangeTracker(
@@ -593,18 +582,6 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     );
   };
 
-  if (loading === RequestStatus.loading) {
-    return (
-      <div className="participant-loading-overlay">
-        <div className="participant-spinner-container">
-          <SpinnerIcon
-            data-testid="loading-spinner"
-            className="participant-fa-spin"
-          />
-        </div>
-      </div>
-    );
-  }
   return (
     <div
       className="row"

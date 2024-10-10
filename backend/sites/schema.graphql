@@ -529,7 +529,9 @@ type SiteParticsResponse {
 }
 
 type SiteParticsDto {
-  partiRoleId: String!
+  userAction: String!
+  srAction: String!
+  particRoleId: String!
   id: String!
   psnorgId: String!
   siteId: String!
@@ -553,14 +555,32 @@ type DocumentDto {
   userAction: String!
   srAction: String!
   id: String!
-  docParticId: String
-  psnorgId: String
-  dprCode: String
-  displayName: String
+  docParticId: String!
+  psnorgId: String!
+  dprCode: String!
+  displayName: String!
   siteId: String!
   submissionDate: String!
   documentDate: String
   title: String!
+}
+
+type AssociatedSiteResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [AssociatedSiteDto!]
+}
+
+type AssociatedSiteDto {
+  userAction: String!
+  srAction: String!
+  id: String!
+  siteId: String!
+  siteIdAssociatedWith: String!
+  effectiveDate: DateTime!
+  note: String
 }
 
 type RecentViewResponse {
@@ -655,22 +675,6 @@ type FolioContentResponse {
   data: [FolioContents!]
 }
 
-type AssociatedSiteResponse {
-  message: String
-  httpStatusCode: Int
-  success: Boolean
-  timestamp: String
-  data: [AssociatedSiteDto!]
-}
-
-type AssociatedSiteDto {
-  guid: String!
-  siteId: String!
-  siteIdAssociatedWith: String!
-  effectiveDate: DateTime!
-  note: String
-}
-
 type LandUseCodeResponse {
   message: String
   httpStatusCode: Int
@@ -696,6 +700,8 @@ type ParcelDescriptionDto {
   idPinNumber: String!
   dateNoted: DateTime!
   landDescription: String!
+  userAction: String!
+  srAction: String!
 }
 
 type Query {
@@ -831,7 +837,7 @@ input SiteParticsInputDto {
   userAction: String
   apiAction: String
   srAction: String!
-  partiRoleId: String!
+  particRoleId: String!
   id: String!
   psnorgId: String!
   siteId: String!
@@ -861,17 +867,11 @@ input SiteAssociationsInputDTO {
   userAction: String
   apiAction: String
   srAction: String!
+  id: String!
   siteId: String!
   siteIdAssociatedWith: String!
   effectiveDate: DateTime!
-  note: String!
-  whoCreated: String!
-  whoUpdated: String!
-  whenCreated: DateTime!
-  whenUpdated: DateTime!
-  rwmFlag: Float!
-  rwmNoteFlag: Float!
-  commonPid: String!
+  note: String
 }
 
 input SubDivisionsInputDTO {

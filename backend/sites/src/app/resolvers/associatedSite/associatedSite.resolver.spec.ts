@@ -1,16 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AssociatedSiteService } from '../../services/associatedSite/associatedSite.service';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import {
-  AssociatedSiteDto,
-  AssociatedSiteResponse,
-} from '../../dto/associatedSite.dto';
+import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
 import { AssociatedSiteResolver } from './associatedSite.resolver';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('AssociatedSiteResolver', () => {
   let resolver: AssociatedSiteResolver;
   let associatedSiteService: AssociatedSiteService;
   let genericResponseProvider: GenericResponseProvider<AssociatedSiteDto[]>;
+  let loggerService: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,6 +19,15 @@ describe('AssociatedSiteResolver', () => {
           provide: AssociatedSiteService,
           useValue: {
             getAssociatedSitesBySiteId: jest.fn(),
+          },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
           },
         },
         {
@@ -35,6 +43,7 @@ describe('AssociatedSiteResolver', () => {
     associatedSiteService = module.get<AssociatedSiteService>(
       AssociatedSiteService,
     );
+    loggerService = module.get<LoggerService>(LoggerService);
     genericResponseProvider = module.get<
       GenericResponseProvider<AssociatedSiteDto[]>
     >(GenericResponseProvider);
@@ -49,11 +58,13 @@ describe('AssociatedSiteResolver', () => {
       const siteId = 'site123';
       const expectedResult: AssociatedSiteDto[] = [
         {
-          guid: 'guid1',
+          id: 'guid1',
           siteId: 'site123',
           effectiveDate: new Date(),
           siteIdAssociatedWith: 'site456',
           note: 'Note 1',
+          srAction: 'pending',
+          userAction: 'pending',
         },
       ];
 

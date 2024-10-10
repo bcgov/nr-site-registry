@@ -10,7 +10,9 @@ const parcelDescriptionQueryHead = `
     parcel_descriptions.description_type,
     parcel_descriptions.id_pin_number,
     parcel_descriptions.date_noted,
-    parcel_descriptions.land_description
+    parcel_descriptions.land_description,
+    parcel_descriptions.user_action,
+    parcel_descriptions.sr_action
   FROM (
     SELECT
       sites.subdivisions.id AS id,
@@ -27,7 +29,9 @@ const parcelDescriptionQueryHead = `
         ELSE NULL
       END AS id_pin_number,
       sites.subdivisions.date_noted AS date_noted,
-      sites.subdivisions.legal_description AS land_description
+      sites.subdivisions.legal_description AS land_description,
+      sites.site_subdivisions.user_action AS user_action,
+      sites.site_subdivisions.sr_action AS sr_action
     FROM sites.site_subdivisions
     LEFT JOIN sites.subdivisions 
       ON sites.site_subdivisions.subdiv_id = sites.subdivisions.id

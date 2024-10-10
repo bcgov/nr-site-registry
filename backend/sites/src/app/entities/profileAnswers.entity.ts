@@ -36,7 +36,6 @@ export class ProfileAnswers {
   @ManyToOne(
     () => ProfileQuestions,
     (profileQuestions) => profileQuestions.profileAnswers,
-    { onDelete: 'CASCADE' },
   )
   @JoinColumn([{ name: 'question_id', referencedColumnName: 'id' }])
   question: ProfileQuestions;

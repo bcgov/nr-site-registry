@@ -43,6 +43,8 @@ describe('SiteSubdivisionsService', () => {
   let returnIdPinNumber: string;
   let returnDateNoted: string;
   let returnLandDescription: string;
+  let returnUserAction: string;
+  let returnSrAction: string;
 
   let returnSuccess: boolean;
 
@@ -69,6 +71,8 @@ describe('SiteSubdivisionsService', () => {
     returnIdPinNumber = '123456';
     returnDateNoted = '2024-08-07T00:00:00.000Z';
     returnLandDescription = 'A parcel of land';
+    returnUserAction = 'updated';
+    returnSrAction = 'approved'; // I don't actually know if this is a real-world value it could assume.
 
     returnSuccess = true;
 
@@ -131,6 +135,8 @@ describe('SiteSubdivisionsService', () => {
           id_pin_number: returnIdPinNumber,
           date_noted: returnDateNoted,
           land_description: returnLandDescription,
+          user_action: returnUserAction,
+          sr_action: returnSrAction,
         },
       ]);
     entityManager.query = queryMock;
@@ -239,6 +245,8 @@ describe('SiteSubdivisionsService', () => {
                 idPinNumber: returnIdPinNumber,
                 dateNoted: new Date(returnDateNoted),
                 landDescription: returnLandDescription,
+                userAction: returnUserAction,
+                srAction: returnSrAction,
               }),
             ]),
             count: returnCount,
@@ -340,6 +348,8 @@ describe('SiteSubdivisionsService', () => {
                 idPinNumber: returnIdPinNumber,
                 dateNoted: new Date(returnDateNoted),
                 landDescription: returnLandDescription,
+                userAction: returnUserAction,
+                srAction: returnSrAction,
               }),
             ]),
             count: returnCount,
@@ -410,7 +420,7 @@ describe('SiteSubdivisionsService', () => {
       expect(errorMock).toHaveBeenCalled();
     });
 
-    it('Produces the correct result', async () => {
+    it('Produces the correct response', async () => {
       let response = await siteSubdivisionService.getParcelDescriptionsBySiteId(
         siteId,
         page,
@@ -432,6 +442,55 @@ describe('SiteSubdivisionsService', () => {
           success: false,
           message:
             'There was an error communicating with the database. Try again later.',
+        }),
+      );
+    });
+  });
+
+  describe('when the user is invalid', () => {
+    beforeEach(async () => {
+      user = {
+        sub: '',
+        identity_provider: '',
+      };
+    });
+
+    it('Logs the error', async () => {
+      await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        siteId,
+        page,
+        pageSize,
+        searchParam,
+        sortBy,
+        sortByDir,
+        showPending,
+        user,
+      );
+
+      expect(errorMock).toHaveBeenCalled();
+    });
+
+    it('Produces the correct response.', async () => {
+      let response = await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        siteId,
+        page,
+        pageSize,
+        searchParam,
+        sortBy,
+        sortByDir,
+        showPending,
+        user,
+      );
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          data: [],
+          httpStatusCode: 500,
+          count: 0,
+          page: 0,
+          pageSize: 0,
+          success: false,
+          message: 'User id is invalid.',
         }),
       );
     });

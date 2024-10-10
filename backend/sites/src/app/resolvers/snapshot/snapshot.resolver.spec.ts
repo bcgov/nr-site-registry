@@ -5,12 +5,14 @@ import { CreateSnapshotDto, SnapshotResponse } from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { sampleSites } from '../../mockData/site.mockData';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { BannerTypeResponse } from 'src/app/dto/response/bannerTypeResponse';
+import { BannerTypeResponse } from '../../dto/response/bannerTypeResponse';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('SnapshotResolver', () => {
   let resolver: SnapshotsResolver;
   let service: SnapshotsService;
   let genericResponseProvider: GenericResponseProvider<Snapshots[]>;
+  let loggerService: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,6 +27,15 @@ describe('SnapshotResolver', () => {
             getSnapshotsById: jest.fn(),
             createSnapshotForSites: jest.fn(),
             getBannerType: jest.fn(),
+          },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
           },
         },
         {
@@ -48,6 +59,7 @@ describe('SnapshotResolver', () => {
       ],
     }).compile();
     resolver = module.get<SnapshotsResolver>(SnapshotsResolver);
+    loggerService = module.get<LoggerService>(LoggerService);
     service = module.get<SnapshotsService>(SnapshotsService);
     genericResponseProvider = module.get<GenericResponseProvider<Snapshots[]>>(
       GenericResponseProvider,

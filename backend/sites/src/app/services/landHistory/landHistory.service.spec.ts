@@ -3,7 +3,7 @@ import { LandHistoryService } from './landHistory.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { LandHistories } from '../../entities/landHistories.entity';
 import { In } from 'typeorm';
-import { LandHistoriesInputDTO } from 'src/app/dto/landHistoriesInput.dto';
+import { LandHistoriesInputDTO } from '../../dto/landHistoriesInput.dto';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 import { REQUEST } from '@nestjs/core';
 

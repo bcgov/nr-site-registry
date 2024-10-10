@@ -3,10 +3,10 @@ import { NotationIputDTO, NotationParticipantInputDTO } from './notation.dto';
 import { SiteParticsInputDto } from './sitePartics.dto';
 import { DocumentInputDTO } from './document.dto';
 import { SiteSummaryDTO } from './siteSummary.dto';
-import { SiteAssociationsInputDTO } from './siteAssociationsInput.dto';
 import { SubDivisionsInputDTO } from './subDivisionsInput.dto';
 import { LandHistoriesInputDTO } from './landHistoriesInput.dto';
 import { SiteProfilesInputDTO } from './siteProfilesInput.dto';
+import { SiteAssociationsInputDTO } from './associatedSite.dto';
 
 @InputType()
 export class SaveSiteDetailsDTO {

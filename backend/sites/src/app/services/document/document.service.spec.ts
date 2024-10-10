@@ -5,15 +5,18 @@ import { DocumentService } from './document.service';
 import { SiteDocs } from '../../entities/siteDocs.entity';
 import { sampleSites } from '../../mockData/site.mockData';
 import { PeopleOrgs } from '../../entities/peopleOrgs.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('DocumentService', () => {
   let service: DocumentService;
   let siteDocsRepository: Repository<SiteDocs>;
+  let sitesLogger: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DocumentService,
+        LoggerService,
         {
           provide: getRepositoryToken(SiteDocs),
           useClass: Repository,
@@ -22,6 +25,7 @@ describe('DocumentService', () => {
     }).compile();
 
     service = module.get<DocumentService>(DocumentService);
+    sitesLogger = module.get<LoggerService>(LoggerService);
     siteDocsRepository = module.get<Repository<SiteDocs>>(
       getRepositoryToken(SiteDocs),
     );
@@ -78,6 +82,7 @@ describe('DocumentService', () => {
           rwmNoteFlag: null,
           userAction: 'pending',
           srAction: 'pending',
+          filePath: '',
           filePath: '',
           siteDocPartics: [
             {

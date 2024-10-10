@@ -58,8 +58,7 @@ const associatedSitesSlice = createSlice({
   },
 });
 
-export const associatedSites = (state: any) =>
-  state.associatedSites.siteAssociate;
+export const associatedSites = (state: any) => state.associatedSites;
 export const { updateAssociatedSites } = associatedSitesSlice.actions;
 
 export default associatedSitesSlice.reducer;

@@ -41,7 +41,6 @@ export class SiteProfileLandUses {
   @ManyToOne(
     () => SiteProfiles,
     (siteProfiles) => siteProfiles.siteProfileLandUses,
-    { onDelete: 'CASCADE' },
   )
   @JoinColumn([
     { name: 'site_id', referencedColumnName: 'siteId' },

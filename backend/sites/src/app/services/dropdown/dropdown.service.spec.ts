@@ -7,6 +7,7 @@ import { PeopleOrgs } from '../../entities/peopleOrgs.entity';
 import { EventClassCd } from '../../entities/eventClassCd.entity';
 import { EventTypeCd } from '../../entities/eventTypeCd.entity';
 import { EventParticRoleCd } from '../../entities/eventParticRoleCd.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 // Mock particRoleCd and peopleOrgs entities and their methods
 jest.mock('../../entities/particRoleCd.entity');
@@ -19,11 +20,13 @@ describe('DropdownService', () => {
   let eventClassCdRepository: Repository<EventClassCd>;
   let eventTypeCdRepository: Repository<EventTypeCd>;
   let eventParticRoleCdRepository: Repository<EventParticRoleCd>;
+  let sitesLogger: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DropdownService,
+        LoggerService,
         {
           provide: getRepositoryToken(ParticRoleCd),
           useClass: Repository,
@@ -48,6 +51,7 @@ describe('DropdownService', () => {
     }).compile();
 
     service = module.get<DropdownService>(DropdownService);
+    sitesLogger = module.get<LoggerService>(LoggerService);
     particRoleRepository = module.get<Repository<ParticRoleCd>>(
       getRepositoryToken(ParticRoleCd),
     );
@@ -96,7 +100,7 @@ describe('DropdownService', () => {
       jest.spyOn(particRoleRepository, 'find').mockRejectedValueOnce(error);
 
       await expect(service.getParticipantRoleCd()).rejects.toThrowError(
-        'Failed to retrieve participant role codes.',
+        'Failed to retrieve participants role code.',
       );
     });
   });
@@ -145,7 +149,7 @@ describe('DropdownService', () => {
         .mockReturnValue(mockQueryBuilder);
 
       await expect(service.getPeopleOrgsCd('', '')).rejects.toThrowError(
-        'Failed to retrieve people organizations.',
+        'Failed to retrieve people orgs.',
       );
     });
   });

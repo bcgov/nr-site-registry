@@ -18,14 +18,14 @@ import { LandHistories } from '../../entities/landHistories.entity';
 import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { Subdivisions } from '../../entities/subdivisions.entity';
-import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { LandHistoryService } from '../landHistory/landHistory.service';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 import { UserActionEnum } from '../../common/userActionEnum';
-import { LoggerService } from 'src/app/logger/logger.service';
 
 import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
+import { LoggerService } from '../../logger/logger.service';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { SiteDocPartics } from '../../entities/siteDocPartics.entity';
 
 /**
@@ -357,17 +357,19 @@ export class SiteService {
                   transactionalEntityManager,
                 );
               } else {
-                console.log('No changes To Site Events');
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Events',
+                );
               }
 
-              if (eventsParticipants) {
-                await transactionalEntityManager.save(
-                  EventPartics,
-                  eventsParticipants,
-                );
-              } else {
-                console.log('No changes To Site Event Participants');
-              }
+              // if (eventsParticipants) {
+              //   await transactionalEntityManager.save(
+              //     EventPartics,
+              //     eventsParticipants,
+              //   );
+              // } else {
+              //   console.log('No changes To Site Event Participants');
+              // }
 
               if (siteParticipants && siteParticipants.length > 0) {
                 await this.processSiteParticipants(
@@ -376,7 +378,9 @@ export class SiteService {
                   transactionalEntityManager,
                 );
               } else {
-                console.log('No changes To Site Participants');
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Participants',
+                );
               }
 
               if (documents && documents.length > 0) {
@@ -386,16 +390,21 @@ export class SiteService {
                   transactionalEntityManager,
                 );
               } else {
-                console.log('No changes To Site Documents');
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Documents',
+                );
               }
 
-              if (siteAssociations) {
-                await transactionalEntityManager.save(
-                  SiteAssocs,
+              if (siteAssociations && siteAssociations.length > 0) {
+                await this.processSiteAssociated(
                   siteAssociations,
+                  userInfo,
+                  transactionalEntityManager,
                 );
               } else {
-                console.log('No changes To Site Associations');
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Associations',
+                );
               }
 
               if (subDivisions) {
@@ -448,7 +457,10 @@ export class SiteService {
         else return false;
       }
     } catch (error) {
-      console.log('Save site details error', error);
+      this.sitesLogger.log(
+        `SiteService.saveSiteDetails(): Save site details error
+        ${error}`,
+      );
       throw error;
     }
   }
@@ -571,13 +583,13 @@ export class SiteService {
                   },
                 });
               } else {
-                console.log(
-                  `There is no document participant in database againts id : ${docParticId}`,
+                this.sitesLogger.log(
+                  `SiteService.processDocuments(): There is no document participant in database againts id : ${docParticId}`,
                 );
               }
             } else {
-              console.log(
-                `There is no document in database againts document id : ${documentId}`,
+              this.sitesLogger.log(
+                `SiteService.processDocuments(): There is no document in database againts document id : ${documentId}`,
               );
             }
             break;
@@ -585,7 +597,9 @@ export class SiteService {
             deleteDocuments.push({ id: documentId });
             break;
           default:
-            console.warn('Unknown action for document:', apiAction);
+            this.sitesLogger.warn(
+              'SiteService.processDocuments(): Unknown action for document:',
+            );
         }
       });
 
@@ -664,7 +678,7 @@ export class SiteService {
           displayName,
           prCode,
           apiAction,
-          partiRoleId,
+          particRoleId,
           srAction,
           ...siteParticsData
         } = participant;
@@ -740,11 +754,11 @@ export class SiteService {
 
               const existingSiteParticRole =
                 await this.siteParticipantRolesRepo.findOneByOrFail({
-                  id: partiRoleId,
+                  id: particRoleId,
                 });
               if (existingSiteParticRole) {
                 updatedSiteParticRoles.push({
-                  id: partiRoleId,
+                  id: particRoleId,
                   changes: {
                     ...existingSiteParticRole,
                     ...siteParticRole,
@@ -755,13 +769,13 @@ export class SiteService {
                   },
                 });
               } else {
-                console.log(
-                  `There is no site participant role in database againts id : ${partiRoleId}`,
+                this.sitesLogger.log(
+                  `SiteService.processSiteParticipants(): There is no site participant role in database againts id : ${particRoleId}`,
                 );
               }
             } else {
-              console.log(
-                `There is no site participant in database againts id : ${participantId}`,
+              this.sitesLogger.log(
+                `SiteService.processSiteParticipants(): There is no site participant in database againts id : ${participantId}`,
               );
             }
             break;
@@ -769,11 +783,13 @@ export class SiteService {
           case UserActionEnum.DELETED:
             // Handle deletion if necessary
             deleteSitePartics.push({ id: participantId });
-            // deleteSiteParticRoles.push({ id: partiRoleId });
+            // deleteSiteParticRoles.push({ id: particRoleId });
             break;
 
           default:
-            console.warn('Unknown action for participant:', apiAction);
+            this.sitesLogger.warn(
+              'SiteService.processSiteParticipants(): Unknown action for participant:',
+            );
         }
       });
 
@@ -889,7 +905,9 @@ export class SiteService {
               });
               return null;
             default:
-              console.warn('Unknown action for event participant:', apiAction);
+              this.sitesLogger.warn(
+                'SiteService.processEvents.processParticipants(): Unknown action for event participant:',
+              );
               return null;
           }
         });
@@ -961,8 +979,8 @@ export class SiteService {
                 },
               });
             } else {
-              console.log(
-                `There is no event in database againts event id : ${notation.id}`,
+              this.sitesLogger.log(
+                `SiteService.processEvents(): There is no event in database againts event id : ${notation.id}`,
               );
             }
             break;
@@ -1005,6 +1023,96 @@ export class SiteService {
         await Promise.all(
           updatedEventPartics.map(({ id, changes }) =>
             transactionalEntityManager.update(EventPartics, { id }, changes),
+          ),
+        );
+      }
+    }
+  }
+
+  /**
+   * Processes and saves associated sites based on the provided actions.
+   * @param siteAccociated - Array of associated sites data including actions to be performed.
+   * @param userInfo - Information about the user performing the actions.
+   * @param transactionalEntityManager - Entity manager for handling transactions.
+   */
+  async processSiteAssociated(
+    siteAccociated: any[],
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    if (siteAccociated && siteAccociated.length > 0) {
+      const newSiteAssociates: SiteAssocs[] = [];
+      const updatedSiteAssociates: {
+        id: string;
+        changes: Partial<SiteAssocs>;
+      }[] = [];
+      const deleteSiteAssociates: { id: string }[] = [];
+
+      const siteAssociatePromises = siteAccociated.map(async (asscos) => {
+        const { id, apiAction, ...siteAssocsData } = asscos;
+        let siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
+        switch (apiAction) {
+          case UserActionEnum.ADDED:
+            newSiteAssociates.push({
+              ...siteAssoc,
+              rwmFlag: 0,
+              rwmNoteFlag: 0,
+              // Need to know common pid relation as it is non-nullable field in DB and we don't and visibility in our design for same.
+              commonPid: 'N',
+              userAction: UserActionEnum.ADDED,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+            break;
+          case UserActionEnum.UPDATED:
+            const existingSiteAssoc =
+              await this.siteAssociationsRepo.findOneByOrFail({
+                id: asscos.id,
+              });
+            if (existingSiteAssoc) {
+              updatedSiteAssociates.push({
+                id: asscos.id,
+                changes: {
+                  ...existingSiteAssoc,
+                  ...siteAssoc,
+                  userAction: UserActionEnum.UPDATED,
+                  whenUpdated: new Date(),
+                  whoUpdated: userInfo ? userInfo.givenName : '',
+                },
+              });
+            } else {
+              this.sitesLogger.log(
+                `SiteService.processSiteAssociated(): There is no site associated in database againts id : ${asscos.id}`,
+              );
+            }
+            break;
+          case UserActionEnum.DELETED:
+            // Handle deletion if necessary
+            deleteSiteAssociates.push({ id: asscos.id });
+            break;
+        }
+      });
+
+      await Promise.all(siteAssociatePromises);
+
+      // Save new site associates in bulk
+      if (newSiteAssociates.length > 0) {
+        await transactionalEntityManager.save(SiteAssocs, newSiteAssociates);
+      }
+
+      // Update existing site participants and site participant roles in bulk
+      if (updatedSiteAssociates.length > 0) {
+        await Promise.all(
+          updatedSiteAssociates.map(({ id, changes }) =>
+            transactionalEntityManager.update(SiteAssocs, { id }, changes),
+          ),
+        );
+      }
+
+      if (deleteSiteAssociates.length > 0) {
+        await Promise.all(
+          deleteSiteAssociates.map(({ id }) =>
+            transactionalEntityManager.delete(SiteAssocs, { id }),
           ),
         );
       }

@@ -1,0 +1,161 @@
+.map-view {
+  width: 100%;
+  height: 100vh;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+/* No footer on small screens - so use full height */
+.map-view.map-view--small {
+  height: 100vh; /* for old browser */
+  /* Use dvh instead of vh otherwise on Chrome the address bar pushes map down */
+  /* https://stackoverflow.com/questions/52848856/100vh-height-when-address-bar-is-shown-chrome-mobile#70048720 */
+  height: 100dvh;
+}
+
+.map-view > .map-container {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Make open street map tiles grayscale */
+.osm--grayscale .leaflet-tile {
+  filter: grayscale(100%);
+}
+
+.leaflet-container.crosshairs-cursor {
+  cursor: crosshair;
+}
+
+.crosshairs-icon,
+.empty-icon {
+  pointer-events: none;
+}
+
+.black-square-icon {
+  pointer-events: none;
+  width: 18px;
+  height: 18px;
+  background-color: var(--surface-color-brand-blue-100);
+  border: 1px solid var(--surface-color-border-light);
+  box-shadow: var(--box-shadow-small);
+}
+
+.point-search-circle,
+.polygon-search-polygon {
+  stroke: var(--surface-color-brand-blue-100);
+  stroke-width: 8;
+  fill: #3470b1;
+  fill-opacity: 0.5;
+}
+
+.polygon-search-line {
+  stroke: var(--surface-color-brand-blue-70);
+  stroke-width: 8;
+}
+
+.polygon-search-line--dotted {
+  stroke-dasharray: 8 24;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+}
+
+.leaflet-tooltip.search-layer-tooltip {
+  background-color: rgba(0, 0, 0, 0.45);
+  border-radius: 4px;
+  color: white;
+  padding: 8px 16px;
+  border: 0 none;
+  box-shadow: none;
+}
+
+.leaflet-tooltip-right.search-layer-tooltip:before {
+  border-right-color: rgba(0, 0, 0, 0.45);
+  margin-left: -11px;
+}
+
+.leaflet-tooltip-left.search-layer-tooltip:before {
+  border-left-color: rgba(0, 0, 0, 0.45);
+  margin-right: -11px;
+}
+
+/* Data Layers customizations - changes the colors of the tile images */
+.wl-pod-springs img {
+  filter: brightness(0.75) hue-rotate(135deg);
+}
+
+.wl-pod-sources img {
+  filter: brightness(0.5);
+}
+
+:root {
+  --layout-margin-xsmall: 4px;
+  --layout-margin-small: 8px;
+  --layout-margin-medium: 16px;
+  --layout-margin-large: 24px;
+  --layout-margin-xlarge: 32px;
+  --layout-margin-xxlarge: 40px;
+  --layout-margin-huge: 56px;
+  --layout-padding-xsmall: 4px;
+  --layout-padding-small: 8px;
+  --layout-padding-medium: 16px;
+  --layout-padding-large: 24px;
+  --layout-border-radius-medium: 4px;
+
+  --header-height: 64px;
+  --footer-height: 64px;
+
+  --surface-color-primary-active-border: #2e5dd7;
+  --surface-color-primary-default: #053662;
+  --surface-color-primary-hover: #1e5189;
+  --surface-color-secondary-hover: #edebe9;
+  --surface-color-background-white: #ffffff;
+  --surface-color-background-light: #faf9f8;
+  --surface-color-border-light: #d8d8d8;
+  --surface-color-border-hover: #b8b8b8;
+  --surface-color-border-medium: #898785;
+  --surface-color-border-dark: #353433;
+  --surface-color-brand-gray-10: #faf9f8;
+  --surface-color-brand-gray-20: #f3f2f1;
+  --surface-color-brand-gray-30: #eceae8;
+  --surface-color-brand-gray-60: #c6c5c3;
+  --surface-color-brand-gray-80: #605e5c;
+  --surface-color-brand-gray-white: #fff;
+  --surface-color-brand-gold-50: #fcc85d;
+  --surface-color-brand-gold-60: #f8ba47;
+  --surface-color-brand-blue-20: #d8eafd;
+  --surface-color-brand-blue-70: #5595d9;
+  --surface-color-brand-blue-100: #053662;
+
+  --support-border-color-success: #42814a;
+  --support-surface-color-info: #f7f9fc;
+  --support-border-color-info: #053662;
+
+  --icons-color-primary: #2d2d2d;
+  --icons-color-secondary: #474543;
+  --icons-color-info: #053662;
+  --icons-color-success: #42814a;
+  --icons-color-disabled: #9f9d9c;
+
+  --typography-color-primary: #2d2d2d;
+  --typography-color-primary-invert: #fff;
+  --typography-color-secondary: #474543;
+  --typography-color-link: #255a90;
+  --typography-color-disabled: #9f9d9c;
+
+  --box-shadow-small: 0 0.6px 1.8px 0 rgba(0, 0, 0, 0.1),
+    0 3.2px 7.2px 0 rgba(0, 0, 0, 0.13);
+
+  --map-button-height-large: 64px;
+  --map-button-height-medium: 40px;
+  --map-button-padding-large: 16px 24px;
+  --map-button-padding-medium: 8px 16px;
+  --map-button-font-size-large: 18px;
+  --map-button-font-size-medium: 16px;
+}

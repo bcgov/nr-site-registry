@@ -4,9 +4,9 @@ import { plainToInstance } from 'class-transformer';
 import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { SitePartics } from '../../entities/sitePartics.entity';
 import { Repository } from 'typeorm';
-import { LoggerService } from 'src/app/logger/logger.service';
-import { UserActionEnum } from 'src/app/common/userActionEnum';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+import { LoggerService } from '../../logger/logger.service';
+import { UserActionEnum } from '../../common/userActionEnum';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 @Injectable()
 export class ParticipantService {
@@ -55,7 +55,7 @@ export class ParticipantService {
         // Transform the fetched site participants into the desired format
         const transformedObjects = result.flatMap((item) =>
           item.siteParticRoles.map((role) => ({
-            partiRoleId: role.id,
+            particRoleId: role.id,
             id: item.id,
             siteId: item.siteId,
             psnorgId: item.psnorgId,
@@ -65,6 +65,11 @@ export class ParticipantService {
             displayName: item.psnorg?.displayName?.trim() || '', // Safely access displayName with default value
             prCode: role.prCode.trim(),
             description: role.prCode2?.description?.trim() || '', // Safely access description with default value
+            srAction:
+              item.srAction === SRApprovalStatusEnum.PUBLIC ||
+              role.srAction === SRApprovalStatusEnum.PUBLIC
+                ? true
+                : false,
           })),
         );
 

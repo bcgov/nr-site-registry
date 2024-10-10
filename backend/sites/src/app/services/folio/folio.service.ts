@@ -7,7 +7,7 @@ import { plainToInstance } from 'class-transformer';
 import { FolioContentsService } from './folioContents.service';
 import { FolioContentDTO } from '../../dto/folioContent.dto';
 import { FolioContents } from '../../entities/folioContents.entity';
-import { LoggerService } from 'src/app/logger/logger.service';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class FolioService {

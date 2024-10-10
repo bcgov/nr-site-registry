@@ -138,21 +138,38 @@ const siteDetailsSlice = createSlice({
 
 export const getSiteDetailsToBeSaved = (state: any) => {
   return {
-    events: deepFilterByUserAction(state.siteDetails.notationData, [
-      UserActionEnum.added,
-      UserActionEnum.updated,
-      UserActionEnum.deleted,
-    ]),
-    siteParticipants: deepFilterByUserAction(
-      state.siteDetails.siteParticipantData,
-      [UserActionEnum.added, UserActionEnum.updated, UserActionEnum.deleted],
-    ),
-    documents: deepFilterByUserAction(state.siteDetails.documentsData, [
-      UserActionEnum.added,
-      UserActionEnum.updated,
-      UserActionEnum.deleted,
-    ]),
-    siteAssociations: state.siteDetails.siteAssociations,
+    events:
+      state.siteDetails.notationData &&
+      state.siteDetails.notationData.length > 0 &&
+      deepFilterByUserAction(state.siteDetails.notationData, [
+        UserActionEnum.added,
+        UserActionEnum.updated,
+        UserActionEnum.deleted,
+      ]),
+    siteParticipants:
+      state.siteDetails.siteParticipantData &&
+      state.siteDetails.siteParticipantData.length > 0 &&
+      deepFilterByUserAction(state.siteDetails.siteParticipantData, [
+        UserActionEnum.added,
+        UserActionEnum.updated,
+        UserActionEnum.deleted,
+      ]),
+    documents:
+      state.siteDetails.siteAssociationsData &&
+      state.siteDetails.siteAssociationsData.length > 0 &&
+      deepFilterByUserAction(state.siteDetails.documentsData, [
+        UserActionEnum.added,
+        UserActionEnum.updated,
+        UserActionEnum.deleted,
+      ]),
+    siteAssociations:
+      state.siteDetails.siteAssociationsData &&
+      state.siteDetails.siteAssociationsData.length > 0 &&
+      deepFilterByUserAction(state.siteDetails.siteAssociationsData, [
+        UserActionEnum.added,
+        UserActionEnum.updated,
+        UserActionEnum.deleted,
+      ]),
     subDivisions: state.siteDetails.subDivisions,
     landHistories: state.siteDetails.landHistoriesData,
     profiles: state.siteDetails.profiles,
@@ -171,6 +188,8 @@ export const currentSiteId = (state: any) => state.siteDetails.siteId;
 export const getSiteDocuments = (state: any) => state.siteDetails.documentsData;
 export const getSiteParticipants = (state: any) =>
   state.siteDetails.siteParticipantData;
+export const getSiteAssociated = (state: any) =>
+  state.siteDetails.siteAssociationsData;
 export const {
   resetSaveSiteDetailsRequestStatus,
   resetSaveSiteDetails,

@@ -578,7 +578,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       {isDelete && (
         <ModalDialog
           key={v4()}
-          label={`Are you sure to delete schedule 2 refernce ?`}
+          label={`Are you sure you want to delete schedule 2 reference?`}
           closeHandler={(response) => {
             if (response) {
               if (isDelete) {

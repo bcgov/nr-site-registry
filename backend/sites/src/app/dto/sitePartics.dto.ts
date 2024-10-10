@@ -15,7 +15,7 @@ export class SiteParticsResponse extends ResponseDto {
 @ObjectType()
 export class SiteParticsDto extends ChangeAuditObjectTypeDTO {
   @Field()
-  partiRoleId: string;
+  particRoleId: string;
 
   @Field()
   @IsString()
@@ -56,7 +56,7 @@ export class SiteParticsDto extends ChangeAuditObjectTypeDTO {
 @InputType()
 export class SiteParticsInputDto extends ChangeAuditEntityDTO {
   @Field()
-  partiRoleId: string;
+  particRoleId: string;
 
   @Field()
   @IsString()

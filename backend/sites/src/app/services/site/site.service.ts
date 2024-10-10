@@ -458,8 +458,8 @@ export class SiteService {
       }
     } catch (error) {
       this.sitesLogger.log(
-        'SiteService.saveSiteDetails(): Save site details error',
-        error,
+        `SiteService.saveSiteDetails(): Save site details error
+        ${error}`,
       );
       throw error;
     }
@@ -597,7 +597,6 @@ export class SiteService {
           default:
             this.sitesLogger.warn(
               'SiteService.processDocuments(): Unknown action for document:',
-              apiAction,
             );
         }
       });
@@ -677,7 +676,7 @@ export class SiteService {
           displayName,
           prCode,
           apiAction,
-          partiRoleId,
+          particRoleId,
           srAction,
           ...siteParticsData
         } = participant;
@@ -753,11 +752,11 @@ export class SiteService {
 
               const existingSiteParticRole =
                 await this.siteParticipantRolesRepo.findOneByOrFail({
-                  id: partiRoleId,
+                  id: particRoleId,
                 });
               if (existingSiteParticRole) {
                 updatedSiteParticRoles.push({
-                  id: partiRoleId,
+                  id: particRoleId,
                   changes: {
                     ...existingSiteParticRole,
                     ...siteParticRole,
@@ -769,7 +768,7 @@ export class SiteService {
                 });
               } else {
                 this.sitesLogger.log(
-                  `SiteService.processSiteParticipants(): There is no site participant role in database againts id : ${partiRoleId}`,
+                  `SiteService.processSiteParticipants(): There is no site participant role in database againts id : ${particRoleId}`,
                 );
               }
             } else {
@@ -782,13 +781,12 @@ export class SiteService {
           case UserActionEnum.DELETED:
             // Handle deletion if necessary
             deleteSitePartics.push({ id: participantId });
-            // deleteSiteParticRoles.push({ id: partiRoleId });
+            // deleteSiteParticRoles.push({ id: particRoleId });
             break;
 
           default:
             this.sitesLogger.warn(
               'SiteService.processSiteParticipants(): Unknown action for participant:',
-              apiAction,
             );
         }
       });
@@ -907,7 +905,6 @@ export class SiteService {
             default:
               this.sitesLogger.warn(
                 'SiteService.processEvents.processParticipants(): Unknown action for event participant:',
-                apiAction,
               );
               return null;
           }

@@ -198,7 +198,9 @@ const Notation: React.FC<INotationProps> = ({
               )}
           </Widget>
           {userType === UserType.Internal && (
-            <p className="sr-time-stamp">{notation.srTimeStamp}</p>
+            <p className="sr-time-stamp">
+              {notation.srTimeStamp ?? 'SR value hard coded'}
+            </p>
           )}
           {showApproveRejectSection && (
             <ApproveRejectButtons approveRejectHandler={approveRejectHandler} />

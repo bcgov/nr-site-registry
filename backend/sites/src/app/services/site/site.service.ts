@@ -433,7 +433,9 @@ export class SiteService {
                   transactionalEntityManager,
                 );
               } else {
-                console.log('No changes To Site profiles');
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails():No changes To Site profiles',
+                );
               }
 
               const historyLog: HistoryLog = {
@@ -1162,8 +1164,8 @@ export class SiteService {
               whoUpdated: userInfo ? userInfo.givenName : '',
             };
           } else {
-            console.log(
-              `There is no profile in database againts id : ${siteDisclosure[0].id}`,
+            this.sitesLogger.log(
+              `SiteService.processSiteDisclosure():There is no profile in database againts id : ${siteDisclosure[0].id}`,
             );
           }
           break;

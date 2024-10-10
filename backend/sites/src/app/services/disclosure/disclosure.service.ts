@@ -4,7 +4,8 @@ import { Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { LoggerService } from '../../logger/logger.service';
 import { UserActionEnum } from '../../common/userActionEnum';
-import { SRApprovalStatusEnum } from 'src/app/common/srApprovalStatusEnum';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class DisclosureService {
@@ -48,11 +49,11 @@ export class DisclosureService {
       if (result && !result.length) {
         return [];
       } else {
-        const disclosure = result.map((res) => {
+        const res = result.map((res) => {
           return {
             ...res,
             srAction:
-              res.srAction === SRApprovalStatusEnum.PUBLIC ? 'true' : 'false',
+              res.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
           };
         });
         this.sitesLogger.log(
@@ -61,6 +62,9 @@ export class DisclosureService {
         this.sitesLogger.debug(
           'DisclosureService.getSiteDisclosureBySiteId() end',
         );
+
+        // Convert the transformed objects into DTOs
+        const disclosure = plainToInstance(SiteProfiles, res);
         return disclosure;
       }
 

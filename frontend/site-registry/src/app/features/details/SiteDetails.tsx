@@ -182,6 +182,7 @@ const SiteDetails = () => {
     ) {
       if (saveSiteDetailsRequestStatus === RequestStatus.success) {
         dispatch(resetSaveSiteDetails(null));
+        dispatch(clearTrackChanges(null));
         dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
         setEdit(false);
       } else {
@@ -273,6 +274,10 @@ const SiteDetails = () => {
         ),
         dispatch(
           fetchNotationParticipants({ siteId: id ?? '', showPending: false }),
+        ),
+        dispatch(fetchDocuments({ siteId: id ?? '', showPending: false })),
+        dispatch(
+          fetchAssociatedSites({ siteId: id ?? '', showPending: false }),
         ),
         // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),

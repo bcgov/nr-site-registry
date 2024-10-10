@@ -67,9 +67,8 @@ const PanelWithUpDown: FC<PanelWithUpDownProps> = ({
             //  </div>
           )}
         </div>
-      )}     
+      )}
     </div>
-    
   );
 };
 

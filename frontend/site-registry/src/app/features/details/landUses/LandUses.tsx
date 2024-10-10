@@ -119,7 +119,7 @@ const LandUses: FC = () => {
 
   useEffect(() => {
     if (siteId) {
-      dispatch(fetchLandUses({ siteId , showPending:false}));
+      dispatch(fetchLandUses({ siteId, showPending: false }));
     }
   }, [dispatch, siteId]);
 
@@ -134,7 +134,6 @@ const LandUses: FC = () => {
   }, [dispatch, editModeEnabled]);
 
   useEffect(() => {
- 
     dispatch(
       setupLandHistoriesDataForSaving(Array.from(editLandUsesData.values())),
     );
@@ -151,7 +150,6 @@ const LandUses: FC = () => {
   };
 
   const onTableChange = (event: any) => {
- 
     const editedRowId = event.row.guid;
 
     if (event.property.includes('select_row')) {
@@ -345,15 +343,15 @@ const LandUses: FC = () => {
         </div>
       </div>
       <LandUseTable
-        onTableChange={onTableChange} 
-        tableColumns={tableColumns} 
-        dataWithTextSearchApplied={dataWithTextSearchApplied} 
+        onTableChange={onTableChange}
+        tableColumns={tableColumns}
+        dataWithTextSearchApplied={dataWithTextSearchApplied}
         editModeEnabled={editModeEnabled}
         tableLoading={tableLoading}
-        viewMode={viewMode} 
+        viewMode={viewMode}
         handleTableSort={handleTableSort}
         selectedRowIds={selectedRowIds}
-        handleRemoveLandUse={handleRemoveLandUse} 
+        handleRemoveLandUse={handleRemoveLandUse}
         handleAddLandUse={handleAddLandUse}
       ></LandUseTable>
     </div>

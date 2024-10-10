@@ -495,16 +495,14 @@ export const GetNotationConfig = () => {
         customMenuMessage: <span>Please select site participant name:</span>,
         filteredOptions: [],
         isLoading: RequestStatus.idle,
-        handleSearch: () => {
-          console.log('handleSearch click');
-        },
+        handleSearch: () => {},
       },
     },
     {
       id: 3,
       displayName: 'SR',
       active: true,
-      graphQLPropertyName: 'sr',
+      graphQLPropertyName: 'srAction',
       displayType: {
         type: FormFieldType.Checkbox,
         label: 'SR',
@@ -560,9 +558,7 @@ export const GetNotationConfig = () => {
         customMenuMessage: <span>Please select site participant name:</span>,
         filteredOptions: [],
         isLoading: RequestStatus.idle,
-        handleSearch: () => {
-          console.log('handleSearch click');
-        },
+        // handleSearch: () => {},
       },
     },
   ];

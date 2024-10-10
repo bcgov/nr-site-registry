@@ -5,15 +5,18 @@ import { DocumentService } from './document.service';
 import { SiteDocs } from '../../entities/siteDocs.entity';
 import { sampleSites } from '../../mockData/site.mockData';
 import { PeopleOrgs } from '../../entities/peopleOrgs.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('DocumentService', () => {
   let service: DocumentService;
   let siteDocsRepository: Repository<SiteDocs>;
+  let sitesLogger: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DocumentService,
+        LoggerService,
         {
           provide: getRepositoryToken(SiteDocs),
           useClass: Repository,
@@ -22,6 +25,7 @@ describe('DocumentService', () => {
     }).compile();
 
     service = module.get<DocumentService>(DocumentService);
+    sitesLogger = module.get<LoggerService>(LoggerService);
     siteDocsRepository = module.get<Repository<SiteDocs>>(
       getRepositoryToken(SiteDocs),
     );
@@ -78,6 +82,7 @@ describe('DocumentService', () => {
           rwmNoteFlag: null,
           userAction: 'pending',
           srAction: 'pending',
+          filePath: '',
           siteDocPartics: [
             {
               id: '1',
@@ -94,6 +99,8 @@ describe('DocumentService', () => {
               psnorg: mockPeopleOrgs[0], // Assigning PeopleOrgs entity
               sdoc: null, // Assigning SiteDocs entity
               sp: null, // Assuming SitePartics entity is null for now
+              srAction: 'pending',
+              userAction: 'pending',
             },
           ],
           site: sampleSites[0],
@@ -103,7 +110,7 @@ describe('DocumentService', () => {
         .spyOn(siteDocsRepository, 'find')
         .mockResolvedValueOnce(mockSiteDocs);
 
-      const result = await service.getSiteDocumentsBySiteId(siteId);
+      const result = await service.getSiteDocumentsBySiteId(siteId, false);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -122,7 +129,7 @@ describe('DocumentService', () => {
       const siteId = 'nonExistentSite';
       jest.spyOn(siteDocsRepository, 'find').mockResolvedValueOnce([]);
 
-      const result = await service.getSiteDocumentsBySiteId(siteId);
+      const result = await service.getSiteDocumentsBySiteId(siteId, false);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -136,9 +143,9 @@ describe('DocumentService', () => {
       );
       jest.spyOn(siteDocsRepository, 'find').mockRejectedValueOnce(mockError);
 
-      await expect(service.getSiteDocumentsBySiteId(siteId)).rejects.toThrow(
-        mockError,
-      );
+      await expect(
+        service.getSiteDocumentsBySiteId(siteId, false),
+      ).rejects.toThrow(mockError);
     });
   });
 
@@ -188,6 +195,7 @@ describe('DocumentService', () => {
         rwmNoteFlag: null,
         userAction: 'pending',
         srAction: 'pending',
+        filePath: '',
         siteDocPartics: [
           {
             id: '1',
@@ -204,6 +212,8 @@ describe('DocumentService', () => {
             psnorg: mockPeopleOrgs[0], // Assigning PeopleOrgs entity
             sdoc: null, // Assigning SiteDocs entity
             sp: null, // Assuming SitePartics entity is null for now
+            srAction: 'pending',
+            userAction: 'pending',
           },
         ],
         site: sampleSites[0],
@@ -211,7 +221,7 @@ describe('DocumentService', () => {
     ];
     jest.spyOn(siteDocsRepository, 'find').mockResolvedValueOnce(mockSiteDocs);
 
-    const result = await service.getSiteDocumentsBySiteId(siteId);
+    const result = await service.getSiteDocumentsBySiteId(siteId, false);
 
     expect(result).toBeDefined();
     expect(Array.isArray(result)).toBeTruthy();

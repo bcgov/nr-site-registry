@@ -13,7 +13,7 @@ export interface ISummaryInfo {
   srMode: boolean;
   handleInputChange: (graphQLPropertyName: any, value: any) => void;
   approveRejectHandler?: (approved: boolean) => void;
-  showApproveRejectSection?: boolean
+  showApproveRejectSection?: boolean;
 }
 
 const SummaryInfo: React.FC<ISummaryInfo> = ({
@@ -23,10 +23,9 @@ const SummaryInfo: React.FC<ISummaryInfo> = ({
   srMode,
   handleInputChange,
   approveRejectHandler,
-  showApproveRejectSection
+  showApproveRejectSection,
 }) => {
-
-    showApproveRejectSection = showApproveRejectSection ?? false;
+  showApproveRejectSection = showApproveRejectSection ?? false;
 
   approveRejectHandler =
     approveRejectHandler ??
@@ -52,9 +51,9 @@ const SummaryInfo: React.FC<ISummaryInfo> = ({
               />
             )}
           </div>
-         {showApproveRejectSection && <ApproveRejectButtons
-            approveRejectHandler={approveRejectHandler}
-          />}
+          {showApproveRejectSection && (
+            <ApproveRejectButtons approveRejectHandler={approveRejectHandler} />
+          )}
         </div>
       }
     />

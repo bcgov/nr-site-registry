@@ -74,7 +74,7 @@ export const fetchParcelDescriptions = createAsyncThunk(
           searchParam: params.searchParam,
           sortBy: params.sortBy,
           sortByDir: params.sortByDir,
-          pending: params.showPending
+          pending: params.showPending,
         },
       });
     } catch (error) {

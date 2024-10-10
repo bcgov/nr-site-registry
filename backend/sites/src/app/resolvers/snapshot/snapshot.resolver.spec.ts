@@ -6,11 +6,13 @@ import { Snapshots } from '../../entities/snapshots.entity';
 import { sampleSites } from '../../mockData/site.mockData';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { BannerTypeResponse } from '../../dto/response/bannerTypeResponse';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('SnapshotResolver', () => {
   let resolver: SnapshotsResolver;
   let service: SnapshotsService;
   let genericResponseProvider: GenericResponseProvider<Snapshots[]>;
+  let loggerService: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,6 +27,15 @@ describe('SnapshotResolver', () => {
             getSnapshotsById: jest.fn(),
             createSnapshotForSites: jest.fn(),
             getBannerType: jest.fn(),
+          },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
           },
         },
         {
@@ -48,6 +59,7 @@ describe('SnapshotResolver', () => {
       ],
     }).compile();
     resolver = module.get<SnapshotsResolver>(SnapshotsResolver);
+    loggerService = module.get<LoggerService>(LoggerService);
     service = module.get<SnapshotsService>(SnapshotsService);
     genericResponseProvider = module.get<GenericResponseProvider<Snapshots[]>>(
       GenericResponseProvider,
@@ -115,6 +127,9 @@ describe('SnapshotResolver', () => {
                   whoUpdated: 'ABC',
                   rwmFlag: 1,
                   sp: null,
+                  id: 'hhh-jjj-lll',
+                  userAction: 'pending',
+                  srAction: 'pending',
                   prCode2: {
                     code: 'ABC',
                     description: 'Desc',
@@ -212,6 +227,9 @@ describe('SnapshotResolver', () => {
                   whoUpdated: 'ABC',
                   rwmFlag: 1,
                   sp: null,
+                  id: 'hhh-jjj-lll',
+                  userAction: 'pending',
+                  srAction: 'pending',
                   prCode2: {
                     code: 'ABC',
                     description: 'Desc',
@@ -307,6 +325,9 @@ describe('SnapshotResolver', () => {
                 {
                   prCode: 'PR001',
                   spId: '1',
+                  id: 'hhh-jjj-lll',
+                  userAction: 'pending',
+                  srAction: 'pending',
                   whenCreated: new Date(),
                   whoCreated: 'ABC',
                   whenUpdated: new Date(),
@@ -409,6 +430,9 @@ describe('SnapshotResolver', () => {
                 {
                   prCode: 'PR001',
                   spId: '1',
+                  id: 'hhh-jjj-lll',
+                  userAction: 'pending',
+                  srAction: 'pending',
                   whenCreated: new Date(),
                   whoCreated: 'ABC',
                   whenUpdated: new Date(),

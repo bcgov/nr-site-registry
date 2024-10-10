@@ -48,7 +48,7 @@ export class LandHistoryResolver {
       siteId,
       searchTerm,
       sortDirection,
-      showPending
+      showPending,
     );
     if (result.length > 0) {
       this.sitesLogger.log(

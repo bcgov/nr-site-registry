@@ -18,6 +18,8 @@ import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { LandHistoryService } from '../landHistory/landHistory.service';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 import { LoggerService } from '../../logger/logger.service';
+import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
+import { SiteDocPartics } from '../../entities/siteDocPartics.entity';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -26,6 +28,7 @@ describe('SiteService', () => {
   let eventsParticipantsRepository: Repository<EventPartics>;
   let siteParticipantsRepository: Repository<SitePartics>;
   let siteDocumentsRepo: Repository<SiteDocs>;
+  let siteDocumentParticsRepo: Repository<SiteDocPartics>;
   let siteAssociationsRepo: Repository<SiteAssocs>;
   let landHistoriesRepo: Repository<LandHistories>;
   let siteSubDivisionsRepo: Repository<SiteSubdivisions>;
@@ -128,6 +131,23 @@ describe('SiteService', () => {
           },
         },
         {
+          provide: getRepositoryToken(SiteParticRoles),
+          useValue: {
+            find: jest.fn(() => {
+              return [
+                { id: 'fff-jjjj-lll', siteId: '123' },
+                { id: 'sdsff-jjhh-llkkj', siteId: '123' },
+              ];
+            }),
+            save: jest.fn(() => {
+              return [
+                { id: '123', siteId: '123' },
+                { id: '124', siteId: '123' },
+              ];
+            }),
+          },
+        },
+        {
           provide: getRepositoryToken(SiteDocs),
           useValue: {
             find: jest.fn(() => {
@@ -140,6 +160,23 @@ describe('SiteService', () => {
               return [
                 { id: '123', siteId: '123' },
                 { id: '124', siteId: '123' },
+              ];
+            }),
+          },
+        },
+        {
+          provide: getRepositoryToken(SiteDocPartics),
+          useValue: {
+            find: jest.fn(() => {
+              return [
+                { id: '123', siteId: '123', psnorgId: '1253' },
+                { id: '124', siteId: '123', psnorgId: '1253' },
+              ];
+            }),
+            save: jest.fn(() => {
+              return [
+                { id: '123', siteId: '123', psnorgId: '1253' },
+                { id: '124', siteId: '123', psnorgId: '1253' },
               ];
             }),
           },

@@ -35,7 +35,7 @@ const initialState: SiteState = {
 
 export const fetchSitesDetails = createAsyncThunk(
   'sites/fetchSitesDetails',
-  async (args: { siteId: string, showPending: Boolean }) => {
+  async (args: { siteId: string; showPending: Boolean }) => {
     try {
       const { siteId } = args;
 
@@ -43,9 +43,9 @@ export const fetchSitesDetails = createAsyncThunk(
         query: print(graphqlSiteDetailsQuery()),
         variables: {
           siteId: args.siteId,
-          pending: args.showPending
+          pending: args.showPending,
         },
-      });     
+      });
       return response.data.data.findSiteBySiteId.data;
     } catch (error) {
       throw error;
@@ -236,7 +236,6 @@ const siteSlice = createSlice({
         return newState;
       })
       .addCase(fetchSitesDetails.fulfilled, (state, action) => {
-        
         const newState = { ...state };
         newState.siteDetails = action.payload;
         newState.siteDetailsFetchStatus = RequestStatus.success;

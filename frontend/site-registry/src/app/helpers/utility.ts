@@ -14,6 +14,14 @@ import { TableColumn } from '../components/table/TableColumn';
 import { UserActionEnum } from '../common/userActionEnum';
 import { MyLocationData, MyLocationSuccess } from '../features/map/ILocation';
 
+// Define the type for the result cache
+type ResultCache = {
+  [key: string]: any; // Replace `any` with the actual type if known
+};
+
+// Cache to store fetched results
+export const resultCache: ResultCache = {};
+
 export interface UpdateDisplayTypeParams {
   indexToUpdate: number;
   updates: Partial<IFormField>; // Use Partial<IFormField> to allow partial updates

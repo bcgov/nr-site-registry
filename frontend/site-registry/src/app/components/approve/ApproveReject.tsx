@@ -34,11 +34,10 @@ const ApproveReject: React.FC<IApproveReject> = ({ name, children }) => {
           <span className="header-label">{name}</span>
         </div>
         <div className="ar-continer-header-right">
-         <Link to="">
-         View</Link>
+          <Link to="">View</Link>
         </div>
       </div>
-      {isOpen && <div>{children}</div>}      
+      {isOpen && <div>{children}</div>}
     </div>
   );
 };
@@ -46,24 +45,36 @@ const ApproveReject: React.FC<IApproveReject> = ({ name, children }) => {
 export default ApproveReject;
 
 export interface IApproveRejectButtons {
- approveLabel?: string;
- rejectLabel?: string;
+  approveLabel?: string;
+  rejectLabel?: string;
   approveRejectHandler: (approved: boolean) => void;
 }
 
-export const ApproveRejectButtons: React.FC<IApproveRejectButtons> = ({  
-    approveLabel,
-    rejectLabel,  
-    approveRejectHandler
+export const ApproveRejectButtons: React.FC<IApproveRejectButtons> = ({
+  approveLabel,
+  rejectLabel,
+  approveRejectHandler,
 }) => {
-    approveLabel = approveLabel ?? 'Approve';
-    rejectLabel = rejectLabel ?? 'Not Public';
-    approveRejectHandler= approveRejectHandler ?? ((event)=>{console.log('approveRejectHandler not provided')})
+  approveLabel = approveLabel ?? 'Approve';
+  rejectLabel = rejectLabel ?? 'Not Public';
+  approveRejectHandler =
+    approveRejectHandler ??
+    ((event) => {
+      console.log('approveRejectHandler not provided');
+    });
   return (
     <div className="approve-reject-actions">
-      <div className="not-public-btn" onClick={()=>approveRejectHandler(false)}> {rejectLabel}</div>
-      <div className="approve-btn" onClick={()=>approveRejectHandler(true)}> {approveLabel}</div>
+      <div
+        className="not-public-btn"
+        onClick={() => approveRejectHandler(false)}
+      >
+        {' '}
+        {rejectLabel}
+      </div>
+      <div className="approve-btn" onClick={() => approveRejectHandler(true)}>
+        {' '}
+        {approveLabel}
+      </div>
     </div>
   );
 };
-

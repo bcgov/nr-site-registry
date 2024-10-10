@@ -252,11 +252,9 @@ const SRUpdates = () => {
     }
   }, [notationData]);
 
-
-  
   useEffect(() => {
     if (siteParticipantData) {
-      const uniquePsnOrgs:any = Array.from(
+      const uniquePsnOrgs: any = Array.from(
         new Map(
           siteParticipantData.map((item: any) => [
             item.psnorgId,
@@ -264,21 +262,19 @@ const SRUpdates = () => {
           ]),
         ).values(),
       );
-     
+
       let params: UpdateDisplayTypeParams = {
         indexToUpdate: participantColumnInternal.findIndex(
           (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
         ),
         updates: {
           isLoading: RequestStatus.success,
-          options: uniquePsnOrgs,     
+          options: uniquePsnOrgs,
         },
-      };      
+      };
       setInternalRow(updateTableColumn(internalRow, params));
-   
     }
   }, [siteParticipantData]);
-
 
   const dispatch = useDispatch<AppDispatch>();
   const { id } = useParams();
@@ -468,7 +464,6 @@ const SRUpdates = () => {
   };
 
   const approveRejectHandlerForLandUses = (event: any) => {
-   
     let saveDTO = null;
     let landUseRecord = event?.row;
     let updatedLandUseRecord = null;
@@ -492,7 +487,6 @@ const SRUpdates = () => {
     };
 
     dispatch(updateSiteDetailsForApproval(saveDTO));
-
   };
 
   const updateOptionsBasedOnMetaData = (
@@ -577,8 +571,6 @@ const SRUpdates = () => {
         : SRApprovalStatusEnum.Private,
       apiAction: UserActionEnum.updated,
     };
-
- 
 
     let saveDTO = {
       ...getDefaultObjectForSaving(),

@@ -3,17 +3,20 @@ import { DisclosureService } from './disclosure.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 jest.mock('../../entities/siteProfiles.entity');
 
 describe('DisclosureService', () => {
   let service: DisclosureService;
   let repository: Repository<SiteProfiles>;
+  let sitesLogger: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DisclosureService,
+        LoggerService,
         {
           provide: getRepositoryToken(SiteProfiles),
           useClass: Repository,
@@ -22,6 +25,7 @@ describe('DisclosureService', () => {
     }).compile();
 
     service = module.get<DisclosureService>(DisclosureService);
+    sitesLogger = module.get<LoggerService>(LoggerService);
     repository = module.get<Repository<SiteProfiles>>(
       getRepositoryToken(SiteProfiles),
     );
@@ -40,7 +44,7 @@ describe('DisclosureService', () => {
       const mockSiteProfile = generateMockSiteProfile(siteId, dateCompleted);
       jest.spyOn(repository, 'find').mockResolvedValueOnce(mockSiteProfile);
 
-      const result = await service.getSiteDisclosureBySiteId(siteId);
+      const result = await service.getSiteDisclosureBySiteId(siteId, false);
 
       expect(result).toEqual(mockSiteProfile);
       expect(repository.find).toBeCalledWith({ where: { siteId } });
@@ -53,9 +57,9 @@ describe('DisclosureService', () => {
       );
       jest.spyOn(repository, 'find').mockRejectedValueOnce(error);
 
-      await expect(service.getSiteDisclosureBySiteId(siteId)).rejects.toThrow(
-        error,
-      );
+      await expect(
+        service.getSiteDisclosureBySiteId(siteId, false),
+      ).rejects.toThrow(error);
     });
   });
 });

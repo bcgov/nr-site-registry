@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
-import { v4 } from 'uuid';
 import { SiteAssocs } from '../../entities/siteAssocs.entity';
 import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
 import { LoggerService } from '../../logger/logger.service';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 import { UserActionEnum } from '../../common/userActionEnum';
 
@@ -47,11 +47,13 @@ export class AssociatedSiteService {
 
       // Transform the fetched data into the desired format
       const transformedObjects = result.map((assocs) => ({
-        guid: v4(), // Generate a unique identifier for each entry
+        id: assocs.id,
         siteId: assocs.siteId,
-        effectiveDate: assocs.effectiveDate.toISOString(),
         siteIdAssociatedWith: assocs.siteIdAssociatedWith,
+        effectiveDate: assocs.effectiveDate.toISOString(),
         note: assocs.note ? assocs.note.trim() : null, // Ensure note is trimmed
+        srAction:
+          assocs.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
       }));
 
       // Convert the transformed objects into DTOs

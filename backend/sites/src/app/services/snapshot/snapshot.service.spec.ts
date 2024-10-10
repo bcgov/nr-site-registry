@@ -15,6 +15,8 @@ import { LandHistories } from '../../entities/landHistories.entity';
 import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { SnapshotSiteContent } from '../../dto/snapshotSiteContent';
+import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('SnapshotService', () => {
   let service: SnapshotsService;
@@ -28,11 +30,14 @@ describe('SnapshotService', () => {
   let landHistoriesRepository: Repository<LandHistories>;
   let siteSubdivisionsRepository: Repository<SiteSubdivisions>;
   let siteProfilesRepository: Repository<SiteProfiles>;
+  let siteParticipantRolesRepo: Repository<SiteParticRoles>;
+  let sitesLogger: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SnapshotsService,
+        LoggerService,
         {
           provide: getRepositoryToken(Snapshots),
           useValue: {
@@ -116,6 +121,24 @@ describe('SnapshotService', () => {
                 { id: '123', commonName: 'victoria' },
                 { id: '121', commonName: 'duncan' },
                 { id: '222', commonName: 'vancouver' },
+              ];
+            }),
+            count: jest.fn(),
+            save: jest.fn(),
+            // Add other methods if necessary
+          },
+        },
+        {
+          provide: getRepositoryToken(SiteParticRoles),
+          useValue: {
+            findOne: jest.fn(() => {
+              return { id: 'sss-llll', commonName: 'victoria' };
+            }),
+            find: jest.fn(() => {
+              return [
+                { id: 'sss-llll', commonName: 'victoria' },
+                { id: 'sdxcf-hddds', commonName: 'duncan' },
+                { id: 'efrdt-llkij', commonName: 'vancouver' },
               ];
             }),
             count: jest.fn(),
@@ -217,6 +240,7 @@ describe('SnapshotService', () => {
     }).compile();
 
     service = module.get<SnapshotsService>(SnapshotsService);
+    sitesLogger = module.get<LoggerService>(LoggerService);
     snapshotRepository = module.get<Repository<Snapshots>>(
       getRepositoryToken(Snapshots),
     );
@@ -244,6 +268,9 @@ describe('SnapshotService', () => {
     );
     siteProfilesRepository = module.get<Repository<SiteProfiles>>(
       getRepositoryToken(SiteProfiles),
+    );
+    siteParticipantRolesRepo = module.get<Repository<SiteParticRoles>>(
+      getRepositoryToken(SiteParticRoles),
     );
   });
 
@@ -303,6 +330,9 @@ describe('SnapshotService', () => {
                   {
                     prCode: 'PR001',
                     spId: '1',
+                    id: 'bbb-jjjj-kkkk-llll',
+                    userAction: 'pending',
+                    srAction: 'pending',
                     whenCreated: new Date(),
                     whoCreated: 'ABC',
                     whenUpdated: new Date(),
@@ -389,6 +419,9 @@ describe('SnapshotService', () => {
                   {
                     prCode: 'PR001',
                     spId: '1',
+                    id: 'bbb-jjjj-kkkk-llll',
+                    userAction: 'pending',
+                    srAction: 'pending',
                     whenCreated: new Date(),
                     whoCreated: 'ABC',
                     whenUpdated: new Date(),
@@ -488,6 +521,9 @@ describe('SnapshotService', () => {
                   {
                     prCode: 'PR001',
                     spId: '1',
+                    id: 'bbb-jjjj-kkkk-llll',
+                    userAction: 'pending',
+                    srAction: 'pending',
                     whenCreated: new Date(),
                     whoCreated: 'ABC',
                     whenUpdated: new Date(),
@@ -665,6 +701,9 @@ describe('SnapshotService', () => {
                     whoUpdated: 'ABC',
                     rwmFlag: 1,
                     sp: null,
+                    id: 'bbb-jjjj-kkkk-llll',
+                    userAction: 'pending',
+                    srAction: 'pending',
                     prCode2: {
                       code: 'ABC',
                       description: 'Desc',

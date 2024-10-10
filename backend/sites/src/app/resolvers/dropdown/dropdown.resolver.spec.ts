@@ -3,11 +3,13 @@ import { DropdownResolver } from './dropdown.resolver';
 import { DropdownService } from '../../services/dropdown/dropdown.service';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { DropdownDto } from '../../dto/dropdown.dto';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('DropdownResolver', () => {
   let resolver: DropdownResolver;
   let dropdownService: DropdownService;
   let genericResponseProvider: GenericResponseProvider<DropdownDto[]>;
+  let loggerService: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,6 +23,15 @@ describe('DropdownResolver', () => {
           },
         },
         {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+          },
+        },
+        {
           provide: GenericResponseProvider,
           useValue: {
             createResponse: jest.fn(),
@@ -31,6 +42,7 @@ describe('DropdownResolver', () => {
 
     resolver = module.get<DropdownResolver>(DropdownResolver);
     dropdownService = module.get<DropdownService>(DropdownService);
+    loggerService = module.get<LoggerService>(LoggerService);
     genericResponseProvider = module.get<
       GenericResponseProvider<DropdownDto[]>
     >(GenericResponseProvider);

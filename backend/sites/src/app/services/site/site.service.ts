@@ -22,8 +22,11 @@ import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { LandHistoryService } from '../landHistory/landHistory.service';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 import { UserActionEnum } from '../../common/userActionEnum';
+
+import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
 import { LoggerService } from '../../logger/logger.service';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { SiteDocPartics } from '../../entities/siteDocPartics.entity';
 
 /**
  * Nestjs Service For Region Entity
@@ -39,8 +42,12 @@ export class SiteService {
     private eventsParticipantsRepo: Repository<EventPartics>,
     @InjectRepository(SitePartics)
     private siteParticipantsRepo: Repository<SitePartics>,
+    @InjectRepository(SiteParticRoles)
+    private siteParticipantRolesRepo: Repository<SiteParticRoles>,
     @InjectRepository(SiteDocs)
     private siteDocumentsRepo: Repository<SiteDocs>,
+    @InjectRepository(SiteDocPartics)
+    private siteDocumentParticsRepo: Repository<SiteDocPartics>,
     @InjectRepository(SiteAssocs)
     private siteAssociationsRepo: Repository<SiteAssocs>,
     @InjectRepository(LandHistories)
@@ -323,6 +330,7 @@ export class SiteService {
           events,
           eventsParticipants,
           siteParticipants,
+          documents,
           siteAssociations,
           subDivisions,
           landHistories,
@@ -349,34 +357,54 @@ export class SiteService {
                   transactionalEntityManager,
                 );
               } else {
-                console.log('No changes To Site Events');
-              }
-
-              if (eventsParticipants) {
-                await transactionalEntityManager.save(
-                  EventPartics,
-                  eventsParticipants,
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Events',
                 );
-              } else {
-                console.log('No changes To Site Event Participants');
               }
 
-              if (siteParticipants) {
-                await transactionalEntityManager.save(
-                  SitePartics,
+              // if (eventsParticipants) {
+              //   await transactionalEntityManager.save(
+              //     EventPartics,
+              //     eventsParticipants,
+              //   );
+              // } else {
+              //   console.log('No changes To Site Event Participants');
+              // }
+
+              if (siteParticipants && siteParticipants.length > 0) {
+                await this.processSiteParticipants(
                   siteParticipants,
+                  userInfo,
+                  transactionalEntityManager,
                 );
               } else {
-                console.log('No changes To Site Participants');
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Participants',
+                );
               }
 
-              if (siteAssociations) {
-                await transactionalEntityManager.save(
-                  SiteAssocs,
-                  siteAssociations,
+              if (documents && documents.length > 0) {
+                await this.processDocuments(
+                  documents,
+                  userInfo,
+                  transactionalEntityManager,
                 );
               } else {
-                console.log('No changes To Site Associations');
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Documents',
+                );
+              }
+
+              if (siteAssociations && siteAssociations.length > 0) {
+                await this.processSiteAssociated(
+                  siteAssociations,
+                  userInfo,
+                  transactionalEntityManager,
+                );
+              } else {
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Associations',
+                );
               }
 
               if (subDivisions) {
@@ -429,8 +457,385 @@ export class SiteService {
         else return false;
       }
     } catch (error) {
-      console.log('Save site details error', error);
+      this.sitesLogger.log(
+        `SiteService.saveSiteDetails(): Save site details error
+        ${error}`,
+      );
       throw error;
+    }
+  }
+
+  /**
+   * Processes and saves site documents based on the provided actions.
+   * @param documents - Array of documents data including actions to be performed.
+   * @param userInfo - Information about the user performing the actions.
+   * @param transactionalEntityManager - Entity manager for handling transactions.
+   */
+  async processDocuments(
+    documents: any[],
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    if (documents && documents.length > 0) {
+      const newDocuments: SiteDocs[] = [];
+      const updateDocuments: { id: string; changes: Partial<SiteDocs> }[] = [];
+      const deleteDocuments: { id: string }[] = [];
+      const newDocumentParticipants: SiteDocPartics[] = [];
+      const updateDocumentParticipants: {
+        id: string;
+        changes: Partial<SiteDocPartics>;
+      }[] = [];
+
+      const siteDocuments = documents.map(async (document) => {
+        const {
+          displayName,
+          psnorgId,
+          dprCode,
+          docParticId,
+          apiAction,
+          srAction,
+          ...siteDocumentData
+        } = document;
+
+        // Validate participant ID
+        let documentId = document.id || ''; // Ensure it's a string
+
+        let siteDocument = { ...new SiteDocs(), ...siteDocumentData, srAction };
+        let siteDocumentParticipant = {
+          ...new SiteDocPartics(),
+          psnorgId,
+          srAction,
+        };
+
+        switch (apiAction) {
+          case UserActionEnum.ADDED:
+            //Generate new id for new document
+            const newDocId = await this.siteDocumentsRepo
+              .createQueryBuilder()
+              .select('Max(id)', 'maxid')
+              .getRawOne()
+              .then((result) => (Number(result.maxid) || 0) + 1);
+
+            //Get the Id of newly created document
+            documentId = newDocId.toString();
+            newDocuments.push({
+              ...siteDocument,
+              id: documentId,
+              rwmFlag: 0,
+              userAction: UserActionEnum.ADDED,
+              // srAction: SRApprovalStatusEnum.PENDING,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+
+            //Generate new id for new document participant.
+            const newDocParticId = await this.siteDocumentParticsRepo
+              .createQueryBuilder()
+              .select('Max(id)', 'maxid')
+              .getRawOne()
+              .then((result) => (Number(result.maxid) || 0) + 1);
+
+            newDocumentParticipants.push({
+              ...siteDocumentParticipant,
+              id: newDocParticId.toString(),
+              sdocId: documentId,
+              rwmFlag: 0,
+              dprCode: dprCode ?? 'ATH',
+              userAction: UserActionEnum.ADDED,
+              // srAction: SRApprovalStatusEnum.PENDING,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+
+            break;
+          case UserActionEnum.UPDATED:
+            const existingDocument =
+              await this.siteDocumentsRepo.findOneByOrFail({ id: documentId });
+            if (existingDocument) {
+              updateDocuments.push({
+                id: documentId,
+                changes: {
+                  ...existingDocument,
+                  ...siteDocument,
+                  userAction: UserActionEnum.UPDATED,
+                  // srAction: SRApprovalStatusEnum.PENDING,
+                  whenUpdated: new Date(),
+                  whoUpdated: userInfo ? userInfo.givenName : '',
+                },
+              });
+
+              const existingDocumentParticipant =
+                await this.siteDocumentParticsRepo.findOneByOrFail({
+                  id: docParticId,
+                });
+              if (existingDocumentParticipant) {
+                updateDocumentParticipants.push({
+                  id: docParticId,
+                  changes: {
+                    ...existingDocumentParticipant,
+                    ...siteDocumentParticipant,
+                    userAction: UserActionEnum.UPDATED,
+                    // srAction: SRApprovalStatusEnum.PENDING,
+                    whenUpdated: new Date(),
+                    whoUpdated: userInfo ? userInfo.givenName : '',
+                  },
+                });
+              } else {
+                this.sitesLogger.log(
+                  `SiteService.processDocuments(): There is no document participant in database againts id : ${docParticId}`,
+                );
+              }
+            } else {
+              this.sitesLogger.log(
+                `SiteService.processDocuments(): There is no document in database againts document id : ${documentId}`,
+              );
+            }
+            break;
+          case UserActionEnum.DELETED:
+            deleteDocuments.push({ id: documentId });
+            break;
+          default:
+            this.sitesLogger.warn(
+              'SiteService.processDocuments(): Unknown action for document:',
+            );
+        }
+      });
+
+      await Promise.all(siteDocuments);
+
+      // Save new site documents and site document participants in bulk
+      if (newDocuments.length > 0) {
+        await transactionalEntityManager.save(SiteDocs, newDocuments);
+      }
+
+      if (newDocumentParticipants.length > 0) {
+        await transactionalEntityManager.save(
+          SiteDocPartics,
+          newDocumentParticipants,
+        );
+      }
+
+      // Update existing site documents and site document participants in bulk
+      if (updateDocuments.length > 0) {
+        await Promise.all(
+          updateDocuments.map(({ id, changes }) =>
+            transactionalEntityManager.update(SiteDocs, { id }, changes),
+          ),
+        );
+      }
+
+      if (updateDocumentParticipants.length > 0) {
+        await Promise.all(
+          updateDocumentParticipants.map(({ id, changes }) =>
+            transactionalEntityManager.update(SiteDocPartics, { id }, changes),
+          ),
+        );
+      }
+
+      // Delete existing site documents and site document participants in bulk
+      if (deleteDocuments.length > 0) {
+        await Promise.all(
+          deleteDocuments.map(({ id }) =>
+            transactionalEntityManager.delete(SiteDocs, { id }),
+          ),
+        );
+      }
+    }
+  }
+
+  /**
+   * Processes and saves site participants based on the provided actions.
+   * @param siteParticipants - Array of site participant data including actions to be performed.
+   * @param userInfo - Information about the user performing the actions.
+   * @param transactionalEntityManager - Entity manager for handling transactions.
+   */
+  async processSiteParticipants(
+    siteParticipants: any[],
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    if (siteParticipants && siteParticipants.length) {
+      // Arrays to store new and updated entities
+      const newSitePartics: SitePartics[] = [];
+      const updatedSitePartics: {
+        id: string;
+        changes: Partial<SitePartics>;
+      }[] = [];
+      const deleteSitePartics: { id: string }[] = [];
+      const newSiteParticRoles: SiteParticRoles[] = [];
+      const updatedSiteParticRoles: {
+        id: string;
+        changes: Partial<SiteParticRoles>;
+      }[] = [];
+      // const deleteSiteParticRoles: { id: string }[] = [];
+
+      // Main processing loop for site participants
+      const siteParticsPromises = siteParticipants.map(async (participant) => {
+        const {
+          description,
+          displayName,
+          prCode,
+          apiAction,
+          particRoleId,
+          srAction,
+          ...siteParticsData
+        } = participant;
+
+        // Validate participant ID
+        let participantId = participant.id || ''; // Ensure it's a string
+
+        let sitePartic: SitePartics = {
+          ...new SitePartics(),
+          ...siteParticsData,
+          srAction,
+        };
+
+        let siteParticRole: SiteParticRoles = {
+          ...new SiteParticRoles(),
+          prCode,
+          srAction,
+        };
+
+        switch (apiAction) {
+          case UserActionEnum.ADDED:
+            // Generate new ID for the new participant
+            const newId = await this.siteParticipantsRepo
+              .createQueryBuilder()
+              .select('MAX(id)', 'maxid')
+              .getRawOne()
+              .then((result) => (Number(result.maxid) || 0) + 1);
+
+            // Get the ID of the newly created participant
+            participantId = newId.toString();
+
+            newSitePartics.push({
+              ...sitePartic,
+              id: participantId,
+              rwmFlag: 0,
+              rwmNoteFlag: 0,
+              userAction: UserActionEnum.ADDED,
+              // srAction: srAction,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+
+            newSiteParticRoles.push({
+              ...siteParticRole,
+              spId: participantId,
+              rwmFlag: 0,
+              userAction: UserActionEnum.ADDED,
+              // srAction: srAction,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+            break;
+
+          case UserActionEnum.UPDATED:
+            const existingSitePartic =
+              await this.siteParticipantsRepo.findOneByOrFail({
+                id: participantId,
+              });
+
+            if (existingSitePartic) {
+              updatedSitePartics.push({
+                id: participantId,
+                changes: {
+                  ...new SitePartics(),
+                  ...existingSitePartic,
+                  ...sitePartic,
+                  userAction: UserActionEnum.UPDATED,
+                  // srAction: srAction,
+                  whenUpdated: new Date(),
+                  whoUpdated: userInfo ? userInfo.givenName : '',
+                },
+              });
+
+              const existingSiteParticRole =
+                await this.siteParticipantRolesRepo.findOneByOrFail({
+                  id: particRoleId,
+                });
+              if (existingSiteParticRole) {
+                updatedSiteParticRoles.push({
+                  id: particRoleId,
+                  changes: {
+                    ...existingSiteParticRole,
+                    ...siteParticRole,
+                    userAction: UserActionEnum.UPDATED,
+                    // srAction: srAction,
+                    whenUpdated: new Date(),
+                    whoUpdated: userInfo ? userInfo.givenName : '',
+                  },
+                });
+              } else {
+                this.sitesLogger.log(
+                  `SiteService.processSiteParticipants(): There is no site participant role in database againts id : ${particRoleId}`,
+                );
+              }
+            } else {
+              this.sitesLogger.log(
+                `SiteService.processSiteParticipants(): There is no site participant in database againts id : ${participantId}`,
+              );
+            }
+            break;
+
+          case UserActionEnum.DELETED:
+            // Handle deletion if necessary
+            deleteSitePartics.push({ id: participantId });
+            // deleteSiteParticRoles.push({ id: particRoleId });
+            break;
+
+          default:
+            this.sitesLogger.warn(
+              'SiteService.processSiteParticipants(): Unknown action for participant:',
+            );
+        }
+      });
+
+      await Promise.all(siteParticsPromises);
+
+      // Save new site participants and site participant roles in bulk
+      if (newSitePartics.length > 0) {
+        await transactionalEntityManager.save(SitePartics, newSitePartics);
+      }
+      if (newSiteParticRoles.length > 0) {
+        await transactionalEntityManager.save(
+          SiteParticRoles,
+          newSiteParticRoles,
+        );
+      }
+
+      // Update existing site participants and site participant roles in bulk
+      if (updatedSitePartics.length > 0) {
+        await Promise.all(
+          updatedSitePartics.map(({ id, changes }) =>
+            transactionalEntityManager.update(SitePartics, { id }, changes),
+          ),
+        );
+      }
+
+      if (updatedSiteParticRoles.length > 0) {
+        await Promise.all(
+          updatedSiteParticRoles.map(({ id, changes }) =>
+            transactionalEntityManager.update(SiteParticRoles, { id }, changes),
+          ),
+        );
+      }
+
+      // Delete existing site participants and site participant roles in bulk
+      // if (deleteSiteParticRoles.length > 0) {
+      //   await Promise.all(
+      //     deleteSiteParticRoles.map(({ id }) =>
+      //       transactionalEntityManager.delete(SiteParticRoles, { id }),
+      //     ),
+      //   );
+      // }
+      if (deleteSitePartics.length > 0) {
+        await Promise.all(
+          deleteSitePartics.map(({ id }) =>
+            transactionalEntityManager.delete(SitePartics, { id }),
+          ),
+        );
+      }
     }
   }
 
@@ -441,7 +846,7 @@ export class SiteService {
    * @param transactionalEntityManager - Entity manager for handling transactions.
    */
   async processEvents(
-    events: any[], // Replace 'any' with actual type if possible
+    events: any[],
     userInfo: any,
     transactionalEntityManager: EntityManager,
   ) {
@@ -461,7 +866,8 @@ export class SiteService {
         participants: any[],
       ) => {
         const participantPromises = participants.map(async (partic) => {
-          const { guid, displayName, apiAction, ...particData } = partic;
+          const { eventParticId, displayName, apiAction, ...particData } =
+            partic;
           switch (apiAction) {
             case UserActionEnum.ADDED:
               return {
@@ -474,9 +880,11 @@ export class SiteService {
               };
             case UserActionEnum.UPDATED:
               const existingPartic =
-                await this.eventsParticipantsRepo.findOneByOrFail({ id: guid });
+                await this.eventsParticipantsRepo.findOneByOrFail({
+                  id: eventParticId,
+                });
               return {
-                id: guid,
+                id: eventParticId,
                 changes: {
                   ...existingPartic,
                   ...particData,
@@ -491,11 +899,13 @@ export class SiteService {
               };
             case UserActionEnum.DELETED:
               await transactionalEntityManager.delete(EventPartics, {
-                id: guid,
+                id: eventParticId,
               });
               return null;
             default:
-              console.warn('Unknown action for event participant:', apiAction);
+              this.sitesLogger.warn(
+                'SiteService.processEvents.processParticipants(): Unknown action for event participant:',
+              );
               return null;
           }
         });
@@ -549,21 +959,28 @@ export class SiteService {
               await this.eventsRepositoryRepo.findOneByOrFail({
                 id: notation.id,
               });
-            updatedEvents.push({
-              id: notation.id,
-              changes: {
-                ...new Events(),
-                ...existingEvent,
-                ...event,
-                userAction:
-                  notation.srAction === SRApprovalStatusEnum.PUBLIC ||
-                  notation.srAction === SRApprovalStatusEnum.PRIVATE
-                    ? UserActionEnum.DEFAULT
-                    : UserActionEnum.UPDATED,
-                whenUpdated: new Date(),
-                whoUpdated: userInfo ? userInfo.givenName : '',
-              },
-            });
+
+            if (existingEvent) {
+              updatedEvents.push({
+                id: notation.id,
+                changes: {
+                  ...new Events(),
+                  ...existingEvent,
+                  ...event,
+                  userAction:
+                    notation.srAction === SRApprovalStatusEnum.PUBLIC ||
+                    notation.srAction === SRApprovalStatusEnum.PRIVATE
+                      ? UserActionEnum.DEFAULT
+                      : UserActionEnum.UPDATED,
+                  whenUpdated: new Date(),
+                  whoUpdated: userInfo ? userInfo.givenName : '',
+                },
+              });
+            } else {
+              this.sitesLogger.log(
+                `SiteService.processEvents(): There is no event in database againts event id : ${notation.id}`,
+              );
+            }
             break;
 
           case UserActionEnum.DELETED:
@@ -604,6 +1021,96 @@ export class SiteService {
         await Promise.all(
           updatedEventPartics.map(({ id, changes }) =>
             transactionalEntityManager.update(EventPartics, { id }, changes),
+          ),
+        );
+      }
+    }
+  }
+
+  /**
+   * Processes and saves associated sites based on the provided actions.
+   * @param siteAccociated - Array of associated sites data including actions to be performed.
+   * @param userInfo - Information about the user performing the actions.
+   * @param transactionalEntityManager - Entity manager for handling transactions.
+   */
+  async processSiteAssociated(
+    siteAccociated: any[],
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    if (siteAccociated && siteAccociated.length > 0) {
+      const newSiteAssociates: SiteAssocs[] = [];
+      const updatedSiteAssociates: {
+        id: string;
+        changes: Partial<SiteAssocs>;
+      }[] = [];
+      const deleteSiteAssociates: { id: string }[] = [];
+
+      const siteAssociatePromises = siteAccociated.map(async (asscos) => {
+        const { id, apiAction, ...siteAssocsData } = asscos;
+        let siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
+        switch (apiAction) {
+          case UserActionEnum.ADDED:
+            newSiteAssociates.push({
+              ...siteAssoc,
+              rwmFlag: 0,
+              rwmNoteFlag: 0,
+              // Need to know common pid relation as it is non-nullable field in DB and we don't and visibility in our design for same.
+              commonPid: 'N',
+              userAction: UserActionEnum.ADDED,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            });
+            break;
+          case UserActionEnum.UPDATED:
+            const existingSiteAssoc =
+              await this.siteAssociationsRepo.findOneByOrFail({
+                id: asscos.id,
+              });
+            if (existingSiteAssoc) {
+              updatedSiteAssociates.push({
+                id: asscos.id,
+                changes: {
+                  ...existingSiteAssoc,
+                  ...siteAssoc,
+                  userAction: UserActionEnum.UPDATED,
+                  whenUpdated: new Date(),
+                  whoUpdated: userInfo ? userInfo.givenName : '',
+                },
+              });
+            } else {
+              this.sitesLogger.log(
+                `SiteService.processSiteAssociated(): There is no site associated in database againts id : ${asscos.id}`,
+              );
+            }
+            break;
+          case UserActionEnum.DELETED:
+            // Handle deletion if necessary
+            deleteSiteAssociates.push({ id: asscos.id });
+            break;
+        }
+      });
+
+      await Promise.all(siteAssociatePromises);
+
+      // Save new site associates in bulk
+      if (newSiteAssociates.length > 0) {
+        await transactionalEntityManager.save(SiteAssocs, newSiteAssociates);
+      }
+
+      // Update existing site participants and site participant roles in bulk
+      if (updatedSiteAssociates.length > 0) {
+        await Promise.all(
+          updatedSiteAssociates.map(({ id, changes }) =>
+            transactionalEntityManager.update(SiteAssocs, { id }, changes),
+          ),
+        );
+      }
+
+      if (deleteSiteAssociates.length > 0) {
+        await Promise.all(
+          deleteSiteAssociates.map(({ id }) =>
+            transactionalEntityManager.delete(SiteAssocs, { id }),
           ),
         );
       }

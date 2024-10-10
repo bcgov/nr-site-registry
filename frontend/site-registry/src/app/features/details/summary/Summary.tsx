@@ -44,7 +44,7 @@ import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { useParams } from 'react-router-dom';
 import SummaryInfo from './SummaryInfo';
 
-const Summary= () => {
+const Summary = () => {
   const auth = useAuth();
 
   const user = getUser();
@@ -52,7 +52,6 @@ const Summary= () => {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    
     dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
   }, [addCartItemStatus]);
   const { id } = useParams();
@@ -97,7 +96,6 @@ const Summary= () => {
   const [srMode, setSRMode] = useState(false);
 
   useEffect(() => {
-    
     if (detailsMode === SiteDetailsMode.EditMode) {
       setEdit(true);
       setSRMode(false);
@@ -459,15 +457,15 @@ const Summary= () => {
 
   return (
     <div className="summary-section-details">
-          <SummaryInfo
-      siteData={editSiteDetailsObject}
-      location={location}
-      edit={edit}
-      srMode={srMode}
-      handleInputChange={handleInputChange}
+      <SummaryInfo
+        siteData={editSiteDetailsObject}
+        location={location}
+        edit={edit}
+        srMode={srMode}
+        handleInputChange={handleInputChange}
       />
 
-      {(
+      {
         <PanelWithUpDown
           label="Parcel ID(s)"
           secondChild={
@@ -510,9 +508,9 @@ const Summary= () => {
             )
           }
         />
-      )}
+      }
 
-      {(
+      {
         <div className="">
           <div className="summary-details-border">
             <span className="summary-details-header">
@@ -534,7 +532,7 @@ const Summary= () => {
             />
           </div>
         </div>
-      )}
+      }
 
       {false && (
         <div className="summary-details-border">
@@ -556,7 +554,7 @@ const Summary= () => {
         </div>
       )}
 
-      {(
+      {
         <div className="external-purchase-section">
           <div className="external-purchase-info">
             <span>
@@ -579,7 +577,7 @@ const Summary= () => {
             </button>
           </div>
         </div>
-      )}
+      }
     </div>
   );
 };

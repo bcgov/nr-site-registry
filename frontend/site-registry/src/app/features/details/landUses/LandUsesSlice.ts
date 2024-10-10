@@ -21,12 +21,12 @@ export const fetchLandUses = createAsyncThunk(
     siteId,
     searchTerm,
     sortDirection,
-    showPending
+    showPending,
   }: {
     siteId: string;
     searchTerm?: string;
     sortDirection?: string;
-    showPending: boolean
+    showPending: boolean;
   }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {

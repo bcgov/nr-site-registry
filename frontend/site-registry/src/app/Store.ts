@@ -36,7 +36,7 @@ export const store = configureStore({
     associatedSites: associatedSitesReducer,
     siteDetails: siteDetailsReducer,
     parcelDescriptions: parcelDescriptionsReducer,
-    srUpdates: srUpdatesReducer
+    srUpdates: srUpdatesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

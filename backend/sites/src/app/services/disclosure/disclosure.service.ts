@@ -14,7 +14,6 @@ export class DisclosureService {
   ) {}
 
   /**
-  /**
    * Retrieves site profiles for a given site ID.
    *
    * @param siteId - The ID of the site whose profiles are to be fetched.

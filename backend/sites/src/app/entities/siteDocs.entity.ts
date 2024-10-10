@@ -81,9 +81,7 @@ export class SiteDocs extends ChangeAuditEntity {
   rwmNoteFlag: number | null;
 
   @Field(() => [SiteDocPartics])
-  @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sdoc, {
-    cascade: true,
-  })
+  @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sdoc)
   siteDocPartics: SiteDocPartics[];
 
   @ManyToOne(() => Sites, (sites) => sites.siteDocs, { onDelete: 'CASCADE' })

@@ -12,6 +12,7 @@ import { RequestStatus } from './requests/status';
 import { notifyError, notifySuccess } from '../components/alert/Alert';
 import { TableColumn } from '../components/table/TableColumn';
 import { UserActionEnum } from '../common/userActionEnum';
+import { MyLocationData, MyLocationSuccess } from '../features/map/ILocation';
 
 export interface UpdateDisplayTypeParams {
   indexToUpdate: number;
@@ -326,3 +327,68 @@ export const deepFilterByUserAction = (
 
   return filterRecursive(data) || [];
 };
+
+const DEFAULT_POSITION_OPTIONS: PositionOptions = {
+  enableHighAccuracy: true,
+  maximumAge: 0,
+};
+
+/**
+ * Uses geolocation to find the current users latitude and longitude.
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Navigator/permissions
+ */
+export function getMyLocation(
+  onSuccess: MyLocationSuccess,
+  onError: PositionErrorCallback | null | undefined = undefined,
+  options: PositionOptions | undefined = DEFAULT_POSITION_OPTIONS,
+) {
+  // Extract just the position and accuracy values
+  const successCb = (result: GeolocationPosition) => {
+    const { coords } = result;
+    const { latitude: lat, longitude: lng, accuracy = 0 } = coords || {};
+    const newData: MyLocationData = { accuracy };
+    if (!isNaN(lat) && !isNaN(lng)) {
+      newData.position = [lat, lng];
+    }
+    onSuccess(newData);
+  };
+  const { geolocation: geo } = navigator;
+  if (typeof geo?.getCurrentPosition === 'function') {
+    // prettier-ignore Ignore Sonar error about geolocation - we need to allow this
+    geo.getCurrentPosition(successCb, onError, options); // NOSONAR
+  } else if (onError) {
+    onError({ code: 2, message: 'Unavailable' } as GeolocationPositionError);
+  }
+}
+
+type PermissionSuccessCallback = (state: PermissionState) => void;
+type PermissionErrorCallback = (error: Error) => void;
+
+/**
+ * Queries the permissions API to see if geolocation has been granted
+ * or denied
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query
+ */
+export function getGeolocationPermission(
+  onSuccess: PermissionSuccessCallback,
+  onError: PermissionErrorCallback | undefined = undefined,
+) {
+  // Not supported on Safari (e2e)
+  const { permissions: perms } = navigator;
+  if (typeof perms?.query === 'function') {
+    perms
+      .query({ name: 'geolocation' })
+      .then((result) => {
+        onSuccess(result.state);
+        return result;
+      })
+      .catch((ex: any) => {
+        if (onError) {
+          onError(ex);
+        }
+      });
+  } else if (onError) {
+    onError(new Error('Not supported'));
+  }
+}

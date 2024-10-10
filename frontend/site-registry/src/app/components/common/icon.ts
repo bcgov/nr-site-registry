@@ -39,6 +39,7 @@ import {
   FaRegFloppyDisk,
   FaPencil,
   FaCaretRight,
+  FaLocationCrosshairs,
 } from 'react-icons/fa6';
 
 import {
@@ -94,3 +95,4 @@ export const ExclamationTriangle = BsExclamationTriangle;
 export const RegFloppyDisk = FaRegFloppyDisk;
 export const PencilIcon = FaPencil;
 export const CaretRightIcon = FaCaretRight;
+export const FindMe = FaLocationCrosshairs;

@@ -26,7 +26,7 @@ interface IParticipantTableProps {
     participantId: any;
     psnorgId: any;
     prCode: string;
-    partiRoleId: string;
+    particRoleId: string;
   }[];
   handleRemoveParticipant: (particIsDelete?: boolean) => void;
   srVisibilityParcticConfig: DropdownItem[];
@@ -85,7 +85,7 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
         srMode={
           viewMode === SiteDetailsMode.SRMode && userType === UserType.Internal
         }
-        primaryKeycolumnName="partiRoleId"
+        primaryKeycolumnName="particRoleId"
         sortHandler={(row, ascDir) => {
           handleTableSort(row, ascDir);
         }}

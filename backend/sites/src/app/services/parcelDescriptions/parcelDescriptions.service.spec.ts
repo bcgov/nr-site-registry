@@ -6,6 +6,7 @@ import {
   getInternalUserQueries,
 } from './parcelDescriptions.queryBuilder';
 import { SnapshotsService } from '../snapshot/snapshot.service';
+import { LoggerService } from '../../logger/logger.service';
 
 jest.mock('./parcelDescriptions.queryBuilder');
 
@@ -13,10 +14,14 @@ describe('SiteSubdivisionsService', () => {
   let siteSubdivisionService: ParcelDescriptionsService;
   let entityManager: EntityManager;
   let snapshotsService: SnapshotsService;
+  let loggerService: LoggerService;
   let queryMock: jest.Mock;
   let getMostRecentSnapshotMock: jest.Mock;
   let getInternalUserQueriesMock: jest.Mock;
   let getExternalUserQueriesMock: jest.Mock;
+  let logMock: jest.Mock;
+  let debugMock: jest.Mock;
+  let errorMock: jest.Mock;
 
   let siteId: number;
   let page: number;
@@ -25,6 +30,7 @@ describe('SiteSubdivisionsService', () => {
   let sortBy: string;
   let sortByDir: string;
   let user: any;
+  let showPending: false;
 
   let queryText: string;
   let queryParams: string[];
@@ -37,8 +43,9 @@ describe('SiteSubdivisionsService', () => {
   let returnIdPinNumber: string;
   let returnDateNoted: string;
   let returnLandDescription: string;
+  let returnUserAction: string;
+  let returnSrAction: string;
 
-  let returnHttpStatusCode: number;
   let returnSuccess: boolean;
 
   beforeEach(async () => {
@@ -64,8 +71,9 @@ describe('SiteSubdivisionsService', () => {
     returnIdPinNumber = '123456';
     returnDateNoted = '2024-08-07T00:00:00.000Z';
     returnLandDescription = 'A parcel of land';
+    returnUserAction = 'updated';
+    returnSrAction = 'approved'; // I don't actually know if this is a real-world value it could assume.
 
-    returnHttpStatusCode = 200;
     returnSuccess = true;
 
     const testingModule: TestingModule = await Test.createTestingModule({
@@ -83,6 +91,14 @@ describe('SiteSubdivisionsService', () => {
             getMostRecentSnapshot: jest.fn(),
           },
         },
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+            debug: jest.fn(),
+            error: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -91,6 +107,7 @@ describe('SiteSubdivisionsService', () => {
     );
     entityManager = testingModule.get<EntityManager>(EntityManager);
     snapshotsService = testingModule.get<SnapshotsService>(SnapshotsService);
+    loggerService = testingModule.get<LoggerService>(LoggerService);
 
     getInternalUserQueriesMock = jest
       .mocked(getInternalUserQueries)
@@ -118,6 +135,8 @@ describe('SiteSubdivisionsService', () => {
           id_pin_number: returnIdPinNumber,
           date_noted: returnDateNoted,
           land_description: returnLandDescription,
+          user_action: returnUserAction,
+          sr_action: returnSrAction,
         },
       ]);
     entityManager.query = queryMock;
@@ -128,6 +147,13 @@ describe('SiteSubdivisionsService', () => {
       },
     });
     snapshotsService.getMostRecentSnapshot = getMostRecentSnapshotMock;
+
+    logMock = jest.fn();
+    debugMock = jest.fn();
+    errorMock = jest.fn();
+    loggerService.log = logMock;
+    loggerService.debug = debugMock;
+    loggerService.error = errorMock;
   });
 
   afterEach(() => {
@@ -143,6 +169,22 @@ describe('SiteSubdivisionsService', () => {
     });
 
     describe('when everything is correct.', () => {
+      it('Logs the call to the function', async () => {
+        await siteSubdivisionService.getParcelDescriptionsBySiteId(
+          siteId,
+          page,
+          pageSize,
+          searchParam,
+          sortBy,
+          sortByDir,
+          showPending,
+          user,
+        );
+
+        expect(logMock).toHaveBeenCalled();
+        expect(debugMock).toHaveBeenCalled();
+      });
+
       it('Runs a count query.', async () => {
         await siteSubdivisionService.getParcelDescriptionsBySiteId(
           siteId,
@@ -151,6 +193,7 @@ describe('SiteSubdivisionsService', () => {
           searchParam,
           sortBy,
           sortByDir,
+          showPending,
           user,
         );
 
@@ -171,6 +214,7 @@ describe('SiteSubdivisionsService', () => {
           searchParam,
           sortBy,
           sortByDir,
+          showPending,
           user,
         );
 
@@ -188,6 +232,7 @@ describe('SiteSubdivisionsService', () => {
             searchParam,
             sortBy,
             sortByDir,
+            showPending,
             user,
           );
 
@@ -200,6 +245,8 @@ describe('SiteSubdivisionsService', () => {
                 idPinNumber: returnIdPinNumber,
                 dateNoted: new Date(returnDateNoted),
                 landDescription: returnLandDescription,
+                userAction: returnUserAction,
+                srAction: returnSrAction,
               }),
             ]),
             count: returnCount,
@@ -223,6 +270,22 @@ describe('SiteSubdivisionsService', () => {
     });
 
     describe('when everything is correct.', () => {
+      it('Logs the call to the function', async () => {
+        await siteSubdivisionService.getParcelDescriptionsBySiteId(
+          siteId,
+          page,
+          pageSize,
+          searchParam,
+          sortBy,
+          sortByDir,
+          showPending,
+          user,
+        );
+
+        expect(logMock).toHaveBeenCalled();
+        expect(debugMock).toHaveBeenCalled();
+      });
+
       it('Runs a count query.', async () => {
         await siteSubdivisionService.getParcelDescriptionsBySiteId(
           siteId,
@@ -231,6 +294,7 @@ describe('SiteSubdivisionsService', () => {
           searchParam,
           sortBy,
           sortByDir,
+          showPending,
           user,
         );
 
@@ -252,6 +316,7 @@ describe('SiteSubdivisionsService', () => {
           searchParam,
           sortBy,
           sortByDir,
+          showPending,
           user,
         );
 
@@ -270,6 +335,7 @@ describe('SiteSubdivisionsService', () => {
             searchParam,
             sortBy,
             sortByDir,
+            showPending,
             user,
           );
 
@@ -282,6 +348,8 @@ describe('SiteSubdivisionsService', () => {
                 idPinNumber: returnIdPinNumber,
                 dateNoted: new Date(returnDateNoted),
                 landDescription: returnLandDescription,
+                userAction: returnUserAction,
+                srAction: returnSrAction,
               }),
             ]),
             count: returnCount,
@@ -309,6 +377,7 @@ describe('SiteSubdivisionsService', () => {
             searchParam,
             sortBy,
             sortByDir,
+            showPending,
             user,
           );
 
@@ -336,7 +405,22 @@ describe('SiteSubdivisionsService', () => {
       entityManager.query = queryMock;
     });
 
-    it('produces the correct result', async () => {
+    it('Logs the error', async () => {
+      await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        siteId,
+        page,
+        pageSize,
+        searchParam,
+        sortBy,
+        sortByDir,
+        showPending,
+        user,
+      );
+
+      expect(errorMock).toHaveBeenCalled();
+    });
+
+    it('Produces the correct response', async () => {
       let response = await siteSubdivisionService.getParcelDescriptionsBySiteId(
         siteId,
         page,
@@ -344,6 +428,7 @@ describe('SiteSubdivisionsService', () => {
         searchParam,
         sortBy,
         sortByDir,
+        showPending,
         user,
       );
 
@@ -357,6 +442,55 @@ describe('SiteSubdivisionsService', () => {
           success: false,
           message:
             'There was an error communicating with the database. Try again later.',
+        }),
+      );
+    });
+  });
+
+  describe('when the user is invalid', () => {
+    beforeEach(async () => {
+      user = {
+        sub: '',
+        identity_provider: '',
+      };
+    });
+
+    it('Logs the error', async () => {
+      await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        siteId,
+        page,
+        pageSize,
+        searchParam,
+        sortBy,
+        sortByDir,
+        showPending,
+        user,
+      );
+
+      expect(errorMock).toHaveBeenCalled();
+    });
+
+    it('Produces the correct response.', async () => {
+      let response = await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        siteId,
+        page,
+        pageSize,
+        searchParam,
+        sortBy,
+        sortByDir,
+        showPending,
+        user,
+      );
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          data: [],
+          httpStatusCode: 500,
+          count: 0,
+          page: 0,
+          pageSize: 0,
+          success: false,
+          message: 'User id is invalid.',
         }),
       );
     });

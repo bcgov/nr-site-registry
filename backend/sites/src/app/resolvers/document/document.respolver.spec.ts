@@ -93,6 +93,7 @@ describe('DocumentResolver', () => {
     expect(mockDocuments[0].psnorgId).toEqual('1');
     expect(documentService.getSiteDocumentsBySiteId).toHaveBeenCalledWith(
       siteId,
+      false,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       'Documents fetched successfully.',
@@ -121,6 +122,7 @@ describe('DocumentResolver', () => {
     expect(result).toEqual(expectedResult);
     expect(documentService.getSiteDocumentsBySiteId).toHaveBeenCalledWith(
       siteId,
+      false,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       `Documents not found for site id ${siteId}`,

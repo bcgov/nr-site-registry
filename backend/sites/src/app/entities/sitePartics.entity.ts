@@ -79,15 +79,11 @@ export class SitePartics extends ChangeAuditEntity {
   // @OneToMany(() => EventPartics, (eventPartics) => eventPartics.sp)
   // eventPartics: EventPartics[];
 
-  @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sp, {
-    cascade: true,
-  })
+  @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sp)
   siteDocPartics: SiteDocPartics[];
 
   @Field(() => [SiteParticRoles])
-  @OneToMany(() => SiteParticRoles, (siteParticRoles) => siteParticRoles.sp, {
-    cascade: true,
-  })
+  @OneToMany(() => SiteParticRoles, (siteParticRoles) => siteParticRoles.sp)
   siteParticRoles: SiteParticRoles[];
 
   @Field(() => PeopleOrgs)
@@ -102,29 +98,18 @@ export class SitePartics extends ChangeAuditEntity {
   @OneToMany(
     () => SiteProfileOwners,
     (siteProfileOwners) => siteProfileOwners.sp,
-    { cascade: true },
   )
   siteProfileOwners: SiteProfileOwners[];
 
-  @OneToMany(
-    () => SiteProfiles,
-    (siteProfiles) => siteProfiles.completorPartic,
-    { cascade: true },
-  )
+  @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.completorPartic)
   siteProfiles: SiteProfiles[];
 
-  @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.contactPartic, {
-    cascade: true,
-  })
+  @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.contactPartic)
   siteProfiles2: SiteProfiles[];
 
-  @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.rwmPartic, {
-    cascade: true,
-  })
+  @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.rwmPartic)
   siteProfiles3: SiteProfiles[];
 
-  @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.siteRegPartic, {
-    cascade: true,
-  })
+  @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.siteRegPartic)
   siteProfiles4: SiteProfiles[];
 }

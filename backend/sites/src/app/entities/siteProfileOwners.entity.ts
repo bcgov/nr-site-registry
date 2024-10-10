@@ -45,7 +45,6 @@ export class SiteProfileOwners {
   // @ManyToOne(
   //   () => SiteProfiles,
   //   (siteProfiles) => siteProfiles.siteProfileOwners,
-  //   { onDelete: 'CASCADE' },
   // )
   // @JoinColumn([
   //   { name: 'site_id', referencedColumnName: 'siteId' },
@@ -53,11 +52,7 @@ export class SiteProfileOwners {
   // ])
   // siteProfiles: SiteProfiles;
 
-  @ManyToOne(
-    () => SitePartics,
-    (sitePartics) => sitePartics.siteProfileOwners,
-    { onDelete: 'CASCADE' },
-  )
+  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfileOwners)
   @JoinColumn([{ name: 'sp_id', referencedColumnName: 'id' }])
   sp: SitePartics;
 }

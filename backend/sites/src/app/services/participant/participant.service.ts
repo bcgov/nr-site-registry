@@ -55,7 +55,7 @@ export class ParticipantService {
         // Transform the fetched site participants into the desired format
         const transformedObjects = result.flatMap((item) =>
           item.siteParticRoles.map((role) => ({
-            partiRoleId: role.id,
+            particRoleId: role.id,
             id: item.id,
             siteId: item.siteId,
             psnorgId: item.psnorgId,

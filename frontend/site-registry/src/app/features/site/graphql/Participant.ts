@@ -9,7 +9,7 @@ export const graphQLSiteParticipantsBySiteId = () => {
         message
         timestamp
         data {
-          partiRoleId
+          particRoleId
           id
           psnorgId
           siteId

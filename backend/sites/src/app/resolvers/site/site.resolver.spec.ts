@@ -4,15 +4,19 @@ import { SiteService } from '../../services/site/site.service';
 import {
   FetchSiteDetail,
   FetchSiteResponse,
+  SaveSiteDetailsResponse,
   SearchSiteResponse,
 } from '../../dto/response/genericResponse';
 import { sampleSites } from '../../mockData/site.mockData';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { DropdownDto } from '../../dto/dropdown.dto';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('SiteResolver', () => {
   let siteResolver: SiteResolver;
   let siteService: SiteService;
+  let loggerService: LoggerService;
+  // let genericResponseProvider: GenericResponseProvider<SaveSiteDetailsResponse>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -45,6 +49,15 @@ describe('SiteResolver', () => {
           },
         },
         {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+          },
+        },
+        {
           provide: GenericResponseProvider,
           useValue: {
             createResponse: jest.fn(
@@ -67,6 +80,7 @@ describe('SiteResolver', () => {
 
     siteResolver = module.get<SiteResolver>(SiteResolver);
     siteService = module.get<SiteService>(SiteService);
+    loggerService = module.get<LoggerService>(LoggerService);
   });
 
   afterEach(() => {
@@ -229,7 +243,7 @@ describe('SiteResolver', () => {
     it('should call siteService.findSiteBySiteId with the provided siteId', () => {
       const siteId = '123';
       siteResolver.findSiteBySiteId(siteId, false);
-      expect(siteService.findSiteBySiteId).toHaveBeenCalledWith(siteId);
+      expect(siteService.findSiteBySiteId).toHaveBeenCalledWith(siteId, false);
     });
 
     it('finds a matching site id', async () => {

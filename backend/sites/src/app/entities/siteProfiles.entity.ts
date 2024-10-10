@@ -345,46 +345,36 @@ export class SiteProfiles extends ChangeAuditEntity {
   // @OneToMany(
   //   () => ProfileAnswers,
   //   (profileAnswers) => profileAnswers.siteProfiles,
-  //   { cascade: true },
   // )
   // profileAnswers: ProfileAnswers[];
 
   // @OneToMany(
   //   () => ProfileSubmissions,
   //   (profileSubmissions) => profileSubmissions.siteProfiles,
-  //   { cascade: true },
   // )
   // profileSubmissions: ProfileSubmissions[];
 
   // @OneToMany(
   //   () => SiteProfileLandUses,
   //   (siteProfileLandUses) => siteProfileLandUses.siteProfiles,
-  //   { cascade: true },
   // )
   // siteProfileLandUses: SiteProfileLandUses[];
 
   // @OneToMany(
   //   () => SiteProfileOwners,
   //   (siteProfileOwners) => siteProfileOwners.siteProfiles,
-  //   { cascade: true },
   // )
   // siteProfileOwners: SiteProfileOwners[];
 
-  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles)
   @JoinColumn([{ name: 'completor_partic_id', referencedColumnName: 'id' }])
   completorPartic: SitePartics;
 
-  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles2, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles2)
   @JoinColumn([{ name: 'contact_partic_id', referencedColumnName: 'id' }])
   contactPartic: SitePartics;
 
-  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles3, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles3)
   @JoinColumn([{ name: 'rwm_partic_id', referencedColumnName: 'id' }])
   rwmPartic: SitePartics;
 
@@ -392,9 +382,7 @@ export class SiteProfiles extends ChangeAuditEntity {
   @JoinColumn([{ name: 'site_id', referencedColumnName: 'id' }])
   site: Sites;
 
-  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles4, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles4)
   @JoinColumn([{ name: 'site_reg_partic_id', referencedColumnName: 'id' }])
   siteRegPartic: SitePartics;
 }

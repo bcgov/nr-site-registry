@@ -4,9 +4,9 @@
   flex-direction: column;
 }
 
-.leaflet-container {
+/* .leaflet-container {
   height: 500px !important;
-}
+} */
 
 .parcel-container {
   padding: var(--layout-margin-medium) var(--layout-margin-xxlarge)

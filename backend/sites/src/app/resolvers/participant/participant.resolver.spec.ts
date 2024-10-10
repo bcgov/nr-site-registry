@@ -55,7 +55,7 @@ describe('ParticipantResolver', () => {
       const siteId = 'site123';
       const expectedResult: SiteParticsDto[] = [
         {
-          partiRoleId: 'guid1',
+          particRoleId: 'guid1',
           id: '1',
           psnorgId: 'org123',
           effectiveDate: new Date(),

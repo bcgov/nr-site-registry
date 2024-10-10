@@ -78,7 +78,12 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchSiteParticipant, setSearchSiteParticipant] = useState('');
   const [selectedRows, setSelectedRows] = useState<
-    { participantId: any; psnorgId: any; prCode: string; partiRoleId: string }[]
+    {
+      participantId: any;
+      psnorgId: any;
+      prCode: string;
+      particRoleId: string;
+    }[]
   >([]);
   const [isDelete, setIsDelete] = useState(false);
   const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
@@ -317,7 +322,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
                 row.participantId === participant.id &&
                 row.psnorgId === participant.psnorgId &&
                 row.prCode === participant.prCode &&
-                row.partiRoleId === participant.partiRoleId,
+                row.particRoleId === participant.particRoleId,
             )
           ) {
             return {
@@ -342,7 +347,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
               row.participantId === participant.id &&
               row.psnorgId === participant.psnorgId &&
               row.prCode === participant.prCode &&
-              row.partiRoleId === participant.partiRoleId,
+              row.particRoleId === participant.particRoleId,
           ),
       );
       setFormData(filteredPartics);
@@ -377,7 +382,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
             participantId: row.id,
             psnorgId: row.psnorgId,
             prCode: row.prCode,
-            partiRoleId: row.partiRoleId,
+            particRoleId: row.particRoleId,
           })),
         ]);
       } else {
@@ -389,7 +394,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
                   selectedRow.participantId === row.id &&
                   selectedRow.psnorgId === row.psnorgId &&
                   selectedRow.prCode === row.prCode &&
-                  selectedRow.partiRoleId === row.partiRoleId,
+                  selectedRow.particRoleId === row.particRoleId,
               ),
           ),
         );
@@ -397,7 +402,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
     } else {
       const updateParticipants = (participants: any, event: any) => {
         return participants.map((participant: any) => {
-          if (participant.partiRoleId === event.row.partiRoleId) {
+          if (participant.particRoleId === event.row.particRoleId) {
             const isPsnorgId =
               typeof event.value === 'object' &&
               event.value !== null &&
@@ -491,7 +496,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const handleAddParticipant = () => {
     const newParticipant = {
-      partiRoleId: v4(),
+      particRoleId: v4(),
       id: v4(),
       psnorgId: '',
       siteId: id,

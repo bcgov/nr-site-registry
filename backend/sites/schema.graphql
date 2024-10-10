@@ -532,7 +532,7 @@ type SiteParticsResponse {
 type SiteParticsDto {
   userAction: String!
   srAction: String!
-  partiRoleId: String!
+  particRoleId: String!
   id: String!
   psnorgId: String!
   siteId: String!
@@ -701,6 +701,8 @@ type ParcelDescriptionDto {
   idPinNumber: String!
   dateNoted: DateTime!
   landDescription: String!
+  userAction: String!
+  srAction: String!
 }
 
 type Query {
@@ -836,7 +838,7 @@ input SiteParticsInputDto {
   userAction: String
   apiAction: String
   srAction: String!
-  partiRoleId: String!
+  particRoleId: String!
   id: String!
   psnorgId: String!
   siteId: String!

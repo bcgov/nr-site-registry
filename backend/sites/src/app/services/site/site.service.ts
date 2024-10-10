@@ -18,14 +18,14 @@ import { LandHistories } from '../../entities/landHistories.entity';
 import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { Subdivisions } from '../../entities/subdivisions.entity';
-import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { LandHistoryService } from '../landHistory/landHistory.service';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 import { UserActionEnum } from '../../common/userActionEnum';
-import { LoggerService } from 'src/app/logger/logger.service';
 
 import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
+import { LoggerService } from '../../logger/logger.service';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { SiteDocPartics } from '../../entities/siteDocPartics.entity';
 
 /**
@@ -357,7 +357,9 @@ export class SiteService {
                   transactionalEntityManager,
                 );
               } else {
-                console.log('No changes To Site Events');
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Events',
+                );
               }
 
               // if (eventsParticipants) {
@@ -376,7 +378,9 @@ export class SiteService {
                   transactionalEntityManager,
                 );
               } else {
-                console.log('No changes To Site Participants');
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Participants',
+                );
               }
 
               if (documents && documents.length > 0) {
@@ -386,7 +390,9 @@ export class SiteService {
                   transactionalEntityManager,
                 );
               } else {
-                console.log('No changes To Site Documents');
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Documents',
+                );
               }
 
               if (siteAssociations && siteAssociations.length > 0) {
@@ -396,7 +402,9 @@ export class SiteService {
                   transactionalEntityManager,
                 );
               } else {
-                console.log('No changes To Site Associations');
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Associations',
+                );
               }
 
               if (subDivisions) {
@@ -453,7 +461,10 @@ export class SiteService {
         else return false;
       }
     } catch (error) {
-      console.log('Save site details error', error);
+      this.sitesLogger.log(
+        `SiteService.saveSiteDetails(): Save site details error
+        ${error}`,
+      );
       throw error;
     }
   }
@@ -574,13 +585,13 @@ export class SiteService {
                   },
                 });
               } else {
-                console.log(
-                  `There is no document participant in database againts id : ${docParticId}`,
+                this.sitesLogger.log(
+                  `SiteService.processDocuments(): There is no document participant in database againts id : ${docParticId}`,
                 );
               }
             } else {
-              console.log(
-                `There is no document in database againts document id : ${documentId}`,
+              this.sitesLogger.log(
+                `SiteService.processDocuments(): There is no document in database againts document id : ${documentId}`,
               );
             }
             break;
@@ -588,7 +599,9 @@ export class SiteService {
             deleteDocuments.push({ id: documentId });
             break;
           default:
-            console.warn('Unknown action for document:', apiAction);
+            this.sitesLogger.warn(
+              'SiteService.processDocuments(): Unknown action for document:',
+            );
         }
       });
 
@@ -667,7 +680,7 @@ export class SiteService {
           displayName,
           prCode,
           apiAction,
-          partiRoleId,
+          particRoleId,
           srAction,
           ...siteParticsData
         } = participant;
@@ -743,11 +756,11 @@ export class SiteService {
 
               const existingSiteParticRole =
                 await this.siteParticipantRolesRepo.findOneByOrFail({
-                  id: partiRoleId,
+                  id: particRoleId,
                 });
               if (existingSiteParticRole) {
                 updatedSiteParticRoles.push({
-                  id: partiRoleId,
+                  id: particRoleId,
                   changes: {
                     ...existingSiteParticRole,
                     ...siteParticRole,
@@ -758,13 +771,13 @@ export class SiteService {
                   },
                 });
               } else {
-                console.log(
-                  `There is no site participant role in database againts id : ${partiRoleId}`,
+                this.sitesLogger.log(
+                  `SiteService.processSiteParticipants(): There is no site participant role in database againts id : ${particRoleId}`,
                 );
               }
             } else {
-              console.log(
-                `There is no site participant in database againts id : ${participantId}`,
+              this.sitesLogger.log(
+                `SiteService.processSiteParticipants(): There is no site participant in database againts id : ${participantId}`,
               );
             }
             break;
@@ -772,11 +785,13 @@ export class SiteService {
           case UserActionEnum.DELETED:
             // Handle deletion if necessary
             deleteSitePartics.push({ id: participantId });
-            // deleteSiteParticRoles.push({ id: partiRoleId });
+            // deleteSiteParticRoles.push({ id: particRoleId });
             break;
 
           default:
-            console.warn('Unknown action for participant:', apiAction);
+            this.sitesLogger.warn(
+              'SiteService.processSiteParticipants(): Unknown action for participant:',
+            );
         }
       });
 
@@ -892,7 +907,9 @@ export class SiteService {
               });
               return null;
             default:
-              console.warn('Unknown action for event participant:', apiAction);
+              this.sitesLogger.warn(
+                'SiteService.processEvents.processParticipants(): Unknown action for event participant:',
+              );
               return null;
           }
         });
@@ -964,8 +981,8 @@ export class SiteService {
                 },
               });
             } else {
-              console.log(
-                `There is no event in database againts event id : ${notation.id}`,
+              this.sitesLogger.log(
+                `SiteService.processEvents(): There is no event in database againts event id : ${notation.id}`,
               );
             }
             break;
@@ -1066,8 +1083,8 @@ export class SiteService {
                 },
               });
             } else {
-              console.log(
-                `There is no site associated in database againts id : ${asscos.id}`,
+              this.sitesLogger.log(
+                `SiteService.processSiteAssociated(): There is no site associated in database againts id : ${asscos.id}`,
               );
             }
             break;

@@ -13,6 +13,7 @@ import { AppDispatch } from '../../../Store';
 import {
   bulkAproveRejectChanges,
   fetchPendingSiteForSRApproval,
+  getSearchParam,
   getTotalRecords,
   selectAllSites,
   updateStatus,
@@ -20,6 +21,7 @@ import {
 import SRUpdatesTableFilter from './srUpdatesTableFilter';
 import Table from '../../../components/table/Table';
 import { showNotification } from '../../../helpers/utility';
+import { fetchInternalUserNameForDropdown, getInternalUserNameForDropdown } from '../dropdowns/DropdownSlice';
 
 const SRUpdatesTables = () => {
   const [displayFilters, SetDisplayFilters] = useState(false);
@@ -30,8 +32,22 @@ const SRUpdatesTables = () => {
   const reviewPendingSites = useSelector(selectAllSites);
   const totalRecords = useSelector(getTotalRecords);
   const updateRequestStatus = useSelector(updateStatus);
+  const searchParamRef = useSelector(getSearchParam);
+  const [searchParam,SetSearchParam] = useState(searchParamRef)
+  useEffect(()=>{
+    SetSearchParam(searchParamRef)
+  },[searchParamRef])
+
+  useEffect(()=>{
+    dispatch(fetchInternalUserNameForDropdown());
+  },[])
+
+
+
 
   const dispatch = useDispatch<AppDispatch>();
+
+
 
   useEffect(() => {
     SetTotalResults(totalRecords);
@@ -79,7 +95,7 @@ const SRUpdatesTables = () => {
     if (selectedRows.length > 0) {
       dispatch(
         bulkAproveRejectChanges({
-          siteIds: selectedRows.map((x) => x.siteId),
+          sites: selectedRows,
           isApproved: false,
         }),
       );
@@ -91,7 +107,7 @@ const SRUpdatesTables = () => {
     if (selectedRows.length > 0) {
       dispatch(
         bulkAproveRejectChanges({
-          siteIds: selectedRows.map((x) => x.siteId),
+          sites: selectedRows,
           isApproved: true,
         }),
       );
@@ -107,7 +123,7 @@ const SRUpdatesTables = () => {
   useEffect(() => {
     dispatch(
       fetchPendingSiteForSRApproval({
-        searchParam: null,
+        searchParam: searchParam,
         page: currentPage,
         pageSize: resultsPerPage     
       }),
@@ -132,7 +148,7 @@ const SRUpdatesTables = () => {
       
     dispatch(
       fetchPendingSiteForSRApproval({
-        searchParam: null,
+        searchParam: searchParam,
         page: currentPage,
         pageSize: resultsPerPage
       }),

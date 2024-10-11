@@ -14,7 +14,8 @@ const initialState: SRReviewListState = {
   currentPage: 1,
   pageSize: 5,
   resultsCount: 0,
-  updateStatus: RequestStatus.idle
+  updateStatus: RequestStatus.idle,
+  searchParam : null
 };
 
 export const fetchPendingSiteForSRApproval = createAsyncThunk(
@@ -90,6 +91,13 @@ const srReviewSlice = createSlice({
       newState.pageSize = action.payload.pageSize;
       return newState;
     },
+    updateSearchParam: (state, payload) => {
+      const newState = {
+        ...state
+      }
+      newState.searchParam = payload;
+      return newState;
+    }
   },
   extraReducers(builder) {
     builder
@@ -147,12 +155,14 @@ export const currentPageSelection = (state: any) => state.srReview.currentPage;
 export const currentPageSize = (state: any) => state.srReview.pageSize;
 export const getTotalRecords = (state: any) => state.srReview.resultsCount;
 export const updateStatus = (state: any) => state.srReview.updateStatus;
+export const getSearchParam = (state: any) => state.srReview.searchParam;
 
 export const {
   resetSites,
   setFetchLoadingState,
   updatePageSizeSetting,
   updateSearchQuery,
+  updateSearchParam
 } = srReviewSlice.actions;
 
 export default srReviewSlice.reducer;

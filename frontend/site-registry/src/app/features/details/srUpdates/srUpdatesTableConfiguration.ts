@@ -1,6 +1,7 @@
 import { FormFieldType } from "../../../components/input-controls/IFormField";
 import { TableColumn } from "../../../components/table/TableColumn";
 
+
 const SRUpdatesTableConfiguration: TableColumn[] = [
     {
         id:1,
@@ -87,7 +88,8 @@ const SRUpdatesTableConfiguration: TableColumn[] = [
             graphQLPropertyName: 'siteId',
             value: '',           
             tableMode: true,
-            href: '/site/details/'
+            href: '/site/details/',
+            customLinkValue:'View'
           },
     }
 ]

@@ -82,6 +82,27 @@ export class SRApproveRejectResponse extends ResponseDto {
 }
 
 
+@InputType()
+export class SiteRecordsForSRAction
+{
+  @Field(()=>String)
+  siteId: string;
+
+  @Field(()=>String)
+  changes: string;
+
+  @Field(()=>String)
+  whoUpdated: string;
+
+  @Field(()=>String)
+  whenUpdated: Date;
+
+  @Field(()=>String)
+  address: string;
+}
+
+
+
 
 @InputType()
 export class BulkApproveRejectChangesDTO {
@@ -91,8 +112,8 @@ export class BulkApproveRejectChangesDTO {
   @IsNotEmpty()
   isApproved: boolean
 
-  @Field(()=>[String])
+  @Field(()=>[SiteRecordsForSRAction])
   @IsArray()
   @IsNotEmpty()
-  siteIds: string[];
+  sites: SiteRecordsForSRAction[];
 }

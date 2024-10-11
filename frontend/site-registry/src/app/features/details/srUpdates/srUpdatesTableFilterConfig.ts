@@ -1,7 +1,18 @@
-import { FormFieldType, IFormField } from "../../../components/input-controls/IFormField";
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  FormFieldType,  
+} from '../../../components/input-controls/IFormField';
+import { useState } from 'react';
+import {
+  getInternalUserNameForDropdown,
+} from '../dropdowns/DropdownSlice';
 
-  
-  export const srUpdatesFilterRows: IFormField[][] = [
+const SRUpdatesFilterRows = () => {
+  const userNameList = useSelector(getInternalUserNameForDropdown);
+
+  const [userList] = useState(userNameList);
+
+  const configuration = [
     [
       {
         type: FormFieldType.Text,
@@ -21,17 +32,16 @@ import { FormFieldType, IFormField } from "../../../components/input-controls/IF
           { key: 'summary', value: 'Summary' },
           { key: 'notation', value: 'Notation' },
           { key: 'notation participants', value: 'Notation Participants' },
-          { key: 'notation', value: 'Site Participants' }, 
+          { key: 'notation', value: 'Site Participants' },
           { key: 'documents', value: 'Documents' },
           { key: 'associated sites', value: 'Associated Sites' },
           { key: 'land histories', value: 'Land Histories' },
           { key: 'parcel description', value: 'Parcel Description' },
           { key: 'site profiles', value: 'Site Profiles' },
-         
         ],
         value: '',
         colSize: 'col-lg-4 col-md-6 col-sm-12',
-      },      
+      },
       {
         type: FormFieldType.Text,
         label: 'Site Address',
@@ -53,14 +63,14 @@ import { FormFieldType, IFormField } from "../../../components/input-controls/IF
         label: 'Created By',
         placeholder: 'Select Staff',
         graphQLPropertyName: 'whoCreated',
-        options: [
-          { key: 'Staff1', value: 'Staff1' },
-          { key: 'Staff2', value: 'Staff2' },
-          { key: 'Staff3', value: 'Staff3' },
-        ],
+        options: userList,
         value: '',
         colSize: 'col-lg-4 col-md-6 col-sm-12',
-      }      
+      },
     ],
   ];
-  
+
+  return configuration;
+};
+
+export default SRUpdatesFilterRows;

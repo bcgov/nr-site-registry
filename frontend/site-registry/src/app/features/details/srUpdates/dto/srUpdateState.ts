@@ -9,6 +9,7 @@ export class SRReviewListState {
   pageSize: number = 10;
   currentPage: number = 1;
   resultsCount: number = 0;
+  searchParam: any = null;
 }
 
 export class SitePendingApprovalDTO {
@@ -21,5 +22,5 @@ export class SitePendingApprovalDTO {
 
 export class BulkApproveRejectChangesDTO {
   isApproved: boolean = false;
-  siteIds: string[] = [];
+  sites: SitePendingApprovalDTO[] = [];
 }

@@ -17,6 +17,7 @@ import { SiteDocs } from '../../entities/siteDocs.entity';
 import { SaveSiteDetailsDTO } from 'src/app/dto/saveSiteDetails.dto';
 import { LandHistoryService } from '../landHistory/landHistory.service';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
+import { SearchParams } from 'src/app/dto/SitesPendingApproval.dto';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -334,7 +335,7 @@ describe('SiteService', () => {
   describe('findSiteBySiteId', () => {
     it('should call findOneOrFail method of the repository with the provided siteId', async () => {
       const siteId = '123';
-      await siteService.findSiteBySiteId(siteId);
+      await siteService.findSiteBySiteId(siteId,false);
       expect(siteRepository.findOneOrFail).toHaveBeenCalledWith({
         where: { id: siteId },
       });
@@ -350,7 +351,7 @@ describe('SiteService', () => {
         expectedResult,
       );
 
-      const result = await siteService.findSiteBySiteId(siteId);
+      const result = await siteService.findSiteBySiteId(siteId,false);
 
       expect(result).toBeInstanceOf(FetchSiteDetail);
       expect(result.httpStatusCode).toBe(200);
@@ -361,7 +362,7 @@ describe('SiteService', () => {
       const siteId = '111';
       const error = new Error('Site not found');
       (siteRepository.findOneOrFail as jest.Mock).mockRejectedValue(error);
-      await expect(siteService.findSiteBySiteId(siteId)).rejects.toThrowError(
+      await expect(siteService.findSiteBySiteId(siteId,false)).rejects.toThrowError(
         error,
       );
     });
@@ -398,4 +399,24 @@ describe('SiteService', () => {
       expect(result).toBe(true);
     });
   });
+
+
+  describe('SR Approval Reject ', () => {
+
+    it('Fetch SR Pending Approval Reject Records'), async ()=>{
+
+     const page = 1;
+
+     const pageSize =5;
+
+     const searchParam:SearchParams = null;
+
+     const result = await siteService.getSiteDetailsPendingSRApproval(searchParam,page,pageSize)
+
+
+     expect(result.data.length).toBeGreaterThan(0);
+
+    }
+
+   })
 });

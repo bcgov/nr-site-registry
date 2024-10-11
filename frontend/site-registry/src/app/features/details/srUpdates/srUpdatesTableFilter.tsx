@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Form from '../../../components/form/Form';
-import { srUpdatesFilterRows } from './srUpdatesTableFilterConfig';
+import SRUpdatesFilterRows  from './srUpdatesTableFilterConfig';
 import { formatDateRange } from '../../../helpers/utility';
-import { fetchPendingSiteForSRApproval } from './state/srUpdatesTableSlice';
+import { fetchPendingSiteForSRApproval, updateSearchParam } from './state/srUpdatesTableSlice';
 import { AppDispatch } from '../../../Store';
 import { useDispatch } from 'react-redux';
+import { fetchInternalUserNameForDropdown } from '../dropdowns/DropdownSlice';
+import SRUpdatesTableConfiguration from './srUpdatesTableConfiguration';
 
 interface ISRUpdatesTableFilter
 {
@@ -15,8 +17,8 @@ interface ISRUpdatesTableFilter
 
 const SRUpdatesTableFilter:React.FC<ISRUpdatesTableFilter> = ({closeSection,currentPage,resultsPerPage}) => {
 
-
   const dispatch = useDispatch<AppDispatch>();
+  const [columnConfig,SetColumnConfig] = useState(SRUpdatesFilterRows());
 
   const [formData, setFormData] = useState<{
     [key: string]: any | [Date, Date];
@@ -45,6 +47,7 @@ const SRUpdatesTableFilter:React.FC<ISRUpdatesTableFilter> = ({closeSection,curr
         whenUpdated : formData.whenUpdated ? formatDateRange(formData.whenUpdated) : ''      
     }
     console.log('formData',formData)
+    dispatch(updateSearchParam(dtoToAPI));
 
     dispatch(fetchPendingSiteForSRApproval({searchParam:dtoToAPI,page:currentPage,pageSize:resultsPerPage}));
 
@@ -53,13 +56,15 @@ const SRUpdatesTableFilter:React.FC<ISRUpdatesTableFilter> = ({closeSection,curr
   const handleReset = () => {
     setFormData({});
     setSelectedFilters([]);
+    dispatch(updateSearchParam(null));
+
     dispatch(fetchPendingSiteForSRApproval({searchParam:null,page:currentPage,pageSize:resultsPerPage}));
   };
   
   return (
     <form onSubmit={handleFormSubmit}>
     <Form
-      formRows={srUpdatesFilterRows}
+      formRows={columnConfig}
       formData={formData}
       handleInputChange={handleInputChange}
     />

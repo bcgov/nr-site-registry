@@ -56,6 +56,7 @@ const siteDetailsSlice = createSlice({
       newState.profilesData = null;
       newState.siteAssociationsData = null;
       newState.siteId = '';
+      newState.sitesSummary  = null;
       return newState;
     },
     resetSaveSiteDetailsRequestStatus: (state, action) => {

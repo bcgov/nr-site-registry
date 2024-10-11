@@ -36,10 +36,15 @@ export class ParticipantResolver {
     this.sitesLogger.log(
       'ParticipantResolver.getSiteParticipantsBySiteId() start siteId:' +
         ' ' +
-        siteId  +' showPending = '+ showPending );
-        
-    const result =
-      await this.participantService.getSiteParticipantsBySiteId(siteId,showPending);
+        siteId +
+        ' showPending = ' +
+        showPending,
+    );
+
+    const result = await this.participantService.getSiteParticipantsBySiteId(
+      siteId,
+      showPending,
+    );
     if (result.length > 0) {
       this.sitesLogger.log(
         'ParticipantResolver.getSiteParticipantsBySiteId() RES:200 end',
@@ -58,7 +63,7 @@ export class ParticipantResolver {
         `Participants data not found for site id: ${siteId}`,
         404,
         false,
-        result
+        result,
       );
     }
   }

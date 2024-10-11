@@ -2,8 +2,8 @@ import gql from 'graphql-tag';
 
 export const graphQLSiteNotationBySiteId = () => {
   return gql`
-    query getSiteNotationBySiteId($siteId: String!,$pending: Boolean) {
-      getSiteNotationBySiteId(siteId: $siteId, pending: $pending ) {
+    query getSiteNotationBySiteId($siteId: String!, $pending: Boolean) {
+      getSiteNotationBySiteId(siteId: $siteId, pending: $pending) {
         httpStatusCode
         success
         message
@@ -21,7 +21,7 @@ export const graphQLSiteNotationBySiteId = () => {
           eclsCode
           srAction
           notationParticipant {
-            guid
+            eventParticId
             eventId
             eprCode
             psnorgId

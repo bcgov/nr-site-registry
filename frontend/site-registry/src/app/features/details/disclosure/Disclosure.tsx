@@ -112,7 +112,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchSiteDisclosure({siteId: id ?? '', showPending: false}))
+      dispatch(fetchSiteDisclosure({ siteId: id ?? '', showPending: false }))
         .then(() => {
           setLoading(RequestStatus.success); // Set loading state to false after all API calls are resolved
         })

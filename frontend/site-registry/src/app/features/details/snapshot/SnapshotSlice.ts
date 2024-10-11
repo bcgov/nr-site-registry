@@ -111,7 +111,6 @@ const snapshotsSlice = createSlice({
         ) {
           state.firstSnapshotCreatedDate = action.payload.data[0].whenCreated;
         }
-       
       })
       .addCase(fetchSnapshots.rejected, (state, action) => {
         state.status = RequestStatus.failed;

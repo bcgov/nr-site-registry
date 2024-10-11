@@ -4,13 +4,14 @@ import { sampleSites } from '../../mockData/site.mockData';
 import { RecentViewDto } from '../../dto/recentView.dto';
 import { DashboardService } from '../../services/dashboard/dashboard.service';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { GenericResponse } from '../../dto/response/genericResponse';
 import { RecentViews } from '../../entities/recentViews.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('DashboardResolver', () => {
   let resolver: DashboardResolver;
   let service: DashboardService;
   let genericResponseProvider: GenericResponseProvider<RecentViews[]>;
+  let loggerService: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,6 +22,15 @@ describe('DashboardResolver', () => {
           useValue: {
             getRecentViewsByUserId: jest.fn(),
             addRecentView: jest.fn(),
+          },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
           },
         },
         {
@@ -46,6 +56,7 @@ describe('DashboardResolver', () => {
 
     resolver = module.get<DashboardResolver>(DashboardResolver);
     service = module.get<DashboardService>(DashboardService);
+    loggerService = module.get<LoggerService>(LoggerService);
     genericResponseProvider = module.get<
       GenericResponseProvider<RecentViews[]>
     >(GenericResponseProvider);

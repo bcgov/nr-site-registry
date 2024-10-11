@@ -6,6 +6,7 @@ import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
 import { plainToInstance } from 'class-transformer';
 import { v4 } from 'uuid';
 import { AssociatedSiteService } from './associatedSite.service';
+import { LoggerService } from '../../logger/logger.service';
 
 // Mock SiteAssocs entity and its Repository
 jest.mock('../../entities/siteAssocs.entity');
@@ -13,11 +14,12 @@ jest.mock('../../entities/siteAssocs.entity');
 describe('AssociatedSiteService', () => {
   let service: AssociatedSiteService;
   let assocSiteRepository: Repository<SiteAssocs>;
-
+  let sitesLogger: LoggerService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AssociatedSiteService,
+        LoggerService,
         {
           provide: getRepositoryToken(SiteAssocs),
           useClass: Repository,
@@ -26,6 +28,7 @@ describe('AssociatedSiteService', () => {
     }).compile();
 
     service = module.get<AssociatedSiteService>(AssociatedSiteService);
+    sitesLogger = module.get<LoggerService>(LoggerService);
     assocSiteRepository = module.get<Repository<SiteAssocs>>(
       getRepositoryToken(SiteAssocs),
     );
@@ -52,7 +55,7 @@ describe('AssociatedSiteService', () => {
         .spyOn(assocSiteRepository, 'find')
         .mockResolvedValueOnce(mockSiteAssocs as SiteAssocs[]);
 
-      const result = await service.getAssociatedSitesBySiteId(siteId);
+      const result = await service.getAssociatedSitesBySiteId(siteId, false);
 
       const expectedTransformedObjects = mockSiteAssocs.map((item) => ({
         guid: v4(),
@@ -79,7 +82,7 @@ describe('AssociatedSiteService', () => {
       jest.spyOn(assocSiteRepository, 'find').mockRejectedValueOnce(error);
 
       await expect(
-        service.getAssociatedSitesBySiteId(siteId),
+        service.getAssociatedSitesBySiteId(siteId, false),
       ).rejects.toThrowError(
         `Failed to retrieve associated sites by site ID: ${siteId}`,
       );

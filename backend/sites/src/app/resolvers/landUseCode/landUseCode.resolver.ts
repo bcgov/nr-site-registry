@@ -1,9 +1,9 @@
 import { Query, Resolver } from '@nestjs/graphql';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { LandUseCd } from 'src/app/entities/landUseCd.entity';
-import { LandUseCodeService } from 'src/app/services/landUseCode/landUseCode.service';
-import { LandUseCodeResponse } from 'src/app/dto/landUseCodeResponse.dto';
+import { LandUseCd } from '../../entities/landUseCd.entity';
+import { LandUseCodeService } from '../../services/landUseCode/landUseCode.service';
+import { LandUseCodeResponse } from '../../dto/landUseCodeResponse.dto';
 import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => LandUseCd)

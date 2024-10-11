@@ -14,7 +14,7 @@ export const GetConfig = () => {
       displayName: 'Participant Name',
       active: true,
       graphQLPropertyName: 'psnorgId',
-      columnSize: ColumnSize.Double,
+      columnSize: ColumnSize.Small,
       displayType: {
         type: FormFieldType.DropDownWithSearch,
         label: '',
@@ -33,9 +33,7 @@ export const GetConfig = () => {
         customPlaceholderCss: 'custom-participant-search-placeholder',
         customMenuMessage: <span>Please select site participant name:</span>,
         tableMode: true,
-        handleSearch: () => {
-          console.log('handleSearch click');
-        },
+        handleSearch: () => {},
       },
     },
     {
@@ -126,12 +124,12 @@ export const GetConfig = () => {
       id: 6,
       displayName: 'SR',
       active: true,
-      graphQLPropertyName: 'sr',
+      graphQLPropertyName: 'srAction',
       displayType: {
         type: FormFieldType.Checkbox,
         label: 'SR',
         placeholder: '',
-        graphQLPropertyName: 'sr',
+        graphQLPropertyName: 'srAction',
         value: false,
         tableMode: true,
         stickyCol: true,
@@ -140,7 +138,6 @@ export const GetConfig = () => {
       // dynamicColumn: true,
       stickyCol: true,
     },
-    
   ];
 
   const participantColumnExternal: TableColumn[] = [
@@ -168,9 +165,9 @@ export const GetConfig = () => {
         customPlaceholderCss: 'custom-participant-search-placeholder',
         customMenuMessage: <span>Please select site participant name:</span>,
         tableMode: true,
-        handleSearch: () => {
-          console.log('handleSearch click');
-        },
+        // handleSearch: () => {
+        //   console.log('handleSearch click');
+        // },
       },
     },
     {
@@ -256,7 +253,7 @@ export const GetConfig = () => {
         customEditInputTextCss: 'custom-participant-edit-input',
         tableMode: true,
       },
-    },  
+    },
   ];
 
   const srVisibilityParcticConfig: DropdownItem[] = [

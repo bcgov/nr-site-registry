@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 // import Landing from "../features/landing/Landing"
 import { Routes, Route, createBrowserRouter } from 'react-router-dom';
 import Search from '../features/site/Search';
-import MapSearch from '../features/map/MapSearch';
 import SiteDetails from '../features/details/SiteDetails';
 import Dashboard from '../features/dashboard/Dashboard';
 import Cart from '../features/cart/Cart';
@@ -15,6 +14,7 @@ import {
   isUserOfType,
   UserRoleType,
 } from '../helpers/utility';
+import MapView from '../features/map/MapView';
 import SRUpdatesTables from '../features/details/srUpdates/srUpdatesTables';
 
 const roleBasedRoutes: any = {
@@ -27,8 +27,8 @@ const roleBasedRoutes: any = {
     { path: '/search/site/details/:id', element: <SiteDetails /> },
     { path: '/folios', element: <Folios /> },
     { path: '/folios/:id', element: <FolioContents /> },
-    { path: '/map', element: <MapSearch /> },
-    { path: '/map/:id', element: <MapSearch /> },
+    { path: '/map', element: <MapView /> },
+    { path: '/map/:id', element: <MapView /> },
     { path: '/site/cart', element: <Cart /> },
     { path: '/review', element: <SRUpdatesTables/>},
     { path: '/site/cart/site/details/:id', element: <SiteDetails /> },
@@ -42,8 +42,8 @@ const roleBasedRoutes: any = {
     { path: '/search/site/details/:id', element: <SiteDetails /> },
     { path: '/folios', element: <Folios /> },
     { path: '/folios/:id', element: <FolioContents /> },
-    { path: '/map', element: <MapSearch /> },
-    { path: '/map/:id', element: <MapSearch /> },
+    { path: '/map', element: <MapView /> },
+    { path: '/map/:id', element: <MapView /> },
     { path: '/review', element: <SRUpdatesTables/>}
   ],
   sr: [
@@ -51,8 +51,8 @@ const roleBasedRoutes: any = {
     { path: '/search', element: <Search /> },
     { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
-    { path: '/map', element: <MapSearch /> },
-    { path: '/map/:id', element: <MapSearch /> },
+    { path: '/map', element: <MapView /> },
+    { path: '/map/:id', element: <MapView /> },
     { path: '/review', element: <SRUpdatesTables/>}
   ],
   public: [
@@ -60,8 +60,8 @@ const roleBasedRoutes: any = {
     { path: '/search', element: <Search /> },
     { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
-    { path: '/map', element: <MapSearch /> },
-    { path: '/map/:id', element: <MapSearch /> },
+    { path: '/map', element: <MapView /> },
+    { path: '/map/:id', element: <MapView /> },
     { path: '/site/cart', element: <Cart /> },
     { path: '/folios/:id', element: <FolioContents /> },
   ],

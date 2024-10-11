@@ -1,5 +1,12 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Sites } from './sites.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
 
@@ -11,12 +18,25 @@ import { ChangeAuditEntity } from './changeAuditEntity';
 @Index('sa_associated_with_frgn', ['siteIdAssociatedWith'], {})
 @Entity('site_assocs')
 export class SiteAssocs extends ChangeAuditEntity {
+  @PrimaryGeneratedColumn('uuid', { name: 'id' })
+  id: string;
+
+  // @Field()
+  // @Column('bigint', { primary: true, name: 'site_id' })
+  // siteId: string;
+
+  // @Field()
+  // @Column('bigint', { primary: true, name: 'site_id_associated_with' })
+  // siteIdAssociatedWith: string;
+
+  //Remove the primary key combination because siteIdAssociatedWith can be updated as per current design
   @Field()
-  @Column('bigint', { primary: true, name: 'site_id' })
+  @Column('bigint', { name: 'site_id' })
   siteId: string;
 
+  //Remove the primary key combination because siteIdAssociatedWith can be updated as per current design
   @Field()
-  @Column('bigint', { primary: true, name: 'site_id_associated_with' })
+  @Column('bigint', { name: 'site_id_associated_with' })
   siteIdAssociatedWith: string;
 
   @Field()

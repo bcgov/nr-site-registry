@@ -16,13 +16,13 @@ const initialState: IParticipantState = {
 // Define the asynchronous thunk to fetch site participants from the backend
 export const fetchSiteParticipants = createAsyncThunk(
   'siteParticipants/fetchSiteParticipants',
-  async (args: {siteId: string, showPending: Boolean}) => {
+  async (args: { siteId: string; showPending: Boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphQLSiteParticipantsBySiteId()),
         variables: {
           siteId: args.siteId,
-          pending: args.showPending
+          pending: args.showPending,
         },
       });
       const participants: IParticipant[] =

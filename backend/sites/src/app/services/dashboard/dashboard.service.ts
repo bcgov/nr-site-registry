@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { RecentViews } from '../../entities/recentViews.entity';
 import { RecentViewDto } from '../../dto/recentView.dto';
-import { LoggerService } from 'src/app/logger/logger.service';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class DashboardService {

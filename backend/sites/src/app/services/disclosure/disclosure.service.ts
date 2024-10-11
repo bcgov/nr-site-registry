@@ -2,9 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
-import { LoggerService } from 'src/app/logger/logger.service';
-import { UserActionEnum } from 'src/app/common/userActionEnum';
-
+import { LoggerService } from '../../logger/logger.service';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 @Injectable()
 export class DisclosureService {
@@ -14,17 +13,21 @@ export class DisclosureService {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-    /**
+  /**
    * Retrieves site profiles for a given site ID.
    *
    * @param siteId - The ID of the site whose profiles are to be fetched.
    * @returns A promise that resolves to an array of SiteProfiles entities.
    * @throws Error if there is an issue retrieving the data.
    */
-  async getSiteDisclosureBySiteId(siteId: string, showPending: boolean): Promise<SiteProfiles[]> {
-
+  async getSiteDisclosureBySiteId(
+    siteId: string,
+    showPending: boolean,
+  ): Promise<SiteProfiles[]> {
     try {
-      this.sitesLogger.log('DisclosureService.getSiteDisclosureBySiteId() start');
+      this.sitesLogger.log(
+        'DisclosureService.getSiteDisclosureBySiteId() start',
+      );
       this.sitesLogger.debug(
         'DisclosureService.getSiteDisclosureBySiteId() start',
       );

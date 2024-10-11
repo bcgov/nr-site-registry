@@ -43,7 +43,6 @@ import {
   formatDateWithNoTimzoneName,
   getUser,
   showNotification,
-  useUser,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import { fetchSiteParticipants } from './participants/ParticipantSlice';
@@ -93,17 +92,18 @@ import { fetchAssociatedSites } from './associates/AssociateSlice';
 import { updateRequestStatus } from './srUpdates/srUpdatesSlice';
 
 const SiteDetails = () => {
-  const [navItems, SetNavItems] = useState<string[]|undefined>();
+  const [navItems, SetNavItems] = useState<string[] | undefined>();
   const [navComponents, SetNavComponents] = useState<JSX.Element[]>();
-  const [dropDownNavItems, SetDropDownNavItems] = useState<{ label: string; value: string; }[]>();
+  const [dropDownNavItems, SetDropDownNavItems] =
+    useState<{ label: string; value: string }[]>();
 
-  const user = useUser();
+  const auth = useAuth();
 
-  useEffect(() => {    
+  useEffect(() => {
     SetNavComponents(getNavComponents());
     SetNavItems(getNavItems());
     SetDropDownNavItems(getDropDownNavItems());
-  }, [user]);
+  }, [auth.user]);
 
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
 
@@ -126,15 +126,14 @@ const SiteDetails = () => {
   };
 
   useEffect(() => {
-    if(addSiteToFolioRequestStatus === RequestStatus.success)
-    {
+    if (addSiteToFolioRequestStatus === RequestStatus.success) {
       //dispatch(resetFolioItemAddedStatus(null));
-    showNotification(
-      addSiteToFolioRequestStatus,
-      'Successfully added site to folio',
-      'Unable to add to folio',
-    );
-  }
+      showNotification(
+        addSiteToFolioRequestStatus,
+        'Successfully added site to folio',
+        'Unable to add to folio',
+      );
+    }
   }, [addSiteToFolioRequestStatus]);
 
   const folioDropdown: IFormField = {
@@ -156,8 +155,6 @@ const SiteDetails = () => {
   const arr: IFormField[] = [folioDropdown];
 
   const arr2: IFormField[][] = [arr];
-
-  const auth = useAuth();
 
   const [addToFolioVisible, SetAddToFolioVisible] = useState(false);
 
@@ -185,6 +182,7 @@ const SiteDetails = () => {
     ) {
       if (saveSiteDetailsRequestStatus === RequestStatus.success) {
         dispatch(resetSaveSiteDetails(null));
+        dispatch(clearTrackChanges(null));
         dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
         setEdit(false);
       } else {
@@ -256,23 +254,33 @@ const SiteDetails = () => {
   // BY DOING THIS WE CAN STOP UNNECCESSARY CALL TO DATABASE
   // THERE ARE SOME CALLS WHICH MAY NOT REQUIRED ON DETAILS PAGE.
   useEffect(() => {
-    console.log("Calling From Site Details")
+    console.log('Calling From Site Details');
     setIsLoading(true); // Set loading state to true before starting API calls
     if (id) {
       dispatch(resetSaveSiteDetails(null));
       dispatch(setupSiteIdForSaving(id));
       Promise.all([
         dispatch(fetchSnapshots(id ?? '')),
-        dispatch(getBannerType(id ?? '')),
+        userType === UserType.External
+          ? dispatch(getBannerType(id ?? ''))
+          : Promise.resolve(),
         dispatch(fetchMinistryContact('EMP')),
         dispatch(fetchNotationClassCd()),
         dispatch(fetchNotationTypeCd()),
         dispatch(fetchNotationParticipantRoleCd()),
         dispatch(fetchParticipantRoleCd()),
-        dispatch(fetchSiteParticipants({ siteId: id ?? '', showPending :false })),
-        dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending :false })),
+        dispatch(
+          fetchSiteParticipants({ siteId: id ?? '', showPending: false }),
+        ),
+        dispatch(
+          fetchNotationParticipants({ siteId: id ?? '', showPending: false }),
+        ),
+        dispatch(fetchDocuments({ siteId: id ?? '', showPending: false })),
+        dispatch(
+          fetchAssociatedSites({ siteId: id ?? '', showPending: false }),
+        ),
         // should be based on condition for External and Internal User.
-        dispatch(fetchSitesDetails({ siteId: id ?? '', showPending :false })),
+        dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
         // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
       ])
         .then(() => {
@@ -284,14 +292,11 @@ const SiteDetails = () => {
     }
   }, [id]);
 
-
-  useEffect(()=>{
-    if(srUpdateRequestStatus === RequestStatus.success)
-    {
-      if (id) {        
+  useEffect(() => {
+    if (srUpdateRequestStatus === RequestStatus.success) {
+      if (id) {
         Promise.all([
-          dispatch(fetchSitesDetails({ siteId: id ?? '', showPending :false })),       
-      
+          dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
         ])
           .then(() => {
             setIsLoading(false); // Set loading state to false after all API calls are resolved
@@ -301,7 +306,7 @@ const SiteDetails = () => {
           });
       }
     }
-  },[srUpdateRequestStatus])
+  }, [srUpdateRequestStatus]);
 
   useEffect(() => {
     if (details && details.id === id) {

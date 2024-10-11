@@ -64,6 +64,7 @@ type SiteDocs {
   documentDate: DateTime
   title: String!
   note: String
+  filePath: String
   whoCreated: String!
   whoUpdated: String
   whenCreated: DateTime!
@@ -79,6 +80,8 @@ type ParticRoleCd {
 }
 
 type SiteParticRoles {
+  userAction: String!
+  srAction: String!
   prCode: String!
   spId: String!
   whoCreated: String!
@@ -182,6 +185,8 @@ type SitePartics {
 }
 
 type SiteDocPartics {
+  userAction: String!
+  srAction: String!
   id: String!
   dprCode: String!
   sdocId: String!
@@ -508,7 +513,7 @@ type NotationDto {
 type NotationParticipantDto {
   userAction: String!
   srAction: String!
-  guid: String!
+  eventParticId: String!
   eventId: String!
   eprCode: String!
   psnorgId: String!
@@ -524,9 +529,12 @@ type SiteParticsResponse {
 }
 
 type SiteParticsDto {
-  guid: String!
+  userAction: String!
+  srAction: String!
+  particRoleId: String!
   id: String!
   psnorgId: String!
+  siteId: String!
   effectiveDate: DateTime!
   endDate: DateTime
   note: String
@@ -544,13 +552,35 @@ type DocumentResponse {
 }
 
 type DocumentDto {
+  userAction: String!
+  srAction: String!
   id: String!
+  docParticId: String!
   psnorgId: String!
+  dprCode: String!
   displayName: String!
   siteId: String!
   submissionDate: String!
   documentDate: String
   title: String!
+}
+
+type AssociatedSiteResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [AssociatedSiteDto!]
+}
+
+type AssociatedSiteDto {
+  userAction: String!
+  srAction: String!
+  id: String!
+  siteId: String!
+  siteIdAssociatedWith: String!
+  effectiveDate: DateTime!
+  note: String
 }
 
 type RecentViewResponse {
@@ -685,22 +715,6 @@ type FolioContentResponse {
   data: [FolioContents!]
 }
 
-type AssociatedSiteResponse {
-  message: String
-  httpStatusCode: Int
-  success: Boolean
-  timestamp: String
-  data: [AssociatedSiteDto!]
-}
-
-type AssociatedSiteDto {
-  guid: String!
-  siteId: String!
-  siteIdAssociatedWith: String!
-  effectiveDate: DateTime!
-  note: String
-}
-
 type LandUseCodeResponse {
   message: String
   httpStatusCode: Int
@@ -726,6 +740,8 @@ type ParcelDescriptionDto {
   idPinNumber: String!
   dateNoted: DateTime!
   landDescription: String!
+  userAction: String!
+  srAction: String!
 }
 
 type Query {
@@ -861,7 +877,7 @@ input NotationParticipantInputDTO {
   userAction: String
   apiAction: String
   srAction: String!
-  guid: String!
+  eventParticId: String!
   eventId: String!
   eprCode: String!
   psnorgId: String!
@@ -872,9 +888,10 @@ input SiteParticsInputDto {
   userAction: String
   apiAction: String
   srAction: String!
-  guid: String!
+  particRoleId: String!
   id: String!
   psnorgId: String!
+  siteId: String!
   effectiveDate: DateTime!
   endDate: DateTime
   note: String
@@ -888,6 +905,7 @@ input DocumentInputDTO {
   apiAction: String
   srAction: String!
   id: String!
+  docParticId: String!
   psnorgId: String!
   displayName: String!
   siteId: String!
@@ -900,17 +918,11 @@ input SiteAssociationsInputDTO {
   userAction: String
   apiAction: String
   srAction: String!
+  id: String!
   siteId: String!
   siteIdAssociatedWith: String!
   effectiveDate: DateTime!
-  note: String!
-  whoCreated: String!
-  whoUpdated: String!
-  whenCreated: DateTime!
-  whenUpdated: DateTime!
-  rwmFlag: Float!
-  rwmNoteFlag: Float!
-  commonPid: String!
+  note: String
 }
 
 input SubDivisionsInputDTO {

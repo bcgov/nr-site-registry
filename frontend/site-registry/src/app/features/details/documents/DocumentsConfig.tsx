@@ -4,6 +4,7 @@ import {
   IFormField,
 } from '../../../components/input-controls/IFormField';
 import { participantNameDrpdown } from '../dropdowns/DropdownSlice';
+import { RequestStatus } from '../../../helpers/requests/status';
 
 export const GetDocumentsConfig = () => {
   const documentFirstChildFormRows: IFormField[][] = [
@@ -107,14 +108,18 @@ export const GetDocumentsConfig = () => {
         label: 'Author',
         placeholder: 'Author....',
         graphQLPropertyName: 'psnorgId',
-        options: [],
         value: '',
+        options: [],
+        filteredOptions: [],
         colSize: 'col-lg-6 col-md-12 col-sm-12',
         customLabelCss: 'custom-docuemnt-lbl-text',
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
         customEditInputTextCss: 'custom-document-edit-input-text ',
         customPlaceholderCss: 'custom-document-search-placeholder',
+        customMenuMessage: <span>Please select site participant name:</span>,
+        handleSearch: () => {},
+        isLoading: RequestStatus.idle,
       },
       {
         type: FormFieldType.Date,

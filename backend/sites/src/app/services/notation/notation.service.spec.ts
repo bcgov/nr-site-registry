@@ -5,16 +5,19 @@ import { Repository } from 'typeorm';
 import { NotationService } from './notation.service';
 import { Events } from '../../entities/events.entity';
 import { EventPartics } from '../../entities/eventPartics.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('NotationService', () => {
   let service: NotationService;
   let notationRepository: Repository<Events>;
   let notationParticRepository: Repository<EventPartics>;
+  let sitesLogger: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NotationService,
+        LoggerService,
         {
           provide: getRepositoryToken(Events),
           useClass: Repository,
@@ -27,6 +30,7 @@ describe('NotationService', () => {
     }).compile();
 
     service = module.get<NotationService>(NotationService);
+    sitesLogger = module.get<LoggerService>(LoggerService);
     notationRepository = module.get<Repository<Events>>(
       getRepositoryToken(Events),
     );
@@ -122,7 +126,7 @@ describe('NotationService', () => {
         .spyOn(notationParticRepository, 'find')
         .mockResolvedValueOnce(mockEvents[0].eventPartics);
 
-      const result = await service.getSiteNotationBySiteId(siteId);
+      const result = await service.getSiteNotationBySiteId(siteId, false);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -130,7 +134,7 @@ describe('NotationService', () => {
       expect(result[0].id).toEqual(mockEvents[0].id);
       expect(result[0].siteId).toEqual(mockEvents[0].siteId);
       expect(result[0].notationParticipant).toHaveLength(1);
-      expect(result[0].notationParticipant[0].guid).toEqual(
+      expect(result[0].notationParticipant[0].eventParticId).toEqual(
         mockEvents[0].eventPartics[0].id,
       );
     });
@@ -139,7 +143,7 @@ describe('NotationService', () => {
       const siteId = 'nonExistentSite';
       jest.spyOn(notationRepository, 'find').mockResolvedValueOnce([]);
 
-      const result = await service.getSiteNotationBySiteId(siteId);
+      const result = await service.getSiteNotationBySiteId(siteId, false);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -151,9 +155,9 @@ describe('NotationService', () => {
       const mockError = new Error('Failed to get site notation.');
       jest.spyOn(notationRepository, 'find').mockRejectedValueOnce(mockError);
 
-      await expect(service.getSiteNotationBySiteId(siteId)).rejects.toThrow(
-        mockError,
-      );
+      await expect(
+        service.getSiteNotationBySiteId(siteId, false),
+      ).rejects.toThrow(mockError);
     });
 
     it('should return transformed notations for multiple events', async () => {
@@ -268,7 +272,7 @@ describe('NotationService', () => {
         .spyOn(notationParticRepository, 'find')
         .mockResolvedValueOnce(mockEvents[0].eventPartics);
 
-      const result = await service.getSiteNotationBySiteId(siteId);
+      const result = await service.getSiteNotationBySiteId(siteId, false);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -281,7 +285,7 @@ describe('NotationService', () => {
       const siteId = 'site_without_events';
       jest.spyOn(notationRepository, 'find').mockResolvedValueOnce([]);
 
-      const result = await service.getSiteNotationBySiteId(siteId);
+      const result = await service.getSiteNotationBySiteId(siteId, false);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -370,7 +374,7 @@ describe('NotationService', () => {
         .spyOn(notationParticRepository, 'find')
         .mockResolvedValueOnce(mockEvents[0].eventPartics);
 
-      const result = await service.getSiteNotationBySiteId(siteId);
+      const result = await service.getSiteNotationBySiteId(siteId, false);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -380,7 +384,7 @@ describe('NotationService', () => {
       expect(result[0].id).toEqual(mockEvents[0].id);
       expect(result[0].siteId).toEqual(mockEvents[0].siteId);
       expect(result[0].notationParticipant).toHaveLength(1);
-      expect(result[0].notationParticipant[0].guid).toEqual(
+      expect(result[0].notationParticipant[0].eventParticId).toEqual(
         mockEvents[0].eventPartics[0].id,
       );
     });
@@ -390,9 +394,9 @@ describe('NotationService', () => {
       const mockError = new Error('Failed to get site notation.');
       jest.spyOn(notationRepository, 'find').mockRejectedValueOnce(mockError);
 
-      await expect(service.getSiteNotationBySiteId(siteId)).rejects.toThrow(
-        mockError,
-      );
+      await expect(
+        service.getSiteNotationBySiteId(siteId, false),
+      ).rejects.toThrow(mockError);
     });
   });
 });

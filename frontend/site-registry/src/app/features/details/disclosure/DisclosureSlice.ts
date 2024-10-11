@@ -17,13 +17,13 @@ const initialState: IDisclosureState = {
 // Define the asynchronous thunk to fetch site participants from the backend
 export const fetchSiteDisclosure = createAsyncThunk(
   'siteDisclosure/fetchSiteDisclosure',
-  async ({siteId, showPending}:{siteId: string,showPending: boolean}) => {
+  async ({ siteId, showPending }: { siteId: string; showPending: boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphQLSiteDisclosureBySiteId()),
         variables: {
           siteId: siteId,
-          pending: showPending
+          pending: showPending,
         },
       });
       const res = response.data.data.getSiteDisclosureBySiteId.data[0];

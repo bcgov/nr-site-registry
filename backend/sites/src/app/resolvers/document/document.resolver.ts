@@ -7,9 +7,7 @@ import { GenericValidationPipe } from '../../utils/validations/genericValidation
 import { UsePipes } from '@nestjs/common';
 import { DocumentDto, DocumentResponse } from '../../dto/document.dto';
 import { CustomRoles } from '../../common/role';
-import { LoggerService } from 'src/app/logger/logger.service';
-
-
+import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => SiteDocs)
 export class DocumentResolver {
@@ -18,7 +16,7 @@ export class DocumentResolver {
     private readonly genericResponseProvider: GenericResponseProvider<
       DocumentDto[]
     >,
-    private readonly sitesLogger: LoggerService
+    private readonly sitesLogger: LoggerService,
   ) {}
 
   @Roles({
@@ -36,11 +34,13 @@ export class DocumentResolver {
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
   ) {
-
     this.sitesLogger.log(
       'DocumentResolver.getSiteDocumentsBySiteId() start siteId:' +
         ' ' +
-        siteId  +' showPending = '+ showPending );
+        siteId +
+        ' showPending = ' +
+        showPending,
+    );
 
     const response = await this.documentService.getSiteDocumentsBySiteId(
       siteId,

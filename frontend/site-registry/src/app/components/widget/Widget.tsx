@@ -63,7 +63,12 @@ const Widget: React.FC<IWidget> = ({
               data={widgetData}
               showPageOptions={showPageOptions}
               allowRowsSelect={allowRowsSelect}
-              changeHandler={changeHandler ?? ((event:any) => {console.log("not handled",changeHandler,event)})}
+              changeHandler={
+                changeHandler ??
+                ((event: any) => {
+                  console.log('not handled', changeHandler, event);
+                })
+              }
               editMode={editMode ?? false}
               srMode={srMode ?? false}
               idColumnName={primaryKeycolumnName ?? ''}

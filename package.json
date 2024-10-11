@@ -1,8 +1,13 @@
 {
   "dependencies": {
-    "@nestjs/config": "^2.2.0"
+    "@nestjs/config": "^2.2.0",
+    "leaflet": "^1.9.4",
+    "leaflet.markercluster": "^1.5.3",
+    "react-leaflet": "^4.2.1",
+    "react-leaflet-cluster": "^2.1.0"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.12",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.7",
     "prettier": "^3.3.3"

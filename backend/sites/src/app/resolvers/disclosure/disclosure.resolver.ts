@@ -37,11 +37,16 @@ export class DisclosureResolver {
     this.sitesLogger.log(
       'DisclosureResolver.getSiteDisclosureBySiteId() start siteId:' +
         ' ' +
-        siteId  +' showPending = '+ showPending );
-        
-    const result =
-      await this.dsiclosureService.getSiteDisclosureBySiteId(siteId, showPending);
-    if (result.length > 0) {
+        siteId +
+        ' showPending = ' +
+        showPending,
+    );
+
+    const result = await this.dsiclosureService.getSiteDisclosureBySiteId(
+      siteId,
+      showPending,
+    );
+    if (result && result.length > 0) {
       this.sitesLogger.log(
         'DisclosureResolver.getSiteDisclosureBySiteId() RES:200 end',
       );

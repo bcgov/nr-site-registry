@@ -8,7 +8,7 @@ import {
   CartDeleteDTOWithSiteID,
   CartDTO,
 } from '../../dto/cart.dto';
-import { LoggerService } from 'src/app/logger/logger.service';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class CartService {

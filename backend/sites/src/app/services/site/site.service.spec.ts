@@ -20,6 +20,7 @@ import { TransactionManagerService } from '../transactionManager/transactionMana
 import { LoggerService } from '../../logger/logger.service';
 import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
 import { SiteDocPartics } from '../../entities/siteDocPartics.entity';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -184,18 +185,15 @@ describe('SiteService', () => {
         {
           provide: getRepositoryToken(SiteAssocs),
           useValue: {
-            find: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            findOneByOrFail: jest.fn(() => {
+              return {
+                id: '1',
+                siteId: '123',
+                siteIdAssociatedWith: '1234',
+                note: 'Test Note',
+              };
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
-            }),
+            save: jest.fn(),
           },
         },
         {
@@ -235,18 +233,16 @@ describe('SiteService', () => {
         {
           provide: getRepositoryToken(SiteProfiles),
           useValue: {
-            find: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            findOneByOrFail: jest.fn(() => {
+              return {
+                id: '123',
+                siteId: '456',
+                dateCompleted: new Date(),
+                whenCreated: new Date(),
+                whoCreated: 'Test User',
+              };
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
-            }),
+            save: jest.fn(),
           },
         },
         {
@@ -255,6 +251,10 @@ describe('SiteService', () => {
             transaction: jest.fn(async () => {
               return await true;
             }),
+            findOneByOrFail: jest.fn(),
+            save: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
           },
         },
         {
@@ -447,5 +447,126 @@ describe('SiteService', () => {
         expect(result).toBe(true);
       });
     });
+  });
+
+  describe('processSiteDisclosure', () => {
+    it('should create a new site profile when action is ADDED', async () => {
+      const siteDisclosure = [
+        {
+          apiAction: UserActionEnum.ADDED,
+          id: '123',
+          siteId: '456',
+          dateCompleted: new Date(),
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      await siteService.processSiteDisclosure(
+        siteDisclosure,
+        userInfo,
+        entityManager,
+      );
+      expect(entityManager.save).toHaveBeenCalled();
+      const addedProfile = (entityManager.save as jest.Mock).mock.calls[0][1];
+      expect(addedProfile.dateCompleted).toBeInstanceOf(Date);
+      expect(addedProfile.whenCreated).toBeInstanceOf(Date);
+      expect(addedProfile.siteId).toBe('456');
+      expect(addedProfile.whoCreated).toBe('Test User');
+    });
+
+    it('should update an existing site profile when action is UPDATED', async () => {
+      const siteDisclosure = [
+        {
+          apiAction: UserActionEnum.UPDATED,
+          id: '123',
+          siteId: '456',
+          dateCompleted: new Date(),
+        },
+      ];
+      const userInfo = { givenName: 'Updated User' };
+
+      await siteService.processSiteDisclosure(
+        siteDisclosure,
+        userInfo,
+        entityManager,
+      );
+      expect(entityManager.save).toHaveBeenCalled();
+      const updatedProfile = (entityManager.save as jest.Mock).mock.calls[0][1];
+      expect(updatedProfile.dateCompleted).toBeInstanceOf(Date);
+      expect(updatedProfile.whenUpdated).toBeInstanceOf(Date);
+      expect(updatedProfile.siteId).toBe('456');
+      expect(updatedProfile.whoUpdated).toBe('Updated User');
+    });
+  });
+
+  describe('processSiteAssociated', () => {
+    it('should add new site associates', async () => {
+      const siteAccociated = [
+        {
+          apiAction: UserActionEnum.ADDED,
+          id: '1',
+          siteId: '123',
+          siteIdAssociatedWith: '9999',
+          note: 'Note added',
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      await siteService.processSiteAssociated(
+        siteAccociated,
+        userInfo,
+        entityManager,
+      );
+      expect(entityManager.save).toHaveBeenCalled();
+      const addedSiteAssoc = (entityManager.save as jest.Mock).mock.calls[0][1];
+      expect(addedSiteAssoc[0].whenCreated).toBeInstanceOf(Date);
+      expect(addedSiteAssoc[0].siteId).toBe('123');
+      expect(addedSiteAssoc[0].whoCreated).toBe('Test User');
+      expect(addedSiteAssoc[0].siteIdAssociatedWith).toBe('9999');
+      expect(addedSiteAssoc[0].note).toBe('Note added');
+    });
+  });
+
+  it('should update existing site associates', async () => {
+    const siteAccociated = [
+      {
+        apiAction: UserActionEnum.UPDATED,
+        id: '1',
+        siteId: '123',
+        siteIdAssociatedWith: '9999',
+        note: 'Note Updated',
+      },
+    ];
+    const userInfo = { givenName: 'Updated User' };
+
+    await siteService.processSiteAssociated(
+      siteAccociated,
+      userInfo,
+      entityManager,
+    );
+    const updatedAssoc = (entityManager.update as jest.Mock).mock.calls[0][2];
+    expect(updatedAssoc.whenUpdated).toBeInstanceOf(Date);
+    expect(updatedAssoc.siteId).toBe('123');
+    expect(updatedAssoc.whoUpdated).toBe('Updated User');
+    expect(updatedAssoc.siteIdAssociatedWith).toBe('9999');
+    expect(updatedAssoc.note).toBe('Note Updated');
+  });
+
+  it('should delete site associates', async () => {
+    const siteAccociated = [
+      {
+        apiAction: UserActionEnum.DELETED,
+        id: '1',
+      },
+    ];
+    const userInfo = { givenName: 'User Four' };
+
+    await siteService.processSiteAssociated(
+      siteAccociated,
+      userInfo,
+      entityManager,
+    );
+    const deletedAssoc = (entityManager.delete as jest.Mock).mock.calls[0][1];
+    expect(deletedAssoc.id).toBe('1');
   });
 });

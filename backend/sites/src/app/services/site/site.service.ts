@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, In, Repository } from 'typeorm';
+import { EntityManager, EntityTarget, In, Repository } from 'typeorm';
 import {
   FetchSiteDetail,
   FetchSiteResponse,
@@ -509,8 +509,12 @@ export class SiteService {
         // Validate participant ID
         let documentId = document.id || ''; // Ensure it's a string
 
-        let siteDocument = { ...new SiteDocs(), ...siteDocumentData, srAction };
-        let siteDocumentParticipant = {
+        const siteDocument = {
+          ...new SiteDocs(),
+          ...siteDocumentData,
+          srAction,
+        };
+        const siteDocumentParticipant = {
           ...new SiteDocPartics(),
           psnorgId,
           srAction,
@@ -693,13 +697,13 @@ export class SiteService {
         // Validate participant ID
         let participantId = participant.id || ''; // Ensure it's a string
 
-        let sitePartic: SitePartics = {
+        const sitePartic: SitePartics = {
           ...new SitePartics(),
           ...siteParticsData,
           srAction,
         };
 
-        let siteParticRole: SiteParticRoles = {
+        const siteParticRole: SiteParticRoles = {
           ...new SiteParticRoles(),
           prCode,
           srAction,
@@ -1057,7 +1061,7 @@ export class SiteService {
 
       const siteAssociatePromises = siteAccociated.map(async (asscos) => {
         const { id, apiAction, ...siteAssocsData } = asscos;
-        let siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
+        const siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
         switch (apiAction) {
           case UserActionEnum.ADDED:
             newSiteAssociates.push({
@@ -1357,7 +1361,7 @@ export class SiteService {
 
   /**
    * Bulk Approval/ Reject For Site Registry Approvals
-   * @param inputDTO list of site 
+   * @param inputDTO list of site
    * @param userInfo authenticated user
    * @returns true/false
    */
@@ -1375,255 +1379,23 @@ export class SiteService {
         const { isApproved, sites } = inputDTO;
 
         sites.forEach(async (site: SiteRecordsForSRAction) => {
-          await this.entityManager.transaction(
-            async (transactionalEntityManager: EntityManager) => {
-              try {
-                if (
-                  (site != null && site.siteId === null) ||
-                  site.siteId === undefined
-                ) {
-                  return false;
-                }
-
-                if (site.changes.indexOf('summary') !== -1) {
-                  const sitesForUpdates = await transactionalEntityManager.find(
-                    Sites,
-                    { where: { id: site.siteId, whoUpdated: site.whoUpdated } },
-                  );
-
-                  sitesForUpdates.forEach((site) => {
-                    site.userAction = UserActionEnum.DEFAULT;
-                    site.srAction = isApproved
-                      ? SRApprovalStatusEnum.PUBLIC
-                      : SRApprovalStatusEnum.PRIVATE;
-                    site.whenUpdated = new Date();
-                    site.whoUpdated = userInfo?.givenName;
-                  });
-
-                  await transactionalEntityManager.save(Sites, sitesForUpdates);
-                }
-
-                if (site.changes.indexOf('notation') !== -1) {
-                  const events = await transactionalEntityManager.find(Events, {
-                    where: { siteId: site.siteId, whoUpdated: site.whoUpdated },
-                  });
-
-                  events.forEach((event) => {
-                    event.userAction = UserActionEnum.DEFAULT;
-                    event.srAction = isApproved
-                      ? SRApprovalStatusEnum.PUBLIC
-                      : SRApprovalStatusEnum.PRIVATE;
-                    event.whenUpdated = new Date();
-                    event.whoUpdated = userInfo?.givenName;
-                  });
-
-                  await transactionalEntityManager.save(Events, events);
-
-                  const eventIds = events.map((event) => event.id);
-
-                  const eventsParticipants =
-                    await transactionalEntityManager.find(EventPartics, {
-                      where: {
-                        eventId: In(eventIds),
-                        whoUpdated: site.whoUpdated,
-                      },
-                    });
-
-                  eventsParticipants.forEach((eventsParticipant) => {
-                    eventsParticipant.userAction = UserActionEnum.DEFAULT;
-                    eventsParticipant.srAction = isApproved
-                      ? SRApprovalStatusEnum.PUBLIC
-                      : SRApprovalStatusEnum.PRIVATE;
-                    eventsParticipant.whenUpdated = new Date();
-                    eventsParticipant.whoUpdated = userInfo?.givenName;
-                  });
-
-                  await transactionalEntityManager.save(
-                    EventPartics,
-                    eventsParticipants,
-                  );
-                }
-
-                if (site.changes.indexOf('site participants') !== -1) {
-                  const siteParticipants =
-                    await transactionalEntityManager.find(SitePartics, {
-                      where: {
-                        siteId: site.siteId,
-                        whoUpdated: site.whoUpdated,
-                      },
-                    });
-
-                  siteParticipants.forEach((siteParticipant) => {
-                    siteParticipant.userAction = UserActionEnum.DEFAULT;
-                    siteParticipant.srAction = isApproved
-                      ? SRApprovalStatusEnum.PUBLIC
-                      : SRApprovalStatusEnum.PRIVATE;
-                    siteParticipant.whenUpdated = new Date();
-                    siteParticipant.whoUpdated = userInfo?.givenName;
-                  });
-
-                  await transactionalEntityManager.save(
-                    SitePartics,
-                    siteParticipants,
-                  );
-                }
-
-                if (site.changes.indexOf('documents') !== -1) {
-                  const siteDocs = await transactionalEntityManager.find(
-                    SiteDocs,
-                    {
-                      where: {
-                        siteId: site.siteId,
-                        whoUpdated: site.whoUpdated,
-                      },
-                    },
-                  );
-
-                  siteDocs.forEach((doc) => {
-                    doc.userAction = UserActionEnum.DEFAULT;
-                    doc.srAction = isApproved
-                      ? SRApprovalStatusEnum.PUBLIC
-                      : SRApprovalStatusEnum.PRIVATE;
-                    doc.whenUpdated = new Date();
-                    doc.whoUpdated = userInfo?.givenName;
-                  });
-
-                  await transactionalEntityManager.save(SiteDocs, siteDocs);
-                }
-
-                if (site.changes.indexOf('associated sites') !== -1) {
-                  const siteAssociations =
-                    await transactionalEntityManager.find(SiteAssocs, {
-                      where: {
-                        siteId: site.siteId,
-                        whoUpdated: site.whoUpdated,
-                      },
-                    });
-
-                  siteAssociations.forEach((siteAssociation) => {
-                    siteAssociation.userAction = UserActionEnum.DEFAULT;
-                    siteAssociation.srAction = isApproved
-                      ? SRApprovalStatusEnum.PUBLIC
-                      : SRApprovalStatusEnum.PRIVATE;
-                    siteAssociation.whenUpdated = new Date();
-                    siteAssociation.whoUpdated = userInfo?.givenName;
-                  });
-
-                  await transactionalEntityManager.save(
-                    SiteAssocs,
-                    siteAssociations,
-                  );
-                }
-
-                if (site.changes.indexOf('land histories') !== -1) {
-                  const landHistories = await transactionalEntityManager.find(
-                    LandHistories,
-                    {
-                      where: {
-                        siteId: site.siteId,
-                        whoUpdated: site.whoUpdated,
-                      },
-                    },
-                  );
-
-                  landHistories.forEach((history) => {
-                    history.userAction = UserActionEnum.DEFAULT;
-                    history.srAction = isApproved
-                      ? SRApprovalStatusEnum.PUBLIC
-                      : SRApprovalStatusEnum.PRIVATE;
-                    history.whenUpdated = new Date();
-                    history.whoUpdated = userInfo?.givenName;
-                  });
-
-                  await transactionalEntityManager.save(
-                    LandHistories,
-                    landHistories,
-                  );
-                }
-
-                if (site.changes.indexOf('site profiles') !== -1) {
-                  const profiles = await transactionalEntityManager.find(
-                    SiteProfiles,
-                    {
-                      where: {
-                        siteId: site.siteId,
-                        whoUpdated: site.whoUpdated,
-                      },
-                    },
-                  );
-
-                  profiles.forEach((profile) => {
-                    profile.userAction = UserActionEnum.DEFAULT;
-                    profile.srAction = isApproved
-                      ? SRApprovalStatusEnum.PUBLIC
-                      : SRApprovalStatusEnum.PRIVATE;
-                    profile.whenUpdated = new Date();
-                    profile.whoUpdated = userInfo?.givenName;
-                  });
-
-                  await transactionalEntityManager.save(SiteProfiles, profiles);
-                }
-
-                if (site.changes.indexOf('parcel description') !== -1) {
-                  const siteSubDivisions =
-                    await transactionalEntityManager.find(SiteSubdivisions, {
-                      where: {
-                        siteId: site.siteId,
-                        whoUpdated: site.whoUpdated,
-                      },
-                    });
-
-                  const subDivIds = siteSubDivisions.map((x) => x.subdivId);
-
-                  const subDivisions = await transactionalEntityManager.find(
-                    Subdivisions,
-                    {
-                      where: { id: In(subDivIds), whoUpdated: site.whoUpdated },
-                    },
-                  );
-
-                  subDivisions.forEach((sub) => {
-                    sub.userAction = UserActionEnum.DEFAULT;
-                    sub.srAction = isApproved
-                      ? SRApprovalStatusEnum.PUBLIC
-                      : SRApprovalStatusEnum.PRIVATE;
-                    sub.whenUpdated = new Date();
-                    sub.whoUpdated = userInfo?.givenName;
-                  });
-
-                  await transactionalEntityManager.save(
-                    Subdivisions,
-                    subDivisions,
-                  );
-
-                  siteSubDivisions.forEach((siteDiv) => {
-                    siteDiv.userAction = UserActionEnum.DEFAULT;
-                    siteDiv.srAction = isApproved
-                      ? SRApprovalStatusEnum.PUBLIC
-                      : SRApprovalStatusEnum.PRIVATE;
-                    siteDiv.whenUpdated = new Date();
-                    siteDiv.whoUpdated = userInfo?.givenName;
-                  });
-
-                  await transactionalEntityManager.save(
-                    SiteSubdivisions,
-                    siteSubDivisions,
-                  );
-                }
-
-                this.sitesLogger.log('SiteService.bulkUpdateForSR() end');
-                this.sitesLogger.debug('SiteService.bulkUpdateForSR() end');
-
-                return true;
-              } catch (error) {
-                this.sitesLogger.log(
-                  'SiteService.bulkUpdateForSR() error' + JSON.stringify(error),
-                );
-                throw error;
+        await this.entityManager.transaction(
+          async (transactionalEntityManager: EntityManager) => {            
+              if (
+                (site != null && site.siteId === null) ||
+                site.siteId === undefined
+              ) {
+                return false;
               }
-            },
-          );
-        });
+              await this.processSRBulkUpdates(
+                transactionalEntityManager,
+                site,
+                isApproved,
+                userInfo,
+              );
+            });
+          },
+        );
 
         return true;
       }
@@ -1634,4 +1406,263 @@ export class SiteService {
       return false;
     }
   }
+
+  async processSRBulkUpdates(
+    transactionalEntityManager: EntityManager,
+    site: SiteRecordsForSRAction,
+    isApproved: boolean,
+    userInfo: any,
+  ) {
+    try {
+      this.sitesLogger.log('SiteService.processSRBulkUpdates() start');
+
+      if ((site != null && site.siteId === null) || site.siteId === undefined) {
+        return false;
+      }
+
+      if (site.changes.indexOf('summary') !== -1) {
+        const sitesForUpdates = await transactionalEntityManager.find(Sites, {
+          where: { id: site.siteId, whoUpdated: site.whoUpdated },
+        });
+
+        if (sitesForUpdates.length > 0) {
+          sitesForUpdates.forEach((site) => {
+            this.setUpdatedStatus(site, isApproved, userInfo);
+          });
+          await transactionalEntityManager.save(Sites, sitesForUpdates);
+        }
+        else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no summary to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('notation') !== -1) {
+        const events = await transactionalEntityManager.find(Events, {
+          where: { siteId: site.siteId, whoUpdated: site.whoUpdated },
+        });
+
+        if (events.length > 0) {
+          events.forEach((event) => {
+            this.setUpdatedStatus(event, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(Events, events);
+
+          const eventIds = events.map((event) => event.id);
+
+          const eventsParticipants = await transactionalEntityManager.find(
+            EventPartics,
+            {
+              where: {
+                eventId: In(eventIds),
+                whoUpdated: site.whoUpdated,
+              },
+            },
+          );
+
+          if (eventsParticipants.length > 0) {
+            eventsParticipants.forEach((eventsParticipant) => {
+              this.setUpdatedStatus(eventsParticipant, isApproved, userInfo);
+            });
+
+            await transactionalEntityManager.save(
+              EventPartics,
+              eventsParticipants,
+            );
+          } else {
+            this.sitesLogger.log(
+              'SiteService.processSRBulkUpdates() no eventsParticipants to process.',
+            );
+          }
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no events to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('site participants') !== -1) {
+        const siteParticipants = await transactionalEntityManager.find(
+          SitePartics,
+          {
+            where: {
+              siteId: site.siteId,
+              whoUpdated: site.whoUpdated,
+            },
+          },
+        );
+
+        if (siteParticipants.length > 0) {
+          siteParticipants.forEach((siteParticipant) => {
+            this.setUpdatedStatus(siteParticipant, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(SitePartics, siteParticipants);
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no siteParticipants to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('documents') !== -1) {
+        const siteDocs = await transactionalEntityManager.find(SiteDocs, {
+          where: {
+            siteId: site.siteId,
+            whoUpdated: site.whoUpdated,
+          },
+        });
+
+        if (siteDocs.length > 0) {
+          siteDocs.forEach((doc) => {
+            this.setUpdatedStatus(doc, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(SiteDocs, siteDocs);
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no siteDocs to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('associated sites') !== -1) {
+        const siteAssociations = await transactionalEntityManager.find(
+          SiteAssocs,
+          {
+            where: {
+              siteId: site.siteId,
+              whoUpdated: site.whoUpdated,
+            },
+          },
+        );
+
+        if (siteAssociations.length > 0) {
+          siteAssociations.forEach((siteAssociation) => {
+            this.setUpdatedStatus(siteAssociation, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(SiteAssocs, siteAssociations);
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no siteAssociations to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('land histories') !== -1) {
+        const landHistories = await transactionalEntityManager.find(
+          LandHistories,
+          {
+            where: {
+              siteId: site.siteId,
+              whoUpdated: site.whoUpdated,
+            },
+          },
+        );
+
+        if (landHistories.length > 0) {
+          landHistories.forEach((history) => {
+            this.setUpdatedStatus(history, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(LandHistories, landHistories);
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no landHistories to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('site profiles') !== -1) {
+        const profiles = await transactionalEntityManager.find(SiteProfiles, {
+          where: {
+            siteId: site.siteId,
+            whoUpdated: site.whoUpdated,
+          },
+        });
+
+        if (profiles.length > 0) {
+          profiles.forEach((profile) => {
+            this.setUpdatedStatus(profile, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(SiteProfiles, profiles);
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no profiles to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('parcel description') !== -1) {
+        const siteSubDivisions = await transactionalEntityManager.find(
+          SiteSubdivisions,
+          {
+            where: {
+              siteId: site.siteId,
+              whoUpdated: site.whoUpdated,
+            },
+          },
+        );
+
+        if (siteSubDivisions.length > 0) {
+          const subDivIds = siteSubDivisions.map((x) => x.subdivId);
+
+          const subDivisions = await transactionalEntityManager.find(
+            Subdivisions,
+            {
+              where: { id: In(subDivIds), whoUpdated: site.whoUpdated },
+            },
+          );
+
+          if (subDivisions.length > 0) {
+            subDivisions.forEach((sub) => {
+              this.setUpdatedStatus(sub, isApproved, userInfo);
+            });
+
+            await transactionalEntityManager.save(Subdivisions, subDivisions);
+          }
+
+          siteSubDivisions.forEach((siteDiv) => {
+            this.setUpdatedStatus(siteDiv, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(
+            SiteSubdivisions,
+            siteSubDivisions,
+          );
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no siteSubDivisions to process.',
+          );
+        }
+      }
+
+      this.sitesLogger.log('SiteService.processSRBulkUpdates() end');
+      return true;
+    } catch (error) {
+      this.sitesLogger.log(
+        'SiteService.processSRBulkUpdates() error' + JSON.stringify(error),
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * SET Updated Status
+   * @param entity
+   * @param isApproved
+   * @param userInfo
+   */
+  setUpdatedStatus = (entity: any, isApproved: boolean, userInfo: any) => {
+    entity.userAction = UserActionEnum.DEFAULT;
+    entity.srAction = isApproved
+      ? SRApprovalStatusEnum.PUBLIC
+      : SRApprovalStatusEnum.PRIVATE;
+    entity.whenUpdated = new Date();
+    entity.whoUpdated = userInfo?.givenName;
+  };
 }

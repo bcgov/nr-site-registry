@@ -20,7 +20,13 @@ import { TransactionManagerService } from '../transactionManager/transactionMana
 import { LoggerService } from '../../logger/logger.service';
 import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
 import { SiteDocPartics } from '../../entities/siteDocPartics.entity';
-import { SearchParams } from 'src/app/dto/SitesPendingApproval.dto';
+import {
+  BulkApproveRejectChangesDTO,
+  QueryResultForPendingSites,
+  SearchParams,
+  SitePendingApprovalRecords,
+} from 'src/app/dto/SitesPendingApproval.dto';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -78,6 +84,14 @@ describe('SiteService', () => {
                 { id: '124', siteId: '123' },
               ];
             }),
+            manager: {
+              query: jest.fn(() => {
+                return [
+                  { id: '123', siteId: '123' },
+                  { id: '124', siteId: '123' },
+                ];
+              }),
+            },
           },
         },
         {
@@ -256,6 +270,12 @@ describe('SiteService', () => {
             transaction: jest.fn(async () => {
               return await true;
             }),
+            find : jest.fn(async()=>{
+              return [];
+            }),
+            save : jest.fn(async()=>{
+              return true;
+            })
           },
         },
         {
@@ -450,24 +470,133 @@ describe('SiteService', () => {
     });
   });
 
+  describe('SR Approval Reject', () => {
+    describe('Fetching Records', () => {
+      it('Fetch SR Pending Approval Reject Records', async () => {
+        const page = 1;
+        const pageSize = 5;
+        const searchParam: SearchParams = null;
 
+        const data: any[] = [
+          {
+            site_id: '1',
+            who_updated: 'Midhun',
+            latest_update: new Date(),
+            changes: 'summary',
+            addr_line_1: 'address 1',
+            addr_line_2: 'address 2 ',
+            addr_line_3: 'address 3',
+          },
+        ];
 
-  describe('SR Approval Reject ', () => {
+        jest.spyOn(siteRepository.manager, 'query').mockResolvedValue(data);
 
-    it('Fetch SR Pending Approval Reject Records'), async ()=>{
+        const result = await siteService.getSiteDetailsPendingSRApproval(
+          searchParam,
+          page,
+          pageSize,
+        );
 
-     const page = 1;
+        expect(result.totalRecords).toBeGreaterThan(0);
+      });
 
-     const pageSize =5;
+      it('Fetch SR Pending Approval Reject Records - Filter', async () => {
+        const page = 1;
+        const pageSize = 5;
+        const searchParam: SearchParams = {
+          changes: 'notation',
+        };
 
-     const searchParam:SearchParams = null;
+        const data: any[] = [
+          {
+            site_id: '1',
+            who_updated: 'Midhun',
+            latest_update: new Date(),
+            changes: 'summary',
+            addr_line_1: 'address 1',
+            addr_line_2: 'address 2 ',
+            addr_line_3: 'address 3',
+          },
+          {
+            site_id: '2',
+            who_updated: 'Midhun',
+            latest_update: new Date(),
+            changes: 'notation',
+            addr_line_1: 'address 1',
+            addr_line_2: 'address 2 ',
+            addr_line_3: 'address 3',
+          },
+        ];
 
-     const result = await siteService.getSiteDetailsPendingSRApproval(searchParam,page,pageSize)
+        jest.spyOn(siteRepository.manager, 'query').mockResolvedValue(data);
 
+        const result = await siteService.getSiteDetailsPendingSRApproval(
+          searchParam,
+          page,
+          pageSize,
+        );
 
-     expect(result.data.length).toBeGreaterThan(0);
+        expect(result.totalRecords).toBeLessThanOrEqual(1);
+      });
+    });
 
-    }
+    describe('Bulk Update For SR', () => {
+      it('Bulk Approve/Reject ', async () => {
+        const inputDTO: BulkApproveRejectChangesDTO = {
+          isApproved: true,
+          sites: [
+            {
+              siteId: '2',
+              whoUpdated: 'Midhun',
+              whenUpdated: new Date(),
+              changes: 'notation',
+              address: 'address 1',
+            },
+          ],
+        };
 
-   })
+        const response = await siteService.bulkUpdateForSR(inputDTO, null);
+
+        console.log('response', response);
+        expect(response).toBe(true);
+      });
+
+      it('Set Public Status Properly', async () => {
+        const entity = {
+          userAction: '',
+          srAction: '',
+          whenUpdated: '',
+          whoUpdated: '',
+        };
+        const userInfo = { givenName: 'Midhun' };
+        const isApproved = true;
+        siteService.setUpdatedStatus(entity, isApproved, userInfo);
+        const status = entity.srAction === SRApprovalStatusEnum.PUBLIC;
+        expect(status).toBeTruthy();
+      });
+
+      it('validate processBulkUpdates', async () => {
+        const site = {
+          siteId: '2',
+          whoUpdated: 'Midhun',
+          whenUpdated: new Date(),
+          changes: 'notation',
+          address: 'address 1',
+        };
+        const userInfo = { givenName: 'Midhun' };
+
+        
+        
+
+        const result = await siteService.processSRBulkUpdates(
+          entityManager,
+          site,
+          true,
+          userInfo,
+        );
+
+        expect(result).toBeTruthy();
+      });
+    });
+  });
 });

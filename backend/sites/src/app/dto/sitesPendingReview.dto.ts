@@ -5,6 +5,9 @@ import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-vali
 @ObjectType()
 export class SitePendingApprovalRecords
 {
+  @Field()  
+  id: string;
+
   @Field()
   siteId: string;
 
@@ -85,6 +88,9 @@ export class SRApproveRejectResponse extends ResponseDto {
 @InputType()
 export class SiteRecordsForSRAction
 {
+  @Field()  
+  id: string;
+  
   @Field(()=>String)
   siteId: string;
 

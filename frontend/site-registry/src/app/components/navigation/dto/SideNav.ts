@@ -8,6 +8,7 @@ import {
   FileExportIcon,
   BookIcon,
   ShoppingCartIcon,
+  ListCheckIcon
 } from '../../common/icon';
 import { useSelector } from 'react-redux';
 import {
@@ -99,13 +100,13 @@ const getSideBarNavList = (userRole: any) => {
       ]),
       new SideNav(
         3,
-        'Resources',
+        'SR',
         true,
         null,
         '/',
         [
-          new SideNav(1, 'Tools', false, toolsIcon, '/tools'),
-          new SideNav(2, 'Reference', false, referenceIcon, '/ref'),
+          // new SideNav(1, 'Tools', false, toolsIcon, '/tools'),
+          new SideNav(2, 'Reference', false, ListCheckIcon, '/review'),
         ],
         false,
       ),

@@ -80,7 +80,7 @@ export const graphqlSiteDetailsQuery = () => {
   `;
 };
 
-export const graphQlGetPendingSiteForSRApproval = () => {
+export const getPendingSiteForSRApprovalQL = () => {
   return gql`
     query getPendingSiteForSRApproval(
       $searchParam: SearchParams
@@ -100,6 +100,7 @@ export const graphQlGetPendingSiteForSRApproval = () => {
             totalRecords
             data
             {
+              id
               changes
               siteId
               whoUpdated

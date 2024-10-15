@@ -33,7 +33,7 @@ import {
   SearchParams,
   SitePendingApprovalRecords,
   SiteRecordsForSRAction,
-} from 'src/app/dto/SitesPendingApproval.dto';
+} from 'src/app/dto/sitesPendingReview.dto';
 
 /**
  * Nestjs Service For Region Entity
@@ -1143,8 +1143,9 @@ export class SiteService {
         'SiteService.getSiteDetailsPendingSRApproval() start',
       );
 
+      // The following query fetches the sites with SR status as pending and group them by user and shows the last updated timestamp 
       const query = `
-       select ResultInFo.site_id,ResultInFo.changes,ResultInFo.Latest_Update,ResultInFo.who as who_updated, SiteInfo.addr_line_1, SiteInfo.addr_line_2,SiteInfo.addr_line_3 from (WITH LatestUpdates AS (
+       select ROW_NUMBER() OVER (ORDER BY site_id) AS row_num,ResultInFo.site_id,ResultInFo.changes,ResultInFo.Latest_Update,ResultInFo.who as who_updated, SiteInfo.addr_line_1, SiteInfo.addr_line_2,SiteInfo.addr_line_3 from (WITH LatestUpdates AS (
           SELECT site_id,
                 MAX(when_Updated) AS Latest_Update,
             who_updated as who
@@ -1276,6 +1277,7 @@ export class SiteService {
       if (queryResult && queryResult.length > 0) {
         result = queryResult.map((res) => {
           return {
+            id: res.row_num,
             siteId: res.site_id,
             changes: res.changes,
             whoUpdated: res.who_updated,
@@ -1355,9 +1357,9 @@ export class SiteService {
           JSON.stringify(error),
       );
 
-      throw new Error('Failed to determine banner type.');
+      throw error;
     }
-  }
+    }
 
   /**
    * Bulk Approval/ Reject For Site Registry Approvals
@@ -1417,6 +1419,7 @@ export class SiteService {
       this.sitesLogger.log('SiteService.processSRBulkUpdates() start');
 
       if ((site != null && site.siteId === null) || site.siteId === undefined) {
+        this.sitesLogger.log('SiteService.processSRBulkUpdates() site is empty');
         return false;
       }
 

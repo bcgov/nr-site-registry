@@ -618,6 +618,7 @@ type NotationDropdownDto {
 }
 
 type SitePendingApprovalRecords {
+  id: String!
   siteId: String!
   changes: String!
   whoUpdated: String!
@@ -1018,6 +1019,7 @@ input BulkApproveRejectChangesDTO {
 }
 
 input SiteRecordsForSRAction {
+  id: String!
   siteId: String!
   changes: String!
   whoUpdated: String!

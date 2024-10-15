@@ -40,6 +40,7 @@ import {
   FaPencil,
   FaCaretRight,
   FaLocationCrosshairs,
+  FaListCheck 
 } from 'react-icons/fa6';
 
 import {
@@ -96,3 +97,4 @@ export const RegFloppyDisk = FaRegFloppyDisk;
 export const PencilIcon = FaPencil;
 export const CaretRightIcon = FaCaretRight;
 export const FindMe = FaLocationCrosshairs;
+export const ListCheckIcon = FaListCheck;

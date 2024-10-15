@@ -20,7 +20,7 @@ import { GenericValidationPipe } from '../../utils/validations/genericValidation
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { CustomRoles } from '../../common/role';
 import { LoggerService } from '../../logger/logger.service';
-import {  BulkApproveRejectChangesDTO, QueryResultForPendingSites, QueryResultForPendingSitesResponse, SearchParams, SRApproveRejectResponse } from 'src/app/dto/SitesPendingApproval.dto';
+import {  BulkApproveRejectChangesDTO, QueryResultForPendingSites, QueryResultForPendingSitesResponse, SearchParams, SRApproveRejectResponse } from 'src/app/dto/sitesPendingReview.dto';
 
 /**
  * Resolver for Region
@@ -317,10 +317,10 @@ export class SiteResolver {
           true,
         );
       } else {
-        this.sitesLogger.log('SiteResolver.bulkAproveRejectChanges()  RES:200 end');
+        this.sitesLogger.log('SiteResolver.bulkAproveRejectChanges()  RES:500 end');
         return this.genericResponseProvider.createResponse(
           `Unable to update sites. `,
-          200,
+          500,
           false,
         );
       }

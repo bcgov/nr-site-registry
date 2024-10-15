@@ -3,7 +3,7 @@ import { print } from 'graphql';
 import { BulkApproveRejectChangesDTO, SRReviewListState } from '../dto/srUpdateState';
 import { RequestStatus } from '../../../../helpers/requests/status';
 import { getAxiosInstance } from '../../../../helpers/utility';
-import { bulkAproveRejectChangesQL, graphQlGetPendingSiteForSRApproval } from '../../../site/graphql/Site';
+import { bulkAproveRejectChangesQL, getPendingSiteForSRApprovalQL } from '../../../site/graphql/Site';
 import { GRAPHQL } from '../../../../helpers/endpoints';
 
 const initialState: SRReviewListState = {
@@ -27,7 +27,7 @@ export const fetchPendingSiteForSRApproval = createAsyncThunk(
   }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
-        query: print(graphQlGetPendingSiteForSRApproval()),
+        query: print(getPendingSiteForSRApprovalQL()),
         variables: {
           searchParam: args.searchParam,
           pageSize: args.pageSize.toString(),
@@ -108,8 +108,6 @@ const srReviewSlice = createSlice({
       })
       .addCase(fetchPendingSiteForSRApproval.fulfilled, (state, action) => {
         const newState = { ...state };
-        console.log('fetchPendingSiteForSRApproval', action.payload);
-
         if (
           action.payload &&
           action.payload.data &&

@@ -25,7 +25,7 @@ import {
   QueryResultForPendingSites,
   SearchParams,
   SitePendingApprovalRecords,
-} from 'src/app/dto/SitesPendingApproval.dto';
+} from 'src/app/dto/sitesPendingReview.dto';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 describe('SiteService', () => {
@@ -546,6 +546,7 @@ describe('SiteService', () => {
           isApproved: true,
           sites: [
             {
+              id:'1',
               siteId: '2',
               whoUpdated: 'Midhun',
               whenUpdated: new Date(),
@@ -577,6 +578,7 @@ describe('SiteService', () => {
 
       it('validate processBulkUpdates', async () => {
         const site = {
+          id:'1',
           siteId: '2',
           whoUpdated: 'Midhun',
           whenUpdated: new Date(),

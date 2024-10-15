@@ -46,7 +46,7 @@ const SRUpdatesTableFilter:React.FC<ISRUpdatesTableFilter> = ({closeSection,curr
         ...formData,
         whenUpdated : formData.whenUpdated ? formatDateRange(formData.whenUpdated) : ''      
     }
-    console.log('formData',formData)
+    
     dispatch(updateSearchParam(dtoToAPI));
 
     dispatch(fetchPendingSiteForSRApproval({searchParam:dtoToAPI,page:currentPage,pageSize:resultsPerPage}));
@@ -62,7 +62,7 @@ const SRUpdatesTableFilter:React.FC<ISRUpdatesTableFilter> = ({closeSection,curr
   };
   
   return (
-    <form onSubmit={handleFormSubmit}>
+    <form onSubmit={handleFormSubmit} data-testid="sr-update-filter-section">
     <Form
       formRows={columnConfig}
       formData={formData}
@@ -70,7 +70,7 @@ const SRUpdatesTableFilter:React.FC<ISRUpdatesTableFilter> = ({closeSection,curr
     />
     <div className="d-flex flex-wrap justify-content-between w-100 mt-3">
           <div>
-            <button type="reset" className="reset-button" onClick={handleReset}>
+            <button type="reset" className="reset-button" onClick={handleReset} data-testid="reset-filter">
               Reset Filters
             </button>
           </div>
@@ -83,6 +83,7 @@ const SRUpdatesTableFilter:React.FC<ISRUpdatesTableFilter> = ({closeSection,curr
             <button
               type="button"
               className=" cancel-button"
+              data-testid="cancel-filter"
               onClick={() => {
                 handleReset();
                 closeSection();

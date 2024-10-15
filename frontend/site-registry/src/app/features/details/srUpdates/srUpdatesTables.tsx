@@ -90,8 +90,7 @@ const SRUpdatesTables = () => {
     }
   };
 
-  const rejectHandler = () => {
-    console.log(selectedRows);
+  const rejectHandler = () => {    
     if (selectedRows.length > 0) {
       dispatch(
         bulkAproveRejectChanges({
@@ -102,8 +101,7 @@ const SRUpdatesTables = () => {
     }
   };
 
-  const handleApprove = () => {
-    console.log(selectedRows);
+  const handleApprove = () => {    
     if (selectedRows.length > 0) {
       dispatch(
         bulkAproveRejectChanges({
@@ -113,12 +111,6 @@ const SRUpdatesTables = () => {
       );
     }
   };
-
-  useEffect(() => {
-    console.log('reviewPendingSites', reviewPendingSites);
-  }, [reviewPendingSites]);
-
-
 
   useEffect(() => {
     dispatch(
@@ -157,8 +149,8 @@ const SRUpdatesTables = () => {
   }, [updateRequestStatus, currentPage, resultsPerPage]);
 
   return (
-    <PageContainer role="SRApprovalPending">
-      <div className="row search-container">
+    <PageContainer role="SRApprovalPending" >
+      <div className="row search-container" data-testid="srreviewtable-component">
         <h1 className="search-text-label">Site Registry Approvals</h1>
       </div>
       <div className="search-results-section-header-top">
@@ -202,7 +194,7 @@ const SRUpdatesTables = () => {
                 }}
               >
                 <FilterIcon />
-                <span className="table-options-text-color">Filters</span>
+                <span className="table-options-text-color" data-testid="filters">Filters</span>
               </div>
             </div>
           </div>
@@ -223,6 +215,7 @@ const SRUpdatesTables = () => {
           onClick={() => {
             handleApprove();
           }}
+          data-testid="approve-btn"
         >
           <TickIcon />
           <span>Approve</span>
@@ -232,12 +225,13 @@ const SRUpdatesTables = () => {
           onClick={() => {
             rejectHandler();
           }}
+          data-testid="reject-btn"
         >
           <XmarkIcon />
           <span>Not Public</span>
         </div>
       </div>
-      <div className="col-12">
+      <div className="col-12" data-testid="srreview-table">
         <Table
           showPageOptions={true}
           label="Search Results"
@@ -254,7 +248,7 @@ const SRUpdatesTables = () => {
             changeHandler(event);
           }}
           editMode={false}
-          idColumnName="siteId"
+          idColumnName="id"
         ></Table>
       </div>
     </PageContainer>

@@ -34,6 +34,7 @@ jobs:
           tag: ${{ github.event.number }}
           tag_fallback: latest
           triggers: ('${{ matrix.package }}/')
+          build_file: ${{ matrix.build_file }}
 
   # https://github.com/bcgov/quickstart-openshift-helpers
   deploys:

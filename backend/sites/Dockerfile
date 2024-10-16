@@ -5,7 +5,7 @@ USER root
 WORKDIR /app
 COPY *.json ./
 COPY ./src /app/src
-COPY schema.graphql /app
+COPY ./schema.graphql /app
 RUN npm ci --omit=dev && \
     npm run build
 

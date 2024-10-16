@@ -169,34 +169,37 @@ describe('SiteService', () => {
         {
           provide: getRepositoryToken(SiteDocs),
           useValue: {
-            find: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            findOneByOrFail: jest.fn(() => {
+              return {
+                id: '1',
+                siteId: '9',
+                submissionDate: new Date(),
+                documentDate: new Date(),
+                title: 'PROPOSED DREDGING AND LANDFILL (REMEDIAL PLAN)',
+                srAction: false,
+              };
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            createQueryBuilder: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnThis(),
+              getRawOne: jest.fn().mockResolvedValue({ maxid: '1' }), // Ensure this returns a promise
             }),
+            save: jest.fn(),
           },
         },
         {
           provide: getRepositoryToken(SiteDocPartics),
           useValue: {
-            find: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123', psnorgId: '1253' },
-                { id: '124', siteId: '123', psnorgId: '1253' },
-              ];
+            findOneByOrFail: jest.fn(() => {
+              return {
+                id: '1',
+                psnorgId: '123',
+                displayName: 'Display Name',
+              };
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123', psnorgId: '1253' },
-                { id: '124', siteId: '123', psnorgId: '1253' },
-              ];
+            save: jest.fn(),
+            createQueryBuilder: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnThis(),
+              getRawOne: jest.fn().mockResolvedValue({ maxid: '1' }), // Ensure this returns a promise
             }),
           },
         },
@@ -304,6 +307,7 @@ describe('SiteService', () => {
             log: jest.fn(),
             debug: jest.fn(),
             error: jest.fn(),
+            warn: jest.fn(),
           },
         },
         {
@@ -739,48 +743,115 @@ describe('SiteService', () => {
       expect(addedSiteAssoc[0].siteIdAssociatedWith).toBe('9999');
       expect(addedSiteAssoc[0].note).toBe('Note added');
     });
+
+    it('should update existing site associates', async () => {
+      const siteAccociated = [
+        {
+          apiAction: UserActionEnum.UPDATED,
+          id: '1',
+          siteId: '123',
+          siteIdAssociatedWith: '9999',
+          note: 'Note Updated',
+        },
+      ];
+      const userInfo = { givenName: 'Updated User' };
+
+      await siteService.processSiteAssociated(
+        siteAccociated,
+        userInfo,
+        entityManager,
+      );
+      const updatedAssoc = (entityManager.update as jest.Mock).mock.calls[0][2];
+      expect(updatedAssoc.whenUpdated).toBeInstanceOf(Date);
+      expect(updatedAssoc.siteId).toBe('123');
+      expect(updatedAssoc.whoUpdated).toBe('Updated User');
+      expect(updatedAssoc.siteIdAssociatedWith).toBe('9999');
+      expect(updatedAssoc.note).toBe('Note Updated');
+    });
+
+    it('should delete site associates', async () => {
+      const siteAccociated = [
+        {
+          apiAction: UserActionEnum.DELETED,
+          id: '1',
+        },
+      ];
+      const userInfo = { givenName: 'User Four' };
+
+      await siteService.processSiteAssociated(
+        siteAccociated,
+        userInfo,
+        entityManager,
+      );
+      const deletedAssoc = (entityManager.delete as jest.Mock).mock.calls[0][1];
+      expect(deletedAssoc.id).toBe('1');
+    });
   });
 
-  it('should update existing site associates', async () => {
-    const siteAccociated = [
-      {
-        apiAction: UserActionEnum.UPDATED,
-        id: '1',
-        siteId: '123',
-        siteIdAssociatedWith: '9999',
-        note: 'Note Updated',
-      },
-    ];
-    const userInfo = { givenName: 'Updated User' };
+  describe('processDocuments', () => {
+    it('should add new documents and participants when action is ADDED', async () => {
+      const documents = [
+        {
+          id: null,
+          displayName: 'Display Name',
+          psnorgId: '123',
+          apiAction: UserActionEnum.ADDED,
+          srAction: SRApprovalStatusEnum.PENDING,
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
 
-    await siteService.processSiteAssociated(
-      siteAccociated,
-      userInfo,
-      entityManager,
-    );
-    const updatedAssoc = (entityManager.update as jest.Mock).mock.calls[0][2];
-    expect(updatedAssoc.whenUpdated).toBeInstanceOf(Date);
-    expect(updatedAssoc.siteId).toBe('123');
-    expect(updatedAssoc.whoUpdated).toBe('Updated User');
-    expect(updatedAssoc.siteIdAssociatedWith).toBe('9999');
-    expect(updatedAssoc.note).toBe('Note Updated');
-  });
+      await siteService.processDocuments(documents, userInfo, entityManager);
 
-  it('should delete site associates', async () => {
-    const siteAccociated = [
-      {
-        apiAction: UserActionEnum.DELETED,
-        id: '1',
-      },
-    ];
-    const userInfo = { givenName: 'User Four' };
+      expect(entityManager.save).toHaveBeenCalledTimes(2); // For SiteDocs and SiteDocPartics
+      const savedDocuments = (entityManager.save as jest.Mock).mock.calls[0][1];
+      const savedDocPartics = (entityManager.save as jest.Mock).mock
+        .calls[0][1];
 
-    await siteService.processSiteAssociated(
-      siteAccociated,
-      userInfo,
-      entityManager,
-    );
-    const deletedAssoc = (entityManager.delete as jest.Mock).mock.calls[0][1];
-    expect(deletedAssoc.id).toBe('1');
+      expect(savedDocuments[0].whenCreated).toBeInstanceOf(Date);
+      expect(savedDocuments[0].whoCreated).toBe('Test User');
+      expect(savedDocPartics[0].whenCreated).toBeInstanceOf(Date);
+      expect(savedDocPartics[0].whoCreated).toBe('Test User');
+    });
+
+    it('should update existing documents and participants when action is UPDATED', async () => {
+      const documents = [
+        {
+          id: '1',
+          docParticId: '1',
+          displayName: 'Updated Document',
+          apiAction: UserActionEnum.UPDATED,
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      await siteService.processDocuments(documents, userInfo, entityManager);
+
+      expect(entityManager.update).toHaveBeenCalledTimes(2); // For SiteDocs and SiteDocPartics
+      expect(entityManager.update).toHaveBeenCalledWith(
+        SiteDocs,
+        { id: '1' },
+        expect.any(Object),
+      );
+      expect(entityManager.update).toHaveBeenCalledWith(
+        SiteDocPartics,
+        { id: '1' },
+        expect.any(Object),
+      );
+    });
+
+    it('should delete documents when action is DELETED', async () => {
+      const documents = [
+        {
+          id: '1',
+          apiAction: UserActionEnum.DELETED,
+        },
+      ];
+      const userInfo = { givenName: 'Tester' };
+
+      await siteService.processDocuments(documents, userInfo, entityManager);
+
+      expect(entityManager.delete).toHaveBeenCalledWith(SiteDocs, { id: '1' });
+    });
   });
 });

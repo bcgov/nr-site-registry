@@ -33,7 +33,7 @@ import {
   SearchParams,
   SitePendingApprovalRecords,
   SiteRecordsForSRAction,
-} from 'src/app/dto/sitesPendingReview.dto';
+} from '../../dto/sitesPendingReview.dto';
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
 
 /**
@@ -1013,7 +1013,10 @@ export class SiteService {
             break;
 
           default:
-            console.warn('Unknown action for event:', apiAction);
+            this.sitesLogger.warn(
+              'SiteService.processEvents Unknown action for event',
+            );
+            break;
         }
 
         // Process related participants regardless of event action

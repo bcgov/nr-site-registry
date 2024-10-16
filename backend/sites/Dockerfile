@@ -22,7 +22,6 @@ COPY --from=build /app/dist ./dist
 # Port and health check
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000
-RUN set -x \
-        && chmod -R 777 /app/
+RUN chmod -R 777 /app/
 # max old space the heap size, 120MB with 200MB limit in deployment.
 CMD ["--max-old-space-size=120", "/app/dist/main"]

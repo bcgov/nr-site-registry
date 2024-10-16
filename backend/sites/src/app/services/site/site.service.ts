@@ -362,15 +362,6 @@ export class SiteService {
                 );
               }
 
-              // if (eventsParticipants) {
-              //   await transactionalEntityManager.save(
-              //     EventPartics,
-              //     eventsParticipants,
-              //   );
-              // } else {
-              //   console.log('No changes To Site Event Participants');
-              // }
-
               if (siteParticipants && siteParticipants.length > 0) {
                 await this.processSiteParticipants(
                   siteParticipants,
@@ -521,9 +512,9 @@ export class SiteService {
             newDocuments.push({
               ...siteDocument,
               id: documentId,
-              rwmFlag: 0,
+              // rwmFlag: 0,
               userAction: UserActionEnum.ADDED,
-              // srAction: SRApprovalStatusEnum.PENDING,
+              srAction: SRApprovalStatusEnum.PENDING,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -539,11 +530,10 @@ export class SiteService {
               ...siteDocumentParticipant,
               id: newDocParticId.toString(),
               sdocId: documentId,
-              rwmFlag: 0,
-              dprCode: 'ATH',
-              // dprCode: dprCode ?? 'ATH',
+              // rwmFlag: 0,
+              dprCode: 'ATH', // dprCode is always ATH, we don't have UI and keeping this cloumn for maintaing historical data.
               userAction: UserActionEnum.ADDED,
-              // srAction: SRApprovalStatusEnum.PENDING,
+              srAction: SRApprovalStatusEnum.PENDING,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -559,7 +549,7 @@ export class SiteService {
                   ...existingDocument,
                   ...siteDocument,
                   userAction: UserActionEnum.UPDATED,
-                  // srAction: SRApprovalStatusEnum.PENDING,
+                  srAction: SRApprovalStatusEnum.PENDING,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },
@@ -577,7 +567,7 @@ export class SiteService {
                     ...existingDocumentParticipant,
                     ...siteDocumentParticipant,
                     userAction: UserActionEnum.UPDATED,
-                    // srAction: SRApprovalStatusEnum.PENDING,
+                    srAction: SRApprovalStatusEnum.PENDING,
                     whenUpdated: new Date(),
                     whoUpdated: userInfo ? userInfo.givenName : '',
                   },

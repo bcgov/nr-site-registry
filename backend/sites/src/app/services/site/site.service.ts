@@ -355,8 +355,10 @@ export class SiteService {
                 sitesSummary.whenUpdated = new Date();
                 sitesSummary.whoUpdated = userInfo?.givenName;
                 await transactionalEntityManager.save(Sites, sitesSummary);
-              } else {
-                console.log('No changes To Site Summary');
+              } else {               
+                this.sitesLogger.log(
+                  'SiteService.saveSiteDetails(): No changes To Site Summary',
+                );
               }
 
               if (events && events.length > 0) {
@@ -1376,6 +1378,7 @@ export class SiteService {
       this.sitesLogger.debug('SiteService.bulkUpdateForSR() start');
 
       if (!inputDTO) {
+        this.sitesLogger.debug('SiteService.bulkUpdateForSR() inputDTO invalid returning false');
         return false;
       } else {
         const { isApproved, sites } = inputDTO;

@@ -8,6 +8,6 @@ async function main() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
-  await app.listen(4007);
+  await app.listen(process.env.PORT || 4007);
 }
 main();

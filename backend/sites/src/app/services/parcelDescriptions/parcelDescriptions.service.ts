@@ -9,6 +9,7 @@ import {
 } from './parcelDescriptions.queryBuilder';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { LoggerService } from '../../logger/logger.service';
+import { ParcelDescriptionInputDTO } from '../../dto/parcelDescriptionInput.dto';
 
 @Injectable()
 export class ParcelDescriptionsService {
@@ -173,5 +174,13 @@ export class ParcelDescriptionsService {
       responsePage,
       responsePageSize,
     );
+  }
+
+  async saveParcelDescriptionsForSite(
+    siteId: string,
+    parcelDescriptions: ParcelDescriptionInputDTO[],
+    userInfo: any,
+  ) {
+    // TODO: Implementation in subsequent PR.
   }
 }

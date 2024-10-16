@@ -1,6 +1,6 @@
 # "build-stage", based on Node.js, to build and compile the frontend
 # pull official base image
-FROM node:14-alpine as build-stage
+FROM node:22-alpine as build
 
 # set working directory
 WORKDIR /app
@@ -24,8 +24,8 @@ COPY . ./
 RUN npm run build
 
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
-FROM nginx:1.17 as production-stage
+FROM nginx:1.9 as deploy
 RUN mkdir /app
-COPY --from=build-stage /app/build /usr/share/nginx/html
+COPY --from=build /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 CMD ["nginx", "-g", "daemon off;"]

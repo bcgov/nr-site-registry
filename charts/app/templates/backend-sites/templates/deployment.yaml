@@ -60,7 +60,7 @@ spec:
             - name: LOG_FILE_MAX_FILES
               value: "7d"
             - name: PORT
-              value: {{ .Values.backendSites.service.targetPort }}
+              value: {{ .Values.backendSites.service.targetPort | quote }}
           ports:
             - name: http
               containerPort: {{ .Values.backendSites.service.targetPort }}

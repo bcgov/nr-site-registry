@@ -20,6 +20,14 @@ import { GenericValidationPipe } from '../../utils/validations/genericValidation
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { CustomRoles } from '../../common/role';
 import { LoggerService } from '../../logger/logger.service';
+import {
+  BulkApproveRejectChangesDTO,
+  QueryResultForPendingSites,
+  QueryResultForPendingSitesResponse,
+  SearchParams,
+  SRApproveRejectResponse,
+} from 'src/app/dto/sitesPendingReview.dto';
+
 /**
  * Resolver for Region
  */
@@ -33,6 +41,7 @@ export class SiteResolver {
     >,
     private readonly genericResponseProviderForSave: GenericResponseProvider<SaveSiteDetailsResponse>,
     private readonly sitesLogger: LoggerService,
+    private readonly siteApprovalResponseProvider: GenericResponseProvider<QueryResultForPendingSites>,
   ) {}
 
   /**
@@ -221,6 +230,107 @@ export class SiteResolver {
         422,
         false,
       );
+    }
+  }
+
+  /**
+   * Find sites where search parameter matches a site id or address
+   * @param searchParam search parameter
+   * @param page page number
+   * @param pageSize size of the page
+   * @returns sites where id or address matches the search param along with pagination params
+   */
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => QueryResultForPendingSitesResponse, {
+    name: 'getPendingSiteForSRApproval',
+  })
+  async getPendingSiteForSRApproval(
+    @Args('searchParam', { type: () => SearchParams, nullable: true })
+    searchParam: SearchParams,
+    @Args('page', { type: () => String }) page: number,
+    @Args('pageSize', { type: () => String }) pageSize: number,
+  ) {
+    try {
+      this.sitesLogger.log(
+        'SiteResolver.getPendingSiteForSRApproval() start dto:' +
+          ' ' +
+          JSON.stringify(searchParam) +
+          ' page ' +
+          page +
+          ' pageSize ' +
+          pageSize,
+      );
+
+      const result = await this.siteService.getSiteDetailsPendingSRApproval(
+        searchParam,
+        page,
+        pageSize,
+      );
+
+      return this.siteApprovalResponseProvider.createResponse(
+        'getPendingSiteForSRApproval response',
+        200,
+        true,
+        result,
+      );
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SiteResolver.getPendingSiteForSRApproval()  end',
+        JSON.stringify(error),
+      );
+      throw new Error('System Error, Please try again.');
+    }
+  }
+
+  @Roles({ roles: [CustomRoles.Internal], mode: RoleMatchingMode.ANY })
+  @Mutation(() => SRApproveRejectResponse, { name: 'bulkAproveRejectChanges' })
+  async bulkAproveRejectChanges(
+    @Args('approveRejectDTO', { type: () => BulkApproveRejectChangesDTO })
+    approveRejectDTO: BulkApproveRejectChangesDTO,
+    @AuthenticatedUser() user: any,
+  ) {
+    this.sitesLogger.log(
+      'SiteResolver.bulkAproveRejectChanges() start dto:' +
+        ' ' +
+        JSON.stringify(approveRejectDTO),
+    );
+    try {
+      let message = false;
+
+      message = await this.siteService.bulkUpdateForSR(approveRejectDTO, user);
+
+      if (message) {
+        this.sitesLogger.log(
+          'SiteResolver.bulkAproveRejectChanges()  RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Successfully updated sites.',
+          200,
+          true,
+        );
+      } else {
+        this.sitesLogger.log(
+          'SiteResolver.bulkAproveRejectChanges()  RES:500 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Unable to update sites. `,
+          500,
+          false,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SiteResolver.bulkAproveRejectChanges()  end',
+        JSON.stringify(error),
+      );
+      throw new Error('System Error, Please try again.');
     }
   }
 }

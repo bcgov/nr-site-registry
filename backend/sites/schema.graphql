@@ -92,32 +92,10 @@ type SiteParticRoles {
   prCode2: ParticRoleCd!
 }
 
-type LandHistories {
-  userAction: String!
-  srAction: String!
-  siteId: String!
-  guid: String!
-  lutCode: String!
-  note: String
-  whoCreated: String!
-  whoUpdated: String
-  whenCreated: DateTime!
-  whenUpdated: DateTime
-  rwmFlag: Float!
-  rwmNoteFlag: Float!
-  siteProfile: String
-  profileDateReceived: DateTime
-  landUse: LandUseCd!
-}
-
-type LandUseCd {
-  code: String!
-  description: String!
-}
-
 type SiteProfiles {
   userAction: String!
   srAction: String!
+  id: String!
   siteId: String!
   dateCompleted: DateTime!
   localAuthDateRecd: DateTime
@@ -293,6 +271,29 @@ type Events {
   eventPartics: [EventPartics!]
   eventTypeCd: EventTypeCd!
   site: Sites!
+}
+
+type LandUseCd {
+  code: String!
+  description: String!
+}
+
+type LandHistories {
+  userAction: String!
+  srAction: String!
+  siteId: String!
+  guid: String!
+  lutCode: String!
+  note: String
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  rwmNoteFlag: Float!
+  siteProfile: String
+  profileDateReceived: DateTime
+  landUse: LandUseCd!
 }
 
 type SiteAssocs {
@@ -583,6 +584,35 @@ type AssociatedSiteDto {
   note: String
 }
 
+type DisclosureResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  data: [SiteProfiles!]
+}
+
+type ParcelDescriptionsResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  count: Float
+  page: Float
+  pageSize: Float
+  data: [ParcelDescriptionDto!]
+}
+
+type ParcelDescriptionDto {
+  id: Float!
+  descriptionType: String!
+  idPinNumber: String!
+  dateNoted: DateTime!
+  landDescription: String!
+  userAction: String!
+  srAction: String!
+}
+
 type RecentViewResponse {
   message: String
   httpStatusCode: Int
@@ -676,14 +706,6 @@ type BannerTypeResponse {
   data: BannerTypeData
 }
 
-type DisclosureResponse {
-  message: String
-  httpStatusCode: Int
-  success: Boolean
-  timestamp: String
-  data: [SiteProfiles!]
-}
-
 type CartResponse {
   message: String
   httpStatusCode: Int
@@ -722,27 +744,6 @@ type LandUseCodeResponse {
   success: Boolean
   timestamp: String
   data: [LandUseCd!]!
-}
-
-type ParcelDescriptionsResponse {
-  message: String
-  httpStatusCode: Int
-  success: Boolean
-  timestamp: String
-  count: Float
-  page: Float
-  pageSize: Float
-  data: [ParcelDescriptionDto!]
-}
-
-type ParcelDescriptionDto {
-  id: Float!
-  descriptionType: String!
-  idPinNumber: String!
-  dateNoted: DateTime!
-  landDescription: String!
-  userAction: String!
-  srAction: String!
 }
 
 type Query {
@@ -811,7 +812,7 @@ input SaveSiteDetailsDTO {
   siteParticipants: [SiteParticsInputDto!]
   documents: [DocumentInputDTO!]
   siteAssociations: [SiteAssociationsInputDTO!]
-  subDivisions: [SubDivisionsInputDTO!]
+  parcelDescriptions: [ParcelDescriptionInputDTO!]
   landHistories: [LandHistoriesInputDTO!]
   profiles: [SiteProfilesInputDTO!]
   siteId: String!
@@ -926,30 +927,15 @@ input SiteAssociationsInputDTO {
   note: String
 }
 
-input SubDivisionsInputDTO {
+input ParcelDescriptionInputDTO {
   userAction: String
   apiAction: String
   srAction: String!
   id: String!
+  descriptionType: String!
+  idPinNumber: String!
   dateNoted: DateTime!
-  pin: String!
-  pid: String!
-  bcaaFolioNumber: String!
-  entityType: String!
-  addrLine_1: String!
-  addrLine_2: String!
-  addrLine_3: String!
-  addrLine_4: String!
-  city: String!
-  postalCode: String!
-  legalDescription: String!
-  whoCreated: String!
-  whoUpdated: String!
-  whenCreated: DateTime!
-  whenUpdated: DateTime!
-  crownLandsFileNo: String!
-  pidStatusCd: String!
-  validPid: String!
+  landDescription: String!
 }
 
 input LandHistoriesInputDTO {
@@ -966,48 +952,17 @@ input SiteProfilesInputDTO {
   userAction: String
   apiAction: String
   srAction: String!
+  id: String!
   siteId: String!
   dateCompleted: DateTime!
+  rwmDateDecision: DateTime
   localAuthDateRecd: DateTime
-  localAuthName: String
-  localAuthAgency: String
-  localAuthAddress1: String
-  localAuthAddress2: String
-  localAuthPhoneAreaCode: String
-  localAuthPhoneNo: String
-  localAuthFaxAreaCode: String
-  localAuthFaxNo: String
+  siteRegDateRecd: DateTime
+  siteRegDateEntered: DateTime
   localAuthDateSubmitted: DateTime
   localAuthDateForwarded: DateTime
   rwmDateReceived: DateTime
   rwmParticId: String
-  rwmPhoneAreaCode: String
-  rwmPhoneNo: String
-  rwmFaxAreaCode: String
-  rwmFaxNo: String
-  investigationRequired: String
-  rwmDateDecision: DateTime
-  siteRegDateRecd: DateTime
-  siteRegDateEntered: DateTime
-  siteRegParticId: String
-  ownerParticId: String
-  siteAddress: String
-  siteCity: String
-  sitePostalCode: String
-  numberOfPids: Float
-  numberOfPins: Float
-  latDegrees: Float
-  latMinutes: Float
-  latSeconds: String
-  longDegrees: Float
-  longMinutes: Float
-  longSeconds: String
-  comments: String
-  whoCreated: String!
-  whoUpdated: String
-  whenCreated: DateTime!
-  whenUpdated: DateTime
-  localAuthEmail: String
   plannedActivityComment: String
   siteDisclosureComment: String
   govDocumentsComment: String

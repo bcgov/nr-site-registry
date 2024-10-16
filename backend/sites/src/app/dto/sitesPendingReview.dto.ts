@@ -1,11 +1,16 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { ResponseDto } from './response/response.dto';
-import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 @ObjectType()
-export class SitePendingApprovalRecords
-{
-  @Field()  
+export class SitePendingApprovalRecords {
+  @Field()
   id: string;
 
   @Field()
@@ -24,23 +29,18 @@ export class SitePendingApprovalRecords
   address: string;
 }
 
-
 @ObjectType()
 export class SitePendingApprovalDTO extends ResponseDto {
-
-   data: SitePendingApprovalRecords[];
-  
+  data: SitePendingApprovalRecords[];
 }
 
 @ObjectType()
 export class QueryResultForPendingSites extends ResponseDto {
-
   @Field(() => Number)
   totalRecords: number;
 
-  @Field(()=>[SitePendingApprovalRecords],{nullable: true})
+  @Field(() => [SitePendingApprovalRecords], { nullable: true })
   data: SitePendingApprovalRecords[];
-  
 }
 
 @ObjectType()
@@ -77,48 +77,41 @@ export class SearchParams {
   addrLine?: string;
 }
 
-
 @ObjectType()
 export class SRApproveRejectResponse extends ResponseDto {
   @Field(() => [SitePendingApprovalDTO], { nullable: true })
   data: SitePendingApprovalDTO[] | null;
 }
 
-
 @InputType()
-export class SiteRecordsForSRAction
-{
-  @Field()  
+export class SiteRecordsForSRAction {
+  @Field()
   id: string;
-  
-  @Field(()=>String)
+
+  @Field(() => String)
   siteId: string;
 
-  @Field(()=>String)
+  @Field(() => String)
   changes: string;
 
-  @Field(()=>String)
+  @Field(() => String)
   whoUpdated: string;
 
-  @Field(()=>String)
+  @Field(() => String)
   whenUpdated: Date;
 
-  @Field(()=>String)
+  @Field(() => String)
   address: string;
 }
 
-
-
-
 @InputType()
 export class BulkApproveRejectChangesDTO {
-
-  @Field(()=>Boolean)
+  @Field(() => Boolean)
   @IsBoolean()
   @IsNotEmpty()
-  isApproved: boolean
+  isApproved: boolean;
 
-  @Field(()=>[SiteRecordsForSRAction])
+  @Field(() => [SiteRecordsForSRAction])
   @IsArray()
   @IsNotEmpty()
   sites: SiteRecordsForSRAction[];

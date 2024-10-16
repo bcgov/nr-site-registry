@@ -38,13 +38,13 @@ export class SiteProfileLandUses {
   @JoinColumn([{ name: 'lut_code', referencedColumnName: 'code' }])
   lutCode2: LandUseCd;
 
-  @ManyToOne(
-    () => SiteProfiles,
-    (siteProfiles) => siteProfiles.siteProfileLandUses,
-  )
-  @JoinColumn([
-    { name: 'site_id', referencedColumnName: 'siteId' },
-    { name: 'sprof_date_completed', referencedColumnName: 'dateCompleted' },
-  ])
-  siteProfiles: SiteProfiles;
+  // @ManyToOne(
+  //   () => SiteProfiles,
+  //   (siteProfiles) => siteProfiles.siteProfileLandUses,
+  // )
+  // @JoinColumn([
+  //   { name: 'site_id', referencedColumnName: 'siteId' },
+  //   { name: 'sprof_date_completed', referencedColumnName: 'dateCompleted' },
+  // ])
+  // siteProfiles: SiteProfiles;
 }

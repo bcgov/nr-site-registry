@@ -159,6 +159,7 @@ export const TextInput: React.FC<InputProps> = ({
   validation,
   allowNumbersOnly,
   isEditing,
+  isDisabled,
   srMode,
   customLabelCss,
   customInputTextCss,
@@ -249,6 +250,7 @@ export const TextInput: React.FC<InputProps> = ({
           onChange={handleTextInputChange}
           aria-label={label} // Accessibility
           required={error ? true : false}
+          disabled={isDisabled ?? false}
         />
       ) : (
         <span className={`d-flex ${customInputTextCss ?? ''}`}>{value}</span>

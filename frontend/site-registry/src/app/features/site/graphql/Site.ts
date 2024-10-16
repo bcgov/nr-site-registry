@@ -85,38 +85,36 @@ export const getPendingSiteForSRApprovalQL = () => {
     query getPendingSiteForSRApproval(
       $searchParam: SearchParams
       $page: String!
-      $pageSize: String!    
+      $pageSize: String!
     ) {
       getPendingSiteForSRApproval(
         searchParam: $searchParam
         page: $page
-        pageSize: $pageSize       
+        pageSize: $pageSize
       ) {
-       
-          httpStatusCode
-          message
-          data
-          {
-            totalRecords
-            data
-            {
-              id
-              changes
-              siteId
-              whoUpdated
-              whenUpdated
-              address
-            }
+        httpStatusCode
+        message
+        data {
+          totalRecords
+          data {
+            id
+            changes
+            siteId
+            whoUpdated
+            whenUpdated
+            address
           }
+        }
       }
     }
   `;
 };
 
-
 export const bulkAproveRejectChangesQL = () => gql`
-  mutation bulkAproveRejectChanges($approveRejectDTO: BulkApproveRejectChangesDTO!) {
-    bulkAproveRejectChanges(approveRejectDTO: $approveRejectDTO) {      
+  mutation bulkAproveRejectChanges(
+    $approveRejectDTO: BulkApproveRejectChangesDTO!
+  ) {
+    bulkAproveRejectChanges(approveRejectDTO: $approveRejectDTO) {
       httpStatusCode
       success
     }

@@ -8,7 +8,7 @@ import {
   FileExportIcon,
   BookIcon,
   ShoppingCartIcon,
-  ListCheckIcon
+  ListCheckIcon,
 } from '../../common/icon';
 import { useSelector } from 'react-redux';
 import {

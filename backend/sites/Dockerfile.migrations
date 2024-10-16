@@ -21,5 +21,4 @@ COPY . .
 # Install postgresql-client
 RUN apk add --no-cache postgresql-client
 
-RUN chmod +x initDB.sh
-ENTRYPOINT ["/app/initDB.sh"]
+ENTRYPOINT [ "sh", "initDB.sh" ]

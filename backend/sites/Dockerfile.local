@@ -29,5 +29,5 @@ EXPOSE 4005
 
 # Start up command
 
-RUN chmod +x local_start.sh
-ENTRYPOINT ["/app/local_start.sh"]
+# Start up command
+ENTRYPOINT ["sh","/app/local_start.sh"]

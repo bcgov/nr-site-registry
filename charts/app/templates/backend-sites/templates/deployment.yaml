@@ -27,7 +27,7 @@ spec:
       {{- end }}
       initContainers: # The container that will do the initial database seed and migrations.
         - name: {{ include "backendSites.fullname" . }}-init
-          image: "{{.Values.global.registry}}/{{.Values.global.repository}}/backend/site-migrations:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          image: "{{.Values.global.registry}}/{{.Values.global.repository}}/backend/sites-migration:{{ .Values.global.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ default "Always" .Values.backendSites.imagePullPolicy }}
           envFrom:
             - secretRef:

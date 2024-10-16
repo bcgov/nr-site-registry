@@ -20,6 +20,16 @@ import { TransactionManagerService } from '../transactionManager/transactionMana
 import { LoggerService } from '../../logger/logger.service';
 import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
 import { SiteDocPartics } from '../../entities/siteDocPartics.entity';
+import {
+  BulkApproveRejectChangesDTO,
+  QueryResultForPendingSites,
+  SearchParams,
+  SitePendingApprovalRecords,
+} from 'src/app/dto/sitesPendingReview.dto';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { ParcelDescriptionInputDTO } from 'src/app/dto/parcelDescriptionInput.dto';
+import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -36,6 +46,7 @@ describe('SiteService', () => {
   let entityManager: EntityManager;
   let historyLogRepository: Repository<HistoryLog>;
   let loggerService: LoggerService;
+  let parcelDescriptionService: ParcelDescriptionsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -77,6 +88,14 @@ describe('SiteService', () => {
                 { id: '124', siteId: '123' },
               ];
             }),
+            manager: {
+              query: jest.fn(() => {
+                return [
+                  { id: '123', siteId: '123' },
+                  { id: '124', siteId: '123' },
+                ];
+              }),
+            },
           },
         },
         {
@@ -184,18 +203,15 @@ describe('SiteService', () => {
         {
           provide: getRepositoryToken(SiteAssocs),
           useValue: {
-            find: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            findOneByOrFail: jest.fn(() => {
+              return {
+                id: '1',
+                siteId: '123',
+                siteIdAssociatedWith: '1234',
+                note: 'Test Note',
+              };
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
-            }),
+            save: jest.fn(),
           },
         },
         {
@@ -235,18 +251,16 @@ describe('SiteService', () => {
         {
           provide: getRepositoryToken(SiteProfiles),
           useValue: {
-            find: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            findOneByOrFail: jest.fn(() => {
+              return {
+                id: '123',
+                siteId: '456',
+                dateCompleted: new Date(),
+                whenCreated: new Date(),
+                whoCreated: 'Test User',
+              };
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
-            }),
+            save: jest.fn(),
           },
         },
         {
@@ -255,6 +269,16 @@ describe('SiteService', () => {
             transaction: jest.fn(async () => {
               return await true;
             }),
+            find: jest.fn(async () => {
+              return [];
+            }),
+            save: jest.fn(async () => {
+              return true;
+            }),
+            findOneByOrFail: jest.fn(),
+            // save: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
           },
         },
         {
@@ -280,6 +304,12 @@ describe('SiteService', () => {
             log: jest.fn(),
             debug: jest.fn(),
             error: jest.fn(),
+          },
+        },
+        {
+          provide: ParcelDescriptionsService,
+          useValue: {
+            saveParcelDescriptionsForSite: jest.fn(),
           },
         },
       ],
@@ -316,6 +346,9 @@ describe('SiteService', () => {
     );
     entityManager = module.get<EntityManager>(EntityManager);
     loggerService = module.get<LoggerService>(LoggerService);
+    parcelDescriptionService = module.get<ParcelDescriptionsService>(
+      ParcelDescriptionsService,
+    );
   });
 
   afterEach(() => {
@@ -415,8 +448,12 @@ describe('SiteService', () => {
     });
   });
 
-  describe('saveSiteDetails', () => {
+  describe('commitSiteDetails', () => {
     describe('when there are no errors', () => {
+      beforeEach(() => {
+        entityManager.save = jest.fn();
+      });
+
       it('returns true.', async () => {
         const userInfo = { sub: 'userId', givenName: 'UserName' };
 
@@ -442,10 +479,308 @@ describe('SiteService', () => {
           ],
         };
 
-        const result = await siteService.saveSiteDetails(inputDTO, userInfo);
+        const result = await siteService.commitSiteDetails(
+          entityManager,
+          inputDTO,
+          userInfo,
+        );
 
         expect(result).toBe(true);
       });
+
+      it('calls the parcel descriptions service.', async () => {
+        const userInfo = { sub: 'userId', givenName: 'UserName' };
+
+        const inputDTO: SaveSiteDetailsDTO = {
+          siteId: '1',
+          parcelDescriptions: [
+            {
+              id: '1',
+              descriptionType: 'Parcel ID',
+              dateNoted: new Date(),
+              idPinNumber: '123456',
+              landDescription: 'Description of Land',
+              userAction: 'pending',
+              apiAction: 'pending',
+              srAction: 'pending',
+            } as ParcelDescriptionInputDTO,
+          ],
+        };
+
+        await siteService.commitSiteDetails(entityManager, inputDTO, userInfo);
+
+        expect(
+          parcelDescriptionService.saveParcelDescriptionsForSite,
+        ).toHaveBeenCalledWith(
+          inputDTO.siteId,
+          inputDTO.parcelDescriptions,
+          userInfo,
+        );
+      });
+
+      it('logs when there are no parcel descriptions', async () => {
+        const userInfo = { sub: 'userId', givenName: 'UserName' };
+
+        const inputDTO: SaveSiteDetailsDTO = {
+          siteId: '1',
+        };
+
+        await siteService.commitSiteDetails(entityManager, inputDTO, userInfo);
+
+        expect(loggerService.log).toHaveBeenCalledWith(
+          expect.stringMatching(/.*No changes to Parcel Descriptions.*/),
+        );
+      });
     });
+  });
+
+  describe('SR Approval Reject', () => {
+    describe('Fetching Records', () => {
+      it('Fetch SR Pending Approval Reject Records', async () => {
+        const page = 1;
+        const pageSize = 5;
+        const searchParam: SearchParams = null;
+
+        const data: any[] = [
+          {
+            site_id: '1',
+            who_updated: 'Midhun',
+            latest_update: new Date(),
+            changes: 'summary',
+            addr_line_1: 'address 1',
+            addr_line_2: 'address 2 ',
+            addr_line_3: 'address 3',
+          },
+        ];
+
+        jest.spyOn(siteRepository.manager, 'query').mockResolvedValue(data);
+
+        const result = await siteService.getSiteDetailsPendingSRApproval(
+          searchParam,
+          page,
+          pageSize,
+        );
+
+        expect(result.totalRecords).toBeGreaterThan(0);
+      });
+
+      it('Fetch SR Pending Approval Reject Records - Filter', async () => {
+        const page = 1;
+        const pageSize = 5;
+        const searchParam: SearchParams = {
+          changes: 'notation',
+        };
+
+        const data: any[] = [
+          {
+            site_id: '1',
+            who_updated: 'Midhun',
+            latest_update: new Date(),
+            changes: 'summary',
+            addr_line_1: 'address 1',
+            addr_line_2: 'address 2 ',
+            addr_line_3: 'address 3',
+          },
+          {
+            site_id: '2',
+            who_updated: 'Midhun',
+            latest_update: new Date(),
+            changes: 'notation',
+            addr_line_1: 'address 1',
+            addr_line_2: 'address 2 ',
+            addr_line_3: 'address 3',
+          },
+        ];
+
+        jest.spyOn(siteRepository.manager, 'query').mockResolvedValue(data);
+
+        const result = await siteService.getSiteDetailsPendingSRApproval(
+          searchParam,
+          page,
+          pageSize,
+        );
+
+        expect(result.totalRecords).toBeLessThanOrEqual(1);
+      });
+    });
+
+    describe('Bulk Update For SR', () => {
+      it('Bulk Approve/Reject ', async () => {
+        const inputDTO: BulkApproveRejectChangesDTO = {
+          isApproved: true,
+          sites: [
+            {
+              id: '1',
+              siteId: '2',
+              whoUpdated: 'Midhun',
+              whenUpdated: new Date(),
+              changes: 'notation',
+              address: 'address 1',
+            },
+          ],
+        };
+
+        const response = await siteService.bulkUpdateForSR(inputDTO, null);
+
+        console.log('response', response);
+        expect(response).toBe(true);
+      });
+
+      it('Set Public Status Properly', async () => {
+        const entity = {
+          userAction: '',
+          srAction: '',
+          whenUpdated: '',
+          whoUpdated: '',
+        };
+        const userInfo = { givenName: 'Midhun' };
+        const isApproved = true;
+        siteService.setUpdatedStatus(entity, isApproved, userInfo);
+        const status = entity.srAction === SRApprovalStatusEnum.PUBLIC;
+        expect(status).toBeTruthy();
+      });
+
+      it('validate processBulkUpdates', async () => {
+        const site = {
+          id: '1',
+          siteId: '2',
+          whoUpdated: 'Midhun',
+          whenUpdated: new Date(),
+          changes: 'notation',
+          address: 'address 1',
+        };
+        const userInfo = { givenName: 'Midhun' };
+
+        const result = await siteService.processSRBulkUpdates(
+          entityManager,
+          site,
+          true,
+          userInfo,
+        );
+
+        expect(result).toBeTruthy();
+      });
+    });
+  });
+
+  describe('processSiteDisclosure', () => {
+    it('should create a new site profile when action is ADDED', async () => {
+      const siteDisclosure = [
+        {
+          apiAction: UserActionEnum.ADDED,
+          id: '123',
+          siteId: '456',
+          dateCompleted: new Date(),
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      await siteService.processSiteDisclosure(
+        siteDisclosure,
+        userInfo,
+        entityManager,
+      );
+      expect(entityManager.save).toHaveBeenCalled();
+      const addedProfile = (entityManager.save as jest.Mock).mock.calls[0][1];
+      expect(addedProfile.dateCompleted).toBeInstanceOf(Date);
+      expect(addedProfile.whenCreated).toBeInstanceOf(Date);
+      expect(addedProfile.siteId).toBe('456');
+      expect(addedProfile.whoCreated).toBe('Test User');
+    });
+
+    it('should update an existing site profile when action is UPDATED', async () => {
+      const siteDisclosure = [
+        {
+          apiAction: UserActionEnum.UPDATED,
+          id: '123',
+          siteId: '456',
+          dateCompleted: new Date(),
+        },
+      ];
+      const userInfo = { givenName: 'Updated User' };
+
+      await siteService.processSiteDisclosure(
+        siteDisclosure,
+        userInfo,
+        entityManager,
+      );
+      expect(entityManager.save).toHaveBeenCalled();
+      const updatedProfile = (entityManager.save as jest.Mock).mock.calls[0][1];
+      expect(updatedProfile.dateCompleted).toBeInstanceOf(Date);
+      expect(updatedProfile.whenUpdated).toBeInstanceOf(Date);
+      expect(updatedProfile.siteId).toBe('456');
+      expect(updatedProfile.whoUpdated).toBe('Updated User');
+    });
+  });
+
+  describe('processSiteAssociated', () => {
+    it('should add new site associates', async () => {
+      const siteAccociated = [
+        {
+          apiAction: UserActionEnum.ADDED,
+          id: '1',
+          siteId: '123',
+          siteIdAssociatedWith: '9999',
+          note: 'Note added',
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      await siteService.processSiteAssociated(
+        siteAccociated,
+        userInfo,
+        entityManager,
+      );
+      expect(entityManager.save).toHaveBeenCalled();
+      const addedSiteAssoc = (entityManager.save as jest.Mock).mock.calls[0][1];
+      expect(addedSiteAssoc[0].whenCreated).toBeInstanceOf(Date);
+      expect(addedSiteAssoc[0].siteId).toBe('123');
+      expect(addedSiteAssoc[0].whoCreated).toBe('Test User');
+      expect(addedSiteAssoc[0].siteIdAssociatedWith).toBe('9999');
+      expect(addedSiteAssoc[0].note).toBe('Note added');
+    });
+  });
+
+  it('should update existing site associates', async () => {
+    const siteAccociated = [
+      {
+        apiAction: UserActionEnum.UPDATED,
+        id: '1',
+        siteId: '123',
+        siteIdAssociatedWith: '9999',
+        note: 'Note Updated',
+      },
+    ];
+    const userInfo = { givenName: 'Updated User' };
+
+    await siteService.processSiteAssociated(
+      siteAccociated,
+      userInfo,
+      entityManager,
+    );
+    const updatedAssoc = (entityManager.update as jest.Mock).mock.calls[0][2];
+    expect(updatedAssoc.whenUpdated).toBeInstanceOf(Date);
+    expect(updatedAssoc.siteId).toBe('123');
+    expect(updatedAssoc.whoUpdated).toBe('Updated User');
+    expect(updatedAssoc.siteIdAssociatedWith).toBe('9999');
+    expect(updatedAssoc.note).toBe('Note Updated');
+  });
+
+  it('should delete site associates', async () => {
+    const siteAccociated = [
+      {
+        apiAction: UserActionEnum.DELETED,
+        id: '1',
+      },
+    ];
+    const userInfo = { givenName: 'User Four' };
+
+    await siteService.processSiteAssociated(
+      siteAccociated,
+      userInfo,
+      entityManager,
+    );
+    const deletedAssoc = (entityManager.delete as jest.Mock).mock.calls[0][1];
+    expect(deletedAssoc.id).toBe('1');
   });
 });

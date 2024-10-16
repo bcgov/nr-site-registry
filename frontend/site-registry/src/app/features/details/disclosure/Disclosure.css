@@ -160,3 +160,15 @@
 .disclosure-spinner-container {
   text-align: center;
 }
+
+.custom-disclosure-search-placeholder {
+  color: var(--typography-color-disabled) !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 24px !important;
+  text-align: left !important;
+}
+
+.custom-disclosure-search-placeholder:hover {
+  color: var(--typography-color-disabled) !important;
+}

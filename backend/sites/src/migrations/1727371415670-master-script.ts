@@ -5,7 +5,7 @@ export class MasterScript1727371415670 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "sites"."snapshots" DROP COLUMN "whenCreated"`,
+      `ALTER TABLE "sites"."snapshots" DROP COLUMN "when_created"`,
     );
     await queryRunner.query(
       `ALTER TABLE "sites"."subdivisions" ADD "user_action" character varying(30) DEFAULT ''`,
@@ -29,7 +29,7 @@ export class MasterScript1727371415670 implements MigrationInterface {
       `ALTER TABLE "sites"."subdivisions" DROP COLUMN "user_action"`,
     );
     await queryRunner.query(
-      `ALTER TABLE "sites"."snapshots" ADD "whenCreated" TIMESTAMP NOT NULL DEFAULT now()`,
+      `ALTER TABLE "sites"."snapshots" ADD "when_created" TIMESTAMP NOT NULL DEFAULT now()`,
     );
   }
 }

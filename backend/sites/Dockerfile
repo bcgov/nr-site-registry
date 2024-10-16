@@ -5,6 +5,7 @@ USER root
 WORKDIR /app
 COPY *.json ./
 COPY ./src /app/src
+COPY ./schema.graphql ./
 RUN npm ci --omit=dev && \
     npm run build
 
@@ -18,7 +19,7 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
-COPY ./schema.graphql  ./schema.graphql
+COPY --from=build /app/schema.graphql  schema.graphql
 # Port and health check
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000

@@ -156,7 +156,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
         ).values(),
       );
       setOptions(uniquePsnOrgs);
-      console.log(siteDocuments);
       setInternalRow((prev) =>
         updateFields(prev, {
           indexToUpdate: prev.findIndex((row) =>
@@ -368,11 +367,14 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
           docParticId: v4(),
           siteId: id,
           psnorgId: '',
-          dprCode: 'ATH',
           submissionDate: new Date(),
           documentDate: new Date(file.lastModified),
           title: file.name.split('.pdf')[0].trim(),
           displayName: '',
+
+          //this need to be filled once file is uploaded in BC Box
+          filePath: 'Need to give uploaded file path.',
+
           apiAction: UserActionEnum.added,
           srAction: SRApprovalStatusEnum.Pending,
         };
@@ -419,6 +421,10 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                   submissionDate: new Date(),
                   documentDate: new Date(file.lastModified),
                   title: file.name.split('.pdf')[0].trim(),
+
+                  //this need to be filled once file is uploaded in BC Box
+                  filePath: 'Need to give uploaded file path.',
+
                   apiAction: UserActionEnum.updated,
                   srAction: SRApprovalStatusEnum.Pending,
                 };
@@ -528,7 +534,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
     graphQLPropertyName: any,
     value: any,
   ) => {
-    console.log(id, graphQLPropertyName, value);
     if (viewMode === SiteDetailsMode.SRMode) {
       console.log({ [graphQLPropertyName]: value, id });
     } else {

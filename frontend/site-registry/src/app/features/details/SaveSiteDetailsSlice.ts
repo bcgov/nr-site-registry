@@ -155,8 +155,8 @@ export const getSiteDetailsToBeSaved = (state: any) => {
         UserActionEnum.deleted,
       ]),
     documents:
-      state.siteDetails.siteAssociationsData &&
-      state.siteDetails.siteAssociationsData.length > 0 &&
+      state.siteDetails.documentsData &&
+      state.siteDetails.documentsData.length > 0 &&
       deepFilterByUserAction(state.siteDetails.documentsData, [
         UserActionEnum.added,
         UserActionEnum.updated,

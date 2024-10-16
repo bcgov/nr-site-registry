@@ -27,6 +27,8 @@ import {
   SitePendingApprovalRecords,
 } from 'src/app/dto/sitesPendingReview.dto';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { ParcelDescriptionInputDTO } from 'src/app/dto/parcelDescriptionInput.dto';
+import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -43,6 +45,7 @@ describe('SiteService', () => {
   let entityManager: EntityManager;
   let historyLogRepository: Repository<HistoryLog>;
   let loggerService: LoggerService;
+  let parcelDescriptionService: ParcelDescriptionsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -270,12 +273,12 @@ describe('SiteService', () => {
             transaction: jest.fn(async () => {
               return await true;
             }),
-            find : jest.fn(async()=>{
+            find: jest.fn(async () => {
               return [];
             }),
-            save : jest.fn(async()=>{
+            save: jest.fn(async () => {
               return true;
-            })
+            }),
           },
         },
         {
@@ -301,6 +304,12 @@ describe('SiteService', () => {
             log: jest.fn(),
             debug: jest.fn(),
             error: jest.fn(),
+          },
+        },
+        {
+          provide: ParcelDescriptionsService,
+          useValue: {
+            saveParcelDescriptionsForSite: jest.fn(),
           },
         },
       ],
@@ -337,6 +346,9 @@ describe('SiteService', () => {
     );
     entityManager = module.get<EntityManager>(EntityManager);
     loggerService = module.get<LoggerService>(LoggerService);
+    parcelDescriptionService = module.get<ParcelDescriptionsService>(
+      ParcelDescriptionsService,
+    );
   });
 
   afterEach(() => {
@@ -475,6 +487,50 @@ describe('SiteService', () => {
 
         expect(result).toBe(true);
       });
+
+      it('calls the parcel descriptions service.', async () => {
+        const userInfo = { sub: 'userId', givenName: 'UserName' };
+
+        const inputDTO: SaveSiteDetailsDTO = {
+          siteId: '1',
+          parcelDescriptions: [
+            {
+              id: '1',
+              descriptionType: 'Parcel ID',
+              dateNoted: new Date(),
+              idPinNumber: '123456',
+              landDescription: 'Description of Land',
+              userAction: 'pending',
+              apiAction: 'pending',
+              srAction: 'pending',
+            } as ParcelDescriptionInputDTO,
+          ],
+        };
+
+        await siteService.commitSiteDetails(entityManager, inputDTO, userInfo);
+
+        expect(
+          parcelDescriptionService.saveParcelDescriptionsForSite,
+        ).toHaveBeenCalledWith(
+          inputDTO.siteId,
+          inputDTO.parcelDescriptions,
+          userInfo,
+        );
+      });
+
+      it('logs when there are no parcel descriptions', async () => {
+        const userInfo = { sub: 'userId', givenName: 'UserName' };
+
+        const inputDTO: SaveSiteDetailsDTO = {
+          siteId: '1',
+        };
+
+        await siteService.commitSiteDetails(entityManager, inputDTO, userInfo);
+
+        expect(loggerService.log).toHaveBeenCalledWith(
+          expect.stringMatching(/.*No changes to Parcel Descriptions.*/),
+        );
+      });
     });
   });
 
@@ -554,7 +610,7 @@ describe('SiteService', () => {
           isApproved: true,
           sites: [
             {
-              id:'1',
+              id: '1',
               siteId: '2',
               whoUpdated: 'Midhun',
               whenUpdated: new Date(),
@@ -586,7 +642,7 @@ describe('SiteService', () => {
 
       it('validate processBulkUpdates', async () => {
         const site = {
-          id:'1',
+          id: '1',
           siteId: '2',
           whoUpdated: 'Midhun',
           whenUpdated: new Date(),
@@ -594,9 +650,6 @@ describe('SiteService', () => {
           address: 'address 1',
         };
         const userInfo = { givenName: 'Midhun' };
-
-        
-        
 
         const result = await siteService.processSRBulkUpdates(
           entityManager,

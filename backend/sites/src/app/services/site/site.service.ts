@@ -34,6 +34,7 @@ import {
   SitePendingApprovalRecords,
   SiteRecordsForSRAction,
 } from 'src/app/dto/sitesPendingReview.dto';
+import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
 
 /**
  * Nestjs Service For Region Entity
@@ -69,6 +70,7 @@ export class SiteService {
     private historyLogRepository: Repository<HistoryLog>,
 
     private readonly landHistoryService: LandHistoryService,
+    private readonly parcelDescriptionService: ParcelDescriptionsService,
     private transactionManagerService: TransactionManagerService,
     private readonly sitesLogger: LoggerService,
   ) {}
@@ -374,7 +376,7 @@ export class SiteService {
       siteParticipants,
       documents,
       siteAssociations,
-      subDivisions,
+      parcelDescriptions,
       landHistories,
       profiles,
     } = inputDTO;
@@ -442,10 +444,16 @@ export class SiteService {
       );
     }
 
-    if (subDivisions) {
-      await transactionalEntityManager.save(Subdivisions, subDivisions);
+    if (parcelDescriptions) {
+      await this.parcelDescriptionService.saveParcelDescriptionsForSite(
+        inputDTO.siteId,
+        parcelDescriptions,
+        userInfo,
+      );
     } else {
-      console.log('No changes To Site subDivisions');
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes to Parcel Descriptions.',
+      );
     }
 
     if (landHistories) {

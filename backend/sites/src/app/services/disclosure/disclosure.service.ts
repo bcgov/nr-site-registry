@@ -30,10 +30,6 @@ export class DisclosureService {
       this.sitesLogger.log(
         'DisclosureService.getSiteDisclosureBySiteId() start',
       );
-      this.sitesLogger.debug(
-        'DisclosureService.getSiteDisclosureBySiteId() start',
-      );
-
       // Fetch site profiles based on the provided siteId
       let result: SiteProfiles[] = [];
 
@@ -59,16 +55,10 @@ export class DisclosureService {
         this.sitesLogger.log(
           'DisclosureService.getSiteDisclosureBySiteId() end',
         );
-        this.sitesLogger.debug(
-          'DisclosureService.getSiteDisclosureBySiteId() end',
-        );
-
         // Convert the transformed objects into DTOs
         const disclosure = plainToInstance(SiteProfiles, res);
         return disclosure;
       }
-
-      // return result; // Return the fetched site profiles
     } catch (error) {
       this.sitesLogger.error(
         'Exception occured in DisclosureService.getSiteDisclosureBySiteId() end',

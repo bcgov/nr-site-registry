@@ -1162,42 +1162,46 @@ export class SiteService {
     transactionalEntityManager: EntityManager,
   ) {
     if (siteDisclosure && siteDisclosure.length > 0) {
-      const { apiAction, id, ...disclosureData } = siteDisclosure[0];
-      let profile = {
-        ...new SiteProfiles(),
-        ...disclosureData,
-      };
-      switch (apiAction) {
-        case UserActionEnum.ADDED:
-          profile = {
-            ...profile,
-            userAction: UserActionEnum.ADDED,
-            whenCreated: new Date(),
-            whoCreated: userInfo ? userInfo.givenName : '',
-          };
-          break;
-        case UserActionEnum.UPDATED:
-          const isExist =
-            siteDisclosure[0].id &&
-            (await this.siteProfilesRepo.findOneByOrFail({
-              id: siteDisclosure[0].id,
-            }));
-          if (isExist) {
+      const disclosurePromises = siteDisclosure.map(async (disclosure) => {
+        const { apiAction, id, ...disclosureData } = disclosure;
+        let profile = {
+          ...new SiteProfiles(),
+          ...disclosureData,
+        };
+        switch (apiAction) {
+          case UserActionEnum.ADDED:
             profile = {
-              ...isExist,
               ...profile,
-              userAction: UserActionEnum.UPDATED,
-              whenUpdated: new Date(),
-              whoUpdated: userInfo ? userInfo.givenName : '',
+              userAction: UserActionEnum.ADDED,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
             };
-          } else {
-            this.sitesLogger.log(
-              `SiteService.processSiteDisclosure():There is no profile in database againts id : ${siteDisclosure[0].id}`,
-            );
-          }
-          break;
-      }
-      await transactionalEntityManager.save(SiteProfiles, profile);
+            break;
+          case UserActionEnum.UPDATED:
+            const isExist =
+              disclosure.id &&
+              (await this.siteProfilesRepo.findOneByOrFail({
+                id: disclosure.id,
+              }));
+            if (isExist) {
+              profile = {
+                ...isExist,
+                ...profile,
+                userAction: UserActionEnum.UPDATED,
+                whenUpdated: new Date(),
+                whoUpdated: userInfo ? userInfo.givenName : '',
+              };
+            } else {
+              this.sitesLogger.log(
+                `SiteService.processSiteDisclosure():There is no profile in database againts id : ${disclosure.id}`,
+              );
+            }
+            break;
+        }
+        await transactionalEntityManager.save(SiteProfiles, profile);
+      });
+
+      await Promise.all(disclosurePromises);
     }
   }
 

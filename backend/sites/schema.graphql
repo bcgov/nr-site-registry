@@ -592,6 +592,27 @@ type DisclosureResponse {
   data: [SiteProfiles!]
 }
 
+type ParcelDescriptionsResponse {
+  message: String
+  httpStatusCode: Int
+  success: Boolean
+  timestamp: String
+  count: Float
+  page: Float
+  pageSize: Float
+  data: [ParcelDescriptionDto!]
+}
+
+type ParcelDescriptionDto {
+  id: Float!
+  descriptionType: String!
+  idPinNumber: String!
+  dateNoted: DateTime!
+  landDescription: String!
+  userAction: String!
+  srAction: String!
+}
+
 type RecentViewResponse {
   message: String
   httpStatusCode: Int
@@ -725,27 +746,6 @@ type LandUseCodeResponse {
   data: [LandUseCd!]!
 }
 
-type ParcelDescriptionsResponse {
-  message: String
-  httpStatusCode: Int
-  success: Boolean
-  timestamp: String
-  count: Float
-  page: Float
-  pageSize: Float
-  data: [ParcelDescriptionDto!]
-}
-
-type ParcelDescriptionDto {
-  id: Float!
-  descriptionType: String!
-  idPinNumber: String!
-  dateNoted: DateTime!
-  landDescription: String!
-  userAction: String!
-  srAction: String!
-}
-
 type Query {
   sites: FetchSiteResponse!
   searchSites(searchParam: String!, page: String!, pageSize: String!, id: String, srStatus: String, siteRiskCode: String, commonName: String, addrLine_1: String, city: String, whoCreated: String, latlongReliabilityFlag: String, latdeg: String, latDegrees: String, latMinutes: String, latSeconds: String, longdeg: String, longDegrees: String, longMinutes: String, longSeconds: String, whenCreated: String, whenUpdated: String): SearchSiteResponse!
@@ -812,7 +812,7 @@ input SaveSiteDetailsDTO {
   siteParticipants: [SiteParticsInputDto!]
   documents: [DocumentInputDTO!]
   siteAssociations: [SiteAssociationsInputDTO!]
-  subDivisions: [SubDivisionsInputDTO!]
+  parcelDescriptions: [ParcelDescriptionInputDTO!]
   landHistories: [LandHistoriesInputDTO!]
   profiles: [SiteProfilesInputDTO!]
   siteId: String!
@@ -927,30 +927,15 @@ input SiteAssociationsInputDTO {
   note: String
 }
 
-input SubDivisionsInputDTO {
+input ParcelDescriptionInputDTO {
   userAction: String
   apiAction: String
   srAction: String!
   id: String!
+  descriptionType: String!
+  idPinNumber: String!
   dateNoted: DateTime!
-  pin: String!
-  pid: String!
-  bcaaFolioNumber: String!
-  entityType: String!
-  addrLine_1: String!
-  addrLine_2: String!
-  addrLine_3: String!
-  addrLine_4: String!
-  city: String!
-  postalCode: String!
-  legalDescription: String!
-  whoCreated: String!
-  whoUpdated: String!
-  whenCreated: DateTime!
-  whenUpdated: DateTime!
-  crownLandsFileNo: String!
-  pidStatusCd: String!
-  validPid: String!
+  landDescription: String!
 }
 
 input LandHistoriesInputDTO {

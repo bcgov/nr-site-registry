@@ -22,10 +22,13 @@ jobs:
         include:
           - package: backend/sites
             build_file: ./backend/sites/Dockerfile
+            build_context: backend/sites
           - package: backend/sites-migration
             build_file: ./backend/sites/Dockerfile.migrations
+            build_context: backend/sites
           - package: frontend/site-registry
             build_file: ./frontend/site-registry/Dockerfile
+            build_context: frontend/site-registry
     timeout-minutes: 10
     steps:
       - uses: bcgov-nr/action-builder-ghcr@v2.2.0
@@ -35,6 +38,7 @@ jobs:
           tag_fallback: latest
           triggers: ('${{ matrix.package }}/')
           build_file: ${{ matrix.build_file }}
+          build_context: ${{ matrix.build_context }}
 
   # https://github.com/bcgov/quickstart-openshift-helpers
   deploys:

@@ -88,6 +88,13 @@ spec:
             requests:
               cpu: 100m
               memory: 150Mi
+          volumeMounts:
+            - mountPath: /logs
+              name: log-storage
+      volumes:
+        - name: log-storage
+          emptyDir: {}
+
       {{- with .Values.backendSites.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

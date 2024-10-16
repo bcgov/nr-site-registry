@@ -331,138 +331,17 @@ export class SiteService {
       if (!inputDTO) {
         return false;
       } else {
-        const {
-          siteId,
-          sitesSummary,
-          events,
-          eventsParticipants,
-          siteParticipants,
-          documents,
-          siteAssociations,
-          subDivisions,
-          landHistories,
-          profiles,
-        } = inputDTO;
-
         const transactionResult = await this.entityManager.transaction(
           async (transactionalEntityManager: EntityManager) => {
             this.transactionManagerService.setEntityManager(
               transactionalEntityManager,
             );
-
             try {
-              if (sitesSummary) {
-                sitesSummary.whenUpdated = new Date();
-                sitesSummary.whoUpdated = userInfo?.givenName;
-                await transactionalEntityManager.save(Sites, sitesSummary);
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Summary',
-                );
-              }
-
-              if (events && events.length > 0) {
-                await this.processEvents(
-                  events,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Events',
-                );
-              }
-
-              // if (eventsParticipants) {
-              //   await transactionalEntityManager.save(
-              //     EventPartics,
-              //     eventsParticipants,
-              //   );
-              // } else {
-              //   console.log('No changes To Site Event Participants');
-              // }
-
-              if (siteParticipants && siteParticipants.length > 0) {
-                await this.processSiteParticipants(
-                  siteParticipants,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Participants',
-                );
-              }
-
-              if (documents && documents.length > 0) {
-                await this.processDocuments(
-                  documents,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Documents',
-                );
-              }
-
-              if (siteAssociations && siteAssociations.length > 0) {
-                await this.processSiteAssociated(
-                  siteAssociations,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Associations',
-                );
-              }
-
-              if (subDivisions) {
-                await transactionalEntityManager.save(
-                  Subdivisions,
-                  subDivisions,
-                );
-              } else {
-                console.log('No changes To Site subDivisions');
-              }
-
-              if (landHistories) {
-                await this.landHistoryService.updateLandHistoriesForSite(
-                  siteId,
-                  landHistories,
-                  userInfo,
-                );
-              } else {
-                console.log('No changes To Site LandHistories');
-              }
-
-              if (profiles && profiles.length > 0) {
-                await this.processSiteDisclosure(
-                  profiles,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails():No changes To Site profiles',
-                );
-              }
-
-              const historyLog: HistoryLog = {
-                userId: userInfo ? userInfo.sub : '',
-                content: inputDTO,
-                id: null,
-                whoCreated: userInfo ? userInfo.givenName : '',
-                whenCreated: new Date(),
-                whenUpdated: new Date(),
-                whoUpdated: userInfo ? userInfo.givenName : '',
-                siteId: inputDTO.siteId,
-              };
-
-              await transactionalEntityManager.save(HistoryLog, historyLog);
-
-              return true;
+              return this.commitSiteDetails(
+                transactionalEntityManager,
+                inputDTO,
+                userInfo,
+              );
             } catch (error) {
               console.error('Save Site Details Transaction failed', error);
               return false;
@@ -480,6 +359,131 @@ export class SiteService {
       );
       throw error;
     }
+  }
+
+  async commitSiteDetails(
+    transactionalEntityManager: EntityManager,
+    inputDTO: SaveSiteDetailsDTO,
+    userInfo: any,
+  ): Promise<boolean> {
+    const {
+      siteId,
+      sitesSummary,
+      events,
+      eventsParticipants,
+      siteParticipants,
+      documents,
+      siteAssociations,
+      subDivisions,
+      landHistories,
+      profiles,
+    } = inputDTO;
+
+    if (sitesSummary) {
+      sitesSummary.whenUpdated = new Date();
+      sitesSummary.whoUpdated = userInfo?.givenName;
+      await transactionalEntityManager.save(Sites, sitesSummary);
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Summary',
+      );
+    }
+
+    if (events && events.length > 0) {
+      await this.processEvents(events, userInfo, transactionalEntityManager);
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Events',
+      );
+    }
+
+    // if (eventsParticipants) {
+    //   await transactionalEntityManager.save(
+    //     EventPartics,
+    //     eventsParticipants,
+    //   );
+    // } else {
+    //   console.log('No changes To Site Event Participants');
+    // }
+
+    if (siteParticipants && siteParticipants.length > 0) {
+      await this.processSiteParticipants(
+        siteParticipants,
+        userInfo,
+        transactionalEntityManager,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Participants',
+      );
+    }
+
+    if (documents && documents.length > 0) {
+      await this.processDocuments(
+        documents,
+        userInfo,
+        transactionalEntityManager,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Documents',
+      );
+    }
+
+    if (siteAssociations && siteAssociations.length > 0) {
+      await this.processSiteAssociated(
+        siteAssociations,
+        userInfo,
+        transactionalEntityManager,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Associations',
+      );
+    }
+
+    if (subDivisions) {
+      await transactionalEntityManager.save(Subdivisions, subDivisions);
+    } else {
+      console.log('No changes To Site subDivisions');
+    }
+
+    if (landHistories) {
+      await this.landHistoryService.updateLandHistoriesForSite(
+        siteId,
+        landHistories,
+        userInfo,
+      );
+    } else {
+      console.log('No changes To Site LandHistories');
+    }
+
+    if (profiles && profiles.length > 0) {
+      await this.processSiteDisclosure(
+        profiles,
+        userInfo,
+        transactionalEntityManager,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails():No changes To Site profiles',
+      );
+    }
+
+    const historyLog: HistoryLog = {
+      userId: userInfo ? userInfo.sub : '',
+      content: inputDTO,
+      id: null,
+      whoCreated: userInfo ? userInfo.givenName : '',
+      whenCreated: new Date(),
+      whenUpdated: new Date(),
+      whoUpdated: userInfo ? userInfo.givenName : '',
+      siteId: inputDTO.siteId,
+    };
+
+    await transactionalEntityManager.save(HistoryLog, historyLog);
+
+    return true;
   }
 
   /**

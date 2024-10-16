@@ -436,8 +436,12 @@ describe('SiteService', () => {
     });
   });
 
-  describe('saveSiteDetails', () => {
+  describe('commitSiteDetails', () => {
     describe('when there are no errors', () => {
+      beforeEach(() => {
+        entityManager.save = jest.fn();
+      });
+
       it('returns true.', async () => {
         const userInfo = { sub: 'userId', givenName: 'UserName' };
 
@@ -463,7 +467,11 @@ describe('SiteService', () => {
           ],
         };
 
-        const result = await siteService.saveSiteDetails(inputDTO, userInfo);
+        const result = await siteService.commitSiteDetails(
+          entityManager,
+          inputDTO,
+          userInfo,
+        );
 
         expect(result).toBe(true);
       });

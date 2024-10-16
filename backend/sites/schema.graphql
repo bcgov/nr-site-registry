@@ -69,26 +69,9 @@ type SiteDocs {
   whoUpdated: String
   whenCreated: DateTime!
   whenUpdated: DateTime
-  rwmFlag: Float
+  rwmFlag: Float!
   rwmNoteFlag: Float
   siteDocPartics: [SiteDocPartics!]!
-}
-
-type SiteDocPartics {
-  userAction: String!
-  srAction: String!
-  id: String!
-  dprCode: String!
-  sdocId: String!
-  spId: String!
-  psnorgId: String!
-  whoCreated: String!
-  whoUpdated: String
-  whenCreated: DateTime!
-  whenUpdated: DateTime
-  rwmFlag: Float
-  dprCode2: DocParticRoleCd!
-  psnorg: PeopleOrgs!
 }
 
 type ParticRoleCd {
@@ -176,6 +159,23 @@ type SitePartics {
   rwmFlag: Float!
   rwmNoteFlag: Float!
   siteParticRoles: [SiteParticRoles!]!
+  psnorg: PeopleOrgs!
+}
+
+type SiteDocPartics {
+  userAction: String!
+  srAction: String!
+  id: String!
+  dprCode: String!
+  sdocId: String!
+  spId: String!
+  psnorgId: String!
+  whoCreated: String!
+  whoUpdated: String
+  whenCreated: DateTime!
+  whenUpdated: DateTime
+  rwmFlag: Float!
+  dprCode2: DocParticRoleCd!
   psnorg: PeopleOrgs!
 }
 
@@ -556,14 +556,14 @@ type DocumentDto {
   userAction: String!
   srAction: String!
   id: String!
-  docParticId: String
-  psnorgId: String
-  displayName: String
+  docParticId: String!
+  psnorgId: String!
+  dprCode: String!
+  displayName: String!
   siteId: String!
   submissionDate: String!
   documentDate: String
   title: String!
-  filePath: String
 }
 
 type AssociatedSiteResponse {
@@ -907,14 +907,13 @@ input DocumentInputDTO {
   apiAction: String
   srAction: String!
   id: String!
-  docParticId: String
+  docParticId: String!
   psnorgId: String!
-  displayName: String
+  displayName: String!
   siteId: String!
   submissionDate: String!
   documentDate: String
   title: String!
-  filePath: String
 }
 
 input SiteAssociationsInputDTO {

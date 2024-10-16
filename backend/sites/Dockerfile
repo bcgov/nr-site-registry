@@ -18,10 +18,9 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
-
+COPY schema.graphql .
 # Port and health check
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000
-RUN chmod -R 777 /app/
 # max old space the heap size, 120MB with 200MB limit in deployment.
 CMD ["--max-old-space-size=120", "/app/dist/main"]

@@ -517,6 +517,20 @@ describe('SiteService', () => {
           userInfo,
         );
       });
+
+      it('logs when there are no parcel descriptions', async () => {
+        const userInfo = { sub: 'userId', givenName: 'UserName' };
+
+        const inputDTO: SaveSiteDetailsDTO = {
+          siteId: '1',
+        };
+
+        await siteService.commitSiteDetails(entityManager, inputDTO, userInfo);
+
+        expect(loggerService.log).toHaveBeenCalledWith(
+          expect.stringMatching(/.*No changes to Parcel Descriptions.*/),
+        );
+      });
     });
   });
 

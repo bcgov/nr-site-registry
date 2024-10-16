@@ -17,6 +17,7 @@ import { SiteAssocs } from '../../entities/siteAssocs.entity';
 import { LandHistories } from '../../entities/landHistories.entity';
 import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
+import { Subdivisions } from '../../entities/subdivisions.entity';
 import { HistoryLog } from '../../entities/siteHistoryLog.entity';
 import { LandHistoryService } from '../landHistory/landHistory.service';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
@@ -450,7 +451,9 @@ export class SiteService {
         userInfo,
       );
     } else {
-      console.log('No changes To Parcel Descriptions.');
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes to Parcel Descriptions.',
+      );
     }
 
     if (landHistories) {

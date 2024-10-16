@@ -217,8 +217,8 @@ bitnami-pg:
     registry: artifacts.developer.gov.bc.ca/docker-remote
   auth:
     existingSecret: '{{ .Release.Name }}-database'
-    username: 'nr-site'
-    database: 'nr-site'
+    username: 'site'
+    database: 'site'
   shmVolume:
     enabled: false
   backup:

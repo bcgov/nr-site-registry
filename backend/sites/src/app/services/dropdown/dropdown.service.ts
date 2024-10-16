@@ -7,6 +7,8 @@ import { EventClassCd } from '../../entities/eventClassCd.entity';
 import { EventTypeCd } from '../../entities/eventTypeCd.entity';
 import { EventParticRoleCd } from '../../entities/eventParticRoleCd.entity';
 import { LoggerService } from '../../logger/logger.service';
+import { User } from 'src/app/entities/user.entity';
+import { DropdownDto } from 'src/app/dto/dropdown.dto';
 
 @Injectable()
 export class DropdownService {
@@ -25,6 +27,9 @@ export class DropdownService {
 
     @InjectRepository(EventParticRoleCd)
     private eventParticRoleCdRepository: Repository<EventParticRoleCd>,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
 
     private readonly sitesLogger: LoggerService,
   ) {}
@@ -237,6 +242,41 @@ export class DropdownService {
         JSON.stringify(error),
       );
       throw new Error('Failed to retrieve notation participant role codes.');
+    }
+  }
+
+  // Get IDIR User List
+  async getIDIRUserGivenNamesForDropDown(): Promise<DropdownDto[]> {
+    try {
+      const IDP = 'idir';
+
+      this.sitesLogger.log('DropdownService.getIDIRUserNamesForDropDown start');
+
+      const idirUserList = await this.userRepository.find({
+        where: { idp: IDP },
+      });
+
+      if (idirUserList.length > 0) {
+        this.sitesLogger.log(
+          'DropdownService.getIDIRUserNamesForDropDown returning user list',
+        );
+        return idirUserList.map((user) => {
+          return {
+            key: user.firstName,
+            value: user.firstName,
+          };
+        });
+      } else {
+        this.sitesLogger.log(
+          'DropdownService.getIDIRUserNamesForDropDown no users found',
+        );
+        return [];
+      }
+    } catch (error) {
+      this.sitesLogger.log(
+        'DropdownService.getIDIRUserNamesForDropDown error' +
+          JSON.stringify(error),
+      );
     }
   }
 }

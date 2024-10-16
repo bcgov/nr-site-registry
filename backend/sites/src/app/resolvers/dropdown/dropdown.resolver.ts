@@ -204,4 +204,45 @@ export class DropdownResolver {
       );
     }
   }
+
+  @Roles({
+    roles: [    
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(()=>DropdownResponse,{name: 'getIDIRUserListForDropDown'})
+  async getIDIRUserListForDropDown() {
+    try {
+      const result =
+        await this.dropdownService.getIDIRUserGivenNamesForDropDown();
+      if (result.length > 0) {
+        this.sitesLogger.log(
+          'DropdownResolver.getIDIRUserListForDropDown() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'User Names fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'DropdownResolver.getIDIRUserListForDropDown() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `User Names not found`,
+          200,
+          false,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.log(
+        'DropdownResolver.getIDIRUserListForDropDown() error' +
+          JSON.stringify(error),
+      );
+      throw error;
+    }
+  }
 }

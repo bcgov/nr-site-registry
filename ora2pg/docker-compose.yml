@@ -1,0 +1,14 @@
+version: '1'
+services:
+
+  ora2pg:
+    build:
+      context: .
+    #    image: georgmoser/ora2pg
+    container_name: ora2pg
+    network_mode: "host"
+    volumes:
+      - ora2pg-data:/data
+
+volumes:
+  ora2pg-data:

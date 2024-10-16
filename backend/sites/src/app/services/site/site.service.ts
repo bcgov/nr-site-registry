@@ -564,7 +564,7 @@ export class SiteService {
               id: newDocParticId.toString(),
               sdocId: documentId,
               // rwmFlag: 0,
-              dprCode: 'ATH', // dprCode is always ATH, we don't have UI and keeping this cloumn for maintaing historical data.
+              dprCode: 'ATH', // dprCode is always ATH. We don't have a UI for this value and keeping this column allows us to maintain historical data.
               userAction: UserActionEnum.ADDED,
               srAction: SRApprovalStatusEnum.PENDING,
               whenCreated: new Date(),

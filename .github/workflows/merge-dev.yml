@@ -46,7 +46,7 @@ jobs:
 
   schemaspy:
     name: Schemaspy
-    uses: .github/workflows/.schema-spy.yml
+    uses: ./.github/workflows/.schema-spy.yml
     secrets: inherit
     needs: [deploys]
     with:

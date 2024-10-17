@@ -1,0 +1,10 @@
+query mapSearch($searchParam: String!) {
+    searchSites(searchParam: $searchParam, page: "1", pageSize: "100") {
+        sites {
+            id
+            addrLine_1
+            latDegrees
+            longDegrees
+        }
+    }
+}

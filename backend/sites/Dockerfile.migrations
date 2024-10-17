@@ -10,9 +10,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
-RUN npm config set unsafe-perm true \
-    && npm ci \
-    && npm config set unsafe-perm false
+RUN npm ci
 
 # Bundle app source
 COPY . .

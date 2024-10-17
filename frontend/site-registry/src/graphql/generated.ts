@@ -60,6 +60,11 @@ export type BceRegionCd = {
   description: Scalars['String']['output'];
 };
 
+export type BulkApproveRejectChangesDto = {
+  isApproved: Scalars['Boolean']['input'];
+  sites: Array<SiteRecordsForSrAction>;
+};
+
 export type Cart = {
   __typename?: 'Cart';
   id: Scalars['String']['output'];
@@ -137,12 +142,12 @@ export type DocParticRoleCd = {
 
 export type DocumentDto = {
   __typename?: 'DocumentDto';
-  displayName: Scalars['String']['output'];
-  docParticId: Scalars['String']['output'];
+  displayName?: Maybe<Scalars['String']['output']>;
+  docParticId?: Maybe<Scalars['String']['output']>;
   documentDate?: Maybe<Scalars['String']['output']>;
-  dprCode: Scalars['String']['output'];
+  filePath?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
-  psnorgId: Scalars['String']['output'];
+  psnorgId?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
   submissionDate: Scalars['String']['output'];
@@ -152,9 +157,10 @@ export type DocumentDto = {
 
 export type DocumentInputDto = {
   apiAction?: InputMaybe<Scalars['String']['input']>;
-  displayName: Scalars['String']['input'];
-  docParticId: Scalars['String']['input'];
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  docParticId?: InputMaybe<Scalars['String']['input']>;
   documentDate?: InputMaybe<Scalars['String']['input']>;
+  filePath?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
   psnorgId: Scalars['String']['input'];
   siteId: Scalars['String']['input'];
@@ -431,6 +437,7 @@ export type Mutation = {
   addFolioItem: FolioResponse;
   addRecentView: RecentViewResponse;
   addSiteToFolio: FolioResponse;
+  bulkAproveRejectChanges: SrApproveRejectResponse;
   createSnapshotForSites: SnapshotResponse;
   deleteCartItem: CartResponse;
   deleteCartItemWithSiteId: CartResponse;
@@ -458,6 +465,11 @@ export type MutationAddRecentViewArgs = {
 
 export type MutationAddSiteToFolioArgs = {
   folioDTO: Array<FolioContentDto>;
+};
+
+
+export type MutationBulkAproveRejectChangesArgs = {
+  approveRejectDTO: BulkApproveRejectChangesDto;
 };
 
 
@@ -577,6 +589,17 @@ export type ParcelDescriptionDto = {
   userAction: Scalars['String']['output'];
 };
 
+export type ParcelDescriptionInputDto = {
+  apiAction?: InputMaybe<Scalars['String']['input']>;
+  dateNoted: Scalars['DateTime']['input'];
+  descriptionType: Scalars['String']['input'];
+  id: Scalars['String']['input'];
+  idPinNumber: Scalars['String']['input'];
+  landDescription: Scalars['String']['input'];
+  srAction: Scalars['String']['input'];
+  userAction?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type ParcelDescriptionsResponse = {
   __typename?: 'ParcelDescriptionsResponse';
   count?: Maybe<Scalars['Float']['output']>;
@@ -623,6 +646,7 @@ export type Query = {
   getBannerType: BannerTypeResponse;
   getCartItemsForUser: CartResponse;
   getFolioItemsForUser: FolioResponse;
+  getIDIRUserListForDropDown: DropdownResponse;
   getLandHistoriesForSite: LandHistoryResponse;
   getLandUseCodes: LandUseCodeResponse;
   getNotationClassCd: DropdownResponse;
@@ -630,6 +654,7 @@ export type Query = {
   getNotationTypeCd: DropdownResponseWithMetaData;
   getParcelDescriptionsBySiteId: ParcelDescriptionsResponse;
   getParticipantRoleCd: DropdownResponse;
+  getPendingSiteForSRApproval: QueryResultForPendingSitesResponse;
   getPeopleOrgsCd: DropdownResponse;
   getRecentViewsByUserId: RecentViewResponse;
   getSiteDisclosureBySiteId: DisclosureResponse;
@@ -690,6 +715,13 @@ export type QueryGetParcelDescriptionsBySiteIdArgs = {
   siteId: Scalars['Int']['input'];
   sortBy: Scalars['String']['input'];
   sortByDir: Scalars['String']['input'];
+};
+
+
+export type QueryGetPendingSiteForSrApprovalArgs = {
+  page: Scalars['String']['input'];
+  pageSize: Scalars['String']['input'];
+  searchParam?: InputMaybe<SearchParams>;
 };
 
 
@@ -777,6 +809,25 @@ export type QuerySearchSitesArgs = {
   whoCreated?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type QueryResultForPendingSites = {
+  __typename?: 'QueryResultForPendingSites';
+  data?: Maybe<Array<SitePendingApprovalRecords>>;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+  totalRecords: Scalars['Float']['output'];
+};
+
+export type QueryResultForPendingSitesResponse = {
+  __typename?: 'QueryResultForPendingSitesResponse';
+  data: QueryResultForPendingSites;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
 export type RecentViewDto = {
   address: Scalars['String']['input'];
   city: Scalars['String']['input'];
@@ -805,17 +856,26 @@ export type RecentViews = {
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
 };
 
+export type SrApproveRejectResponse = {
+  __typename?: 'SRApproveRejectResponse';
+  data?: Maybe<Array<SitePendingApprovalDto>>;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
 export type SaveSiteDetailsDto = {
   documents?: InputMaybe<Array<DocumentInputDto>>;
   events?: InputMaybe<Array<NotationIputDto>>;
   eventsParticipants?: InputMaybe<Array<NotationParticipantInputDto>>;
   landHistories?: InputMaybe<Array<LandHistoriesInputDto>>;
+  parcelDescriptions?: InputMaybe<Array<ParcelDescriptionInputDto>>;
   profiles?: InputMaybe<Array<SiteProfilesInputDto>>;
   siteAssociations?: InputMaybe<Array<SiteAssociationsInputDto>>;
   siteId: Scalars['String']['input'];
   siteParticipants?: InputMaybe<Array<SiteParticsInputDto>>;
   sitesSummary?: InputMaybe<SiteSummaryDto>;
-  subDivisions?: InputMaybe<Array<SubDivisionsInputDto>>;
 };
 
 export type SaveSiteDetailsResponse = {
@@ -825,6 +885,14 @@ export type SaveSiteDetailsResponse = {
   message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
   timestamp?: Maybe<Scalars['String']['output']>;
+};
+
+export type SearchParams = {
+  addrLine?: InputMaybe<Scalars['String']['input']>;
+  changes?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  whenUpdated?: InputMaybe<Scalars['String']['input']>;
+  whoCreated?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SearchSiteResponse = {
@@ -882,7 +950,7 @@ export type SiteDocPartics = {
   id: Scalars['String']['output'];
   psnorg: PeopleOrgs;
   psnorgId: Scalars['String']['output'];
-  rwmFlag: Scalars['Float']['output'];
+  rwmFlag?: Maybe<Scalars['Float']['output']>;
   sdocId: Scalars['String']['output'];
   spId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
@@ -899,7 +967,7 @@ export type SiteDocs = {
   filePath?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   note?: Maybe<Scalars['String']['output']>;
-  rwmFlag: Scalars['Float']['output'];
+  rwmFlag?: Maybe<Scalars['Float']['output']>;
   rwmNoteFlag?: Maybe<Scalars['Float']['output']>;
   siteDocPartics: Array<SiteDocPartics>;
   siteId: Scalars['String']['output'];
@@ -988,11 +1056,30 @@ export type SiteParticsResponse = {
   timestamp?: Maybe<Scalars['String']['output']>;
 };
 
+export type SitePendingApprovalDto = {
+  __typename?: 'SitePendingApprovalDTO';
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
+export type SitePendingApprovalRecords = {
+  __typename?: 'SitePendingApprovalRecords';
+  address: Scalars['String']['output'];
+  changes: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  siteId: Scalars['String']['output'];
+  whenUpdated: Scalars['DateTime']['output'];
+  whoUpdated: Scalars['String']['output'];
+};
+
 export type SiteProfiles = {
   __typename?: 'SiteProfiles';
   comments?: Maybe<Scalars['String']['output']>;
   dateCompleted: Scalars['DateTime']['output'];
   govDocumentsComment?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
   investigationRequired?: Maybe<Scalars['String']['output']>;
   latDegrees?: Maybe<Scalars['Float']['output']>;
   latMinutes?: Maybe<Scalars['Float']['output']>;
@@ -1041,53 +1128,31 @@ export type SiteProfiles = {
 
 export type SiteProfilesInputDto = {
   apiAction?: InputMaybe<Scalars['String']['input']>;
-  comments?: InputMaybe<Scalars['String']['input']>;
   dateCompleted: Scalars['DateTime']['input'];
   govDocumentsComment?: InputMaybe<Scalars['String']['input']>;
-  investigationRequired?: InputMaybe<Scalars['String']['input']>;
-  latDegrees?: InputMaybe<Scalars['Float']['input']>;
-  latMinutes?: InputMaybe<Scalars['Float']['input']>;
-  latSeconds?: InputMaybe<Scalars['String']['input']>;
-  localAuthAddress1?: InputMaybe<Scalars['String']['input']>;
-  localAuthAddress2?: InputMaybe<Scalars['String']['input']>;
-  localAuthAgency?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['String']['input'];
   localAuthDateForwarded?: InputMaybe<Scalars['DateTime']['input']>;
   localAuthDateRecd?: InputMaybe<Scalars['DateTime']['input']>;
   localAuthDateSubmitted?: InputMaybe<Scalars['DateTime']['input']>;
-  localAuthEmail?: InputMaybe<Scalars['String']['input']>;
-  localAuthFaxAreaCode?: InputMaybe<Scalars['String']['input']>;
-  localAuthFaxNo?: InputMaybe<Scalars['String']['input']>;
-  localAuthName?: InputMaybe<Scalars['String']['input']>;
-  localAuthPhoneAreaCode?: InputMaybe<Scalars['String']['input']>;
-  localAuthPhoneNo?: InputMaybe<Scalars['String']['input']>;
-  longDegrees?: InputMaybe<Scalars['Float']['input']>;
-  longMinutes?: InputMaybe<Scalars['Float']['input']>;
-  longSeconds?: InputMaybe<Scalars['String']['input']>;
-  numberOfPids?: InputMaybe<Scalars['Float']['input']>;
-  numberOfPins?: InputMaybe<Scalars['Float']['input']>;
-  ownerParticId?: InputMaybe<Scalars['String']['input']>;
   plannedActivityComment?: InputMaybe<Scalars['String']['input']>;
   rwmDateDecision?: InputMaybe<Scalars['DateTime']['input']>;
   rwmDateReceived?: InputMaybe<Scalars['DateTime']['input']>;
-  rwmFaxAreaCode?: InputMaybe<Scalars['String']['input']>;
-  rwmFaxNo?: InputMaybe<Scalars['String']['input']>;
   rwmParticId?: InputMaybe<Scalars['String']['input']>;
-  rwmPhoneAreaCode?: InputMaybe<Scalars['String']['input']>;
-  rwmPhoneNo?: InputMaybe<Scalars['String']['input']>;
-  siteAddress?: InputMaybe<Scalars['String']['input']>;
-  siteCity?: InputMaybe<Scalars['String']['input']>;
   siteDisclosureComment?: InputMaybe<Scalars['String']['input']>;
   siteId: Scalars['String']['input'];
-  sitePostalCode?: InputMaybe<Scalars['String']['input']>;
   siteRegDateEntered?: InputMaybe<Scalars['DateTime']['input']>;
   siteRegDateRecd?: InputMaybe<Scalars['DateTime']['input']>;
-  siteRegParticId?: InputMaybe<Scalars['String']['input']>;
   srAction: Scalars['String']['input'];
   userAction?: InputMaybe<Scalars['String']['input']>;
-  whenCreated: Scalars['DateTime']['input'];
-  whenUpdated?: InputMaybe<Scalars['DateTime']['input']>;
-  whoCreated: Scalars['String']['input'];
-  whoUpdated?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type SiteRecordsForSrAction = {
+  address: Scalars['String']['input'];
+  changes: Scalars['String']['input'];
+  id: Scalars['String']['input'];
+  siteId: Scalars['String']['input'];
+  whenUpdated: Scalars['String']['input'];
+  whoUpdated: Scalars['String']['input'];
 };
 
 export type SiteRiskCd = {
@@ -1236,32 +1301,6 @@ export type Snapshots = {
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
   whoUpdated?: Maybe<Scalars['String']['output']>;
-};
-
-export type SubDivisionsInputDto = {
-  addrLine_1: Scalars['String']['input'];
-  addrLine_2: Scalars['String']['input'];
-  addrLine_3: Scalars['String']['input'];
-  addrLine_4: Scalars['String']['input'];
-  apiAction?: InputMaybe<Scalars['String']['input']>;
-  bcaaFolioNumber: Scalars['String']['input'];
-  city: Scalars['String']['input'];
-  crownLandsFileNo: Scalars['String']['input'];
-  dateNoted: Scalars['DateTime']['input'];
-  entityType: Scalars['String']['input'];
-  id: Scalars['String']['input'];
-  legalDescription: Scalars['String']['input'];
-  pid: Scalars['String']['input'];
-  pidStatusCd: Scalars['String']['input'];
-  pin: Scalars['String']['input'];
-  postalCode: Scalars['String']['input'];
-  srAction: Scalars['String']['input'];
-  userAction?: InputMaybe<Scalars['String']['input']>;
-  validPid: Scalars['String']['input'];
-  whenCreated: Scalars['DateTime']['input'];
-  whenUpdated: Scalars['DateTime']['input'];
-  whoCreated: Scalars['String']['input'];
-  whoUpdated: Scalars['String']['input'];
 };
 
 export type _Service = {

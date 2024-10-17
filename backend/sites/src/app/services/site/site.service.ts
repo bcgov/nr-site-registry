@@ -1718,8 +1718,6 @@ export class SiteService {
         }
       }
 
-      this.sitesLogger.log('SiteService.processSRBulkUpdates() end');
-
       const historyLog: HistoryLog = {
         userId: userInfo ? userInfo.sub : '',
         content: {...site, 'isApproved': isApproved},
@@ -1733,7 +1731,7 @@ export class SiteService {
   
       await transactionalEntityManager.save(HistoryLog, historyLog);
 
-
+      this.sitesLogger.log('SiteService.processSRBulkUpdates() end');
       return true;
     } catch (error) {
       this.sitesLogger.log(

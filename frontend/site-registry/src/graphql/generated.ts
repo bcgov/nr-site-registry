@@ -447,17 +447,21 @@ export type Mutation = {
   updateSiteDetails: SaveSiteDetailsResponse;
 };
 
+
 export type MutationAddCartItemArgs = {
   cartDTO: Array<CartDto>;
 };
+
 
 export type MutationAddFolioItemArgs = {
   folioDTO: FolioDto;
 };
 
+
 export type MutationAddRecentViewArgs = {
   recentView: RecentViewDto;
 };
+
 
 export type MutationAddSiteToFolioArgs = {
   folioDTO: Array<FolioContentDto>;
@@ -473,25 +477,31 @@ export type MutationCreateSnapshotForSitesArgs = {
   inputDto: Array<CreateSnapshotDto>;
 };
 
+
 export type MutationDeleteCartItemArgs = {
   cartDeleteDTO: Array<CartDeleteDto>;
 };
+
 
 export type MutationDeleteCartItemWithSiteIdArgs = {
   cartDeleteDTO: Array<CartDeleteDtoWithSiteId>;
 };
 
+
 export type MutationDeleteFolioItemArgs = {
   folioId: Scalars['Float']['input'];
 };
+
 
 export type MutationDeleteSitesInFolioArgs = {
   folioDTO: Array<FolioContentDto>;
 };
 
+
 export type MutationUpdateFolioItemArgs = {
   folioDTO: Array<FolioDto>;
 };
+
 
 export type MutationUpdateSiteDetailsArgs = {
   siteDetailsDTO: SaveSiteDetailsDto;
@@ -661,27 +671,33 @@ export type Query = {
   sites: FetchSiteResponse;
 };
 
+
 export type QueryFindSiteBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
+
 
 export type QueryGetAssociatedSitesBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
 
+
 export type QueryGetBannerTypeArgs = {
   siteId: Scalars['String']['input'];
 };
+
 
 export type QueryGetCartItemsForUserArgs = {
   userId: Scalars['String']['input'];
 };
 
+
 export type QueryGetFolioItemsForUserArgs = {
   userId: Scalars['String']['input'];
 };
+
 
 export type QueryGetLandHistoriesForSiteArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
@@ -689,6 +705,7 @@ export type QueryGetLandHistoriesForSiteArgs = {
   siteId: Scalars['String']['input'];
   sortDirection?: InputMaybe<Scalars['String']['input']>;
 };
+
 
 export type QueryGetParcelDescriptionsBySiteIdArgs = {
   page: Scalars['Int']['input'];
@@ -713,49 +730,60 @@ export type QueryGetPeopleOrgsCdArgs = {
   searchParam?: InputMaybe<Scalars['String']['input']>;
 };
 
+
 export type QueryGetRecentViewsByUserIdArgs = {
   userId: Scalars['String']['input'];
 };
+
 
 export type QueryGetSiteDisclosureBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
 
+
 export type QueryGetSiteDocumentsBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
+
 
 export type QueryGetSiteNotationBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
 
+
 export type QueryGetSiteParticipantBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
 
+
 export type QueryGetSitesForFolioArgs = {
   folioDTO: FolioMinDto;
 };
+
 
 export type QueryGetSnapshotsByIdArgs = {
   id: Scalars['Int']['input'];
 };
 
+
 export type QueryGetSnapshotsBySiteIdArgs = {
   siteId: Scalars['String']['input'];
 };
+
 
 export type QueryGetSnapshotsByUserIdArgs = {
   userId: Scalars['String']['input'];
 };
 
+
 export type QuerySearchSiteIdsArgs = {
   searchParam: Scalars['String']['input'];
 };
+
 
 export type QuerySearchSitesArgs = {
   addrLine_1?: InputMaybe<Scalars['String']['input']>;
@@ -1292,17 +1320,17 @@ export type MapSearchQueryVariables = Exact<{
 }>;
 
 
-export type MapSearchQuery = { __typename?: 'Query', searchSites: { __typename?: 'SearchSiteResponse', sites: Array<{ __typename?: 'Sites', id: string, addrLine_1: string, latDegrees?: number | null, longDegrees?: number | null }> } };
+export type MapSearchQuery = { __typename?: 'Query', searchSites: { __typename?: 'SearchSiteResponse', sites: Array<{ __typename?: 'Sites', id: string, addrLine_1: string, latdeg?: number | null, longdeg?: number | null }> } };
 
 
 export const MapSearchDocument = gql`
     query mapSearch($searchParam: String!) {
-  searchSites(searchParam: $searchParam, page: "1", pageSize: "100") {
+  searchSites(searchParam: $searchParam, page: "1", pageSize: "100000") {
     sites {
       id
       addrLine_1
-      latDegrees
-      longDegrees
+      latdeg
+      longdeg
     }
   }
 }

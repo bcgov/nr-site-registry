@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { MapSearchQuery } from '../../../../graphql/generated';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { SiteMarker } from './SiteMarker';
@@ -18,33 +18,34 @@ export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
     StringParam,
   );
 
-  const onSiteMarkerClick = (site: Site) => {
-    setSelectedSiteId(site.id, 'replace');
-    moveToSiteLocation(site);
-  };
+  const moveToSiteLocation = useCallback(
+    (site: Site) => {
+      map.flyTo(
+        {
+          lat: site.latdeg || 0,
+          lng: site.longdeg ? site.longdeg * -1 : 0,
+        },
+        Math.max(map.getZoom(), 14),
+        {
+          animate: true,
+          duration: 1,
+        },
+      );
+    },
+    [map],
+  );
 
-  const moveToSiteLocation = (site: Site) => {
-    map.flyTo(
-      {
-        lat: site.latdeg || 0,
-        lng: site.longdeg ? site.longdeg * -1 : 0,
-      },
-      Math.max(map.getZoom(), 14),
-      {
-        animate: true,
-        duration: 1,
-      },
-    );
-  };
+  const onSiteMarkerClick = useCallback(
+    (site: Site) => {
+      setSelectedSiteId(site.id);
+      moveToSiteLocation(site);
+    },
+    [moveToSiteLocation, setSelectedSiteId],
+  );
 
-  return (
-    <MarkerClusterGroup
-      chunkedLoading
-      maxClusterRadius={20}
-      spiderfyOnMaxZoom
-      showCoverageOnHover
-    >
-      {sites.map((site) => (
+  const markers = useMemo(() => {
+    return sites.map((site) => {
+      return (
         <SiteMarker
           key={site.id}
           isSelected={site.id === selectedSiteId}
@@ -54,7 +55,18 @@ export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
           }}
           onClick={() => onSiteMarkerClick(site)}
         />
-      ))}
+      );
+    });
+  }, [onSiteMarkerClick, selectedSiteId, sites]);
+
+  return (
+    <MarkerClusterGroup
+      chunkedLoading
+      maxClusterRadius={80}
+      spiderfyOnMaxZoom={false}
+      showCoverageOnHover={false}
+    >
+      {markers}
     </MarkerClusterGroup>
   );
 };

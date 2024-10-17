@@ -1,5 +1,5 @@
 query mapSearch($searchParam: String!) {
-    searchSites(searchParam: $searchParam, page: "1", pageSize: "100") {
+    searchSites(searchParam: $searchParam, page: "1", pageSize: "100000") {
         sites {
             id
             addrLine_1

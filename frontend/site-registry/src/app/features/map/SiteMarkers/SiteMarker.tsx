@@ -1,35 +1,14 @@
-import { FC, useState } from 'react';
+import { FC, memo, useState } from 'react';
 import { IconMarker } from '../IconMarker';
-import L, { LatLngLiteral } from 'leaflet';
-
-import mapMarkerDefault from './assets/map_marker_default.png';
-import mapMarkerHover from './assets/map_marker_hover.png';
-import mapMarkerSelected from './assets/map_marker_selected.png';
-
-const mapIconDefault = new L.Icon({
-  iconUrl: mapMarkerDefault,
-  iconSize: [50, 65],
-  iconAnchor: [25, 65],
-});
-
-const mapIconHover = new L.Icon({
-  iconUrl: mapMarkerHover,
-  iconSize: [55, 75],
-  iconAnchor: [27.5, 75],
-});
-
-const mapIconSelected = new L.Icon({
-  iconUrl: mapMarkerSelected,
-  iconSize: [55, 75],
-  iconAnchor: [27.5, 75],
-});
+import { LatLngLiteral } from 'leaflet';
+import { mapIconDefault, mapIconHover, mapIconSelected } from './icons';
 
 interface SiteMarkerProps {
   position: LatLngLiteral;
-  onClick: () => void;
+  onClick?: () => void;
   isSelected?: boolean;
 }
-export const SiteMarker: FC<SiteMarkerProps> = ({
+const SiteMarkerBase: FC<SiteMarkerProps> = ({
   position,
   onClick,
   isSelected = false,
@@ -49,3 +28,11 @@ export const SiteMarker: FC<SiteMarkerProps> = ({
     />
   );
 };
+
+export const SiteMarker = memo(SiteMarkerBase, (prevProps, nextProps) => {
+  return (
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.position.lat === nextProps.position.lat &&
+    prevProps.position.lng === nextProps.position.lng
+  );
+});

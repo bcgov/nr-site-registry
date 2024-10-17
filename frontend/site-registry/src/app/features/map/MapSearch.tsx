@@ -85,16 +85,6 @@ export function MapSearch() {
     setSearchTerm(searchTerm);
   };
 
-  // Leaving this here as an example of a generated query hook
-  // Will likely replace it with something else
-  const { data } = useMapSearchQuery({
-    variables: {
-      searchParam: searchTerm,
-    },
-  });
-
-  console.log(data?.searchSites.sites);
-
   /* TODO: Add Horizontal Scroller for m inimized version */
   return (
     <Box component="div" sx={styles} className="map-search">

@@ -21,6 +21,6 @@ export class HistoryLog extends BaseAuditEntity {
   siteId: string;
 
   @Field(() => GraphQLJSON)
-  @Column('jsonb', { name: 'snapshot_data' })
-  content: SaveSiteDetailsDTO;
+  @Column('jsonb', { name: 'data' })
+  content:  Record<string, any>
 }

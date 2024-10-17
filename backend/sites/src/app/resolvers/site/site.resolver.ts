@@ -242,8 +242,6 @@ export class SiteResolver {
    */
   @Roles({
     roles: [
-      CustomRoles.External,
-      CustomRoles.Internal,
       CustomRoles.SiteRegistrar,
     ],
     mode: RoleMatchingMode.ANY,
@@ -289,7 +287,7 @@ export class SiteResolver {
     }
   }
 
-  @Roles({ roles: [CustomRoles.Internal], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Mutation(() => SRApproveRejectResponse, { name: 'bulkAproveRejectChanges' })
   async bulkAproveRejectChanges(
     @Args('approveRejectDTO', { type: () => BulkApproveRejectChangesDTO })

@@ -223,10 +223,10 @@ export const isUserOfType = (roleType: UserRoleType) => {
 export const getLoggedInUserType = () => {
   return isUserOfType(UserRoleType.CLIENT)
     ? UserRoleType.CLIENT
-    : isUserOfType(UserRoleType.INTERNAL)
-      ? UserRoleType.INTERNAL
-      : isUserOfType(UserRoleType.SR)
-        ? UserRoleType.SR
+    : isUserOfType(UserRoleType.SR)
+      ? UserRoleType.SR
+      : isUserOfType(UserRoleType.INTERNAL)
+        ? UserRoleType.INTERNAL
         : UserRoleType.CLIENT;
 };
 

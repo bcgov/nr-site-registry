@@ -24,6 +24,7 @@ import { SearchInput } from './search/SearchInput';
 import React, { useState } from 'react';
 import { FindMe } from '../../components/common/icon';
 import { FindMeButton } from './FindMeButton';
+import { useMapSearchQuery } from '../../../graphql/generated';
 
 const styles = {
   marginTop: {
@@ -83,6 +84,16 @@ export function MapSearch() {
     const searchTerm = event.target.value;
     setSearchTerm(searchTerm);
   };
+
+  // Leaving this here as an example of a generated query hook
+  // Will likely replace it with something else
+  const { data } = useMapSearchQuery({
+    variables: {
+      searchParam: searchTerm,
+    },
+  });
+
+  console.log(data?.searchSites.sites);
 
   /* TODO: Add Horizontal Scroller for m inimized version */
   return (

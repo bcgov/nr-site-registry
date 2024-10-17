@@ -17,4 +17,5 @@ export interface IWidget {
   changeHandler?: (event: any) => void;
   handleCheckBoxChange?: (event: any) => void;
   sortHandler?: (row: any, ascSort: boolean) => void;
+  showPageOptions?: boolean;
 }

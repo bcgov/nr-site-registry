@@ -9,6 +9,7 @@ export const graphQLSiteDisclosureBySiteId = () => {
         message
         timestamp
         data {
+          id
           siteId
           dateCompleted
           rwmDateDecision
@@ -18,6 +19,7 @@ export const graphQLSiteDisclosureBySiteId = () => {
           govDocumentsComment
           siteDisclosureComment
           plannedActivityComment
+          srAction
         }
       }
     }

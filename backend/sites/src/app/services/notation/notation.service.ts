@@ -88,7 +88,8 @@ export class NotationService {
             etypCode: event.etypCode,
             eclsCode: event.eclsCode,
             userAction: event.userAction ?? UserActionEnum.DEFAULT,
-            srAction: event.srAction ?? SRApprovalStatusEnum.DEFAULT,
+            srAction:
+              event.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
             notationParticipant: eventParticsForEvent.map((partic) => ({
               eventParticId: partic.id,
               eventId: partic.eventId,
@@ -97,7 +98,8 @@ export class NotationService {
               psnorgId: partic.psnorgId,
               displayName: partic.psnorg.displayName,
               userAction: partic.userAction ?? UserActionEnum.DEFAULT,
-              srAction: partic.srAction ?? SRApprovalStatusEnum.DEFAULT,
+              srAction:
+                partic.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
             })),
           };
         });

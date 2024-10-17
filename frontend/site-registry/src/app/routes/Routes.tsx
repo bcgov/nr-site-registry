@@ -18,6 +18,7 @@ import {
   UserRoleType,
 } from '../helpers/utility';
 import MapView from '../features/map/MapView';
+import SRUpdatesTables from '../features/details/srUpdates/srUpdatesTables';
 
 const roleBasedRoutes: any = {
   client: [
@@ -32,6 +33,7 @@ const roleBasedRoutes: any = {
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
     { path: '/site/cart', element: <Cart /> },
+    { path: '/review', element: <SRUpdatesTables /> },
     { path: '/site/cart/site/details/:id', element: <SiteDetails /> },
   ],
   internal: [
@@ -45,6 +47,7 @@ const roleBasedRoutes: any = {
     { path: '/folios/:id', element: <FolioContents /> },
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
+    { path: '/review', element: <SRUpdatesTables /> },
   ],
   sr: [
     { path: '/', element: <Dashboard /> },
@@ -53,6 +56,7 @@ const roleBasedRoutes: any = {
     { path: '/search/site/details/:id', element: <SiteDetails /> },
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
+    { path: '/review', element: <SRUpdatesTables /> },
   ],
   public: [
     { path: '/', element: <Dashboard /> },
@@ -85,23 +89,5 @@ const createRoutesForRole = (role: string) => [
 
 const userType = getLoggedInUserType();
 const siteRouter = createBrowserRouter(createRoutesForRole(userType));
-
-// const AppRoutes = () => {
-
-//   // return (
-//   //   <Routes>
-//   //     <Route path="/" element={<Dashboard />}></Route>
-//   //     <Route path="/search" element={<Search />}></Route>
-//   //     <Route path="/folios" element={<Folios/>}></Route>
-//   //     <Route path="" element={<FolioContents/>}></Route>
-//   //     <Route path="/dashboard" element={<Dashboard />}></Route>
-//   //     <Route path="/dashboard/site/details/:id" element={<SiteDetails/>}></Route>
-//   //     <Route path="/search/site/details/:id" element={<SiteDetails/>}></Route>
-//   //     <Route path="/site/map/:id" element={<MapSearch/>}></Route>
-//   //     <Route path="/site/cart" element={<Cart/>}></Route>
-//   //     <Route path="*" element={<h1>Page not found</h1>}></Route>
-//   //   </Routes>
-//   // );
-// };
 
 export default siteRouter;

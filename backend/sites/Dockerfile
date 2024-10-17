@@ -1,39 +1,27 @@
-# RedHat UBI 8 with nodejs 16
-FROM node:16.14.0-alpine
-
-# Set npm cache directory
-ENV NPM_CONFIG_CACHE=/home/node/.npm
-
-# NPM Permission Fix
-RUN mkdir -p /home/node/.npm \
-    && chown -R 1001:0 /home/node/.npm
-
-# Install packages, build, and keep only prod packages
+# Build
+FROM node:22-slim AS build
+# Install packages, build and keep only prod packages
+USER root
 WORKDIR /app
-#test
+COPY *.json ./
+COPY ./src /app/src
+RUN npm ci --omit=dev && \
+    npm run build
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Deployment container
+# Deploy using minimal Distroless image
+FROM gcr.io/distroless/nodejs22-debian12:nonroot
+# Set node to production
+ENV NODE_ENV=production
 
-# Install app dependencies using npm ci
-RUN npm ci
+# Copy over app
+WORKDIR /app
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
 
-# Bundle app source
-COPY . ./
+# Port and health check
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000
 
-# Change ownership of files to non-root user
-RUN chown -R 1001:0 /app \
-    && chmod -R g=u /app
-
-# Switch to non-root user
-USER 1001
-#test
-
-# Build the application
-RUN npm run build
-
-# Expose port
-EXPOSE 4007
-
-# Start the API
-CMD ["sh", "start.sh"]
+# max old space the heap size, 120MB with 200MB limit in deployment.
+CMD ["--max-old-space-size=120", "/app/dist/main"]

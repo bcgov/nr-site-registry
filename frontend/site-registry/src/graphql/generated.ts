@@ -2,37 +2,24 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = {
-  [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]?: Maybe<T[SubKey]>;
-};
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]: Maybe<T[SubKey]>;
-};
-export type MakeEmpty<
-  T extends { [key: string]: unknown },
-  K extends keyof T,
-> = { [_ in K]?: never };
-export type Incremental<T> =
-  | T
-  | {
-      [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
-    };
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string };
-  String: { input: string; output: string };
-  Boolean: { input: boolean; output: boolean };
-  Int: { input: number; output: number };
-  Float: { input: number; output: number };
-  DateTime: { input: any; output: any };
-  JSON: { input: any; output: any };
-  _Any: { input: any; output: any };
-  federation__FieldSet: { input: any; output: any };
-  link__Import: { input: any; output: any };
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
+  DateTime: { input: any; output: any; }
+  JSON: { input: any; output: any; }
+  _Any: { input: any; output: any; }
+  federation__FieldSet: { input: any; output: any; }
+  link__Import: { input: any; output: any; }
 };
 
 export type AssociatedSiteDto = {
@@ -453,45 +440,56 @@ export type Mutation = {
   updateSiteDetails: SaveSiteDetailsResponse;
 };
 
+
 export type MutationAddCartItemArgs = {
   cartDTO: Array<CartDto>;
 };
+
 
 export type MutationAddFolioItemArgs = {
   folioDTO: FolioDto;
 };
 
+
 export type MutationAddRecentViewArgs = {
   recentView: RecentViewDto;
 };
+
 
 export type MutationAddSiteToFolioArgs = {
   folioDTO: Array<FolioContentDto>;
 };
 
+
 export type MutationCreateSnapshotForSitesArgs = {
   inputDto: Array<CreateSnapshotDto>;
 };
+
 
 export type MutationDeleteCartItemArgs = {
   cartDeleteDTO: Array<CartDeleteDto>;
 };
 
+
 export type MutationDeleteCartItemWithSiteIdArgs = {
   cartDeleteDTO: Array<CartDeleteDtoWithSiteId>;
 };
+
 
 export type MutationDeleteFolioItemArgs = {
   folioId: Scalars['Float']['input'];
 };
 
+
 export type MutationDeleteSitesInFolioArgs = {
   folioDTO: Array<FolioContentDto>;
 };
 
+
 export type MutationUpdateFolioItemArgs = {
   folioDTO: Array<FolioDto>;
 };
+
 
 export type MutationUpdateSiteDetailsArgs = {
   siteDetailsDTO: SaveSiteDetailsDto;
@@ -648,27 +646,33 @@ export type Query = {
   sites: FetchSiteResponse;
 };
 
+
 export type QueryFindSiteBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
+
 
 export type QueryGetAssociatedSitesBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
 
+
 export type QueryGetBannerTypeArgs = {
   siteId: Scalars['String']['input'];
 };
+
 
 export type QueryGetCartItemsForUserArgs = {
   userId: Scalars['String']['input'];
 };
 
+
 export type QueryGetFolioItemsForUserArgs = {
   userId: Scalars['String']['input'];
 };
+
 
 export type QueryGetLandHistoriesForSiteArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
@@ -676,6 +680,7 @@ export type QueryGetLandHistoriesForSiteArgs = {
   siteId: Scalars['String']['input'];
   sortDirection?: InputMaybe<Scalars['String']['input']>;
 };
+
 
 export type QueryGetParcelDescriptionsBySiteIdArgs = {
   page: Scalars['Int']['input'];
@@ -687,54 +692,66 @@ export type QueryGetParcelDescriptionsBySiteIdArgs = {
   sortByDir: Scalars['String']['input'];
 };
 
+
 export type QueryGetPeopleOrgsCdArgs = {
   entityType?: InputMaybe<Scalars['String']['input']>;
   searchParam?: InputMaybe<Scalars['String']['input']>;
 };
 
+
 export type QueryGetRecentViewsByUserIdArgs = {
   userId: Scalars['String']['input'];
 };
+
 
 export type QueryGetSiteDisclosureBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
 
+
 export type QueryGetSiteDocumentsBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
+
 
 export type QueryGetSiteNotationBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
 
+
 export type QueryGetSiteParticipantBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
 
+
 export type QueryGetSitesForFolioArgs = {
   folioDTO: FolioMinDto;
 };
+
 
 export type QueryGetSnapshotsByIdArgs = {
   id: Scalars['Int']['input'];
 };
 
+
 export type QueryGetSnapshotsBySiteIdArgs = {
   siteId: Scalars['String']['input'];
 };
+
 
 export type QueryGetSnapshotsByUserIdArgs = {
   userId: Scalars['String']['input'];
 };
 
+
 export type QuerySearchSiteIdsArgs = {
   searchParam: Scalars['String']['input'];
 };
+
 
 export type QuerySearchSitesArgs = {
   addrLine_1?: InputMaybe<Scalars['String']['input']>;
@@ -1256,39 +1273,29 @@ export enum Link__Purpose {
   /** `EXECUTION` features provide metadata necessary for operation execution. */
   Execution = 'EXECUTION',
   /** `SECURITY` features provide metadata necessary to securely resolve fields. */
-  Security = 'SECURITY',
+  Security = 'SECURITY'
 }
 
 export type MapSearchQueryVariables = Exact<{
   searchParam: Scalars['String']['input'];
 }>;
 
-export type MapSearchQuery = {
-  __typename?: 'Query';
-  searchSites: {
-    __typename?: 'SearchSiteResponse';
-    sites: Array<{
-      __typename?: 'Sites';
-      id: string;
-      addrLine_1: string;
-      latDegrees?: number | null;
-      longDegrees?: number | null;
-    }>;
-  };
-};
+
+export type MapSearchQuery = { __typename?: 'Query', searchSites: { __typename?: 'SearchSiteResponse', sites: Array<{ __typename?: 'Sites', id: string, addrLine_1: string, latDegrees?: number | null, longDegrees?: number | null }> } };
+
 
 export const MapSearchDocument = gql`
-  query mapSearch($searchParam: String!) {
-    searchSites(searchParam: $searchParam, page: "1", pageSize: "100") {
-      sites {
-        id
-        addrLine_1
-        latDegrees
-        longDegrees
-      }
+    query mapSearch($searchParam: String!) {
+  searchSites(searchParam: $searchParam, page: "1", pageSize: "100") {
+    sites {
+      id
+      addrLine_1
+      latDegrees
+      longDegrees
     }
   }
-`;
+}
+    `;
 
 /**
  * __useMapSearchQuery__
@@ -1306,56 +1313,19 @@ export const MapSearchDocument = gql`
  *   },
  * });
  */
-export function useMapSearchQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    MapSearchQuery,
-    MapSearchQueryVariables
-  > &
-    (
-      | { variables: MapSearchQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    ),
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<MapSearchQuery, MapSearchQueryVariables>(
-    MapSearchDocument,
-    options,
-  );
-}
-export function useMapSearchLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    MapSearchQuery,
-    MapSearchQueryVariables
-  >,
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<MapSearchQuery, MapSearchQueryVariables>(
-    MapSearchDocument,
-    options,
-  );
-}
-export function useMapSearchSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<MapSearchQuery, MapSearchQueryVariables>,
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<MapSearchQuery, MapSearchQueryVariables>(
-    MapSearchDocument,
-    options,
-  );
-}
+export function useMapSearchQuery(baseOptions: Apollo.QueryHookOptions<MapSearchQuery, MapSearchQueryVariables> & ({ variables: MapSearchQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MapSearchQuery, MapSearchQueryVariables>(MapSearchDocument, options);
+      }
+export function useMapSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MapSearchQuery, MapSearchQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MapSearchQuery, MapSearchQueryVariables>(MapSearchDocument, options);
+        }
+export function useMapSearchSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MapSearchQuery, MapSearchQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MapSearchQuery, MapSearchQueryVariables>(MapSearchDocument, options);
+        }
 export type MapSearchQueryHookResult = ReturnType<typeof useMapSearchQuery>;
-export type MapSearchLazyQueryHookResult = ReturnType<
-  typeof useMapSearchLazyQuery
->;
-export type MapSearchSuspenseQueryHookResult = ReturnType<
-  typeof useMapSearchSuspenseQuery
->;
-export type MapSearchQueryResult = Apollo.QueryResult<
-  MapSearchQuery,
-  MapSearchQueryVariables
->;
+export type MapSearchLazyQueryHookResult = ReturnType<typeof useMapSearchLazyQuery>;
+export type MapSearchSuspenseQueryHookResult = ReturnType<typeof useMapSearchSuspenseQuery>;
+export type MapSearchQueryResult = Apollo.QueryResult<MapSearchQuery, MapSearchQueryVariables>;

@@ -69,6 +69,13 @@ spec:
             requests:
               cpu: 30m
               memory: 50Mi
+          volumeMounts:
+            - name: {{ .Release.Name }}-config
+              mountPath: /usr/share/nginx/html/config/
+      volumes:
+        - name: {{ .Release.Name }}-config
+          configMap:
+            name: {{ include "frontendSiteRegistry.fullname" . }}
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

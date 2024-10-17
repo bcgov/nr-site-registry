@@ -115,7 +115,17 @@ frontendSiteRegistry:
   pdb:
     enabled: false # enable it in PRODUCTION for having pod disruption budget.
     minAvailable: 1 # the minimum number of pods that must be available during the disruption budget.
-
+  config:
+    REACT_APP_BACKEND_API: ~
+    REACT_APP_AUTH_AUTHORITY: ~
+    REACT_APP_AUTH_CLIENT_ID: ~
+    REACT_APP_AUTH_REDIRECT_URI: ~
+    REACT_APP_AUTH_LOGOUT_REDIRECT_URI: ~
+    REACT_APP_AUTH_RESPONSE_TYPE: "code"
+    REACT_APP_AUTH_SCOPE: "openid profile"
+    REACT_APP_AUTH_FILTER_PROTOCOL_CLAIMS: "true"
+    REACT_APP_AUTH_LOAD_USER_INFO: "true"
+    REACT_APP_AUTH_REVOKE_TOKENS_ON_SIGNOUT: "true"
 crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single postgres
   enabled: false
 

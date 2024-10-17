@@ -98,11 +98,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                 editMode={viewMode === SiteDetailsMode.EditMode}
                 srMode={viewMode === SiteDetailsMode.SRMode}
                 handleInputChange={(graphQLPropertyName, value) =>
-                  handleInputChange(
-                    formData.disclosureId,
-                    graphQLPropertyName,
-                    value,
-                  )
+                  handleInputChange(formData.id, graphQLPropertyName, value)
                 }
                 aria-label="Site Disclosure Statement"
               />
@@ -119,9 +115,8 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
         >
           {formData && (
             <Widget
-              changeHandler={(event) =>
-                handleTableChange(formData.disclosureId, event)
-              }
+              currentPage={1}
+              changeHandler={(event) => handleTableChange(formData.id, event)}
               handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
               title={
                 'III Commercial and Industrial Purposes or Activities on Site'
@@ -152,19 +147,17 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
               }
               primaryKeycolumnName="scheduleId"
               sortHandler={(row, ascDir) => {
-                handleTableSort(row, ascDir, formData.disclosureId);
+                handleTableSort(row, ascDir, formData.id);
               }}
             >
               {viewMode === SiteDetailsMode.EditMode &&
                 userType === UserType.Internal && (
-                  <div className="d-flex gap-2" key={formData.disclosureId}>
+                  <div className="d-flex gap-2" key={formData.id}>
                     <button
                       id="add-schedule-btn"
                       className=" d-flex align-items-center disclosure-add-btn"
                       type="button"
-                      onClick={() =>
-                        handleAddDisclosureSchedule(formData.disclosureId)
-                      }
+                      onClick={() => handleAddDisclosureSchedule(formData.id)}
                       aria-label={'Add'}
                     >
                       <Plus className="btn-user-icon" />
@@ -173,21 +166,17 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
 
                     <button
                       id="delete-schedule-btn"
-                      className={`d-flex align-items-center ${isAnyDisclosureScheduleSelected(formData.disclosureId) ? `disclosure-add-btn` : `disclosure-btn-disable`}`}
-                      disabled={
-                        !isAnyDisclosureScheduleSelected(formData.disclosureId)
-                      }
+                      className={`d-flex align-items-center ${isAnyDisclosureScheduleSelected(formData.id) ? `disclosure-add-btn` : `disclosure-btn-disable`}`}
+                      disabled={!isAnyDisclosureScheduleSelected(formData.id)}
                       type="button"
-                      onClick={() =>
-                        handleRemoveDisclosureSchedule(formData.disclosureId)
-                      }
+                      onClick={() => handleRemoveDisclosureSchedule(formData)}
                       aria-label={'Remove Disclosure Schedule'}
                     >
                       <Minus
-                        className={`${isAnyDisclosureScheduleSelected(formData.disclosureId) ? `btn-user-icon` : `btn-user-icon-disabled`}`}
+                        className={`${isAnyDisclosureScheduleSelected(formData.id) ? `btn-user-icon` : `btn-user-icon-disabled`}`}
                       />
                       <span
-                        className={`${isAnyDisclosureScheduleSelected(formData.disclosureId) ? `disclosure-btn-lbl` : `disclosure-btn-lbl-disabled`}`}
+                        className={`${isAnyDisclosureScheduleSelected(formData.id) ? `disclosure-btn-lbl` : `disclosure-btn-lbl-disabled`}`}
                       >
                         {'Remove'}
                       </span>
@@ -240,11 +229,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                     editMode={viewMode === SiteDetailsMode.EditMode}
                     srMode={viewMode === SiteDetailsMode.SRMode}
                     handleInputChange={(graphQLPropertyName, value) =>
-                      handleInputChange(
-                        formData.disclosureId,
-                        graphQLPropertyName,
-                        value,
-                      )
+                      handleInputChange(formData.id, graphQLPropertyName, value)
                     }
                     aria-label="Site Disclosure Statement"
                   />
@@ -256,7 +241,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
       </div>
       {userType === UserType.Internal && (
         <p className="sr-time-stamp">
-          {formData.srTimeStamp ?? 'Hard Code Value'}
+          {formData?.srTimeStamp ?? 'SR value hard coded'}
         </p>
       )}
       {showApproveRejectSection && (

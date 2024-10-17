@@ -83,7 +83,6 @@ describe('DocumentService', () => {
           userAction: 'pending',
           srAction: 'pending',
           filePath: '',
-          filePath: '',
           siteDocPartics: [
             {
               id: '1',
@@ -99,7 +98,6 @@ describe('DocumentService', () => {
               dprCode2: null, // Assuming this relationship is already defined elsewhere
               psnorg: mockPeopleOrgs[0], // Assigning PeopleOrgs entity
               sdoc: null, // Assigning SiteDocs entity
-              sp: null, // Assuming SitePartics entity is null for now
               userAction: 'pending',
               srAction: 'pending',
             },
@@ -212,7 +210,6 @@ describe('DocumentService', () => {
             dprCode2: null, // Assuming this relationship is already defined elsewhere
             psnorg: mockPeopleOrgs[0], // Assigning PeopleOrgs entity
             sdoc: null, // Assigning SiteDocs entity
-            sp: null, // Assuming SitePartics entity is null for now
             srAction: 'pending',
             userAction: 'pending',
           },

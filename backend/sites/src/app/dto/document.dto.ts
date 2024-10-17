@@ -27,10 +27,6 @@ export class DocumentDto extends ChangeAuditObjectTypeDTO {
   @IsString()
   psnorgId: string;
 
-  // No need f dprCode because this will be Author always as per stand up discussion
-  // @Field({nullable: true})
-  // dprCode: string;
-
   @Field({ nullable: true })
   @IsString()
   displayName: string;
@@ -50,6 +46,9 @@ export class DocumentDto extends ChangeAuditObjectTypeDTO {
   @Field()
   @IsString()
   title: string;
+
+  @Field({ nullable: true })
+  filePath: string | null;
 }
 
 @InputType()
@@ -58,7 +57,7 @@ export class DocumentInputDTO extends ChangeAuditEntityDTO {
   @IsString()
   id: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsString()
   docParticId: string;
 
@@ -66,7 +65,7 @@ export class DocumentInputDTO extends ChangeAuditEntityDTO {
   @IsString()
   psnorgId: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsString()
   displayName: string;
 
@@ -85,4 +84,7 @@ export class DocumentInputDTO extends ChangeAuditEntityDTO {
   @Field()
   @IsString()
   title: string;
+
+  @Field({ nullable: true })
+  filePath: string | null;
 }

@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { LoggerService } from '../../logger/logger.service';
 import { UserActionEnum } from '../../common/userActionEnum';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class DisclosureService {
@@ -28,10 +30,6 @@ export class DisclosureService {
       this.sitesLogger.log(
         'DisclosureService.getSiteDisclosureBySiteId() start',
       );
-      this.sitesLogger.debug(
-        'DisclosureService.getSiteDisclosureBySiteId() start',
-      );
-
       // Fetch site profiles based on the provided siteId
       let result: SiteProfiles[] = [];
 
@@ -44,12 +42,23 @@ export class DisclosureService {
           where: { siteId },
         });
       }
-
-      this.sitesLogger.log('DisclosureService.getSiteDisclosureBySiteId() end');
-      this.sitesLogger.debug(
-        'DisclosureService.getSiteDisclosureBySiteId() end',
-      );
-      return result; // Return the fetched site profiles
+      if (result && !result.length) {
+        return [];
+      } else {
+        const res = result.map((res) => {
+          return {
+            ...res,
+            srAction:
+              res.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
+          };
+        });
+        this.sitesLogger.log(
+          'DisclosureService.getSiteDisclosureBySiteId() end',
+        );
+        // Convert the transformed objects into DTOs
+        const disclosure = plainToInstance(SiteProfiles, res);
+        return disclosure;
+      }
     } catch (error) {
       this.sitesLogger.error(
         'Exception occured in DisclosureService.getSiteDisclosureBySiteId() end',

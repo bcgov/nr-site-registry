@@ -40,14 +40,14 @@ export class ProfileAnswers {
   @JoinColumn([{ name: 'question_id', referencedColumnName: 'id' }])
   question: ProfileQuestions;
 
-  @ManyToOne(
-    () => SiteProfiles,
-    (siteProfiles) => siteProfiles.profileAnswers,
-    { onDelete: 'CASCADE' },
-  )
-  @JoinColumn([
-    { name: 'site_id', referencedColumnName: 'siteId' },
-    { name: 'sprof_date_completed', referencedColumnName: 'dateCompleted' },
-  ])
-  siteProfiles: SiteProfiles;
+  // @ManyToOne(
+  //   () => SiteProfiles,
+  //   (siteProfiles) => siteProfiles.profileAnswers,
+  //   { onDelete: 'CASCADE' },
+  // )
+  // @JoinColumn([
+  //   { name: 'site_id', referencedColumnName: 'siteId' },
+  //   { name: 'sprof_date_completed', referencedColumnName: 'dateCompleted' },
+  // ])
+  // siteProfiles: SiteProfiles;
 }

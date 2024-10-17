@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, EntityTarget, In, Repository } from 'typeorm';
 import {
   FetchSiteDetail,
   FetchSiteResponse,
@@ -27,6 +27,14 @@ import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
 import { LoggerService } from '../../logger/logger.service';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { SiteDocPartics } from '../../entities/siteDocPartics.entity';
+import {
+  BulkApproveRejectChangesDTO,
+  QueryResultForPendingSites,
+  SearchParams,
+  SitePendingApprovalRecords,
+  SiteRecordsForSRAction,
+} from '../../dto/sitesPendingReview.dto';
+import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
 
 /**
  * Nestjs Service For Region Entity
@@ -62,6 +70,7 @@ export class SiteService {
     private historyLogRepository: Repository<HistoryLog>,
 
     private readonly landHistoryService: LandHistoryService,
+    private readonly parcelDescriptionService: ParcelDescriptionsService,
     private transactionManagerService: TransactionManagerService,
     private readonly sitesLogger: LoggerService,
   ) {}
@@ -324,128 +333,17 @@ export class SiteService {
       if (!inputDTO) {
         return false;
       } else {
-        const {
-          siteId,
-          sitesSummary,
-          events,
-          eventsParticipants,
-          siteParticipants,
-          documents,
-          siteAssociations,
-          subDivisions,
-          landHistories,
-          profiles,
-        } = inputDTO;
-
         const transactionResult = await this.entityManager.transaction(
           async (transactionalEntityManager: EntityManager) => {
             this.transactionManagerService.setEntityManager(
               transactionalEntityManager,
             );
-
             try {
-              if (sitesSummary) {
-                await transactionalEntityManager.save(Sites, sitesSummary);
-              } else {
-                console.log('No changes To Site Summary');
-              }
-
-              if (events && events.length > 0) {
-                await this.processEvents(
-                  events,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Events',
-                );
-              }
-
-              // if (eventsParticipants) {
-              //   await transactionalEntityManager.save(
-              //     EventPartics,
-              //     eventsParticipants,
-              //   );
-              // } else {
-              //   console.log('No changes To Site Event Participants');
-              // }
-
-              if (siteParticipants && siteParticipants.length > 0) {
-                await this.processSiteParticipants(
-                  siteParticipants,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Participants',
-                );
-              }
-
-              if (documents && documents.length > 0) {
-                await this.processDocuments(
-                  documents,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Documents',
-                );
-              }
-
-              if (siteAssociations && siteAssociations.length > 0) {
-                await this.processSiteAssociated(
-                  siteAssociations,
-                  userInfo,
-                  transactionalEntityManager,
-                );
-              } else {
-                this.sitesLogger.log(
-                  'SiteService.saveSiteDetails(): No changes To Site Associations',
-                );
-              }
-
-              if (subDivisions) {
-                await transactionalEntityManager.save(
-                  Subdivisions,
-                  subDivisions,
-                );
-              } else {
-                console.log('No changes To Site subDivisions');
-              }
-
-              if (landHistories) {
-                await this.landHistoryService.updateLandHistoriesForSite(
-                  siteId,
-                  landHistories,
-                  userInfo,
-                );
-              } else {
-                console.log('No changes To Site LandHistories');
-              }
-
-              if (profiles) {
-                await transactionalEntityManager.save(SiteProfiles, profiles);
-              } else {
-                console.log('No changes To Site profiles');
-              }
-
-              const historyLog: HistoryLog = {
-                userId: userInfo ? userInfo.sub : '',
-                content: inputDTO,
-                id: null,
-                whoCreated: userInfo ? userInfo.givenName : '',
-                whenCreated: new Date(),
-                whenUpdated: new Date(),
-                whoUpdated: userInfo ? userInfo.givenName : '',
-                siteId: inputDTO.siteId,
-              };
-
-              await transactionalEntityManager.save(HistoryLog, historyLog);
-
-              return true;
+              return this.commitSiteDetails(
+                transactionalEntityManager,
+                inputDTO,
+                userInfo,
+              );
             } catch (error) {
               console.error('Save Site Details Transaction failed', error);
               return false;
@@ -463,6 +361,128 @@ export class SiteService {
       );
       throw error;
     }
+  }
+
+  async commitSiteDetails(
+    transactionalEntityManager: EntityManager,
+    inputDTO: SaveSiteDetailsDTO,
+    userInfo: any,
+  ): Promise<boolean> {
+    const {
+      siteId,
+      sitesSummary,
+      events,
+      eventsParticipants,
+      siteParticipants,
+      documents,
+      siteAssociations,
+      parcelDescriptions,
+      landHistories,
+      profiles,
+    } = inputDTO;
+
+    if (sitesSummary) {
+      sitesSummary.whenUpdated = new Date();
+      sitesSummary.whoUpdated = userInfo?.givenName;
+      await transactionalEntityManager.save(Sites, sitesSummary);
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Summary',
+      );
+    }
+
+    if (events && events.length > 0) {
+      await this.processEvents(events, userInfo, transactionalEntityManager);
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Events',
+      );
+    }
+
+    if (siteParticipants && siteParticipants.length > 0) {
+      await this.processSiteParticipants(
+        siteParticipants,
+        userInfo,
+        transactionalEntityManager,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Participants',
+      );
+    }
+
+    if (documents && documents.length > 0) {
+      await this.processDocuments(
+        documents,
+        userInfo,
+        transactionalEntityManager,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Documents',
+      );
+    }
+
+    if (siteAssociations && siteAssociations.length > 0) {
+      await this.processSiteAssociated(
+        siteAssociations,
+        userInfo,
+        transactionalEntityManager,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes To Site Associations',
+      );
+    }
+
+    if (parcelDescriptions) {
+      await this.parcelDescriptionService.saveParcelDescriptionsForSite(
+        inputDTO.siteId,
+        parcelDescriptions,
+        userInfo,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails(): No changes to Parcel Descriptions.',
+      );
+    }
+
+    if (landHistories) {
+      await this.landHistoryService.updateLandHistoriesForSite(
+        siteId,
+        landHistories,
+        userInfo,
+      );
+    } else {
+      console.log('No changes To Site LandHistories');
+    }
+
+    if (profiles && profiles.length > 0) {
+      await this.processSiteDisclosure(
+        profiles,
+        userInfo,
+        transactionalEntityManager,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails():No changes To Site profiles',
+      );
+    }
+
+    const historyLog: HistoryLog = {
+      userId: userInfo ? userInfo.sub : '',
+      content: inputDTO,
+      id: null,
+      whoCreated: userInfo ? userInfo.givenName : '',
+      whenCreated: new Date(),
+      whenUpdated: new Date(),
+      whoUpdated: userInfo ? userInfo.givenName : '',
+      siteId: inputDTO.siteId,
+    };
+
+    await transactionalEntityManager.save(HistoryLog, historyLog);
+
+    return true;
   }
 
   /**
@@ -500,8 +520,12 @@ export class SiteService {
         // Validate participant ID
         let documentId = document.id || ''; // Ensure it's a string
 
-        let siteDocument = { ...new SiteDocs(), ...siteDocumentData, srAction };
-        let siteDocumentParticipant = {
+        const siteDocument = {
+          ...new SiteDocs(),
+          ...siteDocumentData,
+          srAction,
+        };
+        const siteDocumentParticipant = {
           ...new SiteDocPartics(),
           psnorgId,
           srAction,
@@ -521,9 +545,9 @@ export class SiteService {
             newDocuments.push({
               ...siteDocument,
               id: documentId,
-              rwmFlag: 0,
+              // rwmFlag: 0,
               userAction: UserActionEnum.ADDED,
-              // srAction: SRApprovalStatusEnum.PENDING,
+              srAction: SRApprovalStatusEnum.PENDING,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -539,11 +563,10 @@ export class SiteService {
               ...siteDocumentParticipant,
               id: newDocParticId.toString(),
               sdocId: documentId,
-              rwmFlag: 0,
-              dprCode: 'ATH',
-              // dprCode: dprCode ?? 'ATH',
+              // rwmFlag: 0,
+              dprCode: 'ATH', // dprCode is always ATH. We don't have a UI for this value and keeping this column allows us to maintain historical data.
               userAction: UserActionEnum.ADDED,
-              // srAction: SRApprovalStatusEnum.PENDING,
+              srAction: SRApprovalStatusEnum.PENDING,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -559,7 +582,7 @@ export class SiteService {
                   ...existingDocument,
                   ...siteDocument,
                   userAction: UserActionEnum.UPDATED,
-                  // srAction: SRApprovalStatusEnum.PENDING,
+                  srAction: SRApprovalStatusEnum.PENDING,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },
@@ -577,7 +600,7 @@ export class SiteService {
                     ...existingDocumentParticipant,
                     ...siteDocumentParticipant,
                     userAction: UserActionEnum.UPDATED,
-                    // srAction: SRApprovalStatusEnum.PENDING,
+                    srAction: SRApprovalStatusEnum.PENDING,
                     whenUpdated: new Date(),
                     whoUpdated: userInfo ? userInfo.givenName : '',
                   },
@@ -686,13 +709,13 @@ export class SiteService {
         // Validate participant ID
         let participantId = participant.id || ''; // Ensure it's a string
 
-        let sitePartic: SitePartics = {
+        const sitePartic: SitePartics = {
           ...new SitePartics(),
           ...siteParticsData,
           srAction,
         };
 
-        let siteParticRole: SiteParticRoles = {
+        const siteParticRole: SiteParticRoles = {
           ...new SiteParticRoles(),
           prCode,
           srAction,
@@ -990,7 +1013,10 @@ export class SiteService {
             break;
 
           default:
-            console.warn('Unknown action for event:', apiAction);
+            this.sitesLogger.warn(
+              'SiteService.processEvents Unknown action for event',
+            );
+            break;
         }
 
         // Process related participants regardless of event action
@@ -1050,7 +1076,7 @@ export class SiteService {
 
       const siteAssociatePromises = siteAccociated.map(async (asscos) => {
         const { id, apiAction, ...siteAssocsData } = asscos;
-        let siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
+        const siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
         switch (apiAction) {
           case UserActionEnum.ADDED:
             newSiteAssociates.push({
@@ -1118,4 +1144,602 @@ export class SiteService {
       }
     }
   }
+
+  /**
+   * Processes and saves site disclosure based on the provided actions.
+   * @param siteDisclosure - Site disclosure data including actions to be performed.
+   * @param userInfo - Information about the user performing the actions.
+   * @param transactionalEntityManager - Entity manager for handling transactions.
+   */
+  async processSiteDisclosure(
+    siteDisclosure: any[],
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    if (siteDisclosure && siteDisclosure.length > 0) {
+      const disclosurePromises = siteDisclosure.map(async (disclosure) => {
+        const { apiAction, id, ...disclosureData } = disclosure;
+        let profile = {
+          ...new SiteProfiles(),
+          ...disclosureData,
+        };
+        switch (apiAction) {
+          case UserActionEnum.ADDED:
+            profile = {
+              ...profile,
+              userAction: UserActionEnum.ADDED,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            };
+            break;
+          case UserActionEnum.UPDATED:
+            const isExist =
+              disclosure.id &&
+              (await this.siteProfilesRepo.findOneByOrFail({
+                id: disclosure.id,
+              }));
+            if (isExist) {
+              profile = {
+                ...isExist,
+                ...profile,
+                userAction: UserActionEnum.UPDATED,
+                whenUpdated: new Date(),
+                whoUpdated: userInfo ? userInfo.givenName : '',
+              };
+            } else {
+              this.sitesLogger.log(
+                `SiteService.processSiteDisclosure():There is no profile in database againts id : ${disclosure.id}`,
+              );
+            }
+            break;
+        }
+        await transactionalEntityManager.save(SiteProfiles, profile);
+      });
+
+      await Promise.all(disclosurePromises);
+    }
+  }
+
+  async getSiteDetailsPendingSRApproval(
+    searchParam: SearchParams,
+    page: number,
+    pageSize: number,
+  ): Promise<QueryResultForPendingSites> {
+    try {
+      this.sitesLogger.log(
+        'SiteService.getSiteDetailsPendingSRApproval() start',
+      );
+      this.sitesLogger.debug(
+        'SiteService.getSiteDetailsPendingSRApproval() start',
+      );
+
+      // The following query fetches the sites with SR status as pending and group them by user and shows the last updated timestamp
+      const query = `
+       select ROW_NUMBER() OVER (ORDER BY site_id) AS row_num,ResultInFo.site_id,ResultInFo.changes,ResultInFo.Latest_Update,ResultInFo.who as who_updated, SiteInfo.addr_line_1, SiteInfo.addr_line_2,SiteInfo.addr_line_3 from (WITH LatestUpdates AS (
+          SELECT site_id,
+                MAX(when_Updated) AS Latest_Update,
+            who_updated as who
+          FROM (
+              SELECT id AS site_id, when_Updated ,who_updated 
+              FROM sites.sites
+              WHERE sr_action = 'pending'
+              
+              UNION ALL
+              
+              SELECT site_id, when_Updated , who_updated 
+              FROM sites.events
+              WHERE sr_action = 'pending'
+              
+              UNION ALL
+              
+              SELECT e.site_id, e.when_Updated, e.who_updated 
+              FROM sites.event_partics ep
+              INNER JOIN sites.events e ON ep.event_id = e.id
+              WHERE e.sr_action = 'pending'
+              
+              UNION ALL
+              
+              SELECT site_id, when_Updated, who_updated 
+              FROM sites.site_partics
+              WHERE sr_action = 'pending'
+              
+              UNION ALL
+              
+              SELECT site_id, when_Updated, who_updated 
+              FROM sites.site_docs
+              WHERE sr_action = 'pending'
+              
+              UNION ALL
+              
+              SELECT site_id, when_Updated,who_updated 
+              FROM sites.site_assocs
+              WHERE sr_action = 'pending'
+              
+              UNION ALL
+              
+              SELECT site_id, when_Updated,who_updated 
+              FROM sites.land_histories
+              WHERE sr_action = 'pending'
+              
+              UNION ALL
+              
+              SELECT site_id, when_Updated,who_updated 
+              FROM sites.site_subdivisions
+              WHERE sr_action = 'pending'
+              
+              UNION ALL
+              
+              SELECT site_id, when_Updated ,who_updated 
+              FROM sites.site_profiles
+              WHERE sr_action = 'pending'
+          ) AS updates
+          GROUP BY site_id, who_updated
+      )
+
+      SELECT Final.site_id,Final.Changes,Final.who_updated, lu.latest_update, lu.who FROM (
+      SELECT c.site_id, 
+            STRING_AGG(DISTINCT c.Change, ', ' ORDER BY c.Change) AS Changes,
+		  c.who_updated
+      FROM (
+          SELECT id AS site_id, 'summary' AS Change, when_Updated, who_updated ,addr_line_1,addr_line_2,addr_line_3 
+          FROM sites.sites
+          WHERE sr_action = 'pending'
+          
+          UNION ALL
+          
+          SELECT site_id, 'notation', when_Updated, who_updated , '' , '', '' 
+          FROM sites.events
+          WHERE sr_action = 'pending'
+          
+          UNION ALL
+          
+          SELECT e.site_id, 'notation participants' AS Change, e.when_Updated, e.who_updated , '' , '', '' 
+          FROM sites.event_partics ep
+          INNER JOIN sites.events e ON ep.event_id = e.id
+          WHERE e.sr_action = 'pending'
+          
+          UNION ALL
+          
+          SELECT site_id, 'site participants' AS Change, when_Updated, who_updated ,  '' , '', '' 
+          FROM sites.site_partics
+          WHERE sr_action = 'pending'
+          
+          UNION ALL
+          
+          SELECT site_id, 'documents' AS Change, when_Updated, who_updated,  '' , '', '' 
+          FROM sites.site_docs
+          WHERE sr_action = 'pending'
+          
+          UNION ALL
+          
+          SELECT site_id, 'associated sites' AS Change, when_Updated, who_updated,  '' , '', '' 
+          FROM sites.site_assocs
+          WHERE sr_action = 'pending'
+          
+          UNION ALL
+          
+          SELECT site_id, 'land histories' AS Change, when_Updated, who_updated,  '' , '', '' 
+          FROM sites.land_histories
+          WHERE sr_action = 'pending'
+          
+          UNION ALL
+          
+          SELECT site_id, 'parcel description' AS Change, when_Updated, who_updated,  '' , '', '' 
+          FROM sites.site_subdivisions
+          WHERE sr_action = 'pending'
+          
+          UNION ALL
+          
+          SELECT site_id, 'site profiles' AS Change, when_Updated, who_updated ,  '' , '', '' 
+          FROM sites.site_profiles
+          WHERE sr_action = 'pending'
+      ) AS c
+      GROUP BY c.site_id,c.who_updated) Final
+      JOIN LatestUpdates lu ON Final.site_id = lu.site_id and Final.who_updated = lu.who ) ResultInFo
+      JOIN sites.sites SiteInfo on SiteInfo.id = ResultInFo.site_id
+        `;
+
+      const entityManager = this.siteRepository.manager;
+      const queryResult = await entityManager.query(query);
+
+      let result: SitePendingApprovalRecords[] = [];
+
+      if (queryResult && queryResult.length > 0) {
+        result = queryResult.map((res) => {
+          return {
+            id: res.row_num,
+            siteId: res.site_id,
+            changes: res.changes,
+            whoUpdated: res.who_updated,
+            whenUpdated: res.latest_update,
+            address:
+              res.addr_line_1 + ' ' + res.addr_line_2 + ' ' + res.addr_line_3,
+          };
+        });
+      }
+
+      if (searchParam != null) {
+        if (searchParam.whenUpdated != null && searchParam.whenUpdated != '') {
+          const startDate = new Date(
+            searchParam.whenUpdated
+              .split(' - ')[0]
+              .replace(/(st|nd|rd|th)/, ''),
+          );
+          const endDate = new Date(
+            searchParam.whenUpdated
+              .split(' - ')[1]
+              .replace(/(st|nd|rd|th)/, ''),
+          );
+
+          result = result.filter((res) => {
+            const whenUpdatedDate = new Date(res.whenUpdated);
+            return whenUpdatedDate >= startDate && whenUpdatedDate <= endDate;
+          });
+        }
+
+        if (searchParam.id != null && searchParam.id != '') {
+          result = result.filter((res) => {
+            return res.siteId.indexOf(searchParam.id) !== -1;
+          });
+        }
+
+        if (searchParam.changes != null && searchParam.changes != '') {
+          result = result.filter((res) => {
+            return res.changes.indexOf(searchParam.changes) !== -1;
+          });
+        }
+
+        if (searchParam.addrLine != null && searchParam.addrLine != '') {
+          result = result.filter((res) => {
+            return res.address.indexOf(searchParam.addrLine) !== -1;
+          });
+        }
+
+        if (searchParam.whoCreated != null && searchParam.whoCreated != '') {
+          result = result.filter((res) => {
+            return (
+              res.whoUpdated
+                .toLowerCase()
+                .indexOf(searchParam.whoCreated.toLowerCase()) !== -1
+            );
+          });
+        }
+      }
+
+      const startIndex = (page - 1) * pageSize;
+
+      const paginatedRecords = result.slice(startIndex, startIndex + pageSize);
+
+      const resultDTO: QueryResultForPendingSites = {
+        data: paginatedRecords,
+        totalRecords: result.length,
+      };
+
+      this.sitesLogger.log('SiteService.getSiteDetailsPendingSRApproval() end');
+      this.sitesLogger.debug(
+        'SiteService.getSiteDetailsPendingSRApproval() end',
+      );
+
+      return resultDTO;
+    } catch (error) {
+      this.sitesLogger.log(
+        'SiteService.getSiteDetailsPendingSRApproval() error' +
+          JSON.stringify(error),
+      );
+
+      throw error;
+    }
+  }
+
+  /**
+   * Bulk Approval/ Reject For Site Registry Approvals
+   * @param inputDTO list of site
+   * @param userInfo authenticated user
+   * @returns true/false
+   */
+  async bulkUpdateForSR(
+    inputDTO: BulkApproveRejectChangesDTO,
+    userInfo: any,
+  ): Promise<boolean> {
+    try {
+      this.sitesLogger.log('SiteService.bulkUpdateForSR() start');
+      this.sitesLogger.debug('SiteService.bulkUpdateForSR() start');
+
+      if (!inputDTO) {
+        this.sitesLogger.debug(
+          'SiteService.bulkUpdateForSR() inputDTO invalid returning false',
+        );
+        return false;
+      } else {
+        const { isApproved, sites } = inputDTO;
+
+        sites.forEach(async (site: SiteRecordsForSRAction) => {
+          await this.entityManager.transaction(
+            async (transactionalEntityManager: EntityManager) => {
+              if (
+                (site != null && site.siteId === null) ||
+                site.siteId === undefined
+              ) {
+                return false;
+              }
+              await this.processSRBulkUpdates(
+                transactionalEntityManager,
+                site,
+                isApproved,
+                userInfo,
+              );
+            },
+          );
+        });
+
+        return true;
+      }
+    } catch (error) {
+      this.sitesLogger.log(
+        'SiteService.bulkUpdateForSR() error' + JSON.stringify(error),
+      );
+      return false;
+    }
+  }
+
+  async processSRBulkUpdates(
+    transactionalEntityManager: EntityManager,
+    site: SiteRecordsForSRAction,
+    isApproved: boolean,
+    userInfo: any,
+  ) {
+    try {
+      this.sitesLogger.log('SiteService.processSRBulkUpdates() start');
+
+      if ((site != null && site.siteId === null) || site.siteId === undefined) {
+        this.sitesLogger.log(
+          'SiteService.processSRBulkUpdates() site is empty',
+        );
+        return false;
+      }
+
+      if (site.changes.indexOf('summary') !== -1) {
+        const sitesForUpdates = await transactionalEntityManager.find(Sites, {
+          where: { id: site.siteId, whoUpdated: site.whoUpdated },
+        });
+
+        if (sitesForUpdates.length > 0) {
+          sitesForUpdates.forEach((site) => {
+            this.setUpdatedStatus(site, isApproved, userInfo);
+          });
+          await transactionalEntityManager.save(Sites, sitesForUpdates);
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no summary to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('notation') !== -1) {
+        const events = await transactionalEntityManager.find(Events, {
+          where: { siteId: site.siteId, whoUpdated: site.whoUpdated },
+        });
+
+        if (events.length > 0) {
+          events.forEach((event) => {
+            this.setUpdatedStatus(event, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(Events, events);
+
+          const eventIds = events.map((event) => event.id);
+
+          const eventsParticipants = await transactionalEntityManager.find(
+            EventPartics,
+            {
+              where: {
+                eventId: In(eventIds),
+                whoUpdated: site.whoUpdated,
+              },
+            },
+          );
+
+          if (eventsParticipants.length > 0) {
+            eventsParticipants.forEach((eventsParticipant) => {
+              this.setUpdatedStatus(eventsParticipant, isApproved, userInfo);
+            });
+
+            await transactionalEntityManager.save(
+              EventPartics,
+              eventsParticipants,
+            );
+          } else {
+            this.sitesLogger.log(
+              'SiteService.processSRBulkUpdates() no eventsParticipants to process.',
+            );
+          }
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no events to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('site participants') !== -1) {
+        const siteParticipants = await transactionalEntityManager.find(
+          SitePartics,
+          {
+            where: {
+              siteId: site.siteId,
+              whoUpdated: site.whoUpdated,
+            },
+          },
+        );
+
+        if (siteParticipants.length > 0) {
+          siteParticipants.forEach((siteParticipant) => {
+            this.setUpdatedStatus(siteParticipant, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(SitePartics, siteParticipants);
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no siteParticipants to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('documents') !== -1) {
+        const siteDocs = await transactionalEntityManager.find(SiteDocs, {
+          where: {
+            siteId: site.siteId,
+            whoUpdated: site.whoUpdated,
+          },
+        });
+
+        if (siteDocs.length > 0) {
+          siteDocs.forEach((doc) => {
+            this.setUpdatedStatus(doc, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(SiteDocs, siteDocs);
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no siteDocs to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('associated sites') !== -1) {
+        const siteAssociations = await transactionalEntityManager.find(
+          SiteAssocs,
+          {
+            where: {
+              siteId: site.siteId,
+              whoUpdated: site.whoUpdated,
+            },
+          },
+        );
+
+        if (siteAssociations.length > 0) {
+          siteAssociations.forEach((siteAssociation) => {
+            this.setUpdatedStatus(siteAssociation, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(SiteAssocs, siteAssociations);
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no siteAssociations to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('land histories') !== -1) {
+        const landHistories = await transactionalEntityManager.find(
+          LandHistories,
+          {
+            where: {
+              siteId: site.siteId,
+              whoUpdated: site.whoUpdated,
+            },
+          },
+        );
+
+        if (landHistories.length > 0) {
+          landHistories.forEach((history) => {
+            this.setUpdatedStatus(history, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(LandHistories, landHistories);
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no landHistories to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('site profiles') !== -1) {
+        const profiles = await transactionalEntityManager.find(SiteProfiles, {
+          where: {
+            siteId: site.siteId,
+            whoUpdated: site.whoUpdated,
+          },
+        });
+
+        if (profiles.length > 0) {
+          profiles.forEach((profile) => {
+            this.setUpdatedStatus(profile, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(SiteProfiles, profiles);
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no profiles to process.',
+          );
+        }
+      }
+
+      if (site.changes.indexOf('parcel description') !== -1) {
+        const siteSubDivisions = await transactionalEntityManager.find(
+          SiteSubdivisions,
+          {
+            where: {
+              siteId: site.siteId,
+              whoUpdated: site.whoUpdated,
+            },
+          },
+        );
+
+        if (siteSubDivisions.length > 0) {
+          const subDivIds = siteSubDivisions.map((x) => x.subdivId);
+
+          const subDivisions = await transactionalEntityManager.find(
+            Subdivisions,
+            {
+              where: { id: In(subDivIds), whoUpdated: site.whoUpdated },
+            },
+          );
+
+          if (subDivisions.length > 0) {
+            subDivisions.forEach((sub) => {
+              this.setUpdatedStatus(sub, isApproved, userInfo);
+            });
+
+            await transactionalEntityManager.save(Subdivisions, subDivisions);
+          }
+
+          siteSubDivisions.forEach((siteDiv) => {
+            this.setUpdatedStatus(siteDiv, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(
+            SiteSubdivisions,
+            siteSubDivisions,
+          );
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no siteSubDivisions to process.',
+          );
+        }
+      }
+
+      this.sitesLogger.log('SiteService.processSRBulkUpdates() end');
+      return true;
+    } catch (error) {
+      this.sitesLogger.log(
+        'SiteService.processSRBulkUpdates() error' + JSON.stringify(error),
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * SET Updated Status
+   * @param entity
+   * @param isApproved
+   * @param userInfo
+   */
+  setUpdatedStatus = (entity: any, isApproved: boolean, userInfo: any) => {
+    entity.userAction = UserActionEnum.DEFAULT;
+    entity.srAction = isApproved
+      ? SRApprovalStatusEnum.PUBLIC
+      : SRApprovalStatusEnum.PRIVATE;
+    entity.whenUpdated = new Date();
+    entity.whoUpdated = userInfo?.givenName;
+  };
 }

@@ -71,6 +71,7 @@ describe('DocumentResolver', () => {
         displayName: 'Display Name',
         submissionDate: new Date('2024-07-17').toISOString(),
         documentDate: new Date('2024-07-17').toISOString(),
+        filePath: '',
         srAction: 'pending',
         userAction: 'pending',
       },
@@ -174,6 +175,7 @@ describe('DocumentResolver', () => {
       displayName: 'Display Name',
       submissionDate: new Date('2024-07-17'),
       documentDate: new Date('2024-07-17'),
+      filePath: '',
       srAction: 'pending',
       userAction: 'pending',
     });

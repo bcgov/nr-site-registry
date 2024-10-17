@@ -33,7 +33,7 @@ import {
   SearchParams,
   SitePendingApprovalRecords,
   SiteRecordsForSRAction,
-} from 'src/app/dto/sitesPendingReview.dto';
+} from '../../dto/sitesPendingReview.dto';
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
 
 /**
@@ -399,15 +399,6 @@ export class SiteService {
       );
     }
 
-    // if (eventsParticipants) {
-    //   await transactionalEntityManager.save(
-    //     EventPartics,
-    //     eventsParticipants,
-    //   );
-    // } else {
-    //   console.log('No changes To Site Event Participants');
-    // }
-
     if (siteParticipants && siteParticipants.length > 0) {
       await this.processSiteParticipants(
         siteParticipants,
@@ -466,10 +457,16 @@ export class SiteService {
       console.log('No changes To Site LandHistories');
     }
 
-    if (profiles) {
-      await transactionalEntityManager.save(SiteProfiles, profiles);
+    if (profiles && profiles.length > 0) {
+      await this.processSiteDisclosure(
+        profiles,
+        userInfo,
+        transactionalEntityManager,
+      );
     } else {
-      console.log('No changes To Site profiles');
+      this.sitesLogger.log(
+        'SiteService.saveSiteDetails():No changes To Site profiles',
+      );
     }
 
     const historyLog: HistoryLog = {
@@ -513,7 +510,7 @@ export class SiteService {
         const {
           displayName,
           psnorgId,
-          dprCode,
+          // dprCode,
           docParticId,
           apiAction,
           srAction,
@@ -548,9 +545,9 @@ export class SiteService {
             newDocuments.push({
               ...siteDocument,
               id: documentId,
-              rwmFlag: 0,
+              // rwmFlag: 0,
               userAction: UserActionEnum.ADDED,
-              // srAction: SRApprovalStatusEnum.PENDING,
+              srAction: SRApprovalStatusEnum.PENDING,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -566,10 +563,10 @@ export class SiteService {
               ...siteDocumentParticipant,
               id: newDocParticId.toString(),
               sdocId: documentId,
-              rwmFlag: 0,
-              dprCode: dprCode ?? 'ATH',
+              // rwmFlag: 0,
+              dprCode: 'ATH', // dprCode is always ATH. We don't have a UI for this value and keeping this column allows us to maintain historical data.
               userAction: UserActionEnum.ADDED,
-              // srAction: SRApprovalStatusEnum.PENDING,
+              srAction: SRApprovalStatusEnum.PENDING,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -585,16 +582,17 @@ export class SiteService {
                   ...existingDocument,
                   ...siteDocument,
                   userAction: UserActionEnum.UPDATED,
-                  // srAction: SRApprovalStatusEnum.PENDING,
+                  srAction: SRApprovalStatusEnum.PENDING,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },
               });
 
               const existingDocumentParticipant =
-                await this.siteDocumentParticsRepo.findOneByOrFail({
+                docParticId &&
+                (await this.siteDocumentParticsRepo.findOneByOrFail({
                   id: docParticId,
-                });
+                }));
               if (existingDocumentParticipant) {
                 updateDocumentParticipants.push({
                   id: docParticId,
@@ -602,7 +600,7 @@ export class SiteService {
                     ...existingDocumentParticipant,
                     ...siteDocumentParticipant,
                     userAction: UserActionEnum.UPDATED,
-                    // srAction: SRApprovalStatusEnum.PENDING,
+                    srAction: SRApprovalStatusEnum.PENDING,
                     whenUpdated: new Date(),
                     whoUpdated: userInfo ? userInfo.givenName : '',
                   },
@@ -1015,7 +1013,10 @@ export class SiteService {
             break;
 
           default:
-            console.warn('Unknown action for event:', apiAction);
+            this.sitesLogger.warn(
+              'SiteService.processEvents Unknown action for event',
+            );
+            break;
         }
 
         // Process related participants regardless of event action
@@ -1141,6 +1142,61 @@ export class SiteService {
           ),
         );
       }
+    }
+  }
+
+  /**
+   * Processes and saves site disclosure based on the provided actions.
+   * @param siteDisclosure - Site disclosure data including actions to be performed.
+   * @param userInfo - Information about the user performing the actions.
+   * @param transactionalEntityManager - Entity manager for handling transactions.
+   */
+  async processSiteDisclosure(
+    siteDisclosure: any[],
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    if (siteDisclosure && siteDisclosure.length > 0) {
+      const disclosurePromises = siteDisclosure.map(async (disclosure) => {
+        const { apiAction, id, ...disclosureData } = disclosure;
+        let profile = {
+          ...new SiteProfiles(),
+          ...disclosureData,
+        };
+        switch (apiAction) {
+          case UserActionEnum.ADDED:
+            profile = {
+              ...profile,
+              userAction: UserActionEnum.ADDED,
+              whenCreated: new Date(),
+              whoCreated: userInfo ? userInfo.givenName : '',
+            };
+            break;
+          case UserActionEnum.UPDATED:
+            const isExist =
+              disclosure.id &&
+              (await this.siteProfilesRepo.findOneByOrFail({
+                id: disclosure.id,
+              }));
+            if (isExist) {
+              profile = {
+                ...isExist,
+                ...profile,
+                userAction: UserActionEnum.UPDATED,
+                whenUpdated: new Date(),
+                whoUpdated: userInfo ? userInfo.givenName : '',
+              };
+            } else {
+              this.sitesLogger.log(
+                `SiteService.processSiteDisclosure():There is no profile in database againts id : ${disclosure.id}`,
+              );
+            }
+            break;
+        }
+        await transactionalEntityManager.save(SiteProfiles, profile);
+      });
+
+      await Promise.all(disclosurePromises);
     }
   }
 

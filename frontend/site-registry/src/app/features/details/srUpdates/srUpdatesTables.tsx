@@ -21,7 +21,10 @@ import {
 import SRUpdatesTableFilter from './srUpdatesTableFilter';
 import Table from '../../../components/table/Table';
 import { showNotification } from '../../../helpers/utility';
-import { fetchInternalUserNameForDropdown, getInternalUserNameForDropdown } from '../dropdowns/DropdownSlice';
+import {
+  fetchInternalUserNameForDropdown,
+  getInternalUserNameForDropdown,
+} from '../dropdowns/DropdownSlice';
 
 const SRUpdatesTables = () => {
   const [displayFilters, SetDisplayFilters] = useState(false);
@@ -33,21 +36,16 @@ const SRUpdatesTables = () => {
   const totalRecords = useSelector(getTotalRecords);
   const updateRequestStatus = useSelector(updateStatus);
   const searchParamRef = useSelector(getSearchParam);
-  const [searchParam,SetSearchParam] = useState(searchParamRef)
-  useEffect(()=>{
-    SetSearchParam(searchParamRef)
-  },[searchParamRef])
+  const [searchParam, SetSearchParam] = useState(searchParamRef);
+  useEffect(() => {
+    SetSearchParam(searchParamRef);
+  }, [searchParamRef]);
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(fetchInternalUserNameForDropdown());
-  },[])
-
-
-
+  }, []);
 
   const dispatch = useDispatch<AppDispatch>();
-
-
 
   useEffect(() => {
     SetTotalResults(totalRecords);
@@ -70,7 +68,7 @@ const SRUpdatesTables = () => {
         SetSelectedRows(
           selectedRows.filter((r: any) => r.siteId !== event.row.siteId),
         );
-      }    
+      }
     } else if (event && event.property === 'select_all') {
       const newRows = event.value;
       if (event.selected) {
@@ -90,7 +88,7 @@ const SRUpdatesTables = () => {
     }
   };
 
-  const rejectHandler = () => {    
+  const rejectHandler = () => {
     if (selectedRows.length > 0) {
       dispatch(
         bulkAproveRejectChanges({
@@ -101,7 +99,7 @@ const SRUpdatesTables = () => {
     }
   };
 
-  const handleApprove = () => {    
+  const handleApprove = () => {
     if (selectedRows.length > 0) {
       dispatch(
         bulkAproveRejectChanges({
@@ -117,7 +115,7 @@ const SRUpdatesTables = () => {
       fetchPendingSiteForSRApproval({
         searchParam: searchParam,
         page: currentPage,
-        pageSize: resultsPerPage     
+        pageSize: resultsPerPage,
       }),
     );
   }, []);
@@ -131,26 +129,27 @@ const SRUpdatesTables = () => {
   };
 
   useEffect(() => {
-
     showNotification(
-        updateRequestStatus,
-        'Successfully updated.',
-        'Unable updated',
-      );
-      
+      updateRequestStatus,
+      'Successfully updated.',
+      'Unable updated',
+    );
+
     dispatch(
       fetchPendingSiteForSRApproval({
         searchParam: searchParam,
         page: currentPage,
-        pageSize: resultsPerPage
+        pageSize: resultsPerPage,
       }),
     );
-      
   }, [updateRequestStatus, currentPage, resultsPerPage]);
 
   return (
-    <PageContainer role="SRApprovalPending" >
-      <div className="row search-container" data-testid="srreviewtable-component">
+    <PageContainer role="SRApprovalPending">
+      <div
+        className="row search-container"
+        data-testid="srreviewtable-component"
+      >
         <h1 className="search-text-label">Site Registry Approvals</h1>
       </div>
       <div className="search-results-section-header-top">
@@ -158,10 +157,10 @@ const SRUpdatesTables = () => {
           {/* <h2 className="search-results-section-title">Results</h2> */}
         </div>
         <div className="table-actions hide-custom">
-         <div
+          <div
             className={`table-actions-items ${displayFilters ? 'active' : ''}`}
             onClick={() => {
-              SetDisplayFilters(!displayFilters);            
+              SetDisplayFilters(!displayFilters);
             }}
           >
             <FilterIcon />
@@ -190,11 +189,16 @@ const SRUpdatesTables = () => {
                   displayFilters ? 'active' : ''
                 }`}
                 onClick={() => {
-                  SetDisplayFilters(!displayFilters);                 
+                  SetDisplayFilters(!displayFilters);
                 }}
               >
                 <FilterIcon />
-                <span className="table-options-text-color" data-testid="filters">Filters</span>
+                <span
+                  className="table-options-text-color"
+                  data-testid="filters"
+                >
+                  Filters
+                </span>
               </div>
             </div>
           </div>

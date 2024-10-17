@@ -188,6 +188,7 @@ const TableBody: FC<TableBodyProps> = ({
           isEditing={editMode ?? true}
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
+          isDisabled={field.isDisabled}
         />
       );
     } else if (field.type === FormFieldType.Search) {

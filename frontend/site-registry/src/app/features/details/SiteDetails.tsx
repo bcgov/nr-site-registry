@@ -279,6 +279,7 @@ const SiteDetails = () => {
         dispatch(
           fetchAssociatedSites({ siteId: id ?? '', showPending: false }),
         ),
+        dispatch(fetchSiteDisclosure({ siteId: id ?? '', showPending: false })),
         // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
         // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),

@@ -206,13 +206,10 @@ export class DropdownResolver {
   }
 
   @Roles({
-    roles: [    
-      CustomRoles.Internal,
-      CustomRoles.SiteRegistrar,
-    ],
+    roles: [CustomRoles.Internal, CustomRoles.SiteRegistrar],
     mode: RoleMatchingMode.ANY,
   })
-  @Query(()=>DropdownResponse,{name: 'getIDIRUserListForDropDown'})
+  @Query(() => DropdownResponse, { name: 'getIDIRUserListForDropDown' })
   async getIDIRUserListForDropDown() {
     try {
       const result =

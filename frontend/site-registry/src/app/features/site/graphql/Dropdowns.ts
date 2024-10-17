@@ -88,11 +88,10 @@ export const graphQLNotationTypeCd = () => {
   `;
 };
 
-
 export const getIDIRUserListForDropDownQL = () => {
   return gql`
     query getIDIRUserListForDropDown {
-      getIDIRUserListForDropDown{
+      getIDIRUserListForDropDown {
         httpStatusCode
         success
         message

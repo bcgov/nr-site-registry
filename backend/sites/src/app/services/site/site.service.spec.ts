@@ -29,6 +29,7 @@ import {
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { ParcelDescriptionInputDTO } from 'src/app/dto/parcelDescriptionInput.dto';
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -168,52 +169,52 @@ describe('SiteService', () => {
         {
           provide: getRepositoryToken(SiteDocs),
           useValue: {
-            find: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            findOneByOrFail: jest.fn(() => {
+              return {
+                id: '1',
+                siteId: '9',
+                submissionDate: new Date(),
+                documentDate: new Date(),
+                title: 'PROPOSED DREDGING AND LANDFILL (REMEDIAL PLAN)',
+                srAction: false,
+              };
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            createQueryBuilder: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnThis(),
+              getRawOne: jest.fn().mockResolvedValue({ maxid: '1' }), // Ensure this returns a promise
             }),
+            save: jest.fn(),
           },
         },
         {
           provide: getRepositoryToken(SiteDocPartics),
           useValue: {
-            find: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123', psnorgId: '1253' },
-                { id: '124', siteId: '123', psnorgId: '1253' },
-              ];
+            findOneByOrFail: jest.fn(() => {
+              return {
+                id: '1',
+                psnorgId: '123',
+                displayName: 'Display Name',
+              };
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123', psnorgId: '1253' },
-                { id: '124', siteId: '123', psnorgId: '1253' },
-              ];
+            save: jest.fn(),
+            createQueryBuilder: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnThis(),
+              getRawOne: jest.fn().mockResolvedValue({ maxid: '1' }), // Ensure this returns a promise
             }),
           },
         },
         {
           provide: getRepositoryToken(SiteAssocs),
           useValue: {
-            find: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            findOneByOrFail: jest.fn(() => {
+              return {
+                id: '1',
+                siteId: '123',
+                siteIdAssociatedWith: '1234',
+                note: 'Test Note',
+              };
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
-            }),
+            save: jest.fn(),
           },
         },
         {
@@ -253,18 +254,16 @@ describe('SiteService', () => {
         {
           provide: getRepositoryToken(SiteProfiles),
           useValue: {
-            find: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            findOneByOrFail: jest.fn(() => {
+              return {
+                id: '123',
+                siteId: '456',
+                dateCompleted: new Date(),
+                whenCreated: new Date(),
+                whoCreated: 'Test User',
+              };
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
-            }),
+            save: jest.fn(),
           },
         },
         {
@@ -279,6 +278,10 @@ describe('SiteService', () => {
             save: jest.fn(async () => {
               return true;
             }),
+            findOneByOrFail: jest.fn(),
+            // save: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
           },
         },
         {
@@ -304,6 +307,7 @@ describe('SiteService', () => {
             log: jest.fn(),
             debug: jest.fn(),
             error: jest.fn(),
+            warn: jest.fn(),
           },
         },
         {
@@ -660,6 +664,194 @@ describe('SiteService', () => {
 
         expect(result).toBeTruthy();
       });
+    });
+  });
+
+  describe('processSiteDisclosure', () => {
+    it('should create a new site profile when action is ADDED', async () => {
+      const siteDisclosure = [
+        {
+          apiAction: UserActionEnum.ADDED,
+          id: '123',
+          siteId: '456',
+          dateCompleted: new Date(),
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      await siteService.processSiteDisclosure(
+        siteDisclosure,
+        userInfo,
+        entityManager,
+      );
+      expect(entityManager.save).toHaveBeenCalled();
+      const addedProfile = (entityManager.save as jest.Mock).mock.calls[0][1];
+      expect(addedProfile.dateCompleted).toBeInstanceOf(Date);
+      expect(addedProfile.whenCreated).toBeInstanceOf(Date);
+      expect(addedProfile.siteId).toBe('456');
+      expect(addedProfile.whoCreated).toBe('Test User');
+    });
+
+    it('should update an existing site profile when action is UPDATED', async () => {
+      const siteDisclosure = [
+        {
+          apiAction: UserActionEnum.UPDATED,
+          id: '123',
+          siteId: '456',
+          dateCompleted: new Date(),
+        },
+      ];
+      const userInfo = { givenName: 'Updated User' };
+
+      await siteService.processSiteDisclosure(
+        siteDisclosure,
+        userInfo,
+        entityManager,
+      );
+      expect(entityManager.save).toHaveBeenCalled();
+      const updatedProfile = (entityManager.save as jest.Mock).mock.calls[0][1];
+      expect(updatedProfile.dateCompleted).toBeInstanceOf(Date);
+      expect(updatedProfile.whenUpdated).toBeInstanceOf(Date);
+      expect(updatedProfile.siteId).toBe('456');
+      expect(updatedProfile.whoUpdated).toBe('Updated User');
+    });
+  });
+
+  describe('processSiteAssociated', () => {
+    it('should add new site associates', async () => {
+      const siteAccociated = [
+        {
+          apiAction: UserActionEnum.ADDED,
+          id: '1',
+          siteId: '123',
+          siteIdAssociatedWith: '9999',
+          note: 'Note added',
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      await siteService.processSiteAssociated(
+        siteAccociated,
+        userInfo,
+        entityManager,
+      );
+      expect(entityManager.save).toHaveBeenCalled();
+      const addedSiteAssoc = (entityManager.save as jest.Mock).mock.calls[0][1];
+      expect(addedSiteAssoc[0].whenCreated).toBeInstanceOf(Date);
+      expect(addedSiteAssoc[0].siteId).toBe('123');
+      expect(addedSiteAssoc[0].whoCreated).toBe('Test User');
+      expect(addedSiteAssoc[0].siteIdAssociatedWith).toBe('9999');
+      expect(addedSiteAssoc[0].note).toBe('Note added');
+    });
+
+    it('should update existing site associates', async () => {
+      const siteAccociated = [
+        {
+          apiAction: UserActionEnum.UPDATED,
+          id: '1',
+          siteId: '123',
+          siteIdAssociatedWith: '9999',
+          note: 'Note Updated',
+        },
+      ];
+      const userInfo = { givenName: 'Updated User' };
+
+      await siteService.processSiteAssociated(
+        siteAccociated,
+        userInfo,
+        entityManager,
+      );
+      const updatedAssoc = (entityManager.update as jest.Mock).mock.calls[0][2];
+      expect(updatedAssoc.whenUpdated).toBeInstanceOf(Date);
+      expect(updatedAssoc.siteId).toBe('123');
+      expect(updatedAssoc.whoUpdated).toBe('Updated User');
+      expect(updatedAssoc.siteIdAssociatedWith).toBe('9999');
+      expect(updatedAssoc.note).toBe('Note Updated');
+    });
+
+    it('should delete site associates', async () => {
+      const siteAccociated = [
+        {
+          apiAction: UserActionEnum.DELETED,
+          id: '1',
+        },
+      ];
+      const userInfo = { givenName: 'User Four' };
+
+      await siteService.processSiteAssociated(
+        siteAccociated,
+        userInfo,
+        entityManager,
+      );
+      const deletedAssoc = (entityManager.delete as jest.Mock).mock.calls[0][1];
+      expect(deletedAssoc.id).toBe('1');
+    });
+  });
+
+  describe('processDocuments', () => {
+    it('should add new documents and participants when action is ADDED', async () => {
+      const documents = [
+        {
+          id: null,
+          displayName: 'Display Name',
+          psnorgId: '123',
+          apiAction: UserActionEnum.ADDED,
+          srAction: SRApprovalStatusEnum.PENDING,
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      await siteService.processDocuments(documents, userInfo, entityManager);
+
+      expect(entityManager.save).toHaveBeenCalledTimes(2); // For SiteDocs and SiteDocPartics
+      const savedDocuments = (entityManager.save as jest.Mock).mock.calls[0][1];
+      const savedDocPartics = (entityManager.save as jest.Mock).mock
+        .calls[0][1];
+
+      expect(savedDocuments[0].whenCreated).toBeInstanceOf(Date);
+      expect(savedDocuments[0].whoCreated).toBe('Test User');
+      expect(savedDocPartics[0].whenCreated).toBeInstanceOf(Date);
+      expect(savedDocPartics[0].whoCreated).toBe('Test User');
+    });
+
+    it('should update existing documents and participants when action is UPDATED', async () => {
+      const documents = [
+        {
+          id: '1',
+          docParticId: '1',
+          displayName: 'Updated Document',
+          apiAction: UserActionEnum.UPDATED,
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      await siteService.processDocuments(documents, userInfo, entityManager);
+
+      expect(entityManager.update).toHaveBeenCalledTimes(2); // For SiteDocs and SiteDocPartics
+      expect(entityManager.update).toHaveBeenCalledWith(
+        SiteDocs,
+        { id: '1' },
+        expect.any(Object),
+      );
+      expect(entityManager.update).toHaveBeenCalledWith(
+        SiteDocPartics,
+        { id: '1' },
+        expect.any(Object),
+      );
+    });
+
+    it('should delete documents when action is DELETED', async () => {
+      const documents = [
+        {
+          id: '1',
+          apiAction: UserActionEnum.DELETED,
+        },
+      ];
+      const userInfo = { givenName: 'Tester' };
+
+      await siteService.processDocuments(documents, userInfo, entityManager);
+
+      expect(entityManager.delete).toHaveBeenCalledWith(SiteDocs, { id: '1' });
     });
   });
 });

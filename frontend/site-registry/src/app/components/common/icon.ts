@@ -40,7 +40,7 @@ import {
   FaPencil,
   FaCaretRight,
   FaLocationCrosshairs,
-  FaListCheck 
+  FaListCheck,
 } from 'react-icons/fa6';
 
 import {

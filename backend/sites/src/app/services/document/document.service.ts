@@ -6,6 +6,7 @@ import { plainToInstance } from 'class-transformer';
 import { DocumentDto } from '../../dto/document.dto';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { LoggerService } from '../../logger/logger.service';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 @Injectable()
 export class DocumentService {
@@ -48,6 +49,7 @@ export class DocumentService {
           siteId: res.siteId,
           title: res.title,
           submissionDate: res.submissionDate.toISOString(),
+          srAction: res.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
           documentDate: res.documentDate
             ? res.documentDate.toISOString()
             : null,
@@ -57,8 +59,12 @@ export class DocumentService {
         if (res.siteDocPartics.length > 0) {
           return res.siteDocPartics.map((sdp) => ({
             ...document,
+            srAction:
+              res.srAction === SRApprovalStatusEnum.PUBLIC ||
+              sdp.srAction === SRApprovalStatusEnum.PUBLIC
+                ? true
+                : false,
             docParticId: sdp.id,
-            dprCode: sdp.dprCode,
             psnorgId: sdp.psnorgId,
             displayName: sdp.psnorg.displayName,
           }));

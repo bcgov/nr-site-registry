@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ProfileAnswers } from './profileAnswers.entity';
 import { ProfileSubmissions } from './profileSubmissions.entity';
@@ -19,18 +20,33 @@ import { ChangeAuditEntity } from './changeAuditEntity';
 @Index('site_profiles_pkey', ['dateCompleted', 'siteId'], { unique: true })
 @Index('sprof_rwm_site_partic', ['rwmParticId'], {})
 @Index('sprof_site_reg_site_partic', ['siteRegParticId'], {})
+@Index('site_profiles_id', ['id'], {})
 @Entity('site_profiles')
 export class SiteProfiles extends ChangeAuditEntity {
+  // ADDED THIS PARIMARY KEY COLUMN AND REMOVE COMPOSITE PRIMARY KEY COLUMN
+  // FOR CRUD OPERATION
   @Field()
-  @Column('bigint', { primary: true, name: 'site_id' })
+  @PrimaryGeneratedColumn('uuid', { name: 'id' })
+  id: string;
+
+  @Field()
+  @Column('bigint', { name: 'site_id' })
   siteId: string;
 
   @Field()
-  @Column('timestamp without time zone', {
-    primary: true,
-    name: 'date_completed',
-  })
+  @Column('timestamp without time zone', { name: 'date_completed' })
   dateCompleted: Date;
+
+  // @Field()
+  // @Column('bigint', { primary: true, name: 'site_id' })
+  // siteId: string;
+
+  // @Field()
+  // @Column('timestamp without time zone', {
+  //   primary: true,
+  //   name: 'date_completed',
+  // })
+  // dateCompleted: Date;
 
   @Field({ nullable: true })
   @Column('timestamp without time zone', {
@@ -326,29 +342,29 @@ export class SiteProfiles extends ChangeAuditEntity {
   })
   govDocumentsComment: string | null;
 
-  @OneToMany(
-    () => ProfileAnswers,
-    (profileAnswers) => profileAnswers.siteProfiles,
-  )
-  profileAnswers: ProfileAnswers[];
+  // @OneToMany(
+  //   () => ProfileAnswers,
+  //   (profileAnswers) => profileAnswers.siteProfiles,
+  // )
+  // profileAnswers: ProfileAnswers[];
 
-  @OneToMany(
-    () => ProfileSubmissions,
-    (profileSubmissions) => profileSubmissions.siteProfiles,
-  )
-  profileSubmissions: ProfileSubmissions[];
+  // @OneToMany(
+  //   () => ProfileSubmissions,
+  //   (profileSubmissions) => profileSubmissions.siteProfiles,
+  // )
+  // profileSubmissions: ProfileSubmissions[];
 
-  @OneToMany(
-    () => SiteProfileLandUses,
-    (siteProfileLandUses) => siteProfileLandUses.siteProfiles,
-  )
-  siteProfileLandUses: SiteProfileLandUses[];
+  // @OneToMany(
+  //   () => SiteProfileLandUses,
+  //   (siteProfileLandUses) => siteProfileLandUses.siteProfiles,
+  // )
+  // siteProfileLandUses: SiteProfileLandUses[];
 
-  @OneToMany(
-    () => SiteProfileOwners,
-    (siteProfileOwners) => siteProfileOwners.siteProfiles,
-  )
-  siteProfileOwners: SiteProfileOwners[];
+  // @OneToMany(
+  //   () => SiteProfileOwners,
+  //   (siteProfileOwners) => siteProfileOwners.siteProfiles,
+  // )
+  // siteProfileOwners: SiteProfileOwners[];
 
   @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles)
   @JoinColumn([{ name: 'completor_partic_id', referencedColumnName: 'id' }])

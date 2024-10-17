@@ -1,9 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { print } from 'graphql';
-import { BulkApproveRejectChangesDTO, SRReviewListState } from '../dto/srUpdateState';
+import {
+  BulkApproveRejectChangesDTO,
+  SRReviewListState,
+} from '../dto/srUpdateState';
 import { RequestStatus } from '../../../../helpers/requests/status';
 import { getAxiosInstance } from '../../../../helpers/utility';
-import { bulkAproveRejectChangesQL, getPendingSiteForSRApprovalQL } from '../../../site/graphql/Site';
+import {
+  bulkAproveRejectChangesQL,
+  getPendingSiteForSRApprovalQL,
+} from '../../../site/graphql/Site';
 import { GRAPHQL } from '../../../../helpers/endpoints';
 
 const initialState: SRReviewListState = {
@@ -15,23 +21,19 @@ const initialState: SRReviewListState = {
   pageSize: 5,
   resultsCount: 0,
   updateStatus: RequestStatus.idle,
-  searchParam : null
+  searchParam: null,
 };
 
 export const fetchPendingSiteForSRApproval = createAsyncThunk(
   'sites/getPendingSiteForSRApproval',
-  async (args: {
-    searchParam: any;
-    page: number;
-    pageSize: number;  
-  }) => {
+  async (args: { searchParam: any; page: number; pageSize: number }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(getPendingSiteForSRApprovalQL()),
         variables: {
           searchParam: args.searchParam,
           pageSize: args.pageSize.toString(),
-          page: args.page.toString()        
+          page: args.page.toString(),
         },
       });
       return response.data;
@@ -41,20 +43,18 @@ export const fetchPendingSiteForSRApproval = createAsyncThunk(
   },
 );
 
-
 export const bulkAproveRejectChanges = createAsyncThunk(
-    'sites/bulkAproveRejectChanges',
-    async (approveRejectDTO: BulkApproveRejectChangesDTO) => {
-      const request = await getAxiosInstance().post(GRAPHQL, {
-        query: print(bulkAproveRejectChangesQL()),
-        variables: {
-            approveRejectDTO: approveRejectDTO,
-        },
-      });
-      return request.data;
-    },
-  );
-  
+  'sites/bulkAproveRejectChanges',
+  async (approveRejectDTO: BulkApproveRejectChangesDTO) => {
+    const request = await getAxiosInstance().post(GRAPHQL, {
+      query: print(bulkAproveRejectChangesQL()),
+      variables: {
+        approveRejectDTO: approveRejectDTO,
+      },
+    });
+    return request.data;
+  },
+);
 
 const srReviewSlice = createSlice({
   name: 'srReview',
@@ -93,11 +93,11 @@ const srReviewSlice = createSlice({
     },
     updateSearchParam: (state, payload) => {
       const newState = {
-        ...state
-      }
+        ...state,
+      };
       newState.searchParam = payload;
       return newState;
-    }
+    },
   },
   extraReducers(builder) {
     builder
@@ -115,8 +115,10 @@ const srReviewSlice = createSlice({
           action.payload.data.getPendingSiteForSRApproval.httpStatusCode === 200
         ) {
           newState.fetchStatus = RequestStatus.success;
-          newState.sites = action.payload.data.getPendingSiteForSRApproval.data.data;
-          newState.resultsCount = action.payload.data.getPendingSiteForSRApproval.data.totalRecords;
+          newState.sites =
+            action.payload.data.getPendingSiteForSRApproval.data.data;
+          newState.resultsCount =
+            action.payload.data.getPendingSiteForSRApproval.data.totalRecords;
         } else {
           newState.fetchStatus = RequestStatus.failed;
           newState.sites = [];
@@ -129,21 +131,21 @@ const srReviewSlice = createSlice({
         const newState = { ...state };
         return newState;
       })
-      .addCase(bulkAproveRejectChanges.fulfilled,(state, action) => {
+      .addCase(bulkAproveRejectChanges.fulfilled, (state, action) => {
         const newState = { ...state };
         newState.updateStatus = RequestStatus.success;
         return newState;
       })
-      .addCase(bulkAproveRejectChanges.pending,(state, action) => {
+      .addCase(bulkAproveRejectChanges.pending, (state, action) => {
         const newState = { ...state };
         newState.updateStatus = RequestStatus.pending;
         return newState;
       })
-      .addCase(bulkAproveRejectChanges.rejected,(state, action) => {
+      .addCase(bulkAproveRejectChanges.rejected, (state, action) => {
         const newState = { ...state };
         newState.updateStatus = RequestStatus.failed;
         return newState;
-      })
+      });
   },
 });
 
@@ -160,7 +162,7 @@ export const {
   setFetchLoadingState,
   updatePageSizeSetting,
   updateSearchQuery,
-  updateSearchParam
+  updateSearchParam,
 } = srReviewSlice.actions;
 
 export default srReviewSlice.reducer;

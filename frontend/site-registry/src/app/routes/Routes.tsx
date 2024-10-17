@@ -30,7 +30,7 @@ const roleBasedRoutes: any = {
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
     { path: '/site/cart', element: <Cart /> },
-    { path: '/review', element: <SRUpdatesTables/>},
+    { path: '/review', element: <SRUpdatesTables /> },
     { path: '/site/cart/site/details/:id', element: <SiteDetails /> },
   ],
   internal: [
@@ -44,7 +44,7 @@ const roleBasedRoutes: any = {
     { path: '/folios/:id', element: <FolioContents /> },
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
-    { path: '/review', element: <SRUpdatesTables/>}
+    { path: '/review', element: <SRUpdatesTables /> },
   ],
   sr: [
     { path: '/', element: <Dashboard /> },
@@ -53,7 +53,7 @@ const roleBasedRoutes: any = {
     { path: '/search/site/details/:id', element: <SiteDetails /> },
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
-    { path: '/review', element: <SRUpdatesTables/>}
+    { path: '/review', element: <SRUpdatesTables /> },
   ],
   public: [
     { path: '/', element: <Dashboard /> },
@@ -82,6 +82,5 @@ const createRoutesForRole = (role: string) => [
 
 const userType = getLoggedInUserType();
 const siteRouter = createBrowserRouter(createRoutesForRole(userType));
-
 
 export default siteRouter;

@@ -26,6 +26,10 @@ export const fetchSiteDisclosure = createAsyncThunk(
           pending: showPending,
         },
       });
+
+      // Once get actual source of data for disclosure schedule, delete this line of code because it is just for sake of completing the functionality and demo purpose
+      // const res = {...response.data.data.getSiteDisclosureBySiteId.data[0], disclosureSchedule:[]};
+
       const res = response.data.data.getSiteDisclosureBySiteId.data[0];
       if (res) {
         return res;

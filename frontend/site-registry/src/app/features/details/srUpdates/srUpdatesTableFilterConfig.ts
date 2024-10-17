@@ -1,11 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  FormFieldType,  
-} from '../../../components/input-controls/IFormField';
+import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { useState } from 'react';
-import {
-  getInternalUserNameForDropdown,
-} from '../dropdowns/DropdownSlice';
+import { getInternalUserNameForDropdown } from '../dropdowns/DropdownSlice';
 
 const SRUpdatesFilterRows = () => {
   const userNameList = useSelector(getInternalUserNameForDropdown);

@@ -22,7 +22,7 @@ const initialState: IDropdownsState = {
     notationType: [],
     notationParticipantRole: [],
     ministryContact: [],
-    internalUserList: []
+    internalUserList: [],
   },
   status: RequestStatus.idle,
   error: '',
@@ -124,7 +124,7 @@ export const fetchInternalUserNameForDropdown = createAsyncThunk(
   async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
-        query: print(getIDIRUserListForDropDownQL())       
+        query: print(getIDIRUserListForDropDownQL()),
       });
       return response.data;
     } catch (error) {
@@ -205,12 +205,15 @@ const dropdowns = createSlice({
       .addCase(fetchMinistryContact.rejected, (state, action) => {
         state.status = RequestStatus.failed;
         state.error = action.error.message;
-      })     
+      })
       .addCase(fetchInternalUserNameForDropdown.fulfilled, (state, action) => {
-        if(action?.payload?.data?.getIDIRUserListForDropDown?.httpStatusCode === 200)
-        state.dropdowns.internalUserList = action.payload.data.getIDIRUserListForDropDown.data;
+        if (
+          action?.payload?.data?.getIDIRUserListForDropDown?.httpStatusCode ===
+          200
+        )
+          state.dropdowns.internalUserList =
+            action.payload.data.getIDIRUserListForDropDown.data;
       });
-     
   },
 });
 
@@ -231,6 +234,7 @@ export const updatedNotationType = (state: any) =>
 export const updateNotationClass = (state: any) =>
   state.dropdown.dropdowns.trackNotationClass;
 
-export const getInternalUserNameForDropdown = (state:any) => state.dropdown.dropdowns.internalUserList;
+export const getInternalUserNameForDropdown = (state: any) =>
+  state.dropdown.dropdowns.internalUserList;
 
 export default dropdowns.reducer;

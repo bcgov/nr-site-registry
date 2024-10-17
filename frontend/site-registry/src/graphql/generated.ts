@@ -1271,8 +1271,8 @@ export type MapSearchQuery = {
       __typename?: 'Sites';
       id: string;
       addrLine_1: string;
-      latDegrees?: number | null;
-      longDegrees?: number | null;
+      latdeg?: number | null;
+      longdeg?: number | null;
     }>;
   };
 };
@@ -1283,8 +1283,8 @@ export const MapSearchDocument = gql`
       sites {
         id
         addrLine_1
-        latDegrees
-        longDegrees
+        latdeg
+        longdeg
       }
     }
   }

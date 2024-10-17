@@ -3,8 +3,8 @@ query mapSearch($searchParam: String!) {
         sites {
             id
             addrLine_1
-            latDegrees
-            longDegrees
+            latdeg
+            longdeg
         }
     }
 }

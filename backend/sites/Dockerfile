@@ -2,8 +2,7 @@
 FROM node:22-slim AS build
 USER root
 WORKDIR /app
-COPY package*.json ./
-COPY ./src /app/src
+COPY . ./
 RUN npm ci --omit=dev && \
     npm run build
 

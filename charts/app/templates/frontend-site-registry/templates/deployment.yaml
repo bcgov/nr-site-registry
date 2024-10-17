@@ -64,11 +64,11 @@ spec:
             timeoutSeconds: 5
           resources:
             limits:
-              cpu: 100m
-              memory: 150Mi
-            requests:
               cpu: 30m
-              memory: 50Mi
+              memory: 75Mi
+            requests:
+              cpu: 15m
+              memory: 25Mi
           volumeMounts:
             - name: {{ .Release.Name }}-config
               mountPath: /usr/share/nginx/html/config/

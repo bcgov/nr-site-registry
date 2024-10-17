@@ -19,8 +19,11 @@ jobs:
       - id: vars
         uses: bcgov-nr/action-get-pr@v0.0.1
       - name: Echo PR number
-        run: echo "PR: ${{ steps.vars.outputs.pr }}"
-  
+        run: |
+          echo "PR: ${{ steps.vars.outputs.pr }}"
+          
+          
+
   deploys:
     name: Deploys to TEST
     uses: ./.github/workflows/.deployer.yml
@@ -30,13 +33,23 @@ jobs:
       triggers: ('backend/' 'frontend/')
       environment: test
       tag:  ${{ needs.get-pr-info.outputs.pr }}
-  
+      params:
+        --set backendSites.deploymentStrategy=RollingUpdate
+        --set frontendSiteRegistry.deploymentStrategy=RollingUpdate
+        --set global.autoscaling=true
+        --set backendSites.pdb.enabled=true
+        --set frontendSiteRegistry.pdb.enabled=true
+        --set backendSites.autoscaling.minReplicas=2
+        --set frontendSiteRegistry.autoscaling.minReplicas=2
+        --set global.registry=artifacts.developer.gov.bc.ca/github-docker-remote
+
+
   schemaspy:
     name: Schemaspy
     uses: .github/workflows/.schema-spy.yml
     secrets: inherit
     needs: [deploys]
-    with: 
+    with:
       tag: test
 
 

@@ -98,9 +98,8 @@ describe('DocumentService', () => {
               dprCode2: null, // Assuming this relationship is already defined elsewhere
               psnorg: mockPeopleOrgs[0], // Assigning PeopleOrgs entity
               sdoc: null, // Assigning SiteDocs entity
-              sp: null, // Assuming SitePartics entity is null for now
-              srAction: 'pending',
               userAction: 'pending',
+              srAction: 'pending',
             },
           ],
           site: sampleSites[0],
@@ -211,7 +210,6 @@ describe('DocumentService', () => {
             dprCode2: null, // Assuming this relationship is already defined elsewhere
             psnorg: mockPeopleOrgs[0], // Assigning PeopleOrgs entity
             sdoc: null, // Assigning SiteDocs entity
-            sp: null, // Assuming SitePartics entity is null for now
             srAction: 'pending',
             userAction: 'pending',
           },

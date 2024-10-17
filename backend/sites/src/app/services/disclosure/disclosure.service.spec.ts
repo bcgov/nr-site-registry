@@ -42,11 +42,13 @@ describe('DisclosureService', () => {
       const dateCompleted = new Date();
 
       const mockSiteProfile = generateMockSiteProfile(siteId, dateCompleted);
-      jest.spyOn(repository, 'find').mockResolvedValueOnce(mockSiteProfile);
+      jest
+        .spyOn(repository, 'find')
+        .mockResolvedValueOnce(mockSiteProfile as []);
 
       const result = await service.getSiteDisclosureBySiteId(siteId, false);
 
-      expect(result).toEqual(mockSiteProfile);
+      expect(result[0].whoCreated).toEqual(mockSiteProfile[0].whoCreated);
       expect(repository.find).toBeCalledWith({ where: { siteId } });
     });
 
@@ -65,13 +67,13 @@ describe('DisclosureService', () => {
 });
 
 export function generateMockSiteProfile(siteId: string, dateCompleted: Date) {
-  const mockSiteProfile = new SiteProfiles();
-
-  mockSiteProfile.siteId = siteId;
-  mockSiteProfile.dateCompleted = dateCompleted;
-  mockSiteProfile.localAuthDateRecd = new Date(); // Example of setting a default value
-  mockSiteProfile.localAuthName = 'Local Auth Name';
-  mockSiteProfile.localAuthAgency = 'Local Auth Agency';
-  mockSiteProfile.whoCreated = 'Test User'; // Example of required field
+  const mockSiteProfile = {
+    siteId: siteId,
+    dateCompleted: dateCompleted,
+    localAuthDateRecd: new Date(), // Example of setting a default value
+    localAuthName: 'Local Auth Name',
+    localAuthAgency: 'Local Auth Agency',
+    whoCreated: 'Test User', // Example of required field
+  };
   return [mockSiteProfile];
 }

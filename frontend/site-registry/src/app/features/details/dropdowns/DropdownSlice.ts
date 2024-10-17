@@ -3,6 +3,7 @@ import { getAxiosInstance } from '../../../helpers/utility';
 import { GRAPHQL } from '../../../helpers/endpoints';
 import { print } from 'graphql';
 import {
+  getIDIRUserListForDropDownQL,
   graphQLNotationClassCd,
   graphQLNotationParticipantRoleCd,
   graphQLNotationTypeCd,
@@ -21,6 +22,7 @@ const initialState: IDropdownsState = {
     notationType: [],
     notationParticipantRole: [],
     ministryContact: [],
+    internalUserList: [],
   },
   status: RequestStatus.idle,
   error: '',
@@ -116,6 +118,21 @@ export const fetchMinistryContact = createAsyncThunk(
     }
   },
 );
+
+export const fetchInternalUserNameForDropdown = createAsyncThunk(
+  'dropdowns/fetchInterUserNameForDropdown',
+  async () => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(getIDIRUserListForDropDownQL()),
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
+
 // Define the recent views slice
 const dropdowns = createSlice({
   name: 'dropdowns',
@@ -188,6 +205,14 @@ const dropdowns = createSlice({
       .addCase(fetchMinistryContact.rejected, (state, action) => {
         state.status = RequestStatus.failed;
         state.error = action.error.message;
+      })
+      .addCase(fetchInternalUserNameForDropdown.fulfilled, (state, action) => {
+        if (
+          action?.payload?.data?.getIDIRUserListForDropDown?.httpStatusCode ===
+          200
+        )
+          state.dropdowns.internalUserList =
+            action.payload.data.getIDIRUserListForDropDown.data;
       });
   },
 });
@@ -208,5 +233,8 @@ export const updatedNotationType = (state: any) =>
   state.dropdown.dropdowns.trackNotationType;
 export const updateNotationClass = (state: any) =>
   state.dropdown.dropdowns.trackNotationClass;
+
+export const getInternalUserNameForDropdown = (state: any) =>
+  state.dropdown.dropdowns.internalUserList;
 
 export default dropdowns.reducer;

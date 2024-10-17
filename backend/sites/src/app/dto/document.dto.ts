@@ -19,18 +19,15 @@ export class DocumentDto extends ChangeAuditObjectTypeDTO {
   @IsString()
   id: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsString()
   docParticId: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsString()
   psnorgId: string;
 
-  @Field()
-  dprCode: string;
-
-  @Field()
+  @Field({ nullable: true })
   @IsString()
   displayName: string;
 
@@ -49,6 +46,9 @@ export class DocumentDto extends ChangeAuditObjectTypeDTO {
   @Field()
   @IsString()
   title: string;
+
+  @Field({ nullable: true })
+  filePath: string | null;
 }
 
 @InputType()
@@ -57,7 +57,7 @@ export class DocumentInputDTO extends ChangeAuditEntityDTO {
   @IsString()
   id: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsString()
   docParticId: string;
 
@@ -65,7 +65,7 @@ export class DocumentInputDTO extends ChangeAuditEntityDTO {
   @IsString()
   psnorgId: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsString()
   displayName: string;
 
@@ -84,4 +84,7 @@ export class DocumentInputDTO extends ChangeAuditEntityDTO {
   @Field()
   @IsString()
   title: string;
+
+  @Field({ nullable: true })
+  filePath: string | null;
 }

@@ -1,9 +1,9 @@
 # Build
 FROM node:22-slim AS build
-# Install packages, build and keep only prod packages
 USER root
 WORKDIR /app
-COPY . ./
+COPY package*.json ./
+COPY ./src /app/src
 RUN npm ci --omit=dev && \
     npm run build
 
@@ -17,7 +17,6 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/schema.graphql  schema.graphql
 # Port and health check
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000

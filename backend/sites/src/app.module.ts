@@ -54,7 +54,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       // TODO - Experiment with using old files for localhsot if need be, and true for prod
       autoSchemaFile: {
         federation: 2,
-        path: './schema.graphql',
+        path: process.env.GRAPHQL_SCHEMA_PATH || './schema.graphql',
       },
       /*cors: {
         credentials: true,

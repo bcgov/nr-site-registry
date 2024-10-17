@@ -61,6 +61,8 @@ spec:
               value: "7d"
             - name: PORT
               value: {{ .Values.backendSites.service.targetPort | quote }}
+            - name: GRAPHQL_SCHEMA_FILE_PATH
+              value: "/graphql/schema.graphql"
           ports:
             - name: http
               containerPort: {{ .Values.backendSites.service.targetPort }}
@@ -91,10 +93,13 @@ spec:
           volumeMounts:
             - mountPath: /logs
               name: log-storage
+            - mountPath: /graphql
+              name: graphql-storage
       volumes:
         - name: log-storage
           emptyDir: {}
-
+        - name: graphql-storage
+          emptyDir: {}
       {{- with .Values.backendSites.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

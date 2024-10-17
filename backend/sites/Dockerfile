@@ -1,8 +1,10 @@
 # Build
 FROM node:22-slim AS build
+# Install packages, build and keep only prod packages
 USER root
 WORKDIR /app
-COPY . ./
+COPY *.json ./
+COPY ./src /app/src
 RUN npm ci --omit=dev && \
     npm run build
 

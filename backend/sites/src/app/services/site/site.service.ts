@@ -768,8 +768,10 @@ export class SiteService {
                   ...new SitePartics(),
                   ...existingSitePartic,
                   ...sitePartic,
-                  userAction: UserActionEnum.UPDATED,
-                  // srAction: srAction,
+                  userAction:   participant.srAction === SRApprovalStatusEnum.PUBLIC ||
+                  participant.srAction === SRApprovalStatusEnum.PRIVATE
+                    ? UserActionEnum.DEFAULT
+                    : UserActionEnum.UPDATED,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },

@@ -37,7 +37,7 @@ export class AssociatedSiteService {
 
       if (showPending) {
         result = await this.assocSiteRepository.find({
-          where: { siteId, userAction: UserActionEnum.UPDATED },
+          where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
         });
       } else {
         result = await this.assocSiteRepository.find({

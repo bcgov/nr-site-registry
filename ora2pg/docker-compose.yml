@@ -1,14 +1,10 @@
-version: '1'
+version: '3.8'
+
 services:
-
   ora2pg:
-    build:
-      context: .
-    #    image: georgmoser/ora2pg
-    container_name: ora2pg
-    network_mode: "host"
-    volumes:
-      - ora2pg-data:/data
-
-volumes:
-  ora2pg-data:
+    build: .
+    container_name: ora2pg_service
+    environment:
+      ORA_HOST: ${ORA_HOST}
+      ORA_USER: ${ORA_USER}
+      ORA_PWD: ${ORA_PWD}

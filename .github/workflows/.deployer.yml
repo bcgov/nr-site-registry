@@ -69,7 +69,6 @@ jobs:
 
       # Check triggers (omitted or matched) for deployment
       - uses: bcgov-nr/action-diff-triggers@v0.2.0
-        if: ${{ inputs.environment != '' }} ## Ignore triggers for test and prod deploys, only obey them for pr based deploys
         id: triggers
         with:
           triggers: ${{ inputs.triggers }}

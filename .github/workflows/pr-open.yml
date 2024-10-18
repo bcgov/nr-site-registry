@@ -43,6 +43,7 @@ jobs:
   # https://github.com/bcgov/quickstart-openshift-helpers
   deploys:
     name: Deploys
+    if: ${{ ! github.event.pull_request.draft }}
     needs: [builds]
     uses: ./.github/workflows/.deployer.yml
     secrets: inherit

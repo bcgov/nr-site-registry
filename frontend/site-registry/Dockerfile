@@ -23,7 +23,7 @@ COPY . ./
 RUN npm run build
 
 # Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
-FROM nginx:1.9-alpine AS deploy
+FROM nginx:1.9 AS deploy
 RUN mkdir /app
 COPY --from=build /app/build /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf

@@ -469,18 +469,18 @@ export class SiteService {
       );
     }
 
-    const historyLog: HistoryLog = {
-      userId: userInfo ? userInfo.sub : '',
-      content: inputDTO,
-      id: null,
-      whoCreated: userInfo ? userInfo.givenName : '',
-      whenCreated: new Date(),
-      whenUpdated: new Date(),
-      whoUpdated: userInfo ? userInfo.givenName : '',
-      siteId: inputDTO.siteId,
-    };
+    // const historyLog: HistoryLog = {
+    //   userId: userInfo ? userInfo.sub : '',
+    //   content: inputDTO,
+    //   id: null,
+    //   whoCreated: userInfo ? userInfo.givenName : '',
+    //   whenCreated: new Date(),
+    //   whenUpdated: new Date(),
+    //   whoUpdated: userInfo ? userInfo.givenName : '',
+    //   siteId: inputDTO.siteId,
+    // };
 
-    await transactionalEntityManager.save(HistoryLog, historyLog);
+    // await transactionalEntityManager.save(HistoryLog, historyLog);
 
     return true;
   }
@@ -692,7 +692,7 @@ export class SiteService {
         id: string;
         changes: Partial<SiteParticRoles>;
       }[] = [];
-      // const deleteSiteParticRoles: { id: string }[] = [];
+      const deleteSiteParticRoles: { id: string }[] = [];
 
       // Main processing loop for site participants
       const siteParticsPromises = siteParticipants.map(async (participant) => {
@@ -739,7 +739,6 @@ export class SiteService {
               rwmFlag: 0,
               rwmNoteFlag: 0,
               userAction: UserActionEnum.ADDED,
-              // srAction: srAction,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -749,7 +748,6 @@ export class SiteService {
               spId: participantId,
               rwmFlag: 0,
               userAction: UserActionEnum.ADDED,
-              // srAction: srAction,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -769,7 +767,6 @@ export class SiteService {
                   ...existingSitePartic,
                   ...sitePartic,
                   userAction: UserActionEnum.UPDATED,
-                  // srAction: srAction,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },
@@ -786,7 +783,6 @@ export class SiteService {
                     ...existingSiteParticRole,
                     ...siteParticRole,
                     userAction: UserActionEnum.UPDATED,
-                    // srAction: srAction,
                     whenUpdated: new Date(),
                     whoUpdated: userInfo ? userInfo.givenName : '',
                   },
@@ -806,7 +802,7 @@ export class SiteService {
           case UserActionEnum.DELETED:
             // Handle deletion if necessary
             deleteSitePartics.push({ id: participantId });
-            // deleteSiteParticRoles.push({ id: particRoleId });
+            deleteSiteParticRoles.push({ id: particRoleId });
             break;
 
           default:
@@ -847,13 +843,13 @@ export class SiteService {
       }
 
       // Delete existing site participants and site participant roles in bulk
-      // if (deleteSiteParticRoles.length > 0) {
-      //   await Promise.all(
-      //     deleteSiteParticRoles.map(({ id }) =>
-      //       transactionalEntityManager.delete(SiteParticRoles, { id }),
-      //     ),
-      //   );
-      // }
+      if (deleteSiteParticRoles.length > 0) {
+        await Promise.all(
+          deleteSiteParticRoles.map(({ id }) =>
+            transactionalEntityManager.delete(SiteParticRoles, { id }),
+          ),
+        );
+      }
       if (deleteSitePartics.length > 0) {
         await Promise.all(
           deleteSitePartics.map(({ id }) =>
@@ -1720,7 +1716,7 @@ export class SiteService {
 
       const historyLog: HistoryLog = {
         userId: userInfo ? userInfo.sub : '',
-        content: {...site, 'isApproved': isApproved},
+        content: { ...site, isApproved: isApproved },
         id: null,
         whoCreated: userInfo ? userInfo.givenName : '',
         whenCreated: new Date(),
@@ -1728,7 +1724,7 @@ export class SiteService {
         whoUpdated: userInfo ? userInfo.givenName : '',
         siteId: site.siteId,
       };
-  
+
       await transactionalEntityManager.save(HistoryLog, historyLog);
 
       this.sitesLogger.log('SiteService.processSRBulkUpdates() end');

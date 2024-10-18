@@ -238,7 +238,6 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Handle view mode changes
   useEffect(() => {
     setViewMode(mode);
-    dispatch(setupNotationDataForSaving(notations));
   }, [mode]);
 
   // Search participant effect with debounce
@@ -420,7 +419,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       // Update both formData and trackNotation in one go
       const updatedNotation = updateNotations(formData);
-      const updatedTrackNotation = updateNotations(trackNotation);
+      const updatedTrackNotation = updateNotations(trackNotation ?? formData);
 
       setFormData(updatedNotation);
       dispatch(updateSiteNotation(updatedNotation));
@@ -486,7 +485,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       // Update both formData and trackNotation
       const updatedPartics = updateNotations(formData);
-      const updatedTrackNotatn = updateNotations(trackNotation);
+      const updatedTrackNotatn = updateNotations(trackNotation ?? formData);
 
       // Filter out participants based on selectedRows for formData
       const filteredPartics = updatedPartics.map((notation: any) => ({
@@ -630,7 +629,12 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       setFormData(updateNotationParticipant);
       dispatch(updateSiteNotation(updateNotationParticipant));
       // Update trackNotation without parameters
-      const trackNotatn = updateParticipants(trackNotation, id, event, false);
+      const trackNotatn = updateParticipants(
+        trackNotation ?? formData,
+        id,
+        event,
+        false,
+      );
       dispatch(setupNotationDataForSaving(trackNotatn));
 
       const currLabel =
@@ -709,7 +713,9 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     // Add the new notation to formData
     setFormData((prevData) => [newNotation, ...prevData]);
     dispatch(updateSiteNotation([newNotation, ...formData]));
-    dispatch(setupNotationDataForSaving([newNotation, ...trackNotation]));
+    dispatch(
+      setupNotationDataForSaving([newNotation, ...(trackNotation ?? formData)]),
+    );
     const tracker = new ChangeTracker(IChangeType.Added, 'New Notation Added');
     dispatch(trackChanges(tracker.toPlainObject()));
   };
@@ -747,7 +753,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
 
     // Update both formData and trackNotation in one call
     const updatedParticipants = updateNotations(formData, id);
-    const updatedTrackParticipants = updateNotations(trackNotation, id);
+    const updatedTrackParticipants = updateNotations(
+      trackNotation ?? formData,
+      id,
+    );
 
     setFormData(updatedParticipants);
     dispatch(updateSiteNotation(updatedParticipants));

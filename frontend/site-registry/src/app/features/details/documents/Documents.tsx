@@ -249,7 +249,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Handle view mode changes
   useEffect(() => {
     setViewMode(mode);
-    dispatch(setupDocumentsDataForSaving(siteDocuments));
   }, [mode]);
 
   // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
@@ -379,7 +378,12 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
         const updatedDocuments = [newDocument, ...formData];
         setFormData(updatedDocuments);
         dispatch(updateSiteDocument(updatedDocuments));
-        dispatch(setupDocumentsDataForSaving([newDocument, ...trackDocuments]));
+        dispatch(
+          setupDocumentsDataForSaving([
+            newDocument,
+            ...(trackDocuments ?? formData),
+          ]),
+        );
         const tracker = new ChangeTracker(
           IChangeType.Added,
           'New Site Document',
@@ -430,7 +434,9 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
 
           // Update both formData and trackNotation
           const updatedDocuments = updateDocuments(formData);
-          const updatedTrackedDocuments = updateDocuments(trackDocuments);
+          const updatedTrackedDocuments = updateDocuments(
+            trackDocuments ?? formData,
+          );
 
           // Replace document
           setFormData(updatedDocuments);
@@ -492,7 +498,9 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       // Update both formData and trackDocument
       const updatedDocuments = updateDocuments(formData);
-      const updatedTrackedDocuments = updateDocuments(trackDocuments);
+      const updatedTrackedDocuments = updateDocuments(
+        trackDocuments ?? formData,
+      );
 
       // Filter out document for formData
       const filteredDocuments = updatedDocuments.filter((doc: any) => {
@@ -569,7 +577,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       // Update both formData and trackNotation
       const updatedDocuments = updateDocuments(formData);
-      const updatedTrackDocuments = updateDocuments(trackDocuments);
+      const updatedTrackDocuments = updateDocuments(trackDocuments ?? formData);
       setFormData(updatedDocuments);
       dispatch(updateSiteDocument(updatedDocuments));
       dispatch(setupDocumentsDataForSaving(updatedTrackDocuments));

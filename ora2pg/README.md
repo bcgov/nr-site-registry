@@ -35,4 +35,7 @@ docker run ora2pg
 
 or with a docker-compose:
 
+```
 docker compose up -d --build
+
+```

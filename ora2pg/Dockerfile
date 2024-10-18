@@ -55,14 +55,14 @@ RUN curl -L -o /tmp/ora2pg.zip https://github.com/darold/ora2pg/archive/v$ORA2PG
 RUN mkdir /config
 RUN cp /etc/ora2pg/ora2pg.conf.dist /etc/ora2pg/ora2pg.conf.backup
 # cp /etc/ora2pg/ora2pg.conf.dist /config/ora2pg.conf
-ADD ora2pg.conf /config
+COPY ora2pg.conf /config
 VOLUME /config
 
 # output directory
 RUN mkdir /data
 VOLUME /data
 
-ADD entrypoint.sh /usr/bin/entrypoint.sh
+COPY entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
 
 WORKDIR /

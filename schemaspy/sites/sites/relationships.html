@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>postgres.sites</title>
+        <!-- Tell the browser to be responsive to screen width -->
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
+        <!-- Bootstrap 3.3.5 -->
+        <link rel="stylesheet" href="bower/admin-lte/bootstrap/css/bootstrap.min.css">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="bower/font-awesome/css/font-awesome.min.css">
+        <!-- Ionicons -->
+        <link rel="stylesheet" href="bower/ionicons/css/ionicons.min.css">
+        <!-- DataTables -->
+        <link rel="stylesheet" href="bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+        <link rel="stylesheet" href="bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+        <!-- Code Mirror -->
+        <link rel="stylesheet" href="bower/codemirror/codemirror.css">
+        <!-- Fonts -->
+        <link href='fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+        <link href='fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+        <!-- Theme style -->
+        <link rel="stylesheet" href="bower/admin-lte/dist/css/AdminLTE.min.css">
+        <!-- Salvattore -->
+        <link rel="stylesheet" href="bower/salvattore/salvattore.css">
+        <!-- AdminLTE Skins. Choose a skin from the css/skins
+           folder instead of downloading all of them to reduce the load. -->
+        <link rel="stylesheet" href="bower/admin-lte/dist/css/skins/_all-skins.min.css">
+        <!-- SchemaSpy -->
+        <link rel="stylesheet" href="schemaSpy.css">
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="bower/html5shiv/html5shiv.min.js"></script>
+        <script src="bower/respond/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+    <body class="hold-transition skin-blue layout-top-nav">
+        <div class="wrapper">
+            <header class="main-header">
+                <nav class="navbar navbar-static-top">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <a href="../index.html" class="navbar-brand"><b>postgres</b></a><span class="navbar-brand" style="padding-left: 0">.sites</span>
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"><i class="fa fa-bars"></i></button>
+                        </div>
+
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li><a href="index.html">Tables <span class="sr-only">(current)</span></a></li>
+                                <li><a href="columns.html" title="All of the columns in the schema">Columns</a></li>
+                                <li><a href="constraints.html" title="Useful for diagnosing error messages that just give constraint name or number">Constraints</a></li>
+                                <li><a href="relationships.html" title="Diagram of table relationships">Relationships</a></li>
+                                <li><a href="orphans.html" title="View of tables with neither parents nor children">Orphan&nbsp;Tables</a></li>
+                                <li><a href="anomalies.html" title="Things that might not be quite right">Anomalies</a></li>
+                                <li><a href="routines.html" title="Procedures and functions">Routines</a></li>
+                            </ul>
+                        </div>
+                        <!-- /.navbar-collapse -->
+                        <!-- Navbar Right Menu -->
+                    </div>
+                    <!-- /.container-fluid -->
+                </nav>
+            </header>
+            <!-- Main content -->
+            <!-- Full Width Column -->
+            <div class="content-wrapper">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>All Relationships</h1>
+                </section>
+                <!-- Main content -->
+                <section class="content">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-code-fork"></i>
+                            <h3 class="box-title">Diagrams</h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="nav-tabs-custom">
+                                <!-- Tabs within a box -->
+                                <h5>By default only columns that are primary keys, foreign keys or indexes are shown.</h5>
+                                <ul class="nav nav-tabs pull-left ui-sortable-handle">
+                                    <li class="active"><a href="#compactDegreeImg-chart" data-toggle="tab" aria-expanded="true">Compact</a></li>
+                                    <li class=""><a href="#largeDegreeImg-chart" data-toggle="tab" aria-expanded="true">Large</a></li>
+                                    <li class=""><a href="#compactimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Compact Implied</a></li>
+                                    <li class=""><a href="#largeimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Large Implied</a></li>
+                                </ul>
+                                <div class="tab-content no-padding">
+                                    <div class="chart tab-pane active" id="compactDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="compactRelationshipsDiagram" name="compactRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="15,1512,205,1629">
+<area shape="rect" id="node2" href="tables/events.html" target="_top" title="events" alt="" coords="619,3980,887,4303">
+<area shape="rect" id="node21" href="tables/event_type_cd.html" target="_top" title="event_type_cd" alt="" coords="288,4039,517,4215">
+<area shape="rect" id="node32" href="tables/sites.html" target="_top" title="sites" alt="" coords="287,2577,518,2959">
+<area shape="rect" id="node3" href="tables/profile_submissions.html" target="_top" title="profile_submissions" alt="" coords="1000,257,1237,409">
+<area shape="rect" id="node8" href="tables/submission_cd.html" target="_top" title="submission_cd" alt="" coords="656,287,851,404">
+<area shape="rect" id="node4" href="tables/profile_categories.html" target="_top" title="profile_categories" alt="" coords="292,123,513,269">
+<area shape="rect" id="node5" href="tables/site_staffs.html" target="_top" title="site_staffs" alt="" coords="659,884,847,1060">
+<area shape="rect" id="node7" href="tables/people_orgs.html" target="_top" title="people_orgs" alt="" coords="302,1435,503,1581">
+<area shape="rect" id="node6" href="tables/event_class_cd.html" target="_top" title="event_class_cd" alt="" coords="13,4068,207,4185">
+<area shape="rect" id="node9" href="tables/land_histories.html" target="_top" title="land_histories" alt="" coords="644,3564,863,3769">
+<area shape="rect" id="node36" href="tables/land_use_cd.html" target="_top" title="land_use_cd" alt="" coords="316,3719,489,3836">
+<area shape="rect" id="node10" href="tables/partic_role_cd.html" target="_top" title="partic_role_cd" alt="" coords="659,1952,848,2069">
+<area shape="rect" id="node11" href="tables/site_subdivisions.html" target="_top" title="site_subdivisions" alt="" coords="641,3148,865,3353">
+<area shape="rect" id="node34" href="tables/subdivisions.html" target="_top" title="subdivisions" alt="" coords="299,3177,506,3383">
+<area shape="rect" id="node12" href="tables/site_profile_owners.html" target="_top" title="site_profile_owners" alt="" coords="995,1893,1242,2069">
+<area shape="rect" id="node33" href="tables/site_partics.html" target="_top" title="site_partics" alt="" coords="668,1729,839,1935">
+<area shape="rect" id="node13" href="tables/conditions_text.html" target="_top" title="conditions_text" alt="" coords="1011,3980,1227,4127">
+<area shape="rect" id="node14" href="tables/site_profiles.html" target="_top" title="site_profiles" alt="" coords="981,1553,1256,1876">
+<area shape="rect" id="node15" href="tables/site_assocs.html" target="_top" title="site_assocs" alt="" coords="637,2673,870,2908">
+<area shape="rect" id="node16" href="tables/site_profile_land_uses.html" target="_top" title="site_profile_land_uses" alt="" coords="627,3787,879,3963">
+<area shape="rect" id="node17" href="tables/site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="25,2836,195,2953">
+<area shape="rect" id="node18" href="tables/contamination_class_cd.html" target="_top" title="contamination_class_cd" alt="" coords="619,615,887,732">
+<area shape="rect" id="node19" href="tables/site_crown_land_status_cd.html" target="_top" title="site_crown_land_status_cd" alt="" coords="259,480,547,597">
+<area shape="rect" id="node20" href="tables/event_partic_role_cd.html" target="_top" title="event_partic_role_cd" alt="" coords="633,2087,874,2204">
+<area shape="rect" id="node43" href="tables/site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="15,3392,205,3509">
+<area shape="rect" id="node22" href="tables/site_docs.html" target="_top" title="site_docs" alt="" coords="663,1271,844,1447">
+<area shape="rect" id="node23" href="tables/city_regions.html" target="_top" title="city_regions" alt="" coords="315,1295,490,1417">
+<area shape="rect" id="node24" href="tables/recent_views.html" target="_top" title="recent_views" alt="" coords="651,2925,856,3131">
+<area shape="rect" id="node25" href="tables/cart.html" target="_top" title="cart" alt="" coords="670,2257,837,2433">
+<area shape="rect" id="node26" href="tables/sis_addresses.html" target="_top" title="sis_addresses" alt="" coords="659,1077,847,1253">
+<area shape="rect" id="node27" href="tables/mailout.html" target="_top" title="mailout" alt="" coords="635,1500,872,1676">
+<area shape="rect" id="node28" href="tables/site_crown_land_contaminated.html" target="_top" title="site_crown_land_contaminated" alt="" coords="591,421,916,597">
+<area shape="rect" id="node29" href="tables/doc_partic_role_cd.html" target="_top" title="doc_partic_role_cd" alt="" coords="641,749,865,867">
+<area shape="rect" id="node30" href="tables/site_contamination_class_xref.html" target="_top" title="site_contamination_class_xref" alt="" coords="960,507,1277,653">
+<area shape="rect" id="node31" href="tables/site_doc_partics.html" target="_top" title="site_doc_partics" alt="" coords="1016,1212,1221,1476">
+<area shape="rect" id="node39" href="tables/classification_cd.html" target="_top" title="classification_cd" alt="" coords="5,2701,215,2819">
+<area shape="rect" id="node35" href="tables/event_partics.html" target="_top" title="event_partics" alt="" coords="1025,2309,1212,2573">
+<area shape="rect" id="node37" href="tables/profile_answers.html" target="_top" title="profile_answers" alt="" coords="1007,5,1231,181">
+<area shape="rect" id="node38" href="tables/profile_questions.html" target="_top" title="profile_questions" alt="" coords="645,64,862,269">
+<area shape="rect" id="node40" href="tables/folio.html" target="_top" title="folio" alt="" coords="319,3400,486,3547">
+<area shape="rect" id="node41" href="tables/snapshots.html" target="_top" title="snapshots" alt="" coords="670,2451,837,2656">
+<area shape="rect" id="node42" href="tables/folio_contents.html" target="_top" title="folio_contents" alt="" coords="657,3371,849,3547">
+<area shape="rect" id="node44" href="tables/site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="1015,2087,1223,2292">
+</map>
+                                        <a name='diagram'><img id="compactDegreeImg" src="diagrams/summary/relationships.real.compact.png" usemap="#compactRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="largeDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="largeRelationshipsDiagram" name="largeRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="15,3468,205,3591">
+<area shape="rect" id="node2" href="tables/events.html" target="_top" title="events" alt="" coords="619,7841,887,8609">
+<area shape="rect" id="node21" href="tables/event_type_cd.html" target="_top" title="event_type_cd" alt="" coords="288,7959,517,8316">
+<area shape="rect" id="node32" href="tables/sites.html" target="_top" title="sites" alt="" coords="287,5229,518,6379">
+<area shape="rect" id="node3" href="tables/profile_submissions.html" target="_top" title="profile_submissions" alt="" coords="1000,439,1237,591">
+<area shape="rect" id="node8" href="tables/submission_cd.html" target="_top" title="submission_cd" alt="" coords="656,468,851,620">
+<area shape="rect" id="node4" href="tables/profile_categories.html" target="_top" title="profile_categories" alt="" coords="292,123,513,509">
+<area shape="rect" id="node5" href="tables/site_staffs.html" target="_top" title="site_staffs" alt="" coords="659,1292,847,1884">
+<area shape="rect" id="node7" href="tables/people_orgs.html" target="_top" title="people_orgs" alt="" coords="302,3139,503,3672">
+<area shape="rect" id="node6" href="tables/event_class_cd.html" target="_top" title="event_class_cd" alt="" coords="13,7988,207,8111">
+<area shape="rect" id="node9" href="tables/land_histories.html" target="_top" title="land_histories" alt="" coords="644,7151,863,7596">
+<area shape="rect" id="node36" href="tables/land_use_cd.html" target="_top" title="land_use_cd" alt="" coords="316,7561,489,7684">
+<area shape="rect" id="node10" href="tables/partic_role_cd.html" target="_top" title="partic_role_cd" alt="" coords="659,4557,848,4680">
+<area shape="rect" id="node11" href="tables/site_subdivisions.html" target="_top" title="site_subdivisions" alt="" coords="641,6401,865,6847">
+<area shape="rect" id="node34" href="tables/subdivisions.html" target="_top" title="subdivisions" alt="" coords="299,6408,506,7117">
+<area shape="rect" id="node12" href="tables/site_profile_owners.html" target="_top" title="site_profile_owners" alt="" coords="995,4312,1242,4523">
+<area shape="rect" id="node33" href="tables/site_partics.html" target="_top" title="site_partics" alt="" coords="668,4065,839,4540">
+<area shape="rect" id="node13" href="tables/conditions_text.html" target="_top" title="conditions_text" alt="" coords="1011,7841,1227,8111">
+<area shape="rect" id="node14" href="tables/site_profiles.html" target="_top" title="site_profiles" alt="" coords="981,2764,1256,4295">
+<area shape="rect" id="node15" href="tables/site_assocs.html" target="_top" title="site_assocs" alt="" coords="637,5564,870,6039">
+<area shape="rect" id="node16" href="tables/site_profile_land_uses.html" target="_top" title="site_profile_land_uses" alt="" coords="627,7613,879,7824">
+<area shape="rect" id="node17" href="tables/site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="25,6197,195,6320">
+<area shape="rect" id="node18" href="tables/contamination_class_cd.html" target="_top" title="contamination_class_cd" alt="" coords="619,1012,887,1135">
+<area shape="rect" id="node19" href="tables/site_crown_land_status_cd.html" target="_top" title="site_crown_land_status_cd" alt="" coords="259,901,547,1024">
+<area shape="rect" id="node20" href="tables/event_partic_role_cd.html" target="_top" title="event_partic_role_cd" alt="" coords="633,4697,874,4820">
+<area shape="rect" id="node43" href="tables/site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="15,7093,205,7216">
+<area shape="rect" id="node22" href="tables/site_docs.html" target="_top" title="site_docs" alt="" coords="663,2657,844,3161">
+<area shape="rect" id="node23" href="tables/city_regions.html" target="_top" title="city_regions" alt="" coords="315,2999,490,3121">
+<area shape="rect" id="node24" href="tables/recent_views.html" target="_top" title="recent_views" alt="" coords="651,6056,856,6384">
+<area shape="rect" id="node25" href="tables/cart.html" target="_top" title="cart" alt="" coords="670,4873,837,5172">
+<area shape="rect" id="node26" href="tables/sis_addresses.html" target="_top" title="sis_addresses" alt="" coords="659,1901,847,2640">
+<area shape="rect" id="node27" href="tables/mailout.html" target="_top" title="mailout" alt="" coords="635,3215,872,4012">
+<area shape="rect" id="node28" href="tables/site_crown_land_contaminated.html" target="_top" title="site_crown_land_contaminated" alt="" coords="591,637,916,995">
+<area shape="rect" id="node29" href="tables/doc_partic_role_cd.html" target="_top" title="doc_partic_role_cd" alt="" coords="641,1152,865,1275">
+<area shape="rect" id="node30" href="tables/site_contamination_class_xref.html" target="_top" title="site_contamination_class_xref" alt="" coords="960,811,1277,1051">
+<area shape="rect" id="node31" href="tables/site_doc_partics.html" target="_top" title="site_doc_partics" alt="" coords="1016,2331,1221,2747">
+<area shape="rect" id="node39" href="tables/classification_cd.html" target="_top" title="classification_cd" alt="" coords="5,5699,215,5821">
+<area shape="rect" id="node35" href="tables/event_partics.html" target="_top" title="event_partics" alt="" coords="1025,4915,1212,5331">
+<area shape="rect" id="node37" href="tables/profile_answers.html" target="_top" title="profile_answers" alt="" coords="1007,5,1231,216">
+<area shape="rect" id="node38" href="tables/profile_questions.html" target="_top" title="profile_questions" alt="" coords="645,64,862,451">
+<area shape="rect" id="node40" href="tables/folio.html" target="_top" title="folio" alt="" coords="319,7135,486,7433">
+<area shape="rect" id="node41" href="tables/snapshots.html" target="_top" title="snapshots" alt="" coords="670,5189,837,5547">
+<area shape="rect" id="node42" href="tables/folio_contents.html" target="_top" title="folio_contents" alt="" coords="657,6864,849,7133">
+<area shape="rect" id="node44" href="tables/site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="1015,4540,1223,4897">
+</map>
+                                        <a name='diagram'><img id="largeDegreeImg" src="diagrams/summary/relationships.real.large.png" usemap="#largeRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="compactimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="compactImpliedRelationshipsDiagram" name="compactImpliedRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="5,1516,195,1633">
+<area shape="rect" id="node2" href="tables/events.html" target="_top" title="events" alt="" coords="853,4052,1121,4375">
+<area shape="rect" id="node21" href="tables/event_type_cd.html" target="_top" title="event_type_cd" alt="" coords="521,4111,751,4287">
+<area shape="rect" id="node32" href="tables/sites.html" target="_top" title="sites" alt="" coords="521,2247,751,2628">
+<area shape="rect" id="node3" href="tables/profile_submissions.html" target="_top" title="profile_submissions" alt="" coords="1233,257,1471,409">
+<area shape="rect" id="node8" href="tables/submission_cd.html" target="_top" title="submission_cd" alt="" coords="889,287,1084,404">
+<area shape="rect" id="node4" href="tables/profile_categories.html" target="_top" title="profile_categories" alt="" coords="525,123,747,269">
+<area shape="rect" id="node5" href="tables/site_staffs.html" target="_top" title="site_staffs" alt="" coords="893,956,1081,1132">
+<area shape="rect" id="node7" href="tables/people_orgs.html" target="_top" title="people_orgs" alt="" coords="535,1233,737,1380">
+<area shape="rect" id="node6" href="tables/event_class_cd.html" target="_top" title="event_class_cd" alt="" coords="246,4035,441,4152">
+<area shape="rect" id="node9" href="tables/land_histories.html" target="_top" title="land_histories" alt="" coords="877,3636,1096,3841">
+<area shape="rect" id="node36" href="tables/land_use_cd.html" target="_top" title="land_use_cd" alt="" coords="549,3792,723,3909">
+<area shape="rect" id="node10" href="tables/partic_role_cd.html" target="_top" title="partic_role_cd" alt="" coords="892,2469,1081,2587">
+<area shape="rect" id="node11" href="tables/site_subdivisions.html" target="_top" title="site_subdivisions" alt="" coords="875,2247,1099,2452">
+<area shape="rect" id="node34" href="tables/subdivisions.html" target="_top" title="subdivisions" alt="" coords="533,1920,739,2125">
+<area shape="rect" id="node12" href="tables/site_profile_owners.html" target="_top" title="site_profile_owners" alt="" coords="1229,1995,1475,2171">
+<area shape="rect" id="node33" href="tables/site_partics.html" target="_top" title="site_partics" alt="" coords="901,1801,1072,2007">
+<area shape="rect" id="node13" href="tables/conditions_text.html" target="_top" title="conditions_text" alt="" coords="1244,4052,1460,4199">
+<area shape="rect" id="node14" href="tables/site_profiles.html" target="_top" title="site_profiles" alt="" coords="1215,1655,1489,1977">
+<area shape="rect" id="node23" href="tables/city_regions.html" target="_top" title="city_regions" alt="" coords="256,1567,431,1689">
+<area shape="rect" id="node15" href="tables/site_assocs.html" target="_top" title="site_assocs" alt="" coords="870,3191,1103,3425">
+<area shape="rect" id="node16" href="tables/site_profile_land_uses.html" target="_top" title="site_profile_land_uses" alt="" coords="861,3859,1113,4035">
+<area shape="rect" id="node17" href="tables/site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="258,2505,429,2623">
+<area shape="rect" id="node18" href="tables/contamination_class_cd.html" target="_top" title="contamination_class_cd" alt="" coords="853,651,1121,768">
+<area shape="rect" id="node19" href="tables/site_crown_land_status_cd.html" target="_top" title="site_crown_land_status_cd" alt="" coords="492,516,780,633">
+<area shape="rect" id="node20" href="tables/event_partic_role_cd.html" target="_top" title="event_partic_role_cd" alt="" coords="866,2604,1107,2721">
+<area shape="rect" id="node43" href="tables/site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="248,4169,439,4287">
+<area shape="rect" id="node22" href="tables/site_docs.html" target="_top" title="site_docs" alt="" coords="896,1572,1077,1748">
+<area shape="rect" id="node24" href="tables/recent_views.html" target="_top" title="recent_views" alt="" coords="884,2024,1089,2229">
+<area shape="rect" id="node25" href="tables/cart.html" target="_top" title="cart" alt="" coords="903,2997,1070,3173">
+<area shape="rect" id="node26" href="tables/sis_addresses.html" target="_top" title="sis_addresses" alt="" coords="893,1149,1081,1325">
+<area shape="rect" id="node27" href="tables/mailout.html" target="_top" title="mailout" alt="" coords="868,1343,1105,1519">
+<area shape="rect" id="node28" href="tables/site_crown_land_contaminated.html" target="_top" title="site_crown_land_contaminated" alt="" coords="824,457,1149,633">
+<area shape="rect" id="node29" href="tables/doc_partic_role_cd.html" target="_top" title="doc_partic_role_cd" alt="" coords="875,785,1099,903">
+<area shape="rect" id="node30" href="tables/site_contamination_class_xref.html" target="_top" title="site_contamination_class_xref" alt="" coords="1193,495,1511,641">
+<area shape="rect" id="node31" href="tables/site_doc_partics.html" target="_top" title="site_doc_partics" alt="" coords="1249,763,1455,1027">
+<area shape="rect" id="node39" href="tables/classification_cd.html" target="_top" title="classification_cd" alt="" coords="239,2371,448,2488">
+<area shape="rect" id="node35" href="tables/event_partics.html" target="_top" title="event_partics" alt="" coords="1259,2611,1445,2875">
+<area shape="rect" id="node37" href="tables/profile_answers.html" target="_top" title="profile_answers" alt="" coords="1240,5,1464,181">
+<area shape="rect" id="node38" href="tables/profile_questions.html" target="_top" title="profile_questions" alt="" coords="878,64,1095,269">
+<area shape="rect" id="node40" href="tables/folio.html" target="_top" title="folio" alt="" coords="553,3472,719,3619">
+<area shape="rect" id="node41" href="tables/snapshots.html" target="_top" title="snapshots" alt="" coords="903,2775,1070,2980">
+<area shape="rect" id="node42" href="tables/folio_contents.html" target="_top" title="folio_contents" alt="" coords="891,3443,1083,3619">
+<area shape="rect" id="node44" href="tables/site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="1248,2288,1456,2493">
+</map>
+                                        <a name='diagram'><img id="compactimpliedDegreeImg" src="diagrams/summary/relationships.implied.compact.png" usemap="#compactImpliedRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="largeimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="largeImpliedRelationshipsDiagram" name="largeImpliedRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="5,3419,195,3541">
+<area shape="rect" id="node2" href="tables/events.html" target="_top" title="events" alt="" coords="853,7877,1121,8645">
+<area shape="rect" id="node21" href="tables/event_type_cd.html" target="_top" title="event_type_cd" alt="" coords="521,7995,751,8352">
+<area shape="rect" id="node32" href="tables/sites.html" target="_top" title="sites" alt="" coords="521,4939,751,6088">
+<area shape="rect" id="node3" href="tables/profile_submissions.html" target="_top" title="profile_submissions" alt="" coords="1233,439,1471,591">
+<area shape="rect" id="node8" href="tables/submission_cd.html" target="_top" title="submission_cd" alt="" coords="889,468,1084,620">
+<area shape="rect" id="node4" href="tables/profile_categories.html" target="_top" title="profile_categories" alt="" coords="525,123,747,509">
+<area shape="rect" id="node5" href="tables/site_staffs.html" target="_top" title="site_staffs" alt="" coords="893,1328,1081,1920">
+<area shape="rect" id="node7" href="tables/people_orgs.html" target="_top" title="people_orgs" alt="" coords="535,2345,737,2879">
+<area shape="rect" id="node6" href="tables/event_class_cd.html" target="_top" title="event_class_cd" alt="" coords="246,7913,441,8036">
+<area shape="rect" id="node9" href="tables/land_histories.html" target="_top" title="land_histories" alt="" coords="877,7187,1096,7632">
+<area shape="rect" id="node36" href="tables/land_use_cd.html" target="_top" title="land_use_cd" alt="" coords="549,7461,723,7584">
+<area shape="rect" id="node10" href="tables/partic_role_cd.html" target="_top" title="partic_role_cd" alt="" coords="892,5401,1081,5524">
+<area shape="rect" id="node11" href="tables/site_subdivisions.html" target="_top" title="site_subdivisions" alt="" coords="875,4939,1099,5384">
+<area shape="rect" id="node34" href="tables/subdivisions.html" target="_top" title="subdivisions" alt="" coords="533,4053,739,4763">
+<area shape="rect" id="node12" href="tables/site_profile_owners.html" target="_top" title="site_profile_owners" alt="" coords="1229,4329,1475,4540">
+<area shape="rect" id="node33" href="tables/site_partics.html" target="_top" title="site_partics" alt="" coords="901,4101,1072,4576">
+<area shape="rect" id="node13" href="tables/conditions_text.html" target="_top" title="conditions_text" alt="" coords="1244,7877,1460,8147">
+<area shape="rect" id="node14" href="tables/site_profiles.html" target="_top" title="site_profiles" alt="" coords="1215,2781,1489,4312">
+<area shape="rect" id="node23" href="tables/city_regions.html" target="_top" title="city_regions" alt="" coords="256,3676,431,3799">
+<area shape="rect" id="node15" href="tables/site_assocs.html" target="_top" title="site_assocs" alt="" coords="870,6408,1103,6883">
+<area shape="rect" id="node16" href="tables/site_profile_land_uses.html" target="_top" title="site_profile_land_uses" alt="" coords="861,7649,1113,7860">
+<area shape="rect" id="node17" href="tables/site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="258,5907,429,6029">
+<area shape="rect" id="node18" href="tables/contamination_class_cd.html" target="_top" title="contamination_class_cd" alt="" coords="853,1012,1121,1135">
+<area shape="rect" id="node19" href="tables/site_crown_land_status_cd.html" target="_top" title="site_crown_land_status_cd" alt="" coords="492,901,780,1024">
+<area shape="rect" id="node20" href="tables/event_partic_role_cd.html" target="_top" title="event_partic_role_cd" alt="" coords="866,5541,1107,5664">
+<area shape="rect" id="node43" href="tables/site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="248,8053,439,8176">
+<area shape="rect" id="node22" href="tables/site_docs.html" target="_top" title="site_docs" alt="" coords="896,3544,1077,4048">
+<area shape="rect" id="node24" href="tables/recent_views.html" target="_top" title="recent_views" alt="" coords="884,4593,1089,4921">
+<area shape="rect" id="node25" href="tables/cart.html" target="_top" title="cart" alt="" coords="903,6092,1070,6391">
+<area shape="rect" id="node26" href="tables/sis_addresses.html" target="_top" title="sis_addresses" alt="" coords="893,1937,1081,2676">
+<area shape="rect" id="node27" href="tables/mailout.html" target="_top" title="mailout" alt="" coords="868,2693,1105,3491">
+<area shape="rect" id="node28" href="tables/site_crown_land_contaminated.html" target="_top" title="site_crown_land_contaminated" alt="" coords="824,637,1149,995">
+<area shape="rect" id="node29" href="tables/doc_partic_role_cd.html" target="_top" title="doc_partic_role_cd" alt="" coords="875,1152,1099,1275">
+<area shape="rect" id="node30" href="tables/site_contamination_class_xref.html" target="_top" title="site_contamination_class_xref" alt="" coords="1193,757,1511,997">
+<area shape="rect" id="node31" href="tables/site_doc_partics.html" target="_top" title="site_doc_partics" alt="" coords="1249,1135,1455,1551">
+<area shape="rect" id="node39" href="tables/classification_cd.html" target="_top" title="classification_cd" alt="" coords="239,5408,448,5531">
+<area shape="rect" id="node35" href="tables/event_partics.html" target="_top" title="event_partics" alt="" coords="1259,5553,1445,5969">
+<area shape="rect" id="node37" href="tables/profile_answers.html" target="_top" title="profile_answers" alt="" coords="1240,5,1464,216">
+<area shape="rect" id="node38" href="tables/profile_questions.html" target="_top" title="profile_questions" alt="" coords="878,64,1095,451">
+<area shape="rect" id="node40" href="tables/folio.html" target="_top" title="folio" alt="" coords="553,6900,719,7199">
+<area shape="rect" id="node41" href="tables/snapshots.html" target="_top" title="snapshots" alt="" coords="903,5717,1070,6075">
+<area shape="rect" id="node42" href="tables/folio_contents.html" target="_top" title="folio_contents" alt="" coords="891,6900,1083,7169">
+<area shape="rect" id="node44" href="tables/site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="1248,4868,1456,5225">
+</map>
+                                        <a name='diagram'><img id="largeimpliedDegreeImg" src="diagrams/summary/relationships.implied.large.png" usemap="#largeImpliedRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
+                    </div>
+                </section>
+            </div>
+            <!-- /.content-wrapper -->
+            <footer class="main-footer">
+                <div>
+                    <div class="pull-right hidden-xs">
+                        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+                        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+                    </div>
+                    <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy 6.2.4</a></strong>
+                </div>
+                <!-- /.container -->
+            </footer>
+        </div>
+        <!-- ./wrapper -->
+
+        <!-- jQuery 2.2.3 -->
+        <script src="bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+        <script src="bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+        <!-- Bootstrap 3.3.5 -->
+        <script src="bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+        <!-- DataTables -->
+        <script src="bower/datatables.net/jquery.dataTables.min.js"></script>
+        <script src="bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+        <script src="bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+        <script src="bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+        <script src="bower/datatables.net-buttons/buttons.html5.min.js"></script>
+        <script src="bower/datatables.net-buttons/buttons.print.min.js"></script>
+        <script src="bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+        <!-- SheetJS -->
+        <script src="bower/js-xlsx/xlsx.full.min.js"></script>
+        <!-- pdfmake -->
+        <script src="bower/pdfmake/pdfmake.min.js"></script>
+        <script src="bower/pdfmake/vfs_fonts.js"></script>
+        <!-- SlimScroll -->
+        <script src="bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+        <!-- FastClick -->
+        <script src="bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+        <!-- Salvattore -->
+        <script src="bower/salvattore/salvattore.min.js"></script>
+        <!-- AnchorJS -->
+        <script src="bower/anchor-js/anchor.min.js"></script>
+        <!-- CodeMirror -->
+        <script src="bower/codemirror/codemirror.js"></script>
+        <script src="bower/codemirror/sql.js"></script>
+        <!-- AdminLTE App -->
+        <script src="bower/admin-lte/dist/js/app.min.js"></script>
+        <script src="relationships.js"></script>
+        <script src="schemaSpy.js"></script>
+    </body>
+</html>

@@ -52,7 +52,12 @@ export class SiteProfileOwners {
   // ])
   // siteProfiles: SiteProfiles;
 
-  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfileOwners)
-  @JoinColumn([{ name: 'sp_id', referencedColumnName: 'id' }])
-  sp: SitePartics;
+  // As per our discussion regarding the deletion of a site participant,
+  // it is important to note that other related entities should remain unaffected.
+  // Removing this participant may lead to synchronization issues with oracle.
+  // Therefore, this code has been commented out to prevent potential complications in the future.
+
+  // @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfileOwners)
+  // @JoinColumn([{ name: 'sp_id', referencedColumnName: 'id' }])
+  // sp: SitePartics;
 }

@@ -545,7 +545,6 @@ export class SiteService {
             newDocuments.push({
               ...siteDocument,
               id: documentId,
-              // rwmFlag: 0,
               userAction: UserActionEnum.ADDED,
               srAction: SRApprovalStatusEnum.PENDING,
               whenCreated: new Date(),
@@ -563,7 +562,6 @@ export class SiteService {
               ...siteDocumentParticipant,
               id: newDocParticId.toString(),
               sdocId: documentId,
-              // rwmFlag: 0,
               dprCode: 'ATH', // dprCode is always ATH. We don't have a UI for this value and keeping this column allows us to maintain historical data.
               userAction: UserActionEnum.ADDED,
               srAction: SRApprovalStatusEnum.PENDING,
@@ -692,7 +690,7 @@ export class SiteService {
         id: string;
         changes: Partial<SiteParticRoles>;
       }[] = [];
-      // const deleteSiteParticRoles: { id: string }[] = [];
+      const deleteSiteParticRoles: { id: string }[] = [];
 
       // Main processing loop for site participants
       const siteParticsPromises = siteParticipants.map(async (participant) => {
@@ -736,10 +734,7 @@ export class SiteService {
             newSitePartics.push({
               ...sitePartic,
               id: participantId,
-              rwmFlag: 0,
-              rwmNoteFlag: 0,
               userAction: UserActionEnum.ADDED,
-              // srAction: srAction,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -747,9 +742,7 @@ export class SiteService {
             newSiteParticRoles.push({
               ...siteParticRole,
               spId: participantId,
-              rwmFlag: 0,
               userAction: UserActionEnum.ADDED,
-              // srAction: srAction,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
             });
@@ -769,7 +762,6 @@ export class SiteService {
                   ...existingSitePartic,
                   ...sitePartic,
                   userAction: UserActionEnum.UPDATED,
-                  // srAction: srAction,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },
@@ -786,7 +778,6 @@ export class SiteService {
                     ...existingSiteParticRole,
                     ...siteParticRole,
                     userAction: UserActionEnum.UPDATED,
-                    // srAction: srAction,
                     whenUpdated: new Date(),
                     whoUpdated: userInfo ? userInfo.givenName : '',
                   },
@@ -806,7 +797,7 @@ export class SiteService {
           case UserActionEnum.DELETED:
             // Handle deletion if necessary
             deleteSitePartics.push({ id: participantId });
-            // deleteSiteParticRoles.push({ id: particRoleId });
+            deleteSiteParticRoles.push({ id: particRoleId });
             break;
 
           default:
@@ -847,13 +838,13 @@ export class SiteService {
       }
 
       // Delete existing site participants and site participant roles in bulk
-      // if (deleteSiteParticRoles.length > 0) {
-      //   await Promise.all(
-      //     deleteSiteParticRoles.map(({ id }) =>
-      //       transactionalEntityManager.delete(SiteParticRoles, { id }),
-      //     ),
-      //   );
-      // }
+      if (deleteSiteParticRoles.length > 0) {
+        await Promise.all(
+          deleteSiteParticRoles.map(({ id }) =>
+            transactionalEntityManager.delete(SiteParticRoles, { id }),
+          ),
+        );
+      }
       if (deleteSitePartics.length > 0) {
         await Promise.all(
           deleteSitePartics.map(({ id }) =>
@@ -898,7 +889,6 @@ export class SiteService {
               return {
                 ...particData,
                 eventId,
-                rwmFlag: 50,
                 userAction: UserActionEnum.ADDED,
                 whenCreated: new Date(),
                 whoCreated: userInfo ? userInfo.givenName : '',
@@ -971,8 +961,6 @@ export class SiteService {
               ...event,
               id: notationId,
               eventDate: new Date(),
-              rwmFlag: 50,
-              rwmNoteFlag: 50,
               userAction: UserActionEnum.ADDED,
               whenCreated: new Date(),
               whoCreated: userInfo ? userInfo.givenName : '',
@@ -1081,8 +1069,6 @@ export class SiteService {
           case UserActionEnum.ADDED:
             newSiteAssociates.push({
               ...siteAssoc,
-              rwmFlag: 0,
-              rwmNoteFlag: 0,
               // Need to know common pid relation as it is non-nullable field in DB and we don't and visibility in our design for same.
               commonPid: 'N',
               userAction: UserActionEnum.ADDED,

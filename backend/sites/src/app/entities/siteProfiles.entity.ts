@@ -366,23 +366,33 @@ export class SiteProfiles extends ChangeAuditEntity {
   // )
   // siteProfileOwners: SiteProfileOwners[];
 
-  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles)
-  @JoinColumn([{ name: 'completor_partic_id', referencedColumnName: 'id' }])
-  completorPartic: SitePartics;
+  // As per our discussion regarding the deletion of a site participant,
+  // it is important to note that other related entities should remain unaffected.
+  // Removing this participant may lead to synchronization issues with oracle.
+  // Therefore, this code has been commented out to prevent potential complications in the future.
 
-  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles2)
-  @JoinColumn([{ name: 'contact_partic_id', referencedColumnName: 'id' }])
-  contactPartic: SitePartics;
+  // @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles)
+  // @JoinColumn([{ name: 'completor_partic_id', referencedColumnName: 'id' }])
+  // completorPartic: SitePartics;
 
-  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles3)
-  @JoinColumn([{ name: 'rwm_partic_id', referencedColumnName: 'id' }])
-  rwmPartic: SitePartics;
+  // @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles2)
+  // @JoinColumn([{ name: 'contact_partic_id', referencedColumnName: 'id' }])
+  // contactPartic: SitePartics;
+
+  // @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles3)
+  // @JoinColumn([{ name: 'rwm_partic_id', referencedColumnName: 'id' }])
+  // rwmPartic: SitePartics;
 
   @ManyToOne(() => Sites, (sites) => sites.siteProfiles)
   @JoinColumn([{ name: 'site_id', referencedColumnName: 'id' }])
   site: Sites;
 
-  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles4)
-  @JoinColumn([{ name: 'site_reg_partic_id', referencedColumnName: 'id' }])
-  siteRegPartic: SitePartics;
+  // As per our discussion regarding the deletion of a site participant,
+  // it is important to note that other related entities should remain unaffected.
+  // Removing this participant may lead to synchronization issues with oracle.
+  // Therefore, this code has been commented out to prevent potential complications in the future.
+
+  // @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles4)
+  // @JoinColumn([{ name: 'site_reg_partic_id', referencedColumnName: 'id' }])
+  // siteRegPartic: SitePartics;
 }

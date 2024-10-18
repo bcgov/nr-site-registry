@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev
+      - fix/cicd-dev-triggers # TODO REMOVE THIS BEFORE MERGING BACK INTO DEV
 
 concurrency:
   # Cancel in progress for PR open and close
@@ -30,7 +31,7 @@ jobs:
     secrets: inherit
     needs: [get-pr-info ]
     with:
-      triggers: ('backend/' 'frontend/')
+      # triggers: ('backend/' 'frontend/')
       environment: test
       tag:  ${{ needs.get-pr-info.outputs.pr }}
       params:

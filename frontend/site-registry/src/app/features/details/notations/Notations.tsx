@@ -1,25 +1,17 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import PanelWithUpDown from '../../../components/simple/PanelWithUpDown';
-import Form from '../../../components/form/Form';
 import './Notations.css';
 import Widget from '../../../components/widget/Widget';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { UserType } from '../../../helpers/requests/userType';
 import { AppDispatch } from '../../../Store';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  Plus,
-  SpinnerIcon,
-  UserMinus,
-  UserPlus,
-} from '../../../components/common/icon';
+import { Plus } from '../../../components/common/icon';
 import {
   ChangeTracker,
   IChangeType,
 } from '../../../components/common/IChangeType';
 import {
   resetSiteDetails,
-  selectSiteDetails,
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
@@ -39,7 +31,6 @@ import {
   FormFieldType,
   IFormField,
 } from '../../../components/input-controls/IFormField';
-import Actions from '../../../components/action/Actions';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import {
   ministryContactDrpdown,
@@ -58,7 +49,7 @@ import { useParams } from 'react-router-dom';
 import { GRAPHQL } from '../../../helpers/endpoints';
 import { print } from 'graphql';
 import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
-import GetNotationConfig from './NotationsConfig';
+import { GetNotationConfig } from './NotationsConfig';
 import infoIcon from '../../../images/info-icon.png';
 import {
   getSiteNoatations,
@@ -69,7 +60,6 @@ import { UserActionEnum } from '../../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { IComponentProps } from '../navigation/NavigationPillsConfig';
 import Notation from './Notation';
-import { currentSiteId } from '../SaveSiteDetailsSlice';
 
 const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   const {
@@ -190,37 +180,39 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       const uniquePsnOrgs: any = Array.from(
         new Map(psnOrgs.map((item: any) => [item.key, item])).values(),
       );
-      setOptions(uniquePsnOrgs);
 
-      setInternalTableColumn((prev) =>
-        updateTableColumn(prev, {
-          indexToUpdate: prev.findIndex(
-            (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
-          ),
-          updates: {
-            isLoading: RequestStatus.success,
-            options: uniquePsnOrgs,
-            filteredOptions: [],
-            handleSearch,
-            customInfoMessage: <></>,
-          },
-        }),
-      );
-      setExternalTableCoulmn((prev) =>
-        updateTableColumn(prev, {
-          indexToUpdate: prev.findIndex(
-            (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
-          ),
-          updates: {
-            isLoading: RequestStatus.success,
-            options: uniquePsnOrgs,
-            filteredOptions: [],
-            handleSearch,
-            customInfoMessage: <></>,
-          },
-        }),
-      );
-      setFormData(notations);
+      if (JSON.stringify(uniquePsnOrgs) !== JSON.stringify(options)) {
+        setOptions(uniquePsnOrgs);
+        setInternalTableColumn((prev) =>
+          updateTableColumn(prev, {
+            indexToUpdate: prev.findIndex(
+              (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
+            ),
+            updates: {
+              isLoading: RequestStatus.success,
+              options: uniquePsnOrgs,
+              filteredOptions: [],
+              handleSearch,
+              customInfoMessage: <></>,
+            },
+          }),
+        );
+        setExternalTableCoulmn((prev) =>
+          updateTableColumn(prev, {
+            indexToUpdate: prev.findIndex(
+              (item) => item.displayType?.graphQLPropertyName === 'psnorgId',
+            ),
+            updates: {
+              isLoading: RequestStatus.success,
+              options: uniquePsnOrgs,
+              filteredOptions: [],
+              handleSearch,
+              customInfoMessage: <></>,
+            },
+          }),
+        );
+        setFormData(notations);
+      }
     }
   }, [notations, status]);
 
@@ -290,8 +282,17 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   // Update ministry contact options
   useEffect(() => {
-    if (notationParticipantRole) {
-      setMinistryContactOptions(ministryContact.data);
+    if (notationParticipantRole && ministryContact.data) {
+      const newOptions = ministryContact.data;
+
+      // Check if the new options are different from the current options
+      const isDifferent =
+        JSON.stringify(ministryContactOptions) !== JSON.stringify(newOptions);
+
+      if (isDifferent) {
+        setMinistryContactOptions(newOptions);
+      }
+
       const indexToUpdate = internalTableColumn.findIndex(
         (item) => item.displayType?.graphQLPropertyName === 'eprCode',
       );
@@ -306,7 +307,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       setInternalTableColumn((prev) => updateTableColumn(prev, updateParams));
       setExternalTableCoulmn((prev) => updateTableColumn(prev, updateParams));
     }
-  }, [notationParticipantRole, ministryContact.data]);
+  }, [notationParticipantRole, ministryContact, ministryContactOptions]);
 
   // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
   // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED

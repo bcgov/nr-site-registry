@@ -26,7 +26,18 @@ export class MasterScript1728425598626 implements MigrationInterface {
       `ALTER TABLE "sites"."site_profiles" ADD CONSTRAINT "PK_0a0ceed6b2a8309a042c3ee1b91" PRIMARY KEY ("site_id", "date_completed", "id")`,
     );
     await queryRunner.query(
-      `ALTER TABLE "sites"."snapshots" ADD "when_created" TIMESTAMP NOT NULL DEFAULT now()`,
+      `DO $$
+       BEGIN
+       IF NOT EXISTS (      
+           SELECT 1
+           FROM information_schema.columns
+           WHERE table_schema = 'sites'
+             AND table_name = 'snapshots'
+             AND column_name = 'when_created'       
+       ) THEN
+        ALTER TABLE "sites"."snapshots" ADD "when_created" TIMESTAMP NOT NULL DEFAULT now();
+       END IF;
+       END $$`,
     );
     await queryRunner.query(
       `ALTER TABLE "sites"."site_profiles" DROP CONSTRAINT "FK_2cca26154be730cfec15ef6cb09"`,

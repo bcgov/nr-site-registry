@@ -28,6 +28,4 @@ RUN apk add postgresql-client
 EXPOSE 4005
 
 # Start up command
-
-# Start up command
 ENTRYPOINT ["sh","/app/local_start.sh"]

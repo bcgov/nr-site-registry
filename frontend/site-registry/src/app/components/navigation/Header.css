@@ -59,11 +59,6 @@ header .other {
 
 .header-right-corner-section {
   gap: var(--layout-padding-large);
-  opacity: 0px;
-  /* display: flex; 
-    gap: 16px;
-    opacity: 0px;
-    align-items: center; */
 }
 
 .bars-button {

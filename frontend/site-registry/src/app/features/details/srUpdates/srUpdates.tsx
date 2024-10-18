@@ -602,6 +602,7 @@ const SRUpdates = () => {
     } else if (event && event.property === SRApprovalStatusEnum.Private) {
       updatedRecord = {
         ...record,
+        apiAction: UserActionEnum.updated,
         userAction: UserActionEnum.default,
         srAction: SRApprovalStatusEnum.Private,
       };
@@ -610,6 +611,34 @@ const SRUpdates = () => {
     let saveDTO = {
       ...getDefaultObjectForSaving(),
       siteParticipants: updatedRecord,
+    };
+
+    dispatch(updateSiteDetailsForApproval(saveDTO));
+  };
+
+
+  const handleAssociatedSiteApproveRejectHandler = (event: any) => {
+    let record = event?.row;
+    let updatedRecord = null;
+    if (event && event.property === SRApprovalStatusEnum.Public) {
+      updatedRecord = {
+        ...record,
+        apiAction: UserActionEnum.updated,
+        userAction: UserActionEnum.default,
+        srAction: SRApprovalStatusEnum.Public,
+      };
+    } else if (event && event.property === SRApprovalStatusEnum.Private) {
+      updatedRecord = {
+        ...record,
+        apiAction: UserActionEnum.updated,
+        userAction: UserActionEnum.default,
+        srAction: SRApprovalStatusEnum.Private,
+      };
+    }
+
+    let saveDTO = {
+      ...getDefaultObjectForSaving(),
+      siteAssociations: updatedRecord,
     };
 
     dispatch(updateSiteDetailsForApproval(saveDTO));
@@ -753,7 +782,7 @@ const SRUpdates = () => {
       {associatedSitesData && associatedSitesData.length > 0 && (
         <ApproveReject name="Site Associations">
           <AssociateSiteComponent
-            handleTableChange={handleChange}
+            handleTableChange={handleAssociatedSiteApproveRejectHandler}
             handleWidgetCheckBox={handleChange}
             userType={UserType.Internal}
             viewMode={SiteDetailsMode.ViewOnlyMode}

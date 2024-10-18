@@ -1103,7 +1103,10 @@ export class SiteService {
                 changes: {
                   ...existingSiteAssoc,
                   ...siteAssoc,
-                  userAction: UserActionEnum.UPDATED,
+                  userAction: asscos.srAction === SRApprovalStatusEnum.PUBLIC ||
+                  asscos.srAction === SRApprovalStatusEnum.PRIVATE
+                    ? UserActionEnum.DEFAULT
+                    : UserActionEnum.UPDATED,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },

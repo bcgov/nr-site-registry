@@ -1,23 +1,71 @@
 import { render, screen } from '@testing-library/react';
 import Disclosure from './Disclosure';
-import { Provider, useSelector } from 'react-redux';
+import { Provider, useSelector, useDispatch } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { RequestStatus } from '../../../helpers/requests/status';
 
-// Mocking the useSelector hook with the correct state structure
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
-  useSelector: jest.fn(),
-}));
+const mockDisclosure = {
+  id: '900bc9eb-46b4-4708-bb4c-bea32e59390a',
+  siteId: '9',
+  dateCompleted: '2024-10-08T07:00:00.000Z',
+  rwmDateDecision: '2024-10-08T07:00:00.000Z',
+  localAuthDateRecd: '2024-10-08T07:00:00.000Z',
+  siteRegDateEntered: '2024-10-18T07:00:00.000Z',
+  siteRegDateRecd: '2024-10-08T07:00:00.000Z',
+  govDocumentsComment: 'Test',
+  siteDisclosureComment: 'Test',
+  plannedActivityComment: 'Test',
+  srAction: 'false',
+};
+
+jest.mock('react-redux', () => {
+  const actualRedux = jest.requireActual('react-redux');
+  return {
+    ...actualRedux,
+    useSelector: jest.fn(() => ({
+      siteDisclosure: {
+        siteDisclosure: mockDisclosure,
+        status: 'success',
+        error: '',
+      },
+      sites: {
+        siteDetailsMode: 'edit',
+        resetSiteDetails: false,
+      },
+      siteDetails: {
+        saveRequestStatus: 'success',
+        profilesData: [mockDisclosure],
+      },
+    })),
+    useDispatch: jest.fn(() => ({
+      siteDisclosure: {
+        siteDisclosure: mockDisclosure,
+        status: 'success',
+        error: '',
+      },
+      sites: {
+        siteDetailsMode: 'edit',
+        userType: 'Internal',
+        resetSiteDetails: false,
+      },
+      siteDetails: {
+        saveRequestStatus: 'success',
+        profilesData: [mockDisclosure],
+      },
+    })),
+  };
+});
+
 const mockStore = configureStore([thunk]);
 
 describe('Disclosure Component', () => {
   let store;
-
+  let dispatch;
   beforeEach(() => {
+    dispatch = jest.fn(); // Create a mock dispatch function
     store = mockStore({
       sites: {
         siteDetails: {
@@ -25,12 +73,16 @@ describe('Disclosure Component', () => {
         },
       },
       siteDisclosure: {
-        siteDisclosure: {},
+        siteDisclosure: mockDisclosure,
         status: RequestStatus.idle,
         error: null,
       },
       user: {
         user: { userType: UserType.External },
+      },
+      siteDetails: {
+        saveRequestStatus: 'success',
+        profilesData: mockDisclosure,
       },
     });
 
@@ -42,27 +94,20 @@ describe('Disclosure Component', () => {
           },
         },
         siteDisclosure: {
-          siteDisclosure: {
-            siteId: '9',
-            dateCompleted: '1997-09-09T07:00:00.000Z',
-            rwmDateDecision: '1997-09-09T07:00:00.000Z',
-            localAuthDateRecd: '1997-09-09T07:00:00.000Z',
-            siteRegDateEntered: null,
-            siteRegDateRecd: null,
-            govDocumentsComment: 'TESTING GOV DOCS COMMENTS.',
-            siteDisclosureComment: 'TESTING SITE DISCLOSURE COMMENTS.',
-            plannedActivityComment: 'TESTING COMMENT IN PLANNED ACTIVITY.',
-            siteDisclosure: [
-              { id: 1, statement: 'TESTING GOV DOCS COMMENTS.' },
-            ],
-            status: RequestStatus.succeeded,
-          },
+          siteDisclosure: mockDisclosure,
+          status: RequestStatus.idle,
+          error: null,
         },
         user: {
           user: { userType: UserType.External },
         },
+        siteDetails: {
+          saveRequestStatus: 'success',
+          profilesData: mockDisclosure,
+        },
       });
     });
+    useDispatch.mockReturnValue(dispatch); // Return the mock dispatch function
   });
 
   afterEach(() => {
@@ -72,7 +117,7 @@ describe('Disclosure Component', () => {
   it('renders Disclosure component', () => {
     render(
       <Provider store={store}>
-        <Disclosure />
+        <Disclosure showPending={false} />
       </Provider>,
     );
     const disclosureComponent = screen.getByTestId('disclosure-component');
@@ -95,11 +140,15 @@ describe('Disclosure Component', () => {
         user: {
           user: { userType: UserType.External },
         },
+        siteDetails: {
+          saveRequestStatus: 'success',
+          profilesData: mockDisclosure,
+        },
       });
     });
     render(
       <Provider store={store}>
-        <Disclosure />
+        <Disclosure showPending={false} />
       </Provider>,
     );
     expect(screen.getByText('No Results Found')).toBeInTheDocument();
@@ -107,19 +156,37 @@ describe('Disclosure Component', () => {
 
   it('displays disclosure data when available', async () => {
     store = mockStore({
-      ...store.getState().disclosure,
-      status: RequestStatus.loading,
+      sites: {
+        siteDetails: {
+          siteDetailsMode: SiteDetailsMode.EditMode,
+        },
+      },
+      siteDisclosure: {
+        siteDisclosure: mockDisclosure,
+        status: RequestStatus.success,
+        error: null,
+      },
+      user: {
+        user: { userType: UserType.External },
+      },
+      siteDetails: {
+        saveRequestStatus: 'success',
+        profilesData: [mockDisclosure],
+      },
     });
 
     render(
       <Provider store={store}>
-        <Disclosure />
+        <Disclosure showPending={false} />
       </Provider>,
     );
-    expect(
-      screen.getByText((content, element) =>
-        content.startsWith('TESTING GOV DOCS COMMENTS.'),
-      ),
-    ).toBeInTheDocument();
+
+    const elements = await screen.findAllByText((content) =>
+      content.startsWith('Test'),
+    );
+    expect(elements.length).toBe(3);
+    expect(elements[0].textContent).toEqual('Test');
+    expect(elements[1].textContent).toEqual('Test');
+    expect(elements[2].textContent).toEqual('Test');
   });
 });

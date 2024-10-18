@@ -6,9 +6,11 @@ import { In } from 'typeorm';
 import { LandHistoriesInputDTO } from '../../dto/landHistoriesInput.dto';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 import { REQUEST } from '@nestjs/core';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('LandHistoryService', () => {
   let landHistoryService: LandHistoryService;
+  let loggerServive: LoggerService;
 
   let entityManagerMock: {
     save: jest.Mock;
@@ -53,10 +55,12 @@ describe('LandHistoryService', () => {
           provide: REQUEST,
           useValue: { req: { user: mockUser } },
         },
+        LoggerService
       ],
     }).compile();
 
     landHistoryService = moduleRef.get<LandHistoryService>(LandHistoryService);
+    loggerServive = moduleRef.get<LoggerService>(LoggerService);
   });
 
   afterEach(() => {
@@ -70,7 +74,8 @@ describe('LandHistoryService', () => {
   describe('getLandHistoriesForSite', () => {
     it('should call LandHistories repository with correct data', async () => {
       const siteId = 'site123';
-      await landHistoryService.getLandHistoriesForSite(siteId, '', 'ASC');
+      const showPending = false;
+      await landHistoryService.getLandHistoriesForSite(siteId, '', 'ASC',showPending);
 
       expect(whereMock).toHaveBeenCalledWith('site_id = :siteId', {
         siteId,

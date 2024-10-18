@@ -8,6 +8,7 @@ import { EventClassCd } from '../../entities/eventClassCd.entity';
 import { EventTypeCd } from '../../entities/eventTypeCd.entity';
 import { EventParticRoleCd } from '../../entities/eventParticRoleCd.entity';
 import { LoggerService } from '../../logger/logger.service';
+import { User } from '../../entities/user.entity';
 
 // Mock particRoleCd and peopleOrgs entities and their methods
 jest.mock('../../entities/particRoleCd.entity');
@@ -21,6 +22,7 @@ describe('DropdownService', () => {
   let eventTypeCdRepository: Repository<EventTypeCd>;
   let eventParticRoleCdRepository: Repository<EventParticRoleCd>;
   let sitesLogger: LoggerService;
+  let userRepository: Repository<User>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -47,6 +49,10 @@ describe('DropdownService', () => {
           provide: getRepositoryToken(EventParticRoleCd),
           useClass: Repository,
         },
+        {
+          provide: getRepositoryToken(User),
+          useClass: Repository,
+        },
       ],
     }).compile();
 
@@ -67,6 +73,8 @@ describe('DropdownService', () => {
     eventParticRoleCdRepository = module.get<Repository<EventParticRoleCd>>(
       getRepositoryToken(EventParticRoleCd),
     );
+
+    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
   afterEach(() => {

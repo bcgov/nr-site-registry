@@ -4,11 +4,13 @@ import { LandHistoryService } from '../../services/landHistory/landHistory.servi
 import { LandHistoryResolver } from './landHistory.resolver';
 import { Test } from '@nestjs/testing';
 import { LandHistoryResponse } from '../../dto/landHistory.dto';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('LandHistoryResolver', () => {
   let resolver: LandHistoryResolver;
   let landHistoryService: LandHistoryService;
   let genericResponseProvider: GenericResponseProvider<LandHistories[]>;
+  let loggerService: LoggerService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -38,6 +40,7 @@ describe('LandHistoryResolver', () => {
             ),
           },
         },
+        LoggerService,
       ],
     }).compile();
 
@@ -46,6 +49,7 @@ describe('LandHistoryResolver', () => {
     genericResponseProvider = module.get<
       GenericResponseProvider<LandHistories[]>
     >(GenericResponseProvider);
+    loggerService = module.get<LoggerService>(LoggerService);
   });
 
   afterEach(() => {
@@ -60,6 +64,8 @@ describe('LandHistoryResolver', () => {
     it('should return land histories when found', async () => {
       const mockLandHistories = [new LandHistories()];
 
+      const showPending = false;
+
       const expectedResponse: LandHistoryResponse = {
         message: 'Land uses fetched successfully',
         httpStatusCode: 200,
@@ -71,7 +77,12 @@ describe('LandHistoryResolver', () => {
         .spyOn(landHistoryService, 'getLandHistoriesForSite')
         .mockResolvedValueOnce(mockLandHistories);
 
-      const result = await resolver.getLandHistoriesForSite('1', '', 'ASC');
+      const result = await resolver.getLandHistoriesForSite(
+        '1',
+        '',
+        'ASC',
+        showPending,
+      );
 
       expect(result).toEqual(expectedResponse);
       expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
@@ -91,11 +102,18 @@ describe('LandHistoryResolver', () => {
         data: null,
       };
 
+      const showPending = false;
+
       jest
         .spyOn(landHistoryService, 'getLandHistoriesForSite')
         .mockResolvedValueOnce([]);
 
-      const result = await resolver.getLandHistoriesForSite(siteId, '', 'ASC');
+      const result = await resolver.getLandHistoriesForSite(
+        siteId,
+        '',
+        'ASC',
+        showPending,
+      );
 
       expect(result).toEqual(expectedResponse);
       expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(

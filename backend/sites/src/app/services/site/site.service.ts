@@ -1728,6 +1728,7 @@ export class SiteService {
       await transactionalEntityManager.save(HistoryLog, historyLog);
 
       this.sitesLogger.log('SiteService.processSRBulkUpdates() end');
+
       return true;
     } catch (error) {
       this.sitesLogger.log(

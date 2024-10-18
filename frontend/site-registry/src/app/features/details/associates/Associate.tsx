@@ -108,7 +108,6 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Handle view mode changes
   useEffect(() => {
     setViewMode(mode);
-    dispatch(setupSiteAssociationDataForSaving(sitesAssociated));
   }, [mode]);
 
   // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
@@ -453,7 +452,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
       // Update both formData and trackAssociatedSites
       const updatedAssocs = updateAssocSites(formData, event);
       const updatedTrackAssocSite = updateAssocSites(
-        trackAssociatedSite,
+        trackAssociatedSite ?? formData,
         event,
       );
       setFormData(updatedAssocs);
@@ -533,7 +532,9 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       // Update both formData and trackAssociatedSites
       const updatedAssocs = updateAssocites(formData);
-      const updatedTrackAssocSite = updateAssocites(trackAssociatedSite);
+      const updatedTrackAssocSite = updateAssocites(
+        trackAssociatedSite ?? formData,
+      );
 
       // Filter out assocs based on selectedRows for formData
       const filteredPartics = updatedAssocs.filter(
@@ -570,7 +571,10 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     setFormData((prevData) => [newAssoc, ...prevData]);
     dispatch(updateAssociatedSites([newAssoc, ...formData]));
     dispatch(
-      setupSiteAssociationDataForSaving([newAssoc, ...trackAssociatedSite]),
+      setupSiteAssociationDataForSaving([
+        newAssoc,
+        ...(trackAssociatedSite ?? formData),
+      ]),
     );
     dispatch(
       trackChanges(

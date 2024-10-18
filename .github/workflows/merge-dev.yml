@@ -22,17 +22,15 @@ jobs:
         run: |
           echo "PR: ${{ steps.vars.outputs.pr }}"
           
-          
 
   deploys:
     name: Deploys to TEST
     uses: ./.github/workflows/.deployer.yml
     secrets: inherit
-    needs: [get-pr-info ]
+    needs: [get-pr-info] 
     with:
-      triggers: ('backend/' 'frontend/' '.github/')
       environment: test
-      tag:  ${{ needs.get-pr-info.outputs.pr }}
+      tag:  '${{ needs.get-pr-info.outputs.pr }}'
       params:
         --set backendSites.deploymentStrategy=RollingUpdate
         --set frontendSiteRegistry.deploymentStrategy=RollingUpdate

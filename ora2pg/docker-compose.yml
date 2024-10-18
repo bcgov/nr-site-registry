@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  ora2pg:
+    build: .
+    container_name: ora2pg_service
+    environment:
+      ORA_HOST: ${ORA_HOST}
+      ORA_USER: ${ORA_USER}
+      ORA_PWD: ${ORA_PWD}

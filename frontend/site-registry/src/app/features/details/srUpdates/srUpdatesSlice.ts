@@ -40,7 +40,7 @@ export const updateSiteDetailsForApproval = createAsyncThunk(
 );
 
 export const fetchPendingAssociatedSites = createAsyncThunk(
-  'associatedSites/fetchAssociatedSites',
+  'associatedSites/fetchAssociatedSitesForSRApproval',
   async ({ siteId, showPending }: { siteId: string; showPending: boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {

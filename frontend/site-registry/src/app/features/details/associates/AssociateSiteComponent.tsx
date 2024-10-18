@@ -63,7 +63,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
         title={'Associated Sites'}
         tableColumns={
           userType === UserType.Internal
-            ? viewMode == SiteDetailsMode.EditMode
+            ? viewMode === SiteDetailsMode.EditMode
               ? internalRow
               : associateColumnInternalSRandViewMode
             : associateColumnExternal

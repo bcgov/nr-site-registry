@@ -99,6 +99,7 @@ const SRUpdates = () => {
   } = GetConfig();
 
   const {
+    associateColumnInternal,
     associateColumnExternal,
     associateColumnInternalSRandViewMode,
     srVisibilityAssocConfig,
@@ -116,13 +117,13 @@ const SRUpdates = () => {
       id: 7,
       displayName: '',
       active: true,
-      graphQLPropertyName: 'psnorgId',
+      graphQLPropertyName: SRApprovalStatusEnum.Public,
       columnSize: ColumnSize.Default,
       displayType: {
         type: FormFieldType.IconButton,
         label: '',
         placeholder: 'Approve',
-        graphQLPropertyName: 'psnorgId',
+        graphQLPropertyName: SRApprovalStatusEnum.Public,
         value: '',
         tableMode: true,
         customIcon: <TickIcon />,
@@ -134,13 +135,13 @@ const SRUpdates = () => {
       id: 8,
       displayName: '',
       active: true,
-      graphQLPropertyName: 'psnorgId',
+      graphQLPropertyName: SRApprovalStatusEnum.Private,
       columnSize: ColumnSize.Default,
       displayType: {
         type: FormFieldType.IconButton,
         label: '',
         placeholder: 'Not Public',
-        graphQLPropertyName: 'psnorgId',
+        graphQLPropertyName: SRApprovalStatusEnum.Private,
         value: '',
         tableMode: true,
         customIcon: <XmarkIcon />,
@@ -149,6 +150,48 @@ const SRUpdates = () => {
       },
     },
   ]);
+
+
+  const [updatedAssociateColumnInternalSRandViewMode, updatedSetAssociateColumnInternalSRandViewMode] = useState([
+    ...associateColumnInternalSRandViewMode,
+    {
+      id: 7,
+      displayName: '',
+      active: true,
+      graphQLPropertyName: SRApprovalStatusEnum.Public,
+      columnSize: ColumnSize.Default,
+      displayType: {
+        type: FormFieldType.IconButton,
+        label: '',
+        placeholder: 'Approve',
+        graphQLPropertyName: SRApprovalStatusEnum.Public,
+        value: '',
+        tableMode: true,
+        customIcon: <TickIcon />,
+        customLinkValue: 'Approve',
+        customInputTextCss: 'approve-tick-icon',
+      },
+    },
+    {
+      id: 8,
+      displayName: '',
+      active: true,
+      graphQLPropertyName: SRApprovalStatusEnum.Private,
+      columnSize: ColumnSize.Default,
+      displayType: {
+        type: FormFieldType.IconButton,
+        label: '',
+        placeholder: 'Not Public',
+        graphQLPropertyName: SRApprovalStatusEnum.Private,
+        value: '',
+        tableMode: true,
+        customIcon: <XmarkIcon />,
+        customLinkValue: 'Not Public',
+        customInputTextCss: 'close-tick-icon',
+      },
+    },
+  ]);
+
 
   useEffect(() => {
     if (particRoleDropdwn) {
@@ -377,7 +420,6 @@ const SRUpdates = () => {
       siteParticipants: null,
       documents: null,
       siteAssociations: null,
-      subDivisions: null,
       landHistories: null,
       profiles: null,
       sitesSummary: null,
@@ -547,6 +589,32 @@ const SRUpdates = () => {
     }
   };
 
+  const handleParticipantsApproveRejectHandler = (event: any) => {
+    let record = event?.row;
+    let updatedRecord = null;
+    if (event && event.property === SRApprovalStatusEnum.Public) {
+      updatedRecord = {
+        ...record,
+        apiAction: UserActionEnum.updated,
+        userAction: UserActionEnum.default,
+        srAction: SRApprovalStatusEnum.Public,
+      };
+    } else if (event && event.property === SRApprovalStatusEnum.Private) {
+      updatedRecord = {
+        ...record,
+        userAction: UserActionEnum.default,
+        srAction: SRApprovalStatusEnum.Private,
+      };
+    }
+
+    let saveDTO = {
+      ...getDefaultObjectForSaving(),
+      siteParticipants: updatedRecord,
+    };
+
+    dispatch(updateSiteDetailsForApproval(saveDTO));
+  };
+
   const handleNotationApproveRejectHandler = (
     notation: any,
     isApproved: boolean,
@@ -637,7 +705,7 @@ const SRUpdates = () => {
       {siteParticipantData && siteParticipantData.length > 0 && (
         <ApproveReject name="Participants">
           <ParticipantTable
-            handleTableChange={handleChange}
+            handleTableChange={handleParticipantsApproveRejectHandler}
             handleWidgetCheckBox={handleChange}
             internalRow={internalRow}
             externalRow={externalRow}
@@ -689,11 +757,11 @@ const SRUpdates = () => {
             handleWidgetCheckBox={handleChange}
             userType={UserType.Internal}
             viewMode={SiteDetailsMode.ViewOnlyMode}
-            internalRow={internalRow}
+            internalRow={null}
             associateColumnInternalSRandViewMode={
-              associateColumnInternalSRandViewMode
+              updatedAssociateColumnInternalSRandViewMode
             }
-            associateColumnExternal={associateColumnExternal}
+            associateColumnExternal={null}
             formData={associatedSitesData}
             loading={RequestStatus.success}
             handleTableSort={handleChange}

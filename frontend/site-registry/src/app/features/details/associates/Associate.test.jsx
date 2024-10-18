@@ -1,40 +1,39 @@
 import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import Associate from './Associate';
-import { Provider, useSelector } from 'react-redux';
+import { Provider, useSelector, useDispatch } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { MemoryRouter } from 'react-router-dom';
 import { GetAssociateConfig } from './AssociateConfig';
-import {
-  CircleXMarkIcon,
-  MagnifyingGlassIcon,
-} from '../../../components/common/icon';
 
+const mockAssocs = [
+  {
+    guid: '1',
+    siteId: '123',
+    siteIdAssociatedWith: '456',
+    effectiveDate: '2024-08-15',
+    note: 'Note 1',
+    sr: true,
+  },
+  {
+    guid: '2',
+    siteId: '789',
+    siteIdAssociatedWith: '101',
+    effectiveDate: '2024-08-16',
+    note: 'Note 2',
+    sr: false,
+  },
+];
 const mockStore = configureStore([thunk]);
 
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
-  useSelector: jest.fn((selector) =>
-    selector({
+// Mocking the useSelector hook with the correct state structure
+jest.mock('react-redux', () => {
+  const actualRedux = jest.requireActual('react-redux');
+  return {
+    ...actualRedux,
+    useSelector: jest.fn(() => ({
       associatedSites: {
-        siteAssociate: [
-          {
-            guid: '1',
-            siteId: '123',
-            siteIdAssociatedWith: '456',
-            effectiveDate: '2024-08-15',
-            note: 'Note 1',
-            sr: true,
-          },
-          {
-            guid: '2',
-            siteId: '789',
-            siteIdAssociatedWith: '101',
-            effectiveDate: '2024-08-16',
-            note: 'Note 2',
-            sr: false,
-          },
-        ],
+        siteAssociate: mockAssocs,
         status: 'success',
         error: '',
       },
@@ -42,10 +41,26 @@ jest.mock('react-redux', () => ({
         siteDetailsMode: 'edit',
         resetSiteDetails: false,
       },
-    }),
-  ),
-  useDispatch: jest.fn(),
-}));
+      siteDetails: {
+        saveRequestStatus: 'success',
+      },
+    })),
+    useDispatch: jest.fn(() => ({
+      associatedSites: {
+        siteAssociate: mockAssocs,
+        status: 'success',
+        error: '',
+      },
+      sites: {
+        siteDetailsMode: 'edit',
+        resetSiteDetails: false,
+      },
+      siteDetails: {
+        saveRequestStatus: 'success',
+      },
+    })),
+  };
+});
 
 jest.mock('./AssociateConfig', () => ({
   GetAssociateConfig: jest.fn(() => ({
@@ -299,28 +314,12 @@ jest.mock('./AssociateConfig', () => ({
 
 describe('Associate component', () => {
   let store;
-
+  let dispatch;
   beforeEach(() => {
+    dispatch = jest.fn(); // Create a mock dispatch function
     store = mockStore({
       associatedSites: {
-        siteAssociate: [
-          {
-            guid: '1',
-            siteId: '123',
-            siteIdAssociatedWith: '456',
-            effectiveDate: '2024-08-15',
-            note: 'Note 1',
-            sr: true,
-          },
-          {
-            guid: '2',
-            siteId: '789',
-            siteIdAssociatedWith: '101',
-            effectiveDate: '2024-08-16',
-            note: 'Note 2',
-            sr: false,
-          },
-        ],
+        siteAssociate: mockAssocs,
         status: 'success',
         error: '',
       },
@@ -582,24 +581,7 @@ describe('Associate component', () => {
     useSelector.mockImplementation((callback) => {
       return callback({
         associatedSites: {
-          siteAssociate: [
-            {
-              guid: '1',
-              siteId: '123',
-              siteIdAssociatedWith: '456',
-              effectiveDate: '2024-08-15',
-              note: 'Note 1',
-              sr: true,
-            },
-            {
-              guid: '2',
-              siteId: '789',
-              siteIdAssociatedWith: '101',
-              effectiveDate: '2024-08-16',
-              note: 'Note 2',
-              sr: false,
-            },
-          ],
+          siteAssociate: mockAssocs,
           status: 'success',
           error: '',
         },
@@ -607,8 +589,13 @@ describe('Associate component', () => {
           siteDetailsMode: 'edit',
           resetSiteDetails: false,
         },
+        siteDetails: {
+          saveRequestStatus: 'success',
+        },
       });
     });
+
+    useDispatch.mockReturnValue(dispatch); // Return the mock dispatch function
   });
 
   afterEach(() => {
@@ -619,7 +606,7 @@ describe('Associate component', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <Associate />
+          <Associate showPending={false} />
         </MemoryRouter>
       </Provider>,
     );
@@ -631,7 +618,7 @@ describe('Associate component', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <Associate />
+          <Associate showPending={false} />
         </MemoryRouter>
       </Provider>,
     );
@@ -650,7 +637,7 @@ describe('Associate component', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <Associate />
+          <Associate showPending={false} />
         </MemoryRouter>
       </Provider>,
     );
@@ -677,7 +664,7 @@ describe('Associate component', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <Associate />
+          <Associate showPending={false} />
         </MemoryRouter>
       </Provider>,
     );

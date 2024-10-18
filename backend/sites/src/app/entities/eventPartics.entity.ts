@@ -67,9 +67,10 @@ export class EventPartics extends ChangeAuditEntity {
   })
   whenUpdated: Date | null;
 
-  @Field()
-  @Column('smallint', { name: 'rwm_flag' })
-  rwmFlag: number;
+  //Make this nullable because we are not using it anymore and keeing it for historical data
+  @Field({ nullable: true })
+  @Column('smallint', { name: 'rwm_flag', nullable: true })
+  rwmFlag: number | null;
 
   @ManyToOne(
     () => EventParticRoleCd,

@@ -42,8 +42,10 @@ spec:
               containerPort: 8080
               protocol: TCP
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /health
               port: 8080
+              scheme: HTTP
             initialDelaySeconds: 5
             periodSeconds: 2
             timeoutSeconds: 2
@@ -53,8 +55,10 @@ spec:
           livenessProbe:
             successThreshold: 1
             failureThreshold: 3
-            tcpSocket:
+            httpGet:
+              path: /health
               port: 8080
+              scheme: HTTP
             initialDelaySeconds: 15
             periodSeconds: 30
             timeoutSeconds: 5

@@ -1320,17 +1320,17 @@ export type MapSearchQueryVariables = Exact<{
 }>;
 
 
-export type MapSearchQuery = { __typename?: 'Query', searchSites: { __typename?: 'SearchSiteResponse', sites: Array<{ __typename?: 'Sites', id: string, addrLine_1: string, latDegrees?: number | null, longDegrees?: number | null }> } };
+export type MapSearchQuery = { __typename?: 'Query', searchSites: { __typename?: 'SearchSiteResponse', sites: Array<{ __typename?: 'Sites', id: string, addrLine_1: string, latdeg?: number | null, longdeg?: number | null }> } };
 
 
 export const MapSearchDocument = gql`
     query mapSearch($searchParam: String!) {
-  searchSites(searchParam: $searchParam, page: "1", pageSize: "100") {
+  searchSites(searchParam: $searchParam, page: "1", pageSize: "100000") {
     sites {
       id
       addrLine_1
-      latDegrees
-      longDegrees
+      latdeg
+      longdeg
     }
   }
 }

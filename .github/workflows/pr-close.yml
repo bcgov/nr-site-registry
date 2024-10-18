@@ -12,10 +12,10 @@ concurrency:
 jobs:
   cleanup:
     name: Cleanup and Images
-    uses: bcgov/quickstart-openshift-helpers/.github/workflows/.pr-close.yml@v0.8.0
+    uses: ./.github/workflows/.pr-close.yml
     secrets:
       oc_namespace: ${{ secrets.OC_NAMESPACE }}
       oc_token: ${{ secrets.OC_TOKEN }}
     with:
       cleanup: helm
-      packages: backend frontend migrations
+      packages: backend/sites backend/sites-migration frontend/site-registry

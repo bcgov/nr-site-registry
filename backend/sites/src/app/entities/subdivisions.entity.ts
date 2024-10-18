@@ -1,5 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, Index, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { SiteSubdivisions } from './siteSubdivisions.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
 
@@ -9,7 +15,7 @@ import { ChangeAuditEntity } from './changeAuditEntity';
 @Entity('subdivisions')
 export class Subdivisions extends ChangeAuditEntity {
   @Field()
-  @Column('bigint', { primary: true, name: 'id' })
+  @PrimaryGeneratedColumn('increment')
   id: string;
 
   @Field()

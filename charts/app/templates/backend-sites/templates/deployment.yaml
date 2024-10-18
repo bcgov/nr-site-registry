@@ -1,0 +1,126 @@
+{{- if .Values.backendSites.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "backendSites.fullname" . }}
+  labels:
+    {{- include "backendSites.labels" . | nindent 4 }}
+spec:
+  strategy:
+    type: {{ .Values.backendSites.deploymentStrategy }}
+  {{- if not .Values.backendSites.autoscaling.enabled }}
+  replicas: {{ .Values.backendSites.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "backendSites.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+      labels:
+        {{- include "backendSites.labels" . | nindent 8 }}
+    spec:
+      {{- if .Values.backendSites.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.backendSites.podSecurityContext | nindent 12 }}
+      {{- end }}
+      initContainers: # The container that will do the initial database seed and migrations.
+        - name: {{ include "backendSites.fullname" . }}-init
+          image: "{{.Values.global.registry}}/{{.Values.global.repository}}/backend/sites-migration:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ default "Always" .Values.backendSites.imagePullPolicy }}
+          envFrom:
+            - secretRef:
+                name: {{.Release.Name}}-backend-sites-migrations
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+            requests:
+              cpu: 50m
+              memory: 100Mi
+      containers:
+        - name: {{ include "backendSites.fullname" . }}
+          {{- if .Values.backendSites.securityContext }}
+          securityContext:
+            {{- toYaml .Values.backendSites.securityContext | nindent 12 }}
+          {{- end }}
+          image: "{{.Values.global.registry}}/{{.Values.global.repository}}/backend/sites:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ default "Always" .Values.backendSites.imagePullPolicy }}
+          envFrom:
+            - secretRef:
+                name: {{.Release.Name}}-backend-sites
+          env:
+            - name: LOG_LEVEL
+              value: "info"
+            - name: LOG_FILE_LOCATION
+              value: "/logs/sites-%DATE%.log"
+            - name: LOG_FILE_MAX_SIZE
+              value: "25m"
+            - name: LOG_FILE_MAX_FILES
+              value: "7d"
+            - name: PORT
+              value: {{ .Values.backendSites.service.targetPort | quote }}
+            - name: GRAPHQL_SCHEMA_FILE_PATH
+              value: "/graphql/schema.graphql"
+          ports:
+            - name: http
+              containerPort: {{ .Values.backendSites.service.targetPort }}
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.backendSites.service.targetPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 2
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 30
+          livenessProbe:
+            successThreshold: 1
+            failureThreshold: 3
+            tcpSocket:
+              port: {{ .Values.backendSites.service.targetPort }}
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources: # this is optional
+            limits:
+              cpu: 150m
+              memory: 250Mi
+            requests:
+              cpu: 50m
+              memory: 150Mi
+          volumeMounts:
+            - mountPath: /logs
+              name: log-storage
+            - mountPath: /graphql
+              name: graphql-storage
+      volumes:
+        - name: log-storage
+          emptyDir: {}
+        - name: graphql-storage
+          emptyDir: {}
+      {{- with .Values.backendSites.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backendSites.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - {{ include "backendSites.fullname" . }}
+                  - key: app.kubernetes.io/instance
+                    operator: In
+                    values:
+                      - {{ .Release.Name }}
+              topologyKey: "kubernetes.io/hostname"
+
+{{- end }}

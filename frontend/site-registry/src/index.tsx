@@ -1,7 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider,
+  createHttpLink,
+} from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { store } from './app/Store';
 import { Provider } from 'react-redux';
@@ -11,18 +18,42 @@ import { UserManagerSettings } from 'oidc-client-ts';
 import { getClientSettings } from './app/auth/UserManagerSetting';
 import { RouterProvider } from 'react-router-dom';
 import siteRouter from './app/routes/Routes';
+import { getUser } from './app/helpers/utility';
+import { API, GRAPHQL } from './app/helpers/endpoints';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLDivElement,
 );
 
+const httpLink = createHttpLink({
+  uri: `${API}${GRAPHQL}`,
+});
+
+const authLink = setContext((_, { headers }) => {
+  const user = getUser();
+
+  return {
+    headers: {
+      ...headers,
+      authorization: user?.access_token ? `Bearer ${user.access_token}` : '',
+    },
+  };
+});
+
+const client = new ApolloClient({
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache(),
+});
+
 const authOptions: UserManagerSettings = getClientSettings();
 root.render(
   <React.StrictMode>
     <AuthProvider {...authOptions}>
-      <Provider store={store}>
-        <RouterProvider router={siteRouter} />
-      </Provider>
+      <ApolloProvider client={client}>
+        <Provider store={store}>
+          <RouterProvider router={siteRouter} />
+        </Provider>
+      </ApolloProvider>
     </AuthProvider>
   </React.StrictMode>,
 );

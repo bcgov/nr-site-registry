@@ -87,6 +87,12 @@ const SRUpdates = () => {
     srVisibilityParcticConfig,
   } = GetConfig();
 
+  const {
+    associateColumnInternal,
+    associateColumnExternal,
+    associateColumnInternalSRandViewMode,
+    srVisibilityAssocConfig,
+  } = GetAssociateConfig();
   const { associateColumnInternalSRandViewMode, srVisibilityAssocConfig } =
     GetAssociateConfig();
 

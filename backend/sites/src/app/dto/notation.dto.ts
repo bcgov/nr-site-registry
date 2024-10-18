@@ -93,7 +93,7 @@ export class NotationIputDTO extends ChangeAuditEntityDTO {
 @ObjectType()
 export class NotationParticipantDto extends ChangeAuditObjectTypeDTO {
   @Field()
-  guid: string;
+  eventParticId: string;
 
   @Field()
   eventId: string;
@@ -112,7 +112,7 @@ export class NotationParticipantDto extends ChangeAuditObjectTypeDTO {
 @InputType()
 export class NotationParticipantInputDTO extends ChangeAuditEntityDTO {
   @Field()
-  guid: string;
+  eventParticId: string;
 
   @Field()
   eventId: string;

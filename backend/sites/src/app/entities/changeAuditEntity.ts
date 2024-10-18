@@ -8,7 +8,7 @@ export class ChangeAuditEntity {
     name: 'user_action',
     length: 30,
     nullable: true,
-    default: '',
+    default: null,
   })
   userAction: string;
 
@@ -17,7 +17,7 @@ export class ChangeAuditEntity {
     name: 'sr_action',
     length: 30,
     nullable: true,
-    default: '',
+    default: null,
   })
   srAction: string;
 }

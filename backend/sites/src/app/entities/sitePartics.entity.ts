@@ -79,8 +79,9 @@ export class SitePartics extends ChangeAuditEntity {
   // @OneToMany(() => EventPartics, (eventPartics) => eventPartics.sp)
   // eventPartics: EventPartics[];
 
-  @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sp)
-  siteDocPartics: SiteDocPartics[];
+  //comment this as site doc participant have no relationship with site participant as per current application UI.
+  // @OneToMany(() => SiteDocPartics, (siteDocPartics) => siteDocPartics.sp)
+  // siteDocPartics: SiteDocPartics[];
 
   @Field(() => [SiteParticRoles])
   @OneToMany(() => SiteParticRoles, (siteParticRoles) => siteParticRoles.sp)

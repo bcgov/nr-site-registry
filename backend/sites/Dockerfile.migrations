@@ -1,4 +1,4 @@
-FROM node:16.14.0-alpine
+FROM node:22-alpine
 
 # Set npm cache directory
 ENV NPM_CONFIG_CACHE=/home/node/.npm
@@ -10,9 +10,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
-RUN npm config set unsafe-perm true \
-    && npm ci \
-    && npm config set unsafe-perm false
+RUN npm ci
 
 # Bundle app source
 COPY . .
@@ -21,5 +19,4 @@ COPY . .
 # Install postgresql-client
 RUN apk add --no-cache postgresql-client
 
-# Define the entrypoint
 ENTRYPOINT [ "sh", "initDB.sh" ]

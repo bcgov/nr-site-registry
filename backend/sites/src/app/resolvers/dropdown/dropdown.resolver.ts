@@ -36,7 +36,7 @@ export class DropdownResolver {
   async getParticipantRoleCd() {
     this.sitesLogger.log('DropdownResolver.getParticipantRoleCd() start');
     const result = await this.dropdownService.getParticipantRoleCd();
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       this.sitesLogger.log(
         'DropdownResolver.getParticipantRoleCd() RES:200 end',
       );
@@ -121,7 +121,7 @@ export class DropdownResolver {
   async getNotationTypeCd() {
     this.sitesLogger.log('DropdownResolver.getNotationTypeCd() start');
     const result = await this.dropdownService.getNotationTypeCd();
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       this.sitesLogger.log('DropdownResolver.getNotationTypeCd() RES:200 end');
       return this.genericResponseProviderNotation.createResponse(
         'Notation Type fetched successfully',
@@ -151,7 +151,7 @@ export class DropdownResolver {
   async getNotationClassCd() {
     this.sitesLogger.log('DropdownResolver.getNotationClassCd() start');
     const result = await this.dropdownService.getNotationClassCd();
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       this.sitesLogger.log('DropdownResolver.getNotationClassCd() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Notation Class fetched successfully',
@@ -183,7 +183,7 @@ export class DropdownResolver {
       'DropdownResolver.getNotationParticipantRoleCd() start',
     );
     const result = await this.dropdownService.getNotationParticipantRoleCd();
-    if (result.length > 0) {
+    if (result && result.length > 0) {
       this.sitesLogger.log(
         'DropdownResolver.getNotationParticipantRoleCd() RES:200 end',
       );
@@ -202,6 +202,44 @@ export class DropdownResolver {
         404,
         false,
       );
+    }
+  }
+
+  @Roles({
+    roles: [CustomRoles.Internal, CustomRoles.SiteRegistrar],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => DropdownResponse, { name: 'getIDIRUserListForDropDown' })
+  async getIDIRUserListForDropDown() {
+    try {
+      const result =
+        await this.dropdownService.getIDIRUserGivenNamesForDropDown();
+      if (result.length > 0) {
+        this.sitesLogger.log(
+          'DropdownResolver.getIDIRUserListForDropDown() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'User Names fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'DropdownResolver.getIDIRUserListForDropDown() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `User Names not found`,
+          200,
+          false,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.log(
+        'DropdownResolver.getIDIRUserListForDropDown() error' +
+          JSON.stringify(error),
+      );
+      throw error;
     }
   }
 }

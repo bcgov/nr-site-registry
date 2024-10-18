@@ -111,7 +111,7 @@ const ParcelDescriptions = () => {
       searchParam: searchParam,
       sortBy: sortBy,
       sortByDir: sortByDir,
-      showPending: false
+      showPending: false,
     };
     dispatch(fetchParcelDescriptions(params));
   }, [currentPage, resultsPerPage, searchParam, sortBy, sortByDir]);
@@ -141,18 +141,17 @@ const ParcelDescriptions = () => {
       <div className="row">
         <h2>Parcel Description</h2>
         <hr />
-          <ParcelDescriptionTable 
-            requestStatus={requestStatus} 
-            columns={columns} 
-            data={data} 
-            totalResults={totalResults}
-            handleSelectPage={handleSelectPage}
-            handleChangeResultsPerPage={handleChangeResultsPerPage} 
-            currentPage={currentPage} 
-            resultsPerPage={resultsPerPage} 
-            handleTableSortChange={handleTableSortChange} />
-
-          
+        <ParcelDescriptionTable
+          requestStatus={requestStatus}
+          columns={columns}
+          data={data}
+          totalResults={totalResults}
+          handleSelectPage={handleSelectPage}
+          handleChangeResultsPerPage={handleChangeResultsPerPage}
+          currentPage={currentPage}
+          resultsPerPage={resultsPerPage}
+          handleTableSortChange={handleTableSortChange}
+        />
       </div>
     </div>
   );

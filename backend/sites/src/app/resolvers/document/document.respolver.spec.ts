@@ -3,11 +3,13 @@ import { DocumentResolver } from './document.resolver';
 import { DocumentService } from '../../services/document/document.service';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { DocumentDto, DocumentResponse } from '../../dto/document.dto';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('DocumentResolver', () => {
   let resolver: DocumentResolver;
   let documentService: DocumentService;
   let genericResponseProvider: GenericResponseProvider<DocumentDto[]>;
+  let loggerService: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,6 +19,15 @@ describe('DocumentResolver', () => {
           provide: DocumentService,
           useValue: {
             getSiteDocumentsBySiteId: jest.fn(),
+          },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
           },
         },
         {
@@ -42,6 +53,7 @@ describe('DocumentResolver', () => {
 
     resolver = module.get<DocumentResolver>(DocumentResolver);
     documentService = module.get<DocumentService>(DocumentService);
+    loggerService = module.get<LoggerService>(LoggerService);
     genericResponseProvider = module.get<
       GenericResponseProvider<DocumentDto[]>
     >(GenericResponseProvider);
@@ -52,12 +64,16 @@ describe('DocumentResolver', () => {
     const mockDocuments: DocumentDto[] = [
       {
         id: '1',
+        docParticId: '1',
         siteId: 'SITE456',
         title: 'Document 1',
         psnorgId: '1',
         displayName: 'Display Name',
         submissionDate: new Date('2024-07-17').toISOString(),
         documentDate: new Date('2024-07-17').toISOString(),
+        filePath: '',
+        srAction: 'pending',
+        userAction: 'pending',
       },
     ];
     const expectedResult: DocumentResponse = {
@@ -70,13 +86,14 @@ describe('DocumentResolver', () => {
       .spyOn(documentService, 'getSiteDocumentsBySiteId')
       .mockResolvedValueOnce(mockDocuments);
 
-    const result = await resolver.getSiteDocumentsBySiteId(siteId);
+    const result = await resolver.getSiteDocumentsBySiteId(siteId, false);
 
     expect(result).toEqual(expectedResult);
     expect(mockDocuments[0].id).toEqual('1');
     expect(mockDocuments[0].psnorgId).toEqual('1');
     expect(documentService.getSiteDocumentsBySiteId).toHaveBeenCalledWith(
       siteId,
+      false,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       'Documents fetched successfully.',
@@ -100,11 +117,12 @@ describe('DocumentResolver', () => {
       .spyOn(documentService, 'getSiteDocumentsBySiteId')
       .mockResolvedValueOnce(mockEmptyDocuments);
 
-    const result = await resolver.getSiteDocumentsBySiteId(siteId);
+    const result = await resolver.getSiteDocumentsBySiteId(siteId, false);
 
     expect(result).toEqual(expectedResult);
     expect(documentService.getSiteDocumentsBySiteId).toHaveBeenCalledWith(
       siteId,
+      false,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       `Documents not found for site id ${siteId}`,
@@ -122,7 +140,10 @@ describe('DocumentResolver', () => {
       .spyOn(documentService, 'getSiteDocumentsBySiteId')
       .mockResolvedValueOnce(mockEmptyDocuments);
 
-    const result = await resolver.getSiteDocumentsBySiteId(siteId as any);
+    const result = await resolver.getSiteDocumentsBySiteId(
+      siteId as any,
+      false,
+    );
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
@@ -135,7 +156,7 @@ describe('DocumentResolver', () => {
     const siteId = '';
     const mockEmptyDocuments: DocumentDto[] = [];
 
-    const result = await resolver.getSiteDocumentsBySiteId(siteId);
+    const result = await resolver.getSiteDocumentsBySiteId(siteId, false);
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
@@ -146,19 +167,24 @@ describe('DocumentResolver', () => {
     const siteId = '123';
     const mockLargeDocuments: DocumentDto[] = new Array(1000).fill({
       id: '1',
+      docParticId: '1',
       siteId: 'SITE456',
       title: 'Document 1',
+      dprCode: 'ABC',
       psnorgId: '1',
       displayName: 'Display Name',
       submissionDate: new Date('2024-07-17'),
       documentDate: new Date('2024-07-17'),
+      filePath: '',
+      srAction: 'pending',
+      userAction: 'pending',
     });
 
     jest
       .spyOn(documentService, 'getSiteDocumentsBySiteId')
       .mockResolvedValueOnce(mockLargeDocuments);
 
-    const result = await resolver.getSiteDocumentsBySiteId(siteId);
+    const result = await resolver.getSiteDocumentsBySiteId(siteId, false);
 
     expect(result.success).toEqual(true);
     expect(result.data).toHaveLength(1000);

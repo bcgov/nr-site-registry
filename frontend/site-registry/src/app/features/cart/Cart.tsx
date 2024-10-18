@@ -55,8 +55,8 @@ const Cart = () => {
   }, [createSnapshotRequestStatus]);
 
   useEffect(() => {
-    if(deleteStatus===RequestStatus.success)
-    dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
+    if (deleteStatus === RequestStatus.success)
+      dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
   }, [deleteStatus]);
 
   useEffect(() => {
@@ -69,7 +69,7 @@ const Cart = () => {
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
-      const cartItemsToDelete = cartItemsArr.map((cart:any) => {
+      const cartItemsToDelete = cartItemsArr.map((cart: any) => {
         return {
           userId: loggedInUser.profile.sub,
           siteId: cart.siteId,

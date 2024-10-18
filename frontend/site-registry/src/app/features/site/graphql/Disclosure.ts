@@ -2,13 +2,14 @@ import gql from 'graphql-tag';
 
 export const graphQLSiteDisclosureBySiteId = () => {
   return gql`
-    query getSiteDisclosureBySiteId($siteId: String!,$pending: Boolean) {
+    query getSiteDisclosureBySiteId($siteId: String!, $pending: Boolean) {
       getSiteDisclosureBySiteId(siteId: $siteId, pending: $pending) {
         httpStatusCode
         success
         message
         timestamp
         data {
+          id
           siteId
           dateCompleted
           rwmDateDecision
@@ -18,6 +19,7 @@ export const graphQLSiteDisclosureBySiteId = () => {
           govDocumentsComment
           siteDisclosureComment
           plannedActivityComment
+          srAction
         }
       }
     }

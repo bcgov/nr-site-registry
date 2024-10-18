@@ -3,11 +3,13 @@ import { NotationResolver } from './notation.resolver';
 import { NotationService } from '../../services/notation/notation.service';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { NotationDto, NotationResponse } from '../../dto/notation.dto';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('NotationResolver', () => {
   let resolver: NotationResolver;
   let notationService: NotationService;
   let genericResponseProvider: GenericResponseProvider<NotationDto[]>;
+  let loggerService: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,6 +19,15 @@ describe('NotationResolver', () => {
           provide: NotationService,
           useValue: {
             getSiteNotationBySiteId: jest.fn(),
+          },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
           },
         },
         {
@@ -42,6 +53,7 @@ describe('NotationResolver', () => {
 
     resolver = module.get<NotationResolver>(NotationResolver);
     notationService = module.get<NotationService>(NotationService);
+    loggerService = module.get<LoggerService>(LoggerService);
     genericResponseProvider = module.get<
       GenericResponseProvider<NotationDto[]>
     >(GenericResponseProvider);
@@ -65,7 +77,7 @@ describe('NotationResolver', () => {
         userAction: 'pending',
         notationParticipant: [
           {
-            guid: 'GUID001',
+            eventParticId: 'GUID001',
             eprCode: 'EPR001',
             psnorgId: 'PSNORG123',
             displayName: 'John Doe',
@@ -74,7 +86,7 @@ describe('NotationResolver', () => {
             eventId: '',
           },
           {
-            guid: 'GUID002',
+            eventParticId: 'GUID002',
             eprCode: 'EPR002',
             psnorgId: 'PSNORG456',
             displayName: 'Jane Smith',
@@ -95,7 +107,7 @@ describe('NotationResolver', () => {
       .spyOn(notationService, 'getSiteNotationBySiteId')
       .mockResolvedValueOnce(mockNotations);
 
-    const result = await resolver.getSiteNotationBySiteId(siteId);
+    const result = await resolver.getSiteNotationBySiteId(siteId, false);
 
     expect(result).toEqual(expectedResult);
     expect(mockNotations[0].id).toEqual('1');
@@ -105,6 +117,7 @@ describe('NotationResolver', () => {
     );
     expect(notationService.getSiteNotationBySiteId).toHaveBeenCalledWith(
       siteId,
+      false,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       'Site Notation fetched successfully',
@@ -128,11 +141,12 @@ describe('NotationResolver', () => {
       .spyOn(notationService, 'getSiteNotationBySiteId')
       .mockResolvedValueOnce(mockEmptyNotations);
 
-    const result = await resolver.getSiteNotationBySiteId(siteId);
+    const result = await resolver.getSiteNotationBySiteId(siteId, false);
 
     expect(result).toEqual(expectedResult);
     expect(notationService.getSiteNotationBySiteId).toHaveBeenCalledWith(
       siteId,
+      false,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       `Site Notation data not found for site id: ${siteId}`,
@@ -150,7 +164,7 @@ describe('NotationResolver', () => {
       .spyOn(notationService, 'getSiteNotationBySiteId')
       .mockResolvedValueOnce(mockEmptyNotations);
 
-    const result = await resolver.getSiteNotationBySiteId(siteId as any);
+    const result = await resolver.getSiteNotationBySiteId(siteId as any, false);
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
@@ -163,7 +177,7 @@ describe('NotationResolver', () => {
     const siteId = '';
     const mockEmptyNotations: NotationDto[] = [];
 
-    const result = await resolver.getSiteNotationBySiteId(siteId);
+    const result = await resolver.getSiteNotationBySiteId(siteId, false);
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
@@ -199,7 +213,7 @@ describe('NotationResolver', () => {
       .spyOn(notationService, 'getSiteNotationBySiteId')
       .mockResolvedValueOnce(mockLargeNotations);
 
-    const result = await resolver.getSiteNotationBySiteId(siteId);
+    const result = await resolver.getSiteNotationBySiteId(siteId, false);
 
     expect(result.success).toEqual(true);
     expect(result.data).toHaveLength(1000);

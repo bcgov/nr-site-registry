@@ -4,6 +4,7 @@ import { DocParticRoleCd } from './docParticRoleCd.entity';
 import { PeopleOrgs } from './peopleOrgs.entity';
 import { SiteDocs } from './siteDocs.entity';
 import { SitePartics } from './sitePartics.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
 
 @ObjectType()
 @Index('sdp_classified_by_frgn', ['dprCode'], {})
@@ -18,21 +19,30 @@ import { SitePartics } from './sitePartics.entity';
 @Index('sdp_playing_a_role_i_frgn', ['sdocId'], {})
 @Index('sdp_played_by_frgn', ['spId'], {})
 @Entity('site_doc_partics')
-export class SiteDocPartics {
+export class SiteDocPartics extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'id' })
   id: string;
 
+  // @Field()
+  // @Column('character varying', { name: 'dpr_code', unique: true, length: 6 })
+  // dprCode: string;
+
+  //Need to remove unique constraint because as per stand-up discussion everyone
+  // will be ATH i.e Author. I would suggest to keep this null able as we don't have
+  // UI for dpr code.
   @Field()
-  @Column('character varying', { name: 'dpr_code', unique: true, length: 6 })
+  @Column('character varying', { name: 'dpr_code', length: 6 })
   dprCode: string;
 
   @Field()
   @Column('bigint', { name: 'sdoc_id', unique: true })
   sdocId: string;
 
+  //make it nullable in order todo  CRUD opertaions
+  //keeping this for historical data but for new entries this will be null always.
   @Field()
-  @Column('bigint', { name: 'sp_id' })
+  @Column('bigint', { name: 'sp_id', nullable: true })
   spId: string;
 
   @Field()
@@ -62,9 +72,11 @@ export class SiteDocPartics {
   })
   whenUpdated: Date | null;
 
-  @Field()
-  @Column('smallint', { name: 'rwm_flag' })
-  rwmFlag: number;
+  //Make this nullable because we are not using it anymore and keeing it for
+  //historical data
+  @Field({ nullable: true })
+  @Column('smallint', { name: 'rwm_flag', nullable: true })
+  rwmFlag: number | null;
 
   @Field(() => DocParticRoleCd)
   @ManyToOne(
@@ -85,9 +97,10 @@ export class SiteDocPartics {
   @JoinColumn([{ name: 'sdoc_id', referencedColumnName: 'id' }])
   sdoc: SiteDocs;
 
-  @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteDocPartics, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn([{ name: 'sp_id', referencedColumnName: 'id' }])
-  sp: SitePartics;
+  //Removed this relationship as we don't have any UI for site participant.
+  // @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteDocPartics, {
+  //   onDelete: 'CASCADE',
+  // })
+  // @JoinColumn([{ name: 'sp_id', referencedColumnName: 'id' }])
+  // sp: SitePartics;
 }

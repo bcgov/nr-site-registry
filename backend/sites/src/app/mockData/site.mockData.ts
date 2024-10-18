@@ -65,8 +65,8 @@ const subdivisions: Subdivisions[] = [
     pidStatusCd: 'A',
     validPid: 'Y',
     siteSubdivisions: null,
-    userAction:'',
-    srAction:''
+    userAction: '',
+    srAction: '',
   },
   {
     id: subdivId2,
@@ -90,8 +90,8 @@ const subdivisions: Subdivisions[] = [
     pidStatusCd: 'I',
     validPid: 'Y',
     siteSubdivisions: null,
-    userAction:'',
-    srAction:''
+    userAction: '',
+    srAction: '',
   },
   {
     id: subdivId3,
@@ -115,8 +115,8 @@ const subdivisions: Subdivisions[] = [
     pidStatusCd: 'E',
     validPid: null,
     siteSubdivisions: null,
-    userAction:'',
-    srAction:''
+    userAction: '',
+    srAction: '',
   },
 ];
 siteSubdivisions = [

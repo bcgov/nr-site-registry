@@ -4,10 +4,9 @@ import { plainToInstance } from 'class-transformer';
 import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { SitePartics } from '../../entities/sitePartics.entity';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid'; // Import uuid function for generating unique IDs
 import { LoggerService } from '../../logger/logger.service';
 import { UserActionEnum } from '../../common/userActionEnum';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 @Injectable()
 export class ParticipantService {
@@ -50,35 +49,41 @@ export class ParticipantService {
           relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
         });
 
-      if (!result.length) {
+      if (result && !result.length) {
         return [];
+      } else {
+        // Transform the fetched site participants into the desired format
+        const transformedObjects = result.flatMap((item) =>
+          item.siteParticRoles.map((role) => ({
+            particRoleId: role.id,
+            id: item.id,
+            siteId: item.siteId,
+            psnorgId: item.psnorgId,
+            effectiveDate: new Date(item.effectiveDate).toISOString(),
+            endDate: item.endDate ? new Date(item.endDate).toISOString() : null,
+            note: item.note?.trim() || '', // Ensure note is trimmed and defaults to an empty string if null
+            displayName: item.psnorg?.displayName?.trim() || '', // Safely access displayName with default value
+            prCode: role.prCode.trim(),
+            description: role.prCode2?.description?.trim() || '', // Safely access description with default value
+            srAction:
+              item.srAction === SRApprovalStatusEnum.PUBLIC ||
+              role.srAction === SRApprovalStatusEnum.PUBLIC
+                ? true
+                : false,
+          })),
+        );
+
+        // Convert the transformed objects into DTOs
+        const sitePartics = plainToInstance(SiteParticsDto, transformedObjects);
+
+        this.sitesLogger.log(
+          'ParticipantService.getSiteParticipantsBySiteId() end',
+        );
+        this.sitesLogger.debug(
+          'ParticipantService.getSiteParticipantsBySiteId() end',
+        );
+        return sitePartics;
       }
-
-      // Transform the fetched site participants into the desired format
-      const transformedObjects = result.flatMap((item) =>
-        item.siteParticRoles.map((role) => ({
-          guid: uuidv4(), // Generate a unique GUID for each participant-role mapping
-          id: item.id,
-          psnorgId: item.psnorgId,
-          effectiveDate: new Date(item.effectiveDate).toISOString(),
-          endDate: item.endDate ? new Date(item.endDate).toISOString() : null,
-          note: item.note?.trim() || '', // Ensure note is trimmed and defaults to an empty string if null
-          displayName: item.psnorg?.displayName?.trim() || '', // Safely access displayName with default value
-          prCode: role.prCode.trim(),
-          description: role.prCode2?.description?.trim() || '', // Safely access description with default value
-        })),
-      );
-
-      // Convert the transformed objects into DTOs
-      const sitePartics = plainToInstance(SiteParticsDto, transformedObjects);
-
-      this.sitesLogger.log(
-        'ParticipantService.getSiteParticipantsBySiteId() end',
-      );
-      this.sitesLogger.debug(
-        'ParticipantService.getSiteParticipantsBySiteId() end',
-      );
-      return sitePartics;
     } catch (error) {
       this.sitesLogger.error(
         'Exception occured in ParticipantService.getSiteParticipantsBySiteId() end',

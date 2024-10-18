@@ -36,14 +36,18 @@ export class AssociatedSiteResolver {
     @Args('siteId', { type: () => String }) siteId: string,
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
-    
   ) {
     this.sitesLogger.log(
       'AssociatedSiteResolver.getAssociatedSitesBySiteId() start siteID:' +
         ' ' +
-        siteId  +' showPending = '+ showPending );
-    const result =
-      await this.associatedSiteService.getAssociatedSitesBySiteId(siteId,showPending);
+        siteId +
+        ' showPending = ' +
+        showPending,
+    );
+    const result = await this.associatedSiteService.getAssociatedSitesBySiteId(
+      siteId,
+      showPending,
+    );
     if (result && result.length > 0) {
       this.sitesLogger.log(
         'AssociatedSiteResolver.getAssociatedSitesBySiteId() RES:200 end',

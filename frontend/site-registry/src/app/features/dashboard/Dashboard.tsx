@@ -108,7 +108,6 @@ const Dashboard = () => {
         data={data ?? []}
         allowRowsSelect={true}
       />
-      
     </PageContainer>
   );
 };

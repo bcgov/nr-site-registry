@@ -1,21 +1,35 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ParticRoleCd } from './particRoleCd.entity';
 import { SitePartics } from './sitePartics.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
 
 @ObjectType()
 @Index('spr_classified_by_frgn', ['prCode'], {})
 @Index('site_partic_roles_pkey', ['prCode', 'spId'], { unique: true })
 @Index('spr_rwm_flag', ['rwmFlag'], {})
 @Index('spr_classifying_frgn', ['spId'], {})
+@Index('sp_id', ['id'], {})
 @Entity('site_partic_roles')
-export class SiteParticRoles {
+export class SiteParticRoles extends ChangeAuditEntity {
+  // ADDED THIS PARIMARY KEY COLUMN AND REMOVE COMPOSITE PRIMARY KEY COLUMN
+  // FOR CRUD OPERATION
+  @PrimaryGeneratedColumn('uuid', { name: 'id' })
+  id: string;
+
   @Field()
-  @Column('character varying', { primary: true, name: 'pr_code', length: 6 })
+  @Column('character varying', { name: 'pr_code', length: 6 })
   prCode: string;
 
   @Field()
-  @Column('bigint', { primary: true, name: 'sp_id' })
+  @Column('bigint', { name: 'sp_id' })
   spId: string;
 
   @Field()

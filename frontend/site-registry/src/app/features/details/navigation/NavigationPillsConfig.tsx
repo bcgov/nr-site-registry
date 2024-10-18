@@ -8,7 +8,6 @@ import ParcelDescriptions from '../parcelDescriptions/parcelDescriptions';
 import Participants from '../participants/Participant';
 import SRUpdates from '../srUpdates/srUpdates';
 
-
 import Summary from '../summary/Summary';
 
 const mainNavItems = [
@@ -22,19 +21,15 @@ const mainNavItems = [
   'Site Disclosure',
 ];
 
-
-export interface IComponentProps
-{
+export interface IComponentProps {
   showPending?: boolean;
 }
 
-
-
-
-export const getNavItems= () =>  isUserOfType(UserRoleType.SR)? ['Updates',...mainNavItems] : mainNavItems;
+export const getNavItems = () =>
+  isUserOfType(UserRoleType.SR) ? ['Updates', ...mainNavItems] : mainNavItems;
 
 const mainNavComponents = [
-   <Summary />,
+  <Summary />,
   <Notations />,
   <Participants />,
   <Documents />,
@@ -44,7 +39,10 @@ const mainNavComponents = [
   <Disclosure />,
 ];
 
-export const getNavComponents= () => isUserOfType(UserRoleType.SR)? [ <SRUpdates/> , ...mainNavComponents] : mainNavComponents;
+export const getNavComponents = () =>
+  isUserOfType(UserRoleType.SR)
+    ? [<SRUpdates />, ...mainNavComponents]
+    : mainNavComponents;
 
 export const mainDropDownNavItems = [
   {
@@ -81,9 +79,13 @@ export const mainDropDownNavItems = [
   },
 ];
 
-
-
-export const getDropDownNavItems= () => isUserOfType(UserRoleType.SR)? [ {
-  label: 'Updated',
-  value: 'SRUpdates',
-} , ...mainDropDownNavItems] : mainDropDownNavItems;
+export const getDropDownNavItems = () =>
+  isUserOfType(UserRoleType.SR)
+    ? [
+        {
+          label: 'Updated',
+          value: 'SRUpdates',
+        },
+        ...mainDropDownNavItems,
+      ]
+    : mainDropDownNavItems;

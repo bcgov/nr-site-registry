@@ -43,7 +43,6 @@ import {
   formatDateWithNoTimzoneName,
   getUser,
   showNotification,
-  useUser,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import { fetchSiteParticipants } from './participants/ParticipantSlice';
@@ -98,13 +97,13 @@ const SiteDetails = () => {
   const [dropDownNavItems, SetDropDownNavItems] =
     useState<{ label: string; value: string }[]>();
 
-  const user = useUser();
+  const auth = useAuth();
 
   useEffect(() => {
     SetNavComponents(getNavComponents());
     SetNavItems(getNavItems());
     SetDropDownNavItems(getDropDownNavItems());
-  }, [user]);
+  }, [auth.user]);
 
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
 
@@ -157,8 +156,6 @@ const SiteDetails = () => {
 
   const arr2: IFormField[][] = [arr];
 
-  const auth = useAuth();
-
   const [addToFolioVisible, SetAddToFolioVisible] = useState(false);
 
   const [isVisible, setIsVisible] = useState(false);
@@ -185,6 +182,7 @@ const SiteDetails = () => {
     ) {
       if (saveSiteDetailsRequestStatus === RequestStatus.success) {
         dispatch(resetSaveSiteDetails(null));
+        dispatch(clearTrackChanges(null));
         dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
         setEdit(false);
       } else {
@@ -277,6 +275,11 @@ const SiteDetails = () => {
         dispatch(
           fetchNotationParticipants({ siteId: id ?? '', showPending: false }),
         ),
+        dispatch(fetchDocuments({ siteId: id ?? '', showPending: false })),
+        dispatch(
+          fetchAssociatedSites({ siteId: id ?? '', showPending: false }),
+        ),
+        dispatch(fetchSiteDisclosure({ siteId: id ?? '', showPending: false })),
         // should be based on condition for External and Internal User.
         dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
         // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),

@@ -4,12 +4,13 @@ import { DisclosureService } from '../../services/disclosure/disclosure.service'
 import { DisclosureResolver } from './disclosure.resolver';
 import { Test } from '@nestjs/testing';
 import { DisclosureResponse } from '../../dto/disclosure.dto';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('DisclosureResolver', () => {
   let resolver: DisclosureResolver;
   let disclosureService: DisclosureService;
   let genericResponseProvider: GenericResponseProvider<SiteProfiles[]>;
-
+  let loggerService: LoggerService;
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
@@ -18,6 +19,15 @@ describe('DisclosureResolver', () => {
           provide: DisclosureService,
           useValue: {
             getSiteDisclosureBySiteId: jest.fn(),
+          },
+        },
+        {
+          provide: LoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
           },
         },
         {
@@ -43,6 +53,7 @@ describe('DisclosureResolver', () => {
 
     resolver = module.get<DisclosureResolver>(DisclosureResolver);
     disclosureService = module.get<DisclosureService>(DisclosureService);
+    loggerService = module.get<LoggerService>(LoggerService);
     genericResponseProvider = module.get<
       GenericResponseProvider<SiteProfiles[]>
     >(GenericResponseProvider);
@@ -74,7 +85,7 @@ describe('DisclosureResolver', () => {
         .spyOn(disclosureService, 'getSiteDisclosureBySiteId')
         .mockResolvedValueOnce(mockSiteProfile);
 
-      const result = await resolver.getSiteDisclosureBySiteId(siteId);
+      const result = await resolver.getSiteDisclosureBySiteId(siteId, false);
 
       expect(result).toEqual(expectedResponse);
       expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
@@ -99,7 +110,7 @@ describe('DisclosureResolver', () => {
         .spyOn(disclosureService, 'getSiteDisclosureBySiteId')
         .mockResolvedValueOnce([]);
 
-      const result = await resolver.getSiteDisclosureBySiteId(siteId);
+      const result = await resolver.getSiteDisclosureBySiteId(siteId, false);
 
       expect(result).toEqual(expectedResponse);
       expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(

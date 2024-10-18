@@ -56,6 +56,7 @@ const siteDetailsSlice = createSlice({
       newState.profilesData = null;
       newState.siteAssociationsData = null;
       newState.siteId = '';
+      newState.sitesSummary = null;
       return newState;
     },
     resetSaveSiteDetailsRequestStatus: (state, action) => {
@@ -122,6 +123,13 @@ const siteDetailsSlice = createSlice({
       newState.siteAssociationsData = action.payload;
       return newState;
     },
+    setupSiteDisclosureDataForSaving: (state, action) => {
+      const newState = {
+        ...state,
+      };
+      newState.profilesData = action.payload;
+      return newState;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -138,17 +146,47 @@ const siteDetailsSlice = createSlice({
 
 export const getSiteDetailsToBeSaved = (state: any) => {
   return {
-    events: deepFilterByUserAction(state.siteDetails.notationData, [
-      UserActionEnum.added,
-      UserActionEnum.updated,
-      UserActionEnum.deleted,
-    ]),
-    siteParticipants: state.siteDetails.siteParticipantData,
-    documents: state.siteDetails.documentsData,
-    siteAssociations: state.siteDetails.siteAssociations,
+    events:
+      state.siteDetails.notationData &&
+      state.siteDetails.notationData.length > 0 &&
+      deepFilterByUserAction(state.siteDetails.notationData, [
+        UserActionEnum.added,
+        UserActionEnum.updated,
+        UserActionEnum.deleted,
+      ]),
+    siteParticipants:
+      state.siteDetails.siteParticipantData &&
+      state.siteDetails.siteParticipantData.length > 0 &&
+      deepFilterByUserAction(state.siteDetails.siteParticipantData, [
+        UserActionEnum.added,
+        UserActionEnum.updated,
+        UserActionEnum.deleted,
+      ]),
+    documents:
+      state.siteDetails.siteAssociationsData &&
+      state.siteDetails.siteAssociationsData.length > 0 &&
+      deepFilterByUserAction(state.siteDetails.documentsData, [
+        UserActionEnum.added,
+        UserActionEnum.updated,
+        UserActionEnum.deleted,
+      ]),
+    siteAssociations:
+      state.siteDetails.siteAssociationsData &&
+      state.siteDetails.siteAssociationsData.length > 0 &&
+      deepFilterByUserAction(state.siteDetails.siteAssociationsData, [
+        UserActionEnum.added,
+        UserActionEnum.updated,
+        UserActionEnum.deleted,
+      ]),
     subDivisions: state.siteDetails.subDivisions,
     landHistories: state.siteDetails.landHistoriesData,
-    profiles: state.siteDetails.profiles,
+    profiles:
+      state.siteDetails.profilesData &&
+      deepFilterByUserAction(state.siteDetails.profilesData, [
+        UserActionEnum.added,
+        UserActionEnum.updated,
+        UserActionEnum.deleted,
+      ]),
     siteId: state.siteDetails.siteId,
     sitesSummary: state.siteDetails.sitesSummary,
   };
@@ -157,11 +195,16 @@ export const getSiteDetailsToBeSaved = (state: any) => {
 export const saveRequestStatus = (state: any) =>
   state.siteDetails.saveRequestStatus;
 
-export const trackSiteNotation = (state: any) => state.siteDetails.notationData;
+export const getSiteNoatations = (state: any) => state.siteDetails.notationData;
 
-export const currentSiteId = (state: any) =>
-  state.siteDetails.siteId;
+export const currentSiteId = (state: any) => state.siteDetails.siteId;
 
+export const getSiteDocuments = (state: any) => state.siteDetails.documentsData;
+export const getSiteDisclosure = (state: any) => state.siteDetails.profilesData;
+export const getSiteParticipants = (state: any) =>
+  state.siteDetails.siteParticipantData;
+export const getSiteAssociated = (state: any) =>
+  state.siteDetails.siteAssociationsData;
 export const {
   resetSaveSiteDetailsRequestStatus,
   resetSaveSiteDetails,
@@ -173,6 +216,7 @@ export const {
   setupSiteParticipantDataForSaving,
   setupSubDivisionsDataForSaving,
   setupSiteSummaryForSaving,
+  setupSiteDisclosureDataForSaving,
 } = siteDetailsSlice.actions;
 
 export default siteDetailsSlice.reducer;

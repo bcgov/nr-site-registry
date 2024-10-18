@@ -1,17 +1,15 @@
-.approve-tick-icon
-{
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 16px;
-    text-align: left;
-    color: var(--icons-color-success, #42814A);
+.approve-tick-icon {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: left;
+  color: var(--icons-color-success, #42814a);
 }
 
-.close-tick-icon
-{    
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 16px;
-    text-align: left;
-    color: var(--icons-color-danger, #CE3E39);
+.close-tick-icon {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: left;
+  color: var(--icons-color-danger, #ce3e39);
 }

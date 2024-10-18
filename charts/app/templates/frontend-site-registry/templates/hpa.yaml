@@ -1,0 +1,55 @@
+{{- if .Values.global.autoscaling }}
+{{- if and .Values.frontendSiteRegistry.autoscaling .Values.frontendSiteRegistry.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "frontendSiteRegistry.fullname" . }}
+  labels:
+    {{- include "frontendSiteRegistry.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "frontendSiteRegistry.fullname" . }}
+  minReplicas: {{ .Values.frontendSiteRegistry.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.frontendSiteRegistry.autoscaling.maxReplicas }}
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 30
+        - type: Pods
+          value: 2
+          periodSeconds: 30
+      selectPolicy: Max
+  metrics:
+    {{- if .Values.frontendSiteRegistry.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.frontendSiteRegistry.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.frontendSiteRegistry.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.frontendSiteRegistry.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}
+{{- end }}

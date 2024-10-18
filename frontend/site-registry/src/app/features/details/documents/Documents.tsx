@@ -25,20 +25,11 @@ import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
 import { CheckBoxInput } from '../../../components/input-controls/InputControls';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
-import PanelWithUpDown from '../../../components/simple/PanelWithUpDown';
-import Form from '../../../components/form/Form';
 import {
   ChangeTracker,
   IChangeType,
 } from '../../../components/common/IChangeType';
-import {
-  DownloadPdfIcon,
-  ReplaceIcon,
-  SpinnerIcon,
-  TrashCanIcon,
-  UploadFileIcon,
-  ViewOnlyIcon,
-} from '../../../components/common/icon';
+import { UploadFileIcon } from '../../../components/common/icon';
 import './Documents.css';
 import { useParams } from 'react-router-dom';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';
@@ -155,37 +146,39 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
           ]),
         ).values(),
       );
-      setOptions(uniquePsnOrgs);
-      console.log(siteDocuments);
-      setInternalRow((prev) =>
-        updateFields(prev, {
-          indexToUpdate: prev.findIndex((row) =>
-            row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-          ),
-          updates: {
-            isLoading: RequestStatus.success,
-            options: uniquePsnOrgs,
-            filteredOptions: [],
-            handleSearch,
-            customInfoMessage: <></>,
-          },
-        }),
-      );
-      setExternalRow((prev) =>
-        updateFields(prev, {
-          indexToUpdate: prev.findIndex((row) =>
-            row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-          ),
-          updates: {
-            isLoading: RequestStatus.success,
-            options: uniquePsnOrgs,
-            filteredOptions: [],
-            handleSearch,
-            customInfoMessage: <></>,
-          },
-        }),
-      );
-      setFormData(siteDocuments);
+      if (JSON.stringify(uniquePsnOrgs) !== JSON.stringify(options)) {
+        // only update if different
+        setOptions(uniquePsnOrgs);
+        setInternalRow((prev) =>
+          updateFields(prev, {
+            indexToUpdate: prev.findIndex((row) =>
+              row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+            ),
+            updates: {
+              isLoading: RequestStatus.success,
+              options: uniquePsnOrgs,
+              filteredOptions: [],
+              handleSearch,
+              customInfoMessage: <></>,
+            },
+          }),
+        );
+        setExternalRow((prev) =>
+          updateFields(prev, {
+            indexToUpdate: prev.findIndex((row) =>
+              row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+            ),
+            updates: {
+              isLoading: RequestStatus.success,
+              options: uniquePsnOrgs,
+              filteredOptions: [],
+              handleSearch,
+              customInfoMessage: <></>,
+            },
+          }),
+        );
+        setFormData(siteDocuments);
+      }
     }
   }, [siteDocuments, status]);
 
@@ -249,14 +242,13 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Handle view mode changes
   useEffect(() => {
     setViewMode(mode);
-    dispatch(setupDocumentsDataForSaving(siteDocuments));
   }, [mode]);
 
   // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
   // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
   useEffect(() => {
     if (resetDetails) {
-      dispatch(fetchDocuments({ siteId: id ?? '', showPending: false }));
+      dispatch(fetchDocuments({ siteId: id ?? '', showPending: showPending }));
     }
   }, [resetDetails, saveSiteDetailsRequestStatus]);
 
@@ -368,18 +360,26 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
           docParticId: v4(),
           siteId: id,
           psnorgId: '',
-          dprCode: 'ATH',
           submissionDate: new Date(),
           documentDate: new Date(file.lastModified),
           title: file.name.split('.pdf')[0].trim(),
           displayName: '',
+
+          //this need to be filled once file is uploaded in BC Box
+          filePath: 'Need to give uploaded file path.',
+
           apiAction: UserActionEnum.added,
           srAction: SRApprovalStatusEnum.Pending,
         };
         const updatedDocuments = [newDocument, ...formData];
         setFormData(updatedDocuments);
         dispatch(updateSiteDocument(updatedDocuments));
-        dispatch(setupDocumentsDataForSaving([newDocument, ...trackDocuments]));
+        dispatch(
+          setupDocumentsDataForSaving([
+            newDocument,
+            ...(trackDocuments ?? formData),
+          ]),
+        );
         const tracker = new ChangeTracker(
           IChangeType.Added,
           'New Site Document',
@@ -419,6 +419,10 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                   submissionDate: new Date(),
                   documentDate: new Date(file.lastModified),
                   title: file.name.split('.pdf')[0].trim(),
+
+                  //this need to be filled once file is uploaded in BC Box
+                  filePath: 'Need to give uploaded file path.',
+
                   apiAction: UserActionEnum.updated,
                   srAction: SRApprovalStatusEnum.Pending,
                 };
@@ -430,7 +434,9 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
 
           // Update both formData and trackNotation
           const updatedDocuments = updateDocuments(formData);
-          const updatedTrackedDocuments = updateDocuments(trackDocuments);
+          const updatedTrackedDocuments = updateDocuments(
+            trackDocuments ?? formData,
+          );
 
           // Replace document
           setFormData(updatedDocuments);
@@ -444,23 +450,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
           setCurrentDocument({});
           setCurrentFile({});
           setIsReplace(false);
-
-          // const updatedDoc = formData.map((document) => {
-          //   if (document.id === doc.id) {
-          //     const replacedDoc = {
-          //       ...doc,
-          //       submissionDate: new Date(),
-          //       documentDate: file.lastModified,
-          //       title: file.name.split('.pdf')[0].trim(),
-          //       apiAction: UserActionEnum.updated,
-          //       srAction: SRApprovalStatusEnum.Pending,
-          //     };
-          //     return { ...document, ...replacedDoc };
-          //   }
-          //   return document;
-          // });
-          // setFormData(updatedDoc);
-          //   dispatch(updateSiteDocument(updatedDoc));
         }
       } else {
         alert('Please select a valid PDF file.');
@@ -492,7 +481,9 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       // Update both formData and trackDocument
       const updatedDocuments = updateDocuments(formData);
-      const updatedTrackedDocuments = updateDocuments(trackDocuments);
+      const updatedTrackedDocuments = updateDocuments(
+        trackDocuments ?? formData,
+      );
 
       // Filter out document for formData
       const filteredDocuments = updatedDocuments.filter((doc: any) => {
@@ -509,14 +500,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
       dispatch(trackChanges(tracker.toPlainObject()));
       setCurrentDocument({});
       setIsDelete(false);
-
-      // const nonDeletedDoc = formData.filter((doc) => {
-      //   if (doc.id !== document.id) {
-      //     return doc;
-      //   }
-      // });
-      // setFormData(nonDeletedDoc);
-      // dispatch(updateSiteDocument(nonDeletedDoc));
     } else {
       setCurrentDocument(document);
       setIsDelete(true);
@@ -528,7 +511,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
     graphQLPropertyName: any,
     value: any,
   ) => {
-    console.log(id, graphQLPropertyName, value);
     if (viewMode === SiteDetailsMode.SRMode) {
       console.log({ [graphQLPropertyName]: value, id });
     } else {
@@ -569,57 +551,10 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       // Update both formData and trackNotation
       const updatedDocuments = updateDocuments(formData);
-      const updatedTrackDocuments = updateDocuments(trackDocuments);
+      const updatedTrackDocuments = updateDocuments(trackDocuments ?? formData);
       setFormData(updatedDocuments);
       dispatch(updateSiteDocument(updatedDocuments));
       dispatch(setupDocumentsDataForSaving(updatedTrackDocuments));
-
-      // const updatedDoc = formData.map((document) => {
-      //   if (document.id === id) {
-      //     if (graphQLPropertyName === 'psnorgId') {
-      //       // Parameters for the update
-      //       let params: UpdateDisplayTypeParams = {
-      //         indexToUpdate: documentFormRows.findIndex((row) =>
-      //           row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-      //         ),
-      //         updates: {
-      //           isLoading: RequestStatus.success,
-      //           options,
-      //           filteredOptions: [],
-      //           handleSearch,
-      //           customInfoMessage: <></>,
-      //         },
-      //       };
-      //       const indexToUpdateExt =
-      //         documentFirstChildFormRowsForExternal.findIndex((row) =>
-      //           row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-      //         );
-
-      //       let paramsExt: UpdateDisplayTypeParams = {
-      //         indexToUpdate: indexToUpdateExt,
-      //         updates: {
-      //           isLoading: RequestStatus.success,
-      //           options: [options, { ...value }],
-      //           filteredOptions: [],
-      //           handleSearch: handleSearch,
-      //           customInfoMessage: <></>,
-      //         },
-      //       };
-      //       // setExternalRow(updateFields(externalRow, paramsExt));
-      //       setInternalRow(updateFields(internalRow, params));
-      //       return {
-      //         ...document,
-      //         [graphQLPropertyName]: value.key,
-      //         ['displayName']: value.value,
-      //       };
-      //     }
-      //     return { ...document, [graphQLPropertyName]: value };
-      //   }
-      //   return document;
-      // });
-
-      // setFormData(updatedDoc);
-      // dispatch(updateSiteDocument(updatedDoc));
     }
     const flattedArr = flattenFormRows(documentFormRows);
     const currLabel =
@@ -631,41 +566,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
     );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
-
-  // const fetchNotationParticipant = async (searchParam: string) => {
-  //   try {
-  //     if (
-  //       searchParam !== null &&
-  //       searchParam !== undefined &&
-  //       searchParam !== ''
-  //     ) {
-  //       const response = await getAxiosInstance().post(GRAPHQL, {
-  //         query: print(graphQLPeopleOrgsCd()),
-  //         variables: {
-  //           searchParam: searchParam,
-  //         },
-  //       });
-  //       return response.data.data.getPeopleOrgsCd;
-  //     } else {
-  //       return [];
-  //     }
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // };
-
-  // if (loading === RequestStatus.loading) {
-  //   return (
-  //     <div className="document-loading-overlay">
-  //       <div className="document-spinner-container">
-  //         <SpinnerIcon
-  //           data-testid="loading-spinner"
-  //           className="document-fa-spin"
-  //         />
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="px-2">

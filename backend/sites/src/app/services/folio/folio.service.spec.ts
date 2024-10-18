@@ -5,12 +5,14 @@ import { Folio } from '../../entities/folio.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { FolioContents } from '../../entities/folioContents.entity';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('FolioSerivce', () => {
   let folioSerivce: FolioService;
   let folioContentService: FolioContentsService;
   let folioRepository: Repository<Folio>;
   let folioContentRepository: Repository<FolioContents>;
+  let loggerService: LoggerService
 
   const folios: Folio[] = [
     {
@@ -67,6 +69,7 @@ describe('FolioSerivce', () => {
           provide: getRepositoryToken(FolioContents),
           useClass: Repository,
         },
+        LoggerService
       ],
     }).compile();
 
@@ -80,6 +83,8 @@ describe('FolioSerivce', () => {
     folioContentRepository = module.get<Repository<FolioContents>>(
       getRepositoryToken(FolioContents),
     );
+
+    loggerService = module.get<LoggerService>(LoggerService);
   });
 
   afterEach(() => {

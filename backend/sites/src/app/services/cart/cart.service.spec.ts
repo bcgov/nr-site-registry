@@ -5,10 +5,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { sampleSites } from '../../mockData/site.mockData';
 import { CartDeleteDTO, CartDTO } from '../../dto/cart.dto';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('CartSerive', () => {
   let cartService: CartService;
   let cartRepository: Repository<Cart>;
+  let loggerService: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,12 +37,15 @@ describe('CartSerive', () => {
             })),
           },
         },
+        LoggerService
       ],
     }).compile();
 
     cartService = module.get<CartService>(CartService);
 
     cartRepository = module.get<Repository<Cart>>(getRepositoryToken(Cart));
+
+    loggerService = module.get<LoggerService>(LoggerService);
   });
 
   afterEach(() => {

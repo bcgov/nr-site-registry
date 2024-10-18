@@ -20,7 +20,7 @@ BEGIN
 END $$;`,
     );
     await queryRunner.query(
-        `DO $$
+      `DO $$
   BEGIN
       IF EXISTS (
           SELECT 1
@@ -32,7 +32,7 @@ END $$;`,
           ALTER TABLE "sites"."site_profile_land_uses" 
           DROP CONSTRAINT "FK_84d86cc243b265a436e3ab616c3";
       END IF;
-  END $$;`     
+  END $$;`,
     );
     await queryRunner.query(
       `ALTER TABLE "sites"."site_profile_owners" DROP CONSTRAINT "FK_4d14bbf4faba151de1fd6c6f4d0"`,

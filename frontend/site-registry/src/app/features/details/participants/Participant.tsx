@@ -102,7 +102,6 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Handle view mode changes
   useEffect(() => {
     setViewMode(mode);
-    dispatch(setupSiteParticipantDataForSaving(siteParticipant));
   }, [mode]);
 
   // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
@@ -337,7 +336,9 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       // Update both formData and trackParticipant
       const updatedPartics = updateParticipant(formData);
-      const updatedTrackNotatn = updateParticipant(trackParticipant);
+      const updatedTrackNotatn = updateParticipant(
+        trackParticipant ?? formData,
+      );
 
       // Filter out participants based on selectedRows for formData
       const filteredPartics = updatedPartics.filter(
@@ -441,7 +442,10 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       // Update both formData and trackNotation
       const updatedParticipants = updateParticipants(formData, event);
-      const updatedTrackNotatn = updateParticipants(trackParticipant, event);
+      const updatedTrackNotatn = updateParticipants(
+        trackParticipant ?? formData,
+        event,
+      );
 
       setFormData(updatedParticipants);
       dispatch(updateSiteParticipants(updatedParticipants));
@@ -512,7 +516,10 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
     setFormData((prevData) => [newParticipant, ...prevData]);
     dispatch(updateSiteParticipants([newParticipant, ...formData]));
     dispatch(
-      setupSiteParticipantDataForSaving([newParticipant, ...trackParticipant]),
+      setupSiteParticipantDataForSaving([
+        newParticipant,
+        ...(trackParticipant ?? formData),
+      ]),
     );
     const tracker = new ChangeTracker(
       IChangeType.Added,

@@ -6,10 +6,12 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { Cart } from '../../entities/cart.entity';
 import { sampleSites } from '../../mockData/site.mockData';
 import { GenericResponse } from '../../dto/response/genericResponse';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('CartResolver', () => {
   let resolver: CartResolver;
   let service: CartService;
+  let logger: LoggerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -49,11 +51,13 @@ describe('CartResolver', () => {
             }),
           },
         },
+        LoggerService
       ],
     }).compile();
 
     resolver = module.get<CartResolver>(CartResolver);
     service = module.get<CartService>(CartService);
+    logger = module.get<LoggerService>(LoggerService);
   });
 
   afterEach(() => {

@@ -26,7 +26,7 @@ import {
   QueryResultForPendingSitesResponse,
   SearchParams,
   SRApproveRejectResponse,
-} from 'src/app/dto/sitesPendingReview.dto';
+} from '../../dto/sitesPendingReview.dto';
 
 /**
  * Resolver for Region
@@ -241,9 +241,7 @@ export class SiteResolver {
    * @returns sites where id or address matches the search param along with pagination params
    */
   @Roles({
-    roles: [
-      CustomRoles.SiteRegistrar,
-    ],
+    roles: [CustomRoles.SiteRegistrar],
     mode: RoleMatchingMode.ANY,
   })
   @Query(() => QueryResultForPendingSitesResponse, {

@@ -45,7 +45,7 @@ on:
         type: string
       tag_promote:
         description: 'Tag to promote to; e.g. latest, test, demo or prod'
-        default: latest
+        default: test
         required: false
         type: string
       target:

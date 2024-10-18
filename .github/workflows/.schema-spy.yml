@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Migrations
-        uses: docker://ghcr.io/bcgov/nr-site-registry/backend/sites-migration:${{ github.event.inputs.tag }}
+        uses: docker://ghcr.io/bcgov/nr-site-registry/backend/sites-migration:test
         env:
           POSTGRES_DB_PASSWORD: default
           POSTGRES_DB_USERNAME: postgres

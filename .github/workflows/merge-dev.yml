@@ -30,7 +30,7 @@ jobs:
     secrets: inherit
     needs: [get-pr-info ]
     with:
-      triggers: ('backend/' 'frontend/' '.github/')
+      triggers: ('backend/' 'frontend/')
       environment: test
       tag:  ${{ needs.get-pr-info.outputs.pr }}
       params:

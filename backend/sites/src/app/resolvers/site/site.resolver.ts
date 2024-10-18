@@ -26,7 +26,7 @@ import {
   QueryResultForPendingSitesResponse,
   SearchParams,
   SRApproveRejectResponse,
-} from 'src/app/dto/sitesPendingReview.dto';
+} from '../../dto/sitesPendingReview.dto';
 
 /**
  * Resolver for Region

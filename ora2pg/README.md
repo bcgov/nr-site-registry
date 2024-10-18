@@ -8,10 +8,9 @@ This container can be used to migrate from Oracle to PostgreSQL utilizing the to
 Documentation: https://ora2pg.darold.net/documentation.html
 
 ## How to build
-```
+
 Update the oracle connection string in the "ora2pg.conf" file
 
-```
 ```
 docker build . -t ora2pg
 

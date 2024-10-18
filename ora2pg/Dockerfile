@@ -24,19 +24,25 @@ RUN apt-get update && apt-get install -y -q --no-install-recommends \
     gnupg2 \
     libdbd-pg-perl
 
-ADD /assets /assets
+ARG ORAVERSION=21
+ARG ORACLIENT_BASIC=https://download.oracle.com/otn_software/linux/instantclient/211000/oracle-instantclient-basic-21.1.0.0.0-1.x86_64.rpm
+ARG ORACLIENT_DEVEL=https://download.oracle.com/otn_software/linux/instantclient/211000/oracle-instantclient-devel-21.1.0.0.0-1.x86_64.rpm
+ARG ORACLIENT_SQLPLUS=https://download.oracle.com/otn_software/linux/instantclient/211000/oracle-instantclient-sqlplus-21.1.0.0.0-1.x86_64.rpm
+
 
 # Instal Oracle Client
-RUN mkdir /usr/lib/oracle/12.2/client64/network/admin -p
+RUN mkdir /usr/lib/oracle/$ORAVERSION/client64/network/admin -p \
+    && curl -L -o /tmp/oracle-instantclient.rpm $ORACLIENT_BASIC \
+    && (cd /tmp && alien -i ./oracle-instantclient.rpm && rm -f oracle-instantclient.rpm) \
+    && curl -L -o /tmp/oracle-instantclient.rpm $ORACLIENT_DEVEL \
+    && (cd /tmp && alien -i ./oracle-instantclient.rpm && rm -f oracle-instantclient.rpm) \
+    && curl -L -o /tmp/oracle-instantclient.rpm $ORACLIENT_SQLPLUS \
+    && (cd /tmp && alien -i ./oracle-instantclient.rpm && rm -f oracle-instantclient.rpm)
 
-RUN alien -i /assets/oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm &&\
-    alien -i /assets/oracle-instantclient12.2-devel-12.2.0.1.0-1.x86_64.rpm &&\
-    alien -i /assets/oracle-instantclient12.2-sqlplus-12.2.0.1.0-1.x86_64.rpm
-
-ENV ORACLE_HOME=/usr/lib/oracle/12.2/client64
-ENV TNS_ADMIN=/usr/lib/oracle/12.2/client64/network/admin
-ENV LD_LIBRARY_PATH=/usr/lib/oracle/12.2/client64/lib
-ENV PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/oracle/12.2/client64/bin
+ENV ORACLE_HOME=/usr/lib/oracle/$ORAVERSION/client64
+ENV TNS_ADMIN=/usr/lib/oracle/$ORAVERSION/client64/network/admin
+ENV LD_LIBRARY_PATH=/usr/lib/oracle/$ORAVERSION/client64/lib 
+ENV PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/oracle/$ORAVERSION/client64/bin
 
 # Install DBI module with Postgres, Oracle and Compress::Zlib module
 RUN cpan install Test::NoWarnings &&\

@@ -12,16 +12,17 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  get-pr-info:
-    runs-on: ubuntu-24.04
-    outputs:
-      pr: ${{ steps.vars.outputs.pr }}
-    steps:
-      - id: vars
-        uses: bcgov-nr/action-get-pr@v0.0.1
-      - name: Echo PR number
-        run: |
-          echo "PR: ${{ steps.vars.outputs.pr }}"
+  # TODO: RE-ENABLE BELOW GBEFORE MERGING BACK INTO DEV. Code is valid, just commented for testing purposes. 
+  # get-pr-info:
+  #   runs-on: ubuntu-24.04
+  #   outputs:
+  #     pr: ${{ steps.vars.outputs.pr }}
+  #   steps:
+  #     - id: vars
+  #       uses: bcgov-nr/action-get-pr@v0.0.1
+  #     - name: Echo PR number
+  #       run: |
+  #         echo "PR: ${{ steps.vars.outputs.pr }}"
           
           
 
@@ -29,11 +30,12 @@ jobs:
     name: Deploys to TEST
     uses: ./.github/workflows/.deployer.yml
     secrets: inherit
-    needs: [get-pr-info ]
+    # needs: [get-pr-info ] # TODO - RE-ENABLE THIS LINE
     with:
       # triggers: ('backend/' 'frontend/')
       environment: test
-      tag:  ${{ needs.get-pr-info.outputs.pr }}
+      # tag:  ${{ needs.get-pr-info.outputs.pr }}
+      tag:  '111'
       params:
         --set backendSites.deploymentStrategy=RollingUpdate
         --set frontendSiteRegistry.deploymentStrategy=RollingUpdate

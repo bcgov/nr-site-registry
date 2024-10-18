@@ -1,5 +1,12 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Sites } from './sites.entity';
 import { Subdivisions } from './subdivisions.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
@@ -63,7 +70,7 @@ export class SiteSubdivisions extends ChangeAuditEntity {
   sprofDateCompleted: Date | null;
 
   @Field()
-  @Column('bigint', { primary: true, name: 'site_subdiv_id' })
+  @PrimaryGeneratedColumn('increment')
   siteSubdivId: string;
 
   @Field()

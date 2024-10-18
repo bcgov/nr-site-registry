@@ -49,6 +49,12 @@ jobs:
     with:
       triggers: ('backend/' 'frontend/')
 
+  schemaspy:
+    name: Schemaspy
+    uses: ./.github/workflows/.schema-spy.yml
+    secrets: inherit
+    with:
+      tag: test
 
   results:
     name: PR Results

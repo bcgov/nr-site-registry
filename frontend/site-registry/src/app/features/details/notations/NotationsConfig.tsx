@@ -585,5 +585,3 @@ export const GetNotationConfig = () => {
     srVisibilityConfig,
   };
 };
-
-export default GetNotationConfig;

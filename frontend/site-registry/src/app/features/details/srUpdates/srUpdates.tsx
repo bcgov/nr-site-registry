@@ -30,7 +30,7 @@ import { RequestStatus } from '../../../helpers/requests/status';
 import Notation from '../notations/Notation';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { UserType } from '../../../helpers/requests/userType';
-import GetNotationConfig from '../notations/NotationsConfig';
+import { GetNotationConfig } from '../notations/NotationsConfig';
 import {
   ministryContactDrpdown,
   notationClassDrpdown,

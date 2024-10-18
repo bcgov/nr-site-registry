@@ -11,8 +11,10 @@ async function main() {
   });
   await app.listen(process.env.PORT || 4007);
 }
-main().then(()=>{
-  logger.log(`Process start up took ${process.uptime()} seconds`);
-}).catch(err=>{
-  logger.error(err.message, err.stack);
-});
+main()
+  .then(() => {
+    logger.log(`Process start up took ${process.uptime()} seconds`);
+  })
+  .catch((err) => {
+    logger.error(err.message, err.stack);
+  });

@@ -241,11 +241,7 @@ export class SiteResolver {
    * @returns sites where id or address matches the search param along with pagination params
    */
   @Roles({
-    roles: [
-      CustomRoles.External,
-      CustomRoles.Internal,
-      CustomRoles.SiteRegistrar,
-    ],
+    roles: [CustomRoles.SiteRegistrar],
     mode: RoleMatchingMode.ANY,
   })
   @Query(() => QueryResultForPendingSitesResponse, {
@@ -289,7 +285,7 @@ export class SiteResolver {
     }
   }
 
-  @Roles({ roles: [CustomRoles.Internal], mode: RoleMatchingMode.ANY })
+  @Roles({ roles: [CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Mutation(() => SRApproveRejectResponse, { name: 'bulkAproveRejectChanges' })
   async bulkAproveRejectChanges(
     @Args('approveRejectDTO', { type: () => BulkApproveRejectChangesDTO })

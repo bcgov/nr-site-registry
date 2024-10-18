@@ -12,7 +12,7 @@ import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 import { MapSearch } from './MapSearch';
 import { useMapSearchQuery } from '../../../graphql/generated';
-import { SiteMarkers } from './SiteMarkers';
+import { SiteMarkers } from './siteMarkers/SiteMarkers';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];

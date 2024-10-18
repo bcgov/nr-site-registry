@@ -101,69 +101,95 @@ describe('SiteService', () => {
         {
           provide: getRepositoryToken(Events),
           useValue: {
-            find: jest.fn(() => {
+            findOneByOrFail: jest.fn(() => {
               return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
+                {
+                  id: '1',
+                  siteId: '1',
+                  psnorgId: '1',
+                  completionDate: '2004-06-16T07:00:00.000Z',
+                  requirementDueDate: '1970-01-01T00:00:00.000Z',
+                  requirementReceivedDate: '1970-01-01T00:00:00.000Z',
+                  requiredAction: null,
+                  note: null,
+                  etypCode: 'test type code',
+                  eclsCode: 'test class code',
+                  srAction: 'false',
+                },
               ];
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            createQueryBuilder: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnThis(),
+              getRawOne: jest.fn().mockResolvedValue({ maxid: '1' }), // Ensure this returns a promise
             }),
+            save: jest.fn(),
           },
         },
         {
           provide: getRepositoryToken(EventPartics),
           useValue: {
-            find: jest.fn(() => {
+            findOneByOrFail: jest.fn(() => {
               return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
+                {
+                  eventParticId: 'xxx-xxx',
+                  eventId: '1',
+                  eprCode: 'test epr code',
+                  psnorgId: '1',
+                  displayName: 'Display Name',
+                  srAction: 'false',
+                },
               ];
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            createQueryBuilder: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnThis(),
+              getRawOne: jest.fn().mockResolvedValue({ maxid: '1' }), // Ensure this returns a promise
             }),
+            save: jest.fn(),
           },
         },
         {
           provide: getRepositoryToken(SitePartics),
           useValue: {
-            find: jest.fn(() => {
+            findOneByOrFail: jest.fn(() => {
               return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
+                {
+                  id: '1',
+                  psnorgId: '1',
+                  siteId: '1',
+                  effectiveDate: '1988-03-12T08:00:00.000Z',
+                  endDate: null,
+                  note: 'OWNER OF MAJORITY OF FORMER CP RAIL RIGHT OF WAY.',
+                  displayName: 'ENVIRO-TEST LABORATORIES (EDMONTON, ALBERTA)',
+                  srAction: 'false',
+                },
               ];
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            createQueryBuilder: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnThis(),
+              getRawOne: jest.fn().mockResolvedValue({ maxid: '1' }), // Ensure this returns a promise
             }),
+            save: jest.fn(),
           },
         },
         {
           provide: getRepositoryToken(SiteParticRoles),
           useValue: {
-            find: jest.fn(() => {
+            findOneByOrFail: jest.fn(() => {
               return [
-                { id: 'fff-jjjj-lll', siteId: '123' },
-                { id: 'sdsff-jjhh-llkkj', siteId: '123' },
+                {
+                  particRoleId: 'xxx-xxxx-xxx',
+                  spId: '1',
+                  prCode: 'POWNR',
+                  description: 'PROPERTY OWNER',
+                  srAction: 'false',
+                },
               ];
             }),
-            save: jest.fn(() => {
-              return [
-                { id: '123', siteId: '123' },
-                { id: '124', siteId: '123' },
-              ];
+            createQueryBuilder: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnThis(),
+              getRawOne: jest.fn().mockResolvedValue({ maxid: '1' }), // Ensure this returns a promise
             }),
+            save: jest.fn(),
           },
         },
         {
@@ -852,6 +878,208 @@ describe('SiteService', () => {
       await siteService.processDocuments(documents, userInfo, entityManager);
 
       expect(entityManager.delete).toHaveBeenCalledWith(SiteDocs, { id: '1' });
+    });
+  });
+
+  describe('processSiteParticipants', () => {
+    it('should add new site participants and roles', async () => {
+      const siteParticipants = [
+        {
+          apiAction: UserActionEnum.ADDED,
+          description: 'New Participant',
+          displayName: 'Display Name',
+          prCode: 'PR001',
+          psnorgId: '123',
+          siteId: '1',
+          effectiveDate: '1988-03-12T08:00:00.000Z',
+          endDate: null,
+          note: 'OWNER OF MAJORITY OF FORMER CP RAIL RIGHT OF WAY.',
+          srAction: 'false',
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      await siteService.processSiteParticipants(
+        siteParticipants,
+        userInfo,
+        entityManager,
+      );
+
+      expect(entityManager.save).toHaveBeenCalledTimes(2);
+      const addedSiteParticipant = (entityManager.save as jest.Mock).mock
+        .calls[0][1];
+      expect(entityManager.save).toHaveBeenCalledWith(
+        SitePartics,
+        expect.any(Array),
+      );
+      expect(entityManager.save).toHaveBeenCalledWith(
+        SiteParticRoles,
+        expect.any(Array),
+      );
+      expect(addedSiteParticipant[0].whenCreated).toBeInstanceOf(Date);
+      expect(addedSiteParticipant[0].whoCreated).toBe('Test User');
+    });
+
+    it('should update existing site participants and roles', async () => {
+      const siteParticipants = [
+        {
+          apiAction: UserActionEnum.UPDATED,
+          id: '1',
+          prCode: 'PR002',
+          particRoleId: 'xxx-xxxx-xxx',
+        },
+      ];
+      const userInfo = { givenName: 'Updated User' };
+
+      await siteService.processSiteParticipants(
+        siteParticipants,
+        userInfo,
+        entityManager,
+      );
+      const updatedSiteParticipant = (entityManager.update as jest.Mock).mock
+        .calls[0][2];
+      expect(updatedSiteParticipant.whoUpdated).toBe('Updated User');
+      expect(entityManager.update).toHaveBeenCalledTimes(2);
+      expect(entityManager.update).toHaveBeenCalledWith(
+        SitePartics,
+        { id: '1' },
+        expect.any(Object),
+      );
+      expect(entityManager.update).toHaveBeenCalledWith(
+        SiteParticRoles,
+        { id: 'xxx-xxxx-xxx' },
+        expect.any(Object),
+      );
+    });
+
+    it('should delete site participants and roles', async () => {
+      const siteParticipants = [
+        {
+          apiAction: UserActionEnum.DELETED,
+          id: '1',
+          particRoleId: 'xxx-xxxx-xxx',
+        },
+      ];
+      const userInfo = { givenName: 'Deleter User' };
+
+      await siteService.processSiteParticipants(
+        siteParticipants,
+        userInfo,
+        entityManager,
+      );
+      expect(entityManager.delete).toHaveBeenCalledTimes(2);
+      expect(entityManager.delete).toHaveBeenCalledWith(SitePartics, {
+        id: '1',
+      });
+      expect(entityManager.delete).toHaveBeenCalledWith(SiteParticRoles, {
+        id: 'xxx-xxxx-xxx',
+      });
+    });
+
+    it('should handle empty siteParticipants array', async () => {
+      const siteParticipants = [];
+      const userInfo = { givenName: 'Test User' };
+
+      await siteService.processSiteParticipants(
+        siteParticipants,
+        userInfo,
+        entityManager,
+      );
+
+      expect(entityManager.save).not.toHaveBeenCalled();
+      expect(entityManager.update).not.toHaveBeenCalled();
+      expect(entityManager.delete).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('processEvents', () => {
+    it('should add new events and participants', async () => {
+      const events = [
+        {
+          apiAction: UserActionEnum.ADDED,
+          id: '1',
+          siteId: '1',
+          psnorgId: '1',
+          completionDate: '2004-06-16T07:00:00.000Z',
+          requirementDueDate: '1970-01-01T00:00:00.000Z',
+          requirementReceivedDate: '1970-01-01T00:00:00.000Z',
+          requiredAction: null,
+          note: null,
+          etypCode: 'CMI',
+          eclsCode: 'ADM',
+          srAction: 'false',
+          notationParticipant: [
+            {
+              apiAction: UserActionEnum.ADDED,
+              eventParticId: 'xxx-xxx',
+              eventId: '1',
+              eprCode: 'RVB',
+              psnorgId: '1',
+              displayName: 'SAGER, J.',
+              srAction: 'false',
+            },
+          ],
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      await siteService.processEvents(events, userInfo, entityManager);
+      const addedEvent = (entityManager.save as jest.Mock).mock.calls[0][1];
+      expect(addedEvent[0].whenCreated).toBeInstanceOf(Date);
+      expect(addedEvent[0].whoCreated).toBe('Test User');
+      expect(entityManager.save).toHaveBeenCalledTimes(2);
+      expect(entityManager.save).toHaveBeenCalledWith(
+        Events,
+        expect.any(Array),
+      );
+      expect(entityManager.save).toHaveBeenCalledWith(
+        EventPartics,
+        expect.any(Array),
+      );
+    });
+
+    it('should update existing events and participants', async () => {
+      const events = [
+        {
+          apiAction: UserActionEnum.UPDATED,
+          id: '1',
+          etypCode: 'type',
+          eclsCode: 'class',
+          notationParticipant: [],
+        },
+      ];
+      const userInfo = { givenName: 'Updated User' };
+
+      await siteService.processEvents(events, userInfo, entityManager);
+      const updatedEvent = (entityManager.update as jest.Mock).mock.calls[0][2];
+      expect(updatedEvent.whoUpdated).toBe('Updated User');
+      expect(entityManager.update).toHaveBeenCalledTimes(1);
+      expect(entityManager.update).toHaveBeenCalledWith(
+        Events,
+        { id: '1' },
+        expect.any(Object),
+      );
+    });
+
+    it('should delete participants when action is DELETED', async () => {
+      const events = [
+        {
+          id: '1',
+          notationParticipant: [
+            {
+              apiAction: UserActionEnum.DELETED,
+              eventParticId: 'xxx-xxx',
+            },
+          ],
+        },
+      ];
+      const userInfo = { givenName: 'Deleter User' };
+
+      await siteService.processEvents(events, userInfo, entityManager);
+
+      expect(entityManager.delete).toHaveBeenCalledWith(EventPartics, {
+        id: 'xxx-xxx',
+      });
     });
   });
 });

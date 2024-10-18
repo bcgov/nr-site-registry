@@ -5,34 +5,10 @@ export class MasterScript1729106451871 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `DO $$
-BEGIN
-    IF EXISTS (
-        SELECT 1
-        FROM information_schema.table_constraints
-        WHERE constraint_name = 'FK_b24bc419d1131f423acf44fb9ab'
-        AND table_schema = 'sites'
-        AND table_name = 'profile_submissions'
-    ) THEN
-        ALTER TABLE "sites"."profile_submissions" 
-        DROP CONSTRAINT "FK_b24bc419d1131f423acf44fb9ab";
-    END IF;
-END $$;`,
+      `ALTER TABLE "sites"."profile_submissions" DROP CONSTRAINT "FK_b24bc419d1131f423acf44fb9ab"`,
     );
     await queryRunner.query(
-        `DO $$
-  BEGIN
-      IF EXISTS (
-          SELECT 1
-          FROM information_schema.table_constraints
-          WHERE constraint_name = 'FK_84d86cc243b265a436e3ab616c3'
-          AND table_schema = 'sites'
-          AND table_name = 'site_profile_land_uses'
-      ) THEN
-          ALTER TABLE "sites"."site_profile_land_uses" 
-          DROP CONSTRAINT "FK_84d86cc243b265a436e3ab616c3";
-      END IF;
-  END $$;`     
+      `ALTER TABLE "sites"."site_profile_land_uses" DROP CONSTRAINT "FK_84d86cc243b265a436e3ab616c3"`     
     );
     await queryRunner.query(
       `ALTER TABLE "sites"."site_profile_owners" DROP CONSTRAINT "FK_4d14bbf4faba151de1fd6c6f4d0"`,

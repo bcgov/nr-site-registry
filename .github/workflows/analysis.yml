@@ -63,7 +63,7 @@ jobs:
             -Dsonar.tests.inclusions=**/*spec.ts
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
             -Dsonar.cpd.exclusions=**/migrations/**
-            -Dsonar.projectBaseDir=${{ matrix.dir }}
+            -Dsonar.projectBaseDir=/
           sonar_token: ${{ secrets[matrix.token] }}
           triggers: ('${{ matrix.dir }}/')
 

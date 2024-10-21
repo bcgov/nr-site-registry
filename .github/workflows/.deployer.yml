@@ -43,7 +43,7 @@ on:
       ### Usually a bad idea / not recommended
       timeout-minutes:
         description: 'Timeout minutes'
-        default: 10
+        default: 15
         required: false
         type: number
       values:
@@ -143,6 +143,9 @@ jobs:
       - if: steps.triggers.outputs.triggered == 'true' && inputs.atomic != 'false'
         working-directory: ${{ inputs.directory }}
         run: |
+          # 1 minute less for HELM to do atomic deployment and rollback if not completed within the time.
+          DEPLOY_TIMEOUT=$((${{ inputs.timeout-minutes }}-1)) 
+          
           # Helm upgrade/rollout - atomic, timeout
           helm upgrade \
             --set-string global.repository=${{ github.repository }} \
@@ -153,9 +156,11 @@ jobs:
             --set-string global.secrets.keycloakAuthURL="${{ secrets.KEYCLOAK_AUTH_URL }}" \
             --set-string global.secrets.databaseAdminPassword="${{ secrets.DATABASE_ADMIN_PASSWORD }}" \
             --set-string global.secrets.databasePassword="${{ secrets.DATABASE_PWD }}" \
+            --set-string crunchy.pgBackRest.s3.accessKey="${{ secrets.S3_BACKUP_ACCESS_KEY }}"  \
+            --set-string crunchy.pgBackRest.s3.secretKey="${{ secrets.S3_BACKUP_SECRET_KEY }}"  \
             ${{ inputs.params }} \
             --install --wait --atomic ${{ steps.vars.outputs.release }} \
-            --timeout ${{ inputs.timeout-minutes }}m \
+            --timeout "$DEPLOY_TIMEOUT"m  \
             --values ${{ inputs.values }} \
             ./${{ github.event.repository.name }}-${{ steps.pr.outputs.pr || steps.vars.outputs.version }}.tgz
 

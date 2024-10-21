@@ -48,6 +48,7 @@ jobs:
     secrets: inherit
     with:
       triggers: ('backend/' 'frontend/')
+      values: 'values-pr.yaml' # PR specific values file.
 
   results:
     name: PR Results

@@ -1,0 +1,71 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+#-- global variables, can be accessed by sub-charts.
+global:
+  registry: ghcr.io
+  autoscaling: false
+  secrets:
+    enabled: true
+    persist: false
+#-- the components of the application, backend.
+backendSites:
+  #-- enable or disable backend
+  enabled: true
+  #-- the deployment strategy, can be "Recreate" or "RollingUpdate"
+  deploymentStrategy: Recreate
+  pdb:
+    enabled: false
+  resources:
+    limits:
+      cpu: 100m
+      memory: 250Mi
+    requests:
+      cpu: 50m
+      memory: 150Mi
+
+frontendSiteRegistry:
+  enabled: true
+  deploymentStrategy: Recreate
+  pdb:
+    enabled: false # enable it in PRODUCTION for having pod disruption budget.
+
+crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single postgres
+  enabled: false
+
+bitnami-pg:
+  enabled: true
+  image:
+    registry: artifacts.developer.gov.bc.ca/docker-remote
+  auth:
+    existingSecret: '{{ .Release.Name }}-database'
+    username: {{ .Values.global.config.dbName }}
+    database: {{ .Values.global.config.dbName }}
+  shmVolume:
+    enabled: false
+  backup:
+    enabled: false
+    cronjob:
+      containerSecurityContext: { }
+      podSecurityContext:
+        enabled: false
+      storage:
+        size: 130Mi
+  primary:
+    persistence:
+      enabled: true
+      storageClass: netapp-block-standard
+      accessModes:
+        - ReadWriteOnce
+      size: 120Mi
+    containerSecurityContext:
+      enabled: false
+    podSecurityContext:
+      enabled: false
+    resources:
+      requests:
+        cpu: 50m
+        memory: 150Mi
+      limits:
+        cpu: 100m
+        memory: 250Mi
+

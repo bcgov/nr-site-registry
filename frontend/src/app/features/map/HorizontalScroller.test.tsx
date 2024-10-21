@@ -1,7 +1,5 @@
-//import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-//import { render } from '@/test-utils'
 import { HorizontalScroller } from './HorizontalScroller';
 
 describe('Test suite for HorizontalScroller', () => {
@@ -16,7 +14,7 @@ describe('Test suite for HorizontalScroller', () => {
     expect(screen.getByText('Content')).toBeInTheDocument();
   });
 
-  //The HorizontalScroller component is present for the screen width of <900px
+  //The HorizontalScroller component is enabled for screen width of <900px
   it('should render HorizontalScroller with no scrolling', () => {
     render(
       <div style={{ width: '1000px' }} className="test-class" title="scroller">

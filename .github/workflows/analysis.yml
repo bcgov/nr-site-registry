@@ -63,8 +63,8 @@ jobs:
           sonar_token: ${{ secrets[matrix.token] }}
           triggers: ('${{ matrix.dir }}/')
           env:
-            LOG_LEVEL : info
-            LOG_FILE_LOCATION : /tmp/sites-%DATE%.log
+            LOG_LEVEL: info
+            LOG_FILE_LOCATION: /tmp/sites-%DATE%.log
 
 
   # https://github.com/marketplace/actions/aqua-security-trivy

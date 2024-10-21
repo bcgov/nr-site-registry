@@ -87,7 +87,6 @@ export function MapSearch() {
     setSearchTerm(searchTerm);
   };
 
-  /* TODO: Add Horizontal Scroller for m inimized version */
   return (
     <Box component="div" sx={styles} className="map-search">
       <HorizontalScroller

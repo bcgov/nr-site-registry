@@ -21,7 +21,6 @@ interface Props {
 /**
  * When enabled, this component will horizontally scroll its children,
  * showing a left and right scroll button when appropriate.
- * It also supports swipe left/right gestures.
  */
 export function HorizontalScroller({
   children,
@@ -72,16 +71,6 @@ function HorizontalScrollerComponent({
       doScroll(scrollOffset);
     }
   };
-
-  //   const swipeCallback = (direction: SwipeDirection) => {
-  //     if (direction === 'left') {
-  //       onScrollRight();
-  //     } else if (direction === 'right') {
-  //       onScrollLeft();
-  //     }
-  //   };
-
-  //useSwipe(ref, swipeCallback)
 
   useEffect(() => {
     if (ref.current) {

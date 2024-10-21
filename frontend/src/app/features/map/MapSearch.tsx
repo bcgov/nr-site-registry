@@ -22,9 +22,11 @@ import { TextSearchButton } from './search/TextSearchButton';
 import './MapSearch.css';
 import { SearchInput } from './search/SearchInput';
 import React, { useState } from 'react';
-import { FindMe } from '../../components/common/icon';
 import { FindMeButton } from './FindMeButton';
 import { useMapSearchQuery } from '../../../graphql/generated';
+import { HorizontalScroller } from './HorizontalScroller';
+import { PolygonSearchButton } from './search/PolygonSearchButton';
+import { RadiusSearchButton } from './search/RadiusSearchButton';
 
 const styles = {
   marginTop: {
@@ -88,27 +90,29 @@ export function MapSearch() {
   /* TODO: Add Horizontal Scroller for m inimized version */
   return (
     <Box component="div" sx={styles} className="map-search">
-      {/* <HorizontalScroller
+      <HorizontalScroller
         isEnabled={isSmall}
         className="map-search-scroller"
         scrollOffset={150}
-      > */}
-      {isLarge ? (
-        <Stack direction="row" className="map-search-row">
-          <Autocomplete
-            options={options}
-            renderInput={() => {
-              return <SearchInput sx={searchInputStyles} />;
-            }}
-            className="search-autocomplete"
-            componentsProps={componentProps}
-          />
-          <FindMeButton />
-        </Stack>
-      ) : (
-        <TextSearchButton />
-      )}
-      {/* </HorizontalScroller> */}
+      >
+        {isLarge ? (
+          <Stack direction="row" className="map-search-row">
+            <Autocomplete
+              options={options}
+              renderInput={() => {
+                return <SearchInput sx={searchInputStyles} />;
+              }}
+              className="search-autocomplete"
+              componentsProps={componentProps}
+            />
+            <FindMeButton />
+          </Stack>
+        ) : (
+          <TextSearchButton />
+        )}
+        <PolygonSearchButton />
+        <RadiusSearchButton />
+      </HorizontalScroller>
     </Box>
   );
 }

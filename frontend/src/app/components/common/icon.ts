@@ -41,6 +41,8 @@ import {
   FaCaretRight,
   FaLocationCrosshairs,
   FaListCheck,
+  FaDrawPolygon,
+  FaMapPin,
 } from 'react-icons/fa6';
 
 import {
@@ -98,3 +100,5 @@ export const PencilIcon = FaPencil;
 export const CaretRightIcon = FaCaretRight;
 export const FindMe = FaLocationCrosshairs;
 export const ListCheckIcon = FaListCheck;
+export const DrawPolygon = FaDrawPolygon;
+export const MapPin = FaMapPin;

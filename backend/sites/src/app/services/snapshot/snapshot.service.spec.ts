@@ -320,11 +320,6 @@ describe('SnapshotService', () => {
                 rwmNoteFlag: 1,
                 psnorg: null,
                 site: sampleSites[0],
-                siteProfileOwners: null,
-                siteProfiles: null,
-                siteProfiles2: null,
-                siteProfiles3: null,
-                siteProfiles4: null,
                 siteParticRoles: [
                   {
                     prCode: 'PR001',
@@ -408,11 +403,6 @@ describe('SnapshotService', () => {
                 rwmNoteFlag: 1,
                 psnorg: null,
                 site: sampleSites[0],
-                siteProfileOwners: null,
-                siteProfiles: null,
-                siteProfiles2: null,
-                siteProfiles3: null,
-                siteProfiles4: null,
                 siteParticRoles: [
                   {
                     prCode: 'PR001',
@@ -509,11 +499,6 @@ describe('SnapshotService', () => {
                 rwmNoteFlag: 1,
                 psnorg: null,
                 site: sampleSites[0],
-                siteProfileOwners: null,
-                siteProfiles: null,
-                siteProfiles2: null,
-                siteProfiles3: null,
-                siteProfiles4: null,
                 siteParticRoles: [
                   {
                     prCode: 'PR001',
@@ -682,11 +667,6 @@ describe('SnapshotService', () => {
                 rwmNoteFlag: 1,
                 psnorg: null,
                 site: sampleSites[0],
-                siteProfileOwners: null,
-                siteProfiles: null,
-                siteProfiles2: null,
-                siteProfiles3: null,
-                siteProfiles4: null,
                 siteParticRoles: [
                   {
                     prCode: 'PR001',

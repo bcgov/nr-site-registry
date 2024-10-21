@@ -62,6 +62,9 @@ jobs:
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
           sonar_token: ${{ secrets[matrix.token] }}
           triggers: ('${{ matrix.dir }}/')
+          env:
+            LOG_LEVEL : info
+            LOG_FILE_LOCATION : /tmp/sites-%DATE%.log
 
 
   # https://github.com/marketplace/actions/aqua-security-trivy

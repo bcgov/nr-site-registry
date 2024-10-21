@@ -140,7 +140,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
         prometheus.io/scrape: 'true'
         prometheus.io/port: '9187'
     dataVolumeClaimSpec:
-      storage: 300Mi
+      storage: 380Mi
       storageClassName: netapp-block-standard
 
     requests:
@@ -166,13 +166,13 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     # If retention-full-type set to 'time' then the number defined in retention will take that many days worth of full backups before expiration
     retentionFullType: count
     s3:
-      retention: 14 # two weeks backup in object store.
+      retention: 7 # one weeks backup in object store.
       bucket: nrsitest
       endpoint: nrs.objectstore.gov.bc.ca
       accessKey: ~
       secretKey: ~
       fullBackupSchedule: 0 9 * * * # full backup at GMT 9
-      incrementalBackupSchedule: 0/15 * * * * # every 15 minutes
+      incrementalBackupSchedule: 0 0/1 * * * # every hour
     pvc:
       retention: 1 # one day hot active backup in pvc
       retentionFullType: count

@@ -51,7 +51,7 @@ describe('CartResolver', () => {
             }),
           },
         },
-        LoggerService
+        LoggerService,
       ],
     }).compile();
 

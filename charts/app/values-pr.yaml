@@ -7,6 +7,9 @@ global:
   secrets:
     enabled: true
     persist: false
+  config:
+    dbName: site
+    schemaName: sites
 #-- the components of the application, backend.
 backendSites:
   #-- enable or disable backend

@@ -142,7 +142,6 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     dataVolumeClaimSpec:
       storage: 300Mi
       storageClassName: netapp-block-standard
-      walStorage: 150Mi
 
     requests:
       cpu: 50m

@@ -5,11 +5,11 @@ global:
   #-- the registry where the images are stored. override during runtime for other registry at global level or individual level.
   repository: ~ # provide the repo name from where images will be sourced for example bcgo
   #-- the registry where the images are stored. override during runtime for other registry at global level or individual level. default is ghcr.io
-  registry: ghcr.io # ghcr.io for directly streaming from github container registry or "artifacts.developer.gov.bc.ca/github-docker-remote" for artifactory, or any other registry.
+  registry: artifacts.developer.gov.bc.ca/github-docker-remote # ghcr.io for directly streaming from github container registry or "artifacts.developer.gov.bc.ca/github-docker-remote" for artifactory, or any other registry.
   #-- the tag of the image, it can be latest, 1.0.0 etc..., or the sha256 hash
   tag: ~
   #-- turn off autoscaling for the entire suite by setting this to false. default is true.
-  autoscaling: false
+  autoscaling: true
   #-- global secrets, can be accessed by sub-charts.
   secrets:
     enabled: true
@@ -22,7 +22,9 @@ global:
     keycloakAuthURL: ~
     databaseAdminPassword: ~
     persist: true
-
+  config:
+    dbName: site # if updating this value, make sure this is updated `bitnami-pg: auth:     username: site , database: site in values-pr.yaml`
+    schemaName: sites
   #-- domain of the application, it is required, apps.silver.devops.gov.bc.ca for silver cluster and apps.devops.gov.bc.ca for gold cluster
   domain: "apps.silver.devops.gov.bc.ca" # it is apps.gold.devops.gov.bc.ca for gold cluster
   #-- the database Alias gives a nice way to switch to different databases, crunchy, patroni ... etc.
@@ -32,39 +34,24 @@ backendSites:
   #-- enable or disable backend
   enabled: true
   #-- the deployment strategy, can be "Recreate" or "RollingUpdate"
-  deploymentStrategy: Recreate
+  deploymentStrategy: RollingUpdate
   #-- autoscaling for the component. it is optional and is an object.
   autoscaling:
     #-- enable or disable autoscaling.
     enabled: true
     #-- the minimum number of replicas.
-    minReplicas: 3
+    minReplicas: 2
     #-- the maximum number of replicas.
-    maxReplicas: 7
+    maxReplicas: 3
     #-- the target cpu utilization percentage, is from request cpu and NOT LIMIT CPU.
     targetCPUUtilizationPercentage: 80
-  #-- vault, for injecting secrets from vault. it is optional and is an object. it creates an initContainer which reads from vault and app container can source those secrets. for referring to a working example with vault follow this link: https://github.com/bcgov/onroutebc/blob/main/charts/onroutebc/values.yaml#L171-L186
-  vault:
-    #-- enable or disable vault.
-    enabled: false
-    #-- the role of the vault. it is required, #licenseplate-prod or licenseplate-nonprod, license plate is the namespace without env
-    role: ~
-    #-- the vault path where the secrets live. it is required, dev/api-1, dev/api-2, test/api-1 etc...
-    secretPaths:
-      - dev/api-1
-      - dev/api-2
-      - test/api-1
-      - test/api-2
-      - prod/api-1
-      - prod/api-2
-    #-- resources specific to vault initContainer. it is optional and is an object.
-    resources:
-      limits:
-        cpu: 50m
-        memory: 50Mi
-      requests:
-        cpu: 50m
-        memory: 25Mi
+  resources:
+    limits:
+      cpu: 150m
+      memory: 250Mi
+    requests:
+      cpu: 50m
+      memory: 150Mi
   #-- the service for the component. for inter namespace communication, use the service name as the hostname.
   service:
     #-- the type of the service. it can be ClusterIP, NodePort, LoadBalancer, ExternalName. ClusterIP is the default and is recommended.
@@ -75,23 +62,23 @@ backendSites:
     annotations:
       route.openshift.io/termination: "edge"
   pdb:
-    enabled: false # enable it in PRODUCTION for having pod disruption budget.
+    enabled: true # enable it in PRODUCTION for having pod disruption budget.
     minAvailable: 1 # the minimum number of pods that must be available during the disruption budget.
 
 frontendSiteRegistry:
   # -- enable or disable a component deployment.
   enabled: true
   # -- the deployment strategy, can be "Recreate" or "RollingUpdate"
-  deploymentStrategy: Recreate
+  deploymentStrategy: RollingUpdate
 
   #-- autoscaling for the component. it is optional and is an object.
   autoscaling:
     #-- enable or disable autoscaling.
     enabled: true
     #-- the minimum number of replicas.
-    minReplicas: 3
+    minReplicas: 2
     #-- the maximum number of replicas.
-    maxReplicas: 7
+    maxReplicas: 3
     #-- the target cpu utilization percentage, is from request cpu and NOT LIMIT CPU.
     targetCPUUtilizationPercentage: 80
   #-- the service for the component. for inter namespace communication, use the service name as the hostname.
@@ -113,7 +100,7 @@ frontendSiteRegistry:
     annotations:
       route.openshift.io/termination: "edge"
   pdb:
-    enabled: false # enable it in PRODUCTION for having pod disruption budget.
+    enabled: true # enable it in PRODUCTION for having pod disruption budget.
     minAvailable: 1 # the minimum number of pods that must be available during the disruption budget.
   config:
     REACT_APP_BACKEND_API: ~
@@ -127,29 +114,41 @@ frontendSiteRegistry:
     REACT_APP_AUTH_LOAD_USER_INFO: "true"
     REACT_APP_AUTH_REVOKE_TOKENS_ON_SIGNOUT: "true"
 crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single postgres
-  enabled: false
-
-  crunchyImage: artifacts.developer.gov.bc.ca/bcgov-docker-local/crunchy-postgres-gis:ubi8-15.2-3.3-0
-
-  postgresVersion: 15
+  enabled: true
+  crunchyImage: artifacts.developer.gov.bc.ca/bcgov-docker-local/crunchy-postgres-gis:ubi8-16.2-3.3-0
+  postgresVersion: 16
   postGISVersion: '3.3'
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
+  # enable below to start a new crunchy cluster after disaster from a backed-up location, crunchy will choose the best place to recover from.
+  # follow https://access.crunchydata.com/documentation/postgres-operator/5.2.0/tutorial/disaster-recovery/
+  # Clone From Backups Stored in S3 / GCS / Azure Blob Storage
+  clone:
+    enabled: false
+    path: ~ # provide the proper path to source the cluster. ex: /backups/cluster/version/1, if current new cluster being created, this should be current cluster version -1, ideally
+  # enable this to go back to a specific timestamp in history in the current cluster.
+  # follow https://access.crunchydata.com/documentation/postgres-operator/5.2.0/tutorial/disaster-recovery/
+  # Perform an In-Place Point-in-time-Recovery (PITR)
+  # need to fire this command `oc annotate postgrescluster pay-transparency-tools-crunchy --overwrite postgres-operator.crunchydata.com/pgbackrest-restore=repo1`
+  restore:
+    enabled: false
+    target: ~ # 2024-03-24 17:16:00-07 this is the target timestamp to go back to in current cluster
   instances:
-    name: ha # high availability
-    replicas: 1 # 2 or 3 for high availability in TEST and PROD.
+    name: db # high availability
+    replicas: 2 # 2 or 3 for high availability in TEST and PROD.
     metadata:
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '9187'
     dataVolumeClaimSpec:
-      storage: 120Mi
+      storage: 380Mi
       storageClassName: netapp-block-standard
+
     requests:
-      cpu: 25m
-      memory: 256Mi
+      cpu: 50m
+      memory: 128Mi
     limits:
-      cpu: 100m
-      memory: 512Mi
+      cpu: 150m
+      memory: 256Mi
     replicaCertCopy:
       requests:
         cpu: 1m
@@ -159,34 +158,59 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
         memory: 64Mi
 
   pgBackRest:
-    enabled: false
-    image: # it's not necessary to specify an image as the images specified in the Crunchy Postgres Operator will be pulled by default
-    retention: "1" # Ideally a larger number such as 30 backups/days
+    enabled: true
+    backupPath: /backups/cluster/version
+    clusterCounter: 1 # this is the number to identify what is the current counter for the cluster, each time it is cloned it should be incremented.
+    image: artifacts.developer.gov.bc.ca/bcgov-docker-local/crunchy-pgbackrest:ubi8-2.49-0
     # If retention-full-type set to 'count' then the oldest backups will expire when the number of backups reach the number defined in retention
     # If retention-full-type set to 'time' then the number defined in retention will take that many days worth of full backups before expiration
     retentionFullType: count
-    repos:
-      schedules:
-        full: 0 8 * * *
-        incremental: 0 0,4,12,16,20 * * *
+    s3:
+      retention: 7 # one weeks backup in object store.
+      bucket: nrsitest
+      endpoint: nrs.objectstore.gov.bc.ca
+      accessKey: ~
+      secretKey: ~
+      fullBackupSchedule: 0 9 * * * # full backup at GMT 9
+      incrementalBackupSchedule: 0 0/1 * * * # every hour
+    pvc:
+      retention: 1 # one day hot active backup in pvc
+      retentionFullType: count
+      fullBackupSchedule: 0 8 * * *
+      incrementalBackupSchedule: 0 0,12 * * * # every 12 hour incremental
       volume:
         accessModes: "ReadWriteOnce"
-        storage: 64Mi
+        storage: 96Mi
         storageClassName: netapp-file-backup
+
+    config:
+      requests:
+        cpu: 5m
+        memory: 32Mi
+      limits:
+        cpu: 20m
+        memory: 64Mi
     repoHost:
       requests:
-        cpu: 1m
-        memory: 64Mi
+        cpu: 20m
+        memory: 128Mi
       limits:
         cpu: 50m
-        memory: 128Mi
+        memory: 256Mi
     sidecars:
       requests:
-        cpu: 1m
-        memory: 64Mi
+        cpu: 5m
+        memory: 16Mi
       limits:
-        cpu: 50m
+        cpu: 20m
+        memory: 64Mi
+    jobs:
+      requests:
+        cpu: 20m
         memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 256Mi
 
   patroni:
     postgresql:
@@ -196,18 +220,19 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
         wal_buffers: "64kB" # this can be set to -1 to automatically set as 1/32 of shared_buffers or 64kB, whichever is larger
         min_wal_size: 32MB
         max_wal_size: 64MB # default is 1GB
-        max_slot_wal_keep_size: 128MB # default is -1, allowing unlimited wal growth when replicas fall behind
+        max_slot_wal_keep_size: 96MB # default is -1, allowing unlimited wal growth when replicas fall behind
 
   proxy:
+    enabled: true
     pgBouncer:
       image: # it's not necessary to specify an image as the images specified in the Crunchy Postgres Operator will be pulled by default
       replicas: 1
       requests:
-        cpu: 1m
-        memory: 64Mi
+        cpu: 5m
+        memory: 32Mi
       limits:
-        cpu: 50m
-        memory: 128Mi
+        cpu: 20m
+        memory: 64Mi
 
   # Postgres Cluster resource values:
   pgmonitor:
@@ -216,45 +241,11 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       image: # it's not necessary to specify an image as the images specified in the Crunchy Postgres Operator will be pulled by default
       requests:
         cpu: 1m
-        memory: 64Mi
+        memory: 16Mi
       limits:
-        cpu: 50m
-        memory: 128Mi
+        cpu: 35m
+        memory: 32Mi
 
 bitnami-pg:
-  enabled: true
-  image:
-    registry: artifacts.developer.gov.bc.ca/docker-remote
-  auth:
-    existingSecret: '{{ .Release.Name }}-database'
-    username: 'site'
-    database: 'site'
-  shmVolume:
-    enabled: false
-  backup:
-    enabled: false
-    cronjob:
-      containerSecurityContext: { }
-      podSecurityContext:
-        enabled: false
-      storage:
-        size: 130Mi
-  primary:
-    persistence:
-      enabled: true
-      storageClass: netapp-block-standard
-      accessModes:
-        - ReadWriteOnce
-      size: 120Mi
-    containerSecurityContext:
-      enabled: false
-    podSecurityContext:
-      enabled: false
-    resources:
-      requests:
-        cpu: 50m
-        memory: 150Mi
-      limits:
-        cpu: 100m
-        memory: 250Mi
+  enabled: false
 

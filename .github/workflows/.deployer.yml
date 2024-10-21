@@ -43,7 +43,7 @@ on:
       ### Usually a bad idea / not recommended
       timeout-minutes:
         description: 'Timeout minutes'
-        default: 10
+        default: 15
         required: false
         type: number
       values:
@@ -114,7 +114,8 @@ jobs:
         shell: bash
         run: |
           # OC Login
-          OC_TEMP_TOKEN=$(curl -k -X POST ${{ inputs.oc_server }}/api/v1/namespaces/${{ secrets.oc_namespace }}/serviceaccounts/pipeline/token --header "Authorization: Bearer ${{ secrets.oc_token }}" -d '{"spec": {"expirationSeconds": 600}}' -H 'Content-Type: application/json; charset=utf-8' | jq -r '.status.token' )
+          TOKEN_EXPIRE_IN_SECONDS=$((${{ inputs.timeout-minutes }} * 60))
+          OC_TEMP_TOKEN=$(curl -k -X POST ${{ inputs.oc_server }}/api/v1/namespaces/${{ secrets.oc_namespace }}/serviceaccounts/pipeline/token --header "Authorization: Bearer ${{ secrets.oc_token }}" -d "{\"spec\": {\"expirationSeconds\": $TOKEN_EXPIRE_IN_SECONDS }}" -H 'Content-Type: application/json; charset=utf-8' | jq -r '.status.token' )
 
           oc login --token=$OC_TEMP_TOKEN --server=${{ inputs.oc_server }}
           oc project ${{ secrets.oc_namespace }} # Safeguard!
@@ -143,6 +144,9 @@ jobs:
       - if: steps.triggers.outputs.triggered == 'true' && inputs.atomic != 'false'
         working-directory: ${{ inputs.directory }}
         run: |
+          # 1 minute less for HELM to do atomic deployment and rollback if not completed within the time.
+          DEPLOY_TIMEOUT=$((${{ inputs.timeout-minutes }}-1)) 
+          
           # Helm upgrade/rollout - atomic, timeout
           helm upgrade \
             --set-string global.repository=${{ github.repository }} \
@@ -153,9 +157,11 @@ jobs:
             --set-string global.secrets.keycloakAuthURL="${{ secrets.KEYCLOAK_AUTH_URL }}" \
             --set-string global.secrets.databaseAdminPassword="${{ secrets.DATABASE_ADMIN_PASSWORD }}" \
             --set-string global.secrets.databasePassword="${{ secrets.DATABASE_PWD }}" \
+            --set-string crunchy.pgBackRest.s3.accessKey="${{ secrets.S3_BACKUP_ACCESS_KEY }}"  \
+            --set-string crunchy.pgBackRest.s3.secretKey="${{ secrets.S3_BACKUP_SECRET_KEY }}"  \
             ${{ inputs.params }} \
             --install --wait --atomic ${{ steps.vars.outputs.release }} \
-            --timeout ${{ inputs.timeout-minutes }}m \
+            --timeout "$DEPLOY_TIMEOUT"m  \
             --values ${{ inputs.values }} \
             ./${{ github.event.repository.name }}-${{ steps.pr.outputs.pr || steps.vars.outputs.version }}.tgz
 

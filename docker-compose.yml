@@ -5,13 +5,11 @@ networks:
 
 services:
   site-database:
-    image: postgres/postgis-debezium:15
+    image: postgis/postgis:16-3.5
     user: postgres
     networks:
       - app-tier
     container_name: site-database
-    build:
-      context: etl/debezium-postgis/15-3.3
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

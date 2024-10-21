@@ -56,7 +56,7 @@ jobs:
           dir: ${{ matrix.dir }}
           node_version: "22"
           sonar_args: >
-            -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts
+            -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts,src/app/migrations/
             -Dsonar.organization=bcgov-sonarcloud
             -Dsonar.projectKey=bcgov-sonarcloud_nr-site-registry-${{ matrix.name }}
             -Dsonar.sources=src

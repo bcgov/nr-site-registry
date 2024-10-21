@@ -103,6 +103,10 @@ spec:
       databases:
         - postgres
         - {{ .Values.global.config.dbName }}
+    - name: {{ .Values.global.config.dbName }}-proxy
+      databases:
+        - {{ .Values.global.config.dbName }}
+        - postgres
     {{- if .Values.crunchy.pgBackRest.enabled }}
   backups:
     pgbackrest:

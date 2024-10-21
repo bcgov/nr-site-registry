@@ -57,6 +57,10 @@ inputs:
 runs:
   using: composite
   steps:
+  # Adding checkout after failing on run
+    - if: steps.triggers.outputs.triggered == 'true'
+    uses: actions/checkout@v4
+
     - name: Warnings for breaking changes
       shell: bash
       run: |

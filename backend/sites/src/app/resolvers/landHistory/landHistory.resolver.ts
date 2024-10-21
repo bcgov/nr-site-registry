@@ -32,44 +32,52 @@ export class LandHistoryResolver {
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
   ) {
-    this.sitesLogger.log(
-      'LandHistoryResolver.getLandHistoriesForSite() start siteId:' +
-        ' ' +
-        siteId +
-        ' searchTerm: ' +
-        ' ' +
-        searchTerm +
-        ' sortDirection: ' +
-        ' ' +
-        sortDirection,
-    );
+    try {
+      this.sitesLogger.log(
+        'LandHistoryResolver.getLandHistoriesForSite() start siteId:' +
+          ' ' +
+          siteId +
+          ' searchTerm: ' +
+          ' ' +
+          searchTerm +
+          ' sortDirection: ' +
+          ' ' +
+          sortDirection,
+      );
 
-    const result = await this.landHistoryService.getLandHistoriesForSite(
-      siteId,
-      searchTerm,
-      sortDirection,
-      showPending,
-    );
-    if (result.length > 0) {
-      this.sitesLogger.log(
-        'LandHistoryResolver.getLandHistoriesForSite() RES:200 end',
+      const result = await this.landHistoryService.getLandHistoriesForSite(
+        siteId,
+        searchTerm,
+        sortDirection,
+        showPending,
       );
-      return this.genericResponseProvider.createResponse(
-        'Land uses fetched successfully',
-        200,
-        true,
-        result,
+      if (result.length > 0) {
+        this.sitesLogger.log(
+          'LandHistoryResolver.getLandHistoriesForSite() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Land uses fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'LandHistoryResolver.getLandHistoriesForSite() RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Land uses data not found for site id: ${siteId}`,
+          404,
+          false,
+          null,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in LandHistoryResolver.getLandHistoriesForSite() end',
+        JSON.stringify(error),
       );
-    } else {
-      this.sitesLogger.log(
-        'LandHistoryResolver.getLandHistoriesForSite() RES:404 end',
-      );
-      return this.genericResponseProvider.createResponse(
-        `Land uses data not found for site id: ${siteId}`,
-        404,
-        false,
-        null,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 }

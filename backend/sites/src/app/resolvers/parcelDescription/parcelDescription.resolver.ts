@@ -54,27 +54,35 @@ export class ParcelDescriptionResolver {
     showPending: boolean,
     @AuthenticatedUser() user: any,
   ) {
-    this.sitesLogger.log(
-      'ParcelDescriptionResolver.getParcelDescriptionsBySiteId() start siteID:' +
-        ' ' +
-        siteId,
-    );
-    const response =
-      await this.parcelDescriptionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-        showPending,
-        user,
+    try {
+      this.sitesLogger.log(
+        'ParcelDescriptionResolver.getParcelDescriptionsBySiteId() start siteID:' +
+          ' ' +
+          siteId,
+      );
+      const response =
+        await this.parcelDescriptionService.getParcelDescriptionsBySiteId(
+          siteId,
+          page,
+          pageSize,
+          searchParam,
+          sortBy,
+          sortByDir,
+          showPending,
+          user,
+        );
+
+      this.sitesLogger.log(
+        'ParcelDescriptionResolver.getParcelDescriptionsBySiteId() end',
       );
 
-    this.sitesLogger.log(
-      'ParcelDescriptionResolver.getParcelDescriptionsBySiteId() end',
-    );
-
-    return response;
+      return response;
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in ParcelDescriptionResolver.getParcelDescriptionsBySiteId() end',
+        JSON.stringify(error),
+      );
+      throw new Error('System Error, Please try again.');
+    }
   }
 }

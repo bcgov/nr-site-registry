@@ -37,37 +37,46 @@ export class AssociatedSiteResolver {
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
   ) {
-    this.sitesLogger.log(
-      'AssociatedSiteResolver.getAssociatedSitesBySiteId() start siteID:' +
-        ' ' +
-        siteId +
-        ' showPending = ' +
-        showPending,
-    );
-    const result = await this.associatedSiteService.getAssociatedSitesBySiteId(
-      siteId,
-      showPending,
-    );
-    if (result && result.length > 0) {
+    try {
       this.sitesLogger.log(
-        'AssociatedSiteResolver.getAssociatedSitesBySiteId() RES:200 end',
+        'AssociatedSiteResolver.getAssociatedSitesBySiteId() start siteID:' +
+          ' ' +
+          siteId +
+          ' showPending = ' +
+          showPending,
       );
-      return this.genericResponseProvider.createResponse(
-        'Associated sites fetched successfully',
-        200,
-        true,
-        result,
+      const result =
+        await this.associatedSiteService.getAssociatedSitesBySiteId(
+          siteId,
+          showPending,
+        );
+      if (result && result.length > 0) {
+        this.sitesLogger.log(
+          'AssociatedSiteResolver.getAssociatedSitesBySiteId() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Associated sites fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'AssociatedSiteResolver.getAssociatedSitesBySiteId()  RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Associated sites data not found for site id: ${siteId}`,
+          404,
+          false,
+          [],
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in AssociatedSiteResolver.getAssociatedSitesBySiteId() end',
+        JSON.stringify(error),
       );
-    } else {
-      this.sitesLogger.log(
-        'AssociatedSiteResolver.getAssociatedSitesBySiteId()  RES:404 end',
-      );
-      return this.genericResponseProvider.createResponse(
-        `Associated sites data not found for site id: ${siteId}`,
-        404,
-        false,
-        [],
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 }

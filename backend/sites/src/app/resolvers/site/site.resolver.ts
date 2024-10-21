@@ -57,7 +57,15 @@ export class SiteResolver {
   })
   @Query(() => FetchSiteResponse, { name: 'sites' })
   findAll() {
-    return this.siteService.findAll();
+    try {
+      return this.siteService.findAll();
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SiteResolver.findAll() end',
+        JSON.stringify(error),
+      );
+      throw new Error('System Error, Please try again.');
+    }
   }
 
   /**
@@ -112,30 +120,38 @@ export class SiteResolver {
     @Args('whenUpdated', { type: () => String, nullable: true })
     whenUpdated?: Date,
   ) {
-    this.sitesLogger.log('SiteResolver.searchSites() start ');
-    return await this.siteService.searchSites(
-      searchParam,
-      page,
-      pageSize,
-      id,
-      srStatus,
-      siteRiskCode,
-      commonName,
-      addrLine_1,
-      city,
-      whoCreated,
-      latlongReliabilityFlag,
-      latdeg,
-      latDegrees,
-      latMinutes,
-      latSeconds,
-      longdeg,
-      longDegrees,
-      longMinutes,
-      longSeconds,
-      whenCreated,
-      whenUpdated,
-    );
+    try {
+      this.sitesLogger.log('SiteResolver.searchSites() start ');
+      return await this.siteService.searchSites(
+        searchParam,
+        page,
+        pageSize,
+        id,
+        srStatus,
+        siteRiskCode,
+        commonName,
+        addrLine_1,
+        city,
+        whoCreated,
+        latlongReliabilityFlag,
+        latdeg,
+        latDegrees,
+        latMinutes,
+        latSeconds,
+        longdeg,
+        longDegrees,
+        longMinutes,
+        longSeconds,
+        whenCreated,
+        whenUpdated,
+      );
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SiteResolver.searchSites() end',
+        JSON.stringify(error),
+      );
+      throw new Error('System Error, Please try again.');
+    }
   }
 
   @Roles({
@@ -152,15 +168,22 @@ export class SiteResolver {
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
   ) {
-    this.sitesLogger.log(
-      'SiteResolver.findSiteBySiteId() start siteId:' +
-        ' ' +
-        siteId +
-        ' showPending = ' +
-        showPending,
-    );
-
-    return this.siteService.findSiteBySiteId(siteId, showPending);
+    try {
+      this.sitesLogger.log(
+        'SiteResolver.findSiteBySiteId() start siteId:' +
+          ' ' +
+          siteId +
+          ' showPending = ' +
+          showPending,
+      );
+      return this.siteService.findSiteBySiteId(siteId, showPending);
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SiteResolver.findSiteBySiteId() end',
+        JSON.stringify(error),
+      );
+      throw new Error('System Error, Please try again.');
+    }
   }
 
   @Roles({
@@ -176,25 +199,33 @@ export class SiteResolver {
   async searchSiteIds(
     @Args('searchParam', { type: () => String }) searchParam: string,
   ) {
-    this.sitesLogger.log(
-      'SiteResolver.searchSiteIds() start searchParam:' + ' ' + searchParam,
-    );
-    const result = await this.siteService.searchSiteIds(searchParam);
-    if (result && result.length > 0) {
-      this.sitesLogger.log('SiteResolver.searchSiteIds() RES:200 end');
-      return this.genericResponseProvider.createResponse(
-        'Notation Paticipant Role fetched successfully',
-        200,
-        true,
-        result,
+    try {
+      this.sitesLogger.log(
+        'SiteResolver.searchSiteIds() start searchParam:' + ' ' + searchParam,
       );
-    } else {
-      this.sitesLogger.log('SiteResolver.searchSiteIds() RES:404 end');
-      return this.genericResponseProvider.createResponse(
-        `Notation Paticipant Role not found`,
-        404,
-        false,
+      const result = await this.siteService.searchSiteIds(searchParam);
+      if (result && result.length > 0) {
+        this.sitesLogger.log('SiteResolver.searchSiteIds() RES:200 end');
+        return this.genericResponseProvider.createResponse(
+          'Notation Paticipant Role fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log('SiteResolver.searchSiteIds() RES:404 end');
+        return this.genericResponseProvider.createResponse(
+          `Notation Paticipant Role not found`,
+          404,
+          false,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SiteResolver.searchSiteIds() end',
+        JSON.stringify(error),
       );
+      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -213,23 +244,31 @@ export class SiteResolver {
     @AuthenticatedUser()
     user: any,
   ) {
-    const saveResult = await this.siteService.saveSiteDetails(
-      siteDetailsDTO,
-      user,
-    );
+    try {
+      const saveResult = await this.siteService.saveSiteDetails(
+        siteDetailsDTO,
+        user,
+      );
 
-    if (saveResult) {
-      return this.genericResponseProviderForSave.createResponse(
-        `Successfully saved site details.`,
-        200,
-        true,
+      if (saveResult) {
+        return this.genericResponseProviderForSave.createResponse(
+          `Successfully saved site details.`,
+          200,
+          true,
+        );
+      } else {
+        return this.genericResponseProviderForSave.createResponse(
+          `Failed to save site details.`,
+          422,
+          false,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SiteResolver.updateSiteDetails() end',
+        JSON.stringify(error),
       );
-    } else {
-      return this.genericResponseProviderForSave.createResponse(
-        `Failed to save site details.`,
-        422,
-        false,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 

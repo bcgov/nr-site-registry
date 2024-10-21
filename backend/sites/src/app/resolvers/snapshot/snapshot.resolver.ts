@@ -34,24 +34,32 @@ export class SnapshotsResolver {
   })
   @Query(() => SnapshotResponse, { name: 'getSnapshots' })
   async getSnapshots() {
-    this.sitesLogger.log('SnapshotsResolver.getSnapshots() start');
-    const result = await this.snapshotsService.getSnapshots();
-    if (result && result.length > 0) {
-      this.sitesLogger.log('SnapshotsResolver.getSnapshots() RES:200 end');
-      return this.genericResponseProvider.createResponse(
-        'Snapshot fetched successfully.',
-        200,
-        true,
-        result,
+    try {
+      this.sitesLogger.log('SnapshotsResolver.getSnapshots() start');
+      const result = await this.snapshotsService.getSnapshots();
+      if (result && result.length > 0) {
+        this.sitesLogger.log('SnapshotsResolver.getSnapshots() RES:200 end');
+        return this.genericResponseProvider.createResponse(
+          'Snapshot fetched successfully.',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log('SnapshotsResolver.getSnapshots() RES:404 end');
+        return this.genericResponseProvider.createResponse(
+          `Snapshot not found.`,
+          404,
+          false,
+          null,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SnapshotsResolver.getSnapshots() end',
+        JSON.stringify(error),
       );
-    } else {
-      this.sitesLogger.log('SnapshotsResolver.getSnapshots() RES:404 end');
-      return this.genericResponseProvider.createResponse(
-        `Snapshot not found.`,
-        404,
-        false,
-        null,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -68,30 +76,38 @@ export class SnapshotsResolver {
   async getSnapshotsByUserId(
     @Args('userId', { type: () => String }) userId: string,
   ) {
-    this.sitesLogger.log(
-      'SnapshotsResolver.getSnapshotsByUserId() start userId:' + ' ' + userId,
-    );
-    const result = await this.snapshotsService.getSnapshotsByUserId(userId);
-    if (result && result.length > 0) {
+    try {
       this.sitesLogger.log(
-        'SnapshotsResolver.getSnapshotsByUserId() RES:200 end',
+        'SnapshotsResolver.getSnapshotsByUserId() start userId:' + ' ' + userId,
       );
-      return this.genericResponseProvider.createResponse(
-        'Snapshot fetched successfully.',
-        200,
-        true,
-        result,
+      const result = await this.snapshotsService.getSnapshotsByUserId(userId);
+      if (result && result.length > 0) {
+        this.sitesLogger.log(
+          'SnapshotsResolver.getSnapshotsByUserId() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Snapshot fetched successfully.',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'SnapshotsResolver.getSnapshotsByUserId() RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Snapshot not found for user id: ${userId}`,
+          404,
+          false,
+          null,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SnapshotsResolver.getSnapshotsByUserId() end',
+        JSON.stringify(error),
       );
-    } else {
-      this.sitesLogger.log(
-        'SnapshotsResolver.getSnapshotsByUserId() RES:404 end',
-      );
-      return this.genericResponseProvider.createResponse(
-        `Snapshot not found for user id: ${userId}`,
-        404,
-        false,
-        null,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -110,33 +126,41 @@ export class SnapshotsResolver {
     @AuthenticatedUser()
     user: any,
   ) {
-    this.sitesLogger.log(
-      'SnapshotsResolver.getSnapshotsBySiteId() start siteId:' + ' ' + siteId,
-    );
-    const result = await this.snapshotsService.getSnapshotsBySiteId(
-      siteId,
-      user.sub,
-    );
-    if (result && result.length > 0) {
+    try {
       this.sitesLogger.log(
-        'SnapshotsResolver.getSnapshotsBySiteId() RES:200 end',
+        'SnapshotsResolver.getSnapshotsBySiteId() start siteId:' + ' ' + siteId,
       );
-      return this.genericResponseProvider.createResponse(
-        'Snapshot fetched successfully.',
-        200,
-        true,
-        result,
+      const result = await this.snapshotsService.getSnapshotsBySiteId(
+        siteId,
+        user.sub,
       );
-    } else {
-      this.sitesLogger.log(
-        'SnapshotsResolver.getSnapshotsBySiteId() RES:404 end',
+      if (result && result.length > 0) {
+        this.sitesLogger.log(
+          'SnapshotsResolver.getSnapshotsBySiteId() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Snapshot fetched successfully.',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'SnapshotsResolver.getSnapshotsBySiteId() RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Snapshot not found for site id ${siteId}`,
+          404,
+          false,
+          null,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SnapshotsResolver.getSnapshotsBySiteId() end',
+        JSON.stringify(error),
       );
-      return this.genericResponseProvider.createResponse(
-        `Snapshot not found for site id ${siteId}`,
-        404,
-        false,
-        null,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -151,26 +175,38 @@ export class SnapshotsResolver {
   @Query(() => SnapshotResponse, { name: 'getSnapshotsById' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSnapshotsById(@Args('id', { type: () => Int }) id: number) {
-    this.sitesLogger.log(
-      'SnapshotsResolver.getSnapshotsById() start snapshotId:' + ' ' + id,
-    );
-    const result = await this.snapshotsService.getSnapshotsById(id);
-    if (result && result.length > 0) {
-      this.sitesLogger.log('SnapshotsResolver.getSnapshotsById() RES:200 end');
-      return this.genericResponseProvider.createResponse(
-        'Snapshot fetched successfully.',
-        200,
-        true,
-        result,
+    try {
+      this.sitesLogger.log(
+        'SnapshotsResolver.getSnapshotsById() start snapshotId:' + ' ' + id,
       );
-    } else {
-      this.sitesLogger.log('SnapshotsResolver.getSnapshotsById() RES:404 end');
-      return this.genericResponseProvider.createResponse(
-        `Snapshot not found for snapshot id: ${id}`,
-        404,
-        false,
-        null,
+      const result = await this.snapshotsService.getSnapshotsById(id);
+      if (result && result.length > 0) {
+        this.sitesLogger.log(
+          'SnapshotsResolver.getSnapshotsById() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Snapshot fetched successfully.',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'SnapshotsResolver.getSnapshotsById() RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Snapshot not found for snapshot id: ${id}`,
+          404,
+          false,
+          null,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SnapshotsResolver.getSnapshotsById() end',
+        JSON.stringify(error),
       );
+      throw new Error('System Error, Please try again.');
     }
   }
 

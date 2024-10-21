@@ -34,38 +34,46 @@ export class NotationResolver {
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
   ) {
-    this.sitesLogger.log(
-      'NotationResolver.getSiteNotationBySiteId() start siteId:' +
-        ' ' +
-        siteId +
-        ' showPending = ' +
-        showPending,
-    );
+    try {
+      this.sitesLogger.log(
+        'NotationResolver.getSiteNotationBySiteId() start siteId:' +
+          ' ' +
+          siteId +
+          ' showPending = ' +
+          showPending,
+      );
 
-    const result = await this.notationService.getSiteNotationBySiteId(
-      siteId,
-      showPending,
-    );
-    if (result && result.length > 0) {
-      this.sitesLogger.log(
-        'NotationResolver.getSiteNotationBySiteId() RES:200 end',
+      const result = await this.notationService.getSiteNotationBySiteId(
+        siteId,
+        showPending,
       );
-      return this.genericResponseProvider.createResponse(
-        'Site Notation fetched successfully',
-        200,
-        true,
-        result,
+      if (result && result.length > 0) {
+        this.sitesLogger.log(
+          'NotationResolver.getSiteNotationBySiteId() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Site Notation fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'NotationResolver.getSiteNotationBySiteId() RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Site Notation data not found for site id: ${siteId}`,
+          404,
+          false,
+          null,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in NotationResolver.getSiteNotationBySiteId() end',
+        JSON.stringify(error),
       );
-    } else {
-      this.sitesLogger.log(
-        'NotationResolver.getSiteNotationBySiteId() RES:404 end',
-      );
-      return this.genericResponseProvider.createResponse(
-        `Site Notation data not found for site id: ${siteId}`,
-        404,
-        false,
-        null,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 }

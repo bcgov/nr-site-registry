@@ -32,30 +32,40 @@ export class DashboardResolver {
   async getRecentViewsByUserId(
     @Args('userId', { type: () => String }) userId: string,
   ) {
-    this.sitesLogger.log(
-      'DashboardResolver.getRecentViewsByUserId() start userId:' + ' ' + userId,
-    );
-    const result = await this.dashboardService.getRecentViewsByUserId(userId);
-    if (result.length > 0) {
+    try {
       this.sitesLogger.log(
-        'DashboardResolver.getRecentViewsByUserId() RES:200 end',
+        'DashboardResolver.getRecentViewsByUserId() start userId:' +
+          ' ' +
+          userId,
       );
-      return this.genericResponseProvider.createResponse(
-        'Recent views fetched successfully',
-        200,
-        true,
-        result,
+      const result = await this.dashboardService.getRecentViewsByUserId(userId);
+      if (result.length > 0) {
+        this.sitesLogger.log(
+          'DashboardResolver.getRecentViewsByUserId() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Recent views fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'DashboardResolver.getRecentViewsByUserId() RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Recent views data not found for site id: ${userId}`,
+          404,
+          false,
+          null,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DashboardResolver.getRecentViewsByUserId() end',
+        JSON.stringify(error),
       );
-    } else {
-      this.sitesLogger.log(
-        'DashboardResolver.getRecentViewsByUserId() RES:404 end',
-      );
-      return this.genericResponseProvider.createResponse(
-        `Recent views data not found for site id: ${userId}`,
-        404,
-        false,
-        null,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -72,24 +82,32 @@ export class DashboardResolver {
     @Args('recentView', { type: () => RecentViewDto }, new ValidationPipe())
     recentView: RecentViewDto,
   ) {
-    this.sitesLogger.log(
-      'DashboardResolver.addRecentView() start recentViewDTO:' +
-        ' ' +
-        JSON.stringify(RecentViewDto),
-    );
-    const message = await this.dashboardService.addRecentView(recentView);
-
-    if (message) {
-      this.sitesLogger.log('DashboardResolver.addRecentView() RES:201 end');
-      return this.genericResponseProvider.createResponse(message, 201, true);
-    } else {
-      this.sitesLogger.log('DashboardResolver.addRecentView() RES:404 end');
-      return this.genericResponseProvider.createResponse(
-        `Recent views failed to insert or update recent view. `,
-        400,
-        false,
-        null,
+    try {
+      this.sitesLogger.log(
+        'DashboardResolver.addRecentView() start recentViewDTO:' +
+          ' ' +
+          JSON.stringify(RecentViewDto),
       );
+      const message = await this.dashboardService.addRecentView(recentView);
+
+      if (message) {
+        this.sitesLogger.log('DashboardResolver.addRecentView() RES:201 end');
+        return this.genericResponseProvider.createResponse(message, 201, true);
+      } else {
+        this.sitesLogger.log('DashboardResolver.addRecentView() RES:404 end');
+        return this.genericResponseProvider.createResponse(
+          `Recent views failed to insert or update recent view. `,
+          400,
+          false,
+          null,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DashboardResolver.addRecentView() end',
+        JSON.stringify(error),
+      );
+      throw new Error('System Error, Please try again.');
     }
   }
 }

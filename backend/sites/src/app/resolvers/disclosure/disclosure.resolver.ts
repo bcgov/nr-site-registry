@@ -34,38 +34,46 @@ export class DisclosureResolver {
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
   ) {
-    this.sitesLogger.log(
-      'DisclosureResolver.getSiteDisclosureBySiteId() start siteId:' +
-        ' ' +
-        siteId +
-        ' showPending = ' +
-        showPending,
-    );
+    try {
+      this.sitesLogger.log(
+        'DisclosureResolver.getSiteDisclosureBySiteId() start siteId:' +
+          ' ' +
+          siteId +
+          ' showPending = ' +
+          showPending,
+      );
 
-    const result = await this.dsiclosureService.getSiteDisclosureBySiteId(
-      siteId,
-      showPending,
-    );
-    if (result && result.length > 0) {
-      this.sitesLogger.log(
-        'DisclosureResolver.getSiteDisclosureBySiteId() RES:200 end',
+      const result = await this.dsiclosureService.getSiteDisclosureBySiteId(
+        siteId,
+        showPending,
       );
-      return this.genericResponseProvider.createResponse(
-        'Site Disclosure fetched successfully',
-        200,
-        true,
-        result,
+      if (result && result.length > 0) {
+        this.sitesLogger.log(
+          'DisclosureResolver.getSiteDisclosureBySiteId() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Site Disclosure fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'DisclosureResolver.getSiteDisclosureBySiteId() RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Site Disclosure data not found for site id: ${siteId}`,
+          404,
+          false,
+          null,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DisclosureResolver.getSiteDisclosureBySiteId() end',
+        JSON.stringify(error),
       );
-    } else {
-      this.sitesLogger.log(
-        'DisclosureResolver.getSiteDisclosureBySiteId() RES:404 end',
-      );
-      return this.genericResponseProvider.createResponse(
-        `Site Disclosure data not found for site id: ${siteId}`,
-        404,
-        false,
-        null,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 }

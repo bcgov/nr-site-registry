@@ -33,38 +33,46 @@ export class ParticipantResolver {
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
   ) {
-    this.sitesLogger.log(
-      'ParticipantResolver.getSiteParticipantsBySiteId() start siteId:' +
-        ' ' +
-        siteId +
-        ' showPending = ' +
-        showPending,
-    );
+    try {
+      this.sitesLogger.log(
+        'ParticipantResolver.getSiteParticipantsBySiteId() start siteId:' +
+          ' ' +
+          siteId +
+          ' showPending = ' +
+          showPending,
+      );
 
-    const result = await this.participantService.getSiteParticipantsBySiteId(
-      siteId,
-      showPending,
-    );
-    if (result.length > 0) {
-      this.sitesLogger.log(
-        'ParticipantResolver.getSiteParticipantsBySiteId() RES:200 end',
+      const result = await this.participantService.getSiteParticipantsBySiteId(
+        siteId,
+        showPending,
       );
-      return this.genericResponseProvider.createResponse(
-        'Participants fetched successfully',
-        200,
-        true,
-        result,
+      if (result.length > 0) {
+        this.sitesLogger.log(
+          'ParticipantResolver.getSiteParticipantsBySiteId() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Participants fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'ParticipantResolver.getSiteParticipantsBySiteId() RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Participants data not found for site id: ${siteId}`,
+          404,
+          false,
+          result,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in ParticipantResolver.getSiteParticipantsBySiteId() end',
+        JSON.stringify(error),
       );
-    } else {
-      this.sitesLogger.log(
-        'ParticipantResolver.getSiteParticipantsBySiteId() RES:404 end',
-      );
-      return this.genericResponseProvider.createResponse(
-        `Participants data not found for site id: ${siteId}`,
-        404,
-        false,
-        result,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 }

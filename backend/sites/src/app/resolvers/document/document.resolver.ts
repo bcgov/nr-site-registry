@@ -34,38 +34,46 @@ export class DocumentResolver {
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
   ) {
-    this.sitesLogger.log(
-      'DocumentResolver.getSiteDocumentsBySiteId() start siteId:' +
-        ' ' +
-        siteId +
-        ' showPending = ' +
-        showPending,
-    );
+    try {
+      this.sitesLogger.log(
+        'DocumentResolver.getSiteDocumentsBySiteId() start siteId:' +
+          ' ' +
+          siteId +
+          ' showPending = ' +
+          showPending,
+      );
 
-    const response = await this.documentService.getSiteDocumentsBySiteId(
-      siteId,
-      showPending,
-    );
-    if (response && response.length > 0) {
-      this.sitesLogger.log(
-        'DocumentResolver.getSiteDocumentsBySiteId() RES:200 end',
+      const response = await this.documentService.getSiteDocumentsBySiteId(
+        siteId,
+        showPending,
       );
-      return this.genericResponseProvider.createResponse(
-        'Documents fetched successfully.',
-        200,
-        true,
-        response,
+      if (response && response.length > 0) {
+        this.sitesLogger.log(
+          'DocumentResolver.getSiteDocumentsBySiteId() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Documents fetched successfully.',
+          200,
+          true,
+          response,
+        );
+      } else {
+        this.sitesLogger.log(
+          'DocumentResolver.getSiteDocumentsBySiteId() RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Documents not found for site id ${siteId}`,
+          404,
+          false,
+          null,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DocumentResolver.getSiteDocumentsBySiteId() end',
+        JSON.stringify(error),
       );
-    } else {
-      this.sitesLogger.log(
-        'DocumentResolver.getSiteDocumentsBySiteId() RES:404 end',
-      );
-      return this.genericResponseProvider.createResponse(
-        `Documents not found for site id ${siteId}`,
-        404,
-        false,
-        null,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 }

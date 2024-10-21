@@ -34,28 +34,36 @@ export class DropdownResolver {
   })
   @Query(() => DropdownResponse, { name: 'getParticipantRoleCd' })
   async getParticipantRoleCd() {
-    this.sitesLogger.log('DropdownResolver.getParticipantRoleCd() start');
-    const result = await this.dropdownService.getParticipantRoleCd();
-    if (result && result.length > 0) {
-      this.sitesLogger.log(
-        'DropdownResolver.getParticipantRoleCd() RES:200 end',
+    try {
+      this.sitesLogger.log('DropdownResolver.getParticipantRoleCd() start');
+      const result = await this.dropdownService.getParticipantRoleCd();
+      if (result && result.length > 0) {
+        this.sitesLogger.log(
+          'DropdownResolver.getParticipantRoleCd() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Participants role code fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'DropdownResolver.getParticipantRoleCd() RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Participants role code not found`,
+          404,
+          false,
+          null,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DropdownResolver.getParticipantRoleCd() end',
+        JSON.stringify(error),
       );
-      return this.genericResponseProvider.createResponse(
-        'Participants role code fetched successfully',
-        200,
-        true,
-        result,
-      );
-    } else {
-      this.sitesLogger.log(
-        'DropdownResolver.getParticipantRoleCd() RES:404 end',
-      );
-      return this.genericResponseProvider.createResponse(
-        `Participants role code not found`,
-        404,
-        false,
-        null,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -119,23 +127,35 @@ export class DropdownResolver {
   })
   @Query(() => DropdownResponseWithMetaData, { name: 'getNotationTypeCd' })
   async getNotationTypeCd() {
-    this.sitesLogger.log('DropdownResolver.getNotationTypeCd() start');
-    const result = await this.dropdownService.getNotationTypeCd();
-    if (result && result.length > 0) {
-      this.sitesLogger.log('DropdownResolver.getNotationTypeCd() RES:200 end');
-      return this.genericResponseProviderNotation.createResponse(
-        'Notation Type fetched successfully',
-        200,
-        true,
-        result,
+    try {
+      this.sitesLogger.log('DropdownResolver.getNotationTypeCd() start');
+      const result = await this.dropdownService.getNotationTypeCd();
+      if (result && result.length > 0) {
+        this.sitesLogger.log(
+          'DropdownResolver.getNotationTypeCd() RES:200 end',
+        );
+        return this.genericResponseProviderNotation.createResponse(
+          'Notation Type fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'DropdownResolver.getNotationTypeCd() RES:404 end',
+        );
+        return this.genericResponseProviderNotation.createResponse(
+          `Notation Type not found`,
+          404,
+          false,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DropdownResolver.getNotationTypeCd() end',
+        JSON.stringify(error),
       );
-    } else {
-      this.sitesLogger.log('DropdownResolver.getNotationTypeCd() RES:404 end');
-      return this.genericResponseProviderNotation.createResponse(
-        `Notation Type not found`,
-        404,
-        false,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -149,23 +169,35 @@ export class DropdownResolver {
   })
   @Query(() => DropdownResponse, { name: 'getNotationClassCd' })
   async getNotationClassCd() {
-    this.sitesLogger.log('DropdownResolver.getNotationClassCd() start');
-    const result = await this.dropdownService.getNotationClassCd();
-    if (result && result.length > 0) {
-      this.sitesLogger.log('DropdownResolver.getNotationClassCd() RES:200 end');
-      return this.genericResponseProvider.createResponse(
-        'Notation Class fetched successfully',
-        200,
-        true,
-        result,
+    try {
+      this.sitesLogger.log('DropdownResolver.getNotationClassCd() start');
+      const result = await this.dropdownService.getNotationClassCd();
+      if (result && result.length > 0) {
+        this.sitesLogger.log(
+          'DropdownResolver.getNotationClassCd() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Notation Class fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'DropdownResolver.getNotationClassCd() RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Notation Class not found`,
+          404,
+          false,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DropdownResolver.getNotationClassCd() end',
+        JSON.stringify(error),
       );
-    } else {
-      this.sitesLogger.log('DropdownResolver.getNotationClassCd() RES:404 end');
-      return this.genericResponseProvider.createResponse(
-        `Notation Class not found`,
-        404,
-        false,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -179,29 +211,37 @@ export class DropdownResolver {
   })
   @Query(() => DropdownResponse, { name: 'getNotationParticipantRoleCd' })
   async getNotationParticipantRoleCd() {
-    this.sitesLogger.log(
-      'DropdownResolver.getNotationParticipantRoleCd() start',
-    );
-    const result = await this.dropdownService.getNotationParticipantRoleCd();
-    if (result && result.length > 0) {
+    try {
       this.sitesLogger.log(
-        'DropdownResolver.getNotationParticipantRoleCd() RES:200 end',
+        'DropdownResolver.getNotationParticipantRoleCd() start',
       );
-      return this.genericResponseProvider.createResponse(
-        'Notation Paticipant Role fetched successfully',
-        200,
-        true,
-        result,
+      const result = await this.dropdownService.getNotationParticipantRoleCd();
+      if (result && result.length > 0) {
+        this.sitesLogger.log(
+          'DropdownResolver.getNotationParticipantRoleCd() RES:200 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          'Notation Paticipant Role fetched successfully',
+          200,
+          true,
+          result,
+        );
+      } else {
+        this.sitesLogger.log(
+          'DropdownResolver.getNotationParticipantRoleCd() RES:404 end',
+        );
+        return this.genericResponseProvider.createResponse(
+          `Notation Paticipant Role not found`,
+          404,
+          false,
+        );
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DropdownResolver.getNotationParticipantRoleCd() end',
+        JSON.stringify(error),
       );
-    } else {
-      this.sitesLogger.log(
-        'DropdownResolver.getNotationParticipantRoleCd() RES:404 end',
-      );
-      return this.genericResponseProvider.createResponse(
-        `Notation Paticipant Role not found`,
-        404,
-        false,
-      );
+      throw new Error('System Error, Please try again.');
     }
   }
 

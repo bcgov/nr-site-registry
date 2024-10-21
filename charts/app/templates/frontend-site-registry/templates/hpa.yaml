@@ -1,4 +1,4 @@
-{{- if .Values.global.autoscaling }}
+{{- if and .Values.global.autoscaling .Values.frontendSiteRegistry.enabled }}
 {{- if and .Values.frontendSiteRegistry.autoscaling .Values.frontendSiteRegistry.autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler

@@ -1,3 +1,4 @@
+{{- if .Values.backendSites.enabled }}
 {{- if and .Values.backendSites.pdb  .Values.backendSites.pdb.enabled }}
 ---
 apiVersion: policy/v1
@@ -11,4 +12,5 @@ spec:
     matchLabels:
       {{- include "backendSites.selectorLabels" . | nindent 6 }}
   minAvailable: {{ .Values.backendSites.pdb.minAvailable }}
+{{- end }}
 {{- end }}

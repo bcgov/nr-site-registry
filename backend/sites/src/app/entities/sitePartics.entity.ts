@@ -66,13 +66,15 @@ export class SitePartics extends ChangeAuditEntity {
   })
   whenUpdated: Date | null;
 
-  @Field()
-  @Column('smallint', { name: 'rwm_flag' })
-  rwmFlag: number;
+  //Make this nullable because we are not using it anymore and keeing it for historical data
+  @Field({ nullable: true })
+  @Column('smallint', { name: 'rwm_flag', nullable: true })
+  rwmFlag: number | null;
 
-  @Field()
-  @Column('smallint', { name: 'rwm_note_flag' })
-  rwmNoteFlag: number;
+  //Make this nullable because we are not using it anymore and keeing it for historical data
+  @Field({ nullable: true })
+  @Column('smallint', { name: 'rwm_note_flag', nullable: true })
+  rwmNoteFlag: number | null;
 
   //Commented this as event participant is no longer depends on site participant
   //Uncomment the code in cases there will be migartion issue from oracle
@@ -96,21 +98,26 @@ export class SitePartics extends ChangeAuditEntity {
   @JoinColumn([{ name: 'site_id', referencedColumnName: 'id' }])
   site: Sites;
 
-  @OneToMany(
-    () => SiteProfileOwners,
-    (siteProfileOwners) => siteProfileOwners.sp,
-  )
-  siteProfileOwners: SiteProfileOwners[];
+  // As per our discussion regarding the deletion of a site participant,
+  // it is important to note that other related entities should remain unaffected.
+  // Removing this participant may lead to synchronization issues with oracle.
+  // Therefore, this code has been commented out to prevent potential complications in the future.
 
-  @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.completorPartic)
-  siteProfiles: SiteProfiles[];
+  // @OneToMany(
+  //   () => SiteProfileOwners,
+  //   (siteProfileOwners) => siteProfileOwners.sp,
+  // )
+  // siteProfileOwners: SiteProfileOwners[];
 
-  @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.contactPartic)
-  siteProfiles2: SiteProfiles[];
+  // @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.completorPartic)
+  // siteProfiles: SiteProfiles[];
 
-  @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.rwmPartic)
-  siteProfiles3: SiteProfiles[];
+  // @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.contactPartic)
+  // siteProfiles2: SiteProfiles[];
 
-  @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.siteRegPartic)
-  siteProfiles4: SiteProfiles[];
+  // @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.rwmPartic)
+  // siteProfiles3: SiteProfiles[];
+
+  // @OneToMany(() => SiteProfiles, (siteProfiles) => siteProfiles.siteRegPartic)
+  // siteProfiles4: SiteProfiles[];
 }

@@ -55,7 +55,7 @@ describe('LandHistoryService', () => {
           provide: REQUEST,
           useValue: { req: { user: mockUser } },
         },
-        LoggerService
+        LoggerService,
       ],
     }).compile();
 
@@ -75,7 +75,12 @@ describe('LandHistoryService', () => {
     it('should call LandHistories repository with correct data', async () => {
       const siteId = 'site123';
       const showPending = false;
-      await landHistoryService.getLandHistoriesForSite(siteId, '', 'ASC',showPending);
+      await landHistoryService.getLandHistoriesForSite(
+        siteId,
+        '',
+        'ASC',
+        showPending,
+      );
 
       expect(whereMock).toHaveBeenCalledWith('site_id = :siteId', {
         siteId,

@@ -40,10 +40,10 @@ jobs:
         include:
           - dir: backend/sites
             name: backend
-            token: SONAR_TOKEN_BACKEND
+            token: SONAR_TOKEN_BACKEND_SITES
           - dir: frontend/site-registry
             name: frontend
-            token: SONAR_TOKEN_FRONTEND
+            token: SONAR_TOKEN_FRONTEND_SITE_REGISTRY
     steps:
       - uses: bcgov-nr/action-test-and-analyse@v1.2.1
         env:

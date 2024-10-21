@@ -53,7 +53,7 @@ jobs:
           commands: |
             npm ci
             npm run test:cov
-          dir: ${{ matrix.dir }}/
+          dir: '${{ matrix.dir }}/'
           node_version: "22"
           sonar_args: >
             -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts,src/app/migrations/

@@ -39,8 +39,10 @@ jobs:
         dir: [backend/sites, frontend/site-registry]
         include:
           - dir: backend/sites
+            name: backend
             token: SONAR_TOKEN_BACKEND
           - dir: frontend/site-registry
+            name: frontend
             token: SONAR_TOKEN_FRONTEND
     steps:
       - uses: bcgov-nr/action-test-and-analyse@v1.2.1
@@ -53,7 +55,7 @@ jobs:
           sonar_args: >
             -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts
             -Dsonar.organization=bcgov-sonarcloud
-            -Dsonar.projectKey=nr-site-registry-${{ matrix.dir }}
+            -Dsonar.projectKey=bcgov-sonarcloud_nr-site-registry-${{ matrix.name }}
             -Dsonar.sources=src
             -Dsonar.sources=backend/sites,frontend/site-registr
             -Dsonar.tests.inclusions=**/*spec.ts

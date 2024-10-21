@@ -38,9 +38,9 @@ jobs:
       matrix:
         dir: [backend/sites, frontend/site-registry]
         include:
-          - dir: backend
+          - dir: backend/sites
             token: SONAR_TOKEN_BACKEND
-          - dir: frontend
+          - dir: frontend/site-registry
             token: SONAR_TOKEN_FRONTEND
     steps:
       - uses: bcgov-nr/action-test-and-analyse@v1.2.1

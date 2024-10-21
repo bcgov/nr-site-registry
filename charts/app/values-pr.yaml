@@ -7,9 +7,6 @@ global:
   secrets:
     enabled: true
     persist: false
-  config:
-    dbName: site
-    schemaName: sites
 #-- the components of the application, backend.
 backendSites:
   #-- enable or disable backend
@@ -41,8 +38,8 @@ bitnami-pg:
     registry: artifacts.developer.gov.bc.ca/docker-remote
   auth:
     existingSecret: '{{ .Release.Name }}-database'
-    username: {{ .Values.global.config.dbName }}
-    database: {{ .Values.global.config.dbName }}
+    username: site
+    database: site
   shmVolume:
     enabled: false
   backup:

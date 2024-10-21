@@ -469,18 +469,18 @@ export class SiteService {
       );
     }
 
-    // const historyLog: HistoryLog = {
-    //   userId: userInfo ? userInfo.sub : '',
-    //   content: inputDTO,
-    //   id: null,
-    //   whoCreated: userInfo ? userInfo.givenName : '',
-    //   whenCreated: new Date(),
-    //   whenUpdated: new Date(),
-    //   whoUpdated: userInfo ? userInfo.givenName : '',
-    //   siteId: inputDTO.siteId,
-    // };
+    const historyLog: HistoryLog = {
+      userId: userInfo ? userInfo.sub : '',
+      content: inputDTO,
+      id: null,
+      whoCreated: userInfo ? userInfo.givenName : '',
+      whenCreated: new Date(),
+      whenUpdated: new Date(),
+      whoUpdated: userInfo ? userInfo.givenName : '',
+      siteId: inputDTO.siteId,
+    };
 
-    // await transactionalEntityManager.save(HistoryLog, historyLog);
+    await transactionalEntityManager.save(HistoryLog, historyLog);
 
     return true;
   }

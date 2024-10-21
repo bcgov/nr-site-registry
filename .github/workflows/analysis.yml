@@ -46,6 +46,9 @@ jobs:
             token: SONAR_TOKEN_FRONTEND
     steps:
       - uses: bcgov-nr/action-test-and-analyse@v1.2.1
+        env:
+          LOG_LEVEL: info
+          LOG_FILE_LOCATION: /tmp/sites-%DATE%.log
         with:
           commands: |
             npm ci
@@ -62,10 +65,6 @@ jobs:
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
           sonar_token: ${{ secrets[matrix.token] }}
           triggers: ('${{ matrix.dir }}/')
-          env:
-            LOG_LEVEL: info
-            LOG_FILE_LOCATION: /tmp/sites-%DATE%.log
-
 
   # https://github.com/marketplace/actions/aqua-security-trivy
   trivy:

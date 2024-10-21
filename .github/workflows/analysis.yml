@@ -53,7 +53,7 @@ jobs:
           commands: |
             npm ci
             npm run test:cov
-          dir: ${{ matrix.dir }}
+          dir: ${{ matrix.dir }}/
           node_version: "22"
           sonar_args: >
             -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts,src/app/migrations/
@@ -63,7 +63,6 @@ jobs:
             -Dsonar.tests.inclusions=**/*spec.ts
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
             -Dsonar.cpd.exclusions=**/migrations/**
-            -Dsonar.projectBaseDir=backend/sites
           sonar_token: ${{ secrets[matrix.token] }}
           triggers: ('${{ matrix.dir }}/')
 

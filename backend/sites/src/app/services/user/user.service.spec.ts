@@ -31,8 +31,8 @@ describe('UserService', () => {
           provide: getRepositoryToken(User),
           useClass: Repository,
         },
-        LoggerService
-      ],     
+        LoggerService,
+      ],
     }).compile();
 
     userService = module.get<UserService>(UserService);

@@ -12,7 +12,7 @@ describe('FolioSerivce', () => {
   let folioContentService: FolioContentsService;
   let folioRepository: Repository<Folio>;
   let folioContentRepository: Repository<FolioContents>;
-  let loggerService: LoggerService
+  let loggerService: LoggerService;
 
   const folios: Folio[] = [
     {
@@ -69,7 +69,7 @@ describe('FolioSerivce', () => {
           provide: getRepositoryToken(FolioContents),
           useClass: Repository,
         },
-        LoggerService
+        LoggerService,
       ],
     }).compile();
 

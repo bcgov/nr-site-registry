@@ -37,7 +37,7 @@ describe('CartSerive', () => {
             })),
           },
         },
-        LoggerService
+        LoggerService,
       ],
     }).compile();
 

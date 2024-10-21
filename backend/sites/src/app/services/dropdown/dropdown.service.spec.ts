@@ -52,7 +52,7 @@ describe('DropdownService', () => {
         {
           provide: getRepositoryToken(User),
           useClass: Repository,
-        }
+        },
       ],
     }).compile();
 

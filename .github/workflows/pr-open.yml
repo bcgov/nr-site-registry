@@ -47,7 +47,7 @@ jobs:
     uses: ./.github/workflows/.deployer.yml
     secrets: inherit
     with:
-      triggers: ('backend/' 'frontend/')
+      triggers: ('backend/' 'frontend/' 'charts/' '.github')
       values: 'values-pr.yaml' # PR specific values file.
 
   results:

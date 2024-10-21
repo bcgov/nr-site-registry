@@ -45,8 +45,8 @@ jobs:
             name: frontend
             token: SONAR_TOKEN_FRONTEND_SITE_REGISTRY
     steps:
-      # - uses: bcgov-nr/action-test-and-analyse@v1.2.1
-      - uses: ./.github/workflows/.test-and-analyze.yml
+      - uses: bcgov-nr/action-test-and-analyse@v1.2.1
+      # - uses: ./.github/workflows/.test-and-analyze.yml
         env:
           LOG_LEVEL: info
           LOG_FILE_LOCATION: /tmp/sites-%DATE%.log

@@ -159,7 +159,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
 
   pgBackRest:
     enabled: true
-    backupPath: /backups/cluster/version
+    backupPath: /backups/test/cluster/version # change it for PROD, create values-prod.yaml
     clusterCounter: 1 # this is the number to identify what is the current counter for the cluster, each time it is cloned it should be incremented.
     image: artifacts.developer.gov.bc.ca/bcgov-docker-local/crunchy-pgbackrest:ubi8-2.49-0
     # If retention-full-type set to 'count' then the oldest backups will expire when the number of backups reach the number defined in retention
@@ -167,7 +167,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     retentionFullType: count
     s3:
       retention: 7 # one weeks backup in object store.
-      bucket: nrsitest
+      bucket: nrsitetst
       endpoint: nrs.objectstore.gov.bc.ca
       accessKey: ~
       secretKey: ~

@@ -27,7 +27,7 @@ spec:
         repo2-s3-uri-style: path # This is mandatory since the backups are path based.
         repo2-path: {{ .Values.crunchy.clone.path }} # path to the backup where cluster will bootstrap from
       repo:
-        name: repo2 # hardcoded since repo 2, it is always backed up to object storage.
+        name: repo1 # hardcoded since repo 1, it is always backed up to object storage.
         s3:
           bucket: {{ .Values.crunchy.pgBackRest.s3.bucket }}
           endpoint: {{ .Values.crunchy.pgBackRest.s3.endpoint }}
@@ -92,7 +92,7 @@ spec:
                   matchLabels:
                     postgres-operator.crunchydata.com/cluster:
                       {{ template "crunchy-postgres.fullname" . }}
-                    postgres-operator.crunchydata.com/instance-set: {{ .Values.crunchy.instances.name }}-ha
+                    postgres-operator.crunchydata.com/instance-set: {{ .Values.crunchy.instances.name }}
 
   users:
     - name: {{ .Values.global.config.dbName }}
@@ -125,8 +125,8 @@ spec:
             full: {{ .Values.crunchy.pgBackRest.s3.fullBackupSchedule }}
             incremental: {{ .Values.crunchy.pgBackRest.s3.incrementalBackupSchedule }}
           s3:
-            bucket: {{ .Values.crunchy.pgBackRest.s3.bucket }}
-            endpoint: {{ .Values.crunchy.pgBackRest.s3.endpoint }}
+            bucket: {{ .Values.crunchy.pgBackRest.s3.bucket | quote }}
+            endpoint: {{ .Values.crunchy.pgBackRest.s3.endpoint | quote }}
             region: "ca-central-1"
         - name: repo2
           schedules:
@@ -224,7 +224,7 @@ spec:
                 labelSelector:
                   matchLabels:
                     postgres-operator.crunchydata.com/cluster:
-                      {{ .Values.crunchy.instances.name }}
+                      {{ template "crunchy-postgres.fullname" . }}
                     postgres-operator.crunchydata.com/role: pgbouncer
   {{- end }}
   {{- end }}

@@ -51,7 +51,7 @@ spec:
                   key: dbname
                   name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
             - name: POSTGRES_DB_SCHEMA
-              value: sites
+              value: {{ .Values.global.config.schemaName }}
             - name: POSTGRESQL_HOST
               valueFrom:
                 secretKeyRef:

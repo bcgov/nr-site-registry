@@ -38,11 +38,9 @@ jobs:
       matrix:
         dir: [backend, frontend]
         include:
-          - dir: backend/
-            name: backend
+          - dir: backend
             token: SONAR_TOKEN_BACKEND
-          - dir: frontend/
-            name: frontend
+          - dir: frontend
             token: SONAR_TOKEN_FRONTEND
     steps:
       - uses: bcgov-nr/action-test-and-analyse@v1.2.1
@@ -53,12 +51,12 @@ jobs:
           commands: |
             npm ci
             npm run test:cov
-          dir: '${{ matrix.dir }}/'
+          dir: ${{ matrix.dir }}
           node_version: "22"
           sonar_args: >
             -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts,src/app/migrations/
             -Dsonar.organization=bcgov-sonarcloud
-            -Dsonar.projectKey=bcgov-sonarcloud_nr-site-registry-${{ matrix.name }}
+            -Dsonar.projectKey=bcgov-sonarcloud_nr-site-registry-${{ matrix.dir }}
             -Dsonar.sources=src
             -Dsonar.tests.inclusions=**/*spec.ts
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info

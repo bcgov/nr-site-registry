@@ -34,8 +34,8 @@ services:
     networks:
       - app-tier
     build:
-      context: backend
-      dockerfile: backend/Dockerfile.local
+      context: backend/
+      dockerfile: ./Dockerfile.local
     container_name: sites
     hostname: sites
     depends_on:

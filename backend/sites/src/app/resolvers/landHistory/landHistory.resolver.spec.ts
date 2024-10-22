@@ -6,7 +6,6 @@ import { Test } from '@nestjs/testing';
 import { LandHistoryResponse } from '../../dto/landHistory.dto';
 import { LoggerService } from '../../logger/logger.service';
 
-
 describe('LandHistoryResolver', () => {
   let resolver: LandHistoryResolver;
   let landHistoryService: LandHistoryService;
@@ -41,7 +40,7 @@ describe('LandHistoryResolver', () => {
             ),
           },
         },
-        LoggerService
+        LoggerService,
       ],
     }).compile();
 
@@ -78,7 +77,12 @@ describe('LandHistoryResolver', () => {
         .spyOn(landHistoryService, 'getLandHistoriesForSite')
         .mockResolvedValueOnce(mockLandHistories);
 
-      const result = await resolver.getLandHistoriesForSite('1', '', 'ASC',showPending);
+      const result = await resolver.getLandHistoriesForSite(
+        '1',
+        '',
+        'ASC',
+        showPending,
+      );
 
       expect(result).toEqual(expectedResponse);
       expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
@@ -104,7 +108,12 @@ describe('LandHistoryResolver', () => {
         .spyOn(landHistoryService, 'getLandHistoriesForSite')
         .mockResolvedValueOnce([]);
 
-      const result = await resolver.getLandHistoriesForSite(siteId, '', 'ASC',showPending);
+      const result = await resolver.getLandHistoriesForSite(
+        siteId,
+        '',
+        'ASC',
+        showPending,
+      );
 
       expect(result).toEqual(expectedResponse);
       expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(

@@ -2,7 +2,7 @@
 Expand the name of the chart.
 */}}
 {{- define "frontendSiteRegistry.name" -}}
-{{- printf "frontend-site-registry" }}
+{{- printf "frontend" }}
 {{- end }}
 
 {{/*

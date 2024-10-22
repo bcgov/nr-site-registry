@@ -32,7 +32,7 @@ spec:
           {{- if not .Values.crunchy.enabled }}
           envFrom:
             - secretRef:
-                name: {{.Release.Name}}-backend-sites-migrations
+                name: {{.Release.Name}}-backend-migrations
           {{- else }}
           env:
             - name: POSTGRES_DB_PASSWORD
@@ -90,7 +90,7 @@ spec:
           imagePullPolicy: {{ default "Always" .Values.backendSites.imagePullPolicy }}
           envFrom:
             - secretRef:
-                name: {{.Release.Name}}-backend-sites
+                name: {{.Release.Name}}-backend
           env:
             - name: LOG_LEVEL
               value: "info"

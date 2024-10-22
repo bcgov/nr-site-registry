@@ -5,6 +5,7 @@ ARG ORA2PG_VERSION=24.3
 # ugly fix for "update-alternatives" missing directories in slim image
 RUN mkdir -p /usr/share/man/man1 &&\
     mkdir -p /usr/share/man/man7
+
 RUN apt-get update && apt-get install -y -q --no-install-recommends \
     cpanminus \
     unzip \
@@ -17,20 +18,22 @@ RUN apt-get update && apt-get install -y -q --no-install-recommends \
     postgresql-client \
     # Install mysql
     libdbd-mysql \
-    #install Perl Database Interface
+    # install Perl Database Interface
     libdbi-perl \
     bzip2 \
     libpq-dev \
     gnupg2 \
-    libdbd-pg-perl
+    libdbd-pg-perl \
+    # Install Python 3
+    python3 \
+    python3-pip
 
 ARG ORAVERSION=21
 ARG ORACLIENT_BASIC=https://download.oracle.com/otn_software/linux/instantclient/211000/oracle-instantclient-basic-21.1.0.0.0-1.x86_64.rpm
 ARG ORACLIENT_DEVEL=https://download.oracle.com/otn_software/linux/instantclient/211000/oracle-instantclient-devel-21.1.0.0.0-1.x86_64.rpm
 ARG ORACLIENT_SQLPLUS=https://download.oracle.com/otn_software/linux/instantclient/211000/oracle-instantclient-sqlplus-21.1.0.0.0-1.x86_64.rpm
 
-
-# Instal Oracle Client
+# Install Oracle Client
 RUN mkdir /usr/lib/oracle/$ORAVERSION/client64/network/admin -p \
     && curl -L -o /tmp/oracle-instantclient.rpm $ORACLIENT_BASIC \
     && (cd /tmp && alien -i ./oracle-instantclient.rpm && rm -f oracle-instantclient.rpm) \
@@ -71,6 +74,11 @@ VOLUME /data
 COPY entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod +x /usr/bin/entrypoint.sh
 
+# Install Python 3 dependencies and Python script support
+RUN apt-get install -y python3 python3-pip
+
 WORKDIR /
+
+COPY modify_dml.py /modify_dml.py
 
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]

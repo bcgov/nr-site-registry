@@ -36,17 +36,16 @@ jobs:
           - 5432:5432
     strategy:
       matrix:
-        dir: [backend/sites, frontend/site-registry]
+        dir: [backend, frontend]
         include:
-          - dir: backend/sites
+          - dir: backend/
             name: backend
-            token: SONAR_TOKEN_BACKEND_SITES
-          - dir: frontend/site-registry
+            token: SONAR_TOKEN_BACKEND
+          - dir: frontend/
             name: frontend
-            token: SONAR_TOKEN_FRONTEND_SITE_REGISTRY
+            token: SONAR_TOKEN_FRONTEND
     steps:
-      # - uses: bcgov-nr/action-test-and-analyse@v1.2.1
-      - uses: ./.github/workflows/.test-and-analyze.yml
+      - uses: bcgov-nr/action-test-and-analyse@v1.2.1
         env:
           LOG_LEVEL: info
           LOG_FILE_LOCATION: /tmp/sites-%DATE%.log

@@ -86,7 +86,7 @@ spec:
           securityContext:
             {{- toYaml .Values.backendSites.securityContext | nindent 12 }}
           {{- end }}
-          image: "{{.Values.global.registry}}/{{.Values.global.repository}}/backend/sites:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          image: "{{.Values.global.registry}}/{{.Values.global.repository}}/backend:{{ .Values.global.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ default "Always" .Values.backendSites.imagePullPolicy }}
           envFrom:
             - secretRef:

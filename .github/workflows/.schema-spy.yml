@@ -49,7 +49,7 @@ jobs:
             -e POSTGRES_ADMIN_USERNAME=postgres \
             -e POSTGRES_ADMIN_PASSWORD=default \
             -e POSTGRES_DB_SCHEMA=sites \
-            ghcr.io/bcgov/nr-site-registry/backend/sites-migration:test
+            ghcr.io/bcgov/nr-site-registry/backend-migration:test
 
       - name: Create Output Folder
         run: |

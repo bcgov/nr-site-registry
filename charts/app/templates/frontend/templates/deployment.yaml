@@ -1,40 +1,48 @@
-{{- if .Values.frontendSiteRegistry.enabled }}
+{{- if .Values.frontend.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "frontendSiteRegistry.fullname" . }}
+  name: {{ include "frontend.fullname" . }}
   labels:
-    {{- include "frontendSiteRegistry.labels" . | nindent 4 }}
+    {{- include "frontend.labels" . | nindent 4 }}
 spec:
   strategy:
-    type: {{ .Values.frontendSiteRegistry.deploymentStrategy }}
-  {{- if not .Values.frontendSiteRegistry.autoscaling.enabled }}
-  replicas: {{ .Values.frontendSiteRegistry.replicaCount }}
+    type: {{ .Values.frontend.deploymentStrategy }}
+  {{- if not .Values.frontend.autoscaling.enabled }}
+  replicas: {{ .Values.frontend.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "frontendSiteRegistry.selectorLabels" . | nindent 6 }}
+      {{- include "frontend.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
       labels:
-        {{- include "frontendSiteRegistry.labels" . | nindent 8 }}
+        {{- include "frontend.labels" . | nindent 8 }}
     spec:
-      {{- if .Values.frontendSiteRegistry.podSecurityContext }}
+      {{- if .Values.frontend.podSecurityContext }}
       securityContext:
-        {{- toYaml .Values.frontendSiteRegistry.podSecurityContext | nindent 12 }}
+        {{- toYaml .Values.frontend.podSecurityContext | nindent 12 }}
       {{- end }}
       containers:
-        - name: {{ include "frontendSiteRegistry.fullname" . }}
+        - name: {{ include "frontend.fullname" . }}
           securityContext:
             capabilities:
               add: [ "NET_BIND_SERVICE" ]
-          image: "{{.Values.global.registry}}/{{.Values.global.repository}}/frontend/site-registry:{{ .Values.global.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ default "Always" .Values.frontendSiteRegistry.imagePullPolicy }}
+          image: "{{.Values.global.registry}}/{{.Values.global.repository}}/frontend:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ default "Always" .Values.frontend.imagePullPolicy }}
           env:
             - name: REACT_APP_BACKEND_API
-              value: "https://{{ .Release.Name }}-backendSites.{{ .Values.global.domain }}"
+              value: "https://{{ .Release.Name }}-backend.{{ .Values.global.domain }}"
+            - name: REACT_APP_AUTH_AUTHORITY
+              # value: "https://epd-keycloak-dev.{{ .Values.global.domain }}/auth/realms/forms-flow-ai/"
+              value: "https://epd-keycloak-dev.{{ .Values.global.domain }}/auth/realms/${{ secrets.KEYCLOAK_REALM }}/"
+            - name: REACT_APP_AUTH_CLIENT_ID
+              value: TODO-GET-NEW-CLIENT
+            - name: APP_AUTH_REDIRECT_URI
+              value: "https://{{ lower (include "frontend.fullname" .) }}.{{ .Values.global.domain }}"
+            - name: REACT_APP_
             - name: LOG_LEVEL
               value: "info"
           ports:
@@ -43,7 +51,7 @@ spec:
               protocol: TCP
           readinessProbe:
             httpGet:
-              path: /health
+              path: /
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 5
@@ -56,7 +64,7 @@ spec:
             successThreshold: 1
             failureThreshold: 3
             httpGet:
-              path: /health
+              path: /
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 15
@@ -64,18 +72,11 @@ spec:
             timeoutSeconds: 5
           resources:
             limits:
-              cpu: 30m
-              memory: 75Mi
+              cpu: 100m
+              memory: 150Mi
             requests:
-              cpu: 15m
-              memory: 25Mi
-          volumeMounts:
-            - name: {{ .Release.Name }}-config
-              mountPath: /usr/share/nginx/html/config/
-      volumes:
-        - name: {{ .Release.Name }}-config
-          configMap:
-            name: {{ include "frontendSiteRegistry.fullname" . }}
+              cpu: 30m
+              memory: 50Mi
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -84,7 +85,7 @@ spec:
                   - key: app.kubernetes.io/name
                     operator: In
                     values:
-                      - {{ include "frontendSiteRegistry.fullname" . }}
+                      - {{ include "frontend.fullname" . }}
                   - key: app.kubernetes.io/instance
                     operator: In
                     values:

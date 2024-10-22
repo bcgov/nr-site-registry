@@ -1,12 +1,12 @@
-{{- if .Values.frontendSiteRegistry.enabled }}
+{{- if .Values.frontend.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "frontendSiteRegistry.fullname" . }}
+  name: {{ include "frontend.fullname" . }}
   labels:
-    {{- include "frontendSiteRegistry.labels" . | nindent 4 }}
-  {{- if and .Values.frontendSiteRegistry.ingress .Values.frontendSiteRegistry.ingress.annotations }}
-  {{- with .Values.frontendSiteRegistry.ingress.annotations }}
+    {{- include "frontend.labels" . | nindent 4 }}
+  {{- if and .Values.frontend.ingress .Values.frontend.ingress.annotations }}
+  {{- with .Values.frontend.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -14,14 +14,14 @@ metadata:
 spec:
   ingressClassName: openshift-default
   rules:
-    - host: {{ lower (include "frontendSiteRegistry.fullname" .) }}.{{ .Values.global.domain }}
+    - host: {{ lower (include "frontend.fullname" .) }}.{{ .Values.global.domain }}
       http:
         paths:
           - path: /
             pathType: ImplementationSpecific
             backend:
               service:
-                name: {{ include "frontendSiteRegistry.fullname" . }}
+                name: {{ include "frontend.fullname" . }}
                 port:
                   number: 80
 {{- end }}

@@ -1,4 +1,4 @@
-{{- if .Values.frontendSiteRegistry.enabled }}
+{{- if .Values.frontend.enabled }}
 {{$REACT_APP_BACKEND_API:= printf "https://%s-backend.%s" .Release.Name .Values.global.domain }}
 {{$REACT_APP_AUTH_AUTHORITY:= printf "https://epd-keycloak-dev.apps.silver.devops.gov.bc.ca/auth/realms/forms-flow-ai/" }}
 {{$REACT_APP_AUTH_CLIENT_ID:= printf "epd-local" }}
@@ -8,19 +8,19 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "frontendSiteRegistry.fullname" . }}
+  name: {{ include "frontend.fullname" . }}
   labels:
-    {{- include "frontendSiteRegistry.labels" . | nindent 4 }}
+    {{- include "frontend.labels" . | nindent 4 }}
 data:
-  REACT_APP_BACKEND_API: {{ .Values.frontendSiteRegistry.config.REACT_APP_BACKEND_API | default $REACT_APP_BACKEND_API | quote }}
-  REACT_APP_AUTH_AUTHORITY: {{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_AUTHORITY | default $REACT_APP_AUTH_AUTHORITY | quote }}
-  REACT_APP_AUTH_CLIENT_ID: {{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_CLIENT_ID | default $REACT_APP_AUTH_CLIENT_ID | quote }}
-  REACT_APP_AUTH_REDIRECT_URI: {{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_REDIRECT_URI | default $REACT_APP_AUTH_REDIRECT_URI | quote }}
-  REACT_APP_AUTH_LOGOUT_REDIRECT_URI: {{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_LOGOUT_REDIRECT_URI | default $REACT_APP_AUTH_LOGOUT_REDIRECT_URI | quote }}
-  REACT_APP_AUTH_RESPONSE_TYPE: {{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_RESPONSE_TYPE | quote}}
-  REACT_APP_AUTH_SCOPE:  {{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_SCOPE | quote}}
-  REACT_APP_AUTH_FILTER_PROTOCOL_CLAIMS:  {{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_FILTER_PROTOCOL_CLAIMS | quote}}
-  REACT_APP_AUTH_LOAD_USER_INFO:  {{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_LOAD_USER_INFO | quote}}
-  REACT_APP_AUTH_REVOKE_TOKENS_ON_SIGNOUT:  {{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_REVOKE_TOKENS_ON_SIGNOUT | quote}}
-  config.js: "// runtime-config.js vars\n  window[\"_env_\"] =  {\n    \"REACT_APP_BACKEND_API\": \"{{ .Values.frontendSiteRegistry.config.REACT_APP_BACKEND_API | default $REACT_APP_BACKEND_API }}\",\n    \"REACT_APP_AUTH_AUTHORITY\": \"{{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_AUTHORITY | default $REACT_APP_AUTH_AUTHORITY  }}\",\n    \"REACT_APP_AUTH_CLIENT_ID\": \"{{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_CLIENT_ID | default $REACT_APP_AUTH_CLIENT_ID }}\",\n    \"REACT_APP_AUTH_REDIRECT_URI\": \"{{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_REDIRECT_URI | default $REACT_APP_AUTH_REDIRECT_URI }}\",            \n    \"REACT_APP_AUTH_LOGOUT_REDIRECT_URI\": \"{{ .Values.frontendSiteRegistry.config.REACT_APP_AUTH_LOGOUT_REDIRECT_URI | default $REACT_APP_AUTH_LOGOUT_REDIRECT_URI }}\",\n    \"REACT_APP_AUTH_RESPONSE_TYPE\": \"code\",\n    \"REACT_APP_AUTH_SCOPE\": \"openid profile\",   \n    \"REACT_APP_AUTH_FILTER_PROTOCOL_CLAIMS\": \"true\",\n    \"REACT_APP_AUTH_LOAD_USER_INFO\": \"true\"  \n     }"
+  REACT_APP_BACKEND_API: {{ .Values.frontend.config.REACT_APP_BACKEND_API | default $REACT_APP_BACKEND_API | quote }}
+  REACT_APP_AUTH_AUTHORITY: {{ .Values.frontend.config.REACT_APP_AUTH_AUTHORITY | default $REACT_APP_AUTH_AUTHORITY | quote }}
+  REACT_APP_AUTH_CLIENT_ID: {{ .Values.frontend.config.REACT_APP_AUTH_CLIENT_ID | default $REACT_APP_AUTH_CLIENT_ID | quote }}
+  REACT_APP_AUTH_REDIRECT_URI: {{ .Values.frontend.config.REACT_APP_AUTH_REDIRECT_URI | default $REACT_APP_AUTH_REDIRECT_URI | quote }}
+  REACT_APP_AUTH_LOGOUT_REDIRECT_URI: {{ .Values.frontend.config.REACT_APP_AUTH_LOGOUT_REDIRECT_URI | default $REACT_APP_AUTH_LOGOUT_REDIRECT_URI | quote }}
+  REACT_APP_AUTH_RESPONSE_TYPE: {{ .Values.frontend.config.REACT_APP_AUTH_RESPONSE_TYPE | quote}}
+  REACT_APP_AUTH_SCOPE:  {{ .Values.frontend.config.REACT_APP_AUTH_SCOPE | quote}}
+  REACT_APP_AUTH_FILTER_PROTOCOL_CLAIMS:  {{ .Values.frontend.config.REACT_APP_AUTH_FILTER_PROTOCOL_CLAIMS | quote}}
+  REACT_APP_AUTH_LOAD_USER_INFO:  {{ .Values.frontend.config.REACT_APP_AUTH_LOAD_USER_INFO | quote}}
+  REACT_APP_AUTH_REVOKE_TOKENS_ON_SIGNOUT:  {{ .Values.frontend.config.REACT_APP_AUTH_REVOKE_TOKENS_ON_SIGNOUT | quote}}
+  config.js: "// runtime-config.js vars\n  window[\"_env_\"] =  {\n    \"REACT_APP_BACKEND_API\": \"{{ .Values.frontend.config.REACT_APP_BACKEND_API | default $REACT_APP_BACKEND_API }}\",\n    \"REACT_APP_AUTH_AUTHORITY\": \"{{ .Values.frontend.config.REACT_APP_AUTH_AUTHORITY | default $REACT_APP_AUTH_AUTHORITY  }}\",\n    \"REACT_APP_AUTH_CLIENT_ID\": \"{{ .Values.frontend.config.REACT_APP_AUTH_CLIENT_ID | default $REACT_APP_AUTH_CLIENT_ID }}\",\n    \"REACT_APP_AUTH_REDIRECT_URI\": \"{{ .Values.frontend.config.REACT_APP_AUTH_REDIRECT_URI | default $REACT_APP_AUTH_REDIRECT_URI }}\",            \n    \"REACT_APP_AUTH_LOGOUT_REDIRECT_URI\": \"{{ .Values.frontend.config.REACT_APP_AUTH_LOGOUT_REDIRECT_URI | default $REACT_APP_AUTH_LOGOUT_REDIRECT_URI }}\",\n    \"REACT_APP_AUTH_RESPONSE_TYPE\": \"code\",\n    \"REACT_APP_AUTH_SCOPE\": \"openid profile\",   \n    \"REACT_APP_AUTH_FILTER_PROTOCOL_CLAIMS\": \"true\",\n    \"REACT_APP_AUTH_LOAD_USER_INFO\": \"true\"  \n     }"
 {{- end }}

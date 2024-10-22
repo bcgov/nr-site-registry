@@ -95,7 +95,7 @@ spec:
       from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: {{ template "frontendSiteRegistry.name" . }}
+              app.kubernetes.io/name: {{ template "frontend.name" . }}
               app.kubernetes.io/instance: {{ .Release.Name }}
   policyTypes:
     - Ingress

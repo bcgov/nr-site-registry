@@ -1,16 +1,16 @@
-{{- if .Values.frontendSiteRegistry.enabled }}
-{{- if and .Values.frontendSiteRegistry.pdb  .Values.frontendSiteRegistry.pdb.enabled }}
+{{- if .Values.frontend.enabled }}
+{{- if and .Values.frontend.pdb  .Values.frontend.pdb.enabled }}
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "frontendSiteRegistry.fullname" . }}
+  name: {{ include "frontend.fullname" . }}
   labels:
-    {{- include "frontendSiteRegistry.labels" . | nindent 4 }}
+    {{- include "frontend.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "frontendSiteRegistry.selectorLabels" . | nindent 6 }}
-  minAvailable: {{ .Values.frontendSiteRegistry.pdb.minAvailable }}
+      {{- include "frontend.selectorLabels" . | nindent 6 }}
+  minAvailable: {{ .Values.frontend.pdb.minAvailable }}
 {{- end }}
 {{- end }}

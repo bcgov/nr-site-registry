@@ -1,18 +1,18 @@
-{{- if and .Values.global.autoscaling .Values.frontendSiteRegistry.enabled }}
-{{- if and .Values.frontendSiteRegistry.autoscaling .Values.frontendSiteRegistry.autoscaling.enabled }}
+{{- if and .Values.global.autoscaling .Values.frontend.enabled }}
+{{- if and .Values.frontend.autoscaling .Values.frontend.autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "frontendSiteRegistry.fullname" . }}
+  name: {{ include "frontend.fullname" . }}
   labels:
-    {{- include "frontendSiteRegistry.labels" . | nindent 4 }}
+    {{- include "frontend.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "frontendSiteRegistry.fullname" . }}
-  minReplicas: {{ .Values.frontendSiteRegistry.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.frontendSiteRegistry.autoscaling.maxReplicas }}
+    name: {{ include "frontend.fullname" . }}
+  minReplicas: {{ .Values.frontend.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.frontend.autoscaling.maxReplicas }}
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 300
@@ -35,21 +35,21 @@ spec:
           periodSeconds: 30
       selectPolicy: Max
   metrics:
-    {{- if .Values.frontendSiteRegistry.autoscaling.targetCPUUtilizationPercentage }}
+    {{- if .Values.frontend.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: {{ .Values.frontendSiteRegistry.autoscaling.targetCPUUtilizationPercentage }}
+          averageUtilization: {{ .Values.frontend.autoscaling.targetCPUUtilizationPercentage }}
     {{- end }}
-    {{- if .Values.frontendSiteRegistry.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- if .Values.frontend.autoscaling.targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: {{ .Values.frontendSiteRegistry.autoscaling.targetMemoryUtilizationPercentage }}
+          averageUtilization: {{ .Values.frontend.autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
 {{- end }}
 {{- end }}

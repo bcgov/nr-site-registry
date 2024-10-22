@@ -23,7 +23,7 @@ backend:
       cpu: 50m
       memory: 150Mi
 
-frontendSiteRegistry:
+frontend:
   enabled: true
   deploymentStrategy: Recreate
   pdb:

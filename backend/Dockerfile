@@ -9,7 +9,7 @@ RUN npm ci --omit=dev && \
     npm run build
 
 # Deployment container
-# Deploy using minimal Distroless image
+# Deploy using minimal Distroless image, no root access
 FROM gcr.io/distroless/nodejs22-debian12:nonroot
 # Set node to production
 ENV NODE_ENV=production

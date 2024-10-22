@@ -18,17 +18,17 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        package: [backend/sites, frontend/site-registry, backend/sites-migration]
+        package: [backend, frontend, backend-migration]
         include:
-          - package: backend/sites
-            build_file: ./backend/sites/Dockerfile
-            build_context: backend/sites
-          - package: backend/sites-migration
-            build_file: ./backend/sites/Dockerfile.migrations
-            build_context: backend/sites
-          - package: frontend/site-registry
-            build_file: ./frontend/site-registry/Dockerfile
-            build_context: frontend/site-registry
+          - package: backend
+            build_file: ./backend/Dockerfile
+            build_context: backend
+          - package: backend-migration
+            build_file: ./backend/Dockerfile.migrations
+            build_context: backend
+          - package: frontend
+            build_file: ./frontend/Dockerfile
+            build_context: frontend
     timeout-minutes: 10
     steps:
       - uses: bcgov-nr/action-builder-ghcr@v2.2.0
@@ -43,6 +43,7 @@ jobs:
   # https://github.com/bcgov/quickstart-openshift-helpers
   deploys:
     name: Deploys
+    if: ${{ ! github.event.pull_request.draft }}
     needs: [builds]
     uses: ./.github/workflows/.deployer.yml
     secrets: inherit

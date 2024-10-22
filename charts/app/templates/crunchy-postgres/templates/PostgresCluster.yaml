@@ -24,8 +24,8 @@ spec:
         - secret:
             name: {{ .Release.Name }}-s3-secret
       global:
-        repo2-s3-uri-style: path # This is mandatory since the backups are path based.
-        repo2-path: {{ .Values.crunchy.clone.path }} # path to the backup where cluster will bootstrap from
+        repo1-s3-uri-style: path # This is mandatory since the backups are path based.
+        repo1-path: {{ .Values.crunchy.clone.path }} # path to the backup where cluster will bootstrap from
       repo:
         name: repo1 # hardcoded since repo 1, it is always backed up to object storage.
         s3:
@@ -103,7 +103,7 @@ spec:
       databases:
         - postgres
         - {{ .Values.global.config.dbName }}
-    - name: {{ .Values.global.config.dbName }}-proxy
+    - name: {{ .Values.global.config.dbName }}proxy # this user lets dev connect to postgres via pgbouncer from local system
       databases:
         - {{ .Values.global.config.dbName }}
         - postgres

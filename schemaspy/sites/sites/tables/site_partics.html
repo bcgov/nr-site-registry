@@ -122,31 +122,6 @@
                                                 <td class="constraint detail">FK_4171a309de795d40009f2049ca7</td>
                                                 <td class="constraint detail"><span title='Cascade on delete:&#10;Deletion of parent deletes child'>C</span></td>
                                             </tr>
-                                            <tr>
-                                                <td title="site_profile_owners.sp_id references site_partics.id via FK_43192994f2226491bec18fec2cd"><a href='site_profile_owners.html'>site_profile_owners</a><span class='relatedKey'>.sp_id</span></td>
-                                                <td class="constraint detail">FK_43192994f2226491bec18fec2cd</td>
-                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td title="site_profiles.completor_partic_id references site_partics.id via FK_aafdda946ab5c8dd00cae4d9544"><a href='site_profiles.html'>site_profiles</a><span class='relatedKey'>.completor_partic_id</span></td>
-                                                <td class="constraint detail">FK_aafdda946ab5c8dd00cae4d9544</td>
-                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td title="site_profiles.contact_partic_id references site_partics.id via FK_c67f7496519aa992316fe7b4b21"><a href='site_profiles.html'>site_profiles</a><span class='relatedKey'>.contact_partic_id</span></td>
-                                                <td class="constraint detail">FK_c67f7496519aa992316fe7b4b21</td>
-                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td title="site_profiles.rwm_partic_id references site_partics.id via FK_07815f2409991b176f8b9ea1755"><a href='site_profiles.html'>site_profiles</a><span class='relatedKey'>.rwm_partic_id</span></td>
-                                                <td class="constraint detail">FK_07815f2409991b176f8b9ea1755</td>
-                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td title="site_profiles.site_reg_partic_id references site_partics.id via FK_371e7c30224542fe70e1b3e84a7"><a href='site_profiles.html'>site_profiles</a><span class='relatedKey'>.site_reg_partic_id</span></td>
-                                                <td class="constraint detail">FK_371e7c30224542fe70e1b3e84a7</td>
-                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
-                                            </tr>
                                         </table>
                                     </td>
                                     <td>
@@ -322,7 +297,7 @@
                                     <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="rwm_flag">rwm_flag</span></td>
                                     <td>int2</td>
                                     <td>5</td>
-                                    <td title=''></td>
+                                    <td title='nullable'>√</td>
                                     <td title=''></td>
                                     <td>null</td>
                                     <td>
@@ -339,7 +314,7 @@
                                     <td><span id="rwm_note_flag">rwm_note_flag</span></td>
                                     <td>int2</td>
                                     <td>5</td>
-                                    <td title=''></td>
+                                    <td title='nullable'>√</td>
                                     <td title=''></td>
                                     <td>null</td>
                                     <td>
@@ -471,86 +446,80 @@
                                 <div class="tab-content no-padding">
                                     <div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">
                                         <map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
-<area shape="rect" id="node1" href="site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="651,345,859,551">
-<area shape="rect" id="node2" href="site_partics.html" target="_top" title="site_partics" alt="" coords="280,164,573,644">
+<area shape="rect" id="node1" href="site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="617,132,825,337">
+<area shape="rect" id="node2" href="site_partics.html" target="_top" title="site_partics" alt="" coords="280,159,573,639">
 <area shape="rect" id="node3" href="people_orgs.html" target="_top" title="people_orgs" alt="" coords="20,404,221,551">
 <area shape="rect" id="node4" href="sites.html" target="_top" title="sites" alt="" coords="5,5,236,387">
-<area shape="rect" id="node5" href="site_profile_owners.html" target="_top" title="site_profile_owners" alt="" coords="631,568,878,744">
-<area shape="rect" id="node6" href="site_profiles.html" target="_top" title="site_profiles" alt="" coords="617,5,892,328">
 </map>
                                         <a name='diagram'><img id="oneDegreeImg" src="../diagrams/tables/site_partics.1degree.png" usemap="#oneDegreeRelationshipsDiagram" class="diagram" border="0" align="left"></a>
                                     </div>
                                     <div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">
                                         <map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
-<area shape="rect" id="node1" href="cart.html" target="_top" title="cart" alt="" coords="611,1404,723,1492">
-<area shape="rect" id="node2" href="sites.html" target="_top" title="sites" alt="" coords="301,1512,417,1600">
-<area shape="rect" id="node9" href="bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="15,1088,205,1176">
-<area shape="rect" id="node23" href="classification_cd.html" target="_top" title="classification_cd" alt="" coords="5,1615,215,1703">
-<area shape="rect" id="node24" href="site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="25,1404,195,1492">
-<area shape="rect" id="node25" href="site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="15,1509,205,1597">
-<area shape="rect" id="node3" href="event_partics.html" target="_top" title="event_partics" alt="" coords="903,1528,1090,1616">
-<area shape="rect" id="node4" href="events.html" target="_top" title="events" alt="" coords="600,1756,733,1844">
-<area shape="rect" id="node5" href="people_orgs.html" target="_top" title="people_orgs" alt="" coords="259,889,460,1036">
-<area shape="rect" id="node6" href="folio_contents.html" target="_top" title="folio_contents" alt="" coords="571,2072,763,2160">
-<area shape="rect" id="node7" href="land_histories.html" target="_top" title="land_histories" alt="" coords="571,1299,762,1387">
-<area shape="rect" id="node8" href="mailout.html" target="_top" title="mailout" alt="" coords="596,1088,737,1176">
-<area shape="rect" id="node10" href="recent_views.html" target="_top" title="recent_views" alt="" coords="575,1509,758,1597">
-<area shape="rect" id="node11" href="sis_addresses.html" target="_top" title="sis_addresses" alt="" coords="573,308,760,396">
-<area shape="rect" id="node12" href="site_assocs.html" target="_top" title="site_assocs" alt="" coords="583,1615,750,1703">
-<area shape="rect" id="node13" href="site_crown_land_contaminated.html" target="_top" title="site_crown_land_contaminated" alt="" coords="504,983,829,1071">
-<area shape="rect" id="node14" href="site_doc_partics.html" target="_top" title="site_doc_partics" alt="" coords="894,1033,1099,1121">
-<area shape="rect" id="node15" href="site_docs.html" target="_top" title="site_docs" alt="" coords="591,1193,743,1281">
-<area shape="rect" id="node16" href="site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="893,5,1101,211">
-<area shape="rect" id="node17" href="partic_role_cd.html" target="_top" title="partic_role_cd" alt="" coords="572,8,761,96">
-<area shape="rect" id="node18" href="site_partics.html" target="_top" title="site_partics" alt="" coords="520,413,813,893">
-<area shape="rect" id="node19" href="site_profile_owners.html" target="_top" title="site_profile_owners" alt="" coords="873,228,1120,404">
-<area shape="rect" id="node20" href="site_profiles.html" target="_top" title="site_profiles" alt="" coords="909,421,1085,509">
-<area shape="rect" id="node21" href="site_staffs.html" target="_top" title="site_staffs" alt="" coords="587,203,747,291">
-<area shape="rect" id="node22" href="site_subdivisions.html" target="_top" title="site_subdivisions" alt="" coords="560,1861,773,1949">
-<area shape="rect" id="node26" href="snapshots.html" target="_top" title="snapshots" alt="" coords="586,1967,747,2055">
+<area shape="rect" id="node1" href="cart.html" target="_top" title="cart" alt="" coords="640,1417,752,1505">
+<area shape="rect" id="node2" href="sites.html" target="_top" title="sites" alt="" coords="259,1415,489,1796">
+<area shape="rect" id="node9" href="bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="15,444,205,532">
+<area shape="rect" id="node22" href="classification_cd.html" target="_top" title="classification_cd" alt="" coords="5,1564,215,1652">
+<area shape="rect" id="node23" href="site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="25,1669,195,1757">
+<area shape="rect" id="node24" href="site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="15,1459,205,1547">
+<area shape="rect" id="node3" href="event_partics.html" target="_top" title="event_partics" alt="" coords="913,1471,1100,1559">
+<area shape="rect" id="node4" href="events.html" target="_top" title="events" alt="" coords="629,1733,763,1821">
+<area shape="rect" id="node5" href="people_orgs.html" target="_top" title="people_orgs" alt="" coords="273,317,475,464">
+<area shape="rect" id="node6" href="folio_contents.html" target="_top" title="folio_contents" alt="" coords="600,2049,792,2137">
+<area shape="rect" id="node7" href="land_histories.html" target="_top" title="land_histories" alt="" coords="601,1207,791,1295">
+<area shape="rect" id="node8" href="mailout.html" target="_top" title="mailout" alt="" coords="625,393,767,481">
+<area shape="rect" id="node10" href="recent_views.html" target="_top" title="recent_views" alt="" coords="605,1312,787,1400">
+<area shape="rect" id="node11" href="sis_addresses.html" target="_top" title="sis_addresses" alt="" coords="603,252,789,340">
+<area shape="rect" id="node12" href="site_assocs.html" target="_top" title="site_assocs" alt="" coords="613,1523,779,1611">
+<area shape="rect" id="node13" href="site_crown_land_contaminated.html" target="_top" title="site_crown_land_contaminated" alt="" coords="533,996,859,1084">
+<area shape="rect" id="node14" href="site_doc_partics.html" target="_top" title="site_doc_partics" alt="" coords="904,781,1109,869">
+<area shape="rect" id="node15" href="site_docs.html" target="_top" title="site_docs" alt="" coords="620,1101,772,1189">
+<area shape="rect" id="node16" href="site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="903,237,1111,443">
+<area shape="rect" id="node17" href="partic_role_cd.html" target="_top" title="partic_role_cd" alt="" coords="601,5,791,93">
+<area shape="rect" id="node18" href="site_partics.html" target="_top" title="site_partics" alt="" coords="549,499,843,979">
+<area shape="rect" id="node19" href="site_profiles.html" target="_top" title="site_profiles" alt="" coords="608,1628,784,1716">
+<area shape="rect" id="node20" href="site_staffs.html" target="_top" title="site_staffs" alt="" coords="616,147,776,235">
+<area shape="rect" id="node21" href="site_subdivisions.html" target="_top" title="site_subdivisions" alt="" coords="589,1839,803,1927">
+<area shape="rect" id="node25" href="snapshots.html" target="_top" title="snapshots" alt="" coords="615,1944,777,2032">
 </map>
                                         <a name='diagram'><img id="twodegreesDegreeImg" src="../diagrams/tables/site_partics.2degrees.png" usemap="#twoDegreesRelationshipsDiagram" class="diagram" border="0" align="left"></a>
                                     </div>
                                     <div class="chart tab-pane " id="oneimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
                                         <map id="oneDegreeRelationshipsDiagramImplied" name="oneDegreeRelationshipsDiagramImplied">
-<area shape="rect" id="node1" href="site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="651,345,859,551">
-<area shape="rect" id="node2" href="site_partics.html" target="_top" title="site_partics" alt="" coords="280,164,573,644">
+<area shape="rect" id="node1" href="site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="617,132,825,337">
+<area shape="rect" id="node2" href="site_partics.html" target="_top" title="site_partics" alt="" coords="280,159,573,639">
 <area shape="rect" id="node3" href="people_orgs.html" target="_top" title="people_orgs" alt="" coords="20,404,221,551">
 <area shape="rect" id="node4" href="sites.html" target="_top" title="sites" alt="" coords="5,5,236,387">
-<area shape="rect" id="node5" href="site_profile_owners.html" target="_top" title="site_profile_owners" alt="" coords="631,568,878,744">
-<area shape="rect" id="node6" href="site_profiles.html" target="_top" title="site_profiles" alt="" coords="617,5,892,328">
 </map>
                                         <a name='diagram'><img id="oneimpliedDegreeImg" src="../diagrams/tables/site_partics.implied1degrees.png" usemap="#oneDegreeRelationshipsDiagramImplied" class="diagram" border="0" align="left"></a>
                                     </div>
                                     <div class="chart tab-pane " id="twoimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
                                         <map id="twoDegreesRelationshipsDiagramImplied" name="twoDegreesRelationshipsDiagramImplied">
-<area shape="rect" id="node1" href="cart.html" target="_top" title="cart" alt="" coords="844,213,956,301">
-<area shape="rect" id="node2" href="sites.html" target="_top" title="sites" alt="" coords="535,637,651,725">
-<area shape="rect" id="node3" href="city_regions.html" target="_top" title="city_regions" alt="" coords="256,477,431,565">
-<area shape="rect" id="node4" href="bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="5,1216,195,1304">
-<area shape="rect" id="node24" href="classification_cd.html" target="_top" title="classification_cd" alt="" coords="239,793,448,881">
-<area shape="rect" id="node25" href="site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="258,583,429,671">
-<area shape="rect" id="node26" href="site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="248,688,439,776">
-<area shape="rect" id="node5" href="event_partics.html" target="_top" title="event_partics" alt="" coords="1137,1697,1323,1785">
-<area shape="rect" id="node6" href="events.html" target="_top" title="events" alt="" coords="833,1448,967,1536">
-<area shape="rect" id="node7" href="people_orgs.html" target="_top" title="people_orgs" alt="" coords="492,1796,693,1943">
-<area shape="rect" id="node8" href="folio_contents.html" target="_top" title="folio_contents" alt="" coords="804,319,996,407">
-<area shape="rect" id="node9" href="land_histories.html" target="_top" title="land_histories" alt="" coords="805,424,995,512">
-<area shape="rect" id="node10" href="mailout.html" target="_top" title="mailout" alt="" coords="829,1659,971,1747">
-<area shape="rect" id="node11" href="recent_views.html" target="_top" title="recent_views" alt="" coords="809,72,991,160">
-<area shape="rect" id="node12" href="sis_addresses.html" target="_top" title="sis_addresses" alt="" coords="807,2047,993,2135">
-<area shape="rect" id="node13" href="site_assocs.html" target="_top" title="site_assocs" alt="" coords="817,529,983,617">
-<area shape="rect" id="node14" href="site_crown_land_contaminated.html" target="_top" title="site_crown_land_contaminated" alt="" coords="737,1764,1063,1852">
-<area shape="rect" id="node15" href="site_doc_partics.html" target="_top" title="site_doc_partics" alt="" coords="1127,1956,1333,2044">
-<area shape="rect" id="node16" href="site_docs.html" target="_top" title="site_docs" alt="" coords="824,1553,976,1641">
-<area shape="rect" id="node17" href="site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="1126,1247,1334,1452">
-<area shape="rect" id="node18" href="partic_role_cd.html" target="_top" title="partic_role_cd" alt="" coords="805,1343,995,1431">
-<area shape="rect" id="node19" href="site_partics.html" target="_top" title="site_partics" alt="" coords="753,845,1047,1325">
-<area shape="rect" id="node20" href="site_profile_owners.html" target="_top" title="site_profile_owners" alt="" coords="1107,959,1353,1135">
-<area shape="rect" id="node21" href="site_profiles.html" target="_top" title="site_profiles" alt="" coords="1142,853,1318,941">
-<area shape="rect" id="node22" href="site_staffs.html" target="_top" title="site_staffs" alt="" coords="820,1905,980,1993">
-<area shape="rect" id="node23" href="site_subdivisions.html" target="_top" title="site_subdivisions" alt="" coords="793,635,1007,723">
-<area shape="rect" id="node27" href="snapshots.html" target="_top" title="snapshots" alt="" coords="819,740,981,828">
+<area shape="rect" id="node1" href="cart.html" target="_top" title="cart" alt="" coords="873,321,985,409">
+<area shape="rect" id="node2" href="sites.html" target="_top" title="sites" alt="" coords="492,740,723,1121">
+<area shape="rect" id="node3" href="city_regions.html" target="_top" title="city_regions" alt="" coords="256,683,431,771">
+<area shape="rect" id="node4" href="bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="5,1112,195,1200">
+<area shape="rect" id="node23" href="classification_cd.html" target="_top" title="classification_cd" alt="" coords="239,929,448,1017">
+<area shape="rect" id="node24" href="site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="258,1035,429,1123">
+<area shape="rect" id="node25" href="site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="248,824,439,912">
+<area shape="rect" id="node5" href="event_partics.html" target="_top" title="event_partics" alt="" coords="1147,904,1333,992">
+<area shape="rect" id="node6" href="events.html" target="_top" title="events" alt="" coords="863,427,996,515">
+<area shape="rect" id="node7" href="people_orgs.html" target="_top" title="people_orgs" alt="" coords="507,1711,708,1857">
+<area shape="rect" id="node8" href="folio_contents.html" target="_top" title="folio_contents" alt="" coords="833,532,1025,620">
+<area shape="rect" id="node9" href="land_histories.html" target="_top" title="land_histories" alt="" coords="834,637,1025,725">
+<area shape="rect" id="node10" href="mailout.html" target="_top" title="mailout" alt="" coords="859,1661,1000,1749">
+<area shape="rect" id="node11" href="recent_views.html" target="_top" title="recent_views" alt="" coords="838,5,1021,93">
+<area shape="rect" id="node12" href="sis_addresses.html" target="_top" title="sis_addresses" alt="" coords="836,1767,1023,1855">
+<area shape="rect" id="node13" href="site_assocs.html" target="_top" title="site_assocs" alt="" coords="846,743,1013,831">
+<area shape="rect" id="node14" href="site_crown_land_contaminated.html" target="_top" title="site_crown_land_contaminated" alt="" coords="767,1556,1092,1644">
+<area shape="rect" id="node15" href="site_doc_partics.html" target="_top" title="site_doc_partics" alt="" coords="1137,508,1343,596">
+<area shape="rect" id="node16" href="site_docs.html" target="_top" title="site_docs" alt="" coords="853,216,1005,304">
+<area shape="rect" id="node17" href="site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="1136,1487,1344,1692">
+<area shape="rect" id="node18" href="partic_role_cd.html" target="_top" title="partic_role_cd" alt="" coords="835,1944,1024,2032">
+<area shape="rect" id="node19" href="site_partics.html" target="_top" title="site_partics" alt="" coords="783,1059,1076,1539">
+<area shape="rect" id="node20" href="site_profiles.html" target="_top" title="site_profiles" alt="" coords="841,111,1017,199">
+<area shape="rect" id="node21" href="site_staffs.html" target="_top" title="site_staffs" alt="" coords="849,2049,1009,2137">
+<area shape="rect" id="node22" href="site_subdivisions.html" target="_top" title="site_subdivisions" alt="" coords="823,848,1036,936">
+<area shape="rect" id="node26" href="snapshots.html" target="_top" title="snapshots" alt="" coords="849,953,1010,1041">
 </map>
                                         <a name='diagram'><img id="twoimpliedDegreeImg" src="../diagrams/tables/site_partics.implied2degrees.png" usemap="#twoDegreesRelationshipsDiagramImplied" class="diagram" border="0" align="left"></a>
                                     </div>

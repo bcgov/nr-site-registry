@@ -6,28 +6,17 @@ digraph "twoDegreesRelationshipsDiagramImplied" {
   "folio_contents":"elipses":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "land_histories":"elipses":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "mailout":"elipses":w -> "bce_region_cd":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
-  "mailout":"elipses":w -> "people_orgs":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "mailout":"elipses":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];
-  "people_orgs":"elipses":w -> "bce_region_cd":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "recent_views":"elipses":w -> "city_regions":"city":e [arrowhead=none dir=back arrowtail=crowodot style=dashed];
   "recent_views":"elipses":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "sis_addresses":"elipses":w -> "city_regions":"city":e [arrowhead=none dir=back arrowtail=crowodot style=dashed];
-  "sis_addresses":"elipses":w -> "people_orgs":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_assocs":"elipses":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_assocs":"elipses":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_crown_land_contaminated":"elipses":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=teeodot];
-  "site_crown_land_contaminated":"elipses":w -> "people_orgs":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_docs":"elipses":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_partic_roles":"elipses":w -> "site_partics":"id":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_partics":"psnorg_id":w -> "people_orgs":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_partics":"site_id":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_profile_owners":"elipses":w -> "site_partics":"id":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_profiles":"completor_partic_id":w -> "site_partics":"id":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_profiles":"contact_partic_id":w -> "site_partics":"id":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_profiles":"rwm_partic_id":w -> "site_partics":"id":e [arrowhead=none dir=back arrowtail=crowodot];
+  "site_partics":"elipses":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_profiles":"site_city":w -> "city_regions":"city":e [arrowhead=none dir=back arrowtail=crowodot style=dashed];
   "site_profiles":"site_id":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_profiles":"site_reg_partic_id":w -> "site_partics":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_subdivisions":"elipses":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_subdivisions":"elipses":w -> "subdivisions":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "sites":"bcer_code":w -> "bce_region_cd":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
@@ -125,17 +114,6 @@ digraph "twoDegreesRelationshipsDiagramImplied" {
     target="_top"
     tooltip="mailout"
   ];
-  "people_orgs" [
-   label=<
-    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
-      <TR><TD COLSPAN="3"  BGCOLOR="#f5f5f5"><TABLE BORDER="0" CELLSPACING="0"><TR><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="71" HEIGHT="16"><B>people_orgs</B></TD><TD ALIGN="RIGHT">[table]</TD></TR></TABLE></TD></TR>
-      <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#ffffff">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">  </TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">7 &gt;</TD></TR>
-    </TABLE>>
-    URL="people_orgs.html"
-    target="_top"
-    tooltip="people_orgs"
-  ];
   "recent_views" [
    label=<
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
@@ -191,38 +169,16 @@ digraph "twoDegreesRelationshipsDiagramImplied" {
     target="_top"
     tooltip="site_docs"
   ];
-  "site_partic_roles" [
-   label=<
-    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
-      <TR><TD COLSPAN="3"  BGCOLOR="#f5f5f5"><TABLE BORDER="0" CELLSPACING="0"><TR><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="96" HEIGHT="16"><B>site_partic_roles</B></TD><TD ALIGN="RIGHT">[table]</TD></TR></TABLE></TD></TR>
-      <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#ffffff">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">  </TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">  </TD></TR>
-    </TABLE>>
-    URL="site_partic_roles.html"
-    target="_top"
-    tooltip="site_partic_roles"
-  ];
   "site_partics" [
    label=<
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
       <TR><TD COLSPAN="3"  BGCOLOR="#f5f5f5"><TABLE BORDER="0" CELLSPACING="0"><TR><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="68" HEIGHT="16"><B>site_partics</B></TD><TD ALIGN="RIGHT">[table]</TD></TR></TABLE></TD></TR>
       <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#ffffff">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">  </TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">6 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#ffffff">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">  </TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">1 &gt;</TD></TR>
     </TABLE>>
     URL="site_partics.html"
     target="_top"
     tooltip="site_partics"
-  ];
-  "site_profile_owners" [
-   label=<
-    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
-      <TR><TD COLSPAN="3"  BGCOLOR="#f5f5f5"><TABLE BORDER="0" CELLSPACING="0"><TR><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="115" HEIGHT="16"><B>site_profile_owners</B></TD><TD ALIGN="RIGHT">[table]</TD></TR></TABLE></TD></TR>
-      <TR><TD PORT="elipses" COLSPAN="3" ALIGN="LEFT">...</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#ffffff">&lt; 1</TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">  </TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">  </TD></TR>
-    </TABLE>>
-    URL="site_profile_owners.html"
-    target="_top"
-    tooltip="site_profile_owners"
   ];
   "site_profiles" [
    label=<
@@ -242,7 +198,7 @@ digraph "twoDegreesRelationshipsDiagramImplied" {
       <TR><TD PORT="local_auth_date_submitted" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">local_auth_date_submitted</TD></TR></TABLE></TD><TD PORT="local_auth_date_submitted.type" ALIGN="LEFT">timestamp[29,6]</TD></TR>
       <TR><TD PORT="local_auth_date_forwarded" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">local_auth_date_forwarded</TD></TR></TABLE></TD><TD PORT="local_auth_date_forwarded.type" ALIGN="LEFT">timestamp[29,6]</TD></TR>
       <TR><TD PORT="rwm_date_received" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">rwm_date_received</TD></TR></TABLE></TD><TD PORT="rwm_date_received.type" ALIGN="LEFT">timestamp[29,6]</TD></TR>
-      <TR><TD PORT="rwm_partic_id" COLSPAN="2" BGCOLOR="#ffffff" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"><IMG SRC="../../images/foreignKeys.png"/></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">rwm_partic_id</TD></TR></TABLE></TD><TD PORT="rwm_partic_id.type" ALIGN="LEFT">int8[19]</TD></TR>
+      <TR><TD PORT="rwm_partic_id" COLSPAN="2" BGCOLOR="#ffffff" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">rwm_partic_id</TD></TR></TABLE></TD><TD PORT="rwm_partic_id.type" ALIGN="LEFT">int8[19]</TD></TR>
       <TR><TD PORT="rwm_phone_area_code" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">rwm_phone_area_code</TD></TR></TABLE></TD><TD PORT="rwm_phone_area_code.type" ALIGN="LEFT">varchar[3]</TD></TR>
       <TR><TD PORT="rwm_phone_no" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">rwm_phone_no</TD></TR></TABLE></TD><TD PORT="rwm_phone_no.type" ALIGN="LEFT">varchar[7]</TD></TR>
       <TR><TD PORT="rwm_fax_area_code" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">rwm_fax_area_code</TD></TR></TABLE></TD><TD PORT="rwm_fax_area_code.type" ALIGN="LEFT">varchar[3]</TD></TR>
@@ -251,7 +207,7 @@ digraph "twoDegreesRelationshipsDiagramImplied" {
       <TR><TD PORT="rwm_date_decision" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">rwm_date_decision</TD></TR></TABLE></TD><TD PORT="rwm_date_decision.type" ALIGN="LEFT">timestamp[29,6]</TD></TR>
       <TR><TD PORT="site_reg_date_recd" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">site_reg_date_recd</TD></TR></TABLE></TD><TD PORT="site_reg_date_recd.type" ALIGN="LEFT">timestamp[29,6]</TD></TR>
       <TR><TD PORT="site_reg_date_entered" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">site_reg_date_entered</TD></TR></TABLE></TD><TD PORT="site_reg_date_entered.type" ALIGN="LEFT">timestamp[29,6]</TD></TR>
-      <TR><TD PORT="site_reg_partic_id" COLSPAN="2" BGCOLOR="#ffffff" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"><IMG SRC="../../images/foreignKeys.png"/></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">site_reg_partic_id</TD></TR></TABLE></TD><TD PORT="site_reg_partic_id.type" ALIGN="LEFT">int8[19]</TD></TR>
+      <TR><TD PORT="site_reg_partic_id" COLSPAN="2" BGCOLOR="#ffffff" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">site_reg_partic_id</TD></TR></TABLE></TD><TD PORT="site_reg_partic_id.type" ALIGN="LEFT">int8[19]</TD></TR>
       <TR><TD PORT="owner_partic_id" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">owner_partic_id</TD></TR></TABLE></TD><TD PORT="owner_partic_id.type" ALIGN="LEFT">int8[19]</TD></TR>
       <TR><TD PORT="site_address" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">site_address</TD></TR></TABLE></TD><TD PORT="site_address.type" ALIGN="LEFT">varchar[100]</TD></TR>
       <TR><TD PORT="site_city" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"><IMG SRC="../../images/foreignKeys.png"/></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">site_city</TD></TR></TABLE></TD><TD PORT="site_city.type" ALIGN="LEFT">varchar[30]</TD></TR>
@@ -273,12 +229,10 @@ digraph "twoDegreesRelationshipsDiagramImplied" {
       <TR><TD PORT="planned_activity_comment" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">planned_activity_comment</TD></TR></TABLE></TD><TD PORT="planned_activity_comment.type" ALIGN="LEFT">varchar[2000]</TD></TR>
       <TR><TD PORT="site_disclosure_comment" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">site_disclosure_comment</TD></TR></TABLE></TD><TD PORT="site_disclosure_comment.type" ALIGN="LEFT">varchar[2000]</TD></TR>
       <TR><TD PORT="gov_documents_comment" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">gov_documents_comment</TD></TR></TABLE></TD><TD PORT="gov_documents_comment.type" ALIGN="LEFT">varchar[2000]</TD></TR>
-      <TR><TD PORT="completor_partic_id" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"><IMG SRC="../../images/foreignKeys.png"/></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">completor_partic_id</TD></TR></TABLE></TD><TD PORT="completor_partic_id.type" ALIGN="LEFT">int8[19]</TD></TR>
-      <TR><TD PORT="contact_partic_id" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"><IMG SRC="../../images/foreignKeys.png"/></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">contact_partic_id</TD></TR></TABLE></TD><TD PORT="contact_partic_id.type" ALIGN="LEFT">int8[19]</TD></TR>
       <TR><TD PORT="user_action" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">user_action</TD></TR></TABLE></TD><TD PORT="user_action.type" ALIGN="LEFT">varchar[30]</TD></TR>
       <TR><TD PORT="sr_action" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">sr_action</TD></TR></TABLE></TD><TD PORT="sr_action.type" ALIGN="LEFT">varchar[30]</TD></TR>
       <TR><TD PORT="id" COLSPAN="2" ALIGN="LEFT"><TABLE BORDER="0" CELLSPACING="0" ALIGN="LEFT"><TR ALIGN="LEFT"><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="15" HEIGHT="16"><IMG SRC="../../images/primaryKeys.png"/></TD><TD ALIGN="LEFT" FIXEDSIZE="TRUE" WIDTH="169" HEIGHT="16">id</TD></TR></TABLE></TD><TD PORT="id.type" ALIGN="LEFT">uuid[2147483647]</TD></TR>
-      <TR><TD ALIGN="LEFT" BGCOLOR="#ffffff">&lt; 6</TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">  </TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">0 &gt;</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#ffffff">&lt; 2</TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">  </TD><TD ALIGN="RIGHT" BGCOLOR="#ffffff">0 &gt;</TD></TR>
     </TABLE>>
     URL="site_profiles.html"
     target="_top"

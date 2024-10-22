@@ -166,7 +166,7 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="who_updated" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="6" name="when_created" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="7" name="when_updated" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="rwm_flag" nullable="false" remarks="" size="5" type="int2" typeCode="5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="rwm_flag" nullable="true" remarks="" size="5" type="int2" typeCode="5"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="user_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="sr_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="11" name="id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
@@ -256,8 +256,8 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="who_updated" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="13" name="when_created" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="14" name="when_updated" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="rwm_flag" nullable="false" remarks="" size="5" type="int2" typeCode="5"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="rwm_note_flag" nullable="false" remarks="" size="5" type="int2" typeCode="5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="rwm_flag" nullable="true" remarks="" size="5" type="int2" typeCode="5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="rwm_note_flag" nullable="true" remarks="" size="5" type="int2" typeCode="5"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="17" name="rwm_approval_date" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="ecls_code" nullable="false" remarks="" size="6" type="varchar" typeCode="12">
             <parent column="ecls_code" foreignKey="FK_07f172ed34b648e7f3282aeb305" implied="false" onDeleteCascade="false" schema="sites" table="event_type_cd"/>
@@ -752,8 +752,8 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="who_updated" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="6" name="when_created" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="7" name="when_updated" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="rwm_flag" nullable="false" remarks="" size="5" type="int2" typeCode="5"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="rwm_note_flag" nullable="false" remarks="" size="5" type="int2" typeCode="5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="rwm_flag" nullable="true" remarks="" size="5" type="int2" typeCode="5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="rwm_note_flag" nullable="true" remarks="" size="5" type="int2" typeCode="5"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="common_pid" nullable="false" remarks="" size="1" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="user_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="sr_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
@@ -938,7 +938,7 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="who_updated" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="when_created" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="5" name="when_updated" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="rwm_flag" nullable="false" remarks="" size="5" type="int2" typeCode="5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="rwm_flag" nullable="true" remarks="" size="5" type="int2" typeCode="5"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="user_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="sr_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="9" name="id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
@@ -966,11 +966,6 @@
       <table name="site_partics" remarks="" schema="sites" type="TABLE">
          <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="id" nullable="false" remarks="" size="19" type="int8" typeCode="-5">
             <child column="sp_id" foreignKey="FK_4171a309de795d40009f2049ca7" implied="false" onDeleteCascade="true" schema="sites" table="site_partic_roles"/>
-            <child column="sp_id" foreignKey="FK_43192994f2226491bec18fec2cd" implied="false" onDeleteCascade="false" schema="sites" table="site_profile_owners"/>
-            <child column="completor_partic_id" foreignKey="FK_aafdda946ab5c8dd00cae4d9544" implied="false" onDeleteCascade="false" schema="sites" table="site_profiles"/>
-            <child column="contact_partic_id" foreignKey="FK_c67f7496519aa992316fe7b4b21" implied="false" onDeleteCascade="false" schema="sites" table="site_profiles"/>
-            <child column="rwm_partic_id" foreignKey="FK_07815f2409991b176f8b9ea1755" implied="false" onDeleteCascade="false" schema="sites" table="site_profiles"/>
-            <child column="site_reg_partic_id" foreignKey="FK_371e7c30224542fe70e1b3e84a7" implied="false" onDeleteCascade="false" schema="sites" table="site_profiles"/>
          </column>
          <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="site_id" nullable="false" remarks="" size="19" type="int8" typeCode="-5">
             <parent column="id" foreignKey="FK_73ea22c3bcdc161fa9ede8de094" implied="false" onDeleteCascade="true" schema="sites" table="sites"/>
@@ -985,8 +980,8 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="who_updated" nullable="true" remarks="" size="30" type="bpchar" typeCode="1"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="8" name="when_created" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="9" name="when_updated" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="rwm_flag" nullable="false" remarks="" size="5" type="int2" typeCode="5"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="rwm_note_flag" nullable="false" remarks="" size="5" type="int2" typeCode="5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="rwm_flag" nullable="true" remarks="" size="5" type="int2" typeCode="5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="rwm_note_flag" nullable="true" remarks="" size="5" type="int2" typeCode="5"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="user_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="sr_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <primaryKey column="id" sequenceNumberInPK="1"/>
@@ -1031,9 +1026,7 @@
       <table name="site_profile_owners" remarks="" schema="sites" type="TABLE">
          <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="site_id" nullable="false" remarks="" size="19" type="int8" typeCode="-5"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="1" name="date_completed" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="sp_id" nullable="false" remarks="" size="19" type="int8" typeCode="-5">
-            <parent column="id" foreignKey="FK_43192994f2226491bec18fec2cd" implied="false" onDeleteCascade="false" schema="sites" table="site_partics"/>
-         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="sp_id" nullable="false" remarks="" size="19" type="int8" typeCode="-5"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="owner_company_contact" nullable="true" remarks="" size="150" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="agent_authorized_ind" nullable="true" remarks="" size="1" type="varchar" typeCode="12"/>
          <primaryKey column="site_id" sequenceNumberInPK="1"/>
@@ -1074,9 +1067,7 @@
          <column autoUpdated="false" defaultValue="null" digits="6" id="11" name="local_auth_date_submitted" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="12" name="local_auth_date_forwarded" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="13" name="rwm_date_received" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="rwm_partic_id" nullable="true" remarks="" size="19" type="int8" typeCode="-5">
-            <parent column="id" foreignKey="FK_07815f2409991b176f8b9ea1755" implied="false" onDeleteCascade="false" schema="sites" table="site_partics"/>
-         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="rwm_partic_id" nullable="true" remarks="" size="19" type="int8" typeCode="-5"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="rwm_phone_area_code" nullable="true" remarks="" size="3" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="rwm_phone_no" nullable="true" remarks="" size="7" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="rwm_fax_area_code" nullable="true" remarks="" size="3" type="varchar" typeCode="12"/>
@@ -1085,9 +1076,7 @@
          <column autoUpdated="false" defaultValue="null" digits="6" id="20" name="rwm_date_decision" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="21" name="site_reg_date_recd" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="22" name="site_reg_date_entered" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="23" name="site_reg_partic_id" nullable="true" remarks="" size="19" type="int8" typeCode="-5">
-            <parent column="id" foreignKey="FK_371e7c30224542fe70e1b3e84a7" implied="false" onDeleteCascade="false" schema="sites" table="site_partics"/>
-         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="23" name="site_reg_partic_id" nullable="true" remarks="" size="19" type="int8" typeCode="-5"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="24" name="owner_partic_id" nullable="true" remarks="" size="19" type="int8" typeCode="-5"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="25" name="site_address" nullable="true" remarks="" size="100" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="26" name="site_city" nullable="true" remarks="" size="30" type="varchar" typeCode="12">
@@ -1111,15 +1100,9 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="42" name="planned_activity_comment" nullable="true" remarks="" size="2000" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="43" name="site_disclosure_comment" nullable="true" remarks="" size="2000" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="44" name="gov_documents_comment" nullable="true" remarks="" size="2000" type="varchar" typeCode="12"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="45" name="completor_partic_id" nullable="true" remarks="" size="19" type="int8" typeCode="-5">
-            <parent column="id" foreignKey="FK_aafdda946ab5c8dd00cae4d9544" implied="false" onDeleteCascade="false" schema="sites" table="site_partics"/>
-         </column>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="46" name="contact_partic_id" nullable="true" remarks="" size="19" type="int8" typeCode="-5">
-            <parent column="id" foreignKey="FK_c67f7496519aa992316fe7b4b21" implied="false" onDeleteCascade="false" schema="sites" table="site_partics"/>
-         </column>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="47" name="user_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="48" name="sr_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
-         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="49" name="id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="45" name="user_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="46" name="sr_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="47" name="id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
          <primaryKey column="id" sequenceNumberInPK="1"/>
          <index name="PK_ff8a337252eb6cc03fa239c86c8" unique="true">
             <column ascending="true" name="id"/>

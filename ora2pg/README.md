@@ -1,5 +1,5 @@
 # ora2pg Docker 
-Container image for migrating from oracle to postgresql database.
+Container image for migrating data from oracle to postgresql database.
 
 ## Introduction
 
@@ -9,7 +9,7 @@ Documentation: https://ora2pg.darold.net/documentation.html
 
 ## How to build
 
-Update the oracle connection string in the "ora2pg.conf" file
+Update the oracle connection string by modifying the values for ORACLE_DSN, ORACLE_USER and ORACLE_PWD in the "ora2pg.conf" file and execute the below command
 
 ```
 docker build . -t ora2pg

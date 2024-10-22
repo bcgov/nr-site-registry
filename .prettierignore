@@ -1,2 +1,2 @@
-frontend/site-registry/src/graphql/generated.ts
-frontend/site-registry/graphql.schema.json
+frontend/src/graphql/generated.ts
+frontend/graphql.schema.json

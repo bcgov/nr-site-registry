@@ -41,7 +41,7 @@ spec:
               protocol: TCP
           readinessProbe:
             httpGet:
-              path: /
+              path: /health
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 5
@@ -54,7 +54,7 @@ spec:
             successThreshold: 1
             failureThreshold: 3
             httpGet:
-              path: /
+              path: /health
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 15
@@ -62,11 +62,11 @@ spec:
             timeoutSeconds: 5
           resources:
             limits:
-              cpu: 100m
-              memory: 150Mi
-            requests:
               cpu: 30m
-              memory: 50Mi
+              memory: 75Mi
+            requests:
+              cpu: 15m
+              memory: 25Mi
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

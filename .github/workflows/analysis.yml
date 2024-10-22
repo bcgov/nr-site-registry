@@ -56,7 +56,7 @@ jobs:
           sonar_args: >
             -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts,src/app/migrations/
             -Dsonar.organization=bcgov-sonarcloud
-            -Dsonar.projectKey=bcgov-sonarcloud_nr-site-registry-${{ matrix.dir }}
+            -Dsonar.projectKey=nr-site-registry-${{ matrix.dir }}
             -Dsonar.sources=src
             -Dsonar.tests.inclusions=**/*spec.ts
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info

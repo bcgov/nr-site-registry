@@ -33,16 +33,6 @@ spec:
           image: "{{.Values.global.registry}}/{{.Values.global.repository}}/frontend:{{ .Values.global.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ default "Always" .Values.frontend.imagePullPolicy }}
           env:
-            - name: REACT_APP_BACKEND_API
-              value: "https://{{ .Release.Name }}-backend.{{ .Values.global.domain }}"
-            - name: REACT_APP_AUTH_AUTHORITY
-              # value: "https://epd-keycloak-dev.{{ .Values.global.domain }}/auth/realms/forms-flow-ai/"
-              value: "https://epd-keycloak-dev.{{ .Values.global.domain }}/auth/realms/${{ secrets.KEYCLOAK_REALM }}/"
-            - name: REACT_APP_AUTH_CLIENT_ID
-              value: TODO-GET-NEW-CLIENT
-            - name: APP_AUTH_REDIRECT_URI
-              value: "https://{{ lower (include "frontend.fullname" .) }}.{{ .Values.global.domain }}"
-            - name: REACT_APP_
             - name: LOG_LEVEL
               value: "info"
           ports:

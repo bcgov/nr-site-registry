@@ -1,97 +1,78 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Documents from './Documents';
-import { Provider, useSelector } from 'react-redux';
+import { Provider, useSelector, useDispatch } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { UserType } from '../../../helpers/requests/userType';
 import { GetDocumentsConfig } from './DocumentsConfig';
 
+const mockDocuments = [
+  {
+    id: '3133',
+    siteId: '1550',
+    psnorgId: '622',
+    submissionDate: '1989-11-23T08:00:00.000Z',
+    documentDate: '1989-11-23T08:00:00.000Z',
+    title: 'SUBSURFACE MONITORING',
+    displayName: 'HARDY BBT LIMITED (KAMLOOPS B.C.)',
+  },
+  {
+    id: '3135',
+    siteId: '1550',
+    psnorgId: '57',
+    submissionDate: '1993-04-13T07:00:00.000Z',
+    documentDate: '1993-03-22T08:00:00.000Z',
+    title: 'VAPOUR SAMPLE TESTS MONTE CREEK ESSO',
+    displayName: 'BROWN, DAVID J.',
+  },
+  {
+    id: '3138',
+    siteId: '1550',
+    psnorgId: '3694',
+    submissionDate: '1995-04-18T07:00:00.000Z',
+    documentDate: '1995-04-18T07:00:00.000Z',
+    title: 'ENVIRONMENTAL SERVICES VAPOUR AND GROUNDWATER SAMPLING REPORT',
+    displayName: 'Y.B. HOLDINGS LTD. (KAMLOOPS, B.C.)',
+  },
+];
+
 // Mocking the useSelector hook with the correct state structure
-jest.mock('react-redux', () => ({
-  ...jest.requireActual('react-redux'),
-  useSelector: jest.fn(() => ({
-    documents: {
-      siteDocuments: [
-        {
-          id: '3133',
-          siteId: '1550',
-          psnorgId: '622',
-          submissionDate: '1989-11-23T08:00:00.000Z',
-          documentDate: '1989-11-23T08:00:00.000Z',
-          title: 'SUBSURFACE MONITORING',
-          displayName: 'HARDY BBT LIMITED (KAMLOOPS B.C.)',
-        },
-        {
-          id: '3135',
-          siteId: '1550',
-          psnorgId: '57',
-          submissionDate: '1993-04-13T07:00:00.000Z',
-          documentDate: '1993-03-22T08:00:00.000Z',
-          title: 'VAPOUR SAMPLE TESTS MONTE CREEK ESSO',
-          displayName: 'BROWN, DAVID J.',
-        },
-        {
-          id: '3138',
-          siteId: '1550',
-          psnorgId: '3694',
-          submissionDate: '1995-04-18T07:00:00.000Z',
-          documentDate: '1995-04-18T07:00:00.000Z',
-          title:
-            'ENVIRONMENTAL SERVICES VAPOUR AND GROUNDWATER SAMPLING REPORT',
-          displayName: 'Y.B. HOLDINGS LTD. (KAMLOOPS, B.C.)',
-        },
-      ],
-      status: 'success',
-      error: '',
-    },
-    sites: {
-      siteDetailsMode: 'edit',
-      resetSiteDetails: false,
-    },
-  })),
-  useDispatch: jest.fn(() => ({
-    documents: {
-      siteDocuments: [
-        {
-          id: '3133',
-          siteId: '1550',
-          psnorgId: '622',
-          submissionDate: '1989-11-23T08:00:00.000Z',
-          documentDate: '1989-11-23T08:00:00.000Z',
-          title: 'SUBSURFACE MONITORING',
-          displayName: 'HARDY BBT LIMITED (KAMLOOPS B.C.)',
-        },
-        {
-          id: '3135',
-          siteId: '1550',
-          psnorgId: '57',
-          submissionDate: '1993-04-13T07:00:00.000Z',
-          documentDate: '1993-03-22T08:00:00.000Z',
-          title: 'VAPOUR SAMPLE TESTS MONTE CREEK ESSO',
-          displayName: 'BROWN, DAVID J.',
-        },
-        {
-          id: '3138',
-          siteId: '1550',
-          psnorgId: '3694',
-          submissionDate: '1995-04-18T07:00:00.000Z',
-          documentDate: '1995-04-18T07:00:00.000Z',
-          title:
-            'ENVIRONMENTAL SERVICES VAPOUR AND GROUNDWATER SAMPLING REPORT',
-          displayName: 'Y.B. HOLDINGS LTD. (KAMLOOPS, B.C.)',
-        },
-      ],
-      status: 'edit',
-      error: '',
-    },
-    sites: {
-      siteDetailsMode: 'edit',
-      userType: 'Internal',
-      resetSiteDetails: false,
-    },
-  })),
-}));
+jest.mock('react-redux', () => {
+  const actualRedux = jest.requireActual('react-redux');
+  return {
+    ...actualRedux,
+    useSelector: jest.fn(() => ({
+      documents: {
+        siteDocuments: mockDocuments,
+        status: 'success',
+        error: '',
+      },
+      sites: {
+        siteDetailsMode: 'edit',
+        resetSiteDetails: false,
+      },
+      siteDetails: {
+        saveRequestStatus: 'success',
+      },
+    })),
+    useDispatch: jest.fn(() => ({
+      documents: {
+        siteDocuments: mockDocuments,
+        status: 'edit',
+        error: '',
+      },
+      sites: {
+        siteDetailsMode: 'edit',
+        userType: 'Internal',
+        resetSiteDetails: false,
+      },
+      siteDetails: {
+        saveRequestStatus: 'success',
+      },
+    })),
+  };
+});
 
 // Example of a Jest mock for GetDocumentsConfig
 jest.mock('./DocumentsConfig', () => ({
@@ -250,40 +231,13 @@ const mockStore = configureStore([thunk]);
 
 describe('Documents component', () => {
   let store;
-
+  let dispatch;
   beforeEach(() => {
+    dispatch = jest.fn(); // Create a mock dispatch function
+
     store = mockStore({
       documents: {
-        siteDocuments: [
-          {
-            id: '3133',
-            siteId: '1550',
-            psnorgId: '622',
-            submissionDate: '1989-11-23T08:00:00.000Z',
-            documentDate: '1989-11-23T08:00:00.000Z',
-            title: 'SUBSURFACE MONITORING',
-            displayName: 'HARDY BBT LIMITED (KAMLOOPS B.C.)',
-          },
-          {
-            id: '3135',
-            siteId: '1550',
-            psnorgId: '57',
-            submissionDate: '1993-04-13T07:00:00.000Z',
-            documentDate: '1993-03-22T08:00:00.000Z',
-            title: 'VAPOUR SAMPLE TESTS MONTE CREEK ESSO',
-            displayName: 'BROWN, DAVID J.',
-          },
-          {
-            id: '3138',
-            siteId: '1550',
-            psnorgId: '3694',
-            submissionDate: '1995-04-18T07:00:00.000Z',
-            documentDate: '1995-04-18T07:00:00.000Z',
-            title:
-              'ENVIRONMENTAL SERVICES VAPOUR AND GROUNDWATER SAMPLING REPORT',
-            displayName: 'Y.B. HOLDINGS LTD. (KAMLOOPS, B.C.)',
-          },
-        ],
+        siteDocuments: mockDocuments,
         status: 'success',
         error: '',
       },
@@ -453,41 +407,17 @@ describe('Documents component', () => {
           resetSiteDetails: false,
         },
         documents: {
-          siteDocuments: [
-            {
-              id: '3133',
-              siteId: '1550',
-              psnorgId: '622',
-              submissionDate: '1989-11-23T08:00:00.000Z',
-              documentDate: '1989-11-23T08:00:00.000Z',
-              title: 'SUBSURFACE MONITORING',
-              displayName: 'HARDY BBT LIMITED (KAMLOOPS B.C.)',
-            },
-            {
-              id: '3135',
-              siteId: '1550',
-              psnorgId: '57',
-              submissionDate: '1993-04-13T07:00:00.000Z',
-              documentDate: '1993-03-22T08:00:00.000Z',
-              title: 'VAPOUR SAMPLE TESTS MONTE CREEK ESSO',
-              displayName: 'BROWN, DAVID J.',
-            },
-            {
-              id: '3138',
-              siteId: '1550',
-              psnorgId: '3694',
-              submissionDate: '1995-04-18T07:00:00.000Z',
-              documentDate: '1995-04-18T07:00:00.000Z',
-              title:
-                'ENVIRONMENTAL SERVICES VAPOUR AND GROUNDWATER SAMPLING REPORT',
-              displayName: 'Y.B. HOLDINGS LTD. (KAMLOOPS, B.C.)',
-            },
-          ],
+          siteDocuments: mockDocuments,
           status: 'success',
           error: '',
         },
+        siteDetails: {
+          saveRequestStatus: 'success',
+        },
       });
     });
+
+    useDispatch.mockReturnValue(dispatch); // Return the mock dispatch function
   });
 
   afterEach(() => {
@@ -497,7 +427,7 @@ describe('Documents component', () => {
   it('renders Documents component', () => {
     render(
       <Provider store={store}>
-        <Documents />
+        <Documents showPending={false} />
       </Provider>,
     );
     const documentsComponent = screen.getByTestId('document-component');
@@ -507,7 +437,7 @@ describe('Documents component', () => {
   it('search functionality works correctly', async () => {
     render(
       <Provider store={store}>
-        <Documents />
+        <Documents showPending={false} />
       </Provider>,
     );
 
@@ -528,7 +458,7 @@ describe('Documents component', () => {
   it('clearing the search works correctly', async () => {
     render(
       <Provider store={store}>
-        <Documents />
+        <Documents showPending={false} />
       </Provider>,
     );
 

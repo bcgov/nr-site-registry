@@ -7,8 +7,8 @@ import { EventClassCd } from '../../entities/eventClassCd.entity';
 import { EventTypeCd } from '../../entities/eventTypeCd.entity';
 import { EventParticRoleCd } from '../../entities/eventParticRoleCd.entity';
 import { LoggerService } from '../../logger/logger.service';
-import { User } from 'src/app/entities/user.entity';
-import { DropdownDto } from 'src/app/dto/dropdown.dto';
+import { User } from '../../entities/user.entity';
+import { DropdownDto } from '../../dto/dropdown.dto';
 
 @Injectable()
 export class DropdownService {

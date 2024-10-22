@@ -27,19 +27,11 @@ jobs:
     name: Deploys to TEST
     uses: ./.github/workflows/.deployer.yml
     secrets: inherit
-    needs: [get-pr-info] 
+    needs: [get-pr-info]
     with:
       environment: test
       tag:  '${{ needs.get-pr-info.outputs.pr }}'
-      params:
-        --set backendSites.deploymentStrategy=RollingUpdate
-        --set frontendSiteRegistry.deploymentStrategy=RollingUpdate
-        --set global.autoscaling=true
-        --set backendSites.pdb.enabled=true
-        --set frontendSiteRegistry.pdb.enabled=true
-        --set backendSites.autoscaling.minReplicas=2
-        --set frontendSiteRegistry.autoscaling.minReplicas=2
-        --set global.registry=artifacts.developer.gov.bc.ca/github-docker-remote
+      values: 'values.yaml' # TEST env specific values file
 
 
   schemaspy:

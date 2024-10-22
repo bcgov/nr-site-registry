@@ -153,7 +153,6 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Handle view mode changes
   useEffect(() => {
     setViewMode(mode);
-    dispatch(setupSiteDisclosureDataForSaving(disclosureData));
   }, [mode]);
 
   // Search internal contact effect with debounce
@@ -293,7 +292,9 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
         };
       };
       const updatedFormData = updatedDisclosure(formData);
-      const updatedTrackDisclosure = updatedDisclosure(trackSiteDisclosure);
+      const updatedTrackDisclosure = updatedDisclosure(
+        trackSiteDisclosure ?? formData,
+      );
       setFormData(updatedFormData);
       dispatch(updateSiteDisclosure(serializeDate(updatedFormData)));
       dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
@@ -373,7 +374,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       const updatedFormData = updateReferences(formData);
 
       //need to uncomment it once get the actual source of data
-      // const updatedTrackDisclosure = updateRefernces(trackSiteDisclosure);
+      // const updatedTrackDisclosure = updateRefernces(trackSiteDisclosure ?? formData);
 
       setFormData(updatedFormData);
       dispatch(updateSiteDisclosure(updatedFormData));
@@ -443,7 +444,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     const updatedFormData = updateDisclosure(formData);
 
     //need to uncomment it once get the actual source of data
-    // const updatedTrackDisclosure = updateDisclosure(trackSiteDisclosure);
+    // const updatedTrackDisclosure = updateDisclosure(trackSiteDisclosure ?? formData);
 
     setFormData(updatedFormData);
     dispatch(updateSiteDisclosure(updatedFormData));
@@ -495,7 +496,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       const updatedFormData = updateReferences(formData);
 
       //need to uncomment it once get the actual source of data
-      // const updatedTrackDisclosure = updateRefernces(trackSiteDisclosure);
+      // const updatedTrackDisclosure = updateRefernces(trackSiteDisclosure ?? formData);
 
       // Filter out participants based on selectedRows for formData
       const filteredDisclosure = {

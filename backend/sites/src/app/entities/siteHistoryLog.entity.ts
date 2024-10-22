@@ -22,5 +22,5 @@ export class HistoryLog extends BaseAuditEntity {
 
   @Field(() => GraphQLJSON)
   @Column('jsonb', { name: 'data' })
-  content:  Record<string, any>
+  content: Record<string, any>;
 }

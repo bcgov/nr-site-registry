@@ -3,10 +3,12 @@ import { UserService } from './user.service';
 import { User } from '../../entities/user.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { LoggerService } from '../../logger/logger.service';
 
 describe('UserService', () => {
   let userService: UserService;
   let usersRepository: Repository<User>;
+  let loggerService: LoggerService;
 
   const user: User = {
     firstName: 'john',
@@ -29,12 +31,15 @@ describe('UserService', () => {
           provide: getRepositoryToken(User),
           useClass: Repository,
         },
+        LoggerService,
       ],
     }).compile();
 
     userService = module.get<UserService>(UserService);
 
     usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
+
+    loggerService = module.get<LoggerService>(LoggerService);
   });
 
   afterEach(() => {

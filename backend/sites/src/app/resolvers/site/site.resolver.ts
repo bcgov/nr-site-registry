@@ -253,36 +253,28 @@ export class SiteResolver {
     @Args('page', { type: () => String }) page: number,
     @Args('pageSize', { type: () => String }) pageSize: number,
   ) {
-    try {
-      this.sitesLogger.log(
-        'SiteResolver.getPendingSiteForSRApproval() start dto:' +
-          ' ' +
-          JSON.stringify(searchParam) +
-          ' page ' +
-          page +
-          ' pageSize ' +
-          pageSize,
-      );
-
-      const result = await this.siteService.getSiteDetailsPendingSRApproval(
-        searchParam,
-        page,
+    this.sitesLogger.log(
+      'SiteResolver.getPendingSiteForSRApproval() start dto:' +
+        ' ' +
+        JSON.stringify(searchParam) +
+        ' page ' +
+        page +
+        ' pageSize ' +
         pageSize,
-      );
+    );
 
-      return this.siteApprovalResponseProvider.createResponse(
-        'getPendingSiteForSRApproval response',
-        200,
-        true,
-        result,
-      );
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in SiteResolver.getPendingSiteForSRApproval()  end',
-        JSON.stringify(error),
-      );
-      throw new Error('System Error, Please try again.');
-    }
+    const result = await this.siteService.getSiteDetailsPendingSRApproval(
+      searchParam,
+      page,
+      pageSize,
+    );
+
+    return this.siteApprovalResponseProvider.createResponse(
+      'getPendingSiteForSRApproval response',
+      200,
+      true,
+      result,
+    );
   }
 
   @Roles({ roles: [CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
@@ -297,36 +289,28 @@ export class SiteResolver {
         ' ' +
         JSON.stringify(approveRejectDTO),
     );
-    try {
-      let message = false;
+    let message = false;
 
-      message = await this.siteService.bulkUpdateForSR(approveRejectDTO, user);
+    message = await this.siteService.bulkUpdateForSR(approveRejectDTO, user);
 
-      if (message) {
-        this.sitesLogger.log(
-          'SiteResolver.bulkAproveRejectChanges()  RES:200 end',
-        );
-        return this.genericResponseProvider.createResponse(
-          'Successfully updated sites.',
-          200,
-          true,
-        );
-      } else {
-        this.sitesLogger.log(
-          'SiteResolver.bulkAproveRejectChanges()  RES:500 end',
-        );
-        return this.genericResponseProvider.createResponse(
-          `Unable to update sites. `,
-          500,
-          false,
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in SiteResolver.bulkAproveRejectChanges()  end',
-        JSON.stringify(error),
+    if (message) {
+      this.sitesLogger.log(
+        'SiteResolver.bulkAproveRejectChanges()  RES:200 end',
       );
-      throw new Error('System Error, Please try again.');
+      return this.genericResponseProvider.createResponse(
+        'Successfully updated sites.',
+        200,
+        true,
+      );
+    } else {
+      this.sitesLogger.log(
+        'SiteResolver.bulkAproveRejectChanges()  RES:500 end',
+      );
+      return this.genericResponseProvider.createResponse(
+        `Unable to update sites. `,
+        500,
+        false,
+      );
     }
   }
 }

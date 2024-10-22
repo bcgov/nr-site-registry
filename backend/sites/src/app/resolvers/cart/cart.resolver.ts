@@ -37,31 +37,23 @@ export class CartResolver {
     this.sitesLogger.log(
       'CartResolver.getCartItemsForUser() start userId:' + ' ' + userId,
     );
-    try {
-      const result = await this.cartService.getCartItemsForUser(user?.sub);
-      if (result.length > 0) {
-        this.sitesLogger.log('CartResolver.getCartItemsForUser() RES:200 end');
-        return this.genericResponseProvider.createResponse(
-          'Cart items fetched successfully',
-          200,
-          true,
-          result,
-        );
-      } else {
-        this.sitesLogger.log('CartResolver.getCartItemsForUser() RES:200 end');
-        return this.genericResponseProvider.createResponse(
-          `Cart items not found for user id: ${userId}`,
-          200,
-          true,
-          [],
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in CartResolver.getCartItemsForUser() end',
-        JSON.stringify(error),
+    const result = await this.cartService.getCartItemsForUser(user?.sub);
+    if (result.length > 0) {
+      this.sitesLogger.log('CartResolver.getCartItemsForUser() RES:200 end');
+      return this.genericResponseProvider.createResponse(
+        'Cart items fetched successfully',
+        200,
+        true,
+        result,
       );
-      throw new Error('System Error, Please try again.');
+    } else {
+      this.sitesLogger.log('CartResolver.getCartItemsForUser() RES:200 end');
+      return this.genericResponseProvider.createResponse(
+        `Cart items not found for user id: ${userId}`,
+        200,
+        true,
+        [],
+      );
     }
   }
 
@@ -77,29 +69,21 @@ export class CartResolver {
         ' ' +
         JSON.stringify(cartDTO),
     );
-    try {
-      const result = await this.cartService.addCartItem(cartDTO, user?.sub);
-      if (result) {
-        this.sitesLogger.log('CartResolver.addCartItem() RES:201 end');
-        return this.genericResponseProvider.createResponse(
-          'Items added to cart',
-          201,
-          true,
-        );
-      } else {
-        this.sitesLogger.log('CartResolver.addCartItem() RES:422 end');
-        return this.genericResponseProvider.createResponse(
-          'Unable to add items to cart',
-          422,
-          true,
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in CartResolver.addCartItem() end',
-        JSON.stringify(error),
+    const result = await this.cartService.addCartItem(cartDTO, user?.sub);
+    if (result) {
+      this.sitesLogger.log('CartResolver.addCartItem() RES:201 end');
+      return this.genericResponseProvider.createResponse(
+        'Items added to cart',
+        201,
+        true,
       );
-      throw new Error('System Error, Please try again.');
+    } else {
+      this.sitesLogger.log('CartResolver.addCartItem() RES:422 end');
+      return this.genericResponseProvider.createResponse(
+        'Unable to add items to cart',
+        422,
+        true,
+      );
     }
   }
 
@@ -119,33 +103,25 @@ export class CartResolver {
         ' ' +
         JSON.stringify(cartDeleteDTO),
     );
-    try {
-      const message = await this.cartService.deleteCartItem(
-        cartDeleteDTO,
-        user?.sub,
-      );
+    const message = await this.cartService.deleteCartItem(
+      cartDeleteDTO,
+      user?.sub,
+    );
 
-      if (message) {
-        this.sitesLogger.log('CartResolver.deleteCartItem() RES:200 end');
-        return this.genericResponseProvider.createResponse(
-          'Successfully deleted cart items.',
-          200,
-          true,
-        );
-      } else {
-        this.sitesLogger.log('CartResolver.deleteCartItem() RES:422 end');
-        return this.genericResponseProvider.createResponse(
-          `Unable to delete cart items. `,
-          422,
-          false,
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in CartResolver.deleteCartItem() end',
-        JSON.stringify(error),
+    if (message) {
+      this.sitesLogger.log('CartResolver.deleteCartItem() RES:200 end');
+      return this.genericResponseProvider.createResponse(
+        'Successfully deleted cart items.',
+        200,
+        true,
       );
-      throw new Error('System Error, Please try again.');
+    } else {
+      this.sitesLogger.log('CartResolver.deleteCartItem() RES:422 end');
+      return this.genericResponseProvider.createResponse(
+        `Unable to delete cart items. `,
+        422,
+        false,
+      );
     }
   }
 
@@ -160,28 +136,23 @@ export class CartResolver {
     cartDeleteDTO: CartDeleteDTOWithSiteID[],
     @AuthenticatedUser() user: any,
   ) {
-    try {
-      const message = await this.cartService.deleteCartWithSiteId(
-        cartDeleteDTO,
-        user?.sub,
-      );
+    const message = await this.cartService.deleteCartWithSiteId(
+      cartDeleteDTO,
+      user?.sub,
+    );
 
-      if (message) {
-        return this.genericResponseProvider.createResponse(
-          'Deleted cart items.',
-          200,
-          true,
-        );
-      } else {
-        return this.genericResponseProvider.createResponse(
-          `Unable to delete cart item. `,
-          422,
-          false,
-        );
-      }
-    } catch (error) {
-      console.log('Error', error);
-      throw new Error('System Error, Please try again.');
+    if (message) {
+      return this.genericResponseProvider.createResponse(
+        'Deleted cart items.',
+        200,
+        true,
+      );
+    } else {
+      return this.genericResponseProvider.createResponse(
+        `Unable to delete cart item. `,
+        422,
+        false,
+      );
     }
   }
 }

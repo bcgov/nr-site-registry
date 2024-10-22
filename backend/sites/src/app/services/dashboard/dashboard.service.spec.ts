@@ -93,7 +93,7 @@ describe('DashboardService', () => {
         .mockRejectedValueOnce(new Error('Database connection error'));
 
       await expect(service.getRecentViewsByUserId(userId)).rejects.toThrow(
-        'Database connection error',
+        `Failed to retrieve recent views for userId ${userId}`,
       );
     });
   });

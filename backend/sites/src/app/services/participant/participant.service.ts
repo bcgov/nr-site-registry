@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { SiteParticsDto } from '../../dto/sitePartics.dto';
@@ -90,8 +90,9 @@ export class ParticipantService {
         JSON.stringify(error),
       );
       // Log or handle the error as necessary
-      throw new Error(
-        `Failed to retrieve site participants by siteId: ${error.message}`,
+      throw new HttpException(
+        `Failed to retrieve site participants by siteId: ${siteId}`,
+        HttpStatus.NOT_FOUND,
       );
     }
   }

@@ -152,7 +152,9 @@ describe('NotationService', () => {
 
     it('should throw an error when repository throws an error', async () => {
       const siteId = 'site1';
-      const mockError = new Error('Failed to get site notation.');
+      const mockError = new Error(
+        `Failed to retrieve site notations by site ID: ${siteId}`,
+      );
       jest.spyOn(notationRepository, 'find').mockRejectedValueOnce(mockError);
 
       await expect(
@@ -391,7 +393,9 @@ describe('NotationService', () => {
 
     it('should throw an error when repository throws an error', async () => {
       const siteId = 'site1';
-      const mockError = new Error('Failed to get site notation.');
+      const mockError = new Error(
+        `Failed to retrieve site notations by site ID: ${siteId}`,
+      );
       jest.spyOn(notationRepository, 'find').mockRejectedValueOnce(mockError);
 
       await expect(

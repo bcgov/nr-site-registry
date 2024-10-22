@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Events } from '../../entities/events.entity';
@@ -115,7 +115,10 @@ export class NotationService {
         JSON.stringify(error),
       );
       // Handle or log the error as needed
-      throw new Error(`Failed to get site notation.`);
+      throw new HttpException(
+        `Failed to retrieve site notations by site ID: ${siteId}`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 }

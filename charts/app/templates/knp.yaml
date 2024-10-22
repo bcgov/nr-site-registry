@@ -35,7 +35,7 @@ spec:
       from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: {{ template "backendSites.name" . }}
+              app.kubernetes.io/name: {{ template "backend.name" . }}
               app.kubernetes.io/instance: {{ .Release.Name }}
   policyTypes:
     - Ingress
@@ -55,7 +55,7 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: {{ template "backendSites.name" . }}
+              app.kubernetes.io/name: {{ template "backend.name" . }}
               app.kubernetes.io/instance: {{ .Release.Name }}
   policyTypes:
     - Ingress
@@ -86,7 +86,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: {{ template "backendSites.name" . }}
+      app.kubernetes.io/name: {{ template "backend.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   ingress:
     - ports:

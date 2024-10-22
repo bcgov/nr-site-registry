@@ -30,7 +30,7 @@ jobs:
           artifact_name: "zap_backend"
           cmd_options: "-a"
           issue_title: "ZAP: Backend"
-          target: https://${{ env.PREFIX }}-backendsites.${{ env.DOMAIN }}
+          target: https://${{ env.PREFIX }}-backend.${{ env.DOMAIN }}
 
       - name: ZAP Scan - Frontend
         uses: zaproxy/action-full-scan@v0.11.0

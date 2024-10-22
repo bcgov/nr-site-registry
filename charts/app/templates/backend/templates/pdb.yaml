@@ -1,16 +1,16 @@
-{{- if .Values.backendSites.enabled }}
-{{- if and .Values.backendSites.pdb  .Values.backendSites.pdb.enabled }}
+{{- if .Values.backend.enabled }}
+{{- if and .Values.backend.pdb  .Values.backend.pdb.enabled }}
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "backendSites.fullname" . }}
+  name: {{ include "backend.fullname" . }}
   labels:
-    {{- include "backendSites.labels" . | nindent 4 }}
+    {{- include "backend.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "backendSites.selectorLabels" . | nindent 6 }}
-  minAvailable: {{ .Values.backendSites.pdb.minAvailable }}
+      {{- include "backend.selectorLabels" . | nindent 6 }}
+  minAvailable: {{ .Values.backend.pdb.minAvailable }}
 {{- end }}
 {{- end }}

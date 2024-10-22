@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "backendSites.name" -}}
+{{- define "backend.name" -}}
 {{- printf "backend" }}
 {{- end }}
 
@@ -10,10 +10,10 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "backendSites.fullname" -}}
-{{- $componentName := include "backendSites.name" .  }}
-{{- if .Values.backendSites.fullnameOverride }}
-{{- .Values.backendSites.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- define "backend.fullname" -}}
+{{- $componentName := include "backend.name" .  }}
+{{- if .Values.backend.fullnameOverride }}
+{{- .Values.backend.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
 {{- printf "%s-%s" .Release.Name $componentName | trunc 63 | trimSuffix "-" }}
 {{- end }}
@@ -22,20 +22,20 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Common labels
 */}}
-{{- define "backendSites.labels" -}}
-{{ include "backendSites.selectorLabels" . }}
+{{- define "backend.labels" -}}
+{{ include "backend.selectorLabels" . }}
 {{- if .Values.global.tag }}
 app.kubernetes.io/image-version: {{ .Values.global.tag | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-app.kubernetes.io/short-name: {{ include "backendSites.name" . }}
+app.kubernetes.io/short-name: {{ include "backend.name" . }}
 {{- end }}
 
 {{/*
 Selector labels
 */}}
-{{- define "backendSites.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "backendSites.name" . }}
+{{- define "backend.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "backend.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 

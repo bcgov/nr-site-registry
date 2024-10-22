@@ -8,7 +8,7 @@ global:
     enabled: true
     persist: false
 #-- the components of the application, backend.
-backendSites:
+backend:
   #-- enable or disable backend
   enabled: true
   #-- the deployment strategy, can be "Recreate" or "RollingUpdate"

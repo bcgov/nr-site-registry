@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../Store';
 import { saveRequestStatus } from '../SaveSiteDetailsSlice';
 import {
+  fetchParcelDescriptionsForApproval,
   fetchPendingAssociatedSites,
   fetchPendingDocumentsForApproval,
   fetchPendingLandUses,
@@ -17,6 +18,7 @@ import {
   selectDocuments,
   selectLandUsesData,
   selectNotationData,
+  selectParcelDescriptionData,
   selectSiteParticipants,
   selectSiteSummary,
   updateRequestStatus,
@@ -71,6 +73,9 @@ import {
   selectLandUseCodes,
 } from '../landUses/LandUsesSlice';
 import { getLandUseColumns } from '../landUses/LandUseColumnConfiguration';
+import ParcelDescriptionTable from '../parcelDescriptions/ParcelDescriptionTable';
+import { IFetchParcelDescriptionParams } from '../parcelDescriptions/parcelDescriptionsSlice';
+import { columns as columnConfigForParcelDescription } from '../parcelDescriptions/parcelDescriptionsConfig';
 
 const SRUpdates = () => {
   const siteSummaryData = useSelector(selectSiteSummary);
@@ -80,6 +85,7 @@ const SRUpdates = () => {
   const documentsData = useSelector(selectDocuments);
   const disclosureData = useSelector(selectDisclosure);
   const associatedSitesData = useSelector(selectAssociatedSites);
+  const parcelDescriptionData = useSelector(selectParcelDescriptionData);
 
   const updateRequestStatusFromState = useSelector(updateRequestStatus);
 
@@ -150,6 +156,46 @@ const SRUpdates = () => {
       },
     },
   ]);
+
+  const [parcelDescriptionColumn, SetParcelDescriptionColumn] = useState([
+    ...columnConfigForParcelDescription,
+    {
+      id: 7,
+      displayName: '',
+      active: true,
+      graphQLPropertyName: SRApprovalStatusEnum.Public,
+      columnSize: ColumnSize.Default,
+      displayType: {
+        type: FormFieldType.IconButton,
+        label: '',
+        placeholder: 'Approve',
+        graphQLPropertyName: SRApprovalStatusEnum.Public,
+        value: '',
+        tableMode: true,
+        customIcon: <TickIcon />,
+        customLinkValue: 'Approve',
+        customInputTextCss: 'approve-tick-icon',
+      },
+    },
+    {
+      id: 8,
+      displayName: '',
+      active: true,
+      graphQLPropertyName: SRApprovalStatusEnum.Private,
+      columnSize: ColumnSize.Default,
+      displayType: {
+        type: FormFieldType.IconButton,
+        label: '',
+        placeholder: 'Not Public',
+        graphQLPropertyName: SRApprovalStatusEnum.Private,
+        value: '',
+        tableMode: true,
+        customIcon: <XmarkIcon />,
+        customLinkValue: 'Not Public',
+        customInputTextCss: 'close-tick-icon',
+      },
+    },
+  ])
 
 
   const [updatedAssociateColumnInternalSRandViewMode, updatedSetAssociateColumnInternalSRandViewMode] = useState([
@@ -365,6 +411,17 @@ const SRUpdates = () => {
       dispatch(fetchPendingSiteDisclosure({ siteId, showPending: true }));
 
       dispatch(fetchPendingAssociatedSites({ siteId, showPending: true }));
+
+      const params: IFetchParcelDescriptionParams = {
+        siteId: parseInt(siteId),
+        page: 1,
+        pageSize: 1000,
+        searchParam: "",
+        sortBy: "",
+        sortByDir: "",
+        showPending: true,
+      };
+      dispatch(fetchParcelDescriptionsForApproval(params));
     }
   }, [updateRequestStatusFromState]);
 
@@ -403,6 +460,18 @@ const SRUpdates = () => {
       dispatch(fetchPendingAssociatedSites({ siteId, showPending: true }));
 
       dispatch(fetchLandUseCodes());
+
+      const params: IFetchParcelDescriptionParams = {
+        siteId: parseInt(siteId),
+        page: 1,
+        pageSize: 1000,
+        searchParam: "",
+        sortBy: "",
+        sortByDir: "",
+        showPending: true,
+      };
+      dispatch(fetchParcelDescriptionsForApproval(params));
+
     }
   }, [siteId]);
 
@@ -424,6 +493,7 @@ const SRUpdates = () => {
       profiles: null,
       sitesSummary: null,
       siteId: siteId,
+      parcelDescriptions: null
     };
   };
 
@@ -617,6 +687,33 @@ const SRUpdates = () => {
   };
 
 
+  const handleParcelDescriptionApproveRejectHandler = (event: any) => {
+    let record = event?.row;
+    let updatedRecord = null;
+    if (event && event.property === SRApprovalStatusEnum.Public) {
+      updatedRecord = {
+        ...record,
+        apiAction: UserActionEnum.updated,
+        userAction: UserActionEnum.default,
+        srAction: SRApprovalStatusEnum.Public,
+      };
+    } else if (event && event.property === SRApprovalStatusEnum.Private) {
+      updatedRecord = {
+        ...record,
+        apiAction: UserActionEnum.updated,
+        userAction: UserActionEnum.default,
+        srAction: SRApprovalStatusEnum.Private,
+      };
+    }
+
+    let saveDTO = {
+      ...getDefaultObjectForSaving(),
+      parcelDescriptions: updatedRecord,
+    };
+
+    dispatch(updateSiteDetailsForApproval(saveDTO));
+  };
+
   const handleAssociatedSiteApproveRejectHandler = (event: any) => {
     let record = event?.row;
     let updatedRecord = null;
@@ -676,6 +773,51 @@ const SRUpdates = () => {
 
     dispatch(updateSiteDetailsForApproval(saveDTO));
   };
+
+
+  const handleDocumentsApproveRejectHandler = (
+    document: any,
+    isApproved: boolean,
+  ) => {
+    
+    const updatedDocument = {
+      ...document,
+      srAction: isApproved
+        ? SRApprovalStatusEnum.Public
+        : SRApprovalStatusEnum.Private,
+      apiAction: UserActionEnum.updated,
+    };
+
+    let saveDTO = {
+      ...getDefaultObjectForSaving(),
+      documents: updatedDocument,
+    };
+
+    dispatch(updateSiteDetailsForApproval(saveDTO));
+  };
+
+
+  const handleDisclosureApproveRejectHandler = (
+    disclosure: any,
+    isApproved: boolean,
+  ) => {
+    
+    const updatedDisclosure = {
+      ...disclosure,
+      srAction: isApproved
+        ? SRApprovalStatusEnum.Public
+        : SRApprovalStatusEnum.Private,
+      apiAction: UserActionEnum.updated,
+    };
+
+    let saveDTO = {
+      ...getDefaultObjectForSaving(),
+      profiles: updatedDisclosure,
+    };
+
+    dispatch(updateSiteDetailsForApproval(saveDTO));
+  };
+
 
   const [location] = useState([48.46762, -123.25458]);
 
@@ -774,6 +916,9 @@ const SRUpdates = () => {
                 key={Date.now()}
                 internalRow={documentFormRows}
                 showApproveRejectSection={true}
+                approveRejectHandler={(value) =>
+                  handleDocumentsApproveRejectHandler(document, value)
+                }              
               />
             </ApproveReject>
           );
@@ -821,7 +966,21 @@ const SRUpdates = () => {
         </ApproveReject>
       )}
 
-      <ApproveReject name="Parcel Description">pending</ApproveReject>
+    { parcelDescriptionData?.data && <ApproveReject name="Parcel Description">
+        <ParcelDescriptionTable
+            tableChangeHandler={handleParcelDescriptionApproveRejectHandler}
+            showPageOptions={false}
+            requestStatus={RequestStatus.success}
+            columns={parcelDescriptionColumn}
+            data={parcelDescriptionData.data}
+            totalResults={[].length}
+            handleSelectPage={handleChange}
+            handleChangeResultsPerPage={handleChange}
+            currentPage={1}
+            resultsPerPage={undefined}
+            handleTableSortChange={handleChange}            
+          />
+      </ApproveReject>}
 
       {disclosureData && (
         <ApproveReject name="Disclosure">
@@ -850,6 +1009,9 @@ const SRUpdates = () => {
             handleItemClick={handleChange}
             disclosureCommentsConfig={disclosureCommentsConfig}
             showApproveRejectSection={true}
+            approveRejectHandler={(value)=>{
+              handleDisclosureApproveRejectHandler(disclosureData,value)
+            }}
           />
         </ApproveReject>
       )}

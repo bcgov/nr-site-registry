@@ -581,8 +581,11 @@ export class SiteService {
                 changes: {
                   ...existingDocument,
                   ...siteDocument,
-                  userAction: UserActionEnum.UPDATED,
-                  srAction: SRApprovalStatusEnum.PENDING,
+                  userAction: document.srAction === SRApprovalStatusEnum.PUBLIC ||
+                  document.srAction === SRApprovalStatusEnum.PRIVATE
+                    ? UserActionEnum.DEFAULT
+                    : UserActionEnum.UPDATED,
+                  srAction: document.srAction,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 },
@@ -599,8 +602,10 @@ export class SiteService {
                   changes: {
                     ...existingDocumentParticipant,
                     ...siteDocumentParticipant,
-                    userAction: UserActionEnum.UPDATED,
-                    srAction: SRApprovalStatusEnum.PENDING,
+                    userAction: document.srAction === SRApprovalStatusEnum.PUBLIC ||
+                    document.srAction === SRApprovalStatusEnum.PRIVATE
+                      ? UserActionEnum.DEFAULT
+                      : UserActionEnum.UPDATED,
                     whenUpdated: new Date(),
                     whoUpdated: userInfo ? userInfo.givenName : '',
                   },
@@ -1187,7 +1192,11 @@ export class SiteService {
               profile = {
                 ...isExist,
                 ...profile,
-                userAction: UserActionEnum.UPDATED,
+                userAction: disclosure.srAction === SRApprovalStatusEnum.PUBLIC ||
+                disclosure.srAction === SRApprovalStatusEnum.PRIVATE
+                  ? UserActionEnum.DEFAULT
+                  : UserActionEnum.UPDATED,
+                srAction: disclosure.srAction,
                 whenUpdated: new Date(),
                 whoUpdated: userInfo ? userInfo.givenName : '',
               };

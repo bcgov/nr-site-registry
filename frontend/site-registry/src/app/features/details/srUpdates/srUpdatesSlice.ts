@@ -13,6 +13,10 @@ import { getLandHistoriesForSiteQuery } from '../landUses/graphql/LandUses';
 import { graphQLSiteDocumentsBySiteId } from '../../site/graphql/Document';
 import { graphQLSiteDisclosureBySiteId } from '../../site/graphql/Disclosure';
 import { graphQLAssociatedSitesBySiteId } from '../../site/graphql/Associate';
+import { IFetchParcelDescriptionParams } from '../parcelDescriptions/parcelDescriptionsSlice';
+import { graphQLParcelDescriptionBySiteId } from '../../site/graphql/ParcelDescriptions';
+import { IParcelDescriptionDto, IParcelDescriptionResponseDto } from '../parcelDescriptions/parcelDescriptionDto';
+import { format } from 'date-fns';
 
 const initialState: SRUpdatesState = {
   siteSummaryData: null,
@@ -23,6 +27,7 @@ const initialState: SRUpdatesState = {
   documents: null,
   siteAssociations: null,
   disclosure: null,
+  parcelDescriptionData: null
 };
 
 export const updateSiteDetailsForApproval = createAsyncThunk(
@@ -36,6 +41,65 @@ export const updateSiteDetailsForApproval = createAsyncThunk(
       },
     });
     return request.data;
+  },
+);
+
+export const fetchParcelDescriptionsForApproval = createAsyncThunk(
+  'parcelDescriptions/fetchParcelDescriptionsForApproval',
+  async (params: IFetchParcelDescriptionParams) => {
+    const axios = getAxiosInstance();
+    let response;
+    try {
+      response = await axios.post(GRAPHQL, {
+        query: print(graphQLParcelDescriptionBySiteId()),
+        variables: {
+          siteId: params.siteId,
+          page: params.page,
+          pageSize: params.pageSize,
+          searchParam: params.searchParam,
+          sortBy: params.sortBy,
+          sortByDir: params.sortByDir,
+          pending: params.showPending,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+    if (response?.status != 200) {
+      return {} as IParcelDescriptionResponseDto;
+    }
+    let rawData = response.data?.data?.getParcelDescriptionsBySiteId;
+
+    let formattedData: IParcelDescriptionDto[] = rawData?.data?.map(
+      (parcelDescription: IParcelDescriptionDto) => {
+        // This slices the Z (Zulu Time) designator off of the ISO8601 date string
+        // preventing the browser from applying it's local timezone to the date
+        // object when formatting. Since all of our date strings have a time of
+        // 00:00:00, if a time zone with a negative value were applied it would
+        // cause the resulting formatted date string to be one day lower than it
+        // should be.
+        let dateNoted = new Date(parcelDescription?.dateNoted.slice(0, -1));
+        let formattedDateNoted = dateNoted
+          ? format(new Date(dateNoted), 'PPP')
+          : '';
+        return {
+          id: parcelDescription?.id,
+          descriptionType: parcelDescription?.descriptionType,
+          idPinNumber: parcelDescription?.idPinNumber,
+          dateNoted: formattedDateNoted,
+          landDescription: parcelDescription?.landDescription,
+        };
+      },
+    );
+
+    let formattedResponse: IParcelDescriptionResponseDto = {
+      page: rawData.page,
+      pageSize: rawData.pageSize,
+      count: rawData.count,
+      data: formattedData,
+    };
+
+    return formattedResponse;
   },
 );
 
@@ -308,6 +372,22 @@ const srUpdatesSlice = createSlice({
         console.log('fetchPendingSiteDisclosure - Rejected');
         return newState;
       });
+      builder
+      .addCase(fetchParcelDescriptionsForApproval.pending, (state, action) => {
+        const newState = { ...state };
+        console.log('fetchParcelDescriptionsForApproval - Pending');
+        return newState;
+      })
+      .addCase(fetchParcelDescriptionsForApproval.fulfilled, (state, action) => {
+        const newState = { ...state };
+        newState.parcelDescriptionData = action.payload;
+        return newState;
+      })
+      .addCase(fetchParcelDescriptionsForApproval.rejected, (state, action) => {
+        const newState = { ...state };
+        console.log('fetchParcelDescriptionsForApproval - Rejected');
+        return newState;
+      });
     builder
       .addCase(fetchPendingAssociatedSites.pending, (state, action) => {
         const newState = { ...state };
@@ -354,6 +434,7 @@ export const selectDocuments = (state: any) => state.srUpdates.documents;
 export const selectDisclosure = (state: any) => state.srUpdates.disclosure;
 export const selectAssociatedSites = (state: any) =>
   state.srUpdates.siteAssociations;
+export const selectParcelDescriptionData = (state:any) => state.srUpdates.parcelDescriptionData;
 export const updateRequestStatus = (state: any) =>
   state.srUpdates.updateRequestStatus;
 

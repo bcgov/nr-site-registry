@@ -13,6 +13,8 @@ interface IParcelDescriptionTable {
   currentPage: number | undefined;
   resultsPerPage: number | undefined;
   handleTableSortChange: (column: TableColumn, descending: boolean) => void;
+  showPageOptions: boolean;
+  tableChangeHandler: (event:any) => void;
 }
 
 const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
@@ -25,10 +27,12 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
   currentPage,
   resultsPerPage,
   handleTableSortChange,
+  showPageOptions,
+  tableChangeHandler
 }) => {
   return (
     <Table
-      showPageOptions={true}
+      showPageOptions={showPageOptions}
       label="Search Results"
       isLoading={requestStatus}
       columns={columns}
@@ -39,7 +43,7 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
       currentPage={currentPage}
       resultsPerPage={resultsPerPage}
       allowRowsSelect={false}
-      changeHandler={() => {}}
+      changeHandler={tableChangeHandler}
       editMode={false}
       idColumnName="id"
       sortHandler={handleTableSortChange}

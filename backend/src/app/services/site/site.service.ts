@@ -5,6 +5,7 @@ import {
   FetchSiteDetail,
   FetchSiteResponse,
   SearchSiteResponse,
+  MapSearchResponse,
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteUtil } from '../../utils/site.util';
@@ -262,6 +263,45 @@ export class SiteService {
     response.pageSize = pageSize;
     this.sitesLogger.log('SiteService.searchSites() end');
     this.sitesLogger.debug('SiteService.searchSites() end');
+    return response;
+  }
+
+  async mapSearch(searchTerm = '') {
+    const response = new MapSearchResponse();
+    this.sitesLogger.log('SiteService.mapSearch() start');
+
+    const searchTermClean = searchTerm.toLowerCase().trim();
+    const query = this.siteRepository.createQueryBuilder('sites');
+
+    if (searchTermClean.length) {
+      query
+        .where('LOWER(sites.addr_line_1) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.addr_line_2) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.addr_line_3) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.addr_line_4) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.city) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.provState) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        });
+    }
+
+    const [result] = await query.getManyAndCount();
+
+    this.sitesLogger.log('SiteService.mapSearch() end');
+    response.data = result;
     return response;
   }
 

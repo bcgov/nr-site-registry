@@ -8,6 +8,7 @@ import {
 import {
   FetchSiteDetail,
   FetchSiteResponse,
+  MapSearchResponse,
   SaveSiteDetailsResponse,
   SearchSiteResponse,
 } from '../../dto/response/genericResponse';
@@ -328,5 +329,22 @@ export class SiteResolver {
       );
       throw new Error('System Error, Please try again.');
     }
+  }
+
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => MapSearchResponse, { name: 'mapSearch' })
+  async mapSearch(
+    @Args('searchParam', { type: () => String, nullable: true })
+    searchParam: string,
+  ) {
+    this.sitesLogger.log('SiteResolver.mapSearch() start ');
+    return await this.siteService.mapSearch(searchParam);
   }
 }

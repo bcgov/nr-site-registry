@@ -22,6 +22,22 @@ export class FetchSiteResponse extends BaseHttpResponse {
 }
 
 @ObjectType()
+export class MapSearchResponse extends BaseHttpResponse {
+  @Field(() => [Sites])
+  data: Sites[];
+
+  constructor(
+    message?: string,
+    httpStatusCode?: number,
+    success?: boolean,
+    data?: Sites[] | null,
+  ) {
+    super(message, httpStatusCode, success);
+    this.data = data;
+  }
+}
+
+@ObjectType()
 export class SaveSiteDetailsResponse extends BaseHttpResponse {
   @Field(() => [Sites])
   data: Sites[];

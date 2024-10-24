@@ -8,7 +8,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { RequestStatus } from '../../helpers/requests/status';
 
 import { useAuth } from '../../../../node_modules/react-oidc-context';
-import { getUser } from '../../helpers/utility';
+import { getUser, showNotification } from '../../helpers/utility';
 import FolioContents from './FolioContent';
 import { getAxiosInstance } from '../../helpers/utility';
 
@@ -22,6 +22,7 @@ jest.mock('../../../../node_modules/react-oidc-context', () => ({
 jest.mock('../../helpers/utility', () => ({
   getUser: jest.fn(),
   getAxiosInstance: jest.fn(),
+  showNotification: jest.fn(),
 }));
 
 const router = createBrowserRouter([

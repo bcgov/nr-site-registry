@@ -209,7 +209,7 @@ export type EventPartics = {
   eventId: Scalars['String']['output'];
   psnorg?: Maybe<PeopleOrgs>;
   psnorgId: Scalars['String']['output'];
-  rwmFlag: Scalars['Float']['output'];
+  rwmFlag?: Maybe<Scalars['Float']['output']>;
   spId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
   userAction: Scalars['String']['output'];
@@ -252,8 +252,8 @@ export type Events = {
   requirementDueDate?: Maybe<Scalars['DateTime']['output']>;
   requirementReceivedDate?: Maybe<Scalars['DateTime']['output']>;
   rwmApprovalDate?: Maybe<Scalars['DateTime']['output']>;
-  rwmFlag: Scalars['Float']['output'];
-  rwmNoteFlag: Scalars['Float']['output'];
+  rwmFlag?: Maybe<Scalars['Float']['output']>;
+  rwmNoteFlag?: Maybe<Scalars['Float']['output']>;
   site: Sites;
   siteId: Scalars['String']['output'];
   spId: Scalars['String']['output'];
@@ -919,8 +919,8 @@ export type SiteAssocs = {
   commonPid: Scalars['String']['output'];
   effectiveDate: Scalars['DateTime']['output'];
   note: Scalars['String']['output'];
-  rwmFlag: Scalars['Float']['output'];
-  rwmNoteFlag: Scalars['Float']['output'];
+  rwmFlag?: Maybe<Scalars['Float']['output']>;
+  rwmNoteFlag?: Maybe<Scalars['Float']['output']>;
   siteId: Scalars['String']['output'];
   siteIdAssociatedWith: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
@@ -985,7 +985,7 @@ export type SiteParticRoles = {
   __typename?: 'SiteParticRoles';
   prCode: Scalars['String']['output'];
   prCode2: ParticRoleCd;
-  rwmFlag: Scalars['Float']['output'];
+  rwmFlag?: Maybe<Scalars['Float']['output']>;
   spId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
   userAction: Scalars['String']['output'];
@@ -1003,8 +1003,8 @@ export type SitePartics = {
   note?: Maybe<Scalars['String']['output']>;
   psnorg: PeopleOrgs;
   psnorgId: Scalars['String']['output'];
-  rwmFlag: Scalars['Float']['output'];
-  rwmNoteFlag: Scalars['Float']['output'];
+  rwmFlag?: Maybe<Scalars['Float']['output']>;
+  rwmNoteFlag?: Maybe<Scalars['Float']['output']>;
   siteId: Scalars['String']['output'];
   siteParticRoles: Array<SiteParticRoles>;
   srAction: Scalars['String']['output'];

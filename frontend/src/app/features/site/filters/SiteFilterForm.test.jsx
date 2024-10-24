@@ -62,13 +62,13 @@ describe('SiteFilterForm component', () => {
   });
 
   it('renders Dropdown component correctly', () => {
-    const { getByLabelText, getByPlaceholderText } = render(
+    const { getByLabelText, getByRole } = render(
       <Provider store={store}>
         <SiteFilterForm cancelSearchFilter={() => {}} />
       </Provider>,
     );
     const dropdownLabel = getByLabelText('City');
-    const dropdownPlaceholder = getByPlaceholderText('Select City');
+    const dropdownPlaceholder = getByRole('option', { name: 'Select City' });
     expect(dropdownLabel).toBeInTheDocument();
     expect(dropdownPlaceholder).toBeInTheDocument();
   });

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSnapshotDto } from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
@@ -54,7 +54,10 @@ export class SnapshotsService {
         'Exception occured in SnapshotsService.getSnapshots() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve snapshots.');
+      throw new HttpException(
+        `Failed to retrieve snapshots.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -74,7 +77,10 @@ export class SnapshotsService {
         'Exception occured in SnapshotsService.getSnapshotsByUserId() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve snapshots by userId.');
+      throw new HttpException(
+        `Failed to retrieve snapshots by userId: ${userId}`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -94,7 +100,10 @@ export class SnapshotsService {
         'Exception occured in SnapshotsService.getSnapshotsBySiteId() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve snapshots by userId and siteId.');
+      throw new HttpException(
+        `Failed to retrieve snapshots by userId: ${userId} and siteId: ${siteId}`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -115,7 +124,10 @@ export class SnapshotsService {
         'Exception occured in SnapshotsService.getMostRecentSnapshot() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve the most recent snapshot.');
+      throw new HttpException(
+        `Failed to retrieve the most recent snapshot.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -132,7 +144,10 @@ export class SnapshotsService {
         'Exception occured in SnapshotsService.getSnapshotsById() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to retrieve snapshot by ID: ${id}.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -226,7 +241,10 @@ export class SnapshotsService {
         'Exception occured in SnapshotsService.createSnapshotForSites() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to create snapshot.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -295,7 +313,10 @@ export class SnapshotsService {
       const result = await entityManager.query(query, [siteId, userId]);
       return result.length > 0 ? result[0].bannertype : 'unknown';
     } catch (error) {
-      throw new Error('Failed to determine banner type.');
+      throw new HttpException(
+        `Failed to determine banner type.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 }

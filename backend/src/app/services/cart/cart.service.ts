@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -34,7 +34,10 @@ export class CartService {
         'Exception occured in CartService.getCartItemsForUser() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to get cart items.`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -81,7 +84,10 @@ export class CartService {
         'Exception occured in CartService.addCartItem() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to add cart items.`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -117,7 +123,10 @@ export class CartService {
         'Exception occured in CartService.deleteCartItem() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to delete cart items.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -155,7 +164,7 @@ export class CartService {
         'Exception occured in CartService.deleteCartWithSiteId() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(`Failed to delete cart.`, HttpStatus.NOT_FOUND);
     }
   }
 }

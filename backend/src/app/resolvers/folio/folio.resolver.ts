@@ -40,36 +40,24 @@ export class FolioResolver {
     this.sitesLogger.log(
       'FolioResolver.getFolioItemsForUser() start userId:' + ' ' + userId,
     );
-    try {
-      const result = await this.folioService.getFoliosForUser(user);
+    const result = await this.folioService.getFoliosForUser(user);
 
-      if (result && result.length > 0) {
-        this.sitesLogger.log(
-          'FolioResolver.getFolioItemsForUser() RES:200 end',
-        );
-        return this.genericResponseProvider.createResponse(
-          'Folio fetched successfully',
-          200,
-          true,
-          result,
-        );
-      } else {
-        this.sitesLogger.log(
-          'FolioResolver.getFolioItemsForUser() RES:404 end',
-        );
-        return this.genericResponseProvider.createResponse(
-          `Folio not found for user id: ${userId}`,
-          404,
-          true,
-          [],
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in FolioResolver.getFolioItemsForUser() end',
-        JSON.stringify(error),
+    if (result && result.length > 0) {
+      this.sitesLogger.log('FolioResolver.getFolioItemsForUser() RES:200 end');
+      return this.genericResponseProvider.createResponse(
+        'Folio fetched successfully',
+        200,
+        true,
+        result,
       );
-      throw new Error('System Error, Please try again.');
+    } else {
+      this.sitesLogger.log('FolioResolver.getFolioItemsForUser() RES:404 end');
+      return this.genericResponseProvider.createResponse(
+        `Folio not found for user id: ${userId}`,
+        404,
+        true,
+        [],
+      );
     }
   }
 
@@ -87,32 +75,24 @@ export class FolioResolver {
         ' ' +
         JSON.stringify(folioDTO),
     );
-    try {
-      const result = await this.folioService.getSitesForFolio(folioDTO, user);
+    const result = await this.folioService.getSitesForFolio(folioDTO, user);
 
-      if (result && result.length > 0) {
-        this.sitesLogger.log('FolioResolver.getSitesForFolio() RES:200 end');
-        return this.genericResponseProviderForFolioContent.createResponse(
-          'Sites fetched successfully for folio',
-          200,
-          true,
-          result,
-        );
-      } else {
-        this.sitesLogger.log('FolioResolver.getSitesForFolio() RES:400 end');
-        return this.genericResponseProviderForFolioContent.createResponse(
-          `Unable to fetch sites for folio`,
-          400,
-          true,
-          [],
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in FolioResolver.getSitesForFolio() end',
-        JSON.stringify(error),
+    if (result && result.length > 0) {
+      this.sitesLogger.log('FolioResolver.getSitesForFolio() RES:200 end');
+      return this.genericResponseProviderForFolioContent.createResponse(
+        'Sites fetched successfully for folio',
+        200,
+        true,
+        result,
       );
-      throw new Error('System Error, Please try again.');
+    } else {
+      this.sitesLogger.log('FolioResolver.getSitesForFolio() RES:400 end');
+      return this.genericResponseProviderForFolioContent.createResponse(
+        `Unable to fetch sites for folio`,
+        400,
+        true,
+        [],
+      );
     }
   }
 
@@ -129,30 +109,18 @@ export class FolioResolver {
         ' ' +
         JSON.stringify(folioDTO),
     );
-    try {
-      const message = await this.folioService.addFolio(folioDTO, user);
+    const message = await this.folioService.addFolio(folioDTO, user);
 
-      if (message) {
-        this.sitesLogger.log('FolioResolver.addFolioItem() RES:201 end');
-        return this.genericResponseProvider.createResponse(
-          'Success',
-          201,
-          true,
-        );
-      } else {
-        this.sitesLogger.log('FolioResolver.addFolioItem() RES:422 end');
-        return this.genericResponseProvider.createResponse(
-          `Failed to add Folio. `,
-          422,
-          false,
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in FolioResolver.addFolioItem() end',
-        JSON.stringify(error),
+    if (message) {
+      this.sitesLogger.log('FolioResolver.addFolioItem() RES:201 end');
+      return this.genericResponseProvider.createResponse('Success', 201, true);
+    } else {
+      this.sitesLogger.log('FolioResolver.addFolioItem() RES:422 end');
+      return this.genericResponseProvider.createResponse(
+        `Failed to add Folio. `,
+        422,
+        false,
       );
-      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -169,33 +137,21 @@ export class FolioResolver {
         ' ' +
         JSON.stringify(folioContentDTO),
     );
-    try {
-      const message = await this.folioService.addSiteToFolio(
-        folioContentDTO,
-        user,
-      );
+    const message = await this.folioService.addSiteToFolio(
+      folioContentDTO,
+      user,
+    );
 
-      if (message) {
-        this.sitesLogger.log('FolioResolver.addSiteToFolio() RES:201 end');
-        return this.genericResponseProvider.createResponse(
-          'Success',
-          201,
-          true,
-        );
-      } else {
-        this.sitesLogger.log('FolioResolver.addSiteToFolio() RES:422 end');
-        return this.genericResponseProvider.createResponse(
-          `Failed to add Folio. `,
-          422,
-          false,
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in FolioResolver.addSiteToFolio() end',
-        JSON.stringify(error),
+    if (message) {
+      this.sitesLogger.log('FolioResolver.addSiteToFolio() RES:201 end');
+      return this.genericResponseProvider.createResponse('Success', 201, true);
+    } else {
+      this.sitesLogger.log('FolioResolver.addSiteToFolio() RES:422 end');
+      return this.genericResponseProvider.createResponse(
+        `Failed to add Folio. `,
+        422,
+        false,
       );
-      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -212,30 +168,18 @@ export class FolioResolver {
         ' ' +
         JSON.stringify(folioDTO),
     );
-    try {
-      const message = await this.folioService.updateFolio(folioDTO, user);
+    const message = await this.folioService.updateFolio(folioDTO, user);
 
-      if (message) {
-        this.sitesLogger.log('FolioResolver.updateFolioItem() RES:201 end');
-        return this.genericResponseProvider.createResponse(
-          'Success',
-          201,
-          true,
-        );
-      } else {
-        this.sitesLogger.log('FolioResolver.updateFolioItem() RES:422 end');
-        return this.genericResponseProvider.createResponse(
-          `Failed to add Folio. `,
-          422,
-          false,
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in FolioResolver.updateFolioItem() end',
-        JSON.stringify(error),
+    if (message) {
+      this.sitesLogger.log('FolioResolver.updateFolioItem() RES:201 end');
+      return this.genericResponseProvider.createResponse('Success', 201, true);
+    } else {
+      this.sitesLogger.log('FolioResolver.updateFolioItem() RES:422 end');
+      return this.genericResponseProvider.createResponse(
+        `Failed to add Folio. `,
+        422,
+        false,
       );
-      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -250,30 +194,18 @@ export class FolioResolver {
     this.sitesLogger.log(
       'FolioResolver.deleteFolio() start folioId:' + ' ' + folioId,
     );
-    try {
-      const message = await this.folioService.deleteFolio(folioId, user);
+    const message = await this.folioService.deleteFolio(folioId, user);
 
-      if (message) {
-        this.sitesLogger.log('FolioResolver.deleteFolio() RES:200 end');
-        return this.genericResponseProvider.createResponse(
-          'Deleted',
-          200,
-          true,
-        );
-      } else {
-        this.sitesLogger.log('FolioResolver.deleteFolio() RES:422 end');
-        return this.genericResponseProvider.createResponse(
-          `Failed delete item. `,
-          422,
-          false,
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in FolioResolver.deleteFolio() end',
-        JSON.stringify(error),
+    if (message) {
+      this.sitesLogger.log('FolioResolver.deleteFolio() RES:200 end');
+      return this.genericResponseProvider.createResponse('Deleted', 200, true);
+    } else {
+      this.sitesLogger.log('FolioResolver.deleteFolio() RES:422 end');
+      return this.genericResponseProvider.createResponse(
+        `Failed delete item. `,
+        422,
+        false,
       );
-      throw new Error('System Error, Please try again.');
     }
   }
 
@@ -290,33 +222,21 @@ export class FolioResolver {
         ' ' +
         JSON.stringify(folioContentDTO),
     );
-    try {
-      const message = await this.folioService.deleteSitesInFolio(
-        folioContentDTO,
-        user,
-      );
+    const message = await this.folioService.deleteSitesInFolio(
+      folioContentDTO,
+      user,
+    );
 
-      if (message) {
-        this.sitesLogger.log('FolioResolver.deleteSitesInFolio() RES:200 end');
-        return this.genericResponseProvider.createResponse(
-          'Deleted',
-          200,
-          true,
-        );
-      } else {
-        this.sitesLogger.log('FolioResolver.deleteSitesInFolio() RES:422 end');
-        return this.genericResponseProvider.createResponse(
-          `Failed delete item. `,
-          422,
-          false,
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in FolioResolver.deleteSitesInFolio() end',
-        JSON.stringify(error),
+    if (message) {
+      this.sitesLogger.log('FolioResolver.deleteSitesInFolio() RES:200 end');
+      return this.genericResponseProvider.createResponse('Deleted', 200, true);
+    } else {
+      this.sitesLogger.log('FolioResolver.deleteSitesInFolio() RES:422 end');
+      return this.genericResponseProvider.createResponse(
+        `Failed delete item. `,
+        422,
+        false,
       );
-      throw new Error('System Error, Please try again.');
     }
   }
 }

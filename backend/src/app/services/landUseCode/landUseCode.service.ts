@@ -2,6 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LandUseCd } from '../../entities/landUseCd.entity';
 import { LoggerService } from '../../logger/logger.service';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 export class LandUseCodeService {
   constructor(
@@ -25,7 +26,10 @@ export class LandUseCodeService {
         'Exception occured in LandUseCodeService.getLandUseCodes() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to retrieve land use code`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ParticRoleCd } from '../../entities/particRoleCd.entity';
 import { PeopleOrgs } from '../../entities/peopleOrgs.entity';
@@ -62,7 +62,10 @@ export class DropdownService {
         'Exception occured in DropdownService.getParticipantRoleCd() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve participants role code.');
+      throw new HttpException(
+        `Failed to retrieve participants role code.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -113,7 +116,10 @@ export class DropdownService {
         'Exception occured in DropdownService.getPeopleOrgsCd() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve people orgs.');
+      throw new HttpException(
+        `Failed to retrieve people orgs.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -165,7 +171,10 @@ export class DropdownService {
         'Exception occured in DropdownService.getNotationTypeCd() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve notation type codes.');
+      throw new HttpException(
+        `Failed to retrieve notation type codes.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -197,7 +206,10 @@ export class DropdownService {
         'Exception occured in DropdownService.getNotationClassCd() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve notation class codes.');
+      throw new HttpException(
+        `Failed to retrieve notation class codes.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -241,7 +253,10 @@ export class DropdownService {
         'Exception occured in DropdownService.getNotationParticipantRoleCd() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve notation participant role codes.');
+      throw new HttpException(
+        `Failed to retrieve notation participant role codes.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -276,6 +291,10 @@ export class DropdownService {
       this.sitesLogger.log(
         'DropdownService.getIDIRUserNamesForDropDown error' +
           JSON.stringify(error),
+      );
+      throw new HttpException(
+        `Failed to get users name.`,
+        HttpStatus.NOT_FOUND,
       );
     }
   }

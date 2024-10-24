@@ -193,44 +193,39 @@ export class SnapshotsResolver {
         ' ' +
         JSON.stringify(inputDto),
     );
-    try {
-      if (inputDto) {
-        const isSaved = this.snapshotsService.createSnapshotForSites(
-          inputDto,
-          user,
+    if (inputDto) {
+      const isSaved = this.snapshotsService.createSnapshotForSites(
+        inputDto,
+        user,
+      );
+      if (isSaved) {
+        this.sitesLogger.log(
+          'SnapshotsResolver.createSnapshotForSites() RES:201 end',
         );
-        if (isSaved) {
-          this.sitesLogger.log(
-            'SnapshotsResolver.createSnapshotForSites() RES:201 end',
-          );
-          return this.genericResponseProvider.createResponse(
-            'Successfully created snapshots.',
-            201,
-            true,
-          );
-        } else {
-          this.sitesLogger.log(
-            'SnapshotsResolver.createSnapshotForSites() RES:422 end',
-          );
-          return this.genericResponseProvider.createResponse(
-            `Failed to create snapshots. `,
-            422,
-            false,
-          );
-        }
+        return this.genericResponseProvider.createResponse(
+          'Successfully created snapshots.',
+          201,
+          true,
+        );
       } else {
         this.sitesLogger.log(
           'SnapshotsResolver.createSnapshotForSites() RES:422 end',
         );
         return this.genericResponseProvider.createResponse(
-          `Please provide valid input to create snapshots`,
+          `Failed to create snapshots. `,
           422,
           false,
         );
       }
-    } catch (error) {
-      console.log('Error at createSnapshotForSites', error);
-      throw new Error('System Error, Please try again.');
+    } else {
+      this.sitesLogger.log(
+        'SnapshotsResolver.createSnapshotForSites() RES:422 end',
+      );
+      return this.genericResponseProvider.createResponse(
+        `Please provide valid input to create snapshots`,
+        422,
+        false,
+      );
     }
   }
 
@@ -249,35 +244,27 @@ export class SnapshotsResolver {
         ' user:' +
         user.sub,
     );
-    try {
-      const bannerType = await this.snapshotsService.getBannerType(
-        siteId,
-        user.sub,
-      );
+    const bannerType = await this.snapshotsService.getBannerType(
+      siteId,
+      user.sub,
+    );
 
-      if (bannerType && bannerType.length > 0) {
-        this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:200 end');
-        return {
-          httpStatusCode: 200,
-          message: 'Banner type fetched successfully',
-          data: {
-            bannerType: bannerType,
-          },
-        };
-      } else {
-        this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:404 end');
-        return {
-          httpStatusCode: 404,
-          message: `Failed to determine banner type for site id ${siteId}`,
-          data: null,
-        };
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in SnapshotsResolver.getBannerType() end',
-        JSON.stringify(error),
-      );
-      throw new Error('System Error, Please try again.');
+    if (bannerType && bannerType.length > 0) {
+      this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:200 end');
+      return {
+        httpStatusCode: 200,
+        message: 'Banner type fetched successfully',
+        data: {
+          bannerType: bannerType,
+        },
+      };
+    } else {
+      this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:404 end');
+      return {
+        httpStatusCode: 404,
+        message: `Failed to determine banner type for site id ${siteId}`,
+        data: null,
+      };
     }
   }
 }

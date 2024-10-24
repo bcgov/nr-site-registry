@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Folio } from '../../entities/folio.entity';
 import { Repository } from 'typeorm';
@@ -36,7 +36,10 @@ export class FolioService {
         'Exception occured in FolioService.getFoliosForUser() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to retrieve folios for user`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -67,7 +70,10 @@ export class FolioService {
         'Exception occured in FolioService.getSitesForFolio() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to retrieve sites for folio`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -107,7 +113,7 @@ export class FolioService {
         'Exception occured in FolioService.addFolio() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(`Failed to add folio`, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -151,7 +157,7 @@ export class FolioService {
         'Exception occured in FolioService.updateFolio() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(`Failed to update folio`, HttpStatus.NOT_FOUND);
     }
 
     return true;
@@ -192,7 +198,7 @@ export class FolioService {
         'Exception occured in FolioService.deleteFolio() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(`Failed to delete folio`, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -228,7 +234,10 @@ export class FolioService {
         'Exception occured in FolioService.addSiteToFolio() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to add sites to folio`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -266,7 +275,10 @@ export class FolioService {
         'Exception occured in FolioService.deleteSitesInFolio() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to delete sites in folio`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 }

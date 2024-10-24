@@ -75,35 +75,23 @@ export class DropdownResolver {
     entityType?: string,
   ) {
     this.sitesLogger.log('DropdownResolver.getPeopleOrgsCd() start');
-    try {
-      const result = await this.dropdownService.getPeopleOrgsCd(
-        searchParam,
-        entityType,
-      );
-      if (result && result.length > 0) {
-        this.sitesLogger.log('DropdownResolver.getPeopleOrgsCd() RES:200 end');
-        return this.genericResponseProvider.createResponse(
-          'People Organization fetched successfully',
-          200,
-          true,
-          result,
-        );
-      } else {
-        this.sitesLogger.log('DropdownResolver.getPeopleOrgsCd() RES:404 end');
-        return this.genericResponseProvider.createResponse(
-          `People Organization not found`,
-          404,
-          false,
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in DropdownResolver.getPeopleOrgsCd() end',
-        JSON.stringify(error),
-      );
+    const result = await this.dropdownService.getPeopleOrgsCd(
+      searchParam,
+      entityType,
+    );
+    if (result && result.length > 0) {
+      this.sitesLogger.log('DropdownResolver.getPeopleOrgsCd() RES:200 end');
       return this.genericResponseProvider.createResponse(
-        'Failed to fetch People Organization',
-        500,
+        'People Organization fetched successfully',
+        200,
+        true,
+        result,
+      );
+    } else {
+      this.sitesLogger.log('DropdownResolver.getPeopleOrgsCd() RES:404 end');
+      return this.genericResponseProvider.createResponse(
+        `People Organization not found`,
+        404,
         false,
       );
     }
@@ -211,35 +199,27 @@ export class DropdownResolver {
   })
   @Query(() => DropdownResponse, { name: 'getIDIRUserListForDropDown' })
   async getIDIRUserListForDropDown() {
-    try {
-      const result =
-        await this.dropdownService.getIDIRUserGivenNamesForDropDown();
-      if (result.length > 0) {
-        this.sitesLogger.log(
-          'DropdownResolver.getIDIRUserListForDropDown() RES:200 end',
-        );
-        return this.genericResponseProvider.createResponse(
-          'User Names fetched successfully',
-          200,
-          true,
-          result,
-        );
-      } else {
-        this.sitesLogger.log(
-          'DropdownResolver.getIDIRUserListForDropDown() RES:200 end',
-        );
-        return this.genericResponseProvider.createResponse(
-          `User Names not found`,
-          200,
-          false,
-        );
-      }
-    } catch (error) {
+    const result =
+      await this.dropdownService.getIDIRUserGivenNamesForDropDown();
+    if (result.length > 0) {
       this.sitesLogger.log(
-        'DropdownResolver.getIDIRUserListForDropDown() error' +
-          JSON.stringify(error),
+        'DropdownResolver.getIDIRUserListForDropDown() RES:200 end',
       );
-      throw error;
+      return this.genericResponseProvider.createResponse(
+        'User Names fetched successfully',
+        200,
+        true,
+        result,
+      );
+    } else {
+      this.sitesLogger.log(
+        'DropdownResolver.getIDIRUserListForDropDown() RES:200 end',
+      );
+      return this.genericResponseProvider.createResponse(
+        `User Names not found`,
+        200,
+        false,
+      );
     }
   }
 }

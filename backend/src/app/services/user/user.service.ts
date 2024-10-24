@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../entities/user.entity';
 import { Repository } from 'typeorm';
@@ -46,7 +46,7 @@ export class UserService {
         'Exception occured in UserService.createUserIfNotFound() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(`Failed to create user`, HttpStatus.NOT_FOUND);
     }
   }
 }

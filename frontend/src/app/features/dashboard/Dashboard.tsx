@@ -1,17 +1,12 @@
 import { useEffect, useState } from 'react';
 import { RequestStatus } from '../../helpers/requests/status';
-import {
-  recentAssignedColumn,
-  recentFoliosColumns,
-  recentViewedColumns,
-} from './DashboardConfig';
-import { useDispatch, useSelector } from 'react-redux';
+import { recentViewedColumns } from './DashboardConfig';
+import { useSelector } from 'react-redux';
 import { UserType } from '../../helpers/requests/userType';
 import './Dashboard.css';
 import PageContainer from '../../components/simple/PageContainer';
 import Widget from '../../components/widget/Widget';
-import { getUser, isUserOfType, UserRoleType } from '../../helpers/utility';
-import { AppDispatch } from '../../Store';
+import { getUser } from '../../helpers/utility';
 
 interface DashboardWidgetProps {
   title?: string;
@@ -23,9 +18,7 @@ interface DashboardWidgetProps {
   onButtonClick?: () => void;
 }
 
-const changeHandler = (event: any) => {
-  console.log(event);
-};
+const changeHandler = (event: any) => {};
 
 const DashboardTableWidget: React.FC<DashboardWidgetProps> = ({
   title,
@@ -92,11 +85,6 @@ const Dashboard = () => {
       setLoading(RequestStatus.idle);
     }
   }, [sites.status]);
-
-  const handleButtonClick = () => {
-    alert('Button clicked!');
-    // Additional logic can be added here
-  };
 
   return (
     <PageContainer role="Dashboard">

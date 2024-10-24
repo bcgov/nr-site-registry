@@ -1,7 +1,11 @@
 import { FC, memo, useState } from 'react';
 import { IconMarker } from '../IconMarker';
 import { LatLngLiteral } from 'leaflet';
-import { mapIconDefault, mapIconHover, mapIconSelected } from './icons';
+import {
+  mapMarkerIconDefault,
+  mapMarkerIconHover,
+  mapMarkerIconSelected,
+} from './icons';
 
 interface SiteMarkerProps {
   position: LatLngLiteral;
@@ -15,9 +19,9 @@ const SiteMarkerBase: FC<SiteMarkerProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  let icon = isHovered ? mapIconHover : mapIconDefault;
+  let icon = isHovered ? mapMarkerIconHover : mapMarkerIconDefault;
   if (isSelected) {
-    icon = mapIconSelected;
+    icon = mapMarkerIconSelected;
   }
   return (
     <IconMarker

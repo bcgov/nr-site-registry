@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 // import Landing from "../features/landing/Landing"
 import { Routes, Route, createBrowserRouter } from 'react-router-dom';
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+
 import Search from '../features/site/Search';
 import SiteDetails from '../features/details/SiteDetails';
 import Dashboard from '../features/dashboard/Dashboard';
@@ -70,7 +73,11 @@ const roleBasedRoutes: any = {
 // Create routes based on the user's role
 const createRoutesForRole = (role: string) => [
   {
-    element: <App />,
+    element: (
+      <QueryParamProvider adapter={ReactRouter6Adapter}>
+        <App />
+      </QueryParamProvider>
+    ),
     errorElement: <h1>Page not found</h1>,
     children: roleBasedRoutes[role]?.map((route: any) => ({
       path: route.path,

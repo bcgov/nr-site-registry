@@ -25,7 +25,7 @@ const Banner: React.FC<BannerProps> = ({
     <div>
       {/* Banner Type Message Section */}
       <div className="d-flex status-banner-container">
-        <div className={bannerClass}>
+        <div role="banner" className={bannerClass}>
           <span className={iconClass}>{iconType}</span>
           <span className="status-message">{bannerLabel}</span>
         </div>

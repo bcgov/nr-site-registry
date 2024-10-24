@@ -19,6 +19,7 @@ jest.mock('../../../../node_modules/react-oidc-context', () => ({
 
 jest.mock('../../helpers/utility', () => ({
   getUser: jest.fn(),
+  showNotification: jest.fn(),
 }));
 
 const router = createBrowserRouter([

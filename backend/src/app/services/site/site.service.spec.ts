@@ -1082,4 +1082,48 @@ describe('SiteService', () => {
       });
     });
   });
+
+  describe('mapSearch', () => {
+    it('should fetch all sites if no search term is passed', () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      siteService.mapSearch();
+
+      expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
+      expect(mockQueryBuilder.where).not.toHaveBeenCalled();
+    });
+
+    it('should filter sites by trimmed lower-cased search term if provided', () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      // Padding spaces are intentional here, do not remove
+      siteService.mapSearch('   TeSt   ');
+
+      expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
+      expect(mockQueryBuilder.where).toHaveBeenCalledTimes(1);
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(expect.anything(), {
+        searchTerm: '%test%',
+      });
+      expect(mockQueryBuilder.orWhere).toHaveBeenCalledTimes(6);
+      expect(mockQueryBuilder.orWhere).toHaveBeenCalledWith(expect.anything(), {
+        searchTerm: '%test%',
+      });
+    });
+  });
 });

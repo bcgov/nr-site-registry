@@ -13,6 +13,7 @@ interface Props {
   position: LatLngExpression;
   icon?: Icon | DivIcon;
   onClick?: (e: LeafletMouseEvent) => void;
+  onHover: (hover: boolean) => void;
   eventHandlers?: LeafletEventHandlerFnMap;
   children?: ReactNode;
   riseOnHover?: boolean;
@@ -25,7 +26,8 @@ export const IconMarker = forwardRef<LeafletMarker, Props>(
       position,
       icon,
       onClick,
-      eventHandlers,
+      onHover,
+      eventHandlers = {},
       children = null,
       riseOnHover = false,
       ...rest
@@ -33,15 +35,19 @@ export const IconMarker = forwardRef<LeafletMarker, Props>(
     ref,
   ) => {
     if (onClick) {
-      if (!eventHandlers) {
-        eventHandlers = {
-          click: onClick,
-        };
-      } else {
-        eventHandlers.click = onClick;
-      }
+      eventHandlers = {
+        ...eventHandlers,
+        click: onClick,
+      };
     }
 
+    if (onHover) {
+      eventHandlers = {
+        ...eventHandlers,
+        mouseover: () => onHover(true),
+        mouseout: () => onHover(false),
+      };
+    }
     return (
       <Marker
         ref={ref}

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './SideBar.css';
 import { getSideBarNavList } from './dto/SideNav';
-import { AnglesLeftIcon } from '../common/icon';
-import { AnglesRightIcon } from '../common/icon';
 import { Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from 'react-oidc-context';
@@ -16,27 +14,22 @@ import { AppDispatch } from '../../Store';
 import { getLoggedInUserType, showNotification } from '../../helpers/utility';
 
 function SideBar() {
-  let userCartItems = useSelector(cartItems);
   const dispatch = useDispatch<AppDispatch>();
-
-  const [navList, SetNavList] = useState([]);
-
-  let cartItemAdded = useSelector(addCartItemRequestStatus);
-  let cartItemDeleted = useSelector(deleteRequestStatus);
-
+  const userCartItems = useSelector(cartItems);
+  const cartItemAdded = useSelector(addCartItemRequestStatus);
+  const cartItemDeleted = useSelector(deleteRequestStatus);
   const { user } = useAuth();
+  const location = useLocation();
+
+  const [navList, setNavList] = useState([]);
 
   useEffect(() => {
-    SetNavList(getSideBarNavList(getLoggedInUserType()));
+    setNavList(getSideBarNavList(getLoggedInUserType()));
   }, [user]);
 
-  const cartItemsArr = useSelector(cartItems);
-
-  const delteStatus = useSelector(deleteRequestStatus);
-
   useEffect(() => {
-    dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
-  }, [cartItemAdded, cartItemDeleted]);
+    dispatch(fetchCartItems(user?.profile.sub || ''));
+  }, [cartItemAdded, cartItemDeleted, user]);
 
   useEffect(() => {
     showNotification(
@@ -54,64 +47,45 @@ function SideBar() {
     );
   }, [cartItemDeleted]);
 
-  const location = useLocation();
-  let tabIndex = 1;
-
-  const renderMenuOption = (item: any, index: number) => {
-    ++tabIndex;
-
+  const renderMenuOption = (item: any, tabIndex: number) => {
     const isCurrentPath = location.pathname === item.linkTo;
+    const hasIcon = item.icon;
+    const isCartLink = item.linkTo.includes('cart');
+    const displayCount = userCartItems.length > 0 ? userCartItems.length : '';
 
-    const isParentGroup: boolean = item.displayText && !item.icon;
+    const linkContent = isCartLink ? displayCount : item.displayText;
 
     return (
       <section
         tabIndex={tabIndex}
         aria-label={item.displayText}
         aria-roledescription="menu"
-        role={isParentGroup ? 'group' : 'menuitem'}
-        className={`sideBar-NavItem ${isCurrentPath && item.icon ? 'currentPath' : ''}`}
+        role="menuitem"
+        className={`sideBar-NavItem ${isCurrentPath && hasIcon ? 'currentPath' : ''}`}
+        key={item.id} // Use a unique key based on the item id
       >
-        {item.icon && <item.icon className="sideBar-Icon" />}
-        {item.linkTo.indexOf('cart') === -1 &&
-          item.displayText &&
-          item.icon && (
+        <div className="d-flex align-items-center">
+          {hasIcon && (
             <Link
               to={item.linkTo}
-              className={`sideBarDisplayText nav-section-bold-label nav-color-primary-default`}
+              aria-label={item.displayText}
+              className="pb-1"
+            >
+              <item.icon className="sideBar-Icon" />
+            </Link>
+          )}
+          {linkContent && hasIcon && (
+            <Link
+              to={item.linkTo}
+              className={`sideBarDisplayText ${isCartLink ? 'cart-items-number' : ''} nav-section-bold-label nav-color-primary-default ps-2`}
               aria-label={item.displayText}
               role="menuitem"
             >
-              {item.displayText}
+              {linkContent}
             </Link>
           )}
-        {item.linkTo.indexOf('cart') !== -1 &&
-          userCartItems &&
-          userCartItems.length === 0 &&
-          item.icon && (
-            <Link
-              to={item.linkTo}
-              className={`sideBarDisplayText nav-section-bold-label nav-color-primary-default`}
-              aria-label={item.displayText}
-              role="menuitem"
-            >
-              {userCartItems.length}
-            </Link>
-          )}
-        {item.linkTo.indexOf('cart') !== -1 &&
-          userCartItems &&
-          userCartItems.length > 0 &&
-          item.icon && (
-            <Link
-              to={item.linkTo}
-              className={`sideBarDisplayText cart-items-number nav-section-bold-label nav-color-primary-default`}
-              aria-label={item.displayText}
-              role="menuitem"
-            >
-              {userCartItems.length}
-            </Link>
-          )}
-        {item.displayText && !item.icon && (
+        </div>
+        {item.displayText && !hasIcon && (
           <span
             className="nav-section-bold-label nav-color-secondary"
             aria-label={item.displayText}
@@ -125,44 +99,43 @@ function SideBar() {
   };
 
   return (
-    <div className="side-bar position-sticky ">
+    <div className="side-bar position-sticky">
       <div className="sideBar-Nav" role="menu">
         {navList
-          .filter((item: any) => {
-            return !item.lowerSection;
-          })
+          .filter((item: any) => !item.lowerSection)
           .map((item: any, index: number) => (
-            <React.Fragment key={index}>
-              {renderMenuOption(item, index)}
+            <React.Fragment key={item.id}>
+              {' '}
+              {/* Use item.id for a unique key */}
+              {renderMenuOption(item, index + 1)}
               {item.children &&
-                item.children.map((child: any, index: number) => {
-                  return (
-                    <React.Fragment key={index}>
-                      {renderMenuOption(child, index)}
-                    </React.Fragment>
-                  );
-                })}
+                item.children.map((child: any) => (
+                  <React.Fragment key={child.id}>
+                    {' '}
+                    {/* Ensure each child has a unique key */}
+                    {renderMenuOption(child, index + 1)}
+                  </React.Fragment>
+                ))}
             </React.Fragment>
           ))}
       </div>
 
       <div className="sideBar-Nav" role="menu">
         {navList
-          .filter((item: any) => {
-            return item.lowerSection;
-          })
-          .map((item: any, childIndex: number) => (
-            <React.Fragment key={childIndex}>
-              {renderMenuOption(item, childIndex)}
+          .filter((item: any) => item.lowerSection)
+          .map((item: any, index: number) => (
+            <React.Fragment key={item.id}>
+              {' '}
+              {/* Use item.id for a unique key */}
+              {renderMenuOption(item, index + 1)}
               {item.children &&
-                item.children.map((item: any, index: number) => {
-                  return renderMenuOption(item, index);
-                })}
-              {/* Additional static item */}
-              {/* <div className="sideBar-NavItem arrows">
-                <AnglesLeftIcon className="sideBar-Icon arrow-right" />
-                <AnglesRightIcon className="sideBar-Icon arrow-left" />
-              </div> */}
+                item.children.map((child: any) => (
+                  <React.Fragment key={child.id}>
+                    {' '}
+                    {/* Ensure each child has a unique key */}
+                    {renderMenuOption(child, index + 1)}
+                  </React.Fragment>
+                ))}
             </React.Fragment>
           ))}
       </div>

@@ -32,8 +32,8 @@ services:
     networks:
       - app-tier
     build:
-      context: backend/sites
-      dockerfile: backend/sites/Dockerfile.local
+      context: backend/
+      dockerfile: ./Dockerfile.local
     container_name: sites
     hostname: sites
     depends_on:
@@ -46,8 +46,8 @@ services:
     expose:
       - 4007
     volumes:
-      - ./backend/sites:/app:z
-      - ./backend/sites/node_modules:/app/node_modules
+      - ./backend/:/app:z
+      - ./backend/node_modules:/app/node_modules
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:4007" ]
       interval: 1m30s
@@ -77,6 +77,6 @@ services:
       - "4000:3000"
       - "35729:35729"
     volumes:
-      - ./frontend/site-registry:/app:z
+      - ./frontend:/app:z
       - /app/node_modules
     working_dir: "/app"

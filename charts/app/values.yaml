@@ -30,7 +30,7 @@ global:
   #-- the database Alias gives a nice way to switch to different databases, crunchy, patroni ... etc.
   databaseAlias: bitnami-pg
 #-- the components of the application, backend.
-backendSites:
+backend:
   #-- enable or disable backend
   enabled: true
   #-- the deployment strategy, can be "Recreate" or "RollingUpdate"
@@ -65,7 +65,7 @@ backendSites:
     enabled: true # enable it in PRODUCTION for having pod disruption budget.
     minAvailable: 1 # the minimum number of pods that must be available during the disruption budget.
 
-frontendSiteRegistry:
+frontend:
   # -- enable or disable a component deployment.
   enabled: true
   # -- the deployment strategy, can be "Recreate" or "RollingUpdate"
@@ -128,7 +128,6 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
   # enable this to go back to a specific timestamp in history in the current cluster.
   # follow https://access.crunchydata.com/documentation/postgres-operator/5.2.0/tutorial/disaster-recovery/
   # Perform an In-Place Point-in-time-Recovery (PITR)
-  # need to fire this command `oc annotate postgrescluster pay-transparency-tools-crunchy --overwrite postgres-operator.crunchydata.com/pgbackrest-restore=repo1`
   restore:
     enabled: false
     target: ~ # 2024-03-24 17:16:00-07 this is the target timestamp to go back to in current cluster
@@ -180,7 +179,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       incrementalBackupSchedule: 0 0,12 * * * # every 12 hour incremental
       volume:
         accessModes: "ReadWriteOnce"
-        storage: 96Mi
+        storage: 128Mi
         storageClassName: netapp-file-backup
 
     config:

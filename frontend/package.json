@@ -43,7 +43,7 @@
   "scripts": {
     "start": "concurrently \"react-scripts start\" \"graphql-codegen --watch\"",
     "build": "react-scripts build",
-    "test": "react-scripts test Actions.test.jsx --transformIgnorePatterns \"node_modules/(?!@react-parcelmap-bc)/\"  ",
+    "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!@react-parcelmap-bc)/\"  ",
     "eject": "react-scripts eject",
     "test:cov": "npm test -- --coverage",
     "codegen": "graphql-codegen"

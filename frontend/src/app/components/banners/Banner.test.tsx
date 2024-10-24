@@ -5,26 +5,46 @@ import { BannerMessages } from '../../helpers/requests/bannerMessages'; // Assum
 import Banner from './Banner';
 
 describe('BannerDetails', () => {
+  const snapshotDate = new Date().toISOString();
   it('renders without crashing', () => {
-    const { getByText } = render(<BannerDetails bannerType="bannerType" />);
-    expect(getByText('bannerType')).toBeInTheDocument();
+    render(
+      <BannerDetails
+        snapshotDate={snapshotDate}
+        bannerType={BannerMessages.outdated}
+      />,
+    );
+    expect(screen.getByText('Outdated')).toBeInTheDocument();
   });
 
   it('renders outdated message correctly', () => {
-    render(<BannerDetails bannerType={BannerMessages.outdated} />);
+    render(
+      <BannerDetails
+        snapshotDate={snapshotDate}
+        bannerType={BannerMessages.outdated}
+      />,
+    );
     expect(
-      screen.getByText(BannerMessages.outdatedMessage),
+      screen.getByText(
+        (_, element) => element?.textContent === BannerMessages.outdatedMessage,
+      ),
     ).toBeInTheDocument();
     expect(screen.getByRole('banner')).toHaveClass('message-outdated');
   });
 
   it('renders pending message correctly', () => {
-    render(<BannerDetails bannerType={BannerMessages.pending} />);
+    render(
+      <BannerDetails
+        snapshotDate={snapshotDate}
+        bannerType={BannerMessages.pending}
+      />,
+    );
     expect(
       screen.getByText(BannerMessages.pendingMessage1),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(BannerMessages.pendingMessage2),
+      screen.getByText(
+        (_, element) => element?.textContent === BannerMessages.pendingMessage2,
+      ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(BannerMessages.pendingMessage3),
@@ -38,14 +58,21 @@ describe('BannerDetails', () => {
   });
 
   it('renders current message correctly', () => {
-    render(<BannerDetails bannerType={BannerMessages.current} />);
+    render(
+      <BannerDetails
+        snapshotDate={snapshotDate}
+        bannerType={BannerMessages.current}
+      />,
+    );
     expect(screen.getByRole('banner')).toHaveClass('message-current');
     expect(screen.getByTestId('tick-icon')).toBeInTheDocument();
   });
 
   it('renders default message correctly when no type is found', () => {
-    render(<BannerDetails bannerType="unknownType" />);
-    expect(screen.getByText(BannerMessages.blankMessage)).toBeInTheDocument();
+    render(
+      <BannerDetails snapshotDate={snapshotDate} bannerType="unknownType" />,
+    );
+    expect(screen.getByTestId('invalid-type')).toBeInTheDocument();
   });
 });
 

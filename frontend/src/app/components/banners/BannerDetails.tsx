@@ -25,7 +25,7 @@ const BannerDetails: React.FC<BannerDetailsProps> = ({
   let iconType = <></>;
   let customClassForBanner = '';
   let customClassForIcon = '';
-  let detailMessageNode = <></>;
+  let detailMessageNode = <div data-testid="invalid-type" />;
 
   switch (bannerType) {
     case BannerMessages.outdated:
@@ -67,7 +67,7 @@ const BannerDetails: React.FC<BannerDetailsProps> = ({
       bannerLabel = BannerMessages.currentLabel;
       customClassForBanner = 'message-current';
       customClassForIcon = 'icon-current';
-      iconType = <TickIcon />;
+      iconType = <TickIcon data-testid={'tick-icon'} />;
       break;
     default:
       bannerLabel = BannerMessages.blankMessage;

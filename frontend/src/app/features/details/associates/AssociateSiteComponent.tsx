@@ -76,7 +76,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
         aria-label="Associated Sites Widget"
         customLabelCss="custom-associate-widget-lbl"
         hideTable={false}
-        hideTitle={true}
+        hideTitle={false}
         editMode={
           viewMode === SiteDetailsMode.EditMode &&
           userType === UserType.Internal

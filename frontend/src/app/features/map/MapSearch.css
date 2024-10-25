@@ -119,7 +119,8 @@ button.map-button--active:hover {
 }
 
 .polygon-search-icon,
-.point-search-icon {
+.point-search-icon,
+.radius-search-icon {
   color: var(--typography-color-primary);
 }
 

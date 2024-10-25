@@ -18,6 +18,7 @@
   font-weight: var(--font-weight);
   line-height: var(--line-height);
   text-align: left;
+  margin-bottom: 0;
 }
 
 .widget-table-container {

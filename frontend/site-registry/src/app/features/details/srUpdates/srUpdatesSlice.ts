@@ -114,7 +114,7 @@ export const fetchPendingAssociatedSites = createAsyncThunk(
           pending: showPending,
         },
       });
-      return response.data.data.getAssociatedSitesBySiteId.data;
+      return response.data.data.getAssociatedSitesBySiteId;
     } catch (error) {
       throw error;
     }
@@ -132,7 +132,7 @@ export const fetchPendingSiteDisclosure = createAsyncThunk(
           pending: showPending,
         },
       });
-      const res = response.data.data.getSiteDisclosureBySiteId.data[0];
+      const res = response.data.data.getSiteDisclosureBySiteId;
       if (res) {
         return res;
       }
@@ -155,7 +155,7 @@ export const fetchPendingDocumentsForApproval = createAsyncThunk(
           pending: showPending,
         },
       });
-      return response.data.data.getSiteDocumentsBySiteId.data;
+      return response.data.data.getSiteDocumentsBySiteId;
     } catch (error) {
       throw error;
     }
@@ -173,8 +173,8 @@ export const fetchPendingSiteParticipantsForApproval = createAsyncThunk(
           pending: args.showPending,
         },
       });
-      const participants: IParticipant[] =
-        response.data.data.getSiteParticipantBySiteId.data;
+      const participants =
+        response.data.data.getSiteParticipantBySiteId;
       return participants;
     } catch (error) {
       throw error;
@@ -193,7 +193,7 @@ export const fetchPendingSitesDetailsFprApproval = createAsyncThunk(
           pending: args.showPending,
         },
       });
-      return response.data.data.findSiteBySiteId.data;
+      return response.data.data.findSiteBySiteId;
     } catch (error) {
       throw error;
     }
@@ -211,7 +211,7 @@ export const fetchPendingSiteNotationBySiteId = createAsyncThunk(
           pending: args.showPending,
         },
       });
-      return response.data.data.getSiteNotationBySiteId.data;
+      return response.data.data.getSiteNotationBySiteId;
     } catch (error) {
       throw error;
     }
@@ -237,7 +237,7 @@ export const fetchPendingLandUses = createAsyncThunk(
         variables: { siteId, searchTerm, sortDirection, pending: showPending },
       });
 
-      return response.data.data.getLandHistoriesForSite.data;
+      return response.data.data.getLandHistoriesForSite;
     } catch (error) {
       throw error;
     }
@@ -270,7 +270,15 @@ const srUpdatesSlice = createSlice({
         fetchPendingSitesDetailsFprApproval.fulfilled,
         (state, action) => {
           const newState = { ...state };
-          newState.siteSummaryData = action.payload;
+          if(action.payload.httpStatusCode === 200)
+          {
+            newState.siteSummaryData = action.payload.data
+          }
+          else
+          {
+            newState.siteSummaryData = null;
+          }
+          
           console.log('sitesSummary Updated', action.payload);
           return newState;
         },
@@ -291,7 +299,10 @@ const srUpdatesSlice = createSlice({
       })
       .addCase(fetchPendingSiteNotationBySiteId.fulfilled, (state, action) => {
         const newState = { ...state };
-        newState.notation = action.payload;
+        if(action.payload.httpStatusCode === 200)
+        newState.notation = action.payload.data;
+        else
+        newState.notation = [];
         return newState;
       })
       .addCase(fetchPendingSiteNotationBySiteId.rejected, (state, action) => {
@@ -312,7 +323,9 @@ const srUpdatesSlice = createSlice({
         fetchPendingSiteParticipantsForApproval.fulfilled,
         (state, action) => {
           const newState = { ...state };
-          newState.siteParticipants = action.payload;
+          if (action.payload.httpStatusCode === 200)
+            newState.siteParticipants = action.payload.data;
+          else newState.siteParticipants = [];
           return newState;
         },
       )
@@ -332,7 +345,10 @@ const srUpdatesSlice = createSlice({
       })
       .addCase(fetchPendingLandUses.fulfilled, (state, action) => {
         const newState = { ...state };
+        if (action.payload.httpStatusCode === 200)
         newState.landUsesData = action.payload;
+        else
+        newState.landUsesData = [];
         return newState;
       })
       .addCase(fetchPendingLandUses.rejected, (state, action) => {
@@ -348,7 +364,10 @@ const srUpdatesSlice = createSlice({
       })
       .addCase(fetchPendingDocumentsForApproval.fulfilled, (state, action) => {
         const newState = { ...state };
-        newState.documents = action.payload;
+        if (action.payload.httpStatusCode === 200)
+        newState.documents = action.payload.data;
+        else
+        newState.documents = [];
         return newState;
       })
       .addCase(fetchPendingDocumentsForApproval.rejected, (state, action) => {
@@ -364,7 +383,10 @@ const srUpdatesSlice = createSlice({
       })
       .addCase(fetchPendingSiteDisclosure.fulfilled, (state, action) => {
         const newState = { ...state };
-        newState.disclosure = action.payload;
+        if (action.payload.httpStatusCode === 200)
+        newState.disclosure = action.payload.data[0];
+        else
+        newState.disclosure = null;
         return newState;
       })
       .addCase(fetchPendingSiteDisclosure.rejected, (state, action) => {
@@ -396,8 +418,10 @@ const srUpdatesSlice = createSlice({
       })
       .addCase(fetchPendingAssociatedSites.fulfilled, (state, action) => {
         const newState = { ...state };
-        console.log('data here', action.payload);
-        newState.siteAssociations = action.payload;
+        if (action.payload.httpStatusCode === 200)
+        newState.siteAssociations = action.payload.data;
+        else
+        newState.siteAssociations = [];
         return newState;
       })
       .addCase(fetchPendingAssociatedSites.rejected, (state, action) => {

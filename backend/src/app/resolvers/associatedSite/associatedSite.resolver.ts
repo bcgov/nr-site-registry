@@ -1,4 +1,4 @@
-import { UsePipes } from '@nestjs/common';
+import { HttpStatus, UsePipes } from '@nestjs/common';
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
@@ -54,7 +54,7 @@ export class AssociatedSiteResolver {
       );
       return this.genericResponseProvider.createResponse(
         'Associated sites fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -64,7 +64,7 @@ export class AssociatedSiteResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Associated sites data not found for site id: ${siteId}`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         [],
       );

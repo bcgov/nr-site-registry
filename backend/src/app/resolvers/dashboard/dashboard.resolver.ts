@@ -1,5 +1,5 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { RecentViews } from '../../entities/recentViews.entity';
 import { DashboardService } from '../../services/dashboard/dashboard.service';
@@ -42,7 +42,7 @@ export class DashboardResolver {
       );
       return this.genericResponseProvider.createResponse(
         'Recent views fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -52,7 +52,7 @@ export class DashboardResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Recent views data not found for site id: ${userId}`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );
@@ -81,12 +81,16 @@ export class DashboardResolver {
 
     if (message) {
       this.sitesLogger.log('DashboardResolver.addRecentView() RES:201 end');
-      return this.genericResponseProvider.createResponse(message, 201, true);
+      return this.genericResponseProvider.createResponse(
+        message,
+        HttpStatus.CREATED,
+        true,
+      );
     } else {
-      this.sitesLogger.log('DashboardResolver.addRecentView() RES:404 end');
+      this.sitesLogger.log('DashboardResolver.addRecentView() RES:422 end');
       return this.genericResponseProvider.createResponse(
         `Recent views failed to insert or update recent view. `,
-        400,
+        HttpStatus.UNPROCESSABLE_ENTITY,
         false,
         null,
       );

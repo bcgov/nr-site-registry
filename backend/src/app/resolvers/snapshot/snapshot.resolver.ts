@@ -1,4 +1,4 @@
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
 import {
   AuthenticatedUser,
@@ -40,7 +40,7 @@ export class SnapshotsResolver {
       this.sitesLogger.log('SnapshotsResolver.getSnapshots() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -48,7 +48,7 @@ export class SnapshotsResolver {
       this.sitesLogger.log('SnapshotsResolver.getSnapshots() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Snapshot not found.`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );
@@ -78,7 +78,7 @@ export class SnapshotsResolver {
       );
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -88,7 +88,7 @@ export class SnapshotsResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Snapshot not found for user id: ${userId}`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );
@@ -123,7 +123,7 @@ export class SnapshotsResolver {
       );
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -133,7 +133,7 @@ export class SnapshotsResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Snapshot not found for site id ${siteId}`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );
@@ -159,7 +159,7 @@ export class SnapshotsResolver {
       this.sitesLogger.log('SnapshotsResolver.getSnapshotsById() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -167,7 +167,7 @@ export class SnapshotsResolver {
       this.sitesLogger.log('SnapshotsResolver.getSnapshotsById() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Snapshot not found for snapshot id: ${id}`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );
@@ -204,7 +204,7 @@ export class SnapshotsResolver {
         );
         return this.genericResponseProvider.createResponse(
           'Successfully created snapshots.',
-          201,
+          HttpStatus.CREATED,
           true,
         );
       } else {
@@ -213,17 +213,17 @@ export class SnapshotsResolver {
         );
         return this.genericResponseProvider.createResponse(
           `Failed to create snapshots. `,
-          422,
+          HttpStatus.UNPROCESSABLE_ENTITY,
           false,
         );
       }
     } else {
       this.sitesLogger.log(
-        'SnapshotsResolver.createSnapshotForSites() RES:422 end',
+        'SnapshotsResolver.createSnapshotForSites() RES:400 end',
       );
       return this.genericResponseProvider.createResponse(
         `Please provide valid input to create snapshots`,
-        422,
+        HttpStatus.BAD_REQUEST,
         false,
       );
     }
@@ -252,7 +252,7 @@ export class SnapshotsResolver {
     if (bannerType && bannerType.length > 0) {
       this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:200 end');
       return {
-        httpStatusCode: 200,
+        httpStatusCode: HttpStatus.OK,
         message: 'Banner type fetched successfully',
         data: {
           bannerType: bannerType,
@@ -261,7 +261,7 @@ export class SnapshotsResolver {
     } else {
       this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:404 end');
       return {
-        httpStatusCode: 404,
+        httpStatusCode: HttpStatus.NOT_FOUND,
         message: `Failed to determine banner type for site id ${siteId}`,
         data: null,
       };

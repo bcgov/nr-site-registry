@@ -1,5 +1,5 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { UsePipes } from '@nestjs/common';
+import { HttpStatus, UsePipes } from '@nestjs/common';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
@@ -52,7 +52,7 @@ export class DisclosureResolver {
       );
       return this.genericResponseProvider.createResponse(
         'Site Disclosure fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -62,7 +62,7 @@ export class DisclosureResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Site Disclosure data not found for site id: ${siteId}`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );

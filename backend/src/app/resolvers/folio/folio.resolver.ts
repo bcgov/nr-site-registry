@@ -1,5 +1,5 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
   AuthenticatedUser,
   RoleMatchingMode,
@@ -46,7 +46,7 @@ export class FolioResolver {
       this.sitesLogger.log('FolioResolver.getFolioItemsForUser() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Folio fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -54,7 +54,7 @@ export class FolioResolver {
       this.sitesLogger.log('FolioResolver.getFolioItemsForUser() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Folio not found for user id: ${userId}`,
-        404,
+        HttpStatus.NOT_FOUND,
         true,
         [],
       );
@@ -81,15 +81,15 @@ export class FolioResolver {
       this.sitesLogger.log('FolioResolver.getSitesForFolio() RES:200 end');
       return this.genericResponseProviderForFolioContent.createResponse(
         'Sites fetched successfully for folio',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
     } else {
-      this.sitesLogger.log('FolioResolver.getSitesForFolio() RES:400 end');
+      this.sitesLogger.log('FolioResolver.getSitesForFolio() RES:404 end');
       return this.genericResponseProviderForFolioContent.createResponse(
         `Unable to fetch sites for folio`,
-        400,
+        HttpStatus.NOT_FOUND,
         true,
         [],
       );
@@ -113,12 +113,16 @@ export class FolioResolver {
 
     if (message) {
       this.sitesLogger.log('FolioResolver.addFolioItem() RES:201 end');
-      return this.genericResponseProvider.createResponse('Success', 201, true);
+      return this.genericResponseProvider.createResponse(
+        'Success',
+        HttpStatus.CREATED,
+        true,
+      );
     } else {
       this.sitesLogger.log('FolioResolver.addFolioItem() RES:422 end');
       return this.genericResponseProvider.createResponse(
         `Failed to add Folio. `,
-        422,
+        HttpStatus.UNPROCESSABLE_ENTITY,
         false,
       );
     }
@@ -144,12 +148,16 @@ export class FolioResolver {
 
     if (message) {
       this.sitesLogger.log('FolioResolver.addSiteToFolio() RES:201 end');
-      return this.genericResponseProvider.createResponse('Success', 201, true);
+      return this.genericResponseProvider.createResponse(
+        'Success',
+        HttpStatus.CREATED,
+        true,
+      );
     } else {
       this.sitesLogger.log('FolioResolver.addSiteToFolio() RES:422 end');
       return this.genericResponseProvider.createResponse(
         `Failed to add Folio. `,
-        422,
+        HttpStatus.UNPROCESSABLE_ENTITY,
         false,
       );
     }
@@ -172,12 +180,16 @@ export class FolioResolver {
 
     if (message) {
       this.sitesLogger.log('FolioResolver.updateFolioItem() RES:201 end');
-      return this.genericResponseProvider.createResponse('Success', 201, true);
+      return this.genericResponseProvider.createResponse(
+        'Success',
+        HttpStatus.CREATED,
+        true,
+      );
     } else {
       this.sitesLogger.log('FolioResolver.updateFolioItem() RES:422 end');
       return this.genericResponseProvider.createResponse(
         `Failed to add Folio. `,
-        422,
+        HttpStatus.UNPROCESSABLE_ENTITY,
         false,
       );
     }
@@ -198,12 +210,16 @@ export class FolioResolver {
 
     if (message) {
       this.sitesLogger.log('FolioResolver.deleteFolio() RES:200 end');
-      return this.genericResponseProvider.createResponse('Deleted', 200, true);
+      return this.genericResponseProvider.createResponse(
+        'Deleted',
+        HttpStatus.OK,
+        true,
+      );
     } else {
       this.sitesLogger.log('FolioResolver.deleteFolio() RES:422 end');
       return this.genericResponseProvider.createResponse(
         `Failed delete item. `,
-        422,
+        HttpStatus.UNPROCESSABLE_ENTITY,
         false,
       );
     }
@@ -229,12 +245,16 @@ export class FolioResolver {
 
     if (message) {
       this.sitesLogger.log('FolioResolver.deleteSitesInFolio() RES:200 end');
-      return this.genericResponseProvider.createResponse('Deleted', 200, true);
+      return this.genericResponseProvider.createResponse(
+        'Deleted',
+        HttpStatus.OK,
+        true,
+      );
     } else {
       this.sitesLogger.log('FolioResolver.deleteSitesInFolio() RES:422 end');
       return this.genericResponseProvider.createResponse(
         `Failed delete item. `,
-        422,
+        HttpStatus.UNPROCESSABLE_ENTITY,
         false,
       );
     }

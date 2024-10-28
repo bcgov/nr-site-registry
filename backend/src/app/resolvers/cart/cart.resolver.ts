@@ -1,5 +1,5 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
   AuthenticatedUser,
   RoleMatchingMode,
@@ -42,7 +42,7 @@ export class CartResolver {
       this.sitesLogger.log('CartResolver.getCartItemsForUser() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Cart items fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -50,7 +50,7 @@ export class CartResolver {
       this.sitesLogger.log('CartResolver.getCartItemsForUser() RES:200 end');
       return this.genericResponseProvider.createResponse(
         `Cart items not found for user id: ${userId}`,
-        200,
+        HttpStatus.NOT_FOUND,
         true,
         [],
       );
@@ -74,14 +74,14 @@ export class CartResolver {
       this.sitesLogger.log('CartResolver.addCartItem() RES:201 end');
       return this.genericResponseProvider.createResponse(
         'Items added to cart',
-        201,
+        HttpStatus.CREATED,
         true,
       );
     } else {
       this.sitesLogger.log('CartResolver.addCartItem() RES:422 end');
       return this.genericResponseProvider.createResponse(
         'Unable to add items to cart',
-        422,
+        HttpStatus.UNPROCESSABLE_ENTITY,
         true,
       );
     }
@@ -112,14 +112,14 @@ export class CartResolver {
       this.sitesLogger.log('CartResolver.deleteCartItem() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Successfully deleted cart items.',
-        200,
+        HttpStatus.OK,
         true,
       );
     } else {
       this.sitesLogger.log('CartResolver.deleteCartItem() RES:422 end');
       return this.genericResponseProvider.createResponse(
         `Unable to delete cart items. `,
-        422,
+        HttpStatus.UNPROCESSABLE_ENTITY,
         false,
       );
     }
@@ -144,13 +144,13 @@ export class CartResolver {
     if (message) {
       return this.genericResponseProvider.createResponse(
         'Deleted cart items.',
-        200,
+        HttpStatus.OK,
         true,
       );
     } else {
       return this.genericResponseProvider.createResponse(
         `Unable to delete cart item. `,
-        422,
+        HttpStatus.UNPROCESSABLE_ENTITY,
         false,
       );
     }

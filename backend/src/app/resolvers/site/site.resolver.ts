@@ -15,7 +15,7 @@ import { Sites } from '../../entities/sites.entity';
 import { SiteService } from '../../services/site/site.service';
 import { DropdownDto, DropdownResponse } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { UsePipes } from '@nestjs/common';
+import { HttpStatus, UsePipes } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { CustomRoles } from '../../common/role';
@@ -184,7 +184,7 @@ export class SiteResolver {
       this.sitesLogger.log('SiteResolver.searchSiteIds() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Notation Paticipant Role fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -192,7 +192,7 @@ export class SiteResolver {
       this.sitesLogger.log('SiteResolver.searchSiteIds() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Notation Paticipant Role not found`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
       );
     }
@@ -299,16 +299,16 @@ export class SiteResolver {
       );
       return this.genericResponseProvider.createResponse(
         'Successfully updated sites.',
-        200,
+        HttpStatus.OK,
         true,
       );
     } else {
       this.sitesLogger.log(
-        'SiteResolver.bulkAproveRejectChanges()  RES:500 end',
+        'SiteResolver.bulkAproveRejectChanges()  RES:422 end',
       );
       return this.genericResponseProvider.createResponse(
         `Unable to update sites. `,
-        500,
+        HttpStatus.UNPROCESSABLE_ENTITY,
         false,
       );
     }

@@ -10,6 +10,7 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { DropdownService } from '../../services/dropdown/dropdown.service';
 import { CustomRoles } from '../../common/role';
 import { LoggerService } from '../../logger/logger.service';
+import { HttpStatus } from '@nestjs/common';
 
 @Resolver(() => DropdownDto)
 export class DropdownResolver {
@@ -42,7 +43,7 @@ export class DropdownResolver {
       );
       return this.genericResponseProvider.createResponse(
         'Participants role code fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -52,7 +53,7 @@ export class DropdownResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Participants role code not found`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );
@@ -83,7 +84,7 @@ export class DropdownResolver {
       this.sitesLogger.log('DropdownResolver.getPeopleOrgsCd() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'People Organization fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -91,7 +92,7 @@ export class DropdownResolver {
       this.sitesLogger.log('DropdownResolver.getPeopleOrgsCd() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `People Organization not found`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
       );
     }
@@ -143,7 +144,7 @@ export class DropdownResolver {
       this.sitesLogger.log('DropdownResolver.getNotationClassCd() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Notation Class fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -151,7 +152,7 @@ export class DropdownResolver {
       this.sitesLogger.log('DropdownResolver.getNotationClassCd() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Notation Class not found`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
       );
     }
@@ -177,7 +178,7 @@ export class DropdownResolver {
       );
       return this.genericResponseProvider.createResponse(
         'Notation Paticipant Role fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -187,7 +188,7 @@ export class DropdownResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Notation Paticipant Role not found`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
       );
     }
@@ -207,17 +208,17 @@ export class DropdownResolver {
       );
       return this.genericResponseProvider.createResponse(
         'User Names fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
     } else {
       this.sitesLogger.log(
-        'DropdownResolver.getIDIRUserListForDropDown() RES:200 end',
+        'DropdownResolver.getIDIRUserListForDropDown() RES:404 end',
       );
       return this.genericResponseProvider.createResponse(
         `User Names not found`,
-        200,
+        HttpStatus.NOT_FOUND,
         false,
       );
     }

@@ -7,10 +7,12 @@ export interface IApproveReject {
   name: string;
   children: any;
   testId?: string;
+  link?: string;
 }
 
-const ApproveReject: React.FC<IApproveReject> = ({ name, children,testId }) => {
+const ApproveReject: React.FC<IApproveReject> = ({ name, children,testId, link }) => {
   const [isOpen, SetIsOpen] = useState(false);
+  link = link ?? '';
 
   return (
     <div className="approve-reject-container" data-testid={testId}>
@@ -37,7 +39,7 @@ const ApproveReject: React.FC<IApproveReject> = ({ name, children,testId }) => {
           <span className="header-label">{name}</span>
         </div>
         <div className="ar-continer-header-right">
-          <Link to="">View</Link>
+          <Link to={link}>View</Link>
         </div>
       </div>
       {isOpen && <div data-testid="child-content">{children}</div>}

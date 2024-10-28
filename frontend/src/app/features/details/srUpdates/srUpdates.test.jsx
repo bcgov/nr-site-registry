@@ -9,7 +9,6 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 import React, { act } from 'react';
-// import siteRouter from '../../../../app/routes/Routes';
 
 const mockStore = configureStore([thunk]);
 
@@ -80,9 +79,9 @@ describe('Site Registry Review Tab', () => {
           }
         ],
         parcelDescriptionData: {
-          data: {
+          data: [{
             siteId: '9',
-          }
+          }]
         }
       },
       dropdown: {
@@ -112,8 +111,7 @@ describe('Site Registry Review Tab', () => {
       <Provider store={store}>
         <RouterProvider router={createBrowserRouter(testSiteRouter)} />
       </Provider>,
-    );
-    console.log(screen)
+    );   
     const pageComponent = screen.getByTestId('srreviewtab-component');
     expect(pageComponent).toBeInTheDocument();
   });
@@ -124,8 +122,7 @@ describe('Site Registry Review Tab', () => {
       <Provider store={store}>
         <RouterProvider router={createBrowserRouter(testSiteRouter)} />
       </Provider>,
-    );
-    console.log(screen)
+    );   
     const pageComponent = screen.getByTestId('site-summary-component');
     expect(pageComponent).toBeInTheDocument();
   });
@@ -135,8 +132,7 @@ describe('Site Registry Review Tab', () => {
       <Provider store={store}>
         <RouterProvider router={createBrowserRouter(testSiteRouter)} />
       </Provider>,
-    );
-    console.log(screen)
+    );  
     const pageComponent = screen.getByTestId('srupdates-notation-component');
     expect(pageComponent).toBeInTheDocument();
   });
@@ -146,8 +142,7 @@ describe('Site Registry Review Tab', () => {
       <Provider store={store}>
         <RouterProvider router={createBrowserRouter(testSiteRouter)} />
       </Provider>,
-    );
-    console.log(screen)
+    );  
     const pageComponent = screen.getByTestId('srupdates-participant-component');
     expect(pageComponent).toBeInTheDocument();
   });
@@ -158,8 +153,7 @@ describe('Site Registry Review Tab', () => {
       <Provider store={store}>
         <RouterProvider router={createBrowserRouter(testSiteRouter)} />
       </Provider>,
-    );
-    console.log(screen)
+    );    
     const pageComponent = screen.getByTestId('srupdates-documents-component');
     expect(pageComponent).toBeInTheDocument();
   });
@@ -170,8 +164,7 @@ describe('Site Registry Review Tab', () => {
       <Provider store={store}>
         <RouterProvider router={createBrowserRouter(testSiteRouter)} />
       </Provider>,
-    );
-    console.log(screen)
+    );  
     const pageComponent = screen.getByTestId('srupdates-siteassociations-component');
     expect(pageComponent).toBeInTheDocument();
   });
@@ -182,8 +175,7 @@ describe('Site Registry Review Tab', () => {
       <Provider store={store}>
         <RouterProvider router={createBrowserRouter(testSiteRouter)} />
       </Provider>,
-    );
-    console.log(screen)
+    );   
     const pageComponent = screen.getByTestId('srupdates-landuses-component');
     expect(pageComponent).toBeInTheDocument();
   });
@@ -193,8 +185,7 @@ describe('Site Registry Review Tab', () => {
       <Provider store={store}>
         <RouterProvider router={createBrowserRouter(testSiteRouter)} />
       </Provider>,
-    );
-    console.log(screen)
+    );    
     const pageComponent = screen.getByTestId('srupdates-parceldesc-component');
     expect(pageComponent).toBeInTheDocument();
   });

@@ -29,19 +29,19 @@ export const getNavItems = () =>
   isUserOfType(UserRoleType.SR) ? ['Updates', ...mainNavItems] : mainNavItems;
 
 const mainNavComponents = [
-  <Summary />,
-  <Notations />,
-  <Participants />,
-  <Documents />,
-  <Associate />,
-  <LandUses />,
-  <ParcelDescriptions />,
-  <Disclosure />,
+ { key:"summary", component:  <Summary />},
+ { key:"notations", component: <Notations />},
+ { key:"participants", component: <Participants />},
+ { key:"documents", component: <Documents /> },
+ { key:"associated", component: <Associate /> },
+ { key:"landuses", component: <LandUses /> },
+ { key:"parceldesc", component: <ParcelDescriptions /> },
+ { key:"disclosure", component: <Disclosure /> },
 ];
 
 export const getNavComponents = () =>
   isUserOfType(UserRoleType.SR)
-    ? [<SRUpdates />, ...mainNavComponents]
+    ? [{ key:"updates", component:  <SRUpdates />}, ...mainNavComponents]
     : mainNavComponents;
 
 export const mainDropDownNavItems = [

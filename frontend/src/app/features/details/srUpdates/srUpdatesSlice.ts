@@ -262,8 +262,7 @@ const srUpdatesSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchPendingSitesDetailsFprApproval.pending, (state, action) => {
-        const newState = { ...state };
-        console.log('Failed To Fetch Site Details - Pending');
+        const newState = { ...state };       
         return newState;
       })
       .addCase(
@@ -278,23 +277,20 @@ const srUpdatesSlice = createSlice({
           {
             newState.siteSummaryData = null;
           }
-          
-          console.log('sitesSummary Updated', action.payload);
+         
           return newState;
         },
       )
       .addCase(
         fetchPendingSitesDetailsFprApproval.rejected,
         (state, action) => {
-          const newState = { ...state };
-          console.log('Failed To Fetch Site Details - Rejected');
+          const newState = { ...state };          
           return newState;
         },
       );
     builder
       .addCase(fetchPendingSiteNotationBySiteId.pending, (state, action) => {
-        const newState = { ...state };
-        console.log('fetchPendingSiteNotationBySiteId - Pending');
+        const newState = { ...state };        
         return newState;
       })
       .addCase(fetchPendingSiteNotationBySiteId.fulfilled, (state, action) => {
@@ -306,16 +302,14 @@ const srUpdatesSlice = createSlice({
         return newState;
       })
       .addCase(fetchPendingSiteNotationBySiteId.rejected, (state, action) => {
-        const newState = { ...state };
-        console.log('fetchPendingSiteNotationBySiteId - Rejected');
+        const newState = { ...state };        
         return newState;
       });
     builder
       .addCase(
         fetchPendingSiteParticipantsForApproval.pending,
         (state, action) => {
-          const newState = { ...state };
-          console.log('fetchPendingSiteParticipantsForApproval - Pending');
+          const newState = { ...state };          
           return newState;
         },
       )
@@ -332,15 +326,13 @@ const srUpdatesSlice = createSlice({
       .addCase(
         fetchPendingSiteParticipantsForApproval.rejected,
         (state, action) => {
-          const newState = { ...state };
-          console.log('fetchPendingSiteParticipantsForApproval - Rejected');
+          const newState = { ...state };          
           return newState;
         },
       );
     builder
       .addCase(fetchPendingLandUses.pending, (state, action) => {
-        const newState = { ...state };
-        console.log('fetchPendingLandUses - Pending');
+        const newState = { ...state };      
         return newState;
       })
       .addCase(fetchPendingLandUses.fulfilled, (state, action) => {
@@ -352,14 +344,12 @@ const srUpdatesSlice = createSlice({
         return newState;
       })
       .addCase(fetchPendingLandUses.rejected, (state, action) => {
-        const newState = { ...state };
-        console.log('fetchPendingLandUses - Rejected');
+        const newState = { ...state };       
         return newState;
       });
     builder
       .addCase(fetchPendingDocumentsForApproval.pending, (state, action) => {
-        const newState = { ...state };
-        console.log('fetchPendingDocumentsForApproval - Pending');
+        const newState = { ...state };       
         return newState;
       })
       .addCase(fetchPendingDocumentsForApproval.fulfilled, (state, action) => {
@@ -371,14 +361,12 @@ const srUpdatesSlice = createSlice({
         return newState;
       })
       .addCase(fetchPendingDocumentsForApproval.rejected, (state, action) => {
-        const newState = { ...state };
-        console.log('fetchPendingDocumentsForApproval - Rejected');
+        const newState = { ...state };       
         return newState;
       });
     builder
       .addCase(fetchPendingSiteDisclosure.pending, (state, action) => {
-        const newState = { ...state };
-        console.log('fetchPendingSiteDisclosure - Pending');
+        const newState = { ...state };        
         return newState;
       })
       .addCase(fetchPendingSiteDisclosure.fulfilled, (state, action) => {
@@ -390,14 +378,12 @@ const srUpdatesSlice = createSlice({
         return newState;
       })
       .addCase(fetchPendingSiteDisclosure.rejected, (state, action) => {
-        const newState = { ...state };
-        console.log('fetchPendingSiteDisclosure - Rejected');
+        const newState = { ...state };        
         return newState;
       });
       builder
       .addCase(fetchParcelDescriptionsForApproval.pending, (state, action) => {
-        const newState = { ...state };
-        console.log('fetchParcelDescriptionsForApproval - Pending');
+        const newState = { ...state };        
         return newState;
       })
       .addCase(fetchParcelDescriptionsForApproval.fulfilled, (state, action) => {
@@ -406,14 +392,12 @@ const srUpdatesSlice = createSlice({
         return newState;
       })
       .addCase(fetchParcelDescriptionsForApproval.rejected, (state, action) => {
-        const newState = { ...state };
-        console.log('fetchParcelDescriptionsForApproval - Rejected');
+        const newState = { ...state };      
         return newState;
       });
     builder
       .addCase(fetchPendingAssociatedSites.pending, (state, action) => {
-        const newState = { ...state };
-        console.log('fetchPendingAssociatedSites - Pending');
+        const newState = { ...state };        
         return newState;
       })
       .addCase(fetchPendingAssociatedSites.fulfilled, (state, action) => {
@@ -425,8 +409,7 @@ const srUpdatesSlice = createSlice({
         return newState;
       })
       .addCase(fetchPendingAssociatedSites.rejected, (state, action) => {
-        const newState = { ...state };
-        console.log('fetchPendingAssociatedSites - Rejected');
+        const newState = { ...state };       
         return newState;
       })
       .addCase(updateSiteDetailsForApproval.pending, (state, action) => {
@@ -436,8 +419,7 @@ const srUpdatesSlice = createSlice({
       })
       .addCase(updateSiteDetailsForApproval.fulfilled, (state, action) => {
         const newState = { ...state };
-        newState.updateRequestStatus = RequestStatus.success;
-        console.log('updateRequestStatus', newState.updateRequestStatus);
+        newState.updateRequestStatus = RequestStatus.success;       
         return newState;
       })
       .addCase(updateSiteDetailsForApproval.rejected, (state, action) => {

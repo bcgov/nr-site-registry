@@ -676,7 +676,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
   return (
     <div data-testid="srreviewtab-component">
       {siteSummaryData && (
-        <ApproveReject name="Summary" testId="site-summary-component">
+        <ApproveReject name="Summary" testId="site-summary-component" link="?summary">
           <SummaryInfo
             siteData={siteSummaryData}
             location={location}
@@ -692,7 +692,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       {notationData &&
         notationData.map((notation: any, index: number) => {
           return (
-            <ApproveReject name="Notations" testId="srupdates-notation-component">
+            <ApproveReject name="Notations" testId="srupdates-notation-component" link="?notations">
               <Notation
                 index={index}
                 notation={notation}
@@ -726,7 +726,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
         })}
 
       {siteParticipantData && siteParticipantData.length > 0 && (
-        <ApproveReject name="Participants" testId="srupdates-participant-component">
+        <ApproveReject name="Participants" testId="srupdates-participant-component" link="?participants">
           <ParticipantTable
             handleTableChange={handleParticipantsApproveRejectHandler}
             handleWidgetCheckBox={handleChange}
@@ -743,6 +743,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
             srVisibilityParcticConfig={srVisibilityParcticConfig}
             handleItemClick={handleChange}
             showApproveRejectSection={true}
+            hideLabelForWidget={true}
           />
         </ApproveReject>
       )}
@@ -750,7 +751,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       {documentsData &&
         documentsData.map((document: any, index: number) => {
           return (
-            <ApproveReject name="Documents" testId="srupdates-documents-component">
+            <ApproveReject name="Documents" testId="srupdates-documents-component" link="?documents">
               <Document
                 index={index}
                 userType={UserType.Internal}
@@ -777,7 +778,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
         })}
 
       {associatedSitesData && associatedSitesData.length > 0 && (
-        <ApproveReject name="Site Associations"  testId="srupdates-siteassociations-component">
+        <ApproveReject name="Site Associations"  testId="srupdates-siteassociations-component"  link="?associated">
           <AssociateSiteComponent
             handleTableChange={handleAssociatedSiteApproveRejectHandler}
             handleWidgetCheckBox={handleChange}
@@ -797,12 +798,13 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
             srVisibilityAssocConfig={srVisibilityAssocConfig}
             handleItemClick={handleChange}
             showApproveRejectSection={true}
+            hideLabelForWidget={true}
           />
         </ApproveReject>
       )}
 
       {landUsesData && (
-        <ApproveReject name="LandUses"  testId="srupdates-landuses-component">
+        <ApproveReject name="LandUses"  testId="srupdates-landuses-component" link="?landuses">
           <LandUseTable
             onTableChange={approveRejectHandlerForLandUses}
             tableColumns={landUseTableColumn}
@@ -818,8 +820,8 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
         </ApproveReject>
       )}
 
-      {parcelDescriptionData?.data && (
-        <ApproveReject name="Parcel Description"  testId="srupdates-parceldesc-component">
+      {parcelDescriptionData?.data.length > 0 && parcelDescriptionData?.data && (
+        <ApproveReject name="Parcel Description"  testId="srupdates-parceldesc-component" link="?parceldesc">
           <ParcelDescriptionTable
             tableChangeHandler={handleParcelDescriptionApproveRejectHandler}
             showPageOptions={false}
@@ -837,7 +839,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       )}
 
       {disclosureData && (
-        <ApproveReject name="Disclosure">
+        <ApproveReject name="Disclosure" link="?disclosure">
           <DisclosureComponent
             viewMode={SiteDetailsMode.ViewOnlyMode}
             userType={UserType.Internal}

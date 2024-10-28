@@ -25,6 +25,7 @@ interface IAssociateSiteComponent {
   handleItemClick: (value: string, index?: any) => void;
   approveRejectHandler?: (value: boolean) => void;
   showApproveRejectSection?: boolean;
+  hideLabelForWidget?: boolean;
 }
 
 const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
@@ -45,6 +46,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
   handleItemClick,
   approveRejectHandler,
   showApproveRejectSection,
+  hideLabelForWidget
 }) => {
   showApproveRejectSection = showApproveRejectSection ?? false;
 
@@ -54,6 +56,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
       console.log('Approve/Reject Handler not provided');
     });
 
+    hideLabelForWidget = hideLabelForWidget ?? false;
   return (
     <React.Fragment>
       <Widget
@@ -76,7 +79,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
         aria-label="Associated Sites Widget"
         customLabelCss="custom-associate-widget-lbl"
         hideTable={false}
-        hideTitle={false}
+        hideTitle={hideLabelForWidget}
         editMode={
           viewMode === SiteDetailsMode.EditMode &&
           userType === UserType.Internal

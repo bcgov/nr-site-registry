@@ -6,6 +6,7 @@
   line-height: 40px !important;
   text-align: left;
   color: var(--typography-color-primary, #2d2d2d) !important;
+  margin-bottom: 0;
 }
 
 .custom-associate-lbl-text {

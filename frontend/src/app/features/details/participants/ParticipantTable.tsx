@@ -77,7 +77,7 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
         aria-label="Site Participant Widget"
         customLabelCss="custom-participant-widget-lbl"
         hideTable={false}
-        hideTitle={true}
+        hideTitle={false}
         editMode={
           viewMode === SiteDetailsMode.EditMode &&
           userType === UserType.Internal

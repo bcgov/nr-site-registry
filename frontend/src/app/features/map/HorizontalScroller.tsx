@@ -2,8 +2,6 @@ import { ReactNode, useEffect, useRef, useState } from 'react';
 import { Button } from '@mui/material';
 import clsx from 'clsx';
 
-// import { SwipeDirection, useSwipe } from '../../../hooks/useSwipe';
-
 import { AngleLeft, AngleRight } from '../../components/common/icon';
 
 import './HorizontalScroller.css';

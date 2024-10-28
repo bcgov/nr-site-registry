@@ -692,7 +692,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       {notationData &&
         notationData.map((notation: any, index: number) => {
           return (
-            <ApproveReject name="Notations">
+            <ApproveReject name="Notations" testId="srupdates-notation-component">
               <Notation
                 index={index}
                 notation={notation}
@@ -726,7 +726,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
         })}
 
       {siteParticipantData && siteParticipantData.length > 0 && (
-        <ApproveReject name="Participants">
+        <ApproveReject name="Participants" testId="srupdates-participant-component">
           <ParticipantTable
             handleTableChange={handleParticipantsApproveRejectHandler}
             handleWidgetCheckBox={handleChange}
@@ -750,7 +750,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       {documentsData &&
         documentsData.map((document: any, index: number) => {
           return (
-            <ApproveReject name="Documents">
+            <ApproveReject name="Documents" testId="srupdates-documents-component">
               <Document
                 index={index}
                 userType={UserType.Internal}
@@ -777,7 +777,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
         })}
 
       {associatedSitesData && associatedSitesData.length > 0 && (
-        <ApproveReject name="Site Associations">
+        <ApproveReject name="Site Associations"  testId="srupdates-siteassociations-component">
           <AssociateSiteComponent
             handleTableChange={handleAssociatedSiteApproveRejectHandler}
             handleWidgetCheckBox={handleChange}
@@ -802,7 +802,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       )}
 
       {landUsesData && (
-        <ApproveReject name="LandUses">
+        <ApproveReject name="LandUses"  testId="srupdates-landuses-component">
           <LandUseTable
             onTableChange={approveRejectHandlerForLandUses}
             tableColumns={landUseTableColumn}
@@ -819,7 +819,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       )}
 
       {parcelDescriptionData?.data && (
-        <ApproveReject name="Parcel Description">
+        <ApproveReject name="Parcel Description"  testId="srupdates-parceldesc-component">
           <ParcelDescriptionTable
             tableChangeHandler={handleParcelDescriptionApproveRejectHandler}
             showPageOptions={false}

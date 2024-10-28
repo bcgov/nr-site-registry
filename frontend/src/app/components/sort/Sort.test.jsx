@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import Sort from './Sort';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';

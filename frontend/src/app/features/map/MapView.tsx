@@ -11,6 +11,8 @@ import { MyLocationMarker } from './MyLocationMarker'; // Import the MyLocationM
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 import { MapSearch } from './MapSearch';
+import { useMapSearchQuery } from '../../../graphql/generated';
+import { SiteMarkers } from './siteMarkers/SiteMarkers';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -23,6 +25,12 @@ function MapView() {
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
   // Feature flag for turning OpenStreetMap tiles gray
   const osmGrayscale = false;
+
+  const { data } = useMapSearchQuery({
+    variables: {
+      searchParam: '',
+    },
+  });
 
   return (
     <div
@@ -41,6 +49,7 @@ function MapView() {
           className={clsx(osmGrayscale && 'osm--grayscale')}
         />
         {/* <MyLocationMarker/> */}
+        <SiteMarkers sites={data?.searchSites.sites || []} />
       </MapContainer>
       <MapSearch />
     </div>

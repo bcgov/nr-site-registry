@@ -63,7 +63,7 @@ const UserAccount = (props: any) => {
               <Avatar firstName={user.firstname} lastName={user.lastName} />
               {/* User name */}
               <div id="user-name" className="p-3">
-                {user.firstname + ' ' + user.lastName}
+                {user.firstname}
               </div>
               <div
                 id="account-dropdown"
@@ -159,9 +159,7 @@ const UserAccount = (props: any) => {
                 {/* Profile image */}
                 <Avatar firstName={user.firstname} lastName={user.lastName} />
                 {/* User name */}
-                <span className="px-2">
-                  {user.firstname + ' ' + user.lastName}
-                </span>
+                <span className="px-2">{user.firstname}</span>
               </div>
             </Dropdown.Item>
             <div className="pt-3">

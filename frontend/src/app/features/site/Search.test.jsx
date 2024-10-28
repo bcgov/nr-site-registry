@@ -3,9 +3,14 @@ import { render, fireEvent, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import Search from './Search';
 import configureStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
 import { RequestStatus } from '../../helpers/requests/status';
 
-const mockStore = configureStore([]);
+const mockStore = configureStore([thunk]);
+
+jest.mock('react-oidc-context', () => ({
+  useAuth: jest.fn().mockReturnValue({ isAuthenticated: false }),
+}));
 
 describe('Search Component', () => {
   let store;

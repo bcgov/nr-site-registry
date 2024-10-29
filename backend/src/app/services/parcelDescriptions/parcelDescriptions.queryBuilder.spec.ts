@@ -194,7 +194,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             );
           expect(query).toEqual(
             expect.stringMatching(
-              /.*AND sites\.site_subdivisions\.user_action = 'updated'.*/,
+              /.*AND sites\.site_subdivisions\.sr_action = 'pending'.*/,
             ),
           );
         });
@@ -212,7 +212,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             );
           expect(countQuery).toEqual(
             expect.stringMatching(
-              /.*AND sites\.site_subdivisions\.user_action = 'updated'.*/,
+              /.*AND sites\.site_subdivisions\.sr_action = 'pending'.*/,
             ),
           );
         });
@@ -422,7 +422,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             );
           expect(query).toEqual(
             expect.stringMatching(
-              /.*AND sites\.site_subdivisions\.user_action = 'updated'.*/,
+              /.*AND sites\.site_subdivisions\.sr_action = 'pending'.*/,
             ),
           );
         });
@@ -440,7 +440,7 @@ describe('ParcelDescriptionsQueryBuilder', () => {
             );
           expect(countQuery).toEqual(
             expect.stringMatching(
-              /.*AND sites\.site_subdivisions\.user_action = 'updated'.*/,
+              /.*AND sites\.site_subdivisions\.sr_action = 'pending'.*/,
             ),
           );
         });

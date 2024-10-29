@@ -52,7 +52,7 @@ const Widget: React.FC<IWidget> = ({
       {children && <div>{children}</div>}
       {!hideTable && (
         <div
-          className={`${widgetData && widgetData.length > 12 ? 'widget-table-container' : ''}`}
+          className={`${widgetData && widgetData.length > 12 ? 'widget-table-container' : 'widget-table-conatiner-overflow '}`}
         >
           {/* <div> */}
           <div className="me-1">

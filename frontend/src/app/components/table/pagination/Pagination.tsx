@@ -216,7 +216,7 @@ const Pagination: React.FC<PaginationProps> = ({
         <div className="result-options-section">
           <span>Jump To</span>
           <select
-            data-testId="pagination-control-select"
+            data-testid="pagination-control-select"
             className="reslect-options-select"
             value={currentPage}
             onChange={(e) => {

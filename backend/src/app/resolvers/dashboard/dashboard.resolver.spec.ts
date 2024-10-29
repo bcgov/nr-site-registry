@@ -156,7 +156,7 @@ describe('DashboardResolver', () => {
 
       const result = await resolver.addRecentView(recentView);
 
-      expect(result.httpStatusCode).toEqual(400);
+      expect(result.httpStatusCode).toEqual(422);
       expect(result.message).toEqual(
         'Recent views failed to insert or update recent view. ',
       );

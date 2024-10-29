@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -32,18 +32,19 @@ export class DashboardService {
       if (result) {
         return result; // Return the fetched recent views
       } else {
+        this.sitesLogger.log('DashboardService.getRecentViewsByUserId() end');
+        this.sitesLogger.debug('DashboardService.getRecentViewsByUserId() end');
         return []; // Return an empty array if no recent views are found
       }
-      this.sitesLogger.log('DashboardService.getRecentViewsByUserId() end');
-      this.sitesLogger.debug('DashboardService.getRecentViewsByUserId() end');
     } catch (error) {
       // Log or handle the error as necessary
       this.sitesLogger.error(
         'Exception occured in DashboardService.getRecentViewsByUserId() end',
         JSON.stringify(error),
       );
-      throw new Error(
-        `Failed to retrieve recent views for userId ${userId}: ${error.message}`,
+      throw new HttpException(
+        `Failed to retrieve recent views for userId ${userId}`,
+        HttpStatus.NOT_FOUND,
       );
     }
   }
@@ -115,7 +116,10 @@ export class DashboardService {
         'Exception occured in DashboardService.addRecentView() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to insert or update recent view.');
+      throw new HttpException(
+        `Failed to insert or update recent view.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 }

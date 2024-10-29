@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FolioContents } from '../../entities/folioContents.entity';
 import { Repository } from 'typeorm';
@@ -29,7 +29,10 @@ export class FolioContentsService {
         'Exception occured in FolioContentsService.getSiteForFolio() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to retrieve site for folio`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -69,7 +72,7 @@ export class FolioContentsService {
         'Exception occured in FolioContentsService.addFolioContent() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(`Failed to add folio`, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -96,7 +99,7 @@ export class FolioContentsService {
         'Exception occured in FolioContentsService.deleteFolioContent() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(`Failed to delete folio`, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -124,7 +127,10 @@ export class FolioContentsService {
         'Exception occured in FolioContentsService.deleteSitesInFolio() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to delete sites in folio`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -160,7 +166,10 @@ export class FolioContentsService {
         'Exception occured in FolioContentsService.deleteAllSitesInFolio() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to delete sites in folio`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 }

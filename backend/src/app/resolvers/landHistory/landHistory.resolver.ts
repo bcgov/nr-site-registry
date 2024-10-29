@@ -5,6 +5,7 @@ import { LandHistories } from '../../entities/landHistories.entity';
 import { LandHistoryResponse } from '../../dto/landHistory.dto';
 import { LandHistoryService } from '../../services/landHistory/landHistory.service';
 import { LoggerService } from '../../logger/logger.service';
+import { HttpStatus } from '@nestjs/common';
 type SortDirection = 'ASC' | 'DESC';
 
 @Resolver(() => LandHistories)
@@ -50,13 +51,13 @@ export class LandHistoryResolver {
       sortDirection,
       showPending,
     );
-    if (result.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log(
         'LandHistoryResolver.getLandHistoriesForSite() RES:200 end',
       );
       return this.genericResponseProvider.createResponse(
         'Land uses fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -66,7 +67,7 @@ export class LandHistoryResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Land uses data not found for site id: ${siteId}`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );

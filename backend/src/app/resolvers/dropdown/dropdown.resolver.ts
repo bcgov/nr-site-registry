@@ -10,6 +10,7 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { DropdownService } from '../../services/dropdown/dropdown.service';
 import { CustomRoles } from '../../common/role';
 import { LoggerService } from '../../logger/logger.service';
+import { HttpStatus } from '@nestjs/common';
 
 @Resolver(() => DropdownDto)
 export class DropdownResolver {
@@ -36,13 +37,13 @@ export class DropdownResolver {
   async getParticipantRoleCd() {
     this.sitesLogger.log('DropdownResolver.getParticipantRoleCd() start');
     const result = await this.dropdownService.getParticipantRoleCd();
-    if (result && result.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log(
         'DropdownResolver.getParticipantRoleCd() RES:200 end',
       );
       return this.genericResponseProvider.createResponse(
         'Participants role code fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -52,7 +53,7 @@ export class DropdownResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Participants role code not found`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );
@@ -75,35 +76,23 @@ export class DropdownResolver {
     entityType?: string,
   ) {
     this.sitesLogger.log('DropdownResolver.getPeopleOrgsCd() start');
-    try {
-      const result = await this.dropdownService.getPeopleOrgsCd(
-        searchParam,
-        entityType,
-      );
-      if (result && result.length > 0) {
-        this.sitesLogger.log('DropdownResolver.getPeopleOrgsCd() RES:200 end');
-        return this.genericResponseProvider.createResponse(
-          'People Organization fetched successfully',
-          200,
-          true,
-          result,
-        );
-      } else {
-        this.sitesLogger.log('DropdownResolver.getPeopleOrgsCd() RES:404 end');
-        return this.genericResponseProvider.createResponse(
-          `People Organization not found`,
-          404,
-          false,
-        );
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in DropdownResolver.getPeopleOrgsCd() end',
-        JSON.stringify(error),
-      );
+    const result = await this.dropdownService.getPeopleOrgsCd(
+      searchParam,
+      entityType,
+    );
+    if (result?.length > 0) {
+      this.sitesLogger.log('DropdownResolver.getPeopleOrgsCd() RES:200 end');
       return this.genericResponseProvider.createResponse(
-        'Failed to fetch People Organization',
-        500,
+        'People Organization fetched successfully',
+        HttpStatus.OK,
+        true,
+        result,
+      );
+    } else {
+      this.sitesLogger.log('DropdownResolver.getPeopleOrgsCd() RES:404 end');
+      return this.genericResponseProvider.createResponse(
+        `People Organization not found`,
+        HttpStatus.NOT_FOUND,
         false,
       );
     }
@@ -121,7 +110,7 @@ export class DropdownResolver {
   async getNotationTypeCd() {
     this.sitesLogger.log('DropdownResolver.getNotationTypeCd() start');
     const result = await this.dropdownService.getNotationTypeCd();
-    if (result && result.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log('DropdownResolver.getNotationTypeCd() RES:200 end');
       return this.genericResponseProviderNotation.createResponse(
         'Notation Type fetched successfully',
@@ -151,11 +140,11 @@ export class DropdownResolver {
   async getNotationClassCd() {
     this.sitesLogger.log('DropdownResolver.getNotationClassCd() start');
     const result = await this.dropdownService.getNotationClassCd();
-    if (result && result.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log('DropdownResolver.getNotationClassCd() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Notation Class fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -163,7 +152,7 @@ export class DropdownResolver {
       this.sitesLogger.log('DropdownResolver.getNotationClassCd() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Notation Class not found`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
       );
     }
@@ -183,13 +172,13 @@ export class DropdownResolver {
       'DropdownResolver.getNotationParticipantRoleCd() start',
     );
     const result = await this.dropdownService.getNotationParticipantRoleCd();
-    if (result && result.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log(
         'DropdownResolver.getNotationParticipantRoleCd() RES:200 end',
       );
       return this.genericResponseProvider.createResponse(
         'Notation Paticipant Role fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -199,7 +188,7 @@ export class DropdownResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Notation Paticipant Role not found`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
       );
     }
@@ -211,35 +200,27 @@ export class DropdownResolver {
   })
   @Query(() => DropdownResponse, { name: 'getIDIRUserListForDropDown' })
   async getIDIRUserListForDropDown() {
-    try {
-      const result =
-        await this.dropdownService.getIDIRUserGivenNamesForDropDown();
-      if (result.length > 0) {
-        this.sitesLogger.log(
-          'DropdownResolver.getIDIRUserListForDropDown() RES:200 end',
-        );
-        return this.genericResponseProvider.createResponse(
-          'User Names fetched successfully',
-          200,
-          true,
-          result,
-        );
-      } else {
-        this.sitesLogger.log(
-          'DropdownResolver.getIDIRUserListForDropDown() RES:200 end',
-        );
-        return this.genericResponseProvider.createResponse(
-          `User Names not found`,
-          200,
-          false,
-        );
-      }
-    } catch (error) {
+    const result =
+      await this.dropdownService.getIDIRUserGivenNamesForDropDown();
+    if (result?.length > 0) {
       this.sitesLogger.log(
-        'DropdownResolver.getIDIRUserListForDropDown() error' +
-          JSON.stringify(error),
+        'DropdownResolver.getIDIRUserListForDropDown() RES:200 end',
       );
-      throw error;
+      return this.genericResponseProvider.createResponse(
+        'User Names fetched successfully',
+        HttpStatus.OK,
+        true,
+        result,
+      );
+    } else {
+      this.sitesLogger.log(
+        'DropdownResolver.getIDIRUserListForDropDown() RES:404 end',
+      );
+      return this.genericResponseProvider.createResponse(
+        `User Names not found`,
+        HttpStatus.NOT_FOUND,
+        false,
+      );
     }
   }
 }

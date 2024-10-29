@@ -43,7 +43,7 @@ const externalUserCondition = `
   WHERE sites.site_subdivisions.site_subdiv_id = ANY ($1)
 `;
 const showPendingCondition = `
-  AND sites.site_subdivisions.user_action = 'updated'
+  AND sites.site_subdivisions.sr_action = 'pending'
 `;
 const parcelDescriptionQueryTail = `
   ) parcel_descriptions

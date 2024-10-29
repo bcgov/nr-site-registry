@@ -46,4 +46,14 @@ npm run typeorm:run-migrations
 
 echo "migrations completed"
 
+# Check for existence of SEED_DATA_PATH
+if [ -n "$SEED_DATA_PATH" ]; then
+    # Run the seed data SQL file
+    echo "Seed data set, attempting to load."
+    psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "$SEED_DATA_PATH"
+    echo "Seed data successfully loaded."
+else
+    echo "SEED_DATA_PATH is not set. Skipping seed data loading."
+fi
+
 exit 0

@@ -49,7 +49,7 @@ bitnami-pg:
       podSecurityContext:
         enabled: false
       storage:
-        size: 130Mi
+        size: 250Mi
   primary:
     persistence:
       enabled: true

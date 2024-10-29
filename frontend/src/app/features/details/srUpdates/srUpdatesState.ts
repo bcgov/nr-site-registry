@@ -9,4 +9,5 @@ export interface SRUpdatesState {
   documents: any;
   disclosure: any;
   siteAssociations: any;
+  parcelDescriptionData: any;
 }

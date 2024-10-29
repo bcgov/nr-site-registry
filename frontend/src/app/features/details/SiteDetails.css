@@ -183,6 +183,12 @@
   border-bottom: 1px solid var(--surface-border-light, #d8d8d8);
 }
 
+@media (max-width: 642px) {
+  .custom-sticky-header {
+    align-items: baseline !important;
+  }
+}
+
 .custom-sticky-header-lbl {
   font-size: 14px;
   font-weight: 700;

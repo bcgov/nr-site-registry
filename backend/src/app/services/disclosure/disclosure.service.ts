@@ -35,7 +35,7 @@ export class DisclosureService {
 
       if (showPending) {
         result = await this.disclosureRepository.find({
-          where: { siteId, userAction: UserActionEnum.UPDATED },
+          where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
         });
       } else {
         result = await this.disclosureRepository.find({

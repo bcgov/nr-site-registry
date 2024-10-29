@@ -1,5 +1,4 @@
 import { ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
-import { GqlArgumentsHost } from '@nestjs/graphql';
 import { GenericResponse } from '../dto/response/genericResponse'; // Adjust the path as needed
 import { CustomExceptionFilter } from './customExceptionFilters';
 
@@ -12,14 +11,7 @@ describe('CustomExceptionFilter', () => {
 
   it('should format HttpException correctly', () => {
     const exception = new HttpException('User not found', HttpStatus.NOT_FOUND);
-
-    const host = {
-      switchToHttp: jest.fn(),
-      getType: jest.fn().mockReturnValue('graphql'),
-      getArgs: jest.fn().mockReturnValue([]),
-    } as unknown as ArgumentsHost;
-
-    const response = customExceptionFilter.catch(exception, host);
+    const response = customExceptionFilter.catch(exception);
 
     expect(response).toBeInstanceOf(GenericResponse);
     expect(response.message).toBe('User not found');
@@ -37,7 +29,7 @@ describe('CustomExceptionFilter', () => {
       getArgs: jest.fn().mockReturnValue([]),
     } as unknown as ArgumentsHost;
 
-    const response = customExceptionFilter.catch(exception as any, host);
+    const response = customExceptionFilter.catch(exception as any);
 
     expect(response).toBeInstanceOf(GenericResponse);
     expect(response.message).toBe('Internal server error');
@@ -62,7 +54,7 @@ describe('CustomExceptionFilter', () => {
       getArgs: jest.fn().mockReturnValue([]),
     } as unknown as ArgumentsHost;
 
-    const response = customExceptionFilter.catch(exception, host);
+    const response = customExceptionFilter.catch(exception);
 
     expect(response).toBeInstanceOf(GenericResponse);
     expect(response.message).toBe('Custom error message');

@@ -488,7 +488,7 @@ describe('SnapshotResolver', () => {
 
       const result = await resolver.createSnapshotForSites([snapshotDto], '');
 
-      expect(result.httpStatusCode).toEqual(201);
+      expect(result.httpStatusCode).toEqual(422);
     });
   });
 

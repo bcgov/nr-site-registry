@@ -22,7 +22,7 @@ export class LandUseCodeResolver {
   async getLandUseCodes() {
     this.sitesLogger.log('LandUseCodeResolver.getLandUseCodes() start ');
     const result = await this.landUseCodeService.getLandUseCodes();
-    if (result.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log('LandUseCodeResolver.getLandUseCodes() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Land use codes fetched successfully',

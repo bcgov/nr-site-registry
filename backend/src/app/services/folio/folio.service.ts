@@ -209,7 +209,7 @@ export class FolioService {
     this.sitesLogger.log('FolioService.addSiteToFolio() start');
     this.sitesLogger.debug('FolioService.addSiteToFolio() start');
     try {
-      if (inputDTO.length > 0) {
+      if (inputDTO?.length > 0) {
         inputDTO.forEach((item) => {
           if (item != null) {
             const userId = userInfo.sub;
@@ -248,7 +248,7 @@ export class FolioService {
     this.sitesLogger.log('FolioService.deleteSitesInFolio() start');
     this.sitesLogger.debug('FolioService.deleteSitesInFolio() start');
     try {
-      if (inputDTO.length > 0) {
+      if (inputDTO?.length > 0) {
         inputDTO.forEach((item) => {
           if (item != null) {
             const userId = userInfo.sub;

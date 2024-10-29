@@ -49,7 +49,7 @@ export class ParticipantService {
           relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
         });
 
-      if (result && !result.length) {
+      if (result && !result?.length) {
         return [];
       } else {
         // Transform the fetched site participants into the desired format

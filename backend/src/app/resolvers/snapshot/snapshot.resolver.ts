@@ -194,7 +194,7 @@ export class SnapshotsResolver {
         JSON.stringify(inputDto),
     );
     if (inputDto) {
-      const isSaved = this.snapshotsService.createSnapshotForSites(
+      const isSaved = await this.snapshotsService.createSnapshotForSites(
         inputDto,
         user,
       );
@@ -249,7 +249,7 @@ export class SnapshotsResolver {
       user.sub,
     );
 
-    if (bannerType && bannerType.length > 0) {
+    if (bannerType && bannerType?.length > 0) {
       this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:200 end');
       return {
         httpStatusCode: HttpStatus.OK,

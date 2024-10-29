@@ -46,7 +46,7 @@ export class DocumentResolver {
       siteId,
       showPending,
     );
-    if (response && response.length > 0) {
+    if (response && response?.length > 0) {
       this.sitesLogger.log(
         'DocumentResolver.getSiteDocumentsBySiteId() RES:200 end',
       );

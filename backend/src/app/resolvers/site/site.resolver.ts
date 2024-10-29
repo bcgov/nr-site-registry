@@ -180,7 +180,7 @@ export class SiteResolver {
       'SiteResolver.searchSiteIds() start searchParam:' + ' ' + searchParam,
     );
     const result = await this.siteService.searchSiteIds(searchParam);
-    if (result && result.length > 0) {
+    if (result && result?.length > 0) {
       this.sitesLogger.log('SiteResolver.searchSiteIds() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Notation Paticipant Role fetched successfully',

@@ -38,7 +38,7 @@ export class CartResolver {
       'CartResolver.getCartItemsForUser() start userId:' + ' ' + userId,
     );
     const result = await this.cartService.getCartItemsForUser(user?.sub);
-    if (result.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log('CartResolver.getCartItemsForUser() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Cart items fetched successfully',

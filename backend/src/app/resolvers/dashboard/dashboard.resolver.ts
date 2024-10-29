@@ -36,7 +36,7 @@ export class DashboardResolver {
       'DashboardResolver.getRecentViewsByUserId() start userId:' + ' ' + userId,
     );
     const result = await this.dashboardService.getRecentViewsByUserId(userId);
-    if (result.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log(
         'DashboardResolver.getRecentViewsByUserId() RES:200 end',
       );

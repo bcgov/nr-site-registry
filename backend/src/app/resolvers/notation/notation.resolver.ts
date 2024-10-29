@@ -46,7 +46,7 @@ export class NotationResolver {
       siteId,
       showPending,
     );
-    if (result && result.length > 0) {
+    if (result && result?.length > 0) {
       this.sitesLogger.log(
         'NotationResolver.getSiteNotationBySiteId() RES:200 end',
       );

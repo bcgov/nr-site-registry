@@ -56,7 +56,7 @@ export class DocumentService {
         };
 
         // If there are associated siteDocPartics, map them
-        if (res.siteDocPartics.length > 0) {
+        if (res.siteDocPartics?.length > 0) {
           return res.siteDocPartics.map((sdp) => ({
             ...document,
             srAction:

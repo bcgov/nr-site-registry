@@ -42,7 +42,7 @@ export class DisclosureService {
           where: { siteId },
         });
       }
-      if (result && !result.length) {
+      if (result && !result?.length) {
         return [];
       } else {
         const res = result.map((res) => {

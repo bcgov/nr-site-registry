@@ -45,7 +45,7 @@ export class ParticipantResolver {
       siteId,
       showPending,
     );
-    if (result.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log(
         'ParticipantResolver.getSiteParticipantsBySiteId() RES:200 end',
       );

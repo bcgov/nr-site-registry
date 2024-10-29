@@ -227,7 +227,7 @@ export class SnapshotsService {
 
       const saveResult = await this.snapshotRepository.save(snapShotsToBeSaved);
 
-      if (saveResult.length > 0) {
+      if (saveResult?.length > 0) {
         this.sitesLogger.log('SnapshotsService.createSnapshotForSites() end');
         this.sitesLogger.debug('SnapshotsService.createSnapshotForSites() end');
         return true;
@@ -311,7 +311,7 @@ export class SnapshotsService {
 
       const entityManager = this.snapshotRepository.manager;
       const result = await entityManager.query(query, [siteId, userId]);
-      return result.length > 0 ? result[0].bannertype : 'unknown';
+      return result?.length > 0 ? result[0].bannertype : 'unknown';
     } catch (error) {
       throw new HttpException(
         `Failed to determine banner type.`,

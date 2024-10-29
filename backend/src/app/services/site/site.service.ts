@@ -397,7 +397,7 @@ export class SiteService {
       );
     }
 
-    if (events && events.length > 0) {
+    if (events && events?.length > 0) {
       await this.processEvents(events, userInfo, transactionalEntityManager);
     } else {
       this.sitesLogger.log(
@@ -405,7 +405,7 @@ export class SiteService {
       );
     }
 
-    if (siteParticipants && siteParticipants.length > 0) {
+    if (siteParticipants && siteParticipants?.length > 0) {
       await this.processSiteParticipants(
         siteParticipants,
         userInfo,
@@ -417,7 +417,7 @@ export class SiteService {
       );
     }
 
-    if (documents && documents.length > 0) {
+    if (documents && documents?.length > 0) {
       await this.processDocuments(
         documents,
         userInfo,
@@ -429,7 +429,7 @@ export class SiteService {
       );
     }
 
-    if (siteAssociations && siteAssociations.length > 0) {
+    if (siteAssociations && siteAssociations?.length > 0) {
       await this.processSiteAssociated(
         siteAssociations,
         userInfo,
@@ -463,7 +463,7 @@ export class SiteService {
       console.log('No changes To Site LandHistories');
     }
 
-    if (profiles && profiles.length > 0) {
+    if (profiles && profiles?.length > 0) {
       await this.processSiteDisclosure(
         profiles,
         userInfo,
@@ -503,7 +503,7 @@ export class SiteService {
     transactionalEntityManager: EntityManager,
   ) {
     try {
-      if (documents && documents.length > 0) {
+      if (documents && documents?.length > 0) {
         const newDocuments: SiteDocs[] = [];
         const updateDocuments: { id: string; changes: Partial<SiteDocs> }[] =
           [];
@@ -637,11 +637,11 @@ export class SiteService {
         await Promise.all(siteDocuments);
 
         // Save new site documents and site document participants in bulk
-        if (newDocuments.length > 0) {
+        if (newDocuments?.length > 0) {
           await transactionalEntityManager.save(SiteDocs, newDocuments);
         }
 
-        if (newDocumentParticipants.length > 0) {
+        if (newDocumentParticipants?.length > 0) {
           await transactionalEntityManager.save(
             SiteDocPartics,
             newDocumentParticipants,
@@ -649,7 +649,7 @@ export class SiteService {
         }
 
         // Update existing site documents and site document participants in bulk
-        if (updateDocuments.length > 0) {
+        if (updateDocuments?.length > 0) {
           await Promise.all(
             updateDocuments.map(({ id, changes }) =>
               transactionalEntityManager.update(SiteDocs, { id }, changes),
@@ -657,7 +657,7 @@ export class SiteService {
           );
         }
 
-        if (updateDocumentParticipants.length > 0) {
+        if (updateDocumentParticipants?.length > 0) {
           await Promise.all(
             updateDocumentParticipants.map(({ id, changes }) =>
               transactionalEntityManager.update(
@@ -670,7 +670,7 @@ export class SiteService {
         }
 
         // Delete existing site documents and site document participants in bulk
-        if (deleteDocuments.length > 0) {
+        if (deleteDocuments?.length > 0) {
           await Promise.all(
             deleteDocuments.map(({ id }) =>
               transactionalEntityManager.delete(SiteDocs, { id }),
@@ -698,7 +698,7 @@ export class SiteService {
     transactionalEntityManager: EntityManager,
   ) {
     try {
-      if (siteParticipants && siteParticipants.length) {
+      if (siteParticipants && siteParticipants?.length) {
         // Arrays to store new and updated entities
         const newSitePartics: SitePartics[] = [];
         const updatedSitePartics: {
@@ -833,10 +833,10 @@ export class SiteService {
         await Promise.all(siteParticsPromises);
 
         // Save new site participants and site participant roles in bulk
-        if (newSitePartics.length > 0) {
+        if (newSitePartics?.length > 0) {
           await transactionalEntityManager.save(SitePartics, newSitePartics);
         }
-        if (newSiteParticRoles.length > 0) {
+        if (newSiteParticRoles?.length > 0) {
           await transactionalEntityManager.save(
             SiteParticRoles,
             newSiteParticRoles,
@@ -844,7 +844,7 @@ export class SiteService {
         }
 
         // Update existing site participants and site participant roles in bulk
-        if (updatedSitePartics.length > 0) {
+        if (updatedSitePartics?.length > 0) {
           await Promise.all(
             updatedSitePartics.map(({ id, changes }) =>
               transactionalEntityManager.update(SitePartics, { id }, changes),
@@ -852,7 +852,7 @@ export class SiteService {
           );
         }
 
-        if (updatedSiteParticRoles.length > 0) {
+        if (updatedSiteParticRoles?.length > 0) {
           await Promise.all(
             updatedSiteParticRoles.map(({ id, changes }) =>
               transactionalEntityManager.update(
@@ -865,14 +865,14 @@ export class SiteService {
         }
 
         // Delete existing site participants and site participant roles in bulk
-        if (deleteSiteParticRoles.length > 0) {
+        if (deleteSiteParticRoles?.length > 0) {
           await Promise.all(
             deleteSiteParticRoles.map(({ id }) =>
               transactionalEntityManager.delete(SiteParticRoles, { id }),
             ),
           );
         }
-        if (deleteSitePartics.length > 0) {
+        if (deleteSitePartics?.length > 0) {
           await Promise.all(
             deleteSitePartics.map(({ id }) =>
               transactionalEntityManager.delete(SitePartics, { id }),
@@ -900,7 +900,7 @@ export class SiteService {
     transactionalEntityManager: EntityManager,
   ) {
     try {
-      if (events && events.length > 0) {
+      if (events && events?.length > 0) {
         // Arrays to store new and updated entities
         const newEvents: Events[] = [];
         const updatedEvents: { id: string; changes: Partial<Events> }[] = [];
@@ -1042,7 +1042,7 @@ export class SiteService {
           }
 
           // Process related participants regardless of event action
-          if (notationParticipant && notationParticipant.length > 0) {
+          if (notationParticipant && notationParticipant?.length > 0) {
             await processParticipants(notationId, notationParticipant);
           }
         });
@@ -1050,16 +1050,16 @@ export class SiteService {
         await Promise.all(eventPromises);
 
         // Save new events and event participants in bulk
-        if (newEvents.length > 0) {
+        if (newEvents?.length > 0) {
           await transactionalEntityManager.save(Events, newEvents);
         }
 
-        if (newEventPartics.length > 0) {
+        if (newEventPartics?.length > 0) {
           await transactionalEntityManager.save(EventPartics, newEventPartics);
         }
 
         // Update existing events and participants in bulk
-        if (updatedEvents.length > 0) {
+        if (updatedEvents?.length > 0) {
           await Promise.all(
             updatedEvents.map(({ id, changes }) =>
               transactionalEntityManager.update(Events, { id }, changes),
@@ -1067,7 +1067,7 @@ export class SiteService {
           );
         }
 
-        if (updatedEventPartics.length > 0) {
+        if (updatedEventPartics?.length > 0) {
           await Promise.all(
             updatedEventPartics.map(({ id, changes }) =>
               transactionalEntityManager.update(EventPartics, { id }, changes),
@@ -1095,7 +1095,7 @@ export class SiteService {
     transactionalEntityManager: EntityManager,
   ) {
     try {
-      if (siteAccociated && siteAccociated.length > 0) {
+      if (siteAccociated && siteAccociated?.length > 0) {
         const newSiteAssociates: SiteAssocs[] = [];
         const updatedSiteAssociates: {
           id: string;
@@ -1149,12 +1149,12 @@ export class SiteService {
         await Promise.all(siteAssociatePromises);
 
         // Save new site associates in bulk
-        if (newSiteAssociates.length > 0) {
+        if (newSiteAssociates?.length > 0) {
           await transactionalEntityManager.save(SiteAssocs, newSiteAssociates);
         }
 
         // Update existing site participants and site participant roles in bulk
-        if (updatedSiteAssociates.length > 0) {
+        if (updatedSiteAssociates?.length > 0) {
           await Promise.all(
             updatedSiteAssociates.map(({ id, changes }) =>
               transactionalEntityManager.update(SiteAssocs, { id }, changes),
@@ -1162,7 +1162,7 @@ export class SiteService {
           );
         }
 
-        if (deleteSiteAssociates.length > 0) {
+        if (deleteSiteAssociates?.length > 0) {
           await Promise.all(
             deleteSiteAssociates.map(({ id }) =>
               transactionalEntityManager.delete(SiteAssocs, { id }),
@@ -1190,7 +1190,7 @@ export class SiteService {
     transactionalEntityManager: EntityManager,
   ) {
     try {
-      if (siteDisclosure && siteDisclosure.length > 0) {
+      if (siteDisclosure && siteDisclosure?.length > 0) {
         const disclosurePromises = siteDisclosure.map(async (disclosure) => {
           const { apiAction, id, ...disclosureData } = disclosure;
           let profile = {
@@ -1384,7 +1384,7 @@ export class SiteService {
 
       let result: SitePendingApprovalRecords[] = [];
 
-      if (queryResult && queryResult.length > 0) {
+      if (queryResult && queryResult?.length > 0) {
         result = queryResult.map((res) => {
           return {
             id: res.row_num,
@@ -1452,7 +1452,7 @@ export class SiteService {
 
       const resultDTO: QueryResultForPendingSites = {
         data: paginatedRecords,
-        totalRecords: result.length,
+        totalRecords: result?.length,
       };
 
       this.sitesLogger.log('SiteService.getSiteDetailsPendingSRApproval() end');
@@ -1545,7 +1545,7 @@ export class SiteService {
           where: { id: site.siteId, whoUpdated: site.whoUpdated },
         });
 
-        if (sitesForUpdates.length > 0) {
+        if (sitesForUpdates?.length > 0) {
           sitesForUpdates.forEach((site) => {
             this.setUpdatedStatus(site, isApproved, userInfo);
           });
@@ -1562,7 +1562,7 @@ export class SiteService {
           where: { siteId: site.siteId, whoUpdated: site.whoUpdated },
         });
 
-        if (events.length > 0) {
+        if (events?.length > 0) {
           events.forEach((event) => {
             this.setUpdatedStatus(event, isApproved, userInfo);
           });
@@ -1581,7 +1581,7 @@ export class SiteService {
             },
           );
 
-          if (eventsParticipants.length > 0) {
+          if (eventsParticipants?.length > 0) {
             eventsParticipants.forEach((eventsParticipant) => {
               this.setUpdatedStatus(eventsParticipant, isApproved, userInfo);
             });
@@ -1613,7 +1613,7 @@ export class SiteService {
           },
         );
 
-        if (siteParticipants.length > 0) {
+        if (siteParticipants?.length > 0) {
           siteParticipants.forEach((siteParticipant) => {
             this.setUpdatedStatus(siteParticipant, isApproved, userInfo);
           });
@@ -1634,7 +1634,7 @@ export class SiteService {
           },
         });
 
-        if (siteDocs.length > 0) {
+        if (siteDocs?.length > 0) {
           siteDocs.forEach((doc) => {
             this.setUpdatedStatus(doc, isApproved, userInfo);
           });
@@ -1658,7 +1658,7 @@ export class SiteService {
           },
         );
 
-        if (siteAssociations.length > 0) {
+        if (siteAssociations?.length > 0) {
           siteAssociations.forEach((siteAssociation) => {
             this.setUpdatedStatus(siteAssociation, isApproved, userInfo);
           });
@@ -1682,7 +1682,7 @@ export class SiteService {
           },
         );
 
-        if (landHistories.length > 0) {
+        if (landHistories?.length > 0) {
           landHistories.forEach((history) => {
             this.setUpdatedStatus(history, isApproved, userInfo);
           });
@@ -1703,7 +1703,7 @@ export class SiteService {
           },
         });
 
-        if (profiles.length > 0) {
+        if (profiles?.length > 0) {
           profiles.forEach((profile) => {
             this.setUpdatedStatus(profile, isApproved, userInfo);
           });
@@ -1727,7 +1727,7 @@ export class SiteService {
           },
         );
 
-        if (siteSubDivisions.length > 0) {
+        if (siteSubDivisions?.length > 0) {
           const subDivIds = siteSubDivisions.map((x) => x.subdivId);
 
           const subDivisions = await transactionalEntityManager.find(
@@ -1737,7 +1737,7 @@ export class SiteService {
             },
           );
 
-          if (subDivisions.length > 0) {
+          if (subDivisions?.length > 0) {
             subDivisions.forEach((sub) => {
               this.setUpdatedStatus(sub, isApproved, userInfo);
             });

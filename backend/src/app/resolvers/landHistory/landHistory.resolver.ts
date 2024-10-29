@@ -51,7 +51,7 @@ export class LandHistoryResolver {
       sortDirection,
       showPending,
     );
-    if (result.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log(
         'LandHistoryResolver.getLandHistoriesForSite() RES:200 end',
       );

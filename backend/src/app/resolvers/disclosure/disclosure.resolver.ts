@@ -46,7 +46,7 @@ export class DisclosureResolver {
       siteId,
       showPending,
     );
-    if (result && result.length > 0) {
+    if (result && result?.length > 0) {
       this.sitesLogger.log(
         'DisclosureResolver.getSiteDisclosureBySiteId() RES:200 end',
       );

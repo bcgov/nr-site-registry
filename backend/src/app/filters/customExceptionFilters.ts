@@ -1,16 +1,10 @@
-import {
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { Catch, HttpException, HttpStatus } from '@nestjs/common';
 import { GqlExceptionFilter } from '@nestjs/graphql';
-import { GqlArgumentsHost } from '@nestjs/graphql';
 import { GenericResponse } from '../dto/response/genericResponse';
 
 @Catch()
 export class CustomExceptionFilter implements GqlExceptionFilter {
-  catch(exception: HttpException, host: ArgumentsHost) {
+  catch(exception: HttpException) {
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -25,7 +19,6 @@ export class CustomExceptionFilter implements GqlExceptionFilter {
         : messageResponse['message'];
 
     // Format the error response
-    const result = new GenericResponse(message, status, false, null);
-    return result;
+    return new GenericResponse(message, status, false, null);
   }
 }

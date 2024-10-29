@@ -93,7 +93,7 @@ import { updateRequestStatus } from './srUpdates/srUpdatesSlice';
 
 const SiteDetails = () => {
   const [navItems, SetNavItems] = useState<string[] | undefined>();
-  const [navComponents, SetNavComponents] = useState<JSX.Element[]>();
+  const [navComponents, SetNavComponents] = useState<any[]>();
   const [dropDownNavItems, SetDropDownNavItems] =
     useState<{ label: string; value: string }[]>();
 

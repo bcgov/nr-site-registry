@@ -104,8 +104,6 @@ spec:
               value: {{ .Values.backend.service.targetPort | quote }}
             - name: GRAPHQL_SCHEMA_FILE_PATH
               value: "/graphql/schema.graphql"
-            - name: SEED_DATA_PATH
-              value: "/mnt/sql/data_migration.sql"
           {{- if .Values.crunchy.enabled }}
             - name: POSTGRES_DB_PASSWORD
               valueFrom:

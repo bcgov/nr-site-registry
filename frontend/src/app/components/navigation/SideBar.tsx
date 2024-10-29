@@ -54,13 +54,13 @@ function SideBar() {
     const displayCount = userCartItems.length > 0 ? userCartItems.length : '';
 
     const linkContent = isCartLink ? displayCount : item.displayText;
-
+    const isParentGroup: boolean = item.displayText && !item.icon;
     return (
       <section
         tabIndex={tabIndex}
         aria-label={item.displayText}
         aria-roledescription="menu"
-        role="menuitem"
+        role={isParentGroup ? 'group' : 'menuitem'}
         className={`sideBar-NavItem ${isCurrentPath && hasIcon ? 'currentPath' : ''}`}
         key={item.id} // Use a unique key based on the item id
       >
@@ -110,7 +110,7 @@ function SideBar() {
               {renderMenuOption(item, index + 1)}
               {item.children &&
                 item.children.map((child: any) => (
-                  <React.Fragment key={child.id}>
+                  <React.Fragment key={index}>
                     {' '}
                     {/* Ensure each child has a unique key */}
                     {renderMenuOption(child, index + 1)}
@@ -130,7 +130,7 @@ function SideBar() {
               {renderMenuOption(item, index + 1)}
               {item.children &&
                 item.children.map((child: any) => (
-                  <React.Fragment key={child.id}>
+                  <React.Fragment key={index}>
                     {' '}
                     {/* Ensure each child has a unique key */}
                     {renderMenuOption(child, index + 1)}

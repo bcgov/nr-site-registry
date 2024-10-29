@@ -104,6 +104,8 @@ spec:
               value: {{ .Values.backend.service.targetPort | quote }}
             - name: GRAPHQL_SCHEMA_FILE_PATH
               value: "/graphql/schema.graphql"
+            - name: SEED_DATA_PATH
+              value: "/mnt/sql/data_migration.sql"
           {{- if .Values.crunchy.enabled }}
             - name: POSTGRES_DB_PASSWORD
               valueFrom:
@@ -175,11 +177,16 @@ spec:
               name: log-storage
             - mountPath: /graphql
               name: graphql-storage
+            - mountPath: /mnt/sql
+              name: seed-data-mount
       volumes:
         - name: log-storage
           emptyDir: {}
         - name: graphql-storage
           emptyDir: {}
+        - name: seed-data-mount
+          persistentVolumeClaim:
+            claimName: nr-ora2pg-sql
       {{- with .Values.backend.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

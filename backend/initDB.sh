@@ -47,6 +47,8 @@ npm run typeorm:run-migrations
 echo "migrations completed"
 
 # Check for existence of SEED_DATA_PATH
+# In OpenShift, $SEED_DATA_PATH should point to a PVC that contains storage
+# See ora2pg/openshift/readme.md in this repo for setup of that.
 if [ -n "$SEED_DATA_PATH" ]; then
     # Run the seed data SQL file
     echo "Seed data set, attempting to load."

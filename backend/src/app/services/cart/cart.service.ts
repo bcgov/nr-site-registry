@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -34,7 +34,10 @@ export class CartService {
         'Exception occured in CartService.getCartItemsForUser() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to get cart items.`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -65,10 +68,10 @@ export class CartService {
       }
 
       let insertedRecords: Cart[] = [];
-      if (cartItemsToInsert && cartItemsToInsert.length > 0) {
+      if (cartItemsToInsert?.length > 0) {
         insertedRecords = await this.cartRepository.save(cartItemsToInsert);
 
-        if (insertedRecords.length > 0) return true;
+        if (insertedRecords?.length > 0) return true;
         else return false;
       } else if (cartItemsToInsert?.length === 0) {
         return true;
@@ -81,7 +84,10 @@ export class CartService {
         'Exception occured in CartService.addCartItem() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to add cart items.`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -97,7 +103,7 @@ export class CartService {
         .map((item) => item.cartId);
 
       let deleteResult: DeleteResult = null;
-      if (cartIds.length > 0) {
+      if (cartIds?.length > 0) {
         deleteResult = await this.cartRepository
           .createQueryBuilder()
           .delete()
@@ -117,7 +123,10 @@ export class CartService {
         'Exception occured in CartService.deleteCartItem() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to delete cart items.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -133,7 +142,7 @@ export class CartService {
         .map((item) => item.siteId);
 
       let deleteResult: DeleteResult = null;
-      if (siteIds.length > 0) {
+      if (siteIds?.length > 0) {
         deleteResult = await this.cartRepository
           .createQueryBuilder()
           .delete()
@@ -155,7 +164,7 @@ export class CartService {
         'Exception occured in CartService.deleteCartWithSiteId() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(`Failed to delete cart.`, HttpStatus.NOT_FOUND);
     }
   }
 }

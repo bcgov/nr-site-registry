@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -70,9 +75,10 @@ export class AssociatedSiteService {
         'Exception occured in AssociatedSiteService.getAssociatedSitesBySiteId() end',
         JSON.stringify(error),
       );
-      // Log or handle the error as necessary
-      throw new Error(
+
+      throw new HttpException(
         `Failed to retrieve associated sites by site ID: ${siteId}`,
+        HttpStatus.NOT_FOUND,
       );
     }
   }

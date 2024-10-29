@@ -8,6 +8,7 @@ import { LoggerService } from '../../logger/logger.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 
 import { UserActionEnum } from '../../common/userActionEnum';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 export class LandHistoryService {
   constructor(
@@ -77,7 +78,10 @@ export class LandHistoryService {
         'Exception occured in LandHistoryService.getLandHistoriesForSite() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to retrieve land history for site`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -148,7 +152,10 @@ export class LandHistoryService {
       return updatedRecords;
     } catch (e) {
       console.log('Error updating land histories', e);
-      throw e;
+      throw new HttpException(
+        `Failed to update land history`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 }

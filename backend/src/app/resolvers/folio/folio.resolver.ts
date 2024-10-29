@@ -42,7 +42,7 @@ export class FolioResolver {
     );
     const result = await this.folioService.getFoliosForUser(user);
 
-    if (result && result?.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log('FolioResolver.getFolioItemsForUser() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Folio fetched successfully',
@@ -77,7 +77,7 @@ export class FolioResolver {
     );
     const result = await this.folioService.getSitesForFolio(folioDTO, user);
 
-    if (result && result?.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log('FolioResolver.getSitesForFolio() RES:200 end');
       return this.genericResponseProviderForFolioContent.createResponse(
         'Sites fetched successfully for folio',

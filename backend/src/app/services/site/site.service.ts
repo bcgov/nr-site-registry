@@ -397,7 +397,7 @@ export class SiteService {
       );
     }
 
-    if (events && events?.length > 0) {
+    if (events?.length > 0) {
       await this.processEvents(events, userInfo, transactionalEntityManager);
     } else {
       this.sitesLogger.log(
@@ -405,7 +405,7 @@ export class SiteService {
       );
     }
 
-    if (siteParticipants && siteParticipants?.length > 0) {
+    if (siteParticipants?.length > 0) {
       await this.processSiteParticipants(
         siteParticipants,
         userInfo,
@@ -417,7 +417,7 @@ export class SiteService {
       );
     }
 
-    if (documents && documents?.length > 0) {
+    if (documents?.length > 0) {
       await this.processDocuments(
         documents,
         userInfo,
@@ -429,7 +429,7 @@ export class SiteService {
       );
     }
 
-    if (siteAssociations && siteAssociations?.length > 0) {
+    if (siteAssociations?.length > 0) {
       await this.processSiteAssociated(
         siteAssociations,
         userInfo,
@@ -463,7 +463,7 @@ export class SiteService {
       console.log('No changes To Site LandHistories');
     }
 
-    if (profiles && profiles?.length > 0) {
+    if (profiles?.length > 0) {
       await this.processSiteDisclosure(
         profiles,
         userInfo,
@@ -503,7 +503,7 @@ export class SiteService {
     transactionalEntityManager: EntityManager,
   ) {
     try {
-      if (documents && documents?.length > 0) {
+      if (documents?.length > 0) {
         const newDocuments: SiteDocs[] = [];
         const updateDocuments: { id: string; changes: Partial<SiteDocs> }[] =
           [];
@@ -698,7 +698,7 @@ export class SiteService {
     transactionalEntityManager: EntityManager,
   ) {
     try {
-      if (siteParticipants && siteParticipants?.length) {
+      if (siteParticipants?.length) {
         // Arrays to store new and updated entities
         const newSitePartics: SitePartics[] = [];
         const updatedSitePartics: {
@@ -900,7 +900,7 @@ export class SiteService {
     transactionalEntityManager: EntityManager,
   ) {
     try {
-      if (events && events?.length > 0) {
+      if (events?.length > 0) {
         // Arrays to store new and updated entities
         const newEvents: Events[] = [];
         const updatedEvents: { id: string; changes: Partial<Events> }[] = [];
@@ -1042,7 +1042,7 @@ export class SiteService {
           }
 
           // Process related participants regardless of event action
-          if (notationParticipant && notationParticipant?.length > 0) {
+          if (notationParticipant?.length > 0) {
             await processParticipants(notationId, notationParticipant);
           }
         });
@@ -1095,7 +1095,7 @@ export class SiteService {
     transactionalEntityManager: EntityManager,
   ) {
     try {
-      if (siteAccociated && siteAccociated?.length > 0) {
+      if (siteAccociated?.length > 0) {
         const newSiteAssociates: SiteAssocs[] = [];
         const updatedSiteAssociates: {
           id: string;
@@ -1190,7 +1190,7 @@ export class SiteService {
     transactionalEntityManager: EntityManager,
   ) {
     try {
-      if (siteDisclosure && siteDisclosure?.length > 0) {
+      if (siteDisclosure?.length > 0) {
         const disclosurePromises = siteDisclosure.map(async (disclosure) => {
           const { apiAction, id, ...disclosureData } = disclosure;
           let profile = {
@@ -1384,7 +1384,7 @@ export class SiteService {
 
       let result: SitePendingApprovalRecords[] = [];
 
-      if (queryResult && queryResult?.length > 0) {
+      if (queryResult?.length > 0) {
         result = queryResult.map((res) => {
           return {
             id: res.row_num,

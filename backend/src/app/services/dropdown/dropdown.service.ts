@@ -45,7 +45,7 @@ export class DropdownService {
     this.sitesLogger.debug('DropdownService.getParticipantRoleCd() start');
     try {
       const result = await this.particRoleRepository.find();
-      if (result && result?.length > 0) {
+      if (result?.length > 0) {
         this.sitesLogger.log('DropdownService.getParticipantRoleCd() end');
         this.sitesLogger.debug('DropdownService.getParticipantRoleCd() end');
         return result.map((obj: any) => ({
@@ -134,7 +134,7 @@ export class DropdownService {
     this.sitesLogger.debug('DropdownService.getNotationTypeCd() start');
     try {
       const result = await this.eventTypeCdRepository.find();
-      if (result && result?.length > 0) {
+      if (result?.length > 0) {
         this.sitesLogger.log('DropdownService.getNotationTypeCd() end');
         this.sitesLogger.debug('DropdownService.getNotationTypeCd() end');
         return result.reduce(
@@ -189,7 +189,7 @@ export class DropdownService {
     this.sitesLogger.debug('DropdownService.getNotationClassCd() start');
     try {
       const result = await this.eventClassCdRepository.find();
-      if (result && result?.length > 0) {
+      if (result?.length > 0) {
         this.sitesLogger.log('DropdownService.getNotationClassCd() end');
         this.sitesLogger.debug('DropdownService.getNotationClassCd() end');
         return result.map((obj: EventClassCd) => ({
@@ -228,7 +228,7 @@ export class DropdownService {
     );
     try {
       const result = await this.eventParticRoleCdRepository.find();
-      if (result && result?.length > 0) {
+      if (result?.length > 0) {
         this.sitesLogger.log(
           'DropdownService.getNotationParticipantRoleCd() end',
         );

@@ -68,7 +68,7 @@ export class CartService {
       }
 
       let insertedRecords: Cart[] = [];
-      if (cartItemsToInsert && cartItemsToInsert?.length > 0) {
+      if (cartItemsToInsert?.length > 0) {
         insertedRecords = await this.cartRepository.save(cartItemsToInsert);
 
         if (insertedRecords?.length > 0) return true;

@@ -48,7 +48,7 @@ export class AssociatedSiteResolver {
       siteId,
       showPending,
     );
-    if (result && result?.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log(
         'AssociatedSiteResolver.getAssociatedSitesBySiteId() RES:200 end',
       );

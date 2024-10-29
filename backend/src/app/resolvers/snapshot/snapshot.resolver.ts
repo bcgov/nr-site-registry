@@ -249,7 +249,7 @@ export class SnapshotsResolver {
       user.sub,
     );
 
-    if (bannerType && bannerType?.length > 0) {
+    if (bannerType?.length > 0) {
       this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:200 end');
       return {
         httpStatusCode: HttpStatus.OK,

@@ -43,7 +43,7 @@ export class NotationService {
       }
 
       // If no events are found, return an empty array
-      if (events && !events?.length) {
+      if (!events?.length) {
         return [];
       } else {
         // Extract event IDs to fetch related participants in a single query

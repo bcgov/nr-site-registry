@@ -1227,4 +1227,127 @@ describe('SiteSubdivisionsService', () => {
       });
     });
   });
+
+  describe('deleteParcelDescriptionsForSite', () => {
+    let today: Date;
+    let subdivId: string;
+    let siteSubdivId: string;
+
+    let inputParcelDescriptions: ParcelDescriptionInputDTO[];
+    let siteId: string;
+
+    let databaseSiteSubdivision: SiteSubdivisions;
+
+    let siteSubdivisionFindByResult: SiteSubdivisions[] = [];
+    let siteSubdivisionRemoveResult: SiteSubdivisions[] = [];
+
+    let siteSubdivisionFindByMock: jest.Mock;
+    let siteSubdivisionRemoveMock: jest.Mock;
+
+    beforeEach(() => {
+      today = new Date();
+      subdivId = '1';
+      siteSubdivId = '100';
+
+      siteId = '10';
+      inputParcelDescriptions = [
+        {
+          id: subdivId,
+          descriptionType: 'Crown Land PIN',
+          idPinNumber: '123456',
+          dateNoted: today,
+          landDescription: 'should be ignored',
+          srAction: 'approved',
+          userAction: 'approved',
+          apiAction: 'deleted',
+        },
+      ];
+
+      databaseSiteSubdivision = {
+        srAction: 'pending',
+        userAction: 'pending',
+        siteId: siteId,
+        subdivId: subdivId,
+        dateNoted: today,
+        initialIndicator: 'N',
+        whoCreated: 'employee of the month',
+        whoUpdated: 'employee of the month',
+        whenCreated: today,
+        whenUpdated: today,
+        sprofDateCompleted: null,
+        siteSubdivId: siteSubdivId,
+        sendToSr: 'Y',
+        site: null,
+        subdivision: null,
+      };
+
+      siteSubdivisionFindByResult = [databaseSiteSubdivision];
+      // This value is disregarded.
+      siteSubdivisionRemoveResult = [];
+
+      siteSubdivisionFindByMock = jest
+        .fn()
+        .mockResolvedValue(siteSubdivisionFindByResult);
+      siteSubdivisionRemoveMock = jest
+        .fn()
+        .mockResolvedValue(siteSubdivisionRemoveResult);
+
+      siteSubdivisionsRepository.remove = siteSubdivisionRemoveMock;
+      siteSubdivisionsRepository.findBy = siteSubdivisionFindByMock;
+    });
+    it('logs the call to deleteParcelDescriptionsForSite', async () => {
+      await parcelDescriptionsService.deleteParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+      );
+
+      expect(logMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.deleteParcelDescriptionsForSite(): Entering method.',
+      );
+      expect(logMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.deleteParcelDescriptionsForSite(): Complete.',
+      );
+    });
+
+    it('removes the expected site subdivision from the database', async () => {
+      await parcelDescriptionsService.deleteParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+      );
+
+      expect(logMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.deleteParcelDescriptionsForSite(): Entering method.',
+      );
+      expect(logMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.deleteParcelDescriptionsForSite(): Complete.',
+      );
+    });
+
+    describe('when the site subdivision fails to remove', () => {
+      beforeEach(() => {
+        siteSubdivisionRemoveMock = jest.fn().mockImplementation(() => {
+          throw new Error('A bad thing happened!');
+        });
+        siteSubdivisionsRepository.remove = siteSubdivisionRemoveMock;
+      });
+
+      it('logs and throws the error', async () => {
+        expect(async () => {
+          await parcelDescriptionsService.deleteParcelDescriptionsForSite(
+            siteId,
+            inputParcelDescriptions,
+          );
+        }).rejects.toThrow('A bad thing happened!');
+
+        // Need to wait for the above block to reject before testing the logging
+        // mock.
+        await jest.runAllTimersAsync();
+        expect(errorMock).toHaveBeenCalledTimes(1);
+        expect(errorMock).toHaveBeenCalledWith(
+          'parcelDescriptionService.deleteParcelDescriptionsForSite(): Failed deleting siteSubdivisions.',
+          expect.anything(),
+        );
+      });
+    });
+  });
 });

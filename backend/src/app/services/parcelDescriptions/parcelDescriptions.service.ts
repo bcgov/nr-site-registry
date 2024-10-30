@@ -443,6 +443,31 @@ export class ParcelDescriptionsService {
     siteId: string,
     parcelDescriptions: ParcelDescriptionInputDTO[],
   ) {
-    // TODO: Implementation to come in another pull request
+    this.sitesLogger.log(
+      'parcelDescriptionService.deleteParcelDescriptionsForSite(): Entering method.',
+    );
+
+    // Only the relation between subdivisions and sites, the site subdivision,
+    // can be removed. Subdivisions exist independently of sites.
+    const subdivIds = parcelDescriptions.map((parcelDescription) => {
+      return parcelDescription.id;
+    });
+    let siteSubdivisions = await this.siteSubdivisionsRepository.findBy({
+      subdivId: In(subdivIds),
+      siteId: siteId,
+    });
+    try {
+      await this.siteSubdivisionsRepository.remove(siteSubdivisions);
+    } catch (error) {
+      this.sitesLogger.error(
+        'parcelDescriptionService.deleteParcelDescriptionsForSite(): Failed deleting siteSubdivisions.',
+        JSON.stringify(error),
+      );
+      throw error;
+    }
+
+    this.sitesLogger.log(
+      'parcelDescriptionService.deleteParcelDescriptionsForSite(): Complete.',
+    );
   }
 }

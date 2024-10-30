@@ -14,6 +14,7 @@ import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { SnapshotSiteContent } from '../../dto/snapshotSiteContent';
 import { Events } from '../../entities/events.entity';
 import { LoggerService } from '../../logger/logger.service';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 @Injectable()
 export class SnapshotsService {
@@ -151,6 +152,121 @@ export class SnapshotsService {
     }
   }
 
+  getNotatioParticipantsForSnapshotCreation = async (notationId: string) => {
+    try {
+      if (notationId === '' || notationId === null) {
+        throw Error('notation id cannot be empty');
+      }
+
+      return await this.eventsParticipantsRepo.find({
+        where: {
+          eventId: notationId,
+          srAction: SRApprovalStatusEnum.PUBLIC,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getNotationsForSnapshotCreation = async (siteId: string) => {
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+
+      return await this.eventsRepositoryRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getSiteParticipantsForSnapshotCreation = async (siteId: string) => {
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+
+      return await this.siteParticipantsRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getSiteDocumentsForSnapshotCreation = async (siteId: string) => {
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+
+      return await this.siteDocumentsRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getLandHisotoriesForSnapshotCreation = async (siteId: string) => {
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+
+      return this.landHistoriesRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getDisclosureForSnapshotCreation = async (siteId: string) => {
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+
+      return this.siteProfilesRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getSubDivisionsForSnapshotCreation = async (siteId: string) => {
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+
+      return await this.siteSubDivisionsRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getSiteAssociationsForSnapshotCreation = async (siteId: string) => {
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+
+      return await this.siteAssociationsRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      throw error;
+    }
+  };
+
   async createSnapshotForSites(
     inputDto: CreateSnapshotDto[],
     userInfo: any,
@@ -171,37 +287,35 @@ export class SnapshotsService {
               where: { id: siteId },
             });
 
-            snapShotContent.events = await this.eventsRepositoryRepo.find({
-              where: { siteId },
-            });
+            snapShotContent.events =
+              await this.getNotationsForSnapshotCreation(siteId);
 
-            const fetchEventParticipants = snapShotContent.events.map(
-              async (event) => {
+            await Promise.all(
+              snapShotContent.events.map(async (event) => {
                 snapShotContent.eventsParticipants =
-                  await this.eventsParticipantsRepo.find({
-                    where: { eventId: event.id },
-                  });
-              },
+                  await this.getNotatioParticipantsForSnapshotCreation(
+                    event.id,
+                  );
+              }),
             );
 
             snapShotContent.siteParticipants =
-              await this.siteParticipantsRepo.find({ where: { siteId } });
+              await this.getSiteParticipantsForSnapshotCreation(siteId);
 
-            snapShotContent.documents = await this.siteDocumentsRepo.find({
-              where: { siteId },
-            });
+            snapShotContent.documents =
+              await this.getSiteDocumentsForSnapshotCreation(siteId);
 
-            snapShotContent.landHistories = await this.landHistoriesRepo.find({
-              where: { siteId },
-            });
+            snapShotContent.profiles =
+              await this.getDisclosureForSnapshotCreation(siteId);
 
-            snapShotContent.profiles = await this.siteProfilesRepo.find({
-              where: { siteId },
-            });
+            snapShotContent.landHistories =
+              await this.getLandHisotoriesForSnapshotCreation(siteId);
 
-            snapShotContent.subDivisions = await this.siteSubDivisionsRepo.find(
-              { where: { siteId } },
-            );
+            snapShotContent.subDivisions =
+              await this.getSubDivisionsForSnapshotCreation(siteId);
+
+            snapShotContent.siteAssociations =
+              await this.getSiteAssociationsForSnapshotCreation(siteId);
 
             const newSnapshot = {
               userId: userInfo.sub,
@@ -213,8 +327,6 @@ export class SnapshotsService {
             };
 
             snapShotsToBeSaved.push(newSnapshot);
-
-            await Promise.all(fetchEventParticipants);
           } else {
             console.log('Site id is empty');
           }

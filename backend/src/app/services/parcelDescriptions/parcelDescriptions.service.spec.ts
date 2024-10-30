@@ -26,6 +26,7 @@ describe('SiteSubdivisionsService', () => {
   let logMock: jest.Mock;
   let debugMock: jest.Mock;
   let errorMock: jest.Mock;
+  let warnMock: jest.Mock;
 
   beforeEach(async () => {
     const testingModule: TestingModule = await Test.createTestingModule({
@@ -78,9 +79,11 @@ describe('SiteSubdivisionsService', () => {
     logMock = jest.fn();
     debugMock = jest.fn();
     errorMock = jest.fn();
+    warnMock = jest.fn();
     loggerService.log = logMock;
     loggerService.debug = debugMock;
     loggerService.error = errorMock;
+    loggerService.warn = warnMock;
   });
 
   afterEach(() => {
@@ -934,6 +937,291 @@ describe('SiteSubdivisionsService', () => {
         expect(errorMock).toHaveBeenCalledTimes(1);
         expect(errorMock).toHaveBeenCalledWith(
           'parcelDescriptionService.addParcelDescriptionsForSite(): Failed inserting siteSubdivisions.',
+          expect.anything(),
+        );
+      });
+    });
+  });
+
+  describe('updateParcelDescriptionsForSite', () => {
+    let today: Date;
+    let yesterday: Date;
+
+    let inputParcelDescriptions: ParcelDescriptionInputDTO[];
+    let siteId: string;
+    let userInfo: any;
+
+    let subdivisionFindByResult: Subdivisions[];
+    let subdivisionSaveResult: Subdivisions[];
+
+    let siteSubdivisionFindByResult: SiteSubdivisions[];
+    let siteSubdivisionSaveResult: SiteSubdivisions[];
+
+    let databaseSubdivision: Subdivisions;
+    let databaseSiteSubdivision: SiteSubdivisions;
+
+    let updatedSubdivision: any;
+    let updatedSiteSubdivision: any;
+
+    let subdivisionFindByMock: jest.Mock;
+    let subdivisionSaveMock: jest.Mock;
+    let siteSubdivisionFindByMock: jest.Mock;
+    let siteSubdivisionSaveMock: jest.Mock;
+
+    beforeEach(() => {
+      today = new Date();
+      yesterday = new Date();
+      yesterday.setDate(today.getDate() - 1);
+
+      siteId = '10';
+      inputParcelDescriptions = [
+        {
+          id: '1',
+          descriptionType: 'Crown Land PIN',
+          idPinNumber: '654321',
+          dateNoted: today,
+          landDescription: 'should be ignored',
+          srAction: 'approved',
+          userAction: 'approved',
+          apiAction: 'updated',
+        },
+      ];
+      userInfo = { givenName: 'test' };
+      databaseSubdivision = {
+        srAction: 'pending',
+        userAction: 'pending',
+        id: '1',
+        dateNoted: new Date(),
+        pin: null,
+        pid: '123456',
+        bcaaFolioNumber: null,
+        entityType: null,
+        addrLine_1: 'test addr',
+        addrLine_2: null,
+        addrLine_3: null,
+        addrLine_4: null,
+        city: 'Anyton',
+        postalCode: 'H0H0H0',
+        legalDescription: 'Land Description',
+        whoCreated: 'employee of the month',
+        whoUpdated: 'employee of the month',
+        whenCreated: yesterday,
+        whenUpdated: yesterday,
+        crownLandsFileNo: null,
+        pidStatusCd: 'N',
+        validPid: null,
+        siteSubdivisions: [databaseSiteSubdivision],
+      };
+      databaseSiteSubdivision = {
+        srAction: 'pending',
+        userAction: 'pending',
+        siteId: '10',
+        subdivId: '1',
+        dateNoted: new Date(),
+        initialIndicator: 'N',
+        whoCreated: 'employee of the month',
+        whoUpdated: 'employee of the month',
+        whenCreated: yesterday,
+        whenUpdated: yesterday,
+        sprofDateCompleted: null,
+        siteSubdivId: '100',
+        sendToSr: 'Y',
+        site: null,
+        subdivision: databaseSubdivision,
+      };
+      subdivisionSaveResult = []; // This is never checked or used.
+      siteSubdivisionSaveResult = [];
+      subdivisionFindByResult = [databaseSubdivision];
+      siteSubdivisionFindByResult = [databaseSiteSubdivision];
+
+      // The whenUpdated is tested separately because there isn't a good jest
+      // matcher to test a date property.
+      updatedSubdivision = {
+        srAction: 'approved',
+        userAction: 'approved',
+        id: '1',
+        dateNoted: today,
+        pin: '654321',
+        pid: null,
+        bcaaFolioNumber: null,
+        entityType: null,
+        addrLine_1: 'test addr',
+        addrLine_2: null,
+        addrLine_3: null,
+        addrLine_4: null,
+        city: 'Anyton',
+        postalCode: 'H0H0H0',
+        legalDescription: 'Land Description',
+        whoCreated: 'employee of the month',
+        whoUpdated: 'test',
+        whenCreated: yesterday,
+        crownLandsFileNo: null,
+        pidStatusCd: 'N',
+        validPid: null,
+      };
+      updatedSiteSubdivision = {
+        srAction: 'approved',
+        userAction: 'approved',
+        siteId: '10',
+        subdivId: '1',
+        dateNoted: today,
+        initialIndicator: 'N',
+        whoCreated: 'employee of the month',
+        whoUpdated: 'test',
+        whenCreated: yesterday,
+        sprofDateCompleted: null,
+        siteSubdivId: '100',
+        sendToSr: 'Y',
+        site: null,
+        subdivision: databaseSubdivision,
+      };
+
+      subdivisionFindByMock = jest
+        .fn()
+        .mockResolvedValue(subdivisionFindByResult);
+      subdivisionSaveMock = jest.fn().mockResolvedValue(subdivisionSaveResult);
+      siteSubdivisionFindByMock = jest
+        .fn()
+        .mockResolvedValue(siteSubdivisionFindByResult);
+      siteSubdivisionSaveMock = jest
+        .fn()
+        .mockResolvedValue(siteSubdivisionSaveResult);
+
+      subdivisionsRepository.save = subdivisionSaveMock;
+      subdivisionsRepository.findBy = subdivisionFindByMock;
+      siteSubdivisionsRepository.save = siteSubdivisionSaveMock;
+      siteSubdivisionsRepository.findBy = siteSubdivisionFindByMock;
+    });
+
+    it('logs the call to updateParcelDescriptionsForSite', async () => {
+      await parcelDescriptionsService.updateParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+        userInfo,
+      );
+
+      expect(logMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.updateParcelDescriptionsForSite(): Entering method.',
+      );
+      expect(logMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.updateParcelDescriptionsForSite(): Complete.',
+      );
+    });
+
+    it('saves an updated subdivision to the database.', async () => {
+      await parcelDescriptionsService.updateParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+        userInfo,
+      );
+
+      expect(subdivisionSaveMock).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining(updatedSubdivision)]),
+      );
+      let whenupdated: Date =
+        subdivisionSaveMock.mock.calls[0][0][0].whenUpdated;
+      expect(whenupdated.getTime()).toBeGreaterThan(yesterday.getTime());
+    });
+
+    it('saves the updated site subdivision to the database.', async () => {
+      await parcelDescriptionsService.updateParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+        userInfo,
+      );
+
+      expect(siteSubdivisionSaveMock).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining(updatedSiteSubdivision),
+        ]),
+      );
+      let whenupdated: Date =
+        siteSubdivisionSaveMock.mock.calls[0][0][0].whenUpdated;
+      expect(whenupdated.getTime()).toBeGreaterThan(yesterday.getTime());
+    });
+
+    describe('when the subdivision to update does not exist', () => {
+      beforeEach(() => {
+        subdivisionFindByMock.mockResolvedValue([]);
+      });
+
+      it('logs a warning about the problem.', async () => {
+        await parcelDescriptionsService.updateParcelDescriptionsForSite(
+          siteId,
+          inputParcelDescriptions,
+          userInfo,
+        );
+
+        expect(warnMock).toHaveBeenCalledWith(
+          expect.stringMatching(
+            /Unable to update Parcel Description with id \d+: No matching database entries found./,
+          ),
+        );
+      });
+
+      it('does not attempt to save anything', async () => {
+        await parcelDescriptionsService.updateParcelDescriptionsForSite(
+          siteId,
+          inputParcelDescriptions,
+          userInfo,
+        );
+
+        expect(siteSubdivisionSaveMock).toHaveBeenCalledWith([]);
+        expect(subdivisionSaveMock).toHaveBeenCalledWith([]);
+      });
+    });
+
+    describe('when the subdivision fails to save', () => {
+      beforeEach(() => {
+        subdivisionSaveMock = jest.fn().mockImplementation(() => {
+          throw new Error('A bad thing happened!');
+        });
+        subdivisionsRepository.save = subdivisionSaveMock;
+      });
+
+      it('logs and throws the error', async () => {
+        expect(async () => {
+          await parcelDescriptionsService.updateParcelDescriptionsForSite(
+            siteId,
+            inputParcelDescriptions,
+            userInfo,
+          );
+        }).rejects.toThrow('A bad thing happened!');
+
+        // Need to wait for the above block to reject before testing the logging
+        // mock.
+        await jest.runAllTimersAsync();
+        expect(errorMock).toHaveBeenCalledTimes(1);
+        expect(errorMock).toHaveBeenCalledWith(
+          'parcelDescriptionService.updateParcelDescriptionsForSite(): Failed saving subdivisions.',
+          expect.anything(),
+        );
+      });
+    });
+
+    describe('when the site subdivision fails to save', () => {
+      beforeEach(() => {
+        siteSubdivisionSaveMock = jest.fn().mockImplementation(() => {
+          throw new Error('A bad thing happened!');
+        });
+        siteSubdivisionsRepository.save = siteSubdivisionSaveMock;
+      });
+
+      it('logs and throws the error', async () => {
+        expect(async () => {
+          await parcelDescriptionsService.updateParcelDescriptionsForSite(
+            siteId,
+            inputParcelDescriptions,
+            userInfo,
+          );
+        }).rejects.toThrow('A bad thing happened!');
+
+        // Need to wait for the above block to reject before testing the logging
+        // mock.
+        await jest.runAllTimersAsync();
+        expect(errorMock).toHaveBeenCalledTimes(1);
+        expect(errorMock).toHaveBeenCalledWith(
+          'parcelDescriptionService.updateParcelDescriptionsForSite(): Failed saving siteSubdivisions.',
           expect.anything(),
         );
       });

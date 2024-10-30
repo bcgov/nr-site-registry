@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, InsertResult, Repository } from 'typeorm';
+import { EntityManager, In, InsertResult, Repository } from 'typeorm';
 import { ParcelDescriptionDto } from '../../dto/parcelDescription.dto';
 import { GenericPagedResponse } from '../../dto/response/genericResponse';
 import {
@@ -337,7 +337,106 @@ export class ParcelDescriptionsService {
     parcelDescriptions: ParcelDescriptionInputDTO[],
     userInfo: any,
   ) {
-    // TODO: Implementation to come in another pull request
+    this.sitesLogger.log(
+      'parcelDescriptionService.updateParcelDescriptionsForSite(): Entering method.',
+    );
+
+    const now = new Date();
+    // Fetch subdivision and siteSubdivision entities to update.
+    const subdivIds = parcelDescriptions.map((parcelDescription) => {
+      return parcelDescription.id;
+    });
+    let subdivisions = await this.subdivisionsRepository.findBy({
+      id: In(subdivIds),
+    });
+    let siteSubdivisions = await this.siteSubdivisionsRepository.findBy({
+      subdivId: In(subdivIds),
+      siteId: siteId,
+    });
+
+    // Parse each parcel description's properties into its subdivision and
+    // siteSubdivision database entities.
+    parcelDescriptions.forEach((parcelDescription) => {
+      let subdivision = subdivisions.find((subdivision) => {
+        return subdivision.id === parcelDescription.id;
+      });
+      let siteSubdivision = siteSubdivisions.find((siteSubdivision) => {
+        return siteSubdivision.subdivId === parcelDescription.id;
+      });
+      if (subdivision === undefined || siteSubdivision === undefined) {
+        // This should only happen if the front end becomes out of sync with the
+        // database, or the client modifies the request somehow. If one is
+        // present and not the other, delete the present one since it is not
+        // safe to perform an update.
+        if (subdivision === undefined && siteSubdivision !== undefined) {
+          const indexToDelete = siteSubdivisions.findIndex(() => {
+            return siteSubdivision.subdivId === parcelDescription.id;
+          });
+          siteSubdivisions.splice(indexToDelete, 1);
+        }
+        if (subdivision !== undefined && siteSubdivision === undefined) {
+          const indexToDelete = subdivisions.findIndex(() => {
+            return subdivision.id === parcelDescription.id;
+          });
+          subdivisions.splice(indexToDelete, 1);
+        }
+        this.sitesLogger.warn(
+          `Unable to update Parcel Description with id ${parcelDescription.id}: No matching database entries found.`,
+        );
+        return;
+      }
+      subdivision.pid =
+        parcelDescription.descriptionType === 'Parcel ID'
+          ? parcelDescription.idPinNumber
+          : null;
+      subdivision.pin =
+        parcelDescription.descriptionType === 'Crown Land PIN'
+          ? parcelDescription.idPinNumber
+          : null;
+      subdivision.crownLandsFileNo =
+        parcelDescription.descriptionType === 'Crown Land File Number'
+          ? parcelDescription.idPinNumber
+          : null;
+      subdivision.dateNoted = parcelDescription.dateNoted;
+      subdivision.srAction = parcelDescription.srAction;
+      subdivision.userAction = parcelDescription.userAction;
+      subdivision.whoUpdated = userInfo?.givenName;
+      subdivision.whenUpdated = now;
+      // Note: the user is never able to update the subdivision's legal/land
+      // description. This data comes from LTSA.
+
+      siteSubdivision.dateNoted = parcelDescription.dateNoted;
+      siteSubdivision.userAction = parcelDescription.userAction;
+      siteSubdivision.srAction = parcelDescription.srAction;
+      siteSubdivision.whoUpdated = userInfo?.givenName;
+      siteSubdivision.whenUpdated = now;
+    });
+
+    // Commit the updates.
+    try {
+      await this.subdivisionsRepository.save(subdivisions);
+    } catch (error) {
+      this.sitesLogger.error(
+        'parcelDescriptionService.updateParcelDescriptionsForSite(): Failed saving subdivisions.',
+        JSON.stringify(error),
+      );
+      throw error;
+    }
+    try {
+      await this.siteSubdivisionsRepository.save(siteSubdivisions);
+    } catch (error) {
+      // This code is called within a transaction in the site service, so the
+      // previous save should be rolled back if there is a failure here.
+      this.sitesLogger.error(
+        'parcelDescriptionService.updateParcelDescriptionsForSite(): Failed saving siteSubdivisions.',
+        JSON.stringify(error),
+      );
+      throw error;
+    }
+
+    this.sitesLogger.log(
+      'parcelDescriptionService.updateParcelDescriptionsForSite(): Complete.',
+    );
   }
 
   async deleteParcelDescriptionsForSite(

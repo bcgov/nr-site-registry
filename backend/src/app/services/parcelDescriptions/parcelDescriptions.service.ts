@@ -461,6 +461,49 @@ export class ParcelDescriptionsService {
     siteId: string,
     parcelDescriptions: ParcelDescriptionInputDTO[],
   ) {
-    // TODO: Implementation to come in another pull request
+    this.sitesLogger.log(
+      'parcelDescriptionService.deleteParcelDescriptionsForSite() start',
+    );
+    this.sitesLogger.debug(
+      'parcelDescriptionService.deleteParcelDescriptionsForSite() start',
+    );
+
+    const subdivIds = parcelDescriptions.map((parcelDescription) => {
+      return parcelDescription.id;
+    });
+    let siteSubdivisions = await this.siteSubdivisionsRepository.findBy({
+      subdivId: In(subdivIds),
+      siteId: siteId,
+    });
+    let subdivisions = await this.subdivisionsRepository.findBy({
+      id: In(subdivIds),
+    });
+
+    try {
+      await this.subdivisionsRepository.remove(subdivisions);
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in parcelDescriptionService.deleteParcelDescriptionsForSite() end',
+        JSON.stringify(error),
+      );
+      throw new BadRequestException('Failed removing Parcel Description.');
+    }
+
+    try {
+      await this.siteSubdivisionsRepository.remove(siteSubdivisions);
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in parcelDescriptionService.deleteParcelDescriptionsForSite() end',
+        JSON.stringify(error),
+      );
+      throw new BadRequestException('Failed removing Parcel Description.');
+    }
+
+    this.sitesLogger.log(
+      'parcelDescriptionService.deleteParcelDescriptionsForSite() end',
+    );
+    this.sitesLogger.debug(
+      'parcelDescriptionService.deleteParcelDescriptionsForSite() end',
+    );
   }
 }

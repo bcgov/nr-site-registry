@@ -17,7 +17,7 @@ import { BadRequestException } from '@nestjs/common';
 jest.useFakeTimers();
 jest.mock('./parcelDescriptions.queryBuilder');
 
-describe('SiteSubdivisionsService', () => {
+describe('ParcelDescriptionsService', () => {
   let parcelDescriptionsService: ParcelDescriptionsService;
   let entityManager: EntityManager;
   let snapshotsService: SnapshotsService;
@@ -28,7 +28,6 @@ describe('SiteSubdivisionsService', () => {
   let logMock: jest.Mock;
   let debugMock: jest.Mock;
   let errorMock: jest.Mock;
-  let warnMock: jest.Mock;
 
   beforeEach(async () => {
     const testingModule: TestingModule = await Test.createTestingModule({
@@ -81,11 +80,9 @@ describe('SiteSubdivisionsService', () => {
     logMock = jest.fn();
     debugMock = jest.fn();
     errorMock = jest.fn();
-    warnMock = jest.fn();
     loggerService.log = logMock;
     loggerService.debug = debugMock;
     loggerService.error = errorMock;
-    loggerService.warn = warnMock;
   });
 
   afterEach(() => {
@@ -1236,6 +1233,193 @@ describe('SiteSubdivisionsService', () => {
         expect(errorMock).toHaveBeenCalledTimes(1);
         expect(errorMock).toHaveBeenCalledWith(
           'Exception occured in parcelDescriptionService.updateParcelDescriptionsForSite() end',
+          expect.anything(),
+        );
+      });
+    });
+  });
+
+  describe('deleteParcelDescriptionsForSite', () => {
+    let today: Date;
+    let subdivId: string;
+    let siteSubdivId: string;
+
+    let inputParcelDescriptions: ParcelDescriptionInputDTO[];
+    let siteId: string;
+
+    let databaseSubdivision: Subdivisions;
+    let databaseSiteSubdivision: SiteSubdivisions;
+
+    let subdivisionFindByResult: Subdivisions[];
+    let subdivisionRemoveResult: Subdivisions[];
+    let siteSubdivisionFindByResult: SiteSubdivisions[];
+    let siteSubdivisionRemoveResult: SiteSubdivisions[];
+
+    let subdivisionFindByMock: jest.Mock;
+    let subdivisionRemoveMock: jest.Mock;
+    let siteSubdivisionFindByMock: jest.Mock;
+    let siteSubdivisionRemoveMock: jest.Mock;
+
+    beforeEach(() => {
+      today = new Date();
+      subdivId = '1';
+      siteSubdivId = '100';
+
+      siteId = '10';
+      inputParcelDescriptions = [
+        {
+          id: subdivId,
+          descriptionType: ParcelDescriptionType.CrownLandPIN,
+          idPinNumber: '123456',
+          dateNoted: today,
+          landDescription: 'should be ignored',
+          srAction: 'approved',
+          userAction: 'approved',
+          apiAction: 'deleted',
+        },
+      ];
+
+      databaseSubdivision = {
+        srAction: 'approved',
+        userAction: 'approved',
+        id: '1',
+        dateNoted: today,
+        pin: '654321',
+        pid: null,
+        bcaaFolioNumber: null,
+        entityType: null,
+        addrLine_1: 'test addr',
+        addrLine_2: null,
+        addrLine_3: null,
+        addrLine_4: null,
+        city: 'Anyton',
+        postalCode: 'H0H0H0',
+        legalDescription: 'Land Description',
+        whoCreated: 'employee of the month',
+        whoUpdated: 'test',
+        whenCreated: today,
+        crownLandsFileNo: null,
+        pidStatusCd: 'N',
+        validPid: null,
+      } as Subdivisions;
+      databaseSiteSubdivision = {
+        srAction: 'pending',
+        userAction: 'pending',
+        siteId: siteId,
+        subdivId: subdivId,
+        dateNoted: today,
+        initialIndicator: 'N',
+        whoCreated: 'employee of the month',
+        whoUpdated: 'employee of the month',
+        whenCreated: today,
+        whenUpdated: today,
+        sprofDateCompleted: null,
+        siteSubdivId: siteSubdivId,
+        sendToSr: 'Y',
+        site: null,
+        subdivision: null,
+      } as SiteSubdivisions;
+
+      subdivisionFindByResult = [databaseSubdivision];
+      // This value is disregarded.
+      subdivisionRemoveResult = [];
+
+      siteSubdivisionFindByResult = [databaseSiteSubdivision];
+      // This value is disregarded.
+      siteSubdivisionRemoveResult = [];
+
+      subdivisionFindByMock = jest
+        .fn()
+        .mockResolvedValue(subdivisionFindByResult);
+      subdivisionRemoveMock = jest
+        .fn()
+        .mockResolvedValue(subdivisionRemoveResult);
+      siteSubdivisionFindByMock = jest
+        .fn()
+        .mockResolvedValue(siteSubdivisionFindByResult);
+      siteSubdivisionRemoveMock = jest
+        .fn()
+        .mockResolvedValue(siteSubdivisionRemoveResult);
+
+      subdivisionsRepository.remove = subdivisionRemoveMock;
+      subdivisionsRepository.findBy = subdivisionFindByMock;
+      siteSubdivisionsRepository.remove = siteSubdivisionRemoveMock;
+      siteSubdivisionsRepository.findBy = siteSubdivisionFindByMock;
+    });
+
+    it('removes the expected subdivision from the database', async () => {
+      await parcelDescriptionsService.deleteParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+      );
+
+      expect(subdivisionRemoveMock).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining(databaseSubdivision)]),
+      );
+    });
+
+    it('removes the expected site subdivision from the database', async () => {
+      await parcelDescriptionsService.deleteParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+      );
+
+      expect(siteSubdivisionRemoveMock).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining(databaseSiteSubdivision),
+        ]),
+      );
+    });
+
+    describe('when the subdivision fails to remove', () => {
+      beforeEach(() => {
+        subdivisionRemoveMock = jest.fn().mockImplementation(() => {
+          throw new Error('A bad thing happened!');
+        });
+        subdivisionsRepository.remove = subdivisionRemoveMock;
+      });
+
+      it('logs and throws the error', async () => {
+        expect(async () => {
+          await parcelDescriptionsService.deleteParcelDescriptionsForSite(
+            siteId,
+            inputParcelDescriptions,
+          );
+        }).rejects.toThrow(BadRequestException);
+
+        // Need to wait for the above block to reject before testing the logging
+        // mock.
+        await jest.runAllTimersAsync();
+        expect(errorMock).toHaveBeenCalledTimes(1);
+        expect(errorMock).toHaveBeenCalledWith(
+          'Exception occured in parcelDescriptionService.deleteParcelDescriptionsForSite() end',
+          expect.anything(),
+        );
+      });
+    });
+
+    describe('when the site subdivision fails to remove', () => {
+      beforeEach(() => {
+        siteSubdivisionRemoveMock = jest.fn().mockImplementation(() => {
+          throw new Error('A bad thing happened!');
+        });
+        siteSubdivisionsRepository.remove = siteSubdivisionRemoveMock;
+      });
+
+      it('logs and throws the error', async () => {
+        expect(async () => {
+          await parcelDescriptionsService.deleteParcelDescriptionsForSite(
+            siteId,
+            inputParcelDescriptions,
+          );
+        }).rejects.toThrow(BadRequestException);
+
+        // Need to wait for the above block to reject before testing the logging
+        // mock.
+        await jest.runAllTimersAsync();
+        expect(errorMock).toHaveBeenCalledTimes(1);
+        expect(errorMock).toHaveBeenCalledWith(
+          'Exception occured in parcelDescriptionService.deleteParcelDescriptionsForSite() end',
           expect.anything(),
         );
       });

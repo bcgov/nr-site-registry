@@ -21,7 +21,7 @@
   background-color: var(--surface-background-white) !important;
   box-shadow: var(--surface-shadow-medium);
   border: none !important;
-  width: 272px;
+  width: 17rem;
 }
 
 .custom-action-item {
@@ -40,13 +40,13 @@
   color: var(--typography-color-secondary, #474543) !important;
 }
 
-@media (max-width: 1198px) {
+@media screen and (max-width: 992px) {
   .custom-action-menu {
-    width: 113px; /* Width for large screens */
-    min-width: 113px !important;
+    width: 7.06rem; /* Width for large screens */
+    min-width: 7.06rem !important;
   }
 
   .custom-action-btn {
-    width: 106px;
+    width: 6.63rem;
   }
 }

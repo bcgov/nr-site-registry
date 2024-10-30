@@ -328,10 +328,10 @@ export class SnapshotsService {
 
             snapShotsToBeSaved.push(newSnapshot);
           } else {
-            console.log('Site id is empty');
+            this.sitesLogger.log('SnapshotsService.createSnapshotForSites() Site id is empty');          
           }
         } else {
-          console.log('At createSnapshotForUser dto is null');
+           this.sitesLogger.log('SnapshotsService.createSnapshotForSites() createSnapshotForUser dto is null');
         }
       });
 
@@ -355,7 +355,7 @@ export class SnapshotsService {
       );
       throw new HttpException(
         `Failed to create snapshot.`,
-        HttpStatus.NOT_FOUND,
+        HttpStatus.EXPECTATION_FAILED,
       );
     }
   }

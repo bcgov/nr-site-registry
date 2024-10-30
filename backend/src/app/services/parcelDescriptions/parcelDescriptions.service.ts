@@ -10,6 +10,7 @@ import {
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { LoggerService } from '../../logger/logger.service';
 import { ParcelDescriptionInputDTO } from '../../dto/parcelDescriptionInput.dto';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 @Injectable()
 export class ParcelDescriptionsService {
@@ -181,6 +182,69 @@ export class ParcelDescriptionsService {
     parcelDescriptions: ParcelDescriptionInputDTO[],
     userInfo: any,
   ) {
-    // TODO: Implementation in subsequent PR.
+    this.sitesLogger.log(
+      'parcelDescriptionService.saveParcelDescriptionsForSite(): Entering method.',
+    );
+    const parcelDescriptionsToUpdate = parcelDescriptions.filter(
+      (parcelDescription: ParcelDescriptionInputDTO) => {
+        return parcelDescription.apiAction === UserActionEnum.UPDATED;
+      },
+    );
+    if (parcelDescriptionsToUpdate.length > 0) {
+      await this.updateParcelDescriptionsForSite(
+        siteId,
+        parcelDescriptionsToUpdate,
+        userInfo,
+      );
+    }
+    const parcelDescriptionsToAdd = parcelDescriptions.filter(
+      (parcelDescription: ParcelDescriptionInputDTO) => {
+        return parcelDescription.apiAction === UserActionEnum.ADDED;
+      },
+    );
+    if (parcelDescriptionsToAdd.length > 0) {
+      await this.addParcelDescriptionsForSite(
+        siteId,
+        parcelDescriptionsToAdd,
+        userInfo,
+      );
+    }
+    const parcelDescriptionsToDelete = parcelDescriptions.filter(
+      (parcelDescription: ParcelDescriptionInputDTO) => {
+        return parcelDescription.apiAction === UserActionEnum.DELETED;
+      },
+    );
+    if (parcelDescriptionsToDelete.length > 0) {
+      await this.deleteParcelDescriptionsForSite(
+        siteId,
+        parcelDescriptionsToDelete,
+      );
+    }
+    this.sitesLogger.log(
+      'parcelDescriptionService.saveParcelDescriptionsForSite(): Complete.',
+    );
+  }
+
+  async addParcelDescriptionsForSite(
+    siteId: string,
+    parcelDescriptions: ParcelDescriptionInputDTO[],
+    userInfo: any,
+  ) {
+    // TODO: Implementation to come in another pull request
+  }
+
+  async updateParcelDescriptionsForSite(
+    siteId: string,
+    parcelDescriptions: ParcelDescriptionInputDTO[],
+    userInfo: any,
+  ) {
+    // TODO: Implementation to come in another pull request
+  }
+
+  async deleteParcelDescriptionsForSite(
+    siteId: string,
+    parcelDescriptions: ParcelDescriptionInputDTO[],
+  ) {
+    // TODO: Implementation to come in another pull request
   }
 }

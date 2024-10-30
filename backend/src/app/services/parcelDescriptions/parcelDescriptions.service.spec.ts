@@ -7,75 +7,21 @@ import {
 } from './parcelDescriptions.queryBuilder';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { LoggerService } from '../../logger/logger.service';
+import { ParcelDescriptionInputDTO } from '../../dto/parcelDescriptionInput.dto';
 
 jest.mock('./parcelDescriptions.queryBuilder');
 
 describe('SiteSubdivisionsService', () => {
-  let siteSubdivisionService: ParcelDescriptionsService;
+  let parcelDescriptionsService: ParcelDescriptionsService;
   let entityManager: EntityManager;
   let snapshotsService: SnapshotsService;
   let loggerService: LoggerService;
-  let queryMock: jest.Mock;
-  let getMostRecentSnapshotMock: jest.Mock;
-  let getInternalUserQueriesMock: jest.Mock;
-  let getExternalUserQueriesMock: jest.Mock;
+
   let logMock: jest.Mock;
   let debugMock: jest.Mock;
   let errorMock: jest.Mock;
 
-  let siteId: number;
-  let page: number;
-  let pageSize: number;
-  let searchParam: string;
-  let sortBy: string;
-  let sortByDir: string;
-  let user: any;
-  let showPending: false;
-
-  let queryText: string;
-  let queryParams: string[];
-  let countQueryText: string;
-  let countQueryParams: string[];
-
-  let returnCount: number;
-  let returnId: number;
-  let returnDescriptionType: string;
-  let returnIdPinNumber: string;
-  let returnDateNoted: string;
-  let returnLandDescription: string;
-  let returnUserAction: string;
-  let returnSrAction: string;
-
-  let returnSuccess: boolean;
-
   beforeEach(async () => {
-    siteId = 123;
-    page = 1;
-    pageSize = 10;
-    searchParam = 'searchParam';
-    sortBy = 'date_noted';
-    sortByDir = 'DESC';
-    user = {
-      sub: '1',
-      identity_provider: 'idir',
-    };
-
-    queryText = 'query';
-    queryParams = ['queryParam1', 'queryParam2', 'queryParam3', 'queryParam4'];
-    countQueryText = 'countQuery';
-    countQueryParams = ['countQueryParam1', 'countQueryParam2'];
-
-    returnCount = 1;
-    returnId = 1;
-    returnDescriptionType = 'Parcel Id';
-    returnIdPinNumber = '123456';
-    returnDateNoted = '2024-08-07T00:00:00.000Z';
-    returnLandDescription = 'A parcel of land';
-    returnUserAction = 'updated';
-    returnSrAction = 'approved'; // I don't actually know if this is a real-world value it could assume.
-
-    returnSuccess = true;
-
     const testingModule: TestingModule = await Test.createTestingModule({
       providers: [
         ParcelDescriptionsService,
@@ -102,51 +48,12 @@ describe('SiteSubdivisionsService', () => {
       ],
     }).compile();
 
-    siteSubdivisionService = testingModule.get<ParcelDescriptionsService>(
+    parcelDescriptionsService = testingModule.get<ParcelDescriptionsService>(
       ParcelDescriptionsService,
     );
     entityManager = testingModule.get<EntityManager>(EntityManager);
     snapshotsService = testingModule.get<SnapshotsService>(SnapshotsService);
     loggerService = testingModule.get<LoggerService>(LoggerService);
-
-    getInternalUserQueriesMock = jest
-      .mocked(getInternalUserQueries)
-      .mockReturnValue([
-        queryText,
-        queryParams,
-        countQueryText,
-        countQueryParams,
-      ]);
-    getExternalUserQueriesMock = jest
-      .mocked(getExternalUserQueries)
-      .mockReturnValue([
-        queryText,
-        queryParams,
-        countQueryText,
-        countQueryParams,
-      ]);
-    queryMock = jest
-      .fn()
-      .mockReturnValueOnce([{ count: returnCount }])
-      .mockReturnValueOnce([
-        {
-          id: returnId,
-          description_type: returnDescriptionType,
-          id_pin_number: returnIdPinNumber,
-          date_noted: returnDateNoted,
-          land_description: returnLandDescription,
-          user_action: returnUserAction,
-          sr_action: returnSrAction,
-        },
-      ]);
-    entityManager.query = queryMock;
-
-    getMostRecentSnapshotMock = jest.fn().mockReturnValue({
-      snapshotData: {
-        subDivisions: [{ siteSubdivId: 1 }],
-      },
-    });
-    snapshotsService.getMostRecentSnapshot = getMostRecentSnapshotMock;
 
     logMock = jest.fn();
     debugMock = jest.fn();
@@ -160,17 +67,120 @@ describe('SiteSubdivisionsService', () => {
     jest.clearAllMocks();
   });
 
-  describe('when the user is an internal user', () => {
+  describe('getParcelDescriptionsBySiteId', () => {
+    let siteId: number;
+    let page: number;
+    let pageSize: number;
+    let searchParam: string;
+    let sortBy: string;
+    let sortByDir: string;
+    let user: any;
+    let showPending: false;
+
+    let queryText: string;
+    let queryParams: string[];
+    let countQueryText: string;
+    let countQueryParams: string[];
+
+    let returnCount: number;
+    let returnId: number;
+    let returnDescriptionType: string;
+    let returnIdPinNumber: string;
+    let returnDateNoted: string;
+    let returnLandDescription: string;
+    let returnUserAction: string;
+    let returnSrAction: string;
+
+    let returnSuccess: boolean;
+
+    let queryMock: jest.Mock;
+    let getMostRecentSnapshotMock: jest.Mock;
+    let getInternalUserQueriesMock: jest.Mock;
+    let getExternalUserQueriesMock: jest.Mock;
+
     beforeEach(async () => {
+      getInternalUserQueriesMock = jest
+        .mocked(getInternalUserQueries)
+        .mockReturnValue([
+          queryText,
+          queryParams,
+          countQueryText,
+          countQueryParams,
+        ]);
+      getExternalUserQueriesMock = jest
+        .mocked(getExternalUserQueries)
+        .mockReturnValue([
+          queryText,
+          queryParams,
+          countQueryText,
+          countQueryParams,
+        ]);
+      queryMock = jest
+        .fn()
+        .mockReturnValueOnce([{ count: returnCount }])
+        .mockReturnValueOnce([
+          {
+            id: returnId,
+            description_type: returnDescriptionType,
+            id_pin_number: returnIdPinNumber,
+            date_noted: returnDateNoted,
+            land_description: returnLandDescription,
+            user_action: returnUserAction,
+            sr_action: returnSrAction,
+          },
+        ]);
+      entityManager.query = queryMock;
+
+      getMostRecentSnapshotMock = jest.fn().mockReturnValue({
+        snapshotData: {
+          subDivisions: [{ siteSubdivId: 1 }],
+        },
+      });
+      snapshotsService.getMostRecentSnapshot = getMostRecentSnapshotMock;
+
+      siteId = 123;
+      page = 1;
+      pageSize = 10;
+      searchParam = 'searchParam';
+      sortBy = 'date_noted';
+      sortByDir = 'DESC';
       user = {
         sub: '1',
         identity_provider: 'idir',
       };
+
+      queryText = 'query';
+      queryParams = [
+        'queryParam1',
+        'queryParam2',
+        'queryParam3',
+        'queryParam4',
+      ];
+      countQueryText = 'countQuery';
+      countQueryParams = ['countQueryParam1', 'countQueryParam2'];
+
+      returnCount = 1;
+      returnId = 1;
+      returnDescriptionType = 'Parcel Id';
+      returnIdPinNumber = '123456';
+      returnDateNoted = '2024-08-07T00:00:00.000Z';
+      returnLandDescription = 'A parcel of land';
+      returnUserAction = 'updated';
+      returnSrAction = 'approved'; // I don't actually know if this is a real-world value it could assume.
+
+      returnSuccess = true;
     });
 
-    describe('when everything is correct.', () => {
+    describe('when the user is an internal user', () => {
+      beforeEach(async () => {
+        user = {
+          sub: '1',
+          identity_provider: 'idir',
+        };
+      });
+
       it('Logs the call to the function', async () => {
-        await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        await parcelDescriptionsService.getParcelDescriptionsBySiteId(
           siteId,
           page,
           pageSize,
@@ -186,7 +196,7 @@ describe('SiteSubdivisionsService', () => {
       });
 
       it('Runs a count query.', async () => {
-        await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        await parcelDescriptionsService.getParcelDescriptionsBySiteId(
           siteId,
           page,
           pageSize,
@@ -207,7 +217,7 @@ describe('SiteSubdivisionsService', () => {
       });
 
       it('Makes the main query to the database.', async () => {
-        await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        await parcelDescriptionsService.getParcelDescriptionsBySiteId(
           siteId,
           page,
           pageSize,
@@ -225,7 +235,7 @@ describe('SiteSubdivisionsService', () => {
 
       it('returns the correct results.', async () => {
         let response =
-          await siteSubdivisionService.getParcelDescriptionsBySiteId(
+          await parcelDescriptionsService.getParcelDescriptionsBySiteId(
             siteId,
             page,
             pageSize,
@@ -259,19 +269,17 @@ describe('SiteSubdivisionsService', () => {
         );
       });
     });
-  });
 
-  describe('when the user is an external user', () => {
-    beforeEach(async () => {
-      user = {
-        sub: '1',
-        identity_provider: 'bceid',
-      };
-    });
+    describe('when the user is an external user', () => {
+      beforeEach(async () => {
+        user = {
+          sub: '1',
+          identity_provider: 'bceid',
+        };
+      });
 
-    describe('when everything is correct.', () => {
       it('Logs the call to the function', async () => {
-        await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        await parcelDescriptionsService.getParcelDescriptionsBySiteId(
           siteId,
           page,
           pageSize,
@@ -287,7 +295,7 @@ describe('SiteSubdivisionsService', () => {
       });
 
       it('Runs a count query.', async () => {
-        await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        await parcelDescriptionsService.getParcelDescriptionsBySiteId(
           siteId,
           page,
           pageSize,
@@ -309,7 +317,7 @@ describe('SiteSubdivisionsService', () => {
       });
 
       it('Makes the main query to the database.', async () => {
-        await siteSubdivisionService.getParcelDescriptionsBySiteId(
+        await parcelDescriptionsService.getParcelDescriptionsBySiteId(
           siteId,
           page,
           pageSize,
@@ -328,7 +336,7 @@ describe('SiteSubdivisionsService', () => {
 
       it('Returns the correct results.', async () => {
         let response =
-          await siteSubdivisionService.getParcelDescriptionsBySiteId(
+          await parcelDescriptionsService.getParcelDescriptionsBySiteId(
             siteId,
             page,
             pageSize,
@@ -361,16 +369,67 @@ describe('SiteSubdivisionsService', () => {
           }),
         );
       });
+
+      describe('When there is no snapshot data for the user', () => {
+        beforeEach(async () => {
+          getMostRecentSnapshotMock.mockReturnValue(null);
+        });
+
+        it('Returns an empty response', async () => {
+          let response =
+            await parcelDescriptionsService.getParcelDescriptionsBySiteId(
+              siteId,
+              page,
+              pageSize,
+              searchParam,
+              sortBy,
+              sortByDir,
+              showPending,
+              user,
+            );
+
+          expect(response).toEqual(
+            expect.objectContaining({
+              data: [],
+              httpStatusCode: 200,
+              count: 0,
+              page: 0,
+              pageSize: 0,
+              success: true,
+              message: 'Parcel Descriptions fetched successfully.',
+            }),
+          );
+        });
+      });
     });
 
-    describe('When there is not snapshot data for the user', () => {
+    describe('when the database throws an exception', () => {
       beforeEach(async () => {
-        getMostRecentSnapshotMock.mockReturnValue(null);
+        queryMock = jest.fn().mockImplementation(() => {
+          throw new Error('A bad thing happened!');
+        });
+
+        entityManager.query = queryMock;
       });
 
-      it('Returns an empty response', async () => {
+      it('Logs the error', async () => {
+        await parcelDescriptionsService.getParcelDescriptionsBySiteId(
+          siteId,
+          page,
+          pageSize,
+          searchParam,
+          sortBy,
+          sortByDir,
+          showPending,
+          user,
+        );
+
+        expect(errorMock).toHaveBeenCalled();
+      });
+
+      it('Produces the correct response', async () => {
         let response =
-          await siteSubdivisionService.getParcelDescriptionsBySiteId(
+          await parcelDescriptionsService.getParcelDescriptionsBySiteId(
             siteId,
             page,
             pageSize,
@@ -384,115 +443,264 @@ describe('SiteSubdivisionsService', () => {
         expect(response).toEqual(
           expect.objectContaining({
             data: [],
-            httpStatusCode: 200,
+            httpStatusCode: 500,
             count: 0,
             page: 0,
             pageSize: 0,
-            success: true,
-            message: 'Parcel Descriptions fetched successfully.',
+            success: false,
+            message:
+              'There was an error communicating with the database. Try again later.',
+          }),
+        );
+      });
+    });
+
+    describe('when the user is invalid', () => {
+      beforeEach(async () => {
+        user = {
+          sub: '',
+          identity_provider: '',
+        };
+      });
+
+      it('Logs the error', async () => {
+        await parcelDescriptionsService.getParcelDescriptionsBySiteId(
+          siteId,
+          page,
+          pageSize,
+          searchParam,
+          sortBy,
+          sortByDir,
+          showPending,
+          user,
+        );
+
+        expect(errorMock).toHaveBeenCalled();
+      });
+
+      it('Produces the correct response.', async () => {
+        let response =
+          await parcelDescriptionsService.getParcelDescriptionsBySiteId(
+            siteId,
+            page,
+            pageSize,
+            searchParam,
+            sortBy,
+            sortByDir,
+            showPending,
+            user,
+          );
+
+        expect(response).toEqual(
+          expect.objectContaining({
+            data: [],
+            httpStatusCode: 500,
+            count: 0,
+            page: 0,
+            pageSize: 0,
+            success: false,
+            message: 'User id is invalid.',
           }),
         );
       });
     });
   });
 
-  describe('when the database throws an exception', () => {
+  describe('saveParcelDescriptionsForSite', () => {
+    let updateParcelDescriptionsForSiteMock: jest.Mock;
+    let addParcelDescriptionsForSiteMock: jest.Mock;
+    let deleteParcelDescriptionsForSiteMock: jest.Mock;
+
+    let idForUpdatedParcelDescription: string;
+    let idForAddedParcelDescription: string;
+    let idForDeletedParcelDescription: string;
+
+    let parcelDescriptionToUpdate: ParcelDescriptionInputDTO;
+    let parcelDescriptionToAdd: ParcelDescriptionInputDTO;
+    let parcelDescriptionToDelete: ParcelDescriptionInputDTO;
+    let siteId: string;
+    let inputParcelDescriptions: ParcelDescriptionInputDTO[];
+    let userInfo: any;
+
     beforeEach(async () => {
-      queryMock = jest.fn().mockImplementation(() => {
-        throw new Error('A bad thing happened!');
+      idForUpdatedParcelDescription = '1';
+      idForAddedParcelDescription = '2';
+      idForDeletedParcelDescription = '3';
+
+      parcelDescriptionToUpdate = {
+        id: idForUpdatedParcelDescription,
+        descriptionType: 'Crown Land PIN',
+        idPinNumber: '123456',
+        dateNoted: new Date(),
+        landDescription: 'should be ignored',
+        srAction: 'approved',
+        userAction: 'approved',
+        apiAction: 'updated',
+      };
+      parcelDescriptionToAdd = {
+        id: idForAddedParcelDescription,
+        descriptionType: 'Crown Land PIN',
+        idPinNumber: '654321',
+        dateNoted: new Date(),
+        landDescription: 'should be ignored',
+        srAction: 'pending',
+        userAction: 'pending',
+        apiAction: 'added',
+      };
+      parcelDescriptionToDelete = {
+        id: idForDeletedParcelDescription,
+        descriptionType: 'Crown Land PIN',
+        idPinNumber: '162534',
+        dateNoted: new Date(),
+        landDescription: 'should be ignored',
+        srAction: 'pending',
+        userAction: 'pending',
+        apiAction: 'deleted',
+      };
+
+      siteId = '100';
+      inputParcelDescriptions = [
+        parcelDescriptionToUpdate,
+        parcelDescriptionToAdd,
+        parcelDescriptionToDelete,
+      ];
+      userInfo = { givenName: 'testUser' };
+
+      updateParcelDescriptionsForSiteMock = jest.fn();
+      addParcelDescriptionsForSiteMock = jest.fn();
+      deleteParcelDescriptionsForSiteMock = jest.fn();
+
+      parcelDescriptionsService.updateParcelDescriptionsForSite =
+        updateParcelDescriptionsForSiteMock;
+      parcelDescriptionsService.addParcelDescriptionsForSite =
+        addParcelDescriptionsForSiteMock;
+      parcelDescriptionsService.deleteParcelDescriptionsForSite =
+        deleteParcelDescriptionsForSiteMock;
+    });
+
+    it('logs the call to saveParcelDescriptionsForSite', async () => {
+      await parcelDescriptionsService.saveParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+        userInfo,
+      );
+
+      expect(logMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.saveParcelDescriptionsForSite(): Entering method.',
+      );
+      expect(logMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.saveParcelDescriptionsForSite(): Complete.',
+      );
+    });
+
+    it('calls updateParcelDescriptionsForSite with the correct input', async () => {
+      await parcelDescriptionsService.saveParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+        userInfo,
+      );
+
+      expect(updateParcelDescriptionsForSiteMock).toHaveBeenCalledWith(
+        siteId,
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: idForUpdatedParcelDescription,
+          }),
+        ]),
+        userInfo,
+      );
+    });
+
+    it('calls addParcelDescriptionsForSite with the correct input', async () => {
+      await parcelDescriptionsService.saveParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+        userInfo,
+      );
+
+      expect(addParcelDescriptionsForSiteMock).toHaveBeenCalledWith(
+        siteId,
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: idForAddedParcelDescription,
+          }),
+        ]),
+        userInfo,
+      );
+    });
+
+    it('calls deleteParcelDescriptionsForSite with the correct input', async () => {
+      await parcelDescriptionsService.saveParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+        userInfo,
+      );
+
+      expect(deleteParcelDescriptionsForSiteMock).toHaveBeenCalledWith(
+        siteId,
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: idForDeletedParcelDescription,
+          }),
+        ]),
+      );
+    });
+
+    describe('when there is no parcel description to update', () => {
+      beforeEach(() => {
+        inputParcelDescriptions = [
+          parcelDescriptionToAdd,
+          parcelDescriptionToDelete,
+        ];
       });
 
-      entityManager.query = queryMock;
+      it('does not call updateParcelDescriptionsForSite', async () => {
+        await parcelDescriptionsService.saveParcelDescriptionsForSite(
+          siteId,
+          inputParcelDescriptions,
+          userInfo,
+        );
+
+        expect(updateParcelDescriptionsForSiteMock).not.toHaveBeenCalled();
+      });
     });
 
-    it('Logs the error', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-        showPending,
-        user,
-      );
+    describe('when there is no parcel description to add', () => {
+      beforeEach(() => {
+        inputParcelDescriptions = [
+          parcelDescriptionToUpdate,
+          parcelDescriptionToDelete,
+        ];
+      });
 
-      expect(errorMock).toHaveBeenCalled();
+      it('does not call updateParcelDescriptionsForSite', async () => {
+        await parcelDescriptionsService.saveParcelDescriptionsForSite(
+          siteId,
+          inputParcelDescriptions,
+          userInfo,
+        );
+
+        expect(addParcelDescriptionsForSiteMock).not.toHaveBeenCalled();
+      });
     });
 
-    it('Produces the correct response', async () => {
-      let response = await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-        showPending,
-        user,
-      );
+    describe('when there is no parcel description to delete', () => {
+      beforeEach(() => {
+        inputParcelDescriptions = [
+          parcelDescriptionToAdd,
+          parcelDescriptionToUpdate,
+        ];
+      });
 
-      expect(response).toEqual(
-        expect.objectContaining({
-          data: [],
-          httpStatusCode: 500,
-          count: 0,
-          page: 0,
-          pageSize: 0,
-          success: false,
-          message:
-            'There was an error communicating with the database. Try again later.',
-        }),
-      );
-    });
-  });
+      it('does not call updateParcelDescriptionsForSite', async () => {
+        await parcelDescriptionsService.saveParcelDescriptionsForSite(
+          siteId,
+          inputParcelDescriptions,
+          userInfo,
+        );
 
-  describe('when the user is invalid', () => {
-    beforeEach(async () => {
-      user = {
-        sub: '',
-        identity_provider: '',
-      };
-    });
-
-    it('Logs the error', async () => {
-      await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-        showPending,
-        user,
-      );
-
-      expect(errorMock).toHaveBeenCalled();
-    });
-
-    it('Produces the correct response.', async () => {
-      let response = await siteSubdivisionService.getParcelDescriptionsBySiteId(
-        siteId,
-        page,
-        pageSize,
-        searchParam,
-        sortBy,
-        sortByDir,
-        showPending,
-        user,
-      );
-
-      expect(response).toEqual(
-        expect.objectContaining({
-          data: [],
-          httpStatusCode: 500,
-          count: 0,
-          page: 0,
-          pageSize: 0,
-          success: false,
-          message: 'User id is invalid.',
-        }),
-      );
+        expect(deleteParcelDescriptionsForSiteMock).not.toHaveBeenCalled();
+      });
     });
   });
 });

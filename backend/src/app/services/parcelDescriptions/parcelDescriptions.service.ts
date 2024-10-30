@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, InsertResult, Repository } from 'typeorm';
+import { EntityManager, In, InsertResult, Repository } from 'typeorm';
 import {
   ParcelDescriptionDto,
   ParcelDescriptionType,
@@ -358,7 +358,103 @@ export class ParcelDescriptionsService {
     parcelDescriptions: ParcelDescriptionInputDTO[],
     userInfo: any,
   ) {
-    // TODO: Implementation to come in another pull request
+    this.sitesLogger.log(
+      'parcelDescriptionService.updateParcelDescriptionsForSite() start',
+    );
+    this.sitesLogger.debug(
+      'parcelDescriptionService.updateParcelDescriptionsForSite() start',
+    );
+
+    const now = new Date();
+    // Fetch subdivision and siteSubdivision entities to update.
+    const subdivIds = parcelDescriptions.map((parcelDescription) => {
+      return parcelDescription.id;
+    });
+    let subdivisions = await this.subdivisionsRepository.findBy({
+      id: In(subdivIds),
+    });
+    let siteSubdivisions = await this.siteSubdivisionsRepository.findBy({
+      subdivId: In(subdivIds),
+      siteId: siteId,
+    });
+
+    // Parse each parcel description's properties into its subdivision and
+    // siteSubdivision database entities.
+    parcelDescriptions.forEach((parcelDescription) => {
+      let subdivision = subdivisions.find((subdivision) => {
+        return subdivision.id === parcelDescription.id;
+      });
+      let siteSubdivision = siteSubdivisions.find((siteSubdivision) => {
+        return siteSubdivision.subdivId === parcelDescription.id;
+      });
+      if (subdivision === undefined || siteSubdivision === undefined) {
+        // This should only happen if the front end becomes out of sync with the
+        // database, or the client modifies the request somehow.
+        const error = new BadRequestException(
+          'Failed to update Parcel Description.',
+        );
+        this.sitesLogger.error(
+          'Exception occured in parcelDescriptionService.updateParcelDescriptionsForSite() end',
+          JSON.stringify(error),
+        );
+        throw error;
+      }
+      subdivision.pid =
+        parcelDescription.descriptionType === ParcelDescriptionType.ParcelID
+          ? parcelDescription.idPinNumber
+          : null;
+      subdivision.pin =
+        parcelDescription.descriptionType === ParcelDescriptionType.CrownLandPIN
+          ? parcelDescription.idPinNumber
+          : null;
+      subdivision.crownLandsFileNo =
+        parcelDescription.descriptionType ===
+        ParcelDescriptionType.CrownLandFileNumber
+          ? parcelDescription.idPinNumber
+          : null;
+      subdivision.dateNoted = parcelDescription.dateNoted;
+      subdivision.srAction = parcelDescription.srAction;
+      subdivision.userAction = parcelDescription.userAction;
+      subdivision.whoUpdated = userInfo?.givenName;
+      subdivision.whenUpdated = now;
+      // Note: the user is never able to update the subdivision's legal/land
+      // description. This data comes from LTSA.
+
+      siteSubdivision.dateNoted = parcelDescription.dateNoted;
+      siteSubdivision.userAction = parcelDescription.userAction;
+      siteSubdivision.srAction = parcelDescription.srAction;
+      siteSubdivision.whoUpdated = userInfo?.givenName;
+      siteSubdivision.whenUpdated = now;
+    });
+
+    // Commit the updates.
+    try {
+      await this.subdivisionsRepository.save(subdivisions);
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in parcelDescriptionService.updateParcelDescriptionsForSite() end',
+        JSON.stringify(error),
+      );
+      throw new BadRequestException('Failed to update Parcel Description.');
+    }
+    try {
+      await this.siteSubdivisionsRepository.save(siteSubdivisions);
+    } catch (error) {
+      // This code is called within a transaction in the site service, so the
+      // previous save should be rolled back if there is a failure here.
+      this.sitesLogger.error(
+        'Exception occured in parcelDescriptionService.updateParcelDescriptionsForSite() end',
+        JSON.stringify(error),
+      );
+      throw new BadRequestException('Failed to update Parcel Description.');
+    }
+
+    this.sitesLogger.log(
+      'parcelDescriptionService.updateParcelDescriptionsForSite() end',
+    );
+    this.sitesLogger.debug(
+      'parcelDescriptionService.updateParcelDescriptionsForSite() end',
+    );
   }
 
   async deleteParcelDescriptionsForSite(

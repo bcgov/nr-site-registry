@@ -26,6 +26,7 @@ describe('ParcelDescriptionsService', () => {
   let logMock: jest.Mock;
   let debugMock: jest.Mock;
   let errorMock: jest.Mock;
+  let warnMock: jest.Mock;
 
   beforeEach(async () => {
     const testingModule: TestingModule = await Test.createTestingModule({
@@ -72,9 +73,11 @@ describe('ParcelDescriptionsService', () => {
     logMock = jest.fn();
     debugMock = jest.fn();
     errorMock = jest.fn();
+    warnMock = jest.fn();
     loggerService.log = logMock;
     loggerService.debug = debugMock;
     loggerService.error = errorMock;
+    loggerService.warn = warnMock;
   });
 
   afterEach(() => {

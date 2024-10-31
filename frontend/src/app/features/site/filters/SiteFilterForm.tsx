@@ -21,7 +21,7 @@ const SiteFilterForm: React.FC<SiteFilterProps> = ({
 }) => {
   return (
     <>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} data-testid="form">
         <Form
           formRows={formRows}
           formData={formData}
@@ -29,13 +29,22 @@ const SiteFilterForm: React.FC<SiteFilterProps> = ({
         />
         <div className="d-flex flex-wrap justify-content-between w-100 mt-3">
           <div>
-            <button type="reset" className="reset-button" onClick={onReset}>
+            <button
+              type="reset"
+              className="reset-button"
+              onClick={onReset}
+              data-testid="Reset Filters"
+            >
               Reset Filters
             </button>
           </div>
           <div>
             {/* Submit button */}
-            <button type="submit" className=" submit-button">
+            <button
+              type="submit"
+              className=" submit-button"
+              data-testid="Submit"
+            >
               Submit
             </button>
             {/* Cancel button */}
@@ -43,6 +52,7 @@ const SiteFilterForm: React.FC<SiteFilterProps> = ({
               type="button"
               className=" cancel-button"
               onClick={cancelSearchFilter}
+              data-testid="Cancel"
             >
               Cancel
             </button>

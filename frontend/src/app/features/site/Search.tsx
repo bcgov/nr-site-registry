@@ -275,7 +275,7 @@ const Search = () => {
     if (filters.length !== 0) {
       dispatch(
         fetchSites({
-          searchParam: sites.searchQuery,
+          searchParam: currSearchVal.searchQuery,
           filter: filteredFormData,
         }),
       );
@@ -309,7 +309,9 @@ const Search = () => {
     setFormData((prevData) => {
       const newData = { ...prevData };
       delete newData[filter.key]; // Remove the filter key from the form data
-      dispatch(fetchSites({ searchParam: sites.searchQuery, filter: newData }));
+      dispatch(
+        fetchSites({ searchParam: currSearchVal.searchQuery, filter: newData }),
+      );
       return newData;
     });
     let currFilter = selectedFilters.filter((item) => item.key !== filter.key);

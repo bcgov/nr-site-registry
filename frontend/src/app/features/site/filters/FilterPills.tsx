@@ -20,6 +20,7 @@ const FilterPills: React.FC<FilterPillsProps> = ({
   return (
     <div
       id="filter-pill"
+      data-testid="filter-pill"
       className="d-flex justify-content-end flex-wrap selected-filter"
     >
       {filters.map((filter, index) => (

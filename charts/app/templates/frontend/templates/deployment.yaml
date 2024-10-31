@@ -68,15 +68,15 @@ spec:
               memory: 25Mi
           volumeMounts:
             - name: config-volume
-              mountPath: /app/config/config.js  # Mount target path inside the container
-              subPath: config.js  # Mount only config.js from the ConfigMap
+              mountPath: /usr/share/nginx/html/config/ # Mount target path inside the container, match dockerfile workdir
+              subPath: config.js
       volumes:
         - name: config-volume
           configMap:
             name:  {{ include "frontend.fullname" . }}  # ConfigMap name
             items:
               - key: config.js
-                path: config.js  # Specify config.js to mount
+                path: config.js 
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

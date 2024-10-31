@@ -56,6 +56,11 @@ const ParcelDescriptions = () => {
     dispatch(setSearchParam(''));
   };
 
+
+  const tableChangeHandler = () => {
+    // To Be Implemented As Part Of EDIT functionality
+  }
+
   const handleSortInputChange = (
     graphQLPropertyName: any,
     newSortByInputValue: string | [Date, Date],
@@ -142,6 +147,7 @@ const ParcelDescriptions = () => {
         <h2>Parcel Description</h2>
         <hr />
         <ParcelDescriptionTable
+          showPageOptions={true}
           requestStatus={requestStatus}
           columns={columns}
           data={data}
@@ -151,6 +157,7 @@ const ParcelDescriptions = () => {
           currentPage={currentPage}
           resultsPerPage={resultsPerPage}
           handleTableSortChange={handleTableSortChange}
+          tableChangeHandler={tableChangeHandler}
         />
       </div>
     </div>

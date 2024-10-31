@@ -453,7 +453,7 @@ describe('SnapshotService', () => {
         );
 
       await expect(service.getSnapshotsByUserId(userId)).rejects.toThrow(
-        'Failed to retrieve snapshots by userId.',
+        `Failed to retrieve snapshots by userId: ${userId}`,
       );
       expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
     });
@@ -550,7 +550,9 @@ describe('SnapshotService', () => {
 
       await expect(
         service.getSnapshotsBySiteId(siteId, userId),
-      ).rejects.toThrow('Failed to retrieve snapshots by userId and siteId.');
+      ).rejects.toThrow(
+        `Failed to retrieve snapshots by userId: ${userId} and siteId: ${siteId}`,
+      );
       expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
     });
   });
@@ -710,10 +712,12 @@ describe('SnapshotService', () => {
       const id = 1;
       jest
         .spyOn(snapshotRepository, 'find')
-        .mockRejectedValueOnce(new Error('Database connection error'));
+        .mockRejectedValueOnce(
+          new Error(`Failed to retrieve snapshot by ID: ${id}.`),
+        );
 
       await expect(service.getSnapshotsById(id)).rejects.toThrow(
-        'Database connection error',
+        `Failed to retrieve snapshot by ID: ${id}.`,
       );
       expect(snapshotRepository.find).toHaveBeenCalledTimes(1);
     });
@@ -780,7 +784,7 @@ describe('SnapshotService', () => {
 
       await expect(
         service.createSnapshotForSites([snapshotDto], ''),
-      ).rejects.toThrow('Failed to insert snapshot.');
+      ).rejects.toThrow('Failed to create snapshot.');
       expect(snapshotRepository.save).toHaveBeenCalledTimes(1);
     });
   });

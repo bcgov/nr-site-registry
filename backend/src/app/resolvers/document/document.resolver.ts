@@ -4,7 +4,7 @@ import { DocumentService } from '../../services/document/document.service';
 import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
-import { UsePipes } from '@nestjs/common';
+import { HttpStatus, UsePipes } from '@nestjs/common';
 import { DocumentDto, DocumentResponse } from '../../dto/document.dto';
 import { CustomRoles } from '../../common/role';
 import { LoggerService } from '../../logger/logger.service';
@@ -46,13 +46,13 @@ export class DocumentResolver {
       siteId,
       showPending,
     );
-    if (response && response.length > 0) {
+    if (response?.length > 0) {
       this.sitesLogger.log(
         'DocumentResolver.getSiteDocumentsBySiteId() RES:200 end',
       );
       return this.genericResponseProvider.createResponse(
         'Documents fetched successfully.',
-        200,
+        HttpStatus.OK,
         true,
         response,
       );
@@ -62,7 +62,7 @@ export class DocumentResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Documents not found for site id ${siteId}`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );

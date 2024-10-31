@@ -33,6 +33,7 @@ interface IParticipantTableProps {
   handleItemClick: (value: string) => void;
   approveRejectHandler?: (value: boolean) => void;
   showApproveRejectSection?: boolean;
+  hideLabelForWidget?: boolean;
 }
 
 const ParticipantTable: React.FC<IParticipantTableProps> = ({
@@ -52,8 +53,10 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
   handleItemClick,
   showApproveRejectSection,
   approveRejectHandler,
+  hideLabelForWidget
 }) => {
   showApproveRejectSection = showApproveRejectSection ?? false;
+  hideLabelForWidget = hideLabelForWidget ?? false;
 
   approveRejectHandler =
     approveRejectHandler ??
@@ -77,7 +80,7 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
         aria-label="Site Participant Widget"
         customLabelCss="custom-participant-widget-lbl"
         hideTable={false}
-        hideTitle={false}
+        hideTitle={hideLabelForWidget}
         editMode={
           viewMode === SiteDetailsMode.EditMode &&
           userType === UserType.Internal

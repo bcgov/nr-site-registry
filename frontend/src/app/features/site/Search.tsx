@@ -34,11 +34,17 @@ import { TableColumn } from '../../components/table/TableColumn';
 import { getSiteSearchResultsColumns } from './dto/Columns';
 import SiteFilterForm from './filters/SiteFilterForm';
 import PageContainer from '../../components/simple/PageContainer';
-import { getUser } from '../../helpers/utility';
+import {
+  flattenFormRows,
+  formatDateRange,
+  getUser,
+} from '../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import AddToFolio from '../folios/AddToFolio';
 import { downloadCSV } from '../../helpers/csvExport/csvExport';
+import FilterPills from './filters/FilterPills';
+import { formRows } from './dto/SiteFilterConfig';
 
 const Search = () => {
   const auth = useAuth();
@@ -228,6 +234,89 @@ const Search = () => {
     }
   };
 
+  const [selectedFilters, setSelectedFilters] = useState<
+    { key: string; value: string; label: string }[]
+  >([]);
+  const [formData, setFormData] = useState<{
+    [key: string]: any | [Date, Date];
+  }>({});
+
+  const handleInputChange = (key: string, value: any) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [key]: value,
+    }));
+  };
+
+  const handleFormSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const filteredFormData: { [key: string]: string } = {};
+    const filters: { key: string; value: string; label: string }[] = [];
+    const flattedArr = flattenFormRows(formRows);
+    // Filter out form data with non-empty values and construct filteredFormData and filters
+    for (const [key, value] of Object.entries(formData)) {
+      let currLabel =
+        flattedArr && flattedArr.find((row) => row.graphQLPropertyName === key);
+      if (key === 'whenCreated' || key === 'whenUpdated') {
+        let dateRangeValue = formatDateRange(value);
+        filteredFormData[key] = value;
+        filters.push({
+          key,
+          value: dateRangeValue,
+          label: currLabel?.label ?? '',
+        });
+      } else if (value.trim() !== '') {
+        filteredFormData[key] = value;
+        filters.push({ key, value, label: currLabel?.label ?? '' });
+      }
+    }
+
+    // show and format pill.
+    if (filters.length !== 0) {
+      dispatch(
+        fetchSites({
+          searchParam: sites.searchQuery,
+          filter: filteredFormData,
+        }),
+      );
+      setSelectedFilters(filters);
+
+      // Save filter selections to local storage
+      localStorage.setItem('siteFilterPills', JSON.stringify(filters));
+    }
+  };
+
+  const handleReset = () => {
+    setFormData({});
+    setSelectedFilters([]);
+    localStorage.removeItem('siteFilterPills');
+  };
+
+  useEffect(() => {
+    const storedFilters = localStorage.getItem('siteFilterPills');
+    if (storedFilters) {
+      const parsedFilters = JSON.parse(storedFilters);
+      const initialFormData: any = {};
+      parsedFilters.forEach((filter: any) => {
+        initialFormData[filter.key] = filter.value;
+      });
+      setFormData(initialFormData);
+      setSelectedFilters(parsedFilters);
+    }
+  }, []);
+
+  const handleRemoveFilter = (filter: any) => {
+    setFormData((prevData) => {
+      const newData = { ...prevData };
+      delete newData[filter.key]; // Remove the filter key from the form data
+      dispatch(fetchSites({ searchParam: sites.searchQuery, filter: newData }));
+      return newData;
+    });
+    let currFilter = selectedFilters.filter((item) => item.key !== filter.key);
+    setSelectedFilters(currFilter);
+    localStorage.setItem('siteFilterPills', JSON.stringify(currFilter));
+  };
+
   return (
     <PageContainer role="Search">
       <div className="row search-container">
@@ -370,7 +459,13 @@ const Search = () => {
               </button>
             </div>
             {displayFilters && (
-              <SiteFilterForm cancelSearchFilter={cancelSearchFilter} />
+              <SiteFilterForm
+                formData={formData}
+                onInputChange={handleInputChange}
+                onSubmit={handleFormSubmit}
+                onReset={handleReset}
+                cancelSearchFilter={cancelSearchFilter}
+              />
             )}
             {displayColumn ? (
               <div>
@@ -415,6 +510,12 @@ const Search = () => {
               </div>
             </div>
           </div>
+          <FilterPills
+            filters={selectedFilters}
+            onRemoveFilter={(filter) => {
+              handleRemoveFilter(filter);
+            }}
+          />
           <div>
             <div className="" aria-label="Search results">
               <SearchResults

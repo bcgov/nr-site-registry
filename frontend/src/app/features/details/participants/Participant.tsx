@@ -32,6 +32,7 @@ import {
   getAxiosInstance,
   getUser,
   resultCache,
+  sortArray,
   UpdateDisplayTypeParams,
   updateTableColumn,
 } from '../../../helpers/utility';
@@ -529,24 +530,17 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   };
 
   const handleTableSort = (row: any, ascDir: any) => {
+    debugger;
     let property = row['graphQLPropertyName'];
     setFormData((prevData) => {
+      // Create a shallow copy of the previous data
       let updatedParticipant = [...prevData];
-      updatedParticipant.sort(function (a: any, b: any) {
-        if (ascDir)
-          return a[property] > b[property]
-            ? 1
-            : a[property] < b[property]
-              ? -1
-              : 0;
-        else
-          return b[property] > a[property]
-            ? 1
-            : b[property] < a[property]
-              ? -1
-              : 0;
-      });
-      return [...updatedParticipant];
+
+      // Call the common sort function to sort the updatedParticipant array
+      updatedParticipant = sortArray(updatedParticipant, property, ascDir);
+
+      // Return the sorted array
+      return updatedParticipant;
     });
   };
 

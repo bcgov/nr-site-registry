@@ -20,6 +20,7 @@ import {
   getAxiosInstance,
   getUser,
   resultCache,
+  sortArray,
   UpdateDisplayTypeParams,
   updateTableColumn,
 } from '../../../helpers/utility';
@@ -782,20 +783,13 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
           let updatedNotationParticipant = [
             ...tempNotation.notationParticipant,
           ];
-          updatedNotationParticipant.sort(function (a: any, b: any) {
-            if (ascDir)
-              return a[property] > b[property]
-                ? 1
-                : a[property] < b[property]
-                  ? -1
-                  : 0;
-            else
-              return b[property] > a[property]
-                ? 1
-                : b[property] < a[property]
-                  ? -1
-                  : 0;
-          });
+          // Call the common sort function to sort the updatedParticipant array
+          updatedNotationParticipant = sortArray(
+            updatedNotationParticipant,
+            property,
+            ascDir,
+          );
+
           return {
             ...tempNotation,
             notationParticipant: updatedNotationParticipant,

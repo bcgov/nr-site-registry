@@ -199,7 +199,7 @@ const Folios = () => {
           handleSearchChange={handleSearchChange}
         />
       </div>
-      <div className="col-12">
+      <div className="col-12 overflow-auto w-100">
         <Table
           label="Folios"
           isLoading={RequestStatus.success}

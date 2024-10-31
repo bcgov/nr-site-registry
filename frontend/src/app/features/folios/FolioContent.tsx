@@ -167,13 +167,13 @@ const FolioContents = () => {
 
   return (
     <PageContainer role="Folio Contents">
-      <div className="d-flex folio-actions-gap">
+      <div className="d-flex folio-actions folio-actions-gap">
         <button
-          className="d-flex btn-back align-items-center"
+          className="d-flex btn-back align-items-center back-btn-fc"
           onClick={onClickBackButton}
         >
           <AngleLeft className="btn-icon" />
-          <span className="btn-back-lbl">Back to</span>
+          <span className="btn-back-lbl">Back to Folios</span>
         </button>
         <div className="folio-description">
           <div>
@@ -192,9 +192,9 @@ const FolioContents = () => {
         <div>
           <CustomLabel label="Folio Contents" labelType="b-h1" />
         </div>
-        <div className="search-result-actions">
+        <div className="folio-content-actions">
           <div
-            className="search-result-actions-btn"
+            className="folio-content-actions-btn"
             onClick={() => {
               handleAddToShoppingCart();
             }}
@@ -203,7 +203,7 @@ const FolioContents = () => {
             <span>Add Selected To Cart</span>
           </div>
           <div
-            className="search-result-actions-btn"
+            className="folio-content-actions-btn"
             onClick={() => {
               SetShowDeleteConfirmModal(true);
             }}
@@ -212,28 +212,30 @@ const FolioContents = () => {
             <span>Remove Selected From Folio</span>
           </div>
         </div>
-        <Table
-          label="Folios"
-          isLoading={RequestStatus.success}
-          columns={FolioContentTableColumns}
-          data={sitesInFolioArr.map((x) => {
-            let combinedObject = {
-              ...x,
-              ...x.site,
-            };
+        <div className='col-12 overflow-auto w-100'>
+          <Table
+            label="Folios"
+            isLoading={RequestStatus.success}
+            columns={FolioContentTableColumns}
+            data={sitesInFolioArr.map((x) => {
+              let combinedObject = {
+                ...x,
+                ...x.site,
+              };
 
-            return combinedObject;
-          })}
-          totalResults={[].length}
-          allowRowsSelect={true}
-          showPageOptions={false}
-          changeHandler={(event) => {
-            handleChangeEventFromTable(event);
-          }}
-          editMode={false}
-          idColumnName="id"
-          deleteHandler={() => {}}
-        />
+              return combinedObject;
+            })}
+            totalResults={[].length}
+            allowRowsSelect={true}
+            showPageOptions={false}
+            changeHandler={(event) => {
+              handleChangeEventFromTable(event);
+            }}
+            editMode={false}
+            idColumnName="id"
+            deleteHandler={() => {}}
+          />
+        </div>        
       </div>
 
       {showDeleteConfirmModal && (

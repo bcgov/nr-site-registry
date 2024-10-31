@@ -14,14 +14,14 @@ const NavigationPills: React.FC<INavigationPills> = ({
 
   const location = useLocation();
 
-  useEffect(() => {   
-    if(location?.search !== '')
-          {
-      const componentIndex = components.findIndex( (item:any) => item.key === location?.search.replace('?',''))
+  useEffect(() => {
+    if (location?.search !== '') {
+      const componentIndex = components.findIndex(
+        (item: any) => item.key === location?.search.replace('?', ''),
+      );
 
-      if(componentIndex > -1)
-      {
-        handlePillClick(componentIndex)
+      if (componentIndex > -1) {
+        handlePillClick(componentIndex);
       }
     }
   }, [location]);
@@ -31,7 +31,7 @@ const NavigationPills: React.FC<INavigationPills> = ({
   };
 
   return (
-    <div>
+    <div className="pt-5">
       <div className="d-flex d-xxl-flex d-xl-flex gap-2 d-none ">
         {items.map((item, index) => (
           <Link
@@ -102,7 +102,9 @@ const NavigationPills: React.FC<INavigationPills> = ({
       <div className="mt-4">
         {components &&
           components?.map((tabComponent: any, index: number) =>
-            index === activeIndex ? <div key={index}>{tabComponent.component}</div> : null,
+            index === activeIndex ? (
+              <div key={index}>{tabComponent.component}</div>
+            ) : null,
           )}
       </div>
     </div>

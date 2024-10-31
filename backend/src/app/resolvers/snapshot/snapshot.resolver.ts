@@ -177,8 +177,6 @@ export class SnapshotsResolver {
   @Roles({
     roles: [
       CustomRoles.External,
-      CustomRoles.Internal,
-      CustomRoles.SiteRegistrar,
     ],
     mode: RoleMatchingMode.ANY,
   })

@@ -120,6 +120,10 @@
   color: var(--typography-color-primary, #2d2d2d);
 }
 
+.btn-icon-color-white {
+  color: var(--typography-color-primary-invert, #2d2d2d);
+}
+
 .btn-folio-icon {
   font-size: 16px;
   font-weight: 900;

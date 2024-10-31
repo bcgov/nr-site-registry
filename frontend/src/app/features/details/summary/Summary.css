@@ -41,3 +41,10 @@
   gap: var(--layout-margin-small);
   justify-content: center;
 }
+
+@media (max-width: 576px) {
+  .external-purchase-buttons {
+      flex-direction: column; /* Change to column layout */
+      align-items: center;    /* Center items */
+  }
+}

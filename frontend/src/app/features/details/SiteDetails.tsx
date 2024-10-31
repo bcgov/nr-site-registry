@@ -166,7 +166,7 @@ const SiteDetails = () => {
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
   const [save, setSave] = useState(false);
-  const [userType, setUserType] = useState<UserType>(UserType.External);
+  const [userType, setUserType] = useState<UserType | null>(null);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
@@ -241,7 +241,7 @@ const SiteDetails = () => {
       setUserType(UserType.External);
     }
     dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
-  }, []);
+  }, [loggedInUser]);
 
   const savedChanges = useSelector(trackedChanges);
   const mode = useSelector(siteDetailsMode);
@@ -291,7 +291,7 @@ const SiteDetails = () => {
           console.error('Error fetching data:', error);
         });
     }
-  }, [id]);
+  }, [id, userType]);
 
   useEffect(() => {
     if (srUpdateRequestStatus === RequestStatus.success) {

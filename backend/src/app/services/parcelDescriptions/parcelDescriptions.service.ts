@@ -183,7 +183,10 @@ export class ParcelDescriptionsService {
     userInfo: any,
   ) {
     this.sitesLogger.log(
-      'parcelDescriptionService.saveParcelDescriptionsForSite(): Entering method.',
+      'parcelDescriptionService.saveParcelDescriptionsForSite() start',
+    );
+    this.sitesLogger.debug(
+      'parcelDescriptionService.saveParcelDescriptionsForSite() start',
     );
     const parcelDescriptionsToUpdate = parcelDescriptions.filter(
       (parcelDescription: ParcelDescriptionInputDTO) => {
@@ -221,7 +224,10 @@ export class ParcelDescriptionsService {
       );
     }
     this.sitesLogger.log(
-      'parcelDescriptionService.saveParcelDescriptionsForSite(): Complete.',
+      'parcelDescriptionService.saveParcelDescriptionsForSite() end',
+    );
+    this.sitesLogger.debug(
+      'parcelDescriptionService.saveParcelDescriptionsForSite() end',
     );
   }
 

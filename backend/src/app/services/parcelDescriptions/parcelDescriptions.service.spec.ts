@@ -586,10 +586,16 @@ describe('SiteSubdivisionsService', () => {
       );
 
       expect(logMock).toHaveBeenCalledWith(
-        'parcelDescriptionService.saveParcelDescriptionsForSite(): Entering method.',
+        'parcelDescriptionService.saveParcelDescriptionsForSite() start',
+      );
+      expect(debugMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.saveParcelDescriptionsForSite() start',
       );
       expect(logMock).toHaveBeenCalledWith(
-        'parcelDescriptionService.saveParcelDescriptionsForSite(): Complete.',
+        'parcelDescriptionService.saveParcelDescriptionsForSite() end',
+      );
+      expect(debugMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.saveParcelDescriptionsForSite() end',
       );
     });
 

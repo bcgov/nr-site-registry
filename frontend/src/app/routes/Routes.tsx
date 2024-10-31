@@ -22,7 +22,7 @@ import SRUpdatesTables from '../features/details/srUpdates/srUpdatesTables';
 
 const roleBasedRoutes: any = {
   client: [
-    { path: '/', element: <Dashboard /> },
+    { path: '/', element: <Search /> },
     { path: '/dashboard', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
     { path: '/site/details/:id', element: <SiteDetails /> },
@@ -37,7 +37,7 @@ const roleBasedRoutes: any = {
     { path: '/site/cart/site/details/:id', element: <SiteDetails /> },
   ],
   internal: [
-    { path: '/', element: <Dashboard /> },
+    { path: '/', element: <Search /> },
     { path: '/dashboard', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
     { path: '/site/details/:id', element: <SiteDetails /> },
@@ -50,7 +50,7 @@ const roleBasedRoutes: any = {
     { path: '/review', element: <SRUpdatesTables /> },
   ],
   sr: [
-    { path: '/', element: <Dashboard /> },
+    { path: '/', element: <Search /> },
     { path: '/search', element: <Search /> },
     { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
@@ -59,7 +59,7 @@ const roleBasedRoutes: any = {
     { path: '/review', element: <SRUpdatesTables /> },
   ],
   public: [
-    { path: '/', element: <Dashboard /> },
+    { path: '/', element: <Search /> },
     { path: '/search', element: <Search /> },
     { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },

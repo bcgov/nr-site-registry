@@ -397,7 +397,7 @@ const SiteDetails = () => {
   return (
     <>
       {isVisible && (
-        <div className="d-flex justify-content-between custom-sticky-header w-100">
+        <div className="d-flex justify-content-between align-items-center custom-sticky-header w-100">
           <div className="d-flex gap-2 flex-wrap align-items-center">
             <button
               className="d-flex btn-back align-items-center me-3"
@@ -406,7 +406,7 @@ const SiteDetails = () => {
               <AngleLeft className="btn-icon" />
               <span className="btn-back-lbl">Back </span>
             </button>
-            <div className="d-flex  flex-wrap  align-items-center gap-2 pe-3 custom-sticky-header-lbl">
+            <div className="d-flex flex-wrap align-items-center gap-2 pe-3 custom-sticky-header-lbl">
               Site ID:{' '}
               <span className="custom-sticky-header-txt">{id ?? ''}</span>
               <span className="d-flex align-items-center justify-content-center px-2 custom-dot">
@@ -423,7 +423,7 @@ const SiteDetails = () => {
               viewMode === SiteDetailsMode.ViewOnlyMode &&
               userType === UserType.Internal && (
                 <Actions
-                  label="Action"
+                  label="Actions"
                   items={ActionItems}
                   onItemClick={handleItemClick}
                 />
@@ -556,7 +556,7 @@ const SiteDetails = () => {
                 viewMode === SiteDetailsMode.ViewOnlyMode &&
                 userType === UserType.Internal && (
                   <Actions
-                    label="Action"
+                    label="Actions"
                     items={ActionItems}
                     onItemClick={handleItemClick}
                   />

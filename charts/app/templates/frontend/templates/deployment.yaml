@@ -49,7 +49,6 @@ spec:
             timeoutSeconds: 2
             successThreshold: 1
             failureThreshold: 30
-          #-- the liveness probe for the container. it is optional and is an object. for default values check this link: https://github.com/bcgov/helm-service/blob/main/charts/component/templates/deployment.yaml#L324-L328
           livenessProbe:
             successThreshold: 1
             failureThreshold: 3
@@ -67,6 +66,17 @@ spec:
             requests:
               cpu: 15m
               memory: 25Mi
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config/config.js  # Mount target path inside the container
+              subPath: config.js  # Mount only config.js from the ConfigMap
+      volumes:
+        - name: config-volume
+          configMap:
+            name:  {{ include "frontend.fullname" . }}  # ConfigMap name
+            items:
+              - key: config.js
+                path: config.js  # Specify config.js to mount
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

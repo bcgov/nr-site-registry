@@ -68,7 +68,7 @@ spec:
               memory: 25Mi
           volumeMounts:
             - name: config-volume
-              mountPath: /usr/share/nginx/html/config/ # Mount target path inside the container, match dockerfile workdir
+              mountPath: /usr/share/nginx/html/config/config.js # Mount target path inside the container, match dockerfile workdir
               subPath: config.js
       volumes:
         - name: config-volume

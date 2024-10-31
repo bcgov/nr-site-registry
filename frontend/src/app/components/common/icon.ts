@@ -27,6 +27,7 @@ import {
   FaAngleRight,
   FaChevronDown,
   FaChevronUp,
+  FaChevronRight,
   FaFloppyDisk,
   FaUserMinus,
   FaUserPlus,
@@ -50,6 +51,7 @@ import {
   BsEyeFill,
   BsExclamationCircle,
   BsExclamationTriangle,
+  BsXLg,
 } from 'react-icons/bs';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -77,10 +79,12 @@ export const DropdownUpIcon = FaCaretUp;
 export const DropdownIcon = FaCaretDown;
 export const CalendarIcon = FaCalendar;
 export const XmarkIcon = FaXmark;
+export const XmarkIcon2 = BsXLg;
 export const AngleLeft = FaAngleLeft;
 export const AngleRight = FaAngleRight;
 export const ChevronDown = FaChevronDown;
 export const ChevronUp = FaChevronUp;
+export const ChevronRight = FaChevronRight;
 export const FloppyDisk = FaFloppyDisk;
 export const UserPlus = FaUserPlus;
 export const UserMinus = FaUserMinus;

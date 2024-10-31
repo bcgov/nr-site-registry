@@ -127,7 +127,7 @@ export const SiteDetailsDrawer: FC = () => {
     if (expansion === ExpansionState.Default) {
       styles = {
         ...styles,
-        height: `${Math.floor(document.body.clientHeight / 2)}px`,
+        height: `50%`,
         maxHeight: '480px',
       };
     }
@@ -158,7 +158,7 @@ export const SiteDetailsDrawer: FC = () => {
       styles = {
         ...styles,
         transform: `translateY(${Math.floor(document.body.clientHeight / 2)}px)`,
-        height: `${Math.floor(document.body.clientHeight / 2)}px`,
+        height: `50%`,
         maxHeight: '480px',
         visibility: isVisible ? 'visible' : 'hidden',
       };

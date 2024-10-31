@@ -42,3 +42,22 @@
   align-items: center;
   border: 1px solid var(--surface-border-dark, #353433);
 }
+
+@media (max-width: 576px) {
+
+  .folio-actions {
+    display: flex;
+    flex-direction: column;    
+  }
+
+  .folio-add-new {
+    display: flex;
+    flex-direction: column;    
+  }
+
+  .folio-edit-btn
+  {
+    width: 100%;
+  }
+}
+

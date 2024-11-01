@@ -1,6 +1,6 @@
 .map-view {
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 65px);
 
   position: relative;
   display: flex;
@@ -12,10 +12,10 @@
 
 /* No footer on small screens - so use full height */
 .map-view.map-view--small {
-  height: 100vh; /* for old browser */
+  height: calc(100vh - 65px); /* for old browser */
   /* Use dvh instead of vh otherwise on Chrome the address bar pushes map down */
   /* https://stackoverflow.com/questions/52848856/100vh-height-when-address-bar-is-shown-chrome-mobile#70048720 */
-  height: 100dvh;
+  height: calc(100dvh - 65px);
 }
 
 .map-view > .map-container {

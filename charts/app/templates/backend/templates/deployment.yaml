@@ -70,6 +70,8 @@ spec:
                 secretKeyRef:
                   key: user
                   name: {{.Release.Name}}-crunchy-pguser-postgres
+            - name: SEED_DATA_PATH
+              value: "/mnt/sql/data_migration.sql"
           resources: # this is optional
             limits:
               cpu: {{ .Values.backend.resources.limits.cpu }}

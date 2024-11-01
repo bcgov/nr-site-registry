@@ -6,10 +6,8 @@ import {
   Roles,
 } from 'nest-keycloak-connect';
 import {
-  FetchSiteDetail,
   FetchSiteResponse,
   SaveSiteDetailsResponse,
-  SearchSiteResponse,
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteService } from '../../services/site/site.service';
@@ -59,7 +57,7 @@ export class SiteResolver {
   findAll() {
     return this.siteService.findAll();
   }
- 
+
   @Roles({
     roles: [
       CustomRoles.External,

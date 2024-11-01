@@ -886,10 +886,9 @@
             <column ascending="true" name="psnorg_id"/>
             <column ascending="true" name="sdoc_id"/>
          </index>
-         <index name="UQ_df9a943e1b0b8d86df36971b144" unique="true">
+         <index name="UQ_ea8bfa64c824437bf5638070eeb" unique="true">
+            <column ascending="true" name="dpr_code"/>
             <column ascending="true" name="psnorg_id"/>
-         </index>
-         <index name="UQ_ef5d35263f0cc2773256c285647" unique="true">
             <column ascending="true" name="sdoc_id"/>
          </index>
       </table>
@@ -1227,10 +1226,8 @@
             <column ascending="true" name="psnorg_id"/>
             <column ascending="true" name="start_date"/>
          </index>
-         <index name="UQ_6a823f4bdaf2485661fa50b8246" unique="true">
+         <index name="UQ_7544573ebdd7a4b82ff680f4823" unique="true">
             <column ascending="true" name="psnorg_id"/>
-         </index>
-         <index name="UQ_ca2c3e875aa5e455ee86bf8e02e" unique="true">
             <column ascending="true" name="start_date"/>
          </index>
       </table>
@@ -1399,10 +1396,9 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="snapshot_data" nullable="false" remarks="" size="2147483647" type="jsonb" typeCode="1111"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="who_created" nullable="false" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="who_updated" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
-         <column autoUpdated="false" defaultValue="now()" digits="6" id="6" name="whenCreated" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="user_id" nullable="false" remarks="" size="100" type="varchar" typeCode="12"/>
-         <column autoUpdated="false" defaultValue="now()" digits="6" id="8" name="when_updated" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <column autoUpdated="false" defaultValue="now()" digits="6" id="9" name="when_created" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="user_id" nullable="false" remarks="" size="100" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="7" name="when_updated" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="8" name="when_created" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
          <primaryKey column="id" sequenceNumberInPK="1"/>
          <index name="PK_f5661b5fd4224d23e26a631986b" unique="true">
             <column ascending="true" name="id"/>

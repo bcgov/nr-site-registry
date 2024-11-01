@@ -676,7 +676,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
   return (
     <div data-testid="srreviewtab-component">
       {siteSummaryData && (
-        <ApproveReject name="Summary" testId="site-summary-component" link="?summary">
+        <ApproveReject
+          name="Summary"
+          testId="site-summary-component"
+          link="?summary"
+        >
           <SummaryInfo
             siteData={siteSummaryData}
             location={location}
@@ -692,7 +696,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       {notationData &&
         notationData.map((notation: any, index: number) => {
           return (
-            <ApproveReject name="Notations" testId="srupdates-notation-component" link="?notations">
+            <ApproveReject
+              name="Notations"
+              testId="srupdates-notation-component"
+              link="?notations"
+            >
               <Notation
                 index={index}
                 notation={notation}
@@ -726,7 +734,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
         })}
 
       {siteParticipantData && siteParticipantData.length > 0 && (
-        <ApproveReject name="Participants" testId="srupdates-participant-component" link="?participants">
+        <ApproveReject
+          name="Participants"
+          testId="srupdates-participant-component"
+          link="?participants"
+        >
           <ParticipantTable
             handleTableChange={handleParticipantsApproveRejectHandler}
             handleWidgetCheckBox={handleChange}
@@ -751,7 +763,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       {documentsData &&
         documentsData.map((document: any, index: number) => {
           return (
-            <ApproveReject name="Documents" testId="srupdates-documents-component" link="?documents">
+            <ApproveReject
+              name="Documents"
+              testId="srupdates-documents-component"
+              link="?documents"
+            >
               <Document
                 index={index}
                 userType={UserType.Internal}
@@ -778,7 +794,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
         })}
 
       {associatedSitesData && associatedSitesData.length > 0 && (
-        <ApproveReject name="Site Associations"  testId="srupdates-siteassociations-component"  link="?associated">
+        <ApproveReject
+          name="Site Associations"
+          testId="srupdates-siteassociations-component"
+          link="?associated"
+        >
           <AssociateSiteComponent
             handleTableChange={handleAssociatedSiteApproveRejectHandler}
             handleWidgetCheckBox={handleChange}
@@ -804,7 +824,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       )}
 
       {landUsesData && (
-        <ApproveReject name="LandUses"  testId="srupdates-landuses-component" link="?landuses">
+        <ApproveReject
+          name="LandUses"
+          testId="srupdates-landuses-component"
+          link="?landuses"
+        >
           <LandUseTable
             onTableChange={approveRejectHandlerForLandUses}
             tableColumns={landUseTableColumn}
@@ -820,23 +844,28 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
         </ApproveReject>
       )}
 
-      {parcelDescriptionData?.data.length > 0 && parcelDescriptionData?.data && (
-        <ApproveReject name="Parcel Description"  testId="srupdates-parceldesc-component" link="?parceldesc">
-          <ParcelDescriptionTable
-            tableChangeHandler={handleParcelDescriptionApproveRejectHandler}
-            showPageOptions={false}
-            requestStatus={RequestStatus.success}
-            columns={parcelDescriptionColumn}
-            data={parcelDescriptionData.data}
-            totalResults={[].length}
-            handleSelectPage={handleChange}
-            handleChangeResultsPerPage={handleChange}
-            currentPage={1}
-            resultsPerPage={undefined}
-            handleTableSortChange={handleChange}
-          />
-        </ApproveReject>
-      )}
+      {parcelDescriptionData?.data.length > 0 &&
+        parcelDescriptionData?.data && (
+          <ApproveReject
+            name="Parcel Description"
+            testId="srupdates-parceldesc-component"
+            link="?parceldesc"
+          >
+            <ParcelDescriptionTable
+              tableChangeHandler={handleParcelDescriptionApproveRejectHandler}
+              showPageOptions={false}
+              requestStatus={RequestStatus.success}
+              columns={parcelDescriptionColumn}
+              data={parcelDescriptionData.data}
+              totalResults={[].length}
+              handleSelectPage={handleChange}
+              handleChangeResultsPerPage={handleChange}
+              currentPage={1}
+              resultsPerPage={undefined}
+              handleTableSortChange={handleChange}
+            />
+          </ApproveReject>
+        )}
 
       {disclosureData && (
         <ApproveReject name="Disclosure" link="?disclosure">
@@ -871,6 +900,19 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
           />
         </ApproveReject>
       )}
+      {!disclosureData &&
+        (!parcelDescriptionData || parcelDescriptionData.data.length === 0) &&
+        (!landUsesData || landUsesData.length === 0) &&
+        (!associatedSitesData || associatedSitesData.length === 0) &&
+        (!documentsData || documentsData.length === 0) && 
+        (!siteParticipantData || siteParticipantData.length === 0) && 
+        (!notationData || notationData.length === 0) && 
+        (!siteSummaryData) &&
+        (
+          <div>
+            <span> No updates to review</span>
+          </div>
+        )}
     </div>
   );
 };

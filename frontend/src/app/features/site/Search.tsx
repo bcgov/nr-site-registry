@@ -34,11 +34,12 @@ import { TableColumn } from '../../components/table/TableColumn';
 import { getSiteSearchResultsColumns } from './dto/Columns';
 import SiteFilterForm from './filters/SiteFilterForm';
 import PageContainer from '../../components/simple/PageContainer';
-import { getUser } from '../../helpers/utility';
+import { getUser, isUserOfType, UserRoleType } from '../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import AddToFolio from '../folios/AddToFolio';
 import { downloadCSV } from '../../helpers/csvExport/csvExport';
+import { UserType } from '../../helpers/requests/userType';
 
 const Search = () => {
   const auth = useAuth();
@@ -391,14 +392,14 @@ const Search = () => {
               </div>
             ) : null}
             <div className="search-result-actions">
-              <div
+              {!isUserOfType(UserRoleType.INTERNAL) && <div
                 className="search-result-actions-btn"
                 onClick={() => handleAddToShoppingCart()}
               >
                 <ShoppingCartIcon />
                 <span>Add Selected To Cart</span>
-              </div>
-              <div
+              </div>}
+              {!isUserOfType(UserRoleType.INTERNAL) && <div
                 className="search-result-actions-btn"
                 onClick={() => {
                   let loggedInUser = getUser();
@@ -413,7 +414,7 @@ const Search = () => {
               >
                 <FolderPlusIcon />
                 <span>Add Selected To Folio</span>
-              </div>
+              </div>}
               {showAddToFolio && (
                 <AddToFolio
                   className="pos-absolute-search"

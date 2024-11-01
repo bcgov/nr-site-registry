@@ -16,8 +16,8 @@ digraph "twoDegreesRelationshipsDiagramImplied" {
   "site_crown_land_contaminated":"elipses":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=teeodot];
   "site_crown_land_contaminated":"elipses":w -> "people_orgs":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_doc_partics":"dpr_code":w -> "doc_partic_role_cd":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_doc_partics":"psnorg_id":w -> "people_orgs":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_doc_partics":"sdoc_id":w -> "site_docs":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
+  "site_doc_partics":"psnorg_id":w -> "people_orgs":"elipses":e [arrowhead=none dir=back arrowtail=teeodot];
+  "site_doc_partics":"sdoc_id":w -> "site_docs":"id.type":e [arrowhead=none dir=back arrowtail=teeodot];
   "site_docs":"site_id":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_partics":"elipses":w -> "people_orgs":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_partics":"elipses":w -> "sites":"id":e [arrowhead=none dir=back arrowtail=crowodot];

@@ -6,9 +6,9 @@ digraph "oneDegreeRelationshipsDiagram" {
   "people_orgs":"bcer_code":w -> "bce_region_cd":"code":e [arrowhead=none dir=back arrowtail=crowodot];
   "sis_addresses":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_crown_land_contaminated":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_doc_partics":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
+  "site_doc_partics":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=teeodot];
   "site_partics":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_staffs":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
+  "site_staffs":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=teeodot];
   "bce_region_cd" [
    label=<
     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">

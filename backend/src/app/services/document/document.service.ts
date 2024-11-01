@@ -31,7 +31,7 @@ export class DocumentService {
       let result: SiteDocs[] = [];
       if (showPending) {
         result = await this.siteDocsRepository.find({
-          where: { siteId, userAction: UserActionEnum.UPDATED },
+          where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
           relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
         });
       } else {

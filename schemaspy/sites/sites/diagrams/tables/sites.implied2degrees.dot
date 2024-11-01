@@ -27,8 +27,8 @@ digraph "twoDegreesRelationshipsDiagramImplied" {
   "site_crown_land_contaminated":"id":w -> "sites":"id.type":e [arrowhead=none dir=back arrowtail=teeodot];
   "site_crown_land_contaminated":"psnorg_id":w -> "people_orgs":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_crown_land_contaminated":"site_crown_land_status_code":w -> "site_crown_land_status_cd":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_doc_partics":"elipses":w -> "people_orgs":"elipses":e [arrowhead=none dir=back arrowtail=teeodot];
-  "site_doc_partics":"elipses":w -> "site_docs":"id":e [arrowhead=none dir=back arrowtail=teeodot];
+  "site_doc_partics":"elipses":w -> "people_orgs":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
+  "site_doc_partics":"elipses":w -> "site_docs":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_docs":"site_id":w -> "sites":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_partic_roles":"elipses":w -> "site_partics":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_partics":"psnorg_id":w -> "people_orgs":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];

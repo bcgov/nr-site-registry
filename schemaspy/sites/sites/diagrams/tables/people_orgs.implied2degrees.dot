@@ -16,13 +16,13 @@ digraph "twoDegreesRelationshipsDiagramImplied" {
   "site_crown_land_contaminated":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_crown_land_contaminated":"site_crown_land_status_code":w -> "site_crown_land_status_cd":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_doc_partics":"dpr_code":w -> "doc_partic_role_cd":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_doc_partics":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=teeodot];
-  "site_doc_partics":"sdoc_id":w -> "site_docs":"elipses":e [arrowhead=none dir=back arrowtail=teeodot];
+  "site_doc_partics":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
+  "site_doc_partics":"sdoc_id":w -> "site_docs":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_docs":"elipses":w -> "sites":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_partic_roles":"elipses":w -> "site_partics":"id":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_partics":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
   "site_partics":"site_id":w -> "sites":"elipses":e [arrowhead=none dir=back arrowtail=crowodot];
-  "site_staffs":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=teeodot];
+  "site_staffs":"psnorg_id":w -> "people_orgs":"id.type":e [arrowhead=none dir=back arrowtail=crowodot];
   "sites":"elipses":w -> "bce_region_cd":"code":e [arrowhead=none dir=back arrowtail=crowodot];
   "sites":"elipses":w -> "city_regions":"elipses":e [arrowhead=none dir=back arrowtail=crowodot style=dashed];
   "bce_region_cd" [

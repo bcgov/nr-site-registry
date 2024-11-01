@@ -259,37 +259,54 @@ const SiteDetails = () => {
     if (id) {
       dispatch(resetSaveSiteDetails(null));
       dispatch(setupSiteIdForSaving(id));
-      Promise.all([
-        dispatch(fetchSnapshots(id ?? '')),
-        userType === UserType.External
-          ? dispatch(getBannerType(id ?? ''))
-          : Promise.resolve(),
-        dispatch(fetchMinistryContact('EMP')),
-        dispatch(fetchNotationClassCd()),
-        dispatch(fetchNotationTypeCd()),
-        dispatch(fetchNotationParticipantRoleCd()),
-        dispatch(fetchParticipantRoleCd()),
-        dispatch(
-          fetchSiteParticipants({ siteId: id ?? '', showPending: false }),
-        ),
-        dispatch(
-          fetchNotationParticipants({ siteId: id ?? '', showPending: false }),
-        ),
-        dispatch(fetchDocuments({ siteId: id ?? '', showPending: false })),
-        dispatch(
-          fetchAssociatedSites({ siteId: id ?? '', showPending: false }),
-        ),
-        dispatch(fetchSiteDisclosure({ siteId: id ?? '', showPending: false })),
-        // should be based on condition for External and Internal User.
-        dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
-        // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
-      ])
-        .then(() => {
+
+     
+      if( auth.user !== null)
+      {
+        Promise.all([
+          dispatch(fetchSnapshots(id ?? '')),
+           userType === UserType.External
+             ? dispatch(getBannerType(id ?? ''))
+             : Promise.resolve(),
+           dispatch(fetchMinistryContact('EMP')),
+           dispatch(fetchNotationClassCd()),
+           dispatch(fetchNotationTypeCd()),
+           dispatch(fetchNotationParticipantRoleCd()),
+           dispatch(fetchParticipantRoleCd()),
+           dispatch(
+             fetchSiteParticipants({ siteId: id ?? '', showPending: false }),
+           ),
+           dispatch(
+             fetchNotationParticipants({ siteId: id ?? '', showPending: false }),
+           ),
+           dispatch(fetchDocuments({ siteId: id ?? '', showPending: false })),
+           dispatch(
+             fetchAssociatedSites({ siteId: id ?? '', showPending: false }),
+           ),
+           dispatch(fetchSiteDisclosure({ siteId: id ?? '', showPending: false })),
+           // should be based on condition for External and Internal User.
+           dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false }))
+
+           // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
+         ])
+           .then(() => {
+             setIsLoading(false); // Set loading state to false after all API calls are resolved
+           })
+           .catch((error) => {
+             console.error('Error fetching data:', error);
+           });
+      }
+      else
+      {
+        dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })).then(() => {
           setIsLoading(false); // Set loading state to false after all API calls are resolved
         })
         .catch((error) => {
           console.error('Error fetching data:', error);
         });
+
+      }
+      
     }
   }, [id, userType]);
 
@@ -458,7 +475,14 @@ const SiteDetails = () => {
                   <div
                     className="d-flex btn-folio align-items-center"
                     onClick={() => {
-                      SetAddToFolioVisible(!addToFolioVisible);
+                      if (loggedInUser === null) {
+                        auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+                      }
+                      else
+                      {
+                        SetAddToFolioVisible(!addToFolioVisible);
+                      }
+                     
                     }}
                   >
                     <FolderPlusIcon className="btn-folio-icon" />
@@ -591,7 +615,14 @@ const SiteDetails = () => {
                     <div
                       className="d-flex btn-folio align-items-center"
                       onClick={() => {
-                        SetAddToFolioVisible(!addToFolioVisible);
+
+                        if (loggedInUser === null) {
+                          auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+                        }
+                        else
+                        {
+                          SetAddToFolioVisible(!addToFolioVisible);
+                        }
                       }}
                     >
                       <FolderPlusIcon className="btn-folio-icon" />

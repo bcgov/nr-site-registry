@@ -55,7 +55,10 @@ const Summary = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
+    if(user !== null)
+    {
+      dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
+    }
   }, [addCartItemStatus]);
   const { id } = useParams();
 
@@ -113,7 +116,7 @@ const Summary = () => {
 
   // State Initializations
   const initialParcelIds = [
-    12123123, 123123, 12312312, 1231231, 23, 123123123123, 123123213, 1123123,
+    0
   ];
 
   const [location, setLocation] = useState([48.46762, -123.25458]);

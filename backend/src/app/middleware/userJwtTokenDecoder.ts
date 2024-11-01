@@ -15,8 +15,7 @@ export class UserJWTTokenDecoderMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const token = req.headers['authorization']?.split(' ')[1];
-
-    if (token) {
+    if (token && token !== 'undefined' && token.trim() !== '' ) {
       try {
         const decodedToken: any = this.jwtService.decode(token);
         const { email, sub, identity_provider, given_name, family_name } =

@@ -118,10 +118,11 @@ const LandUses: FC = () => {
   }, [editModeEnabled, landUseCodes]);
 
   useEffect(() => {
-    if (siteId) {
+    if (siteId && !landUsesData.length) {
       dispatch(fetchLandUses({ siteId, showPending: false }));
     }
-  }, [dispatch, siteId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [siteId]);
 
   useEffect(() => {
     setTableData(landUsesData);
@@ -216,6 +217,7 @@ const LandUses: FC = () => {
     dispatch(trackChanges(tracker.toPlainObject()));
 
     setTableData(updatedLandUses);
+    dispatch(updateLandUses(updatedLandUses));
   };
 
   const handleRowSelect = (rowId: string) => {

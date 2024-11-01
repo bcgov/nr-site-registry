@@ -22,9 +22,7 @@ import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
 import { SiteDocPartics } from '../../entities/siteDocPartics.entity';
 import {
   BulkApproveRejectChangesDTO,
-  QueryResultForPendingSites,
   SearchParams,
-  SitePendingApprovalRecords,
 } from 'src/app/dto/sitesPendingReview.dto';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { ParcelDescriptionInputDTO } from 'src/app/dto/parcelDescriptionInput.dto';

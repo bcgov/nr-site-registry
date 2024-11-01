@@ -431,6 +431,15 @@ export type Mailout = {
   whoUpdated: Scalars['String']['output'];
 };
 
+export type MapSearchResponse = {
+  __typename?: 'MapSearchResponse';
+  data: Array<Sites>;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   addCartItem: CartResponse;
@@ -666,6 +675,7 @@ export type Query = {
   getSnapshotsById: SnapshotResponse;
   getSnapshotsBySiteId: SnapshotResponse;
   getSnapshotsByUserId: SnapshotResponse;
+  mapSearch: MapSearchResponse;
   searchSiteIds: DropdownResponse;
   searchSites: SearchSiteResponse;
   sites: FetchSiteResponse;
@@ -777,6 +787,11 @@ export type QueryGetSnapshotsBySiteIdArgs = {
 
 export type QueryGetSnapshotsByUserIdArgs = {
   userId: Scalars['String']['input'];
+};
+
+
+export type QueryMapSearchArgs = {
+  searchParam?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1316,17 +1331,17 @@ export enum Link__Purpose {
 }
 
 export type MapSearchQueryVariables = Exact<{
-  searchParam: Scalars['String']['input'];
+  searchParam?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type MapSearchQuery = { __typename?: 'Query', searchSites: { __typename?: 'SearchSiteResponse', sites: Array<{ __typename?: 'Sites', id: string, addrLine_1: string, latdeg?: number | null, longdeg?: number | null }> } };
+export type MapSearchQuery = { __typename?: 'Query', mapSearch: { __typename?: 'MapSearchResponse', data: Array<{ __typename?: 'Sites', id: string, addrLine_1: string, latdeg?: number | null, longdeg?: number | null }> } };
 
 
 export const MapSearchDocument = gql`
-    query mapSearch($searchParam: String!) {
-  searchSites(searchParam: $searchParam, page: "1", pageSize: "100000") {
-    sites {
+    query mapSearch($searchParam: String) {
+  mapSearch(searchParam: $searchParam) {
+    data {
       id
       addrLine_1
       latdeg
@@ -1352,7 +1367,7 @@ export const MapSearchDocument = gql`
  *   },
  * });
  */
-export function useMapSearchQuery(baseOptions: Apollo.QueryHookOptions<MapSearchQuery, MapSearchQueryVariables> & ({ variables: MapSearchQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useMapSearchQuery(baseOptions?: Apollo.QueryHookOptions<MapSearchQuery, MapSearchQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<MapSearchQuery, MapSearchQueryVariables>(MapSearchDocument, options);
       }

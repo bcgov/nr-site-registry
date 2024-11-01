@@ -25,6 +25,7 @@ import {
   SearchParams,
   SRApproveRejectResponse,
 } from '../../dto/sitesPendingReview.dto';
+import { MapSearchResponse } from '../../dto/mapSearch.dto';
 
 /**
  * Resolver for Region
@@ -40,6 +41,9 @@ export class SiteResolver {
     private readonly genericResponseProviderForSave: GenericResponseProvider<SaveSiteDetailsResponse>,
     private readonly sitesLogger: LoggerService,
     private readonly siteApprovalResponseProvider: GenericResponseProvider<QueryResultForPendingSites>,
+    private readonly mapSearchGenericResponseProvider: GenericResponseProvider<
+      Sites[]
+    >,
   ) {}
 
   /**
@@ -205,6 +209,39 @@ export class SiteResolver {
         `Unable to update sites. `,
         HttpStatus.UNPROCESSABLE_ENTITY,
         false,
+      );
+    }
+  }
+
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => MapSearchResponse, { name: 'mapSearch' })
+  async mapSearch(
+    @Args('searchParam', { type: () => String, nullable: true })
+    searchParam: string,
+  ) {
+    this.sitesLogger.log('SiteResolver.mapSearch() start ');
+    try {
+      const data = await this.siteService.mapSearch(searchParam);
+      return this.mapSearchGenericResponseProvider.createResponse(
+        'Successfully fetched sites for map',
+        HttpStatus.OK,
+        true,
+        data,
+      );
+    } catch (e) {
+      this.sitesLogger.log('SiteResolver.mapSearch() failed');
+      return this.mapSearchGenericResponseProvider.createResponse(
+        'Error fetching sites for map',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        false,
+        [],
       );
     }
   }

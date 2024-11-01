@@ -29,11 +29,6 @@ spec:
         - name: {{ include "backend.fullname" . }}-init
           image: "{{.Values.global.registry}}/{{.Values.global.repository}}/backend-migration:{{ .Values.global.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ default "Always" .Values.backend.imagePullPolicy }}
-          {{- if not .Values.crunchy.enabled }}
-          envFrom:
-            - secretRef:
-                name: {{.Release.Name}}-backend-migrations
-          {{- else }}
           env:
             - name: POSTGRES_DB_PASSWORD
               valueFrom:
@@ -66,13 +61,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+                  name: {{.Release.Name}}-crunchy-pguser-postgres
             - name: POSTGRES_ADMIN_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: user
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
-          {{- end }}
+                  name: {{.Release.Name}}-crunchy-pguser-postgres
           resources: # this is optional
             limits:
               cpu: {{ .Values.backend.resources.limits.cpu }}
@@ -104,7 +98,6 @@ spec:
               value: {{ .Values.backend.service.targetPort | quote }}
             - name: GRAPHQL_SCHEMA_FILE_PATH
               value: "/graphql/schema.graphql"
-          {{- if .Values.crunchy.enabled }}
             - name: POSTGRES_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -136,13 +129,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+                  name: {{.Release.Name}}-crunchy-pguser-postgres
             - name: POSTGRES_ADMIN_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: user
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
-          {{- end }}
+                  name: {{.Release.Name}}-crunchy-pguser-postgres
           ports:
             - name: http
               containerPort: {{ .Values.backend.service.targetPort }}

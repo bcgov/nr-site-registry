@@ -39,7 +39,11 @@ on:
         description: Paths used to trigger a deployment; e.g. ('./backend/' './frontend/)
         required: false
         type: string
-
+      db_user:
+        description: The database user
+        required: false
+        type: string
+        default: 'site'
       ### Usually a bad idea / not recommended
       timeout-minutes:
         description: 'Timeout minutes'
@@ -159,6 +163,7 @@ jobs:
             --set-string global.secrets.databasePassword="${{ secrets.DATABASE_PWD }}" \
             --set-string crunchy.pgBackRest.s3.accessKey="${{ secrets.S3_BACKUP_ACCESS_KEY }}"  \
             --set-string crunchy.pgBackRest.s3.secretKey="${{ secrets.S3_BACKUP_SECRET_KEY }}"  \
+            --set-string global.config.dbName=${{ inputs.db_user }} \
             ${{ inputs.params }} \
             --install --wait --atomic ${{ steps.vars.outputs.release }} \
             --timeout "$DEPLOY_TIMEOUT"m  \

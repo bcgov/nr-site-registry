@@ -73,15 +73,20 @@ const Search = () => {
   };
 
   useEffect(() => {
-    dispatch(
-      fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
-    );
+    if(currSearchVal.searchQuery !== "")
+    {
+      dispatch(     
+        fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
+      );
+    }
   }, [currentPageInState]);
 
   useEffect(() => {
-    dispatch(
-      fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
-    );
+    if (currSearchVal.searchQuery !== '') {
+      dispatch(
+        fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
+      );
+    }
   }, [currentPageSizeInState]);
 
   const hideColumns = () => {
@@ -116,8 +121,8 @@ const Search = () => {
     );
   };
 
-  useEffect(() => {
-    if (currSearchVal.searchQuery) {
+  useEffect(() => {    
+    if (currSearchVal.searchQuery !== '') {
       setUserAction(false);
       setSearchText(currSearchVal.searchQuery);
       dispatch(fetchSites({ searchParam: currSearchVal.searchQuery }));
@@ -396,7 +401,14 @@ const Search = () => {
               <div
                 className="search-result-actions-btn"
                 onClick={() => {
-                  SetShowAddToFolio(!showAddToFolio);
+                  let loggedInUser = getUser();
+                  if (loggedInUser === null) {
+                    auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+                  }
+                  else
+                  {
+                    SetShowAddToFolio(!showAddToFolio);
+                  }                 
                 }}
               >
                 <FolderPlusIcon />

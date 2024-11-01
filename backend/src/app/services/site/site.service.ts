@@ -5,7 +5,6 @@ import {
   FetchSiteDetail,
   FetchSiteResponse,
   SearchSiteResponse,
-  MapSearchResponse,
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteUtil } from '../../utils/site.util';
@@ -267,7 +266,6 @@ export class SiteService {
   }
 
   async mapSearch(searchTerm = '') {
-    const response = new MapSearchResponse();
     this.sitesLogger.log('SiteService.mapSearch() start');
 
     const searchTermClean = searchTerm.toLowerCase().trim();
@@ -301,8 +299,7 @@ export class SiteService {
     const [result] = await query.getManyAndCount();
 
     this.sitesLogger.log('SiteService.mapSearch() end');
-    response.data = result;
-    return response;
+    return result;
   }
 
   /**

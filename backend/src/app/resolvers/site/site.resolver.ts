@@ -8,7 +8,6 @@ import {
 import {
   FetchSiteDetail,
   FetchSiteResponse,
-  MapSearchResponse,
   SaveSiteDetailsResponse,
   SearchSiteResponse,
 } from '../../dto/response/genericResponse';
@@ -16,7 +15,7 @@ import { Sites } from '../../entities/sites.entity';
 import { SiteService } from '../../services/site/site.service';
 import { DropdownDto, DropdownResponse } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { UsePipes } from '@nestjs/common';
+import { HttpStatus, UsePipes } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { CustomRoles } from '../../common/role';
@@ -28,6 +27,7 @@ import {
   SearchParams,
   SRApproveRejectResponse,
 } from '../../dto/sitesPendingReview.dto';
+import { MapSearchResponse } from '../../dto/mapSearch.dto';
 
 /**
  * Resolver for Region
@@ -43,6 +43,9 @@ export class SiteResolver {
     private readonly genericResponseProviderForSave: GenericResponseProvider<SaveSiteDetailsResponse>,
     private readonly sitesLogger: LoggerService,
     private readonly siteApprovalResponseProvider: GenericResponseProvider<QueryResultForPendingSites>,
+    private readonly mapSearchGenericResponseProvider: GenericResponseProvider<
+      Sites[]
+    >,
   ) {}
 
   /**
@@ -345,6 +348,21 @@ export class SiteResolver {
     searchParam: string,
   ) {
     this.sitesLogger.log('SiteResolver.mapSearch() start ');
-    return await this.siteService.mapSearch(searchParam);
+    try {
+      const data = await this.siteService.mapSearch(searchParam);
+      return this.mapSearchGenericResponseProvider.createResponse(
+        'Successfully fetched sites for map',
+        HttpStatus.OK,
+        true,
+        data,
+      );
+    } catch (e) {
+      return this.mapSearchGenericResponseProvider.createResponse(
+        'Error fetching sites for map',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        false,
+        [],
+      );
+    }
   }
 }

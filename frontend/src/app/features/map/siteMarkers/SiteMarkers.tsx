@@ -5,7 +5,7 @@ import { SiteMarker } from './SiteMarker';
 import { StringParam, useQueryParam } from 'use-query-params';
 import { useMap } from 'react-leaflet';
 
-type Site = MapSearchQuery['searchSites']['sites'][number];
+type Site = MapSearchQuery['mapSearch']['data'][number];
 interface SiteMarkersProps {
   sites: Site[];
 }

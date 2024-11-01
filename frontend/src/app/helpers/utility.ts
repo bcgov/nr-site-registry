@@ -400,3 +400,33 @@ export function getGeolocationPermission(
     onError(new Error('Not supported'));
   }
 }
+
+/**
+ * Sorts an array of objects based on a specified property and direction.
+ *
+ * @param array - The array of objects to sort.
+ * @param property - The property to sort by. Should be a key of the object type.
+ * @param ascDir - A boolean indicating the sort direction:
+ *                 true for ascending and false for descending.
+ * @returns A new sorted array.
+ */
+export function sortArray<T>(
+  array: T[],
+  property: keyof T,
+  ascDir: boolean,
+): T[] {
+  return array.sort((a, b) => {
+    // Replace null or undefined values with an empty string for comparison
+    const aValue = a[property] == null ? '' : a[property];
+    const bValue = b[property] == null ? '' : b[property];
+
+    // Perform the sorting based on the ascending/descending direction specified by ascDir
+    if (ascDir) {
+      // For ascending order, compare aValue and bValue
+      return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+    } else {
+      // For descending order, reverse the comparison
+      return bValue > aValue ? 1 : bValue < aValue ? -1 : 0;
+    }
+  });
+}

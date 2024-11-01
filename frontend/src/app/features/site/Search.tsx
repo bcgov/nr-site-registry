@@ -38,6 +38,8 @@ import {
   flattenFormRows,
   formatDateRange,
   getUser,
+  isUserOfType,
+  UserRoleType,
 } from '../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
@@ -79,9 +81,8 @@ const Search = () => {
   };
 
   useEffect(() => {
-    if(currSearchVal.searchQuery !== "")
-    {
-      dispatch(     
+    if (currSearchVal.searchQuery !== '') {
+      dispatch(
         fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
       );
     }
@@ -127,7 +128,7 @@ const Search = () => {
     );
   };
 
-  useEffect(() => {    
+  useEffect(() => {
     if (currSearchVal.searchQuery !== '') {
       setUserAction(false);
       setSearchText(currSearchVal.searchQuery);
@@ -488,29 +489,33 @@ const Search = () => {
               </div>
             ) : null}
             <div className="search-result-actions">
-              <div
-                className="search-result-actions-btn"
-                onClick={() => handleAddToShoppingCart()}
-              >
-                <ShoppingCartIcon />
-                <span>Add Selected To Cart</span>
-              </div>
-              <div
-                className="search-result-actions-btn"
-                onClick={() => {
-                  let loggedInUser = getUser();
-                  if (loggedInUser === null) {
-                    auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
-                  }
-                  else
-                  {
-                    SetShowAddToFolio(!showAddToFolio);
-                  }                 
-                }}
-              >
-                <FolderPlusIcon />
-                <span>Add Selected To Folio</span>
-              </div>
+              {!isUserOfType(UserRoleType.INTERNAL) && (
+                <div
+                  className="search-result-actions-btn"
+                  onClick={() => handleAddToShoppingCart()}
+                >
+                  <ShoppingCartIcon />
+                  <span>Add Selected To Cart</span>
+                </div>
+              )}
+              {!isUserOfType(UserRoleType.INTERNAL) && (
+                <div
+                  className="search-result-actions-btn"
+                  onClick={() => {
+                    let loggedInUser = getUser();
+                    if (loggedInUser === null) {
+                      auth.signinRedirect({
+                        extraQueryParams: { kc_idp_hint: 'bceid' },
+                      });
+                    } else {
+                      SetShowAddToFolio(!showAddToFolio);
+                    }
+                  }}
+                >
+                  <FolderPlusIcon />
+                  <span>Add Selected To Folio</span>
+                </div>
+              )}
               {showAddToFolio && (
                 <AddToFolio
                   className="pos-absolute-search"

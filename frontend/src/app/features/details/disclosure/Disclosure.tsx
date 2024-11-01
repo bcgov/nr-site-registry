@@ -27,6 +27,7 @@ import {
   getUser,
   resultCache,
   serializeDate,
+  sortArray,
   updateFields,
 } from '../../../helpers/utility';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
@@ -399,23 +400,14 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     let property = row['graphQLPropertyName'];
     setFormData((prevData) => {
       if (prevData.disclosureId === disclosureId) {
-        // Filter out selected rows from notationParticipant array
-        const updatedDisclosureSchedule = prevData.disclosureSchedule.sort(
-          function (a: any, b: any) {
-            if (ascDir)
-              return a[property] > b[property]
-                ? 1
-                : a[property] < b[property]
-                  ? -1
-                  : 0;
-            else
-              return b[property] > a[property]
-                ? 1
-                : b[property] < a[property]
-                  ? -1
-                  : 0;
-          },
+        // Call the common sort function to sort the updatedParticipant array
+        const updatedDisclosureSchedule = sortArray(
+          [...prevData.disclosureSchedule],
+          property,
+          ascDir,
         );
+
+        // Return the sorted array
         return { ...prevData, notationParticipant: updatedDisclosureSchedule };
       }
     });

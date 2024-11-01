@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SearchResults from './SearchResults';
 import { Provider } from 'react-redux';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import { RequestStatus } from '../../helpers/requests/status';
 import { getSiteSearchResultsColumns } from './dto/Columns';
@@ -45,19 +46,30 @@ describe('SearchResults Component', () => {
         whenCreated: '2024-04-04',
       },
     ];
+
+    const router = createBrowserRouter([
+      {
+        element: (
+          <SearchResults
+            data={mockData}
+            pageChange={(currentPage, resultsPerPage) => {}}
+            columns={getSiteSearchResultsColumns()}
+          />
+        ),
+        path: '/',
+      },
+    ]);
+
     const { container } = render(
       <Provider store={store}>
-        <SearchResults
-          data={mockData}
-          pageChange={(currentPage, resultsPerPage) => {}}
-        />
+        <RouterProvider router={router} />
       </Provider>,
     );
     const siteIdLink = screen.getByText('View');
     expect(siteIdLink).toBeInTheDocument();
   });
 
-  test('checkbox selects row when clicked', () => {
+  test('checkbox selects row when clicked', async () => {
     const mockData = [
       {
         siteId: 1,
@@ -68,17 +80,28 @@ describe('SearchResults Component', () => {
         whenCreated: '2024-04-04',
       },
     ];
+    const router = createBrowserRouter([
+      {
+        element: (
+          <SearchResults
+            data={mockData}
+            columns={getSiteSearchResultsColumns()}
+            changeHandler={() => {}}
+            pageChange={() => {}}
+          />
+        ),
+        path: '/',
+      },
+    ]);
     render(
       <Provider store={store}>
-        <SearchResults
-          data={mockData}
-          pageChange={(currentPage, resultsPerPage) => {}}
-        />
+        <RouterProvider router={router} />
       </Provider>,
     );
     const checkbox = screen.getByLabelText('Select Row');
+
     expect(checkbox).toBeInTheDocument();
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
     expect(checkbox).toBeChecked();
   });
 
@@ -95,13 +118,22 @@ describe('SearchResults Component', () => {
         whenCreated: '2024-04-04',
       },
     ];
+
+    const router = createBrowserRouter([
+      {
+        element: (
+          <SearchResults
+            data={mockData}
+            columns={columns}
+            pageChange={() => {}}
+          />
+        ),
+        path: '/',
+      },
+    ]);
     render(
       <Provider store={store}>
-        <SearchResults
-          data={mockData}
-          columns={columns}
-          pageChange={() => {}}
-        />
+        <RouterProvider router={router} />
       </Provider>,
     );
     const siteIdLink = screen.getByText('View');

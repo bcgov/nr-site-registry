@@ -93,7 +93,7 @@ import { updateRequestStatus } from './srUpdates/srUpdatesSlice';
 
 const SiteDetails = () => {
   const [navItems, SetNavItems] = useState<string[] | undefined>();
-  const [navComponents, SetNavComponents] = useState<JSX.Element[]>();
+  const [navComponents, SetNavComponents] = useState<any[]>();
   const [dropDownNavItems, SetDropDownNavItems] =
     useState<{ label: string; value: string }[]>();
 
@@ -166,7 +166,7 @@ const SiteDetails = () => {
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
   const [save, setSave] = useState(false);
-  const [userType, setUserType] = useState<UserType>(UserType.External);
+  const [userType, setUserType] = useState<UserType | null>(null);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
@@ -213,7 +213,7 @@ const SiteDetails = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
+      if (window.scrollY > 5) {
         // Adjust the scroll position as needed
         setIsVisible(true);
       } else {
@@ -241,7 +241,7 @@ const SiteDetails = () => {
       setUserType(UserType.External);
     }
     dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
-  }, []);
+  }, [loggedInUser]);
 
   const savedChanges = useSelector(trackedChanges);
   const mode = useSelector(siteDetailsMode);
@@ -259,39 +259,53 @@ const SiteDetails = () => {
     if (id) {
       dispatch(resetSaveSiteDetails(null));
       dispatch(setupSiteIdForSaving(id));
-      Promise.all([
-        dispatch(fetchSnapshots(id ?? '')),
-        userType === UserType.External
-          ? dispatch(getBannerType(id ?? ''))
-          : Promise.resolve(),
-        dispatch(fetchMinistryContact('EMP')),
-        dispatch(fetchNotationClassCd()),
-        dispatch(fetchNotationTypeCd()),
-        dispatch(fetchNotationParticipantRoleCd()),
-        dispatch(fetchParticipantRoleCd()),
-        dispatch(
-          fetchSiteParticipants({ siteId: id ?? '', showPending: false }),
-        ),
-        dispatch(
-          fetchNotationParticipants({ siteId: id ?? '', showPending: false }),
-        ),
-        dispatch(fetchDocuments({ siteId: id ?? '', showPending: false })),
-        dispatch(
-          fetchAssociatedSites({ siteId: id ?? '', showPending: false }),
-        ),
-        dispatch(fetchSiteDisclosure({ siteId: id ?? '', showPending: false })),
-        // should be based on condition for External and Internal User.
-        dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
-        // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
-      ])
-        .then(() => {
-          setIsLoading(false); // Set loading state to false after all API calls are resolved
-        })
-        .catch((error) => {
-          console.error('Error fetching data:', error);
-        });
+
+      if (auth.user !== null) {
+        Promise.all([
+          dispatch(fetchSnapshots(id ?? '')),
+          userType === UserType.External
+            ? dispatch(getBannerType(id ?? ''))
+            : Promise.resolve(),
+          dispatch(fetchMinistryContact('EMP')),
+          dispatch(fetchNotationClassCd()),
+          dispatch(fetchNotationTypeCd()),
+          dispatch(fetchNotationParticipantRoleCd()),
+          dispatch(fetchParticipantRoleCd()),
+          dispatch(
+            fetchSiteParticipants({ siteId: id ?? '', showPending: false }),
+          ),
+          dispatch(
+            fetchNotationParticipants({ siteId: id ?? '', showPending: false }),
+          ),
+          dispatch(fetchDocuments({ siteId: id ?? '', showPending: false })),
+          dispatch(
+            fetchAssociatedSites({ siteId: id ?? '', showPending: false }),
+          ),
+          dispatch(
+            fetchSiteDisclosure({ siteId: id ?? '', showPending: false }),
+          ),
+          // should be based on condition for External and Internal User.
+          dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
+
+          // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
+        ])
+          .then(() => {
+            setIsLoading(false); // Set loading state to false after all API calls are resolved
+          })
+          .catch((error) => {
+            console.error('Error fetching data:', error);
+          });
+      } else {
+        dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false }))
+          .then(() => {
+            setIsLoading(false); // Set loading state to false after all API calls are resolved
+          })
+          .catch((error) => {
+            console.error('Error fetching data:', error);
+          });
+      }
     }
-  }, [id]);
+  }, [id, userType]);
 
   useEffect(() => {
     if (srUpdateRequestStatus === RequestStatus.success) {
@@ -397,7 +411,7 @@ const SiteDetails = () => {
   return (
     <>
       {isVisible && (
-        <div className="d-flex justify-content-between custom-sticky-header w-100">
+        <div className="d-flex justify-content-between align-items-center custom-sticky-header w-100">
           <div className="d-flex gap-2 flex-wrap align-items-center">
             <button
               className="d-flex btn-back align-items-center me-3"
@@ -406,7 +420,7 @@ const SiteDetails = () => {
               <AngleLeft className="btn-icon" />
               <span className="btn-back-lbl">Back </span>
             </button>
-            <div className="d-flex  flex-wrap  align-items-center gap-2 pe-3 custom-sticky-header-lbl">
+            <div className="d-flex flex-wrap align-items-center gap-2 pe-3 custom-sticky-header-lbl">
               Site ID:{' '}
               <span className="custom-sticky-header-txt">{id ?? ''}</span>
               <span className="d-flex align-items-center justify-content-center px-2 custom-dot">
@@ -423,7 +437,7 @@ const SiteDetails = () => {
               viewMode === SiteDetailsMode.ViewOnlyMode &&
               userType === UserType.Internal && (
                 <Actions
-                  label="Action"
+                  label="Actions"
                   items={ActionItems}
                   onItemClick={handleItemClick}
                 />
@@ -458,7 +472,13 @@ const SiteDetails = () => {
                   <div
                     className="d-flex btn-folio align-items-center"
                     onClick={() => {
-                      SetAddToFolioVisible(!addToFolioVisible);
+                      if (loggedInUser === null) {
+                        auth.signinRedirect({
+                          extraQueryParams: { kc_idp_hint: 'bceid' },
+                        });
+                      } else {
+                        SetAddToFolioVisible(!addToFolioVisible);
+                      }
                     }}
                   >
                     <FolderPlusIcon className="btn-folio-icon" />
@@ -556,7 +576,7 @@ const SiteDetails = () => {
                 viewMode === SiteDetailsMode.ViewOnlyMode &&
                 userType === UserType.Internal && (
                   <Actions
-                    label="Action"
+                    label="Actions"
                     items={ActionItems}
                     onItemClick={handleItemClick}
                   />
@@ -591,7 +611,13 @@ const SiteDetails = () => {
                     <div
                       className="d-flex btn-folio align-items-center"
                       onClick={() => {
-                        SetAddToFolioVisible(!addToFolioVisible);
+                        if (loggedInUser === null) {
+                          auth.signinRedirect({
+                            extraQueryParams: { kc_idp_hint: 'bceid' },
+                          });
+                        } else {
+                          SetAddToFolioVisible(!addToFolioVisible);
+                        }
                       }}
                     >
                       <FolderPlusIcon className="btn-folio-icon" />

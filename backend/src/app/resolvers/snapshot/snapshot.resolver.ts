@@ -1,4 +1,4 @@
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
 import {
   AuthenticatedUser,
@@ -40,7 +40,7 @@ export class SnapshotsResolver {
       this.sitesLogger.log('SnapshotsResolver.getSnapshots() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -48,7 +48,7 @@ export class SnapshotsResolver {
       this.sitesLogger.log('SnapshotsResolver.getSnapshots() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Snapshot not found.`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );
@@ -78,7 +78,7 @@ export class SnapshotsResolver {
       );
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -88,7 +88,7 @@ export class SnapshotsResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Snapshot not found for user id: ${userId}`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );
@@ -123,7 +123,7 @@ export class SnapshotsResolver {
       );
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -133,7 +133,7 @@ export class SnapshotsResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Snapshot not found for site id ${siteId}`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );
@@ -159,7 +159,7 @@ export class SnapshotsResolver {
       this.sitesLogger.log('SnapshotsResolver.getSnapshotsById() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Snapshot fetched successfully.',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -167,7 +167,7 @@ export class SnapshotsResolver {
       this.sitesLogger.log('SnapshotsResolver.getSnapshotsById() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Snapshot not found for snapshot id: ${id}`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );
@@ -177,8 +177,6 @@ export class SnapshotsResolver {
   @Roles({
     roles: [
       CustomRoles.External,
-      CustomRoles.Internal,
-      CustomRoles.SiteRegistrar,
     ],
     mode: RoleMatchingMode.ANY,
   })
@@ -193,44 +191,39 @@ export class SnapshotsResolver {
         ' ' +
         JSON.stringify(inputDto),
     );
-    try {
-      if (inputDto) {
-        const isSaved = this.snapshotsService.createSnapshotForSites(
-          inputDto,
-          user,
+    if (inputDto) {
+      const isSaved = await this.snapshotsService.createSnapshotForSites(
+        inputDto,
+        user,
+      );
+      if (isSaved) {
+        this.sitesLogger.log(
+          'SnapshotsResolver.createSnapshotForSites() RES:201 end',
         );
-        if (isSaved) {
-          this.sitesLogger.log(
-            'SnapshotsResolver.createSnapshotForSites() RES:201 end',
-          );
-          return this.genericResponseProvider.createResponse(
-            'Successfully created snapshots.',
-            201,
-            true,
-          );
-        } else {
-          this.sitesLogger.log(
-            'SnapshotsResolver.createSnapshotForSites() RES:422 end',
-          );
-          return this.genericResponseProvider.createResponse(
-            `Failed to create snapshots. `,
-            422,
-            false,
-          );
-        }
+        return this.genericResponseProvider.createResponse(
+          'Successfully created snapshots.',
+          HttpStatus.CREATED,
+          true,
+        );
       } else {
         this.sitesLogger.log(
           'SnapshotsResolver.createSnapshotForSites() RES:422 end',
         );
         return this.genericResponseProvider.createResponse(
-          `Please provide valid input to create snapshots`,
-          422,
+          `Failed to create snapshots. `,
+          HttpStatus.UNPROCESSABLE_ENTITY,
           false,
         );
       }
-    } catch (error) {
-      console.log('Error at createSnapshotForSites', error);
-      throw new Error('System Error, Please try again.');
+    } else {
+      this.sitesLogger.log(
+        'SnapshotsResolver.createSnapshotForSites() RES:400 end',
+      );
+      return this.genericResponseProvider.createResponse(
+        `Please provide valid input to create snapshots`,
+        HttpStatus.BAD_REQUEST,
+        false,
+      );
     }
   }
 
@@ -249,35 +242,27 @@ export class SnapshotsResolver {
         ' user:' +
         user.sub,
     );
-    try {
-      const bannerType = await this.snapshotsService.getBannerType(
-        siteId,
-        user.sub,
-      );
+    const bannerType = await this.snapshotsService.getBannerType(
+      siteId,
+      user.sub,
+    );
 
-      if (bannerType && bannerType.length > 0) {
-        this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:200 end');
-        return {
-          httpStatusCode: 200,
-          message: 'Banner type fetched successfully',
-          data: {
-            bannerType: bannerType,
-          },
-        };
-      } else {
-        this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:404 end');
-        return {
-          httpStatusCode: 404,
-          message: `Failed to determine banner type for site id ${siteId}`,
-          data: null,
-        };
-      }
-    } catch (error) {
-      this.sitesLogger.error(
-        'Exception occured in SnapshotsResolver.getBannerType() end',
-        JSON.stringify(error),
-      );
-      throw new Error('System Error, Please try again.');
+    if (bannerType?.length > 0) {
+      this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:200 end');
+      return {
+        httpStatusCode: HttpStatus.OK,
+        message: 'Banner type fetched successfully',
+        data: {
+          bannerType: bannerType,
+        },
+      };
+    } else {
+      this.sitesLogger.log('SnapshotsResolver.getBannerType() RES:404 end');
+      return {
+        httpStatusCode: HttpStatus.NOT_FOUND,
+        message: `Failed to determine banner type for site id ${siteId}`,
+        data: null,
+      };
     }
   }
 }

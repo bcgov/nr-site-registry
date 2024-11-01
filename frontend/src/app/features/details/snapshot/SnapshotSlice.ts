@@ -154,6 +154,10 @@ export const getFirstSnapshotCreatedDate = (state: any) => {
   return state.snapshots.firstSnapshotCreatedDate;
 };
 
+export const isUserPurchasedSnapshot = (state: any) => {
+  return state.snapshots.firstSnapshotCreatedDate !== null;
+};
+
 export const createSnapshotForSitesStatus = (state: any) =>
   state.snapshots.createSnapshotRequest;
 

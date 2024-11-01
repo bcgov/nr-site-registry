@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSnapshotDto } from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
@@ -14,6 +14,7 @@ import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { SnapshotSiteContent } from '../../dto/snapshotSiteContent';
 import { Events } from '../../entities/events.entity';
 import { LoggerService } from '../../logger/logger.service';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 @Injectable()
 export class SnapshotsService {
@@ -54,7 +55,10 @@ export class SnapshotsService {
         'Exception occured in SnapshotsService.getSnapshots() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve snapshots.');
+      throw new HttpException(
+        `Failed to retrieve snapshots.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -74,7 +78,10 @@ export class SnapshotsService {
         'Exception occured in SnapshotsService.getSnapshotsByUserId() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve snapshots by userId.');
+      throw new HttpException(
+        `Failed to retrieve snapshots by userId: ${userId}`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -94,7 +101,10 @@ export class SnapshotsService {
         'Exception occured in SnapshotsService.getSnapshotsBySiteId() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve snapshots by userId and siteId.');
+      throw new HttpException(
+        `Failed to retrieve snapshots by userId: ${userId} and siteId: ${siteId}`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -115,7 +125,10 @@ export class SnapshotsService {
         'Exception occured in SnapshotsService.getMostRecentSnapshot() end',
         JSON.stringify(error),
       );
-      throw new Error('Failed to retrieve the most recent snapshot.');
+      throw new HttpException(
+        `Failed to retrieve the most recent snapshot.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 
@@ -132,9 +145,144 @@ export class SnapshotsService {
         'Exception occured in SnapshotsService.getSnapshotsById() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to retrieve snapshot by ID: ${id}.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
+
+  getNotatioParticipantsForSnapshotCreation = async (notationId: string) => {
+    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start');  
+    try {
+      if (notationId === '' || notationId === null) {
+        throw Error('notation id cannot be empty');
+      }
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end');  
+      return await this.eventsParticipantsRepo.find({
+        where: {
+          eventId: notationId,
+          srAction: SRApprovalStatusEnum.PUBLIC,
+        },
+      });
+    } catch (error) {
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      throw error;
+    }
+  };
+
+  getNotationsForSnapshotCreation = async (siteId: string) => {
+    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      return await this.eventsRepositoryRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      throw error;
+    }
+  };
+
+  getSiteParticipantsForSnapshotCreation = async (siteId: string) => {
+    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      return await this.siteParticipantsRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      throw error;
+    }
+  };
+
+  getSiteDocumentsForSnapshotCreation = async (siteId: string) => {
+    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      return await this.siteDocumentsRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      throw error;
+    }
+  };
+
+  getLandHisotoriesForSnapshotCreation = async (siteId: string) => {
+    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      return this.landHistoriesRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      throw error;
+    }
+  };
+
+  getDisclosureForSnapshotCreation = async (siteId: string) => {
+    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      return this.siteProfilesRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      throw error;
+    }
+  };
+
+  getSubDivisionsForSnapshotCreation = async (siteId: string) => {
+    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      return await this.siteSubDivisionsRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      throw error;
+    }
+  };
+
+  getSiteAssociationsForSnapshotCreation = async (siteId: string) => {
+    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    try {
+      if (siteId === '' || siteId === null) {
+        throw Error('site id cannot be empty');
+      }
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      return await this.siteAssociationsRepo.find({
+        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+      });
+    } catch (error) {
+      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      throw error;
+    }
+  };
 
   async createSnapshotForSites(
     inputDto: CreateSnapshotDto[],
@@ -156,37 +304,35 @@ export class SnapshotsService {
               where: { id: siteId },
             });
 
-            snapShotContent.events = await this.eventsRepositoryRepo.find({
-              where: { siteId },
-            });
+            snapShotContent.events =
+              await this.getNotationsForSnapshotCreation(siteId);
 
-            const fetchEventParticipants = snapShotContent.events.map(
-              async (event) => {
+            await Promise.all(
+              snapShotContent.events.map(async (event) => {
                 snapShotContent.eventsParticipants =
-                  await this.eventsParticipantsRepo.find({
-                    where: { eventId: event.id },
-                  });
-              },
+                  await this.getNotatioParticipantsForSnapshotCreation(
+                    event.id,
+                  );
+              }),
             );
 
             snapShotContent.siteParticipants =
-              await this.siteParticipantsRepo.find({ where: { siteId } });
+              await this.getSiteParticipantsForSnapshotCreation(siteId);
 
-            snapShotContent.documents = await this.siteDocumentsRepo.find({
-              where: { siteId },
-            });
+            snapShotContent.documents =
+              await this.getSiteDocumentsForSnapshotCreation(siteId);
 
-            snapShotContent.landHistories = await this.landHistoriesRepo.find({
-              where: { siteId },
-            });
+            snapShotContent.profiles =
+              await this.getDisclosureForSnapshotCreation(siteId);
 
-            snapShotContent.profiles = await this.siteProfilesRepo.find({
-              where: { siteId },
-            });
+            snapShotContent.landHistories =
+              await this.getLandHisotoriesForSnapshotCreation(siteId);
 
-            snapShotContent.subDivisions = await this.siteSubDivisionsRepo.find(
-              { where: { siteId } },
-            );
+            snapShotContent.subDivisions =
+              await this.getSubDivisionsForSnapshotCreation(siteId);
+
+            snapShotContent.siteAssociations =
+              await this.getSiteAssociationsForSnapshotCreation(siteId);
 
             const newSnapshot = {
               userId: userInfo.sub,
@@ -198,13 +344,11 @@ export class SnapshotsService {
             };
 
             snapShotsToBeSaved.push(newSnapshot);
-
-            await Promise.all(fetchEventParticipants);
           } else {
-            console.log('Site id is empty');
+            this.sitesLogger.log('SnapshotsService.createSnapshotForSites() Site id is empty');          
           }
         } else {
-          console.log('At createSnapshotForUser dto is null');
+           this.sitesLogger.log('SnapshotsService.createSnapshotForSites() createSnapshotForUser dto is null');
         }
       });
 
@@ -212,7 +356,7 @@ export class SnapshotsService {
 
       const saveResult = await this.snapshotRepository.save(snapShotsToBeSaved);
 
-      if (saveResult.length > 0) {
+      if (saveResult?.length > 0) {
         this.sitesLogger.log('SnapshotsService.createSnapshotForSites() end');
         this.sitesLogger.debug('SnapshotsService.createSnapshotForSites() end');
         return true;
@@ -226,7 +370,10 @@ export class SnapshotsService {
         'Exception occured in SnapshotsService.createSnapshotForSites() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new HttpException(
+        `Failed to create snapshot.`,
+        HttpStatus.EXPECTATION_FAILED,
+      );
     }
   }
 
@@ -293,9 +440,12 @@ export class SnapshotsService {
 
       const entityManager = this.snapshotRepository.manager;
       const result = await entityManager.query(query, [siteId, userId]);
-      return result.length > 0 ? result[0].bannertype : 'unknown';
+      return result?.length > 0 ? result[0].bannertype : 'unknown';
     } catch (error) {
-      throw new Error('Failed to determine banner type.');
+      throw new HttpException(
+        `Failed to determine banner type.`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 }

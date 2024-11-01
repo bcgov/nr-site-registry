@@ -34,11 +34,12 @@ import { TableColumn } from '../../components/table/TableColumn';
 import { getSiteSearchResultsColumns } from './dto/Columns';
 import SiteFilterForm from './filters/SiteFilterForm';
 import PageContainer from '../../components/simple/PageContainer';
-import { getUser } from '../../helpers/utility';
+import { getUser, isUserOfType, UserRoleType } from '../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import AddToFolio from '../folios/AddToFolio';
 import { downloadCSV } from '../../helpers/csvExport/csvExport';
+import { UserType } from '../../helpers/requests/userType';
 
 const Search = () => {
   const auth = useAuth();
@@ -73,15 +74,20 @@ const Search = () => {
   };
 
   useEffect(() => {
-    dispatch(
-      fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
-    );
+    if(currSearchVal.searchQuery !== "")
+    {
+      dispatch(     
+        fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
+      );
+    }
   }, [currentPageInState]);
 
   useEffect(() => {
-    dispatch(
-      fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
-    );
+    if (currSearchVal.searchQuery !== '') {
+      dispatch(
+        fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
+      );
+    }
   }, [currentPageSizeInState]);
 
   const hideColumns = () => {
@@ -116,8 +122,8 @@ const Search = () => {
     );
   };
 
-  useEffect(() => {
-    if (currSearchVal.searchQuery) {
+  useEffect(() => {    
+    if (currSearchVal.searchQuery !== '') {
       setUserAction(false);
       setSearchText(currSearchVal.searchQuery);
       dispatch(fetchSites({ searchParam: currSearchVal.searchQuery }));
@@ -386,22 +392,29 @@ const Search = () => {
               </div>
             ) : null}
             <div className="search-result-actions">
-              <div
+              {!isUserOfType(UserRoleType.INTERNAL) && <div
                 className="search-result-actions-btn"
                 onClick={() => handleAddToShoppingCart()}
               >
                 <ShoppingCartIcon />
                 <span>Add Selected To Cart</span>
-              </div>
-              <div
+              </div>}
+              {!isUserOfType(UserRoleType.INTERNAL) && <div
                 className="search-result-actions-btn"
                 onClick={() => {
-                  SetShowAddToFolio(!showAddToFolio);
+                  let loggedInUser = getUser();
+                  if (loggedInUser === null) {
+                    auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+                  }
+                  else
+                  {
+                    SetShowAddToFolio(!showAddToFolio);
+                  }                 
                 }}
               >
                 <FolderPlusIcon />
                 <span>Add Selected To Folio</span>
-              </div>
+              </div>}
               {showAddToFolio && (
                 <AddToFolio
                   className="pos-absolute-search"

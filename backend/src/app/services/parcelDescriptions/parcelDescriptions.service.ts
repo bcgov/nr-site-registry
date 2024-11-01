@@ -50,7 +50,7 @@ export class ParcelDescriptionsService {
     const internalUser: boolean = user?.identity_provider === 'idir';
 
     // Fail fast if the user is invalid
-    if (userId.length === 0) {
+    if (userId?.length === 0) {
       this.sitesLogger.error(
         'An invalid user was passed into ParcelDescriptionsService.getParcelDescriptionsBySiteId() end',
         '',
@@ -129,7 +129,7 @@ export class ParcelDescriptionsService {
         countQueryParams,
       );
       rawResults = await this.entityManager.query(query, queryParams);
-      count = countResult.length > 0 ? countResult[0]?.count : 0;
+      count = countResult?.length > 0 ? countResult[0]?.count : 0;
     } catch (error) {
       this.sitesLogger.error(
         'Exception occured in ParcelDescriptionsService.getParcelDescriptionsBySiteId() end',

@@ -5,6 +5,7 @@ import { LandUseCd } from '../../entities/landUseCd.entity';
 import { LandUseCodeService } from '../../services/landUseCode/landUseCode.service';
 import { LandUseCodeResponse } from '../../dto/landUseCodeResponse.dto';
 import { LoggerService } from '../../logger/logger.service';
+import { HttpStatus } from '@nestjs/common';
 
 @Resolver(() => LandUseCd)
 export class LandUseCodeResolver {
@@ -21,11 +22,11 @@ export class LandUseCodeResolver {
   async getLandUseCodes() {
     this.sitesLogger.log('LandUseCodeResolver.getLandUseCodes() start ');
     const result = await this.landUseCodeService.getLandUseCodes();
-    if (result.length > 0) {
+    if (result?.length > 0) {
       this.sitesLogger.log('LandUseCodeResolver.getLandUseCodes() RES:200 end');
       return this.genericResponseProvider.createResponse(
         'Land use codes fetched successfully',
-        200,
+        HttpStatus.OK,
         true,
         result,
       );
@@ -33,7 +34,7 @@ export class LandUseCodeResolver {
       this.sitesLogger.log('LandUseCodeResolver.getLandUseCodes() RES:404 end');
       return this.genericResponseProvider.createResponse(
         `Land use codes data not found`,
-        404,
+        HttpStatus.NOT_FOUND,
         false,
         null,
       );

@@ -138,7 +138,7 @@ describe('DocumentService', () => {
     it('should throw an error when repository throws an error', async () => {
       const siteId = 'site1';
       const mockError = new Error(
-        'Failed to retrieve site documents by site id.',
+        `Failed to retrieve site documents by site ID: ${siteId}`,
       );
       jest.spyOn(siteDocsRepository, 'find').mockRejectedValueOnce(mockError);
 

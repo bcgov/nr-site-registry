@@ -6,18 +6,22 @@ import { Link } from 'react-router-dom';
 export interface IApproveReject {
   name: string;
   children: any;
+  testId?: string;
+  link?: string;
 }
 
-const ApproveReject: React.FC<IApproveReject> = ({ name, children }) => {
+const ApproveReject: React.FC<IApproveReject> = ({ name, children,testId, link }) => {
   const [isOpen, SetIsOpen] = useState(false);
+  link = link ?? '';
 
   return (
-    <div className="approve-reject-container">
+    <div className="approve-reject-container" data-testid={testId}>
       <div className="ar-continer-header">
         <div className="ar-continer-header-left">
           {isOpen && (
             <DropdownIcon
               className="caret-icons"
+               data-testid="dropdown-icon"
               onClick={() => {
                 SetIsOpen(false);
               }}
@@ -26,6 +30,7 @@ const ApproveReject: React.FC<IApproveReject> = ({ name, children }) => {
           {!isOpen && (
             <CaretRightIcon
               className="caret-icons"
+              data-testid="caret-right-icon"
               onClick={() => {
                 SetIsOpen(true);
               }}
@@ -34,10 +39,10 @@ const ApproveReject: React.FC<IApproveReject> = ({ name, children }) => {
           <span className="header-label">{name}</span>
         </div>
         <div className="ar-continer-header-right">
-          <Link to="">View</Link>
+          <Link to={link}>View</Link>
         </div>
       </div>
-      {isOpen && <div>{children}</div>}
+      {isOpen && <div data-testid="child-content">{children}</div>}
     </div>
   );
 };
@@ -63,15 +68,18 @@ export const ApproveRejectButtons: React.FC<IApproveRejectButtons> = ({
       console.log('approveRejectHandler not provided');
     });
   return (
-    <div className="approve-reject-actions">
+    <div className="approve-reject-actions" data-testid="approve-reject-actions-div">
       <div
         className="not-public-btn"
+        data-testid="not-public-btn"
         onClick={() => approveRejectHandler(false)}
       >
         {' '}
         {rejectLabel}
       </div>
-      <div className="approve-btn" onClick={() => approveRejectHandler(true)}>
+      <div className="approve-btn" 
+       data-testid="approve-btn"
+      onClick={() => approveRejectHandler(true)}>
         {' '}
         {approveLabel}
       </div>

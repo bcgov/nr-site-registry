@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './NavigationPills.css';
 import { INavigationPills } from './INavigationPills';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Actions from '../../action/Actions';
 
 const NavigationPills: React.FC<INavigationPills> = ({
@@ -12,12 +12,26 @@ const NavigationPills: React.FC<INavigationPills> = ({
 }) => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location?.search !== '') {
+      const componentIndex = components.findIndex(
+        (item: any) => item.key === location?.search.replace('?', ''),
+      );
+
+      if (componentIndex > -1) {
+        handlePillClick(componentIndex);
+      }
+    }
+  }, [location]);
+
   const handlePillClick = (index: number) => {
     setActiveIndex(index);
   };
 
   return (
-    <div>
+    <div className="pt-5">
       <div className="d-flex d-xxl-flex d-xl-flex gap-2 d-none ">
         {items.map((item, index) => (
           <Link
@@ -87,8 +101,10 @@ const NavigationPills: React.FC<INavigationPills> = ({
       </div>
       <div className="mt-4">
         {components &&
-          components?.map((component: JSX.Element, index: number) =>
-            index === activeIndex ? <div key={index}>{component}</div> : null,
+          components?.map((tabComponent: any, index: number) =>
+            index === activeIndex ? (
+              <div key={index}>{tabComponent.component}</div>
+            ) : null,
           )}
       </div>
     </div>

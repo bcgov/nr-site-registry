@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SiteDocs } from '../../entities/siteDocs.entity';
 import { Repository } from 'typeorm';
@@ -31,7 +31,7 @@ export class DocumentService {
       let result: SiteDocs[] = [];
       if (showPending) {
         result = await this.siteDocsRepository.find({
-          where: { siteId, userAction: UserActionEnum.UPDATED },
+          where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
           relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
         });
       } else {
@@ -56,7 +56,7 @@ export class DocumentService {
         };
 
         // If there are associated siteDocPartics, map them
-        if (res.siteDocPartics.length > 0) {
+        if (res.siteDocPartics?.length > 0) {
           return res.siteDocPartics.map((sdp) => ({
             ...document,
             srAction:
@@ -90,7 +90,10 @@ export class DocumentService {
         JSON.stringify(error),
       );
       // Provide more context in the error message
-      throw new Error('Failed to retrieve site documents by site id.');
+      throw new HttpException(
+        `Failed to retrieve site documents by site ID: ${siteId}`,
+        HttpStatus.NOT_FOUND,
+      );
     }
   }
 }

@@ -43,16 +43,22 @@ import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 
 import { useParams } from 'react-router-dom';
 import SummaryInfo from './SummaryInfo';
+import { isUserPurchasedSnapshot } from '../snapshot/SnapshotSlice';
 
 const Summary = () => {
   const auth = useAuth();
+
+  const isUserPurchasedSite = useSelector(isUserPurchasedSnapshot);
 
   const user = getUser();
   const addCartItemStatus = useSelector(addCartItemRequestStatus);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
+    if(user !== null)
+    {
+      dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
+    }
   }, [addCartItemStatus]);
   const { id } = useParams();
 
@@ -110,7 +116,7 @@ const Summary = () => {
 
   // State Initializations
   const initialParcelIds = [
-    12123123, 123123, 12312312, 1231231, 23, 123123123123, 123123213, 1123123,
+    0
   ];
 
   const [location, setLocation] = useState([48.46762, -123.25458]);
@@ -191,24 +197,12 @@ const Summary = () => {
     setParcelIds(parcelIdsLocal);
   };
 
-  const data = [
-    {
-      notation: 1,
-      participants: 3,
-      associatedSites: 1,
-      documents: 1,
-      landUses: 5,
-      parcelDescription: 10,
-    },
+  const data:any = [
+    
   ];
 
-  const activityData = [
-    {
-      id: 1,
-      activity: 'some activity',
-      user: 'Midhun',
-      timeStamp: '23-04-1989 00:11:11',
-    },
+  const activityData:any = [
+    
   ];
 
   const columns: TableColumn[] = [
@@ -517,9 +511,9 @@ const Summary = () => {
               Summary of details types
             </span>
           </div>
-          <div className="col-12">
+          <div className="col-12 overflow-auto w-100">
             <Table
-              label="Search Results"
+              label="Summary Details"
               isLoading={RequestStatus.success}
               columns={columns}
               data={data}
@@ -534,12 +528,12 @@ const Summary = () => {
         </div>
       }
 
-      {false && (
+      {isUserPurchasedSite && (
         <div className="summary-details-border">
           <span className="summary-details-header">Activity Log</span>
-          <div className="col-12">
+          <div className="col-12 overflow-auto w-100">
             <Table
-              label="Search Results"
+              label="Activity Log"
               isLoading={RequestStatus.success}
               columns={activityColumns}
               data={activityData}
@@ -554,7 +548,7 @@ const Summary = () => {
         </div>
       )}
 
-      {
+      { !isUserPurchasedSite && 
         <div className="external-purchase-section">
           <div className="external-purchase-info">
             <span>
@@ -564,10 +558,10 @@ const Summary = () => {
           </div>
           <div className="external-purchase-buttons">
             <button className="d-flex btn-cart align-items-center">
-              <ShoppingCartIcon className="btn-icon" />
+              <ShoppingCartIcon className="btn-icon btn-icon-color-white"  />
               <span className="btn-cart-lbl" onClick={() => handleAddToCart()}>
                 {' '}
-                Add to Cart
+                Purchase Site Details
               </span>
             </button>
             <button className="d-flex btn-folio align-items-center">

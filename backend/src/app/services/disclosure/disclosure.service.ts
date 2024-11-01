@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
@@ -35,14 +35,14 @@ export class DisclosureService {
 
       if (showPending) {
         result = await this.disclosureRepository.find({
-          where: { siteId, userAction: UserActionEnum.UPDATED },
+          where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
         });
       } else {
         result = await this.disclosureRepository.find({
           where: { siteId },
         });
       }
-      if (result && !result.length) {
+      if (!result?.length) {
         return [];
       } else {
         const res = result.map((res) => {
@@ -65,8 +65,9 @@ export class DisclosureService {
         JSON.stringify(error),
       );
       // Log or handle the error as necessary
-      throw new Error(
+      throw new HttpException(
         `Failed to retrieve site disclosures for siteId ${siteId}`,
+        HttpStatus.NOT_FOUND,
       );
     }
   }

@@ -20,3 +20,6 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     pvc:
       volume:
         storage: 1000Mi
+  # Postgres Cluster resource values:
+  pgmonitor:
+    enabled: true

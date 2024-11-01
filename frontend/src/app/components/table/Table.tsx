@@ -165,7 +165,7 @@ const Table: FC<TableProps> = ({
         </table>
       </div>
       <div>
-        {showPageOptions && data.length !== 0 ? (
+        {showPageOptions && data?.length !== 0 ? (
           <Pagination
             changeResultsPerPage={changeResultsPerPage}
             selectPage={selectPage}

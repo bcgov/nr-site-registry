@@ -17,7 +17,9 @@ describe('Search Component', () => {
 
   beforeEach(() => {
     store = mockStore({
-      sites: [],
+      sites: {
+        sites: []
+      },
       error: '',
       fetchStatus: RequestStatus.idle,
       deleteStatus: RequestStatus.idle,

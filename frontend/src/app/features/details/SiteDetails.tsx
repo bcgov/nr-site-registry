@@ -250,6 +250,10 @@ const SiteDetails = () => {
     setViewMode(mode);
   }, [mode]);
 
+  useEffect(()=>{
+    dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode))
+  },[])
+
   // NEEDS TO FETCH DATA BASED ON CONDITION WHEATHER IT IS EXTERNAL USER OR INTERNAL USER
   // BY DOING THIS WE CAN STOP UNNECCESSARY CALL TO DATABASE
   // THERE ARE SOME CALLS WHICH MAY NOT REQUIRED ON DETAILS PAGE.

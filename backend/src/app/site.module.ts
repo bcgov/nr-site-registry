@@ -85,6 +85,7 @@ import { ParcelDescriptionResolver } from './resolvers/parcelDescription/parcelD
 import { ParcelDescriptionsService } from './services/parcelDescriptions/parcelDescriptions.service';
 import { TransactionManagerService } from './services/transactionManager/transactionManager.service';
 import { LoggerService } from './logger/logger.service';
+import { SitePublicResolver } from './resolvers/site/sitePublic.resolver';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -149,6 +150,7 @@ import { LoggerService } from './logger/logger.service';
     ]),
   ],
   providers: [
+    SitePublicResolver,
     SiteResolver,
     SiteService,
     DashboardResolver,

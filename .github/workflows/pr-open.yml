@@ -47,6 +47,7 @@ jobs:
     secrets: inherit
     with:
       values: 'values-dev.yaml'
+      app_values:  'values-pr.yaml' # PR specific values file.
     # https://github.com/bcgov/quickstart-openshift-helpers
   deploys:
     name: Deploys
@@ -58,6 +59,7 @@ jobs:
       triggers: ('backend/' 'frontend/' 'charts/' '.github/workflows/')
       values: 'values-pr.yaml' # PR specific values file.
       db_user: site-${{ github.event.number }}
+
 
   results:
     name: PR Results

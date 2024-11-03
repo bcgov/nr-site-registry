@@ -27,6 +27,11 @@ on:
         default: 'values.yaml'
         required: false
         type: string
+      app_values:
+        description: 'App specific values file which is present inside charts/app'
+        default: 'values.yaml'
+        required: false
+        type: string
       enabled:
         description: 'Enable the deployment of the crunchy database, easy switch to turn it on/off'
         default: true
@@ -96,8 +101,6 @@ jobs:
             helm upgrade --install --wait --set crunchy.pgBackRest.s3.enabled=true \
              --set-string crunchy.pgBackRest.s3.accessKey=${{ secrets.s3_access_key }} \
               --set-string crunchy.pgBackRest.s3.secretKey=${{ secrets.s3_secret_key }} \
-              --set-string crunchy.pgBackRest.s3.bucket=${{ secrets.s3_bucket }} \
-              --set-string crunchy.pgBackRest.s3.endpoint=${{ secrets.s3_endpoint }} \
               --values ${{ inputs.values }} postgres  .
           else
             helm upgrade --install --wait --values ${{ inputs.values }} postgres .
@@ -119,7 +122,7 @@ jobs:
               exit 0
             fi
             # check if seed is disabled in config of helm values inside charts/app/values file, global.config.seed.enabled=false, if so, then create db from site as template, using yq, since it is yaml file.
-            IS_SEED_ENABLED=$(yq eval '.global.config.seed.enabled' ./charts/app/${{ inputs.values }})
+            IS_SEED_ENABLED=$(yq eval '.global.config.seed.enabled' ./charts/app/${{ inputs.app_values }})
             if [ $IS_SEED_ENABLED == "false" ]; then
               echo "Seed is disabled, creating db from site database as template"
               # get primary crunchy pod and remove the role and db

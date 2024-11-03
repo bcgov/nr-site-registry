@@ -113,20 +113,12 @@ jobs:
               echo "User already exists"
               exit 0
             fi
-            # check if seed is disabled in config of helm values inside charts/app/values file, global.config.seed.enabled=false, if so, then create db from site as template, using yq, since it is yaml file.
-            IS_SEED_ENABLED=$(yq eval '.global.config.seed.enabled' charts/app/${{ inputs.values }})
-            if [ $IS_SEED_ENABLED == "false" ]; then
-              echo "Seed is disabled, creating db from site database as template"
-              # get primary crunchy pod and remove the role and db
-              CRUNCHY_PG_PRIMARY_POD_NAME=$(oc get pods -l postgres-operator.crunchydata.com/role=master -o json | jq -r '.items[0].metadata.name')
-              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -c "CREATE DATABASE \"${DB_USER}\" WITH TEMPLATE site;"
-            fi
             UPDATED_USERS=$(echo "${CURRENT_USERS}" | jq --argjson NEW_USER "${NEW_USER}" '. + [$NEW_USER]')
             PATCH_JSON=$(jq -n --argjson users "${UPDATED_USERS}" '{"spec": {"users": $users}}')
             oc patch PostgresCluster/postgres-crunchy --type=merge -p "${PATCH_JSON}"
 
-            # wait for sometime as it takes time to create the user, query the secret and check if it is created, otherwise wait in a loop for 5 rounds
-            for i in {1..5}; do
+            # wait for sometime as it takes time to create the user, query the secret and check if it is created, otherwise wait in a loop for 10 rounds
+            for i in {1..10}; do
             if oc get secret postgres-crunchy-pguser-${DB_USER} -o jsonpath='{.metadata.name}' > /dev/null; then
                 echo "Secret created"
                 break

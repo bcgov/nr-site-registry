@@ -36,7 +36,7 @@ jobs:
     name: Deploys to TEST
     uses: ./.github/workflows/.deployer.yml
     secrets: inherit
-    needs: [get-pr-info]
+    needs: [get-pr-info, deploy_db]
     with:
       environment: test
       tag:  '${{ needs.get-pr-info.outputs.pr }}'

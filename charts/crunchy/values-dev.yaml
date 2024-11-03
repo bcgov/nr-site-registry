@@ -1,0 +1,8 @@
+crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single postgres
+  clone:
+    enabled: true
+    s3:
+      enabled: true
+    pvc:
+      enabled: false
+    path: /backups/test/cluster/version/1 # provide the proper path to source the cluster. ex: /backups/cluster/version/1, if

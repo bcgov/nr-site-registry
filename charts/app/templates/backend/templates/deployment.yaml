@@ -92,29 +92,29 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DB_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: user
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DATABASE
               valueFrom:
                 secretKeyRef:
                   key: dbname
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DB_SCHEMA
               value: {{ .Values.global.config.schemaName }}
             - name: POSTGRESQL_HOST
               valueFrom:
                 secretKeyRef:
                   key: host
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRESQL_PORT
               valueFrom:
                 secretKeyRef:
                   key: port
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -163,29 +163,29 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DB_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: user
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DATABASE
               valueFrom:
                 secretKeyRef:
                   key: dbname
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DB_SCHEMA
               value: {{ .Values.global.config.schemaName }}
             - name: POSTGRESQL_HOST
               valueFrom:
                 secretKeyRef:
                   key: host
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRESQL_PORT
               valueFrom:
                 secretKeyRef:
                   key: port
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:

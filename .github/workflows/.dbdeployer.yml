@@ -130,7 +130,9 @@ jobs:
               oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -c "CREATE DATABASE \"${DB_USER}\" WITH TEMPLATE site;"
             fi
             UPDATED_USERS=$(echo "$CURRENT_USERS" | jq --argjson NEW_USER "$NEW_USER" '. + [$NEW_USER]')
+            echo "$UPDATED_USERS"
             PATCH_JSON=$(jq -n --argjson users "$UPDATED_USERS" '{"spec": {"users": $users}}')
+            echo "$PATCH_JSON"
             oc patch PostgresCluster/postgres-crunchy --type=merge -p "${PATCH_JSON}"
 
             # wait for sometime as it takes time to create the user, query the secret and check if it is created, otherwise wait in a loop for 10 rounds

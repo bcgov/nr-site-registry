@@ -119,7 +119,7 @@ jobs:
               exit 0
             fi
             # check if seed is disabled in config of helm values inside charts/app/values file, global.config.seed.enabled=false, if so, then create db from site as template, using yq, since it is yaml file.
-            IS_SEED_ENABLED=$(yq eval '.global.config.seed.enabled' charts/app/${{ inputs.values }})
+            IS_SEED_ENABLED=$(yq eval '.global.config.seed.enabled' ./charts/app/${{ inputs.values }})
             if [ $IS_SEED_ENABLED == "false" ]; then
               echo "Seed is disabled, creating db from site database as template"
               # get primary crunchy pod and remove the role and db

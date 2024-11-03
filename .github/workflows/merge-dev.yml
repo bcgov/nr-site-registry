@@ -25,9 +25,7 @@ jobs:
   deploy_db:
     name: Deploys Database
     uses: ./.github/workflows/.dbdeployer.yml
-    secrets:
-      oc_namespace: ${{ secrets.OC_NAMESPACE }}
-      oc_token: ${{ secrets.OC_TOKEN }}
+    secrets: inherit
     with:
       environment: test
       values: 'values-test.yaml'

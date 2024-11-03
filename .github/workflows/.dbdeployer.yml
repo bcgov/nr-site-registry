@@ -111,8 +111,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
             echo 'Adding PR specific user to Crunchy DB'
-            DB_USER="site-${{ github.event.number }}"
-            NEW_USER='{"databases":["$DB_USER"],"name":"$DB_USER"}'
+            NEW_USER='{"databases":["site-${{ github.event.number }}"],"name":"site-${{ github.event.number }}"}'
             CURRENT_USERS=$(oc get PostgresCluster/postgres-crunchy -o json | jq '.spec.users')
             echo "${CURRENT_USERS}"
 

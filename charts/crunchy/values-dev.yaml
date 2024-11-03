@@ -1,6 +1,6 @@
 crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single postgres
   clone:
-    enabled: true
+    enabled: false # enable it when the dev cluster needs to be cloned from test
     s3:
       enabled: true
     pvc:

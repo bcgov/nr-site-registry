@@ -47,7 +47,7 @@ on:
       ### Usually a bad idea / not recommended
       timeout-minutes:
         description: 'Timeout minutes'
-        default: 15
+        default: 20
         required: false
         type: number
       values:
@@ -63,6 +63,7 @@ on:
 
 jobs:
   deployer:
+    timeout-minutes: ${{ inputs.timeout-minutes }}
     name: Helm
     environment: ${{ inputs.environment }}
     runs-on: ubuntu-24.04

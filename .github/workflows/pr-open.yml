@@ -44,9 +44,7 @@ jobs:
     name: Deploys Database
     if: ${{ ! github.event.pull_request.draft }}
     uses: ./.github/workflows/.dbdeployer.yml
-    secrets:
-      oc_namespace: ${{ secrets.OC_NAMESPACE }}
-      oc_token: ${{ secrets.OC_TOKEN }}
+    secrets: inherit
     with:
       values: 'values-dev.yaml'
     # https://github.com/bcgov/quickstart-openshift-helpers

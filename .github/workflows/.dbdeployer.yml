@@ -136,7 +136,7 @@ jobs:
 
             # wait for sometime as it takes time to create the user, query the secret and check if it is created, otherwise wait in a loop for 10 rounds
             for i in {1..10}; do
-            if oc get secret postgres-crunchy-pguser-$DB_USER -o jsonpath='{.metadata.name}' > /dev/null; then
+            if oc get secret postgres-crunchy-pguser-site-${{ github.event.number }} -o jsonpath='{.metadata.name}' > /dev/null; then
                 echo "Secret created"
                 break
             else

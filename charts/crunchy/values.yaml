@@ -145,3 +145,5 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       limits:
         cpu: 35m
         memory: 32Mi
+  databaseInitSQL:
+    enabled: true

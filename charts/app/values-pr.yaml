@@ -7,6 +7,9 @@ global:
   secrets:
     enabled: true
     persist: false
+  config:
+    seed:
+      enabled: true
 #-- the components of the application, backend.
 backend:
   #-- enable or disable backend

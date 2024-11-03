@@ -29,10 +29,65 @@ spec:
         - name: {{ include "backend.fullname" . }}-init
           image: "{{.Values.global.registry}}/{{.Values.global.repository}}/backend-migration:{{ .Values.global.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ default "Always" .Values.backend.imagePullPolicy }}
+          env:
+            - name: POSTGRES_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+            - name: POSTGRES_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: user
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+            - name: POSTGRES_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: dbname
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+            - name: POSTGRES_DB_SCHEMA
+              value: {{ .Values.global.config.schemaName }}
+            - name: POSTGRESQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: host
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+            - name: POSTGRESQL_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: port
+                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbName }}
+            - name: POSTGRES_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{.Release.Name}}-crunchy-pguser-postgres
+            - name: POSTGRES_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: user
+                  name: {{.Release.Name}}-crunchy-pguser-postgres
+          resources: # this is optional
+            limits:
+              cpu: {{ .Values.backend.resources.limits.cpu }}
+              memory: {{ .Values.backend.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.backend.resources.requests.cpu }}
+              memory: {{ .Values.backend.resources.requests.memory }}
+        {{- if .Values.global.config.seed.enabled }}
+        - name: {{ include "backend.fullname" . }}-seed
+          image: "artifacts.developer.gov.bc.ca/docker-remote/postges:alpine" # here we just need a prebuilt image with psql and shell, just use postgres alpine image
+          imagePullPolicy: {{ default "Always" .Values.backend.imagePullPolicy }}
+          command: ["/bin/sh"]
+          args: ["-c", "sh /mnt/scripts/seed.sh"]
           volumeMounts:
             - mountPath: /mnt/sql
               name: seed-data-mount
+            - mountPath: /mnt/scripts
+              name: seed-data-scripts
           env:
+            - name: SEED_ENABLED
+              value: {{.Values.global.config.seed.enabled}}
             - name: POSTGRES_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -79,6 +134,7 @@ spec:
             requests:
               cpu: {{ .Values.backend.resources.requests.cpu }}
               memory: {{ .Values.backend.resources.requests.memory }}
+        {{- end }}
       containers:
         - name: {{ include "backend.fullname" . }}
           {{- if .Values.backend.securityContext }}
@@ -182,6 +238,10 @@ spec:
         - name: seed-data-mount
           persistentVolumeClaim:
             claimName: nr-ora2pg-sql
+        - name: seed-data-scripts
+          configMap:
+            name: {{ template "backend.name" . }}-scripts
+
       {{- with .Values.backend.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -40,6 +40,11 @@ spec:
       repoName: repo1
     {{- end}}
   {{- end}}
+  {{- if .Values.crunchy.databaseInitSQL.enabled }}
+  databaseInitSQL:
+    name: {{ required "A ConfigMap name is required for running bootstrap SQL."  (include "crunchy-postgres.fullname" .) | quote }}
+    key: {{ required "A key in a ConfigMap containing any bootstrap SQL is required." "bootstrap.sql" | quote }}
+  {{- end }}
   {{- if .Values.crunchy.pgmonitor.enabled }}
   monitoring:
     pgmonitor:

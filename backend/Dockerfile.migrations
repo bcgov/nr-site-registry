@@ -19,4 +19,4 @@ COPY . .
 # Install postgresql-client
 RUN apk add --no-cache postgresql-client
 
-ENTRYPOINT [ "sh", "initDB.sh" ]
+ENTRYPOINT [ "sh", "migrations.sh" ]

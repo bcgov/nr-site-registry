@@ -116,7 +116,7 @@ jobs:
             echo "${CURRENT_USERS}"
 
             # check if current_users already contains the new_user
-            if echo "${CURRENT_USERS}" | jq -e ".[] | select(.name == \"${DB_USER}\")" > /dev/null; then
+            if echo "${CURRENT_USERS}" | jq -e ".[] | select(.name == \"site-${{ github.event.number }}\")" > /dev/null; then
               echo "User already exists"
               exit 0
             fi

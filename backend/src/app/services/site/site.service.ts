@@ -267,6 +267,43 @@ export class SiteService {
     return response;
   }
 
+  async mapSearch(searchTerm = '') {
+    this.sitesLogger.log('SiteService.mapSearch() start');
+
+    const searchTermClean = searchTerm.toLowerCase().trim();
+    const query = this.siteRepository.createQueryBuilder('sites');
+
+    if (searchTermClean.length) {
+      query
+        .where('LOWER(sites.addr_line_1) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.addr_line_2) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.addr_line_3) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.addr_line_4) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.city) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.provState) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        });
+    }
+
+    const [result] = await query.getManyAndCount();
+
+    this.sitesLogger.log('SiteService.mapSearch() end');
+    return result;
+  }
+
   /**
    * Find sites by its ID
    * @param siteId site Id

@@ -21,7 +21,7 @@ jobs:
       - name: Echo PR number
         run: |
           echo "PR: ${{ steps.vars.outputs.pr }}"
-          
+
   deploy_db:
     name: Deploys Database
     uses: ./.github/workflows/.dbdeployer.yml
@@ -30,6 +30,8 @@ jobs:
       oc_token: ${{ secrets.OC_TOKEN }}
     with:
       environment: test
+      values: 'values-test.yaml'
+
   deploys:
     name: Deploys to TEST
     uses: ./.github/workflows/.deployer.yml

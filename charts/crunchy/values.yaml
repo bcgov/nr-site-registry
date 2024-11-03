@@ -34,7 +34,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     dataVolumeClaimSpec:
       storage: 2000Mi
       storageClassName: netapp-block-standard
-      walStorage: 350Mi
+      walStorage: 450Mi
 
     requests:
       cpu: 50m
@@ -52,17 +52,17 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
 
   pgBackRest:
     enabled: true
-    backupPath: /backups/test/cluster/version # change it for PROD, create values-prod.yaml
+    backupPath: /backups/dev/cluster/version # change it for PROD, create values-prod.yaml
     clusterCounter: 1 # this is the number to identify what is the current counter for the cluster, each time it is cloned it should be incremented.
     image: artifacts.developer.gov.bc.ca/bcgov-docker-local/crunchy-pgbackrest:ubi8-2.49-0
     # If retention-full-type set to 'count' then the oldest backups will expire when the number of backups reach the number defined in retention
     # If retention-full-type set to 'time' then the number defined in retention will take that many days worth of full backups before expiration
     retentionFullType: count
     s3:
-      enabled: false # if enabled, below must be provided, in dev environment, it's not necessary to enable s3.
+      enabled: true # if enabled, below must be provided, in dev environment, it's not necessary to enable s3.
       retention: ~ # one weeks backup in object store.
-      bucket: ~
-      endpoint: ~
+      bucket: nrsitetst
+      endpoint: nrs.objectstore.gov.bc.ca
       accessKey: ~
       secretKey: ~
       fullBackupSchedule: ~ # make sure to provide values here, if s3 is enabled.
@@ -74,7 +74,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       incrementalBackupSchedule: 0 0,12 * * * # every 12 hour incremental
       volume:
         accessModes: "ReadWriteOnce"
-        storage: 2000Mi
+        storage: 512Mi
         storageClassName: netapp-file-backup
 
     config:

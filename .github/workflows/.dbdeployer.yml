@@ -20,6 +20,7 @@ on:
       s3_enabled:
         description: Enable S3 backups
         required: false
+        default: true
         type: boolean
       values:
         description: 'Values file'
@@ -45,12 +46,6 @@ on:
       s3_secret_key:
         description: S3 secret key
         required: false
-      s3_bucket:
-        description: S3 bucket
-        required: false
-      s3_endpoint:
-        description: S3 endpoint
-        required: false
 jobs:
   deploy_db:
     runs-on: ubuntu-24.04
@@ -74,14 +69,6 @@ jobs:
             fi
             if [ ! "${{ secrets.s3_secret_key }}" ]; then
               echo "S3 secret key not found"
-              exit 1
-            fi
-            if [ ! "${{ secrets.s3_bucket }}" ]; then
-              echo "S3 bucket not found"
-              exit 1
-            fi
-            if [ ! "${{ secrets.s3_endpoint }}" ]; then
-              echo "S3 endpoint not found"
               exit 1
             fi
           fi

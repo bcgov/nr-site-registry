@@ -19,4 +19,4 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       incrementalBackupSchedule: 0 0/8 * * * # every hour
     pvc:
       volume:
-        storage: 1000Mi
+        storage: 512Mi

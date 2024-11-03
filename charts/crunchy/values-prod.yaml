@@ -7,7 +7,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       walStorage: 350Mi
 
   pgBackRest:
-    backupPath: /backups/test/cluster/version # change it for PROD, create values-prod.yaml
+    backupPath: /backups/prod/cluster/version # change it for PROD, create values-prod.yaml
     s3:
       enabled: true
       retention: 14 # one weeks backup in object store for prod environment
@@ -19,7 +19,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       incrementalBackupSchedule: 0/15 * * * * # every 15 minutes incremental backup
     pvc:
       volume:
-        storage: 1000Mi
+        storage: 1024Mi
   # Postgres Cluster resource values:
   pgmonitor:
     enabled: true

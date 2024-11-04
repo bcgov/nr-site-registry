@@ -163,7 +163,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DB_USERNAME
               valueFrom:
                 secretKeyRef:

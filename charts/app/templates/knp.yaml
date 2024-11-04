@@ -12,7 +12,7 @@ spec:
   ingress:
     - ports:
       - protocol: TCP
-        port: 80
+        port: {{.Values.frontend.service.targetPort}}
       from:
         - namespaceSelector:
             matchLabels:
@@ -28,12 +28,12 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: {{ template  "frontend.name"}}
+      app.kubernetes.io/name: {{ template  "backend.name"}}
       app.kubernetes.io/instance: {{ .Release.Name }}
   ingress:
     - ports:
       - protocol: TCP
-        port: 80
+        port: {{.Values.backend.service.targetPort}}
       from:
         - namespaceSelector:
             matchLabels:

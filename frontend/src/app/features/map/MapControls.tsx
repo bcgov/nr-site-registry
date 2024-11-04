@@ -10,12 +10,16 @@ import {
   MAP_CONTROLS_RIGHT_XL,
 } from '../../constants/Constant';
 
-import { Control } from './Control';
+import { Control } from './controls/Control';
 
 import './MapControl.css';
-import { FindMeControl } from './FindMeControl';
+import { FindMeControl } from './controls/FindMeControl';
 
-export function MapControls() {
+interface MapControlsProps {
+  setLocationVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function MapControls({ setLocationVisible }: MapControlsProps) {
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
   const isMedium = useMediaQuery(theme.breakpoints.down('lg'));
@@ -43,7 +47,7 @@ export function MapControls() {
 
   return (
     <Control position="bottomright" className="map-controls" style={style}>
-      {isMedium && <FindMeControl />}
+      {isMedium && <FindMeControl setLocationVisible={setLocationVisible} />}
     </Control>
   );
 }

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { LatLngTuple, Map } from 'leaflet';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
@@ -36,6 +36,7 @@ function MapView() {
   });
 
   const mapRef = useRef<Map>(null);
+  const [isLocationVisible, setLocationVisible] = useState(false);
 
   return (
     <div
@@ -54,11 +55,11 @@ function MapView() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           className={clsx(osmGrayscale && 'osm--grayscale')}
         />
-        <MapControls />
-        <MyLocationMarker />
+        <MapControls setLocationVisible={setLocationVisible} />
+        {<MyLocationMarker isLocationVisible={isLocationVisible} />}
         <SiteMarkers sites={data?.mapSearch.data || []} />
       </MapContainer>
-      <MapSearch />
+      <MapSearch setLocationVisible={setLocationVisible} />
       <SiteDetailsDrawer mapRef={mapRef} />
     </div>
   );

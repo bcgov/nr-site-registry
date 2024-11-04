@@ -57,7 +57,10 @@ function MyLocationMarkerContent() {
   ) : null;
 }
 
-export function MyLocationMarker() {
-  const isVisible = useMyLocationVisible();
-  return isVisible ? <MyLocationMarkerContent /> : null;
+interface MyLocationMarkerProps {
+  isLocationVisible: boolean;
+}
+export function MyLocationMarker({ isLocationVisible }: MyLocationMarkerProps) {
+  //const isVisible = useMyLocationVisible();
+  return isLocationVisible ? <MyLocationMarkerContent /> : null;
 }

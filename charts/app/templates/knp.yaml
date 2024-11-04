@@ -7,16 +7,39 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: frontend
+      app.kubernetes.io/name: {{ template  "frontend.name"}}
       app.kubernetes.io/instance: {{ .Release.Name }}
   ingress:
-    - from:
+    - ports:
+      - protocol: TCP
+        port: 80
+      from:
         - namespaceSelector:
             matchLabels:
               network.openshift.io/policy-group: ingress
   policyTypes:
     - Ingress
-{{- if not .Values.crunchy.enabled }} # for bitnami pg in PR env
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-openshift-ingress-to-backend
+  labels: {{- include "selectorLabels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: {{ template  "frontend.name"}}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  ingress:
+    - ports:
+      - protocol: TCP
+        port: 80
+      from:
+        - namespaceSelector:
+            matchLabels:
+              network.openshift.io/policy-group: ingress
+  policyTypes:
+    - Ingress
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -26,8 +49,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: {{ .Values.global.databaseAlias}}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      postgres-operator.crunchydata.com/cluster: {{ .Values.global.databaseAlias}}
   ingress:
     - ports:
         - protocol: TCP
@@ -35,48 +57,10 @@ spec:
       from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/name: {{ template "backend.name" . }}
+              app.kubernetes.io/name: {{ template  "backend.name"}}
               app.kubernetes.io/instance: {{ .Release.Name }}
   policyTypes:
     - Ingress
-{{- end }}
-{{- if .Values.crunchy.enabled}} # for crunchy in TEST and PROD
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: {{ .Release.Name }}-allow-backend-to-crunchy
-  labels: {{- include "selectorLabels" . | nindent 4 }}
-spec:
-  podSelector:
-    matchLabels:
-      postgres-operator.crunchydata.com/cluster: {{ template "crunchy-postgres.fullname" . }}
-  ingress:
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: {{ template "backend.name" . }}
-              app.kubernetes.io/instance: {{ .Release.Name }}
-  policyTypes:
-    - Ingress
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: {{ .Release.Name }}-allow-crunchy-pods
-  labels: {{- include "selectorLabels" . | nindent 4 }}
-spec:
-  podSelector:
-    matchLabels:
-      postgres-operator.crunchydata.com/cluster: {{ template "crunchy-postgres.fullname" . }}
-  ingress:
-    - from:
-        - podSelector:
-            matchLabels:
-              postgres-operator.crunchydata.com/cluster: {{ template "crunchy-postgres.fullname" . }}
-  policyTypes:
-    - Ingress
-{{- end }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

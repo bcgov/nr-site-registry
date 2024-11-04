@@ -183,8 +183,8 @@ describe('SnapshotService', () => {
   ];
 
   const sampleSite: Sites = {
-    userAction:"",
-    srAction: "",
+    userAction: '',
+    srAction: '',
     id: '1',
     bcerCode: 'BC1234',
     sstCode: 'SST56',
@@ -202,8 +202,7 @@ describe('SnapshotService', () => {
     victoriaFileNo: 'VF-001',
     regionalFileNo: 'RF-002',
     classCode: 'CC01',
-    generalDescription:
-      'This site is an example for demonstration purposes.',
+    generalDescription: 'This site is an example for demonstration purposes.',
     whoCreated: 'admin',
     whoUpdated: 'editor',
     whenCreated: new Date('2024-01-01T00:00:00Z'),
@@ -213,10 +212,10 @@ describe('SnapshotService', () => {
     consultantSubmitted: 'Y',
     longDegrees: 118,
     longMinutes: 14,
-    longSeconds: '14.34',
+    longSeconds: 14.34,
     latDegrees: 34,
     latMinutes: 3,
-    latSeconds: '7.92',
+    latSeconds: 7.92,
     srStatus: 'Y',
     latlongReliabilityFlag: 'High',
     siteRiskCode: 'UNC',
@@ -238,10 +237,10 @@ describe('SnapshotService', () => {
     recentViewedSites: [],
     cart: [],
     folioContents: [],
-    snapshots: [],                
+    snapshots: [],
   };
 
-  const sampleSitePartics : SitePartics = {                
+  const sampleSitePartics: SitePartics = {
     id: '1',
     siteId: 'site_001',
     psnorgId: 'org_123',
@@ -259,10 +258,9 @@ describe('SnapshotService', () => {
     userAction: 'created',
     srAction: 'reviewed',
     site: sampleSite,
-  }
+  };
 
-
-  const samplePSORG :PeopleOrgs = {
+  const samplePSORG: PeopleOrgs = {
     id: '1',
     organizationName: 'Example Organization',
     displayName: 'Example Org',
@@ -287,124 +285,128 @@ describe('SnapshotService', () => {
     siteDocPartics: [],
     sitePartics: [],
     siteStaffs: [],
-  }
+  };
 
-
-  const sampleSiteSubDivions:SiteSubdivisions[] = [{
-    site: sampleSite,
-    subdivision: null,
-    userAction:"",
-    srAction: "public",
-    "siteId": "101",
-    "subdivId": "202",
-    "dateNoted": new Date("2024-10-01T10:00:00Z"),
-    "initialIndicator": "Y",
-    "whoCreated": "admin_user",
-    "whoUpdated": "editor_user",
-    "whenCreated": new Date("2024-10-01T09:30:00Z"),
-    "whenUpdated": new Date("2024-10-15T14:00:00Z"),
-    "sprofDateCompleted": new Date("2024-10-10T12:00:00Z"),
-    "siteSubdivId": "303",
-    "sendToSr": "N"
-  }
-  ]
+  const sampleSiteSubDivions: SiteSubdivisions[] = [
+    {
+      site: sampleSite,
+      subdivision: null,
+      userAction: '',
+      srAction: 'public',
+      siteId: '101',
+      subdivId: '202',
+      dateNoted: new Date('2024-10-01T10:00:00Z'),
+      initialIndicator: 'Y',
+      whoCreated: 'admin_user',
+      whoUpdated: 'editor_user',
+      whenCreated: new Date('2024-10-01T09:30:00Z'),
+      whenUpdated: new Date('2024-10-15T14:00:00Z'),
+      sprofDateCompleted: new Date('2024-10-10T12:00:00Z'),
+      siteSubdivId: '303',
+      sendToSr: 'N',
+    },
+  ];
 
   const sampleSiteAssociations: SiteAssocs[] = [
     {
-      site:sampleSite,
-      siteIdAssociatedWith2:sampleSite,
-      userAction:"",
-      srAction: "public",
-      "id": "f8c2d6e9-3e10-4e6b-b123-2f0a1eeb9e0c",
-      "siteId": "101",
-      "siteIdAssociatedWith": "202",
-      "effectiveDate": new Date('2024-01-01T12:00:00Z'),
-      "note": "This site is associated with Site 202 for monitoring purposes.",
-      "whoCreated": "admin_user",
-      "whoUpdated": "editor_user",
-      "whenCreated": new Date('2024-01-01T12:00:00Z'),
-      "whenUpdated": new Date('2024-01-01T12:00:00Z'),
-      "rwmFlag": null,
-      "rwmNoteFlag": null,
-      "commonPid": "Y"
-    }
-  ]
-
-  const sampleProfiles: SiteProfiles[] = [{
-    site: sampleSite,
-    userAction:"",
-    srAction: "public",
-    "id": "a2c3e5c6-4f7b-49e6-97d6-1e1b7f45e890",
-    "siteId": "101",
-    "dateCompleted": new Date("2024-01-15T10:30:00Z"),
-    "localAuthDateRecd": new Date("2024-01-15T10:30:00Z"),
-    "localAuthName": "John Doe",
-    "localAuthAgency": "Environmental Agency",
-    "localAuthAddress1": "123 Main St",
-    "localAuthAddress2": "Suite 200",
-    "localAuthPhoneAreaCode": "555",
-    "localAuthPhoneNo": "1234567",
-    "localAuthFaxAreaCode": "555",
-    "localAuthFaxNo": "7654321",
-    "localAuthDateSubmitted": new Date("2024-01-15T10:30:00Z"),
-    "localAuthDateForwarded": new Date("2024-01-15T10:30:00Z"),
-    "rwmDateReceived": new Date("2024-01-15T10:30:00Z"),
-    "rwmParticId": "2001",
-    "rwmPhoneAreaCode": "555",
-    "rwmPhoneNo": "7654321",
-    "rwmFaxAreaCode": "555",
-    "rwmFaxNo": "1234567",
-    "investigationRequired": "Y",
-    "rwmDateDecision": new Date("2024-01-15T10:30:00Z"),
-    "siteRegDateRecd": new Date("2024-01-15T10:30:00Z"),
-    "siteRegDateEntered": new Date("2024-01-15T10:30:00Z"),
-    "siteRegParticId": "3001",
-    "ownerParticId": "4001",
-    "siteAddress": "456 Elm St",
-    "siteCity": "Anytown",
-    "sitePostalCode": "12345",
-    "numberOfPids": 5,
-    "numberOfPins": 10,
-    "latDegrees": 34,
-    "latMinutes": 12,
-    "latSeconds": "34.56",
-    "longDegrees": -118,
-    "longMinutes": 15,
-    "longSeconds": "45.67",
-    "comments": "Site requires further investigation.",
-    "whoCreated": "admin_user",
-    "whoUpdated": "editor_user",
-    "whenCreated": new Date("2024-01-15T10:30:00Z"),
-    "whenUpdated": new Date("2024-01-15T10:30:00Z"),
-    "localAuthEmail": "johndoe@example.com",
-    "plannedActivityComment": "Planning for site assessment.",
-    "siteDisclosureComment": "Disclosure of previous activities.",
-    "govDocumentsComment": "Pending government document approvals."
-  }]  ;
-  
-  const sampleLandHistories: LandHistories[] = [{
-    userAction:"",
-    srAction:"public",
-    "siteId": "1",
-    "guid": "d7f8c6e3-7b9b-4f5e-8b92-e5b9b1d34567",
-    "lutCode": "LU1234",
-    "note": "Initial land use assessment completed.",
-    "whoCreated": "admin_user",
-    "whoUpdated": "editor_user",
-    "whenCreated": new Date("2024-01-15T10:30:00Z"),
-    "whenUpdated": new Date("2024-01-15T10:30:00Z"),
-    "rwmFlag": 1,
-    "rwmNoteFlag": 0,
-    "siteProfile": "Y",
-    "profileDateReceived": new Date("2024-01-15T10:30:00Z"),
-    "landUse": {
-      "code": "LU1234",
-      "description": "Residential Development",
-      "landHistories":  [],
-      siteProfileLandUses: []
+      site: sampleSite,
+      siteIdAssociatedWith2: sampleSite,
+      userAction: '',
+      srAction: 'public',
+      id: 'f8c2d6e9-3e10-4e6b-b123-2f0a1eeb9e0c',
+      siteId: '101',
+      siteIdAssociatedWith: '202',
+      effectiveDate: new Date('2024-01-01T12:00:00Z'),
+      note: 'This site is associated with Site 202 for monitoring purposes.',
+      whoCreated: 'admin_user',
+      whoUpdated: 'editor_user',
+      whenCreated: new Date('2024-01-01T12:00:00Z'),
+      whenUpdated: new Date('2024-01-01T12:00:00Z'),
+      rwmFlag: null,
+      rwmNoteFlag: null,
+      commonPid: 'Y',
     },
-    "site": sampleSite
-  }]
+  ];
+
+  const sampleProfiles: SiteProfiles[] = [
+    {
+      site: sampleSite,
+      userAction: '',
+      srAction: 'public',
+      id: 'a2c3e5c6-4f7b-49e6-97d6-1e1b7f45e890',
+      siteId: '101',
+      dateCompleted: new Date('2024-01-15T10:30:00Z'),
+      localAuthDateRecd: new Date('2024-01-15T10:30:00Z'),
+      localAuthName: 'John Doe',
+      localAuthAgency: 'Environmental Agency',
+      localAuthAddress1: '123 Main St',
+      localAuthAddress2: 'Suite 200',
+      localAuthPhoneAreaCode: '555',
+      localAuthPhoneNo: '1234567',
+      localAuthFaxAreaCode: '555',
+      localAuthFaxNo: '7654321',
+      localAuthDateSubmitted: new Date('2024-01-15T10:30:00Z'),
+      localAuthDateForwarded: new Date('2024-01-15T10:30:00Z'),
+      rwmDateReceived: new Date('2024-01-15T10:30:00Z'),
+      rwmParticId: '2001',
+      rwmPhoneAreaCode: '555',
+      rwmPhoneNo: '7654321',
+      rwmFaxAreaCode: '555',
+      rwmFaxNo: '1234567',
+      investigationRequired: 'Y',
+      rwmDateDecision: new Date('2024-01-15T10:30:00Z'),
+      siteRegDateRecd: new Date('2024-01-15T10:30:00Z'),
+      siteRegDateEntered: new Date('2024-01-15T10:30:00Z'),
+      siteRegParticId: '3001',
+      ownerParticId: '4001',
+      siteAddress: '456 Elm St',
+      siteCity: 'Anytown',
+      sitePostalCode: '12345',
+      numberOfPids: 5,
+      numberOfPins: 10,
+      latDegrees: 34,
+      latMinutes: 12,
+      latSeconds: '34.56',
+      longDegrees: -118,
+      longMinutes: 15,
+      longSeconds: '45.67',
+      comments: 'Site requires further investigation.',
+      whoCreated: 'admin_user',
+      whoUpdated: 'editor_user',
+      whenCreated: new Date('2024-01-15T10:30:00Z'),
+      whenUpdated: new Date('2024-01-15T10:30:00Z'),
+      localAuthEmail: 'johndoe@example.com',
+      plannedActivityComment: 'Planning for site assessment.',
+      siteDisclosureComment: 'Disclosure of previous activities.',
+      govDocumentsComment: 'Pending government document approvals.',
+    },
+  ];
+
+  const sampleLandHistories: LandHistories[] = [
+    {
+      userAction: '',
+      srAction: 'public',
+      siteId: '1',
+      guid: 'd7f8c6e3-7b9b-4f5e-8b92-e5b9b1d34567',
+      lutCode: 'LU1234',
+      note: 'Initial land use assessment completed.',
+      whoCreated: 'admin_user',
+      whoUpdated: 'editor_user',
+      whenCreated: new Date('2024-01-15T10:30:00Z'),
+      whenUpdated: new Date('2024-01-15T10:30:00Z'),
+      rwmFlag: 1,
+      rwmNoteFlag: 0,
+      siteProfile: 'Y',
+      profileDateReceived: new Date('2024-01-15T10:30:00Z'),
+      landUse: {
+        code: 'LU1234',
+        description: 'Residential Development',
+        landHistories: [],
+        siteProfileLandUses: [],
+      },
+      site: sampleSite,
+    },
+  ];
 
   const sampleSiteParticipants: SitePartics[] = [
     {
@@ -415,19 +417,24 @@ describe('SnapshotService', () => {
       endDate: null,
       note: 'Note 1',
       psnorg: samplePSORG,
-      whoCreated: "",
+      whoCreated: '',
       rwmFlag: 1,
-      rwmNoteFlag : 1,
+      rwmNoteFlag: 1,
       site: sampleSite,
       whoUpdated: 'admin',
       whenCreated: new Date('2024-01-01T12:00:00Z'),
       whenUpdated: new Date('2024-10-01T12:00:00Z'),
-      userAction:"",
-      srAction: "",   
+      userAction: '',
+      srAction: '',
       siteParticRoles: [
-        { rwmFlag:1, sp:sampleSitePartics
-          , userAction:"", srAction:"",
-          id:"", spId:"",  whoCreated: 'admin',
+        {
+          rwmFlag: 1,
+          sp: sampleSitePartics,
+          userAction: '',
+          srAction: '',
+          id: '',
+          spId: '',
+          whoCreated: 'admin',
           whoUpdated: 'admin',
           whenCreated: new Date('2024-01-01T12:00:00Z'),
           whenUpdated: new Date('2024-10-01T12:00:00Z'),
@@ -436,9 +443,9 @@ describe('SnapshotService', () => {
             description: 'Role 1 Description',
             code: '',
             siteParticRoles: [
-              {              
-                userAction:"",
-                srAction: "",              
+              {
+                userAction: '',
+                srAction: '',
                 id: 'b8a7c6f3-d29b-4f91-9b16-e21e8b63e4f5',
                 prCode: 'ROLE1',
                 spId: '12345',
@@ -1325,7 +1332,6 @@ describe('SnapshotService', () => {
       ).rejects.toThrow(mockError);
     });
 
-
     it('Should Only Return Land Histories with Pending Status', async () => {
       jest
         .spyOn(landHistoriesRepository, 'find')
@@ -1350,7 +1356,6 @@ describe('SnapshotService', () => {
         service.getLandHisotoriesForSnapshotCreation(''),
       ).rejects.toThrow(mockError);
     });
-
 
     it('Should Only Return Disclosure with Pending Status', async () => {
       jest
@@ -1377,7 +1382,6 @@ describe('SnapshotService', () => {
       ).rejects.toThrow(mockError);
     });
 
-
     it('Should Only Return Site Associations with Pending Status', async () => {
       jest
         .spyOn(siteAssocsRepository, 'find')
@@ -1403,7 +1407,6 @@ describe('SnapshotService', () => {
       ).rejects.toThrow(mockError);
     });
 
-
     it('Should Only Return Site SubDivisions with Pending Status', async () => {
       jest
         .spyOn(siteSubdivisionsRepository, 'find')
@@ -1428,7 +1431,5 @@ describe('SnapshotService', () => {
         service.getSubDivisionsForSnapshotCreation(''),
       ).rejects.toThrow(mockError);
     });
-
-    
   });
 });

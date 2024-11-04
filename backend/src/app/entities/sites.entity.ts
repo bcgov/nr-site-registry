@@ -199,7 +199,7 @@ export class Sites extends ChangeAuditEntity {
     precision: 4,
     scale: 2,
   })
-  longSeconds: string | null;
+  longSeconds: number | null;
 
   @Field({ nullable: true })
   @Column('smallint', { name: 'lat_degrees', nullable: true })
@@ -216,7 +216,7 @@ export class Sites extends ChangeAuditEntity {
     precision: 4,
     scale: 2,
   })
-  latSeconds: string | null;
+  latSeconds: number | null;
 
   @Field()
   @Column('character varying', {

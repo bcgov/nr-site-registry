@@ -160,10 +160,6 @@ jobs:
             --set-string global.secrets.keycloakRealm="${{ secrets.KEYCLOAK_REALM }}" \
             --set-string global.secrets.keycloakClientID="${{ secrets.KEYCLOAK_CLIENTID }}" \
             --set-string global.secrets.keycloakAuthURL="${{ secrets.KEYCLOAK_AUTH_URL }}" \
-            --set-string global.secrets.databaseAdminPassword="${{ secrets.DATABASE_ADMIN_PASSWORD }}" \
-            --set-string global.secrets.databasePassword="${{ secrets.DATABASE_PWD }}" \
-            --set-string crunchy.pgBackRest.s3.accessKey="${{ secrets.S3_ACCESS_KEY }}"  \
-            --set-string crunchy.pgBackRest.s3.secretKey="${{ secrets.S3_SECRET_KEY }}"  \
             --set-string global.config.dbUser=${{ inputs.db_user }} \
             ${{ inputs.params }} \
             --install --wait --atomic ${{ steps.vars.outputs.release }} \

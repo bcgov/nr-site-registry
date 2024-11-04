@@ -142,3 +142,22 @@ header .other {
 ::-webkit-scrollbar-thumb {
   background: #888; /* color of the thumb */
 }
+
+
+
+
+
+@media (max-width: 576px) {
+
+  .customNavbarSM
+  {
+    display: flex;
+    flex-direction: column;
+     
+  }
+
+  .header-right-corner-section {
+    gap: var(--layout-padding-small);
+  }
+
+}

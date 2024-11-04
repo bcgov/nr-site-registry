@@ -13,14 +13,10 @@ global:
   #-- global secrets, can be accessed by sub-charts.
   secrets:
     enabled: true
-    databasePassword: ~
-    databaseUser: ~
-    databaseName: ~
     keycloakSecret: ~
     keycloakRealm: ~
     keycloakClientID: ~
     keycloakAuthURL: ~
-    databaseAdminPassword: ~
     persist: true
   config:
     dbName: site # if updating this value, make sure this is updated `bitnami-pg: auth:     username: site , database: site in values-pr.yaml`

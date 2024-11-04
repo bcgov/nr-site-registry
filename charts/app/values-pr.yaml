@@ -7,6 +7,10 @@ global:
   secrets:
     enabled: true
     persist: false
+    keycloakSecret: ~
+    keycloakRealm: ~
+    keycloakClientID: ~
+    keycloakAuthURL: ~
   config:
     seed:
       enabled: true # TODO -> when test is successfully deployed, make PR/Dev env always cloned , so seed happens in TEST env

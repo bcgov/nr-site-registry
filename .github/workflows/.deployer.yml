@@ -162,7 +162,7 @@ jobs:
             --set-string global.secrets.keycloakAuthURL="${{ secrets.KEYCLOAK_AUTH_URL }}" \
             --set-string global.config.dbUser=${{ inputs.db_user }} \
             ${{ inputs.params }} \
-            --install --wait --atomic ${{ steps.vars.outputs.release }} \
+            --install --wait --atomic ${{ steps.vars.outputs.release }} --debug \
             --timeout "$DEPLOY_TIMEOUT"m  \
             --values ${{ inputs.values }} \
             ./${{ github.event.repository.name }}-${{ steps.pr.outputs.pr || steps.vars.outputs.version }}.tgz

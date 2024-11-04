@@ -13,7 +13,7 @@ spec:
       #-- the port for the service. the service will be accessible on this port within the namespace.
       port: 80
       #-- the container port where the application is listening on
-      targetPort: 8080
+      targetPort: {{.Values.frontend.service.targetPort}}
       #-- the protocol for the port. it can be TCP or UDP. TCP is the default and is recommended.
       protocol: TCP
   selector:

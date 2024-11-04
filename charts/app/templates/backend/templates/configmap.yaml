@@ -31,8 +31,9 @@ data:
     exit 0
     fi
 
+    echo "SEED DATA PATH :: $SEED_DATA_PATH"
     # check if seed data path is set or not
-    if [ ! "$SEED_DATA_PATH" ]; then
+    if [ -z "$SEED_DATA_PATH" ]; then
     echo "SEED_DATA_PATH is not set. Exiting."
     exit 0
     fi

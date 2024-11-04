@@ -76,7 +76,7 @@ spec:
               memory: {{ .Values.backend.resources.requests.memory }}
         {{- if .Values.global.config.seed.enabled }}
         - name: {{ include "backend.fullname" . }}-seed
-          image: "artifacts.developer.gov.bc.ca/docker-remote/postges:alpine" # here we just need a prebuilt image with psql and shell, just use postgres alpine image
+          image: "artifacts.developer.gov.bc.ca/docker-remote/postgres:alpine" # here we just need a prebuilt image with psql and shell, just use postgres alpine image
           imagePullPolicy: {{ default "Always" .Values.backend.imagePullPolicy }}
           command: ["/bin/sh"]
           args: ["-c", "sh /mnt/scripts/seed.sh"]

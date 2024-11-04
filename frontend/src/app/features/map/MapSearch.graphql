@@ -8,3 +8,24 @@ query mapSearch($searchParam: String) {
         }
     }
 }
+
+query MapSearch_findSiteBySiteId($siteId: String!) {
+    findSiteBySiteId(siteId: $siteId) {
+        data {
+            id
+            addrLine_1
+            addrLine_2
+            addrLine_3
+            addrLine_4
+            city
+            latDegrees
+            latMinutes
+            latSeconds
+            longDegrees
+            longMinutes
+            longSeconds
+            generalDescription
+            siteRiskCode
+        }
+    }
+}

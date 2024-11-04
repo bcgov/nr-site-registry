@@ -17,6 +17,7 @@ import associatedSitesReducer from './features/details/associates/AssociateSlice
 import parcelDescriptionsReducer from './features/details/parcelDescriptions/parcelDescriptionsSlice';
 import srUpdatesReducer from './features/details/srUpdates/srUpdatesSlice';
 import srReviewReducer from './features/details/srUpdates/state/srUpdatesTableSlice';
+import mapReducer from './features/map/map-slice';
 
 const persistedStore: any = loadFromLocalStorage();
 
@@ -39,6 +40,7 @@ export const store = configureStore({
     parcelDescriptions: parcelDescriptionsReducer,
     srUpdates: srUpdatesReducer,
     srReview: srReviewReducer,
+    map: mapReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, EntityTarget, In, Repository } from 'typeorm';
+import { Brackets, EntityManager, In, Repository } from 'typeorm';
 import {
   FetchSiteDetail,
   FetchSiteResponse,
@@ -126,32 +126,34 @@ export class SiteService {
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
 
-    const query = this.siteRepository
-      .createQueryBuilder('sites')
-      .where('CAST(sites.id AS TEXT) like :searchParam', {
-        searchParam: `%${searchParam}%`,
-      })
-      .orWhere('LOWER(sites.addr_line_1) LIKE LOWER(:searchParam)', {
-        searchParam: `%${searchParam.toLowerCase()}%`,
-      })
-      .orWhere('LOWER(sites.addr_line_2) LIKE LOWER(:searchParam)', {
-        searchParam: `%${searchParam.toLowerCase()}%`,
-      })
-      .orWhere('LOWER(sites.addr_line_3) LIKE LOWER(:searchParam)', {
-        searchParam: `%${searchParam.toLowerCase()}%`,
-      })
-      .orWhere('LOWER(sites.addr_line_4) LIKE LOWER(:searchParam)', {
-        searchParam: `%${searchParam.toLowerCase()}%`,
-      })
-      .orWhere('LOWER(sites.city) LIKE LOWER(:searchParam)', {
-        searchParam: `%${searchParam.toLowerCase()}%`,
-      })
-      .orWhere('LOWER(sites.provState) LIKE LOWER(:searchParam)', {
-        searchParam: `%${searchParam.toLowerCase()}%`,
-      })
-      .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchParam)', {
-        searchParam: `%${searchParam.toLowerCase()}%`,
-      });
+    const query = this.siteRepository.createQueryBuilder('sites').where(
+      new Brackets((qb) => {
+        qb.where('CAST(sites.id AS TEXT) LIKE :searchParam', {
+          searchParam: `%${searchParam}%`,
+        })
+          .orWhere('LOWER(sites.addr_line_1) LIKE LOWER(:searchParam)', {
+            searchParam: `%${searchParam.toLowerCase()}%`,
+          })
+          .orWhere('LOWER(sites.addr_line_2) LIKE LOWER(:searchParam)', {
+            searchParam: `%${searchParam.toLowerCase()}%`,
+          })
+          .orWhere('LOWER(sites.addr_line_3) LIKE LOWER(:searchParam)', {
+            searchParam: `%${searchParam.toLowerCase()}%`,
+          })
+          .orWhere('LOWER(sites.addr_line_4) LIKE LOWER(:searchParam)', {
+            searchParam: `%${searchParam.toLowerCase()}%`,
+          })
+          .orWhere('LOWER(sites.city) LIKE LOWER(:searchParam)', {
+            searchParam: `%${searchParam.toLowerCase()}%`,
+          })
+          .orWhere('LOWER(sites.provState) LIKE LOWER(:searchParam)', {
+            searchParam: `%${searchParam.toLowerCase()}%`,
+          })
+          .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchParam)', {
+            searchParam: `%${searchParam.toLowerCase()}%`,
+          });
+      }),
+    );
 
     if (id) {
       query.andWhere('sites.id = :id', { id: id });
@@ -263,6 +265,43 @@ export class SiteService {
     this.sitesLogger.log('SiteService.searchSites() end');
     this.sitesLogger.debug('SiteService.searchSites() end');
     return response;
+  }
+
+  async mapSearch(searchTerm = '') {
+    this.sitesLogger.log('SiteService.mapSearch() start');
+
+    const searchTermClean = searchTerm.toLowerCase().trim();
+    const query = this.siteRepository.createQueryBuilder('sites');
+
+    if (searchTermClean.length) {
+      query
+        .where('LOWER(sites.addr_line_1) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.addr_line_2) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.addr_line_3) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.addr_line_4) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.city) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.provState) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        })
+        .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchTerm)', {
+          searchTerm: `%${searchTermClean}%`,
+        });
+    }
+
+    const [result] = await query.getManyAndCount();
+
+    this.sitesLogger.log('SiteService.mapSearch() end');
+    return result;
   }
 
   /**

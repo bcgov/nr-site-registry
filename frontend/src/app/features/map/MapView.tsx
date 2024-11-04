@@ -13,6 +13,7 @@ import './MapView.css';
 import { MapSearch } from './MapSearch';
 import { useMapSearchQuery } from '../../../graphql/generated';
 import { SiteMarkers } from './siteMarkers/SiteMarkers';
+import { SiteDetailsDrawer } from './siteDrawer/SiteDetailsDrawer';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -49,9 +50,10 @@ function MapView() {
           className={clsx(osmGrayscale && 'osm--grayscale')}
         />
         {/* <MyLocationMarker/> */}
-        <SiteMarkers sites={data?.searchSites.sites || []} />
+        <SiteMarkers sites={data?.mapSearch.data || []} />
       </MapContainer>
       <MapSearch />
+      <SiteDetailsDrawer />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { DocParticRoleCd } from './docParticRoleCd.entity';
 import { PeopleOrgs } from './peopleOrgs.entity';
 import { SiteDocs } from './siteDocs.entity';
@@ -19,6 +19,7 @@ import { ChangeAuditEntity } from './changeAuditEntity';
 @Index('sdp_playing_a_role_i_frgn', ['sdocId'], {})
 @Index('sdp_played_by_frgn', ['spId'], {})
 @Entity('site_doc_partics')
+@Unique(['dprCode', 'psnorgId', 'sdocId'])
 export class SiteDocPartics extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'id' })
@@ -36,7 +37,7 @@ export class SiteDocPartics extends ChangeAuditEntity {
   dprCode: string;
 
   @Field()
-  @Column('bigint', { name: 'sdoc_id', unique: true })
+  @Column('bigint', { name: 'sdoc_id' })
   sdocId: string;
 
   //make it nullable in order todo  CRUD opertaions
@@ -46,7 +47,7 @@ export class SiteDocPartics extends ChangeAuditEntity {
   spId: string;
 
   @Field()
-  @Column('bigint', { name: 'psnorg_id', unique: true })
+  @Column('bigint', { name: 'psnorg_id' })
   psnorgId: string;
 
   @Field()

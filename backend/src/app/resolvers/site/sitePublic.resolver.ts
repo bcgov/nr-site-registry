@@ -1,34 +1,16 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import {
-  AuthenticatedUser,
-  AuthGuard,
-  Resource,
-  RoleMatchingMode,
-  Roles,
-  Unprotected,
-} from 'nest-keycloak-connect';
+import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Unprotected } from 'nest-keycloak-connect';
 import {
   FetchSiteDetail,
-  FetchSiteResponse,
   SaveSiteDetailsResponse,
   SearchSiteResponse,
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteService } from '../../services/site/site.service';
-import { DropdownDto, DropdownResponse } from '../../dto/dropdown.dto';
+import { DropdownDto } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { HttpStatus, UsePipes } from '@nestjs/common';
-import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
-import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
-import { CustomRoles } from '../../common/role';
 import { LoggerService } from '../../logger/logger.service';
-import {
-  BulkApproveRejectChangesDTO,
-  QueryResultForPendingSites,
-  QueryResultForPendingSitesResponse,
-  SearchParams,
-  SRApproveRejectResponse,
-} from '../../dto/sitesPendingReview.dto';
+import { QueryResultForPendingSites } from '../../dto/sitesPendingReview.dto';
 
 /**
  * Resolver for Region
@@ -45,7 +27,6 @@ export class SitePublicResolver {
     private readonly sitesLogger: LoggerService,
     private readonly siteApprovalResponseProvider: GenericResponseProvider<QueryResultForPendingSites>,
   ) {}
-
 
   /**
    * Find sites where search parameter matches a site id or address
@@ -116,7 +97,7 @@ export class SitePublicResolver {
       whenUpdated,
     );
   }
- 
+
   @Query(() => FetchSiteDetail, { name: 'findSiteBySiteId' })
   findSiteBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
@@ -133,5 +114,4 @@ export class SitePublicResolver {
 
     return this.siteService.findSiteBySiteId(siteId, showPending);
   }
-
 }

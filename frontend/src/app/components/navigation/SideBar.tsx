@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './SideBar.css';
-import { getSideBarNavList } from './dto/SideNav';
+import SideNav, { getSideBarNavList } from './dto/SideNav';
 import { Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from 'react-oidc-context';
@@ -21,7 +21,8 @@ function SideBar() {
   const { user } = useAuth();
   const location = useLocation();
 
-  const [navList, setNavList] = useState([]);
+  // Specify the type for navList as SideNav[]
+  const [navList, setNavList] = useState<SideNav[]>([]);
 
   useEffect(() => {
     setNavList(getSideBarNavList(getLoggedInUserType()));
@@ -110,7 +111,7 @@ function SideBar() {
               {renderMenuOption(item, index + 1)}
               {item.children &&
                 item.children.map((child: any) => (
-                  <React.Fragment key={index}>
+                  <React.Fragment key={child.id}>
                     {' '}
                     {/* Ensure each child has a unique key */}
                     {renderMenuOption(child, index + 1)}
@@ -130,7 +131,7 @@ function SideBar() {
               {renderMenuOption(item, index + 1)}
               {item.children &&
                 item.children.map((child: any) => (
-                  <React.Fragment key={index}>
+                  <React.Fragment key={child.id}>
                     {' '}
                     {/* Ensure each child has a unique key */}
                     {renderMenuOption(child, index + 1)}

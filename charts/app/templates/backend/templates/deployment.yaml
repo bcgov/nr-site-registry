@@ -29,6 +29,9 @@ spec:
         - name: {{ include "backend.fullname" . }}-init
           image: "{{.Values.global.registry}}/{{.Values.global.repository}}/backend-migration:{{ .Values.global.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ default "Always" .Values.backend.imagePullPolicy }}
+          volumeMounts:
+            - mountPath: /mnt/sql
+              name: seed-data-mount
           {{- if not .Values.crunchy.enabled }}
           envFrom:
             - secretRef:
@@ -175,11 +178,16 @@ spec:
               name: log-storage
             - mountPath: /graphql
               name: graphql-storage
+            - mountPath: /mnt/sql
+              name: seed-data-mount
       volumes:
         - name: log-storage
           emptyDir: {}
         - name: graphql-storage
           emptyDir: {}
+        - name: seed-data-mount
+          persistentVolumeClaim:
+            claimName: nr-ora2pg-sql
       {{- with .Values.backend.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

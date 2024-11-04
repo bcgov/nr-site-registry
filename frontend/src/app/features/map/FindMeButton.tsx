@@ -1,28 +1,8 @@
-<<<<<<< HEAD
-import { useDispatch } from 'react-redux';
-import { Button, Icon, useMediaQuery, useTheme } from '@mui/material';
-=======
 import { Button } from '@mui/material';
->>>>>>> 5c7547c (feat: SRS-527 Map Search – Find Me)
 import clsx from 'clsx';
 
 import { FindMe } from '../../components/common/icon';
 import { useGeolocationPermission } from '../../../hooks/useMyLocation';
-<<<<<<< HEAD
-import { setMyLocationVisible, useMyLocationVisible } from './map-slice';
-
-export function FindMeButton() {
-  const dispatch = useDispatch();
-  const isMarkerVisible = useMyLocationVisible();
-  const state = useGeolocationPermission();
-
-  if (state === 'denied') {
-    return null;
-  }
-
-  const onClick = () => {
-    dispatch(setMyLocationVisible(!isMarkerVisible));
-=======
 
 import { useState } from 'react';
 
@@ -44,7 +24,6 @@ export function FindMeButton({ setLocationVisible }: FindMeButtonProps) {
       setIsMarkerVisible(newValue);
       return newValue;
     });
->>>>>>> 5c7547c (feat: SRS-527 Map Search – Find Me)
   };
 
   return (

@@ -15,3 +15,12 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       endpoint: nrs.objectstore.gov.bc.ca
       fullBackupSchedule: 0 9 * * * # full backup at GMT 9
       incrementalBackupSchedule: 0 4 * * * # At 4 hour
+    pvc:
+      retention: 1 # one day hot active backup in pvc
+      retentionFullType: count
+      fullBackupSchedule: 0 8 * * *
+      incrementalBackupSchedule: 0 0,12 * * * # every 12 hour incremental
+      volume:
+        accessModes: "ReadWriteOnce"
+        storage: 2048Mi
+        storageClassName: netapp-file-backup

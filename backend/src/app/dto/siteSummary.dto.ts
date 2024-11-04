@@ -85,7 +85,7 @@ export class SiteSummaryDTO extends ChangeAuditEntityDTO {
   longMinutes: number | null;
 
   @Field({ nullable: true })
-  longSeconds: string | null;
+  longSeconds: number | null;
 
   @Field({ nullable: true })
   latDegrees: number | null;
@@ -94,7 +94,7 @@ export class SiteSummaryDTO extends ChangeAuditEntityDTO {
   latMinutes: number | null;
 
   @Field({ nullable: true })
-  latSeconds: string | null;
+  latSeconds: number | null;
 
   @Field({ nullable: true })
   srStatus: string;

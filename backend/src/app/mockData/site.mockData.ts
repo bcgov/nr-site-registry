@@ -202,10 +202,10 @@ sampleSites = [
     consultantSubmitted: 'Consultant Submitted',
     longDegrees: 0, // Example long degrees
     longMinutes: 0, // Example long minutes
-    longSeconds: '0', // Example long seconds
+    longSeconds: 0, // Example long seconds
     latDegrees: 0, // Example lat degrees
     latMinutes: 0, // Example lat minutes
-    latSeconds: '0', // Example lat seconds
+    latSeconds: 0, // Example lat seconds
     srStatus: 'SR Status',
     latlongReliabilityFlag: 'LatLong Reliability Flag',
     siteRiskCode: 'Site Risk Code',
@@ -259,10 +259,10 @@ sampleSites = [
     consultantSubmitted: 'Consultant Submitted',
     longDegrees: 0, // Example long degrees
     longMinutes: 0, // Example long minutes
-    longSeconds: '0', // Example long seconds
+    longSeconds: 0, // Example long seconds
     latDegrees: 0, // Example lat degrees
     latMinutes: 0, // Example lat minutes
-    latSeconds: '0', // Example lat seconds
+    latSeconds: 0, // Example lat seconds
     srStatus: 'SR Status',
     latlongReliabilityFlag: 'LatLong Reliability Flag',
     siteRiskCode: 'Site Risk Code',

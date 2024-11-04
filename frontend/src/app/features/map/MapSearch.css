@@ -88,7 +88,8 @@ button.map-button {
 }
 
 button.map-button:hover {
-  border-color: var(--rs-gray-0);
+  border-color: var(--surface-color-border-hover);
+  background-color: var(--surface-background-white);
 }
 
 button.map-button.map-button--large {
@@ -104,12 +105,14 @@ button.map-button.map-button--medium {
 }
 
 button.map-button--active {
-  background-color: var(--rs-gray-0);
+  /* background-color: var(--rs-gray-0); */
+  background-color: var(--surface-color-secondary-hover);
   border: 3px solid var(--surface-color-primary-active-border);
 }
 
 button.map-button--active:hover {
-  border-color: var(--rs-gray-0);
+  border-color: var(--surface-color-primary-active-border);
+  background-color: var(--surface-color-secondary-hover);
 }
 
 .data-layers-icon,

@@ -14,6 +14,7 @@ import { MapSearch } from './MapSearch';
 import { useMapSearchQuery } from '../../../graphql/generated';
 import { SiteMarkers } from './siteMarkers/SiteMarkers';
 import { SiteDetailsDrawer } from './siteDrawer/SiteDetailsDrawer';
+import { MapControls } from './MapControls';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -49,7 +50,8 @@ function MapView() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           className={clsx(osmGrayscale && 'osm--grayscale')}
         />
-        {/* <MyLocationMarker/> */}
+        <MapControls />
+        <MyLocationMarker />
         <SiteMarkers sites={data?.mapSearch.data || []} />
       </MapContainer>
       <MapSearch />

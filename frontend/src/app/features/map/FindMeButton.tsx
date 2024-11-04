@@ -1,28 +1,23 @@
 import { useDispatch } from 'react-redux';
-import { Button } from '@mui/material';
+import { Button, Icon, useMediaQuery, useTheme } from '@mui/material';
 import clsx from 'clsx';
 
-// import {
-//   setMyLocationVisible,
-//   useMyLocationVisible,
-// } from '@/features/map/map-slice'
-// import { useGeolocationPermission } from '@/hooks/useMyLocation'
-
 import { FindMe } from '../../components/common/icon';
+import { useGeolocationPermission } from '../../../hooks/useMyLocation';
+import { setMyLocationVisible, useMyLocationVisible } from './map-slice';
 
 export function FindMeButton() {
-  //   const dispatch = useDispatch()
-  //   const isMarkerVisible = useMyLocationVisible()
+  const dispatch = useDispatch();
+  const isMarkerVisible = useMyLocationVisible();
+  const state = useGeolocationPermission();
 
-  //   const state = useGeolocationPermission()
-  // No point in showing the button if the permission has been denied
-  //   if (state === 'denied') {
-  //     return null
-  //   }
+  if (state === 'denied') {
+    return null;
+  }
 
-  //   const onClick = () => {
-  //     dispatch(setMyLocationVisible(!isMarkerVisible))
-  //   }
+  const onClick = () => {
+    dispatch(setMyLocationVisible(!isMarkerVisible));
+  };
 
   return (
     <Button
@@ -32,10 +27,10 @@ export function FindMeButton() {
       className={clsx(
         'map-button',
         'map-button--large',
-        // isMarkerVisible && 'map-button--active',
+        isMarkerVisible && 'map-button--active',
       )}
       startIcon={<FindMe title="Find me icon" className="find-me-icon" />}
-      //   onClick={onClick}
+      onClick={onClick}
     >
       Find Me
     </Button>

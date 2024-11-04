@@ -34,39 +34,39 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DB_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: user
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DATABASE
               valueFrom:
                 secretKeyRef:
                   key: dbname
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DB_SCHEMA
               value: {{ .Values.global.config.schemaName }}
             - name: POSTGRESQL_HOST
               valueFrom:
                 secretKeyRef:
                   key: host
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRESQL_PORT
               valueFrom:
                 secretKeyRef:
                   key: port
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: {{.Release.Name}}-crunchy-pguser-postgres
+                  name: postgres-crunchy-pguser-postgres
             - name: POSTGRES_ADMIN_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: user
-                  name: {{.Release.Name}}-crunchy-pguser-postgres
+                  name: postgres-crunchy-pguser-postgres
           resources: # this is optional
             limits:
               cpu: {{ .Values.backend.resources.limits.cpu }}
@@ -92,39 +92,39 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DB_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: user
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DATABASE
               valueFrom:
                 secretKeyRef:
                   key: dbname
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DB_SCHEMA
               value: {{ .Values.global.config.schemaName }}
             - name: POSTGRESQL_HOST
               valueFrom:
                 secretKeyRef:
                   key: host
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRESQL_PORT
               valueFrom:
                 secretKeyRef:
                   key: port
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: {{.Release.Name}}-crunchy-pguser-postgres
+                  name: postgres-crunchy-pguser-postgres
             - name: POSTGRES_ADMIN_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: user
-                  name: {{.Release.Name}}-crunchy-pguser-postgres
+                  name: postgres-crunchy-pguser-postgres
             - name: SEED_DATA_PATH
               value: "/mnt/sql/data_migration.sql"
           resources: # this is optional
@@ -168,34 +168,34 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: user
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DATABASE
               valueFrom:
                 secretKeyRef:
                   key: dbname
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DB_SCHEMA
               value: {{ .Values.global.config.schemaName }}
             - name: POSTGRESQL_HOST
               valueFrom:
                 secretKeyRef:
                   key: host
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRESQL_PORT
               valueFrom:
                 secretKeyRef:
                   key: port
-                  name: {{.Release.Name}}-crunchy-pguser-{{ .Values.global.config.dbUser }}
+                  name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: {{.Release.Name}}-crunchy-pguser-postgres
+                  name: postgres-crunchy-pguser-postgres
             - name: POSTGRES_ADMIN_USERNAME
               valueFrom:
                 secretKeyRef:
                   key: user
-                  name: {{.Release.Name}}-crunchy-pguser-postgres
+                  name: postgres-crunchy-pguser-postgres
           ports:
             - name: http
               containerPort: {{ .Values.backend.service.targetPort }}

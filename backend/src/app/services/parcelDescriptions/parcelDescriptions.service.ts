@@ -281,6 +281,8 @@ export class ParcelDescriptionsService {
           whenUpdated: now,
           whoCreated: userInfo?.givenName,
           whenCreated: now,
+          // This value is enforced to be NOT NULL at the database level, but
+          // aren't used anywhere in this application.
           pidStatusCd: 'N', // TODO: Determine what this is and set appropriately.
         } as Subdivisions;
       },
@@ -322,6 +324,8 @@ export class ParcelDescriptionsService {
           whenUpdated: newSubdivision.whenUpdated,
           whoCreated: newSubdivision.whoCreated,
           whenCreated: newSubdivision.whenCreated,
+          // These two values are enforced to be NOT NULL at the database level,
+          // but aren't used anywhere in this application.
           initialIndicator: 'N', // TODO: Determine what this is an set appropriately.
           sendToSr: newSubdivision.srAction === 'pending' ? 'Y' : 'N', // TODO: Validate that this is the correct mapping (I don't think we'll actually use this column).
         } as SiteSubdivisions;

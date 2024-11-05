@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, InsertResult, Repository } from 'typeorm';
 import {
@@ -303,7 +303,7 @@ export class ParcelDescriptionsService {
         'Exception occured in parcelDescriptionService.addParcelDescriptionsForSite() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new BadRequestException('Failed to add Parcel Description.');
     }
     const newSubdivisions = insertResult.generatedMaps as Subdivisions[];
 
@@ -337,7 +337,7 @@ export class ParcelDescriptionsService {
         'Exception occured in parcelDescriptionService.addParcelDescriptionsForSite() end',
         JSON.stringify(error),
       );
-      throw error;
+      throw new BadRequestException('Failed to add Parcel Description.');
     }
 
     this.sitesLogger.log(

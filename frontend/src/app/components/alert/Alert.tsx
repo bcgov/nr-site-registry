@@ -13,7 +13,7 @@ const createToastOptions = (type: 'error' | 'success'): ToastOptions => ({
   className: `toast-${type}`,
   type,
   closeButton: false,
-  position: 'bottom-right',
+  position: 'top-center',
 });
 
 const ErrorMsg: React.FC<ErrorMsgProps> = ({

@@ -32,7 +32,6 @@
     var(--layout-padding-small) var(--layout-padding-medium);
   gap: var(--layout-margin-small);
   border-radius: var(--layout-border-radius-medium);
-  opacity: 0px;
   background: #ffffff;
 
   font-size: 16px;

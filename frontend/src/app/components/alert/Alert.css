@@ -10,6 +10,9 @@
   right: 5em;
 }
 
+.Toastify__toast-container--top-center {
+  z-index: 100001;
+}
 .custom {
   display: flex;
   gap: var(--layout-margin-medium);

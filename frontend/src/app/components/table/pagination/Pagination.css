@@ -5,7 +5,6 @@
   padding: var(--layout-padding-small);
   gap: var(--layout-margin-small);
   border-radius: var(--layout-border-width-medium);
-  opacity: 0px;
   display: flex;
   color: var(--surface-primary-default);
   justify-content: center;

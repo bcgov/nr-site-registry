@@ -154,7 +154,7 @@ export const getFirstSnapshotCreatedDate = (state: any) => {
   return state.snapshots.firstSnapshotCreatedDate;
 };
 
-export const isUserPurchasedSnapshot = (state: any) => {
+export const hasUserPurchasedSnapshot = (state: any) => {
   return state.snapshots.firstSnapshotCreatedDate !== null;
 };
 

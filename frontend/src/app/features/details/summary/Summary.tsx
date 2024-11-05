@@ -35,7 +35,7 @@ import {
   fetchCartItems,
   resetCartItemAddedStatus,
 } from '../../cart/CartSlice';
-import { getUser } from '../../../helpers/utility';
+import { getUser, isUserOfType, UserRoleType } from '../../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
 import { setupSiteSummaryForSaving } from '../SaveSiteDetailsSlice';
 import { UserActionEnum } from '../../../common/userActionEnum';
@@ -44,6 +44,7 @@ import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { useParams } from 'react-router-dom';
 import SummaryInfo from './SummaryInfo';
 import { isUserPurchasedSnapshot } from '../snapshot/SnapshotSlice';
+import { UserType } from '../../../helpers/requests/userType';
 
 const Summary = () => {
   const auth = useAuth();
@@ -55,7 +56,7 @@ const Summary = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    if(user !== null)
+    if( isUserOfType(UserRoleType.CLIENT) &&  user !== null)
     {
       dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
     }

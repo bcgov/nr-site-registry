@@ -149,11 +149,10 @@ header .other {
 
 @media (max-width: 576px) {
 
-  .customNavbarSM
+  .navbar-for-small-device
   {
     display: flex;
-    flex-direction: column;
-     
+    flex-direction: column;     
   }
 
   .header-right-corner-section {

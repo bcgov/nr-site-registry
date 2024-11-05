@@ -7,7 +7,7 @@ import Form from '../../components/form/Form';
 import { Sites } from '../site/dto/Site';
 import './SummaryForm.css';
 import { useSelector } from 'react-redux';
-import { isUserPurchasedSnapshot } from './snapshot/SnapshotSlice';
+import { hasUserPurchasedSnapshot } from './snapshot/SnapshotSlice';
 import { isUserOfType, UserRoleType } from '../../helpers/utility';
 
 interface SummaryFormProps {
@@ -27,7 +27,7 @@ const SummaryForm: FC<SummaryFormProps> = ({
   changeHandler,
 }) => {
 
-  const userPurchasedSnapshot = useSelector(isUserPurchasedSnapshot);
+  const userPurchasedSnapshot = useSelector(hasUserPurchasedSnapshot);
 
   const formRows:IFormField[][]  = [
     [
@@ -203,7 +203,7 @@ const SummaryForm: FC<SummaryFormProps> = ({
     ],
   ];
 
-  const [finalFormConfiguration, SetFinalFormConfiguration] = useState<IFormField[][]>(formRows); 
+  const [finalFormConfiguration, setFinalFormConfiguration] = useState<IFormField[][]>(formRows); 
 
   const locationDescription =  [
     {
@@ -224,7 +224,7 @@ const SummaryForm: FC<SummaryFormProps> = ({
     if ((isUserOfType(UserRoleType.CLIENT) && userPurchasedSnapshot) || (isUserOfType(UserRoleType.INTERNAL) || isUserOfType(UserRoleType.SR)) ) {
       const newRows = [...formRows];
       newRows.splice(4, 0, locationDescription);
-      SetFinalFormConfiguration(newRows);
+      setFinalFormConfiguration(newRows);
     }
   }, [userPurchasedSnapshot]);
 

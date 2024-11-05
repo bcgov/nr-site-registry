@@ -43,13 +43,13 @@ import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 
 import { useParams } from 'react-router-dom';
 import SummaryInfo from './SummaryInfo';
-import { isUserPurchasedSnapshot } from '../snapshot/SnapshotSlice';
+import { hasUserPurchasedSnapshot } from '../snapshot/SnapshotSlice';
 import { UserType } from '../../../helpers/requests/userType';
 
 const Summary = () => {
   const auth = useAuth();
 
-  const isUserPurchasedSite = useSelector(isUserPurchasedSnapshot);
+  const isUserPurchasedSite = useSelector(hasUserPurchasedSnapshot);
 
   const user = getUser();
   const addCartItemStatus = useSelector(addCartItemRequestStatus);

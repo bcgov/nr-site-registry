@@ -42,7 +42,9 @@ import {
   formatDate,
   formatDateWithNoTimzoneName,
   getUser,
+  isUserOfType,
   showNotification,
+  UserRoleType,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import { fetchSiteParticipants } from './participants/ParticipantSlice';
@@ -103,6 +105,12 @@ const SiteDetails = () => {
     SetNavComponents(getNavComponents());
     SetNavItems(getNavItems());
     SetDropDownNavItems(getDropDownNavItems());
+
+    if(isUserOfType(UserRoleType.CLIENT))
+    {
+      dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
+    }
+
   }, [auth.user]);
 
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
@@ -231,8 +239,7 @@ const SiteDetails = () => {
 
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
-      setUserType(UserType.External);
-      dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
+      setUserType(UserType.External);      
     } else if (
       loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
     ) {

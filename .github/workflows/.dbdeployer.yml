@@ -111,6 +111,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
             echo 'Adding PR specific user to Crunchy DB'
+            password=$(tr -dc 'A-Za-z0-9!$#' < /dev/urandom | head -c 20)
             NEW_USER='{"databases":["site-${{ github.event.number }}"],"name":"site-${{ github.event.number }}"}'
             CURRENT_USERS=$(oc get PostgresCluster/postgres-crunchy -o json | jq '.spec.users')
             echo "${CURRENT_USERS}"
@@ -124,9 +125,9 @@ jobs:
             IS_SEED_ENABLED=$(yq eval '.global.config.seed.enabled' charts/app/${{ inputs.app_values }})
             if [ $IS_SEED_ENABLED == "false" ]; then
               echo "Seed is disabled, creating db from site database as template"
-              # get primary crunchy pod and remove the role and db
+              # get primary crunchy pod and add the role and db
               CRUNCHY_PG_PRIMARY_POD_NAME=$(oc get pods -l postgres-operator.crunchydata.com/role=master -o json | jq -r '.items[0].metadata.name')
-              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -c "CREATE ROLE \"site-${{ github.event.number }}\" WITH CREATEDB CREATEROLE;"
+              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -c "CREATE ROLE \"site-${{ github.event.number }}\" WITH CREATEDB CREATEROLE LOGIN PASSWORD \"$password\";"
               oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -c "CREATE DATABASE \"site-${{ github.event.number }}\" TEMPLATE site OWNER \"site-${{ github.event.number }}\";"
             fi
             UPDATED_USERS=$(echo "$CURRENT_USERS" | jq --argjson NEW_USER "$NEW_USER" '. + [$NEW_USER]')

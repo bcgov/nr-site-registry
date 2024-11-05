@@ -120,15 +120,7 @@ jobs:
               echo "User already exists"
               exit 0
             fi
-            # check if seed is disabled in config of helm values inside charts/app/values file, global.config.seed.enabled=false, if so, then create db from site as template, using yq, since it is yaml file.
-            IS_SEED_ENABLED=$(yq eval '.global.config.seed.enabled' ./charts/app/${{ inputs.app_values }})
-            if [ $IS_SEED_ENABLED == "false" ]; then
-              echo "Seed is disabled, creating db from site database as template"
-              # get primary crunchy pod and remove the role and db
-              CRUNCHY_PG_PRIMARY_POD_NAME=$(oc get pods -l postgres-operator.crunchydata.com/role=master -o json | jq -r '.items[0].metadata.name')
-              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -c "CREATE DATABASE \"site-${{ github.event.number }}\" WITH TEMPLATE site;" || \
-                echo "could not create db from site db as template"
-            fi
+
             UPDATED_USERS=$(echo "$CURRENT_USERS" | jq --argjson NEW_USER "$NEW_USER" '. + [$NEW_USER]')
             echo "$UPDATED_USERS"
             PATCH_JSON=$(jq -n --argjson users "$UPDATED_USERS" '{"spec": {"users": $users}}')

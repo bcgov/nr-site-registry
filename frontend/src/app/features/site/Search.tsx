@@ -539,22 +539,6 @@ const Search = () => {
                 <span>Export Results As File</span>
               </div>
             </div>
-            {displayFilters && (
-              <SiteFilterForm cancelSearchFilter={cancelSearchFilter} />
-            )}
-            {displayColumn ? (
-              <div>
-                {' '}
-                <Column
-                  toggleColumnSelectionForDisplay={
-                    toggleColumnSelectionForDisplay
-                  }
-                  columns={columnsToDisplay}
-                  reset={resetDefaultColums}
-                  close={hideColumns}
-                />
-              </div>
-            ) : null}
           </div>
           <FilterPills
             filters={selectedFilters}

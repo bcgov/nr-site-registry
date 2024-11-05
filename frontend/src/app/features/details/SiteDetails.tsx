@@ -232,6 +232,7 @@ const SiteDetails = () => {
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
       setUserType(UserType.External);
+      dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
     } else if (
       loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
     ) {
@@ -239,9 +240,7 @@ const SiteDetails = () => {
     } else {
       // not logged in
       setUserType(UserType.External);
-    }
-    dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
-  }, [loggedInUser]);
+    }  }, [loggedInUser]);
 
   const savedChanges = useSelector(trackedChanges);
   const mode = useSelector(siteDetailsMode);
@@ -701,7 +700,7 @@ const SiteDetails = () => {
           components={navComponents}
           dropdownItems={dropDownNavItems}
           isDisable={
-            UserType.External === userType && snapshot.snapshot.data === null
+            getUser() === null || (UserType.External === userType && snapshot?.snapshot?.data === null)
           }
         />
       </PageContainer>

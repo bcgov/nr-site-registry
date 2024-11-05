@@ -4,7 +4,6 @@
 
 .status-banner-message {
   border-radius: var(--layout-border-width-large);
-  opacity: 0px;
   margin-right: var(--layout-margin-large);
   white-space: nowrap;
 }

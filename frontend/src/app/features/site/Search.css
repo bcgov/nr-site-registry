@@ -258,7 +258,6 @@ div.search-parent {
   background: var(--surface-background-white, #ffffff);
   gap: 8px;
   border-radius: var(--layout-border-medium);
-  opacity: 0px;
   display: flex;
   box-shadow: 0px 6.4px 14.4px 0px #00000021;
   box-shadow: 0px 1.2px 3.6px 0px #0000001a;
@@ -269,6 +268,6 @@ div.search-parent {
 
 .disabled-btn
 {
-  color: var(--surface-color-primary-disabled, #EDEBE9);
+  color: var(--surface-primary-disabled, #EDEBE9);
   background: var(--typography-color-disabled, #9F9D9C);
 }

@@ -29,21 +29,6 @@ const SummaryForm: FC<SummaryFormProps> = ({
 
   const userPurchasedSnapshot = useSelector(isUserPurchasedSnapshot);
 
-  const [finalFormConfiguration, SetFinalFormConfiguration] = useState<IFormField[][]>([]); 
-
-  const locationDescription =  [
-    {
-      type: FormFieldType.Text,
-      label: 'Location Description',
-      placeholder: 'Location Description',
-      graphQLPropertyName: 'generalDescription',
-      value: '',
-      customLabelCss: 'custom-summary-lbl-text',
-      customInputTextCss: 'custom-summary-input-text',
-    }
-  ];
-  
-  
   const formRows:IFormField[][]  = [
     [
       {
@@ -218,13 +203,30 @@ const SummaryForm: FC<SummaryFormProps> = ({
     ],
   ];
 
+  const [finalFormConfiguration, SetFinalFormConfiguration] = useState<IFormField[][]>(formRows); 
+
+  const locationDescription =  [
+    {
+      type: FormFieldType.Text,
+      label: 'Location Description',
+      placeholder: 'Location Description',
+      graphQLPropertyName: 'generalDescription',
+      value: '',
+      customLabelCss: 'custom-summary-lbl-text',
+      customInputTextCss: 'custom-summary-input-text',
+    }
+  ];
+  
+  
+  
+
   useEffect(() => {
     if ((isUserOfType(UserRoleType.CLIENT) && userPurchasedSnapshot) || (isUserOfType(UserRoleType.INTERNAL) || isUserOfType(UserRoleType.SR)) ) {
       const newRows = [...formRows];
       newRows.splice(4, 0, locationDescription);
       SetFinalFormConfiguration(newRows);
     }
-  }, []);
+  }, [userPurchasedSnapshot]);
 
   
 

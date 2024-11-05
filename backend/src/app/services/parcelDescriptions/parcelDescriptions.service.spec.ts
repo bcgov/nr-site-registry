@@ -11,7 +11,8 @@ import { ParcelDescriptionInputDTO } from '../../dto/parcelDescriptionInput.dto'
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Subdivisions } from '../../entities/subdivisions.entity';
 import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
-import { ParcelDescriptionType } from 'src/app/dto/parcelDescription.dto';
+import { ParcelDescriptionType } from '../../dto/parcelDescription.dto';
+import { BadRequestException } from '@nestjs/common';
 
 jest.useFakeTimers();
 jest.mock('./parcelDescriptions.queryBuilder');
@@ -911,7 +912,7 @@ describe('SiteSubdivisionsService', () => {
             inputParcelDescriptions,
             userInfo,
           );
-        }).rejects.toThrow('A bad thing happened!');
+        }).rejects.toThrow(BadRequestException);
 
         // Need to wait for the above block to reject before testing the logging
         // mock.
@@ -939,7 +940,7 @@ describe('SiteSubdivisionsService', () => {
             inputParcelDescriptions,
             userInfo,
           );
-        }).rejects.toThrow('A bad thing happened!');
+        }).rejects.toThrow(BadRequestException);
 
         // Need to wait for the above block to reject before testing the logging
         // mock.

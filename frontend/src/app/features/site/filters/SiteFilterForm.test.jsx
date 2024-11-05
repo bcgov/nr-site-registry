@@ -1,75 +1,142 @@
-import { render, fireEvent } from '@testing-library/react';
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import SiteFilterForm from './SiteFilterForm';
-import { Provider } from 'react-redux';
-import configureStore from 'redux-mock-store';
 
-const mockStore = configureStore([]);
+// Mocking the Form component
+jest.mock('../../../components/form/Form', () => {
+  return function MockForm(props) {
+    return (
+      <div>
+        {props.formRows.map((row, index) => (
+          <div key={index}>
+            {row.map((field) => (
+              <input
+                key={field.graphQLPropertyName}
+                data-testid={field.graphQLPropertyName}
+                value={props.formData[field.graphQLPropertyName] || ''}
+                onChange={(e) =>
+                  props.handleInputChange(
+                    field.graphQLPropertyName,
+                    e.target.value,
+                  )
+                }
+                placeholder={field.placeholder}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    );
+  };
+});
 
-describe('SiteFilterForm component', () => {
-  let store;
+describe('SiteFilterForm', () => {
+  const mockOnInputChange = jest.fn();
+  const mockOnSubmit = jest.fn();
+  const mockOnReset = jest.fn();
+  const mockCancelSearchFilter = jest.fn();
+
+  const formData = {
+    id: '',
+    srStatus: '',
+    commonName: '',
+    siteRiskCode: '',
+    addrLine_1: '',
+    city: '',
+    whoCreated: '',
+    latlongReliabilityFlag: '',
+    latdeg: '',
+    longdeg: '',
+    whenCreated: [],
+    whenUpdated: [],
+  };
 
   beforeEach(() => {
-    store = mockStore({
-      sites: {},
-    });
+    jest.clearAllMocks();
   });
 
-  it('render without chrashing', async () => {
+  it('renders the form with initial data', () => {
     render(
-      <Provider store={store}>
-        <SiteFilterForm cancelSearchFilter={() => {}} />
-      </Provider>,
+      <SiteFilterForm
+        formData={formData}
+        onInputChange={mockOnInputChange}
+        onSubmit={mockOnSubmit}
+        onReset={mockOnReset}
+        cancelSearchFilter={mockCancelSearchFilter}
+      />,
     );
+
+    expect(screen.getByTestId('form')).toBeInTheDocument();
+    expect(screen.getByTestId('Submit')).toBeInTheDocument();
+    expect(screen.getByTestId('Reset Filters')).toBeInTheDocument();
+    expect(screen.getByTestId('Cancel')).toBeInTheDocument();
   });
 
-  it('Update the input text value correctly', async () => {
-    const { getByLabelText } = render(
-      <Provider store={store}>
-        <SiteFilterForm cancelSearchFilter={() => {}} />
-      </Provider>,
+  it('calls onInputChange when an input value changes', () => {
+    render(
+      <SiteFilterForm
+        formData={formData}
+        onInputChange={mockOnInputChange}
+        onSubmit={mockOnSubmit}
+        onReset={mockOnReset}
+        cancelSearchFilter={mockCancelSearchFilter}
+      />,
     );
-    const input = getByLabelText('Site ID');
-    fireEvent.change(input, { target: { value: '1' } });
-    expect(input.value).toBe('1');
-    fireEvent.change(input, { target: { value: '125,13626' } });
-    expect(input.value).toBe('125,13626');
+
+    const inputId = screen.getByTestId('id');
+    fireEvent.change(inputId, { target: { value: '123' } });
+
+    expect(mockOnInputChange).toHaveBeenCalledWith('id', '123');
   });
 
-  it('Clear form data on reset button click', async () => {
-    const { getByText, getByLabelText } = render(
-      <Provider store={store}>
-        <SiteFilterForm cancelSearchFilter={() => {}} />
-      </Provider>,
+  it('calls onSubmit when the form is submitted', () => {
+    render(
+      <SiteFilterForm
+        formData={formData}
+        onInputChange={mockOnInputChange}
+        onSubmit={mockOnSubmit}
+        onReset={mockOnReset}
+        cancelSearchFilter={mockCancelSearchFilter}
+      />,
     );
-    const input = getByLabelText('Site ID');
-    fireEvent.change(input, { target: { value: '1' } });
-    const resetButton = getByText('Reset Filters');
+
+    const form = screen.getByTestId('form');
+    fireEvent.submit(form);
+
+    expect(mockOnSubmit).toHaveBeenCalled();
+  });
+
+  it('calls onReset when reset button is clicked', () => {
+    render(
+      <SiteFilterForm
+        formData={formData}
+        onInputChange={mockOnInputChange}
+        onSubmit={mockOnSubmit}
+        onReset={mockOnReset}
+        cancelSearchFilter={mockCancelSearchFilter}
+      />,
+    );
+
+    const resetButton = screen.getByTestId('Reset Filters');
     fireEvent.click(resetButton);
-    expect(input.value).toBe('');
+
+    expect(mockOnReset).toHaveBeenCalled();
   });
 
-  it('clear form data on cancel button click', async () => {
-    const { getByText, getByLabelText } = render(
-      <Provider store={store}>
-        <SiteFilterForm cancelSearchFilter={() => {}} />
-      </Provider>,
+  it('calls cancelSearchFilter when cancel button is clicked', () => {
+    render(
+      <SiteFilterForm
+        formData={formData}
+        onInputChange={mockOnInputChange}
+        onSubmit={mockOnSubmit}
+        onReset={mockOnReset}
+        cancelSearchFilter={mockCancelSearchFilter}
+      />,
     );
-    const input = getByLabelText('Site Address');
-    fireEvent.change(input, { target: { value: '12345 ABC' } });
-    const cancelBtn = getByText('Cancel');
-    fireEvent.click(cancelBtn);
-    expect(input.value).toBe('');
-  });
 
-  it('renders Dropdown component correctly', () => {
-    const { getByLabelText, getByRole } = render(
-      <Provider store={store}>
-        <SiteFilterForm cancelSearchFilter={() => {}} />
-      </Provider>,
-    );
-    const dropdownLabel = getByLabelText('City');
-    const dropdownPlaceholder = getByRole('option', { name: 'Select City' });
-    expect(dropdownLabel).toBeInTheDocument();
-    expect(dropdownPlaceholder).toBeInTheDocument();
+    const cancelButton = screen.getByTestId('Cancel');
+    fireEvent.click(cancelButton);
+
+    expect(mockCancelSearchFilter).toHaveBeenCalled();
   });
 });

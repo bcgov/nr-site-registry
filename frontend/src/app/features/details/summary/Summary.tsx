@@ -56,8 +56,7 @@ const Summary = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    if( isUserOfType(UserRoleType.CLIENT) &&  user !== null)
-    {
+    if (isUserOfType(UserRoleType.CLIENT) && user !== null) {
       dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
     }
   }, [addCartItemStatus]);
@@ -116,9 +115,7 @@ const Summary = () => {
   }, [detailsMode]);
 
   // State Initializations
-  const initialParcelIds = [
-    0
-  ];
+  const initialParcelIds = [0];
 
   const [location, setLocation] = useState([48.46762, -123.25458]);
 
@@ -198,13 +195,9 @@ const Summary = () => {
     setParcelIds(parcelIdsLocal);
   };
 
-  const data:any = [
-    
-  ];
+  const data: any = [];
 
-  const activityData:any = [
-    
-  ];
+  const activityData: any = [];
 
   const columns: TableColumn[] = [
     {
@@ -549,7 +542,7 @@ const Summary = () => {
         </div>
       )}
 
-      { !isUserPurchasedSite && 
+      {!isUserPurchasedSite && (
         <div className="external-purchase-section">
           <div className="external-purchase-info">
             <span>
@@ -559,7 +552,7 @@ const Summary = () => {
           </div>
           <div className="external-purchase-buttons">
             <button className="d-flex btn-cart align-items-center">
-              <ShoppingCartIcon className="btn-icon btn-icon-color-white"  />
+              <ShoppingCartIcon className="btn-icon btn-icon-color-white" />
               <span className="btn-cart-lbl" onClick={() => handleAddToCart()}>
                 {' '}
                 Purchase Site Details
@@ -572,7 +565,7 @@ const Summary = () => {
             </button>
           </div>
         </div>
-      }
+      )}
     </div>
   );
 };

@@ -265,9 +265,7 @@ div.search-parent {
     var(--layout-padding-medium) var(--layout-padding-small);
 }
 
-
-.disabled-btn
-{
-  color: var(--surface-primary-disabled, #EDEBE9);
-  background: var(--typography-color-disabled, #9F9D9C);
+.disabled-btn {
+  color: var(--surface-primary-disabled, #edebe9);
+  background: var(--typography-color-disabled, #9f9d9c);
 }

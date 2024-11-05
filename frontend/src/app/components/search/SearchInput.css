@@ -50,7 +50,7 @@
   background: white;
   padding: var(--layout-padding-medium) 0px var(--layout-padding-medium) 0px;
   gap: 8px;
-  border-radius: var(--layout-border-radius-medium); 
+  border-radius: var(--layout-border-radius-medium);
   background: var(--surface-background-white, #ffffff);
   /* box-shadow: 0px 6.4px 14.4px 0px #00000021; */
   box-shadow: 0px 1.2px 3.6px 0px #0000001a;
@@ -60,7 +60,7 @@
   height: 43px;
   padding: var(--layout-padding-small) var(--layout-padding-medium)
     var(--layout-padding-small) var(--layout-padding-medium);
-  gap: var(--layout-margin-medium); 
+  gap: var(--layout-margin-medium);
   cursor: pointer;
 }
 

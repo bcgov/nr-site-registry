@@ -143,20 +143,13 @@ header .other {
   background: #888; /* color of the thumb */
 }
 
-
-
-
-
 @media (max-width: 576px) {
-
-  .navbar-for-small-device
-  {
+  .navbar-for-small-device {
     display: flex;
-    flex-direction: column;     
+    flex-direction: column;
   }
 
   .header-right-corner-section {
     gap: var(--layout-padding-small);
   }
-
 }

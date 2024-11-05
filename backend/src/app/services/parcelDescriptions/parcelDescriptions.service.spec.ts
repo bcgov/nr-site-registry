@@ -11,6 +11,7 @@ import { ParcelDescriptionInputDTO } from '../../dto/parcelDescriptionInput.dto'
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Subdivisions } from '../../entities/subdivisions.entity';
 import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
+import { ParcelDescriptionType } from 'src/app/dto/parcelDescription.dto';
 
 jest.useFakeTimers();
 jest.mock('./parcelDescriptions.queryBuilder');
@@ -549,7 +550,7 @@ describe('SiteSubdivisionsService', () => {
 
       parcelDescriptionToUpdate = {
         id: idForUpdatedParcelDescription,
-        descriptionType: 'Crown Land PIN',
+        descriptionType: ParcelDescriptionType.CrownLandPIN,
         idPinNumber: '123456',
         dateNoted: new Date(),
         landDescription: 'should be ignored',
@@ -559,7 +560,7 @@ describe('SiteSubdivisionsService', () => {
       };
       parcelDescriptionToAdd = {
         id: idForAddedParcelDescription,
-        descriptionType: 'Crown Land PIN',
+        descriptionType: ParcelDescriptionType.CrownLandPIN,
         idPinNumber: '654321',
         dateNoted: new Date(),
         landDescription: 'should be ignored',
@@ -569,7 +570,7 @@ describe('SiteSubdivisionsService', () => {
       };
       parcelDescriptionToDelete = {
         id: idForDeletedParcelDescription,
-        descriptionType: 'Crown Land PIN',
+        descriptionType: ParcelDescriptionType.CrownLandPIN,
         idPinNumber: '162534',
         dateNoted: new Date(),
         landDescription: 'should be ignored',
@@ -762,7 +763,7 @@ describe('SiteSubdivisionsService', () => {
       inputParcelDescriptions = [
         {
           id: '1',
-          descriptionType: 'Crown Land PIN',
+          descriptionType: ParcelDescriptionType.CrownLandPIN,
           idPinNumber: '123456',
           dateNoted: today,
           landDescription: 'should be ignored',

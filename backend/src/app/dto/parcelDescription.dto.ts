@@ -8,17 +8,24 @@ export class ParcelDescriptionsResponse extends PagedResponseDto {
   data: ParcelDescriptionDto[] | null;
 }
 
-export type DescriptionTypeValue =
-  | 'Parcel ID'
-  | 'Crown Land PIN'
-  | 'Crown Land File Number'
-  | 'Unknown';
+export enum ParcelDescriptionType {
+  ParcelID = 'Parcel ID',
+  CrownLandPIN = 'Crown Land PIN',
+  CrownLandFileNumber = 'Crown Land File Number',
+  Unknown = 'Unknown',
+}
+
+export type ParcelDescriptionTypeValue =
+  | ParcelDescriptionType.ParcelID
+  | ParcelDescriptionType.CrownLandPIN
+  | ParcelDescriptionType.CrownLandFileNumber
+  | ParcelDescriptionType.Unknown;
 
 @ObjectType()
 export class ParcelDescriptionDto {
   constructor(
     id: number | null,
-    descriptionType: DescriptionTypeValue | null,
+    descriptionType: ParcelDescriptionTypeValue | null,
     idPinNumber: string | null,
     dateNoted: Date | null,
     landDescription: string | null,
@@ -26,7 +33,9 @@ export class ParcelDescriptionDto {
     srAction: string | null,
   ) {
     this.id = id ? id : 0;
-    this.descriptionType = descriptionType ? descriptionType : 'Unknown';
+    this.descriptionType = descriptionType
+      ? descriptionType
+      : ParcelDescriptionType.Unknown;
     this.idPinNumber = idPinNumber ? idPinNumber : 'Unknown';
     this.dateNoted = dateNoted;
     this.landDescription = landDescription ? landDescription : '';
@@ -39,7 +48,7 @@ export class ParcelDescriptionDto {
 
   @Field()
   @IsString()
-  descriptionType: DescriptionTypeValue;
+  descriptionType: ParcelDescriptionTypeValue;
 
   @Field()
   @IsString()

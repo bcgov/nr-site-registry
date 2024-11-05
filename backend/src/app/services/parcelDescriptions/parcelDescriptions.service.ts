@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, InsertResult, Repository } from 'typeorm';
-import { ParcelDescriptionDto } from '../../dto/parcelDescription.dto';
+import {
+  ParcelDescriptionDto,
+  ParcelDescriptionType,
+} from '../../dto/parcelDescription.dto';
 import { GenericPagedResponse } from '../../dto/response/genericResponse';
 import {
   getExternalUserQueries,
@@ -254,11 +257,12 @@ export class ParcelDescriptionsService {
     const subdivisions: Subdivisions[] = parcelDescriptions.map(
       (parcelDescription) => {
         const pid =
-          parcelDescription.descriptionType === 'Parcel ID'
+          parcelDescription.descriptionType === ParcelDescriptionType.ParcelID
             ? parcelDescription.idPinNumber
             : null;
         const pin =
-          parcelDescription.descriptionType === 'Crown Land PIN'
+          parcelDescription.descriptionType ===
+          ParcelDescriptionType.CrownLandPIN
             ? parcelDescription.idPinNumber
             : null;
         const crownLandsFileNo =

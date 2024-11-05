@@ -499,7 +499,7 @@ const Search = () => {
             <div className="search-result-actions">
               {!isUserOfType(UserRoleType.INTERNAL) && (
                 <div
-                  className="search-result-actions-btn"
+                  className={`search-result-actions-btn ${selectedRows.length === 0 ? 'disabled-btn' : 'search-result-actions-btn-highlight'}`}
                   onClick={() => handleAddToShoppingCart()}
                 >
                   <ShoppingCartIcon />
@@ -508,7 +508,7 @@ const Search = () => {
               )}
               {!isUserOfType(UserRoleType.INTERNAL) && (
                 <div
-                  className="search-result-actions-btn"
+                  className={`search-result-actions-btn ${selectedRows.length === 0 ? 'disabled-btn' : 'search-result-actions-btn-highlight'}`}
                   onClick={() => {
                     let loggedInUser = getUser();
                     if (loggedInUser === null) {
@@ -531,11 +531,30 @@ const Search = () => {
                 />
               )}
 
-              <div className="search-result-actions-btn" onClick={handleExport}>
+              <div
+                className={`search-result-actions-btn ${selectedRows.length === 0 ? 'disabled-btn' : 'search-result-actions-btn-highlight'}`}
+                onClick={handleExport}
+              >
                 <FileExportIcon />
                 <span>Export Results As File</span>
               </div>
             </div>
+            {displayFilters && (
+              <SiteFilterForm cancelSearchFilter={cancelSearchFilter} />
+            )}
+            {displayColumn ? (
+              <div>
+                {' '}
+                <Column
+                  toggleColumnSelectionForDisplay={
+                    toggleColumnSelectionForDisplay
+                  }
+                  columns={columnsToDisplay}
+                  reset={resetDefaultColums}
+                  close={hideColumns}
+                />
+              </div>
+            ) : null}
           </div>
           <FilterPills
             filters={selectedFilters}

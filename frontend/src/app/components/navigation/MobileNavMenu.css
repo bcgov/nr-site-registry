@@ -51,7 +51,6 @@
   padding: var(--layout-margin-large) 0px var(--layout-margin-medium) 0px;
   gap: 16px;
   border: 1px 0px 0px 0px;
-  opacity: 0px;
   border-top: 1px solid var(--surface-border-light);
 }
 

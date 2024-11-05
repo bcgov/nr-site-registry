@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import {
   FormFieldType,
   IFormField,
@@ -6,6 +6,9 @@ import {
 import Form from '../../components/form/Form';
 import { Sites } from '../site/dto/Site';
 import './SummaryForm.css';
+import { useSelector } from 'react-redux';
+import { hasUserPurchasedSnapshot } from './snapshot/SnapshotSlice';
+import { isUserOfType, UserRoleType } from '../../helpers/utility';
 
 interface SummaryFormProps {
   sitesDetails: Sites;
@@ -23,7 +26,10 @@ const SummaryForm: FC<SummaryFormProps> = ({
   srMode,
   changeHandler,
 }) => {
-  const formRows: IFormField[][] = [
+
+  const userPurchasedSnapshot = useSelector(hasUserPurchasedSnapshot);
+
+  const formRows:IFormField[][]  = [
     [
       {
         type: FormFieldType.Text,
@@ -183,17 +189,7 @@ const SummaryForm: FC<SummaryFormProps> = ({
         customInputTextCss: 'custom-summary-input-text',
       },
     ],
-    [
-      {
-        type: FormFieldType.Text,
-        label: 'Location Description',
-        placeholder: 'Location Description',
-        graphQLPropertyName: 'generalDescription',
-        value: '',
-        customLabelCss: 'custom-summary-lbl-text',
-        customInputTextCss: 'custom-summary-input-text',
-      },
-    ],
+   
     [
       {
         type: FormFieldType.Text,
@@ -207,6 +203,33 @@ const SummaryForm: FC<SummaryFormProps> = ({
     ],
   ];
 
+  const [finalFormConfiguration, setFinalFormConfiguration] = useState<IFormField[][]>(formRows); 
+
+  const locationDescription =  [
+    {
+      type: FormFieldType.Text,
+      label: 'Location Description',
+      placeholder: 'Location Description',
+      graphQLPropertyName: 'generalDescription',
+      value: '',
+      customLabelCss: 'custom-summary-lbl-text',
+      customInputTextCss: 'custom-summary-input-text',
+    }
+  ];
+  
+  
+  
+
+  useEffect(() => {
+    if ((isUserOfType(UserRoleType.CLIENT) && userPurchasedSnapshot) || (isUserOfType(UserRoleType.INTERNAL) || isUserOfType(UserRoleType.SR)) ) {
+      const newRows = [...formRows];
+      newRows.splice(4, 0, locationDescription);
+      setFinalFormConfiguration(newRows);
+    }
+  }, [userPurchasedSnapshot]);
+
+  
+
   const [formData, setFormData] = useState<{
     [key: string]: any | [Date, Date];
   }>({});
@@ -216,7 +239,7 @@ const SummaryForm: FC<SummaryFormProps> = ({
       <Form
         editMode={edit}
         srMode={srMode}
-        formRows={formRows}
+        formRows={finalFormConfiguration}
         formData={sitesDetails}
         handleInputChange={changeHandler}
       />

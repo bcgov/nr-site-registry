@@ -8,7 +8,6 @@
     var(--layout-padding-medium) var(--layout-padding-large);
   gap: var(--layout-margin-small);
   border-radius: var(--layout-margin-xsmall);
-  opacity: 0px;
   background: var(--surface-primary-default, #053662);
   display: flex;
 }

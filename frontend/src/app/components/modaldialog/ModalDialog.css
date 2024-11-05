@@ -66,7 +66,6 @@
   padding: var(--layout-padding-medium) var(--layout-padding-large)
     var(--layout-padding-medium) var(--layout-padding-large);
   gap: var(--layout-margin-xsmall);
-  opacity: 0px;
   display: flex;
   justify-content: flex-end;
 }
@@ -79,7 +78,6 @@
     padding: var(--layout-padding-medium) var(--layout-padding-large)
       var(--layout-padding-medium) var(--layout-padding-large);
     gap: var(--layout-margin-xsmall);
-    opacity: 0px;
     display: flex;
     justify-content: flex-end;
     flex-direction: column;

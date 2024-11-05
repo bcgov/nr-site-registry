@@ -42,7 +42,7 @@ const Header = () => {
   };
 
   return (
-    <header className="navbar position-sticky ">
+    <header className="navbar position-sticky navbar-small-device">
       <div className="banner" tabIndex={1} role="navigation">
         <a href="https://gov.bc.ca">
           <img src={logo} className="logo" alt="BC Government Logo" />

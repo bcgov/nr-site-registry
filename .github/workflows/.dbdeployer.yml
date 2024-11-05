@@ -129,6 +129,10 @@ jobs:
               CRUNCHY_PG_PRIMARY_POD_NAME=$(oc get pods -l postgres-operator.crunchydata.com/role=master -o json | jq -r '.items[0].metadata.name')
               oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -c "CREATE ROLE \"site-${{ github.event.number }}\" WITH CREATEDB CREATEROLE LOGIN PASSWORD '$password';"
               oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -c "CREATE DATABASE \"site-${{ github.event.number }}\" TEMPLATE site OWNER \"site-${{ github.event.number }}\";"
+              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -c "GRANT ALL PRIVILEGES ON DATABASE \"site-${{ github.event.number }}\" TO \"site-${{ github.event.number }}\";"
+              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -d "site-${{ github.event.number }}" -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'sites') LOOP EXECUTE 'GRANT ALL PRIVILEGES ON TABLE sites.' || quote_ident(r.tablename) || ' TO \"site-${{ github.event.number }}\"'; END LOOP; END \$\$;"
+              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -d "site-${{ github.event.number }}" -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = 'sites') LOOP EXECUTE 'GRANT ALL PRIVILEGES ON SEQUENCE sites.' || quote_ident(r.sequence_name) || ' TO \"site-${{ github.event.number }}\"'; END LOOP; END \$\$;"
+              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -d "site-${{ github.event.number }}" -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'sites') LOOP EXECUTE 'GRANT ALL PRIVILEGES ON FUNCTION sites.' || quote_ident(r.routine_name) || ' TO \"site-${{ github.event.number }}\"'; END LOOP; END \$\$;"
             fi
             UPDATED_USERS=$(echo "$CURRENT_USERS" | jq --argjson NEW_USER "$NEW_USER" '. + [$NEW_USER]')
             echo "$UPDATED_USERS"

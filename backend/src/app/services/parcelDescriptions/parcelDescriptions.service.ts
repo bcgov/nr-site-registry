@@ -266,7 +266,8 @@ export class ParcelDescriptionsService {
             ? parcelDescription.idPinNumber
             : null;
         const crownLandsFileNo =
-          parcelDescription.descriptionType === 'Crown Land File Number'
+          parcelDescription.descriptionType ===
+          ParcelDescriptionType.CrownLandFileNumber
             ? parcelDescription.idPinNumber
             : null;
         return {

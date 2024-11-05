@@ -66,6 +66,14 @@ const Search = () => {
     ...columns,
   ]);
   const [showMobileTableMenu, SetShowMobileTableMenu] = useState(false);
+  const [selectedRows, SetSelectedRows] = useState<any[]>([]);
+  const [showAddToFolio, SetShowAddToFolio] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState<
+    { key: string; value: string; label: string }[]
+  >([]);
+  const [formData, setFormData] = useState<{
+    [key: string]: any | [Date, Date];
+  }>({});
 
   const toggleColumnSelectionForDisplay = (column: TableColumn) => {
     const index = columnsToDisplay.findIndex((item) => item.id === column.id);
@@ -107,8 +115,6 @@ const Search = () => {
   const cancelSearchFilter = () => {
     SetDisplayFilters(false);
   };
-
-  useEffect(() => {}, []);
 
   const search = (value: any) => {
     return sites;
@@ -152,7 +158,20 @@ const Search = () => {
     setSearchText(event.target.value);
     if (event.target.value.length >= 3) {
       dispatch(setFetchLoadingState(null));
-      dispatch(fetchSites({ searchParam: event.target.value }));
+      if (selectedFilters) {
+        const filterData: any = {};
+        selectedFilters.forEach((filter: any) => {
+          filterData[filter.key] = filter.value;
+        });
+        dispatch(
+          fetchSites({
+            searchParam: event.target.value,
+            filter: filterData,
+          }),
+        );
+      } else {
+        dispatch(fetchSites({ searchParam: event.target.value }));
+      }
       dispatch(updateSearchQuery(event.target.value));
     } else {
       dispatch(resetSites(null));
@@ -189,8 +208,6 @@ const Search = () => {
       dispatch(addCartItem(cartItems)).unwrap();
     }
   };
-
-  const [selectedRows, SetSelectedRows] = useState<any[]>([]);
 
   const changeHandler = (event: any) => {
     if (event && event.property === 'select_row') {
@@ -232,20 +249,11 @@ const Search = () => {
     }
   };
 
-  const [showAddToFolio, SetShowAddToFolio] = useState(false);
-
   const handleExport = () => {
     if (selectedRows.length > 0) {
       downloadCSV(selectedRows);
     }
   };
-
-  const [selectedFilters, setSelectedFilters] = useState<
-    { key: string; value: string; label: string }[]
-  >([]);
-  const [formData, setFormData] = useState<{
-    [key: string]: any | [Date, Date];
-  }>({});
 
   const handleInputChange = (key: string, value: any) => {
     setFormData((prevData) => ({

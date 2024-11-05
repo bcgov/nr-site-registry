@@ -87,14 +87,7 @@ frontend:
     #-- the type of the service. it can be ClusterIP, NodePort, LoadBalancer, ExternalName. ClusterIP is the default and is recommended.
     type: ClusterIP
     #-- the ports for the service.
-    ports:
-      - name: http
-        #-- the port for the service. the service will be accessible on this port within the namespace.
-        port: 80
-        #-- the container port where the application is listening on
-        targetPort: 3000
-        #-- the protocol for the port. it can be TCP or UDP. TCP is the default and is recommended.
-        protocol: TCP
+    targetPort: 8080
   ingress:
     annotations:
       route.openshift.io/termination: "edge"

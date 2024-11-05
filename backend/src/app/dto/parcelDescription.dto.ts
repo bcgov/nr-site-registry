@@ -8,11 +8,17 @@ export class ParcelDescriptionsResponse extends PagedResponseDto {
   data: ParcelDescriptionDto[] | null;
 }
 
+export type DescriptionTypeValue =
+  | 'Parcel ID'
+  | 'Crown Land PIN'
+  | 'Crown Land File Number'
+  | 'Unknown';
+
 @ObjectType()
 export class ParcelDescriptionDto {
   constructor(
     id: number | null,
-    descriptionType: string | null,
+    descriptionType: DescriptionTypeValue | null,
     idPinNumber: string | null,
     dateNoted: Date | null,
     landDescription: string | null,
@@ -33,7 +39,7 @@ export class ParcelDescriptionDto {
 
   @Field()
   @IsString()
-  descriptionType: string;
+  descriptionType: DescriptionTypeValue;
 
   @Field()
   @IsString()

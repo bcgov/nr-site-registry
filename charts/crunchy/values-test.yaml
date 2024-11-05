@@ -1,0 +1,23 @@
+# Only ovverride values-test.yaml if the environment is TEST with the following values as a delta:
+crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single postgres
+  instances:
+    dataVolumeClaimSpec:
+      storage: 600Mi
+      storageClassName: netapp-block-standard
+      walStorage: 350Mi
+
+  pgBackRest:
+    clusterCounter: 2 # for some reason 1, did not work, putting it to 2 worked, so updating it in pipelines.
+    backupPath: /backups/test/cluster/version # change it for PROD, create values-prod.yaml
+    s3:
+      enabled: true
+      retention: 7 # one weeks backup in object store for test environment
+      bucket: nrsitetst
+      endpoint: nrs.objectstore.gov.bc.ca
+      accessKey: ~
+      secretKey: ~
+      fullBackupSchedule: 0 9 * * * # full backup at GMT 9
+      incrementalBackupSchedule: 0 0/8 * * * # every hour
+    pvc:
+      volume:
+        storage: 1024Mi

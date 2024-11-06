@@ -628,8 +628,10 @@ export class SiteService {
                   changes: {
                     ...existingDocument,
                     ...siteDocument,
-                    userAction: UserActionEnum.UPDATED,
-                    srAction: SRApprovalStatusEnum.PENDING,
+                    userAction: document.srAction === SRApprovalStatusEnum.PUBLIC ||
+                    document.srAction === SRApprovalStatusEnum.PRIVATE
+                      ? UserActionEnum.DEFAULT
+                      : UserActionEnum.UPDATED,                   
                     whenUpdated: new Date(),
                     whoUpdated: userInfo ? userInfo.givenName : '',
                   },
@@ -646,8 +648,10 @@ export class SiteService {
                     changes: {
                       ...existingDocumentParticipant,
                       ...siteDocumentParticipant,
-                      userAction: UserActionEnum.UPDATED,
-                      srAction: SRApprovalStatusEnum.PENDING,
+                      userAction: document.srAction === SRApprovalStatusEnum.PUBLIC ||
+                      document.srAction === SRApprovalStatusEnum.PRIVATE
+                        ? UserActionEnum.DEFAULT
+                        : UserActionEnum.UPDATED,                     
                       whenUpdated: new Date(),
                       whoUpdated: userInfo ? userInfo.givenName : '',
                     },

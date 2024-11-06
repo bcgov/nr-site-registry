@@ -42,7 +42,9 @@ import {
   formatDate,
   formatDateWithNoTimzoneName,
   getUser,
+  isUserOfType,
   showNotification,
+  UserRoleType,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import { fetchSiteParticipants } from './participants/ParticipantSlice';
@@ -103,6 +105,10 @@ const SiteDetails = () => {
     SetNavComponents(getNavComponents());
     SetNavItems(getNavItems());
     SetDropDownNavItems(getDropDownNavItems());
+
+    if (isUserOfType(UserRoleType.CLIENT)) {
+      dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
+    }
   }, [auth.user]);
 
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
@@ -240,7 +246,6 @@ const SiteDetails = () => {
       // not logged in
       setUserType(UserType.External);
     }
-    dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
   }, [loggedInUser]);
 
   const savedChanges = useSelector(trackedChanges);
@@ -250,9 +255,9 @@ const SiteDetails = () => {
     setViewMode(mode);
   }, [mode]);
 
-  useEffect(()=>{
-    dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode))
-  },[])
+  useEffect(() => {
+    dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+  }, []);
 
   // NEEDS TO FETCH DATA BASED ON CONDITION WHEATHER IT IS EXTERNAL USER OR INTERNAL USER
   // BY DOING THIS WE CAN STOP UNNECCESSARY CALL TO DATABASE
@@ -701,7 +706,9 @@ const SiteDetails = () => {
           components={navComponents}
           dropdownItems={dropDownNavItems}
           isDisable={
-            UserType.External === userType && snapshot.snapshot.data === null
+            getUser() === null ||
+            (UserType.External === userType &&
+              snapshot?.snapshot?.data === null)
           }
         />
       </PageContainer>

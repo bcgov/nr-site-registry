@@ -1283,7 +1283,7 @@ export type Sites = {
   sitePartics: Array<SitePartics>;
   siteProfiles: Array<SiteProfiles>;
   siteRiskCode: Scalars['String']['output'];
-  siteRiskCode2?: Maybe<SiteRiskCd>;
+  siteRiskCode2: SiteRiskCd;
   siteSubdivisions: SiteSubdivisions;
   srAction: Scalars['String']['output'];
   srStatus: Scalars['String']['output'];

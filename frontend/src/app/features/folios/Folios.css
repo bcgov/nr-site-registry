@@ -20,7 +20,6 @@
     var(--layout-padding-small) var(--layout-padding-medium);
   gap: var(--layout-margin-small);
   border-radius: var(--layout-border-width-medium);
-  opacity: 0px;
   background: var(--surface-primary-default, #053662);
   display: flex;
   justify-content: center;
@@ -36,7 +35,6 @@
     var(--layout-padding-small) var(--layout-padding-medium);
   gap: var(--layout-margin-small);
   border-radius: var(--layout-border-width-medium);
-  opacity: 0px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -44,20 +42,17 @@
 }
 
 @media (max-width: 576px) {
-
   .folio-actions {
     display: flex;
-    flex-direction: column;    
+    flex-direction: column;
   }
 
   .folio-add-new {
     display: flex;
-    flex-direction: column;    
+    flex-direction: column;
   }
 
-  .folio-edit-btn
-  {
+  .folio-edit-btn {
     width: 100%;
   }
 }
-

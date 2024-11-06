@@ -180,6 +180,7 @@ const UserAccount = (props: any) => {
                 onClick={() => {
                   auth.removeUser().then(() => {
                     window.location.href = authRedirectUri;
+                    localStorage.removeItem('siteFilterPills');
                   });
                 }}
               >

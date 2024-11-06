@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { ChangeAuditEntityDTO } from './changeAuditEntity.dto';
-import { DescriptionTypeValue } from './parcelDescription.dto';
+import { ParcelDescriptionTypeValue } from './parcelDescription.dto';
 
 @InputType()
 export class ParcelDescriptionInputDTO extends ChangeAuditEntityDTO {
@@ -8,7 +8,7 @@ export class ParcelDescriptionInputDTO extends ChangeAuditEntityDTO {
   id: string;
 
   @Field()
-  descriptionType: DescriptionTypeValue;
+  descriptionType: ParcelDescriptionTypeValue;
 
   @Field()
   idPinNumber: string | null;

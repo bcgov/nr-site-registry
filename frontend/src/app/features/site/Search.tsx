@@ -34,12 +34,19 @@ import { TableColumn } from '../../components/table/TableColumn';
 import { getSiteSearchResultsColumns } from './dto/Columns';
 import SiteFilterForm from './filters/SiteFilterForm';
 import PageContainer from '../../components/simple/PageContainer';
-import { getUser, isUserOfType, UserRoleType } from '../../helpers/utility';
+import {
+  flattenFormRows,
+  formatDateRange,
+  getUser,
+  isUserOfType,
+  UserRoleType,
+} from '../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import AddToFolio from '../folios/AddToFolio';
 import { downloadCSV } from '../../helpers/csvExport/csvExport';
-import { UserType } from '../../helpers/requests/userType';
+import FilterPills from './filters/FilterPills';
+import { formRows } from './dto/SiteFilterConfig';
 
 const Search = () => {
   const auth = useAuth();
@@ -59,6 +66,14 @@ const Search = () => {
     ...columns,
   ]);
   const [showMobileTableMenu, SetShowMobileTableMenu] = useState(false);
+  const [selectedRows, SetSelectedRows] = useState<any[]>([]);
+  const [showAddToFolio, SetShowAddToFolio] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState<
+    { key: string; value: string; label: string }[]
+  >([]);
+  const [formData, setFormData] = useState<{
+    [key: string]: any | [Date, Date];
+  }>({});
 
   const toggleColumnSelectionForDisplay = (column: TableColumn) => {
     const index = columnsToDisplay.findIndex((item) => item.id === column.id);
@@ -74,9 +89,8 @@ const Search = () => {
   };
 
   useEffect(() => {
-    if(currSearchVal.searchQuery !== "")
-    {
-      dispatch(     
+    if (currSearchVal.searchQuery !== '') {
+      dispatch(
         fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
       );
     }
@@ -102,8 +116,6 @@ const Search = () => {
     SetDisplayFilters(false);
   };
 
-  useEffect(() => {}, []);
-
   const search = (value: any) => {
     return sites;
   };
@@ -122,7 +134,7 @@ const Search = () => {
     );
   };
 
-  useEffect(() => {    
+  useEffect(() => {
     if (currSearchVal.searchQuery !== '') {
       setUserAction(false);
       setSearchText(currSearchVal.searchQuery);
@@ -146,7 +158,20 @@ const Search = () => {
     setSearchText(event.target.value);
     if (event.target.value.length >= 3) {
       dispatch(setFetchLoadingState(null));
-      dispatch(fetchSites({ searchParam: event.target.value }));
+      if (selectedFilters) {
+        const filterData: any = {};
+        selectedFilters.forEach((filter: any) => {
+          filterData[filter.key] = filter.value;
+        });
+        dispatch(
+          fetchSites({
+            searchParam: event.target.value,
+            filter: filterData,
+          }),
+        );
+      } else {
+        dispatch(fetchSites({ searchParam: event.target.value }));
+      }
       dispatch(updateSearchQuery(event.target.value));
     } else {
       dispatch(resetSites(null));
@@ -183,8 +208,6 @@ const Search = () => {
       dispatch(addCartItem(cartItems)).unwrap();
     }
   };
-
-  const [selectedRows, SetSelectedRows] = useState<any[]>([]);
 
   const changeHandler = (event: any) => {
     if (event && event.property === 'select_row') {
@@ -226,12 +249,88 @@ const Search = () => {
     }
   };
 
-  const [showAddToFolio, SetShowAddToFolio] = useState(false);
-
   const handleExport = () => {
     if (selectedRows.length > 0) {
       downloadCSV(selectedRows);
     }
+  };
+
+  const handleInputChange = (key: string, value: any) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [key]: value,
+    }));
+  };
+
+  const handleFormSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const filteredFormData: { [key: string]: string } = {};
+    const filters: { key: string; value: string; label: string }[] = [];
+    const flattedArr = flattenFormRows(formRows);
+    // Filter out form data with non-empty values and construct filteredFormData and filters
+    for (const [key, value] of Object.entries(formData)) {
+      let currLabel =
+        flattedArr && flattedArr.find((row) => row.graphQLPropertyName === key);
+      if (key === 'whenCreated' || key === 'whenUpdated') {
+        let dateRangeValue = formatDateRange(value);
+        filteredFormData[key] = value;
+        filters.push({
+          key,
+          value: dateRangeValue,
+          label: currLabel?.label ?? '',
+        });
+      } else if (value.trim() !== '') {
+        filteredFormData[key] = value;
+        filters.push({ key, value, label: currLabel?.label ?? '' });
+      }
+    }
+
+    // show and format pill.
+    if (filters.length !== 0) {
+      dispatch(
+        fetchSites({
+          searchParam: currSearchVal.searchQuery,
+          filter: filteredFormData,
+        }),
+      );
+      setSelectedFilters(filters);
+
+      // Save filter selections to local storage
+      localStorage.setItem('siteFilterPills', JSON.stringify(filters));
+    }
+  };
+
+  const handleReset = () => {
+    setFormData({});
+    setSelectedFilters([]);
+    localStorage.removeItem('siteFilterPills');
+  };
+
+  useEffect(() => {
+    const storedFilters = localStorage.getItem('siteFilterPills');
+    if (storedFilters) {
+      const parsedFilters = JSON.parse(storedFilters);
+      const initialFormData: any = {};
+      parsedFilters.forEach((filter: any) => {
+        initialFormData[filter.key] = filter.value;
+      });
+      setFormData(initialFormData);
+      setSelectedFilters(parsedFilters);
+    }
+  }, []);
+
+  const handleRemoveFilter = (filter: any) => {
+    setFormData((prevData) => {
+      const newData = { ...prevData };
+      delete newData[filter.key]; // Remove the filter key from the form data
+      dispatch(
+        fetchSites({ searchParam: currSearchVal.searchQuery, filter: newData }),
+      );
+      return newData;
+    });
+    let currFilter = selectedFilters.filter((item) => item.key !== filter.key);
+    setSelectedFilters(currFilter);
+    localStorage.setItem('siteFilterPills', JSON.stringify(currFilter));
   };
 
   return (
@@ -376,7 +475,13 @@ const Search = () => {
               </button>
             </div>
             {displayFilters && (
-              <SiteFilterForm cancelSearchFilter={cancelSearchFilter} />
+              <SiteFilterForm
+                formData={formData}
+                onInputChange={handleInputChange}
+                onSubmit={handleFormSubmit}
+                onReset={handleReset}
+                cancelSearchFilter={cancelSearchFilter}
+              />
             )}
             {displayColumn ? (
               <div>
@@ -392,29 +497,33 @@ const Search = () => {
               </div>
             ) : null}
             <div className="search-result-actions">
-              {!isUserOfType(UserRoleType.INTERNAL) && <div
-                className="search-result-actions-btn"
-                onClick={() => handleAddToShoppingCart()}
-              >
-                <ShoppingCartIcon />
-                <span>Add Selected To Cart</span>
-              </div>}
-              {!isUserOfType(UserRoleType.INTERNAL) && <div
-                className="search-result-actions-btn"
-                onClick={() => {
-                  let loggedInUser = getUser();
-                  if (loggedInUser === null) {
-                    auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
-                  }
-                  else
-                  {
-                    SetShowAddToFolio(!showAddToFolio);
-                  }                 
-                }}
-              >
-                <FolderPlusIcon />
-                <span>Add Selected To Folio</span>
-              </div>}
+              {!isUserOfType(UserRoleType.INTERNAL) && (
+                <div
+                  className={`search-result-actions-btn ${selectedRows.length === 0 ? 'disabled-btn' : 'search-result-actions-btn-highlight'}`}
+                  onClick={() => handleAddToShoppingCart()}
+                >
+                  <ShoppingCartIcon />
+                  <span>Add Selected To Cart</span>
+                </div>
+              )}
+              {!isUserOfType(UserRoleType.INTERNAL) && (
+                <div
+                  className={`search-result-actions-btn ${selectedRows.length === 0 ? 'disabled-btn' : 'search-result-actions-btn-highlight'}`}
+                  onClick={() => {
+                    let loggedInUser = getUser();
+                    if (loggedInUser === null) {
+                      auth.signinRedirect({
+                        extraQueryParams: { kc_idp_hint: 'bceid' },
+                      });
+                    } else {
+                      SetShowAddToFolio(!showAddToFolio);
+                    }
+                  }}
+                >
+                  <FolderPlusIcon />
+                  <span>Add Selected To Folio</span>
+                </div>
+              )}
               {showAddToFolio && (
                 <AddToFolio
                   className="pos-absolute-search"
@@ -422,12 +531,21 @@ const Search = () => {
                 />
               )}
 
-              <div className="search-result-actions-btn" onClick={handleExport}>
+              <div
+                className={`search-result-actions-btn ${selectedRows.length === 0 ? 'disabled-btn' : 'search-result-actions-btn-highlight'}`}
+                onClick={handleExport}
+              >
                 <FileExportIcon />
                 <span>Export Results As File</span>
               </div>
             </div>
           </div>
+          <FilterPills
+            filters={selectedFilters}
+            onRemoveFilter={(filter) => {
+              handleRemoveFilter(filter);
+            }}
+          />
           <div>
             <div className="" aria-label="Search results">
               <SearchResults

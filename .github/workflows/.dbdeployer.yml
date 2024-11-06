@@ -110,45 +110,6 @@ jobs:
         shell: bash
         if: github.event_name == 'pull_request'
         run: |
-            echo 'Adding PR specific user to Crunchy DB'
-            password=$(openssl rand -base64 20 | tr -dc 'A-Za-z0-9!$#')
-            NEW_USER='{"databases":["site-${{ github.event.number }}"],"name":"site-${{ github.event.number }}"}'
-            CURRENT_USERS=$(oc get PostgresCluster/postgres-crunchy -o json | jq '.spec.users')
-            echo "${CURRENT_USERS}"
-
-            # check if current_users already contains the new_user
-            if echo "${CURRENT_USERS}" | jq -e ".[] | select(.name == \"site-${{ github.event.number }}\")" > /dev/null; then
-              echo "User already exists"
-              exit 0
-            fi
-            # check if seed is disabled in config of helm values inside charts/app/values file, global.config.seed.enabled=false, if so, then create db from site as template, using yq, since it is yaml file.
-            IS_SEED_ENABLED=$(yq eval '.global.config.seed.enabled' charts/app/${{ inputs.app_values }})
-            if [ $IS_SEED_ENABLED == "false" ]; then
-              echo "Seed is disabled, creating db from site database as template"
-              # get primary crunchy pod and add the role and db
-              CRUNCHY_PG_PRIMARY_POD_NAME=$(oc get pods -l postgres-operator.crunchydata.com/role=master -o json | jq -r '.items[0].metadata.name')
-              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -c "CREATE ROLE \"site-${{ github.event.number }}\" WITH CREATEDB CREATEROLE LOGIN PASSWORD '$password';"
-              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -c "CREATE DATABASE \"site-${{ github.event.number }}\" TEMPLATE site OWNER \"site-${{ github.event.number }}\";"
-              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -c "GRANT ALL PRIVILEGES ON DATABASE \"site-${{ github.event.number }}\" TO \"site-${{ github.event.number }}\";"
-              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -d "site-${{ github.event.number }}" -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'sites') LOOP EXECUTE 'GRANT ALL PRIVILEGES ON TABLE sites.' || quote_ident(r.tablename) || ' TO \"site-${{ github.event.number }}\"'; END LOOP; END \$\$;"
-              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -d "site-${{ github.event.number }}" -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema = 'sites') LOOP EXECUTE 'GRANT ALL PRIVILEGES ON SEQUENCE sites.' || quote_ident(r.sequence_name) || ' TO \"site-${{ github.event.number }}\"'; END LOOP; END \$\$;"
-              oc exec "${CRUNCHY_PG_PRIMARY_POD_NAME}" -- psql -d "site-${{ github.event.number }}" -c "DO \$\$ DECLARE r RECORD; BEGIN FOR r IN (SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'sites') LOOP EXECUTE 'GRANT ALL PRIVILEGES ON FUNCTION sites.' || quote_ident(r.routine_name) || ' TO \"site-${{ github.event.number }}\"'; END LOOP; END \$\$;"
-            fi
-            UPDATED_USERS=$(echo "$CURRENT_USERS" | jq --argjson NEW_USER "$NEW_USER" '. + [$NEW_USER]')
-            echo "$UPDATED_USERS"
-            PATCH_JSON=$(jq -n --argjson users "$UPDATED_USERS" '{"spec": {"users": $users}}')
-            echo "$PATCH_JSON"
-            oc patch PostgresCluster/postgres-crunchy --type=merge -p "${PATCH_JSON}"
-
-            # wait for sometime as it takes time to create the user, query the secret and check if it is created, otherwise wait in a loop for 10 rounds
-            for i in {1..10}; do
-            if oc get secret postgres-crunchy-pguser-site-${{ github.event.number }} -o jsonpath='{.metadata.name}' > /dev/null; then
-                echo "Secret created"
-                break
-            else
-                echo "Secret not created, waiting for 60 seconds"
-                sleep 60
-            fi
-            done
+            # echo testing
 
 

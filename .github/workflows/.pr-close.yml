@@ -168,7 +168,7 @@ jobs:
           # If found, then remove
           helm status ${{ env.release }} && helm uninstall --no-hooks ${{ env.release }} || \
             echo "Not found: ${{ env.release }}"
-      
+
       # Cleanup for OpenShift template deployments, uses labels
       - name: Label
         if: inputs.cleanup == 'label'
@@ -186,25 +186,24 @@ jobs:
           echo "${{ inputs.remove_pvc }}" | while IFS= read -r pvc; do
               oc delete pvc ${pvc//,/} || echo "Not found: ${pvc//,/}"
           done
-      
+
       - name: Remove PR user and database from crunchy.
         shell: bash
         run: |
           # check if postgres-crunchy exists or else exit
           oc get PostgresCluster/postgres-crunchy || exit 0
-          DB_USER="site-${{ github.event.number }}"
           # Remove the user from the crunchy cluster yaml and apply the changes
-          USER_TO_REMOVE='{"databases":["${DB_USER}"],"name":"${DB_USER}"}'
+          USER_TO_REMOVE='{"databases":["site-${{ github.event.number }}"],"name":"site-${{ github.event.number }}"}'
           
           echo 'getting current users from crunchy'
           CURRENT_USERS=$(oc get PostgresCluster/postgres-crunchy -o json | jq '.spec.users')
           echo "${CURRENT_USERS}"
           
           # Remove the user from the list, 
-          UPDATED_USERS=$(echo "${CURRENT_USERS}" | jq --argjson user "${USER_TO_REMOVE}" 'map(select(. != $user))')
+          UPDATED_USERS=$(echo "$CURRENT_USERS" | jq --argjson user "$USER_TO_REMOVE" 'map(select(. != $user))')
 
-          PATCH_JSON=$(jq -n --argjson users "${UPDATED_USERS}" '{"spec": {"users": $users}}')
-          oc patch PostgresCluster/postgres-crunchy --type=merge -p "${PATCH_JSON}"
+          PATCH_JSON=$(jq -n --argjson users "$UPDATED_USERS" '{"spec": {"users": $users}}')
+          oc patch PostgresCluster/postgres-crunchy --type=merge -p "$PATCH_JSON"
           
           # get primary crunchy pod and remove the role and db
           CRUNCHY_PG_PRIMARY_POD_NAME=$(oc get pods -l postgres-operator.crunchydata.com/role=master -o json | jq -r '.items[0].metadata.name')

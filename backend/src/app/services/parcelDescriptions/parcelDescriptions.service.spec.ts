@@ -1,4 +1,4 @@
-import { EntityManager } from 'typeorm';
+import { EntityManager, InsertResult, Repository } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ParcelDescriptionsService } from './parcelDescriptions.service';
 import {
@@ -8,7 +8,13 @@ import {
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { LoggerService } from '../../logger/logger.service';
 import { ParcelDescriptionInputDTO } from '../../dto/parcelDescriptionInput.dto';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Subdivisions } from '../../entities/subdivisions.entity';
+import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
+import { ParcelDescriptionType } from '../../dto/parcelDescription.dto';
+import { BadRequestException } from '@nestjs/common';
 
+jest.useFakeTimers();
 jest.mock('./parcelDescriptions.queryBuilder');
 
 describe('SiteSubdivisionsService', () => {
@@ -16,6 +22,8 @@ describe('SiteSubdivisionsService', () => {
   let entityManager: EntityManager;
   let snapshotsService: SnapshotsService;
   let loggerService: LoggerService;
+  let subdivisionsRepository: Repository<Subdivisions>;
+  let siteSubdivisionsRepository: Repository<SiteSubdivisions>;
 
   let logMock: jest.Mock;
   let debugMock: jest.Mock;
@@ -30,6 +38,14 @@ describe('SiteSubdivisionsService', () => {
           useValue: {
             query: jest.fn(),
           },
+        },
+        {
+          provide: getRepositoryToken(Subdivisions),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(SiteSubdivisions),
+          useClass: Repository,
         },
         {
           provide: SnapshotsService,
@@ -52,6 +68,12 @@ describe('SiteSubdivisionsService', () => {
       ParcelDescriptionsService,
     );
     entityManager = testingModule.get<EntityManager>(EntityManager);
+    subdivisionsRepository = testingModule.get<Repository<Subdivisions>>(
+      getRepositoryToken(Subdivisions),
+    );
+    siteSubdivisionsRepository = testingModule.get<
+      Repository<SiteSubdivisions>
+    >(getRepositoryToken(SiteSubdivisions));
     snapshotsService = testingModule.get<SnapshotsService>(SnapshotsService);
     loggerService = testingModule.get<LoggerService>(LoggerService);
 
@@ -529,7 +551,7 @@ describe('SiteSubdivisionsService', () => {
 
       parcelDescriptionToUpdate = {
         id: idForUpdatedParcelDescription,
-        descriptionType: 'Crown Land PIN',
+        descriptionType: ParcelDescriptionType.CrownLandPIN,
         idPinNumber: '123456',
         dateNoted: new Date(),
         landDescription: 'should be ignored',
@@ -539,7 +561,7 @@ describe('SiteSubdivisionsService', () => {
       };
       parcelDescriptionToAdd = {
         id: idForAddedParcelDescription,
-        descriptionType: 'Crown Land PIN',
+        descriptionType: ParcelDescriptionType.CrownLandPIN,
         idPinNumber: '654321',
         dateNoted: new Date(),
         landDescription: 'should be ignored',
@@ -549,7 +571,7 @@ describe('SiteSubdivisionsService', () => {
       };
       parcelDescriptionToDelete = {
         id: idForDeletedParcelDescription,
-        descriptionType: 'Crown Land PIN',
+        descriptionType: ParcelDescriptionType.CrownLandPIN,
         idPinNumber: '162534',
         dateNoted: new Date(),
         landDescription: 'should be ignored',
@@ -706,6 +728,228 @@ describe('SiteSubdivisionsService', () => {
         );
 
         expect(deleteParcelDescriptionsForSiteMock).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('addParcelDescriptionsForSite', () => {
+    let today: Date;
+
+    let siteId: string;
+    let inputParcelDescriptions: ParcelDescriptionInputDTO[];
+    let userInfo: any;
+
+    let subdivId: string;
+    let siteSubdivId: string;
+
+    let addedSubdivision: any;
+    let addedSiteSubdivision: any;
+
+    let subdivisionInsertResult: InsertResult;
+    let siteSubdivisionInsertResult: InsertResult;
+
+    let subdivisionCreateQueryBuilderMock: jest.Mock;
+    let subdivisionInsertMock: jest.Mock;
+    let subdivisionIntoMock: jest.Mock;
+    let subdivisionValuesMock: jest.Mock;
+    let subdivisionReturningMock: jest.Mock;
+    let subdivisionExecuteMock: jest.Mock;
+
+    let siteSubdivisionInsertMock: jest.Mock;
+
+    beforeEach(() => {
+      today = new Date();
+
+      siteId = '10';
+      inputParcelDescriptions = [
+        {
+          id: '1',
+          descriptionType: ParcelDescriptionType.CrownLandPIN,
+          idPinNumber: '123456',
+          dateNoted: today,
+          landDescription: 'should be ignored',
+          srAction: 'pending',
+          userAction: 'pending',
+          apiAction: 'added',
+        },
+      ];
+      userInfo = { givenName: 'test' };
+
+      subdivId = '1';
+      siteSubdivId = '100';
+
+      addedSubdivision = {
+        srAction: 'pending',
+        userAction: 'pending',
+        dateNoted: today,
+        pin: '123456',
+        pid: null,
+        whoCreated: 'test',
+        whoUpdated: 'test',
+        crownLandsFileNo: null,
+        pidStatusCd: 'N',
+      };
+      addedSiteSubdivision = {
+        srAction: 'pending',
+        userAction: 'pending',
+        siteId: siteId,
+        subdivId: subdivId,
+        dateNoted: today,
+        initialIndicator: 'N',
+        whoCreated: 'test',
+        whoUpdated: 'test',
+        sendToSr: 'Y',
+      };
+
+      // The main point of these returns is to get the properties from the
+      // inserted objects.
+      subdivisionInsertResult = {
+        identifiers: [], // Value is disregarded.
+        generatedMaps: [{ id: subdivId, ...addedSubdivision }],
+        raw: {}, // Value is disregarded.
+      };
+      siteSubdivisionInsertResult = {
+        identifiers: [], // Value is disregarded.
+        generatedMaps: [
+          { siteSubdivId: siteSubdivId, ...addedSiteSubdivision },
+        ],
+        raw: {}, // Value is disregarded.
+      };
+
+      subdivisionInsertMock = jest.fn().mockReturnThis();
+      subdivisionIntoMock = jest.fn().mockReturnThis();
+      subdivisionValuesMock = jest.fn().mockReturnThis();
+      subdivisionReturningMock = jest.fn().mockReturnThis();
+      subdivisionExecuteMock = jest
+        .fn()
+        .mockResolvedValue(subdivisionInsertResult);
+      subdivisionCreateQueryBuilderMock = jest.fn().mockImplementation(() => {
+        return {
+          insert: subdivisionInsertMock,
+          into: subdivisionIntoMock,
+          values: subdivisionValuesMock,
+          returning: subdivisionReturningMock,
+          execute: subdivisionExecuteMock,
+        };
+      });
+
+      siteSubdivisionInsertMock = jest
+        .fn()
+        .mockResolvedValue(siteSubdivisionInsertResult);
+
+      subdivisionsRepository.createQueryBuilder =
+        subdivisionCreateQueryBuilderMock;
+      siteSubdivisionsRepository.insert = siteSubdivisionInsertMock;
+    });
+
+    it('logs the call to addParcelDescriptionsForSite', async () => {
+      await parcelDescriptionsService.addParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+        userInfo,
+      );
+
+      expect(logMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.addParcelDescriptionsForSite() start',
+      );
+      expect(debugMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.addParcelDescriptionsForSite() start',
+      );
+      expect(logMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.addParcelDescriptionsForSite() end',
+      );
+      expect(debugMock).toHaveBeenCalledWith(
+        'parcelDescriptionService.addParcelDescriptionsForSite() end',
+      );
+    });
+
+    it('inserts the expected subdivision into the database', async () => {
+      await parcelDescriptionsService.addParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+        userInfo,
+      );
+      expect(subdivisionCreateQueryBuilderMock).toHaveBeenCalled();
+      expect(subdivisionInsertMock).toHaveBeenCalled();
+      expect(subdivisionIntoMock).toHaveBeenCalledWith(Subdivisions);
+      expect(subdivisionValuesMock).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining(addedSubdivision)]),
+      );
+      expect(subdivisionReturningMock).toHaveBeenCalledWith('*');
+      expect(subdivisionExecuteMock).toHaveBeenCalled();
+    });
+    it('inserts the expected site subdivision into the database', async () => {
+      await parcelDescriptionsService.addParcelDescriptionsForSite(
+        siteId,
+        inputParcelDescriptions,
+        userInfo,
+      );
+      expect(siteSubdivisionInsertMock).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining(addedSiteSubdivision)]),
+      );
+    });
+
+    describe('when the subdivision fails to insert', () => {
+      beforeEach(() => {
+        subdivisionExecuteMock = jest.fn().mockImplementation(() => {
+          throw new Error('A bad thing happened!');
+        });
+        subdivisionCreateQueryBuilderMock = jest.fn().mockImplementation(() => {
+          return {
+            insert: subdivisionInsertMock,
+            into: subdivisionIntoMock,
+            values: subdivisionValuesMock,
+            returning: subdivisionReturningMock,
+            execute: subdivisionExecuteMock,
+          };
+        });
+      });
+
+      it('logs and throws the error', async () => {
+        expect(async () => {
+          await parcelDescriptionsService.addParcelDescriptionsForSite(
+            siteId,
+            inputParcelDescriptions,
+            userInfo,
+          );
+        }).rejects.toThrow(BadRequestException);
+
+        // Need to wait for the above block to reject before testing the logging
+        // mock.
+        await jest.runAllTimersAsync();
+        expect(errorMock).toHaveBeenCalledTimes(1);
+        expect(errorMock).toHaveBeenCalledWith(
+          'Exception occured in parcelDescriptionService.addParcelDescriptionsForSite() end',
+          expect.anything(),
+        );
+      });
+    });
+
+    describe('when the sitesubdivision fails to insert', () => {
+      beforeEach(() => {
+        siteSubdivisionInsertMock = jest.fn().mockImplementation(() => {
+          throw new Error('A bad thing happened!');
+        });
+        siteSubdivisionsRepository.insert = siteSubdivisionInsertMock;
+      });
+
+      it('logs and throws the error', async () => {
+        expect(async () => {
+          await parcelDescriptionsService.addParcelDescriptionsForSite(
+            siteId,
+            inputParcelDescriptions,
+            userInfo,
+          );
+        }).rejects.toThrow(BadRequestException);
+
+        // Need to wait for the above block to reject before testing the logging
+        // mock.
+        await jest.runAllTimersAsync();
+        expect(errorMock).toHaveBeenCalledTimes(1);
+        expect(errorMock).toHaveBeenCalledWith(
+          'Exception occured in parcelDescriptionService.addParcelDescriptionsForSite() end',
+          expect.anything(),
+        );
       });
     });
   });

@@ -18,9 +18,11 @@ export class SitePendingApprovalDTO {
   whoUpdated: string = '';
   whenUpdated: Date = new Date();
   address: string = '';
+  id: string = ''
 }
 
 export class BulkApproveRejectChangesDTO {
   isApproved: boolean = false;
+  fromSiteDetails: boolean = false;
   sites: SitePendingApprovalDTO[] = [];
 }

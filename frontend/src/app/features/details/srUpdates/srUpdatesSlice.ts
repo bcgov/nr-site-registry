@@ -193,6 +193,7 @@ export const fetchPendingSitesDetailsFprApproval = createAsyncThunk(
           pending: args.showPending,
         },
       });
+      console.log("response.data.data.findSiteBySiteId;",response)
       return response.data.data.findSiteBySiteId;
     } catch (error) {
       throw error;
@@ -271,6 +272,7 @@ const srUpdatesSlice = createSlice({
           const newState = { ...state };
           if(action.payload.httpStatusCode === 200)
           {
+            console.log("new  newState.siteSummaryData",  action.payload.data)
             newState.siteSummaryData = action.payload.data
           }
           else
@@ -443,6 +445,17 @@ export const selectAssociatedSites = (state: any) =>
 export const selectParcelDescriptionData = (state:any) => state.srUpdates.parcelDescriptionData;
 export const updateRequestStatus = (state: any) =>
   state.srUpdates.updateRequestStatus;
+
+export const hasNoPendingUpdates = (state:any) => {
+   console.log("in hasNoPendingUpdates")
+  return (!state.srUpdates.disclosure &&
+(!state.srUpdates.parcelDescriptionData ||state.srUpdates.parcelDescriptionData.data.length === 0) &&
+(!state.srUpdates.landUsesData || state.srUpdates.landUsesData.length === 0) &&
+(! state.srUpdates.siteAssociations ||  state.srUpdates.siteAssociations.length === 0) &&
+(! state.srUpdates.documents ||  state.srUpdates.documents.length === 0) && 
+(! state.srUpdates.siteParticipants ||  state.srUpdates.siteParticipants.length === 0) && 
+(! state.srUpdates.notation ||  state.srUpdates.notation.length === 0) && 
+(!state.srUpdates.siteSummaryData))}
 
 export const { resetAllData, resetRequestStatus } = srUpdatesSlice.actions;
 

@@ -16,7 +16,8 @@ import {
   getSearchParam,
   getTotalRecords,
   selectAllSites,
-  updateStatus,
+  bulkUpdateApproveRejectStatus,
+  resetBulkUpdateStatus,
 } from './state/srUpdatesTableSlice';
 import SRUpdatesTableFilter from './srUpdatesTableFilter';
 import Table from '../../../components/table/Table';
@@ -34,7 +35,7 @@ const SRUpdatesTables = () => {
   const [totalResults, SetTotalResults] = useState(1);
   const reviewPendingSites = useSelector(selectAllSites);
   const totalRecords = useSelector(getTotalRecords);
-  const updateRequestStatus = useSelector(updateStatus);
+  const updateRequestStatus = useSelector(bulkUpdateApproveRejectStatus);
   const searchParamRef = useSelector(getSearchParam);
   const [searchParam, SetSearchParam] = useState(searchParamRef);
   useEffect(() => {
@@ -94,6 +95,7 @@ const SRUpdatesTables = () => {
         bulkAproveRejectChanges({
           sites: selectedRows,
           isApproved: false,
+          fromSiteDetails: false
         }),
       );
     }
@@ -105,6 +107,7 @@ const SRUpdatesTables = () => {
         bulkAproveRejectChanges({
           sites: selectedRows,
           isApproved: true,
+          fromSiteDetails: false
         }),
       );
     }
@@ -129,10 +132,16 @@ const SRUpdatesTables = () => {
   };
 
   useEffect(() => {
+
+    if(updateRequestStatus === RequestStatus.success || updateRequestStatus === RequestStatus.failed)
+    {
+       dispatch(resetBulkUpdateStatus(null));
+    }
+
     showNotification(
       updateRequestStatus,
       'Successfully updated.',
-      'Unable updated',
+      'Failed to update',
     );
 
     dispatch(

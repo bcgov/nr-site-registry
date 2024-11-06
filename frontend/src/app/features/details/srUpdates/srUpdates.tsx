@@ -172,6 +172,7 @@ const SRUpdates = () => {
   const notationTypeDropdownData = useSelector(notationTypeDrpdown);
   const notationClass = useSelector(notationClassDrpdown);
   const { landUseCodes } = useSelector(selectLandUseCodes);
+ 
 
 
   const { id } = useParams();
@@ -366,46 +367,46 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
     }
   }, [updateRequestStatusFromState]);
 
-  useEffect(() => {
-    if (siteId !== '') {
-      dispatch(
-        fetchPendingSitesDetailsFprApproval({ siteId, showPending: true }),
-      );
+  // useEffect(() => {
+  //   if (siteId !== '') {
+  //     dispatch(
+  //       fetchPendingSitesDetailsFprApproval({ siteId, showPending: true }),
+  //     );
 
-      dispatch(fetchPendingSiteNotationBySiteId({ siteId, showPending: true }));
-      dispatch(
-        fetchPendingSiteParticipantsForApproval({ siteId, showPending: true }),
-      );
+  //     dispatch(fetchPendingSiteNotationBySiteId({ siteId, showPending: true }));
+  //     dispatch(
+  //       fetchPendingSiteParticipantsForApproval({ siteId, showPending: true }),
+  //     );
 
-      dispatch(
-        fetchPendingLandUses({
-          siteId,
-          searchTerm: '',
-          sortDirection: 'ASC',
-          showPending: true,
-        }),
-      );
+  //     dispatch(
+  //       fetchPendingLandUses({
+  //         siteId,
+  //         searchTerm: '',
+  //         sortDirection: 'ASC',
+  //         showPending: true,
+  //       }),
+  //     );
 
-      dispatch(fetchPendingDocumentsForApproval({ siteId, showPending: true }));
+  //     dispatch(fetchPendingDocumentsForApproval({ siteId, showPending: true }));
 
-      dispatch(fetchPendingSiteDisclosure({ siteId, showPending: true }));
+  //     dispatch(fetchPendingSiteDisclosure({ siteId, showPending: true }));
 
-      dispatch(fetchPendingAssociatedSites({ siteId, showPending: true }));
+  //     dispatch(fetchPendingAssociatedSites({ siteId, showPending: true }));
 
-      dispatch(fetchLandUseCodes());
+  //     dispatch(fetchLandUseCodes());
 
-      const params: IFetchParcelDescriptionParams = {
-        siteId: parseInt(siteId),
-        page: 1,
-        pageSize: 1000,
-        searchParam: '',
-        sortBy: '',
-        sortByDir: '',
-        showPending: true,
-      };
-      dispatch(fetchParcelDescriptionsForApproval(params));
-    }
-  }, [siteId]);
+  //     const params: IFetchParcelDescriptionParams = {
+  //       siteId: parseInt(siteId),
+  //       page: 1,
+  //       pageSize: 1000,
+  //       searchParam: '',
+  //       sortBy: '',
+  //       sortByDir: '',
+  //       showPending: true,
+  //     };
+  //     dispatch(fetchParcelDescriptionsForApproval(params));
+  //   }
+  // }, [siteId]);
 
   const handleChange = (event: any) => {
     console.log('No Change Hanlder Required Here', event);

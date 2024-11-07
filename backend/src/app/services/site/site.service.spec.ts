@@ -636,6 +636,7 @@ describe('SiteService', () => {
       it('Bulk Approve/Reject ', async () => {
         const inputDTO: BulkApproveRejectChangesDTO = {
           isApproved: true,
+          fromSiteDetails: false,
           sites: [
             {
               id: '1',
@@ -683,6 +684,7 @@ describe('SiteService', () => {
           entityManager,
           site,
           true,
+          false,
           userInfo,
         );
 

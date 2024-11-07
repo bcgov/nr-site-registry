@@ -1,92 +1,126 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import SearchInput from '../../components/search/SearchInput';
-import { useDispatch, useSelector } from 'react-redux';
+import { FolderPlusIcon } from '../../components/common/icon';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
 import {
-  addSiteToFolio,
-  addSiteToFolioRequest,
-  fetchFolioItems,
-  folioItems,
-} from './redux/FolioSlice';
-import { getUser, showNotification } from '../../helpers/utility';
-import { AppDispatch } from '../../Store';
+  useFolio_GetFolioItemsForUserLazyQuery,
+  useFolio_AddSiteToFolioMutation,
+} from '../../../graphql/generated';
+import { notifyError, notifySuccess } from '../../components/alert/Alert';
+import { getUser } from '../../helpers/utility';
+import { useAuth } from 'react-oidc-context';
+import { Placement } from 'react-bootstrap/esm/types';
+import clsx from 'clsx';
 
-interface ColumnProps {
-  className: string;
-  selectedRows: any[];
+interface AddToFolioProps {
+  label?: string;
+  disabled?: boolean;
+  selectedSiteIds: string[];
+  popupPlacement?: Placement;
+  triggerClassName?: string;
 }
 
-const AddToFolio: FC<ColumnProps> = ({ className, selectedRows }) => {
-  const [folioSearchTerm, SetFolioSearchTeam] = useState('');
-  const folioDetails = useSelector(folioItems);
+const AddToFolio: FC<AddToFolioProps> = ({
+  label,
+  disabled = false,
+  selectedSiteIds,
+  popupPlacement = 'bottom-start',
+  triggerClassName,
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const loggedInUser = getUser();
-  const dispatch = useDispatch<AppDispatch>();
+  const auth = useAuth();
 
-  const addSiteToFolioRequestStatus = useSelector(addSiteToFolioRequest);
+  const [getFolioItems, { loading, data }] =
+    useFolio_GetFolioItemsForUserLazyQuery();
 
-  const handleFolioSelect = (folioId: string) => {
-    let selectedFolio = folioDetails.filter(
-      (x: any) => x.folioId === folioId,
-    )[0];
+  const [addSiteToFolio] = useFolio_AddSiteToFolioMutation({
+    onCompleted: () => notifySuccess('Successfully added site to folio'),
+    onError: () => notifyError('Unable to add to folio'),
+  });
 
-    if (selectedRows.length === 0) {
-      alert('Please select one or more sites to be added to folio');
-      return;
+  const checkUserAuthentication = () => {
+    const loggedInUser = getUser();
+    if (loggedInUser === null) {
+      auth.signinRedirect({
+        extraQueryParams: { kc_idp_hint: 'bceid' },
+      });
+      return false;
     }
 
-    let rows = selectedRows.map((row) => {
-      return {
-        siteId: row.id,
-        folioId: selectedFolio.id + '',
-        id: parseInt(selectedFolio.id),
-        whoCreated: loggedInUser?.profile.given_name ?? '',
-        userId: loggedInUser?.profile.sub ?? '',
-      };
-    });
-
-    dispatch(addSiteToFolio(rows)).unwrap();
+    return true;
   };
 
-  useEffect(() => {
-    dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
-  }, []);
+  const folioItems =
+    data?.getFolioItemsForUser.data?.filter((folio) => {
+      const regex = new RegExp(searchTerm, 'i');
+      return regex.test(folio.folioId);
+    }) || [];
 
-  useEffect(() => {
-    showNotification(
-      addSiteToFolioRequestStatus,
-      'Successfully added site to folio',
-      'Unable to add to folio',
-    );
-  }, [addSiteToFolioRequestStatus]);
+  const searchOptions = folioItems.map((folio) => {
+    return {
+      label: folio.folioId,
+      value: folio.id,
+    };
+  });
+
+  const handleFolioSelect = (selectedFolio: (typeof searchOptions)[number]) => {
+    addSiteToFolio({
+      variables: {
+        addSiteToFolioDTO: selectedSiteIds.map((siteId) => {
+          return {
+            id: selectedFolio.value,
+            siteId,
+          };
+        }),
+      },
+    });
+  };
 
   return (
-    <div className={className}>
-      <SearchInput
-        label={'Search Folios'}
-        placeHolderText={'Search Folios'}
-        searchTerm={folioSearchTerm}
-        clearSearch={() => {
-          SetFolioSearchTeam('');
-        }}
-        handleSearchChange={(e) => {
-          if (e.target) {
-            SetFolioSearchTeam(e.target.value);
-          } else {
-            SetFolioSearchTeam(e);
-          }
-        }}
-        options={folioDetails
-          .filter(
-            (y: any) =>
-              y.folioId.toLowerCase().indexOf(folioSearchTerm.toLowerCase()) !==
-              -1,
-          )
-          .map((x: any) => x.folioId)}
-        optionSelectHandler={(value) => {
-          handleFolioSelect(value);
-        }}
-      />
-    </div>
+    <OverlayTrigger
+      trigger="click"
+      placement={popupPlacement}
+      rootClose // closes the popover on outside click
+      transition={false}
+      onToggle={(open) => {
+        if (open && checkUserAuthentication()) {
+          getFolioItems();
+        }
+      }}
+      overlay={
+        <Popover className="folio-popover">
+          <SearchInput
+            loading={loading}
+            label={'Search Folios'}
+            placeHolderText={'Search Folios'}
+            searchTerm={searchTerm}
+            clearSearch={() => {
+              setSearchTerm('');
+            }}
+            handleSearchChange={(e) => {
+              setSearchTerm(e.target.value);
+            }}
+            options={searchOptions}
+            optionSelectHandler={(value) => {
+              handleFolioSelect(value);
+            }}
+          />
+        </Popover>
+      }
+    >
+      <button
+        className={clsx([
+          'search-result-actions-btn',
+          'search-result-actions-btn-highlight',
+          triggerClassName,
+        ])}
+        disabled={disabled}
+      >
+        <FolderPlusIcon />
+        <span>{label}</span>
+      </button>
+    </OverlayTrigger>
   );
 };
 

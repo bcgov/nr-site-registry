@@ -22,6 +22,12 @@ export type Scalars = {
   link__Import: { input: any; output: any; }
 };
 
+export type AddSiteToFolioDto = {
+  /** ID column of Folio, not `folioId` */
+  id: Scalars['Float']['input'];
+  siteId: Scalars['String']['input'];
+};
+
 export type AssociatedSiteDto = {
   __typename?: 'AssociatedSiteDto';
   effectiveDate: Scalars['DateTime']['output'];
@@ -473,7 +479,7 @@ export type MutationAddRecentViewArgs = {
 
 
 export type MutationAddSiteToFolioArgs = {
-  folioDTO: Array<FolioContentDto>;
+  addSiteToFolioDTO: Array<AddSiteToFolioDto>;
 };
 
 
@@ -700,11 +706,6 @@ export type QueryGetBannerTypeArgs = {
 
 
 export type QueryGetCartItemsForUserArgs = {
-  userId: Scalars['String']['input'];
-};
-
-
-export type QueryGetFolioItemsForUserArgs = {
   userId: Scalars['String']['input'];
 };
 
@@ -1330,6 +1331,18 @@ export enum Link__Purpose {
   Security = 'SECURITY'
 }
 
+export type Folio_GetFolioItemsForUserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type Folio_GetFolioItemsForUserQuery = { __typename?: 'Query', getFolioItemsForUser: { __typename?: 'FolioResponse', data?: Array<{ __typename?: 'Folio', id: number, userId: string, folioId: string, description: string, whoCreated: string, whenUpdated?: any | null }> | null } };
+
+export type Folio_AddSiteToFolioMutationVariables = Exact<{
+  addSiteToFolioDTO: Array<AddSiteToFolioDto> | AddSiteToFolioDto;
+}>;
+
+
+export type Folio_AddSiteToFolioMutation = { __typename?: 'Mutation', addSiteToFolio: { __typename?: 'FolioResponse', message?: string | null, httpStatusCode?: number | null, success?: boolean | null } };
+
 export type MapSearchQueryVariables = Exact<{
   searchParam?: InputMaybe<Scalars['String']['input']>;
 }>;
@@ -1345,6 +1358,87 @@ export type MapSearch_FindSiteBySiteIdQueryVariables = Exact<{
 export type MapSearch_FindSiteBySiteIdQuery = { __typename?: 'Query', findSiteBySiteId: { __typename?: 'FetchSiteDetail', data?: { __typename?: 'Sites', id: string, addrLine_1: string, addrLine_2?: string | null, addrLine_3?: string | null, addrLine_4?: string | null, city: string, latDegrees?: number | null, latMinutes?: number | null, latSeconds?: number | null, longDegrees?: number | null, longMinutes?: number | null, longSeconds?: number | null, generalDescription?: string | null, siteRiskCode: string } | null } };
 
 
+export const Folio_GetFolioItemsForUserDocument = gql`
+    query Folio_getFolioItemsForUser {
+  getFolioItemsForUser {
+    data {
+      id
+      userId
+      folioId
+      description
+      whoCreated
+      whenUpdated
+    }
+  }
+}
+    `;
+
+/**
+ * __useFolio_GetFolioItemsForUserQuery__
+ *
+ * To run a query within a React component, call `useFolio_GetFolioItemsForUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFolio_GetFolioItemsForUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFolio_GetFolioItemsForUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useFolio_GetFolioItemsForUserQuery(baseOptions?: Apollo.QueryHookOptions<Folio_GetFolioItemsForUserQuery, Folio_GetFolioItemsForUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<Folio_GetFolioItemsForUserQuery, Folio_GetFolioItemsForUserQueryVariables>(Folio_GetFolioItemsForUserDocument, options);
+      }
+export function useFolio_GetFolioItemsForUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Folio_GetFolioItemsForUserQuery, Folio_GetFolioItemsForUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<Folio_GetFolioItemsForUserQuery, Folio_GetFolioItemsForUserQueryVariables>(Folio_GetFolioItemsForUserDocument, options);
+        }
+export function useFolio_GetFolioItemsForUserSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<Folio_GetFolioItemsForUserQuery, Folio_GetFolioItemsForUserQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<Folio_GetFolioItemsForUserQuery, Folio_GetFolioItemsForUserQueryVariables>(Folio_GetFolioItemsForUserDocument, options);
+        }
+export type Folio_GetFolioItemsForUserQueryHookResult = ReturnType<typeof useFolio_GetFolioItemsForUserQuery>;
+export type Folio_GetFolioItemsForUserLazyQueryHookResult = ReturnType<typeof useFolio_GetFolioItemsForUserLazyQuery>;
+export type Folio_GetFolioItemsForUserSuspenseQueryHookResult = ReturnType<typeof useFolio_GetFolioItemsForUserSuspenseQuery>;
+export type Folio_GetFolioItemsForUserQueryResult = Apollo.QueryResult<Folio_GetFolioItemsForUserQuery, Folio_GetFolioItemsForUserQueryVariables>;
+export const Folio_AddSiteToFolioDocument = gql`
+    mutation Folio_addSiteToFolio($addSiteToFolioDTO: [AddSiteToFolioDTO!]!) {
+  addSiteToFolio(addSiteToFolioDTO: $addSiteToFolioDTO) {
+    message
+    httpStatusCode
+    success
+  }
+}
+    `;
+export type Folio_AddSiteToFolioMutationFn = Apollo.MutationFunction<Folio_AddSiteToFolioMutation, Folio_AddSiteToFolioMutationVariables>;
+
+/**
+ * __useFolio_AddSiteToFolioMutation__
+ *
+ * To run a mutation, you first call `useFolio_AddSiteToFolioMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useFolio_AddSiteToFolioMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [folioAddSiteToFolioMutation, { data, loading, error }] = useFolio_AddSiteToFolioMutation({
+ *   variables: {
+ *      addSiteToFolioDTO: // value for 'addSiteToFolioDTO'
+ *   },
+ * });
+ */
+export function useFolio_AddSiteToFolioMutation(baseOptions?: Apollo.MutationHookOptions<Folio_AddSiteToFolioMutation, Folio_AddSiteToFolioMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<Folio_AddSiteToFolioMutation, Folio_AddSiteToFolioMutationVariables>(Folio_AddSiteToFolioDocument, options);
+      }
+export type Folio_AddSiteToFolioMutationHookResult = ReturnType<typeof useFolio_AddSiteToFolioMutation>;
+export type Folio_AddSiteToFolioMutationResult = Apollo.MutationResult<Folio_AddSiteToFolioMutation>;
+export type Folio_AddSiteToFolioMutationOptions = Apollo.BaseMutationOptions<Folio_AddSiteToFolioMutation, Folio_AddSiteToFolioMutationVariables>;
 export const MapSearchDocument = gql`
     query mapSearch($searchParam: String) {
   mapSearch(searchParam: $searchParam) {

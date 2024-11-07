@@ -113,11 +113,9 @@ const SiteDetails = () => {
     SetNavItems(getNavItems(false));
     SetDropDownNavItems(getDropDownNavItems(false));
 
-    if(isUserOfType(UserRoleType.CLIENT))
-    {
+    if (isUserOfType(UserRoleType.CLIENT)) {
       dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
     }
-
   }, [auth.user]);
 
 
@@ -295,7 +293,7 @@ const SiteDetails = () => {
 
   useEffect(() => {
     if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
-      setUserType(UserType.External);      
+      setUserType(UserType.External);
     } else if (
       loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
     ) {
@@ -303,7 +301,8 @@ const SiteDetails = () => {
     } else {
       // not logged in
       setUserType(UserType.External);
-    }  }, [loggedInUser]);
+    }
+  }, [loggedInUser]);
 
   const savedChanges = useSelector(trackedChanges);
   const mode = useSelector(siteDetailsMode);
@@ -312,9 +311,9 @@ const SiteDetails = () => {
     setViewMode(mode);
   }, [mode]);
 
-  useEffect(()=>{
-    dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode))
-  },[])
+  useEffect(() => {
+    dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+  }, []);
 
   // NEEDS TO FETCH DATA BASED ON CONDITION WHEATHER IT IS EXTERNAL USER OR INTERNAL USER
   // BY DOING THIS WE CAN STOP UNNECCESSARY CALL TO DATABASE
@@ -865,7 +864,9 @@ const SiteDetails = () => {
           components={navComponents}
           dropdownItems={dropDownNavItems}
           isDisable={
-            getUser() === null || (UserType.External === userType && snapshot?.snapshot?.data === null)
+            getUser() === null ||
+            (UserType.External === userType &&
+              snapshot?.snapshot?.data === null)
           }
         />
       </PageContainer>

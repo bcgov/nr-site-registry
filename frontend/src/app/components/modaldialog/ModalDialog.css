@@ -70,10 +70,7 @@
   justify-content: flex-end;
 }
 
-
-
 @media (max-width: 576px) {
-
   .custom-modal-actions-footer {
     padding: var(--layout-padding-medium) var(--layout-padding-large)
       var(--layout-padding-medium) var(--layout-padding-large);
@@ -82,8 +79,4 @@
     justify-content: flex-end;
     flex-direction: column;
   }
-
-
-  
-
 }

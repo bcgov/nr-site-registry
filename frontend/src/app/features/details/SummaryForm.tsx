@@ -26,10 +26,9 @@ const SummaryForm: FC<SummaryFormProps> = ({
   srMode,
   changeHandler,
 }) => {
-
   const userPurchasedSnapshot = useSelector(hasUserPurchasedSnapshot);
 
-  const formRows:IFormField[][]  = [
+  const formRows: IFormField[][] = [
     [
       {
         type: FormFieldType.Text,
@@ -189,7 +188,7 @@ const SummaryForm: FC<SummaryFormProps> = ({
         customInputTextCss: 'custom-summary-input-text',
       },
     ],
-   
+
     [
       {
         type: FormFieldType.Text,
@@ -203,9 +202,10 @@ const SummaryForm: FC<SummaryFormProps> = ({
     ],
   ];
 
-  const [finalFormConfiguration, setFinalFormConfiguration] = useState<IFormField[][]>(formRows); 
+  const [finalFormConfiguration, setFinalFormConfiguration] =
+    useState<IFormField[][]>(formRows);
 
-  const locationDescription =  [
+  const locationDescription = [
     {
       type: FormFieldType.Text,
       label: 'Location Description',
@@ -214,21 +214,20 @@ const SummaryForm: FC<SummaryFormProps> = ({
       value: '',
       customLabelCss: 'custom-summary-lbl-text',
       customInputTextCss: 'custom-summary-input-text',
-    }
+    },
   ];
-  
-  
-  
 
   useEffect(() => {
-    if ((isUserOfType(UserRoleType.CLIENT) && userPurchasedSnapshot) || (isUserOfType(UserRoleType.INTERNAL) || isUserOfType(UserRoleType.SR)) ) {
+    if (
+      (isUserOfType(UserRoleType.CLIENT) && userPurchasedSnapshot) ||
+      isUserOfType(UserRoleType.INTERNAL) ||
+      isUserOfType(UserRoleType.SR)
+    ) {
       const newRows = [...formRows];
       newRows.splice(4, 0, locationDescription);
       setFinalFormConfiguration(newRows);
     }
   }, [userPurchasedSnapshot]);
-
-  
 
   const [formData, setFormData] = useState<{
     [key: string]: any | [Date, Date];

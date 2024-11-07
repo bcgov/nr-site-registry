@@ -42,20 +42,17 @@
 }
 
 @media (max-width: 576px) {
-
   .folio-actions {
     display: flex;
-    flex-direction: column;    
+    flex-direction: column;
   }
 
   .folio-add-new {
     display: flex;
-    flex-direction: column;    
+    flex-direction: column;
   }
 
-  .folio-edit-btn
-  {
+  .folio-edit-btn {
     width: 100%;
   }
 }
-

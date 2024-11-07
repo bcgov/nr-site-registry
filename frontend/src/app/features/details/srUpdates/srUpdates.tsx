@@ -78,7 +78,6 @@ import { IFetchParcelDescriptionParams } from '../parcelDescriptions/parcelDescr
 import { columns as columnConfigForParcelDescription } from '../parcelDescriptions/parcelDescriptionsConfig';
 
 const SRUpdates = () => {
-
   const dispatch = useDispatch<AppDispatch>();
 
   const {
@@ -174,7 +173,6 @@ const SRUpdates = () => {
   const { landUseCodes } = useSelector(selectLandUseCodes);
  
 
-
   const { id } = useParams();
   const [siteId, SetSiteId] = useState<string>('');
   const [landUseTableColumn, SetLandUseTableColumns] = useState<any>();
@@ -200,11 +198,10 @@ const SRUpdates = () => {
   ]);
 
   const [notationFormRowsInternalLocal, SetNotationFormRowsInternalLocal] =
-  useState(notationFormRowsInternal);
+    useState(notationFormRowsInternal);
 
-const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
-  useState(notationColumnInternal);
-
+  const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
+    useState(notationColumnInternal);
 
   useEffect(() => {
     if (particRoleDropdwn) {
@@ -221,9 +218,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
     }
   }, [particRoleDropdwn]);
 
-
   useEffect(() => {
-   
     const indexToUpdateExt = notationFormRowsInternal.findIndex((row) =>
       row.some((field) => field.graphQLPropertyName === 'etypCode'),
     );
@@ -272,7 +267,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       const uniquePsnOrgs: any = Array.from(
         new Map(psnOrgs.map((item: any) => [item.key, item])).values(),
       );
-  
+
       SetNotationColumnInternalLocal((prev) =>
         updateTableColumn(prev, {
           indexToUpdate: prev.findIndex(
@@ -311,14 +306,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
     }
   }, [siteParticipantData]);
 
-
-
   useEffect(() => {
     if (id !== undefined) SetSiteId(id);
   }, [id]);
 
-   useEffect(() => {
-  
+  useEffect(() => {
     if (updateRequestStatusFromState === RequestStatus.success) {
       showNotification(
         updateRequestStatusFromState,
@@ -864,11 +856,10 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
         (!parcelDescriptionData || parcelDescriptionData.data.length === 0) &&
         (!landUsesData || landUsesData.length === 0) &&
         (!associatedSitesData || associatedSitesData.length === 0) &&
-        (!documentsData || documentsData.length === 0) && 
-        (!siteParticipantData || siteParticipantData.length === 0) && 
-        (!notationData || notationData.length === 0) && 
-        (!siteSummaryData) &&
-        (
+        (!documentsData || documentsData.length === 0) &&
+        (!siteParticipantData || siteParticipantData.length === 0) &&
+        (!notationData || notationData.length === 0) &&
+        !siteSummaryData && (
           <div>
             <span> No updates to review</span>
           </div>

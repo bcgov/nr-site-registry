@@ -32,7 +32,7 @@ describe('FolioSerivce', () => {
     {
       id: '1',
       siteId: '1',
-      folioId: '1',
+      folioId: 1,
       whoCreated: 'test',
       whenCreated: new Date('07-26-2024'),
       whoUpdated: 'test',
@@ -221,7 +221,7 @@ describe('FolioSerivce', () => {
       .mockResolvedValue(folioContent[0]);
 
     const result = await folioSerivce.addSiteToFolio(
-      [{ id: 1, siteId: '5', folioId: '1', userId: '1', whoCreated: '' }],
+      [{ id: 1, siteId: '5' }],
       user,
     );
 

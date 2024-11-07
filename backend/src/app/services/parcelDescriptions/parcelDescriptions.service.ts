@@ -492,6 +492,8 @@ export class ParcelDescriptionsService {
     try {
       await this.siteSubdivisionsRepository.remove(siteSubdivisions);
     } catch (error) {
+      // This code is called within a transaction in the site service, so the
+      // previous save should be rolled back if there is a failure here.
       this.sitesLogger.error(
         'Exception occured in parcelDescriptionService.deleteParcelDescriptionsForSite() end',
         JSON.stringify(error),

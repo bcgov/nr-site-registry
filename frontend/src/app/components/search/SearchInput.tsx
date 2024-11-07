@@ -19,7 +19,7 @@ const SearchInput: React.FC<ISearchInput> = ({
   createNewLabel,
   createNewHandler,
   placeHolderText,
-  loading,
+  loading = true,
 }) => {
   const handler = optionSelectHandler ?? ((e) => {});
 
@@ -41,15 +41,16 @@ const SearchInput: React.FC<ISearchInput> = ({
   return (
     <div>
       {label && (
-        <div className="d-flex gap-2">
+        <div>
           <label
             htmlFor={searchId}
             className="form-label custom-search-label"
             aria-labelledby={label}
           >
             {label}
+
+            {loading && <SpinnerIcon className="fa-spin mx-2" />}
           </label>
-          {loading && <SpinnerIcon className="fa-spin" />}
         </div>
       )}
       <div className="search-box-container">

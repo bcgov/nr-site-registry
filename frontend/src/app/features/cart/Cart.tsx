@@ -38,11 +38,11 @@ const Cart = () => {
 
   const user = getUser();
 
-  useEffect(()=>{
+  useEffect(() => {
     if (user === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     }
-  },[])
+  }, []);
 
   const cartItemsArr = useSelector(cartItems);
 

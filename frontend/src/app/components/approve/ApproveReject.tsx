@@ -10,7 +10,12 @@ export interface IApproveReject {
   link?: string;
 }
 
-const ApproveReject: React.FC<IApproveReject> = ({ name, children,testId, link }) => {
+const ApproveReject: React.FC<IApproveReject> = ({
+  name,
+  children,
+  testId,
+  link,
+}) => {
   const [isOpen, SetIsOpen] = useState(false);
   link = link ?? '';
 
@@ -21,7 +26,7 @@ const ApproveReject: React.FC<IApproveReject> = ({ name, children,testId, link }
           {isOpen && (
             <DropdownIcon
               className="caret-icons"
-               data-testid="dropdown-icon"
+              data-testid="dropdown-icon"
               onClick={() => {
                 SetIsOpen(false);
               }}
@@ -68,7 +73,10 @@ export const ApproveRejectButtons: React.FC<IApproveRejectButtons> = ({
       console.log('approveRejectHandler not provided');
     });
   return (
-    <div className="approve-reject-actions" data-testid="approve-reject-actions-div">
+    <div
+      className="approve-reject-actions"
+      data-testid="approve-reject-actions-div"
+    >
       <div
         className="not-public-btn"
         data-testid="not-public-btn"
@@ -77,9 +85,11 @@ export const ApproveRejectButtons: React.FC<IApproveRejectButtons> = ({
         {' '}
         {rejectLabel}
       </div>
-      <div className="approve-btn" 
-       data-testid="approve-btn"
-      onClick={() => approveRejectHandler(true)}>
+      <div
+        className="approve-btn"
+        data-testid="approve-btn"
+        onClick={() => approveRejectHandler(true)}
+      >
         {' '}
         {approveLabel}
       </div>

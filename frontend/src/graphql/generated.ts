@@ -22,6 +22,12 @@ export type Scalars = {
   link__Import: { input: any; output: any; }
 };
 
+export type AddSiteToFolioDto = {
+  /** Primary key column of Folio talbe, not `folioId` */
+  id: Scalars['Float']['input'];
+  siteId: Scalars['String']['input'];
+};
+
 export type AssociatedSiteDto = {
   __typename?: 'AssociatedSiteDto';
   effectiveDate: Scalars['DateTime']['output'];
@@ -61,6 +67,7 @@ export type BceRegionCd = {
 };
 
 export type BulkApproveRejectChangesDto = {
+  fromSiteDetails: Scalars['Boolean']['input'];
   isApproved: Scalars['Boolean']['input'];
   sites: Array<SiteRecordsForSrAction>;
 };
@@ -316,7 +323,7 @@ export type FolioContentResponse = {
 export type FolioContents = {
   __typename?: 'FolioContents';
   folio: Folio;
-  folioId: Scalars['String']['output'];
+  folioId: Scalars['Float']['output'];
   id: Scalars['String']['output'];
   site: Sites;
   siteId: Scalars['String']['output'];
@@ -473,7 +480,7 @@ export type MutationAddRecentViewArgs = {
 
 
 export type MutationAddSiteToFolioArgs = {
-  folioDTO: Array<FolioContentDto>;
+  addSiteToFolioDTO: Array<AddSiteToFolioDto>;
 };
 
 
@@ -700,11 +707,6 @@ export type QueryGetBannerTypeArgs = {
 
 
 export type QueryGetCartItemsForUserArgs = {
-  userId: Scalars['String']['input'];
-};
-
-
-export type QueryGetFolioItemsForUserArgs = {
   userId: Scalars['String']['input'];
 };
 

@@ -23,7 +23,7 @@ export const getActionItems= (inlcudeSRApprovalOptions: boolean): DropdownItem[]
   if(inlcudeSRApprovalOptions)
   {
     return [...ActionItems, {
-      label: 'Approval All Changes',
+      label: 'Approve All Changes',
       value: SiteActionBtn.ApproveAll
     },
     {

@@ -98,10 +98,9 @@ import { bulkAproveRejectChanges, bulkUpdateApproveRejectStatus, resetBulkUpdate
 
 const SiteDetails = () => {
 
+  const [confirmSiteReview,SetConfirmSiteReview] = useState<Boolean | null>(null);
   const bulkApproveRejectStatus = useSelector(bulkUpdateApproveRejectStatus);
   const hasNoPendingUpdatesFromState = useSelector(hasNoPendingUpdates);
-  console.log("hasNoPendingUpdatesFromState",hasNoPendingUpdatesFromState)
-
   const [navItems, SetNavItems] = useState<string[] | undefined>();
   const [navComponents, SetNavComponents] = useState<any[]>();
   const [dropDownNavItems, SetDropDownNavItems] =
@@ -235,8 +234,7 @@ const SiteDetails = () => {
   }, [saveSiteDetailsRequestStatus]);
 
 
-  useEffect(() => {
-    console.log("bulkApproveRejectStatus",bulkApproveRejectStatus);
+  useEffect(() => {    
     if (
       bulkApproveRejectStatus === RequestStatus.success ||
       bulkApproveRejectStatus === RequestStatus.failed
@@ -471,30 +469,28 @@ const SiteDetails = () => {
         dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
         break;
       case SiteActionBtn.ApproveAll:
-        setEdit(false);
-        if(id)
-        dispatch(
-          bulkAproveRejectChanges({
-            sites: [{siteId: id, changes: 'summary, notation, notation participants, site participants, documents, associated sites, land histories, site profiles, parcel description', whoUpdated: auth.user?.profile?.given_name ?? '', whenUpdated: new Date(), address:'', id : '1' }],
-            isApproved: true,
-            fromSiteDetails: true
-          }),
-        );
-        // setViewMode(SiteDetailsMode.ViewOnlyMode);
-        // dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+        setEdit(false);    
+        SetConfirmSiteReview(true);  
+        // if(id)
+        // dispatch(
+        //   bulkAproveRejectChanges({
+        //     sites: [{siteId: id, changes: 'summary, notation, notation participants, site participants, documents, associated sites, land histories, site profiles, parcel description', whoUpdated: auth.user?.profile?.given_name ?? '', whenUpdated: new Date(), address:'', id : '1' }],
+        //     isApproved: true,
+        //     fromSiteDetails: true
+        //   }),
+        // );
         break;
       case SiteActionBtn.RejectAll:
-        setEdit(false);
-        // setViewMode(SiteDetailsMode.ViewOnlyMode);
-        // dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
-        if(id)
-          dispatch(
-            bulkAproveRejectChanges({
-              sites: [{siteId: id, changes: 'summary, notation, notation participants, site participants, documents, associated sites, land histories, site profiles, parcel description', whoUpdated: auth.user?.profile?.given_name ?? '', whenUpdated: new Date(), address:'', id : '1' }],
-              isApproved: false,
-              fromSiteDetails: true
-            }),
-          );
+        setEdit(false);      
+        SetConfirmSiteReview(false);  
+        // if(id)
+        //   dispatch(
+        //     bulkAproveRejectChanges({
+        //       sites: [{siteId: id, changes: 'summary, notation, notation participants, site participants, documents, associated sites, land histories, site profiles, parcel description', whoUpdated: auth.user?.profile?.given_name ?? '', whenUpdated: new Date(), address:'', id : '1' }],
+        //       isApproved: false,
+        //       fromSiteDetails: true
+        //     }),
+        //   );
         break;
       default:
         break;
@@ -680,6 +676,21 @@ const SiteDetails = () => {
         </div>
       )}
       <PageContainer role="details">
+        {confirmSiteReview != null &&  (confirmSiteReview === false || confirmSiteReview === true) && (
+          <ModalDialog           
+            label={`Are you sure to proceed`}
+            closeHandler={(response) => {
+              if (response) {
+                alert(confirmSiteReview);
+                if (confirmSiteReview) {
+                  //handleRemoveAssociate(response);
+                 
+                }
+              }
+              SetConfirmSiteReview(null);
+            }}
+          />
+        )}
         {save && (
           <ModalDialog
             closeHandler={(response) => {

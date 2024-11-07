@@ -23,7 +23,7 @@ export type Scalars = {
 };
 
 export type AddSiteToFolioDto = {
-  /** ID column of Folio, not `folioId` */
+  /** Primary key column of Folio talbe, not `folioId` */
   id: Scalars['Float']['input'];
   siteId: Scalars['String']['input'];
 };
@@ -67,6 +67,7 @@ export type BceRegionCd = {
 };
 
 export type BulkApproveRejectChangesDto = {
+  fromSiteDetails: Scalars['Boolean']['input'];
   isApproved: Scalars['Boolean']['input'];
   sites: Array<SiteRecordsForSrAction>;
 };
@@ -322,7 +323,7 @@ export type FolioContentResponse = {
 export type FolioContents = {
   __typename?: 'FolioContents';
   folio: Folio;
-  folioId: Scalars['String']['output'];
+  folioId: Scalars['Float']['output'];
   id: Scalars['String']['output'];
   site: Sites;
   siteId: Scalars['String']['output'];

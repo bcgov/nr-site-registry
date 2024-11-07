@@ -87,7 +87,6 @@ describe('SiteResolver', () => {
     jest.clearAllMocks();
   });
 
-
   describe('searchSites', () => {
     it('should call siteService.searchSites with the provided searchParam and no filter conditions', () => {
       const searchParam = 'example';

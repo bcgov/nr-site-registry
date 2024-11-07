@@ -56,10 +56,9 @@ const ParcelDescriptions = () => {
     dispatch(setSearchParam(''));
   };
 
-
   const tableChangeHandler = () => {
     // To Be Implemented As Part Of EDIT functionality
-  }
+  };
 
   const handleSortInputChange = (
     graphQLPropertyName: any,

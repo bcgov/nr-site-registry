@@ -12,8 +12,7 @@
   text-align: left;
 }
 
-.folio-actions
-{
+.folio-actions {
   display: flex;
   flex-direction: row;
 }
@@ -63,21 +62,13 @@
   cursor: pointer;
 }
 
-
 @media (max-width: 576px) {
-
-  .folio-content-actions-btn
-  {
+  .folio-content-actions-btn {
     width: 100% !important;
   }
 
-  .folio-actions
-  {
+  .folio-actions {
     display: flex;
     flex-direction: column;
   }
-
-
-  
-
 }

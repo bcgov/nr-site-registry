@@ -96,8 +96,7 @@ describe('SiteResolver', () => {
     expect(siteService.findAll).toHaveBeenCalled();
   });
 
-  
-    /*it('site search matches a search parameter with filter conditions', async () => {
+  /*it('site search matches a search parameter with filter conditions', async () => {
       const searchParam = '123';
       const page = 1;
       const pageSize = 1;
@@ -115,6 +114,4 @@ describe('SiteResolver', () => {
       expect(siteService.searchSites).toHaveBeenCalledWith(searchParam, page, pageSize, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
       expect(result).toEqual(expectedFilteredSites);
     });*/
-    
- 
 });

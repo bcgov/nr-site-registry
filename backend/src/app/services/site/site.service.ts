@@ -1558,8 +1558,7 @@ export class SiteService {
               );
             },
           );
-        }
-        
+        }        
         return true;
       }
     } catch (error) {
@@ -1589,9 +1588,9 @@ export class SiteService {
 
       if (site.changes.indexOf('summary') !== -1) {
         const sitesForUpdates = !fromSiteDetails? await transactionalEntityManager.find(Sites, {
-          where: { id: site.siteId, whoUpdated: site.whoUpdated },
+          where: { id: site.siteId, whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING },
         }):await transactionalEntityManager.find(Sites, {
-          where: { id: site.siteId },
+          where: { id: site.siteId, srAction: SRApprovalStatusEnum.PENDING },
         });
 
         if (sitesForUpdates?.length > 0) {
@@ -1608,9 +1607,9 @@ export class SiteService {
 
       if (site.changes.indexOf('notation') !== -1) {
         const events = !fromSiteDetails?await transactionalEntityManager.find(Events, {
-          where: { siteId: site.siteId, whoUpdated: site.whoUpdated },
+          where: { siteId: site.siteId, whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING },
         }):await transactionalEntityManager.find(Events, {
-          where: { siteId: site.siteId},
+          where: { siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING},
         });
 
         if (events?.length > 0) {
@@ -1628,13 +1627,15 @@ export class SiteService {
               where: {
                 eventId: In(eventIds),
                 whoUpdated: site.whoUpdated,
+                srAction: SRApprovalStatusEnum.PENDING
               },
             },
           ):await transactionalEntityManager.find(
             EventPartics,
             {
               where: {
-                eventId: In(eventIds)              
+                eventId: In(eventIds) ,
+                srAction: SRApprovalStatusEnum.PENDING            
               },
             },
           );
@@ -1666,14 +1667,14 @@ export class SiteService {
           {
             where: {
               siteId: site.siteId,
-              whoUpdated: site.whoUpdated,
+              whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING
             },
           },
         ):await transactionalEntityManager.find(
           SitePartics,
           {
             where: {
-              siteId: site.siteId,
+              siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING
             },
           },
         );
@@ -1695,11 +1696,11 @@ export class SiteService {
         const siteDocs = !fromSiteDetails?await transactionalEntityManager.find(SiteDocs, {
           where: {
             siteId: site.siteId,
-            whoUpdated: site.whoUpdated,
+            whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING
           },
         }):await transactionalEntityManager.find(SiteDocs, {
           where: {
-            siteId: site.siteId,
+            siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING
           },
         });
 
@@ -1722,14 +1723,14 @@ export class SiteService {
           {
             where: {
               siteId: site.siteId,
-              whoUpdated: site.whoUpdated,
+              whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING
             },
           },
         ):await transactionalEntityManager.find(
           SiteAssocs,
           {
             where: {
-              siteId: site.siteId,
+              siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING
             },
           },
         );
@@ -1753,14 +1754,14 @@ export class SiteService {
           {
             where: {
               siteId: site.siteId,
-              whoUpdated: site.whoUpdated,
+              whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING
             },
           },
         ):await transactionalEntityManager.find(
           LandHistories,
           {
             where: {
-              siteId: site.siteId,             
+              siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING             
             },
           },
         );
@@ -1782,11 +1783,11 @@ export class SiteService {
         const profiles = !fromSiteDetails?await transactionalEntityManager.find(SiteProfiles, {
           where: {
             siteId: site.siteId,
-            whoUpdated: site.whoUpdated,
+            whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING
           },
         }):await transactionalEntityManager.find(SiteProfiles, {
           where: {
-            siteId: site.siteId,
+            siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING
           },
         });
 
@@ -1809,14 +1810,14 @@ export class SiteService {
           {
             where: {
               siteId: site.siteId,
-              whoUpdated: site.whoUpdated,
+              whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING
             },
           },
         ):await transactionalEntityManager.find(
           SiteSubdivisions,
           {
             where: {
-              siteId: site.siteId,
+              siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING
             },
           },
         );
@@ -1827,12 +1828,12 @@ export class SiteService {
           const subDivisions = !fromSiteDetails?await transactionalEntityManager.find(
             Subdivisions,
             {
-              where: { id: In(subDivIds), whoUpdated: site.whoUpdated },
+              where: { id: In(subDivIds), whoUpdated: site.whoUpdated , srAction: SRApprovalStatusEnum.PENDING},
             },
           ):await transactionalEntityManager.find(
             Subdivisions,
             {
-              where: { id: In(subDivIds)},
+              where: { id: In(subDivIds), srAction: SRApprovalStatusEnum.PENDING}
             },
           );
 

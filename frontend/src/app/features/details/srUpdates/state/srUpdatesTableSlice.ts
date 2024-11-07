@@ -61,6 +61,13 @@ const srReviewSlice = createSlice({
   initialState,
 
   reducers: {
+    resetBulkUpdateStatus: (state, action) =>{
+      const newState = {
+        ...state,
+      };
+      newState.updateStatus = RequestStatus.idle;
+      return newState;
+    },
     setFetchLoadingState: (state, action) => {
       const newState = {
         ...state,
@@ -154,7 +161,7 @@ export const loadingState = (state: any) => state.srReview.fetchStatus;
 export const currentPageSelection = (state: any) => state.srReview.currentPage;
 export const currentPageSize = (state: any) => state.srReview.pageSize;
 export const getTotalRecords = (state: any) => state.srReview.resultsCount;
-export const updateStatus = (state: any) => state.srReview.updateStatus;
+export const bulkUpdateApproveRejectStatus = (state: any) => state.srReview.updateStatus;
 export const getSearchParam = (state: any) => state.srReview.searchParam;
 
 export const {
@@ -163,6 +170,7 @@ export const {
   updatePageSizeSetting,
   updateSearchQuery,
   updateSearchParam,
+  resetBulkUpdateStatus
 } = srReviewSlice.actions;
 
 export default srReviewSlice.reducer;

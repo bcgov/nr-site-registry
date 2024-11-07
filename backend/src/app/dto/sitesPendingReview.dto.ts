@@ -111,6 +111,10 @@ export class BulkApproveRejectChangesDTO {
   @IsNotEmpty()
   isApproved: boolean;
 
+  @Field(() => Boolean)
+  @IsBoolean() 
+  fromSiteDetails: boolean;
+
   @Field(() => [SiteRecordsForSRAction])
   @IsArray()
   @IsNotEmpty()

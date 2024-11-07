@@ -34,10 +34,10 @@ import {
 import { IChangeType } from '../../components/common/IChangeType';
 
 import './SiteDetails.css'; // Ensure this import is correct
-import { SiteDetailsMode } from './dto/SiteDetailsMode';
+import { SiteActionBtn, SiteDetailsMode } from './dto/SiteDetailsMode';
 import { UserType } from '../../helpers/requests/userType';
 import Actions from '../../components/action/Actions';
-import { ActionItems } from '../../components/action/ActionsConfig';
+import { ActionItems, getActionItems } from '../../components/action/ActionsConfig';
 import {
   formatDate,
   formatDateWithNoTimzoneName,
@@ -91,9 +91,16 @@ import {
   setupSiteIdForSaving,
 } from './SaveSiteDetailsSlice';
 import { fetchAssociatedSites } from './associates/AssociateSlice';
-import { updateRequestStatus } from './srUpdates/srUpdatesSlice';
+import { fetchParcelDescriptionsForApproval, fetchPendingAssociatedSites, fetchPendingDocumentsForApproval, fetchPendingLandUses, fetchPendingSiteDisclosure, fetchPendingSiteNotationBySiteId, fetchPendingSiteParticipantsForApproval, fetchPendingSitesDetailsFprApproval, hasNoPendingUpdates, updateRequestStatus } from './srUpdates/srUpdatesSlice';
+import { fetchLandUseCodes } from './landUses/LandUsesSlice';
+import { IFetchParcelDescriptionParams } from './parcelDescriptions/parcelDescriptionsSlice';
+import { bulkAproveRejectChanges, bulkUpdateApproveRejectStatus, resetBulkUpdateStatus } from './srUpdates/state/srUpdatesTableSlice';
 
 const SiteDetails = () => {
+
+  const [confirmSiteReview,SetConfirmSiteReview] = useState<Boolean | null>(null);
+  const bulkApproveRejectStatus = useSelector(bulkUpdateApproveRejectStatus);
+  const hasNoPendingUpdatesFromState = useSelector(hasNoPendingUpdates);
   const [navItems, SetNavItems] = useState<string[] | undefined>();
   const [navComponents, SetNavComponents] = useState<any[]>();
   const [dropDownNavItems, SetDropDownNavItems] =
@@ -102,14 +109,30 @@ const SiteDetails = () => {
   const auth = useAuth();
 
   useEffect(() => {
-    SetNavComponents(getNavComponents());
-    SetNavItems(getNavItems());
-    SetDropDownNavItems(getDropDownNavItems());
+    SetNavComponents(getNavComponents(false));
+    SetNavItems(getNavItems(false));
+    SetDropDownNavItems(getDropDownNavItems(false));
 
     if (isUserOfType(UserRoleType.CLIENT)) {
       dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
     }
   }, [auth.user]);
+
+
+  useEffect(()=>{
+    if(isUserOfType(UserRoleType.SR) && !hasNoPendingUpdatesFromState)
+    {
+      SetNavComponents(getNavComponents(true));
+      SetNavItems(getNavItems(true));
+      SetDropDownNavItems(getDropDownNavItems(true));
+    }
+    else
+    {
+      SetNavComponents(getNavComponents(false));
+      SetNavItems(getNavItems(false));
+      SetDropDownNavItems(getDropDownNavItems(false));
+    }
+  },[hasNoPendingUpdatesFromState])
 
   const [folioSearchTerm, SetFolioSearchTeam] = useState('');
 
@@ -191,6 +214,8 @@ const SiteDetails = () => {
         dispatch(clearTrackChanges(null));
         dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
         setEdit(false);
+        if(id)
+        checkForRecordsPendingReview(id);
       } else {
         // dont close edit mode
       }
@@ -205,6 +230,37 @@ const SiteDetails = () => {
       // do nothing
     }
   }, [saveSiteDetailsRequestStatus]);
+
+
+  useEffect(() => {    
+    if (
+      bulkApproveRejectStatus === RequestStatus.success ||
+      bulkApproveRejectStatus === RequestStatus.failed
+    ) {
+      if (bulkApproveRejectStatus === RequestStatus.success) {
+        dispatch(resetBulkUpdateStatus(null));      
+        dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+        setEdit(false);
+        if(id)
+        checkForRecordsPendingReview(id);
+      } else if (bulkApproveRejectStatus === RequestStatus.failed) {
+        // dont close edit mode
+        dispatch(resetBulkUpdateStatus(null));
+      }
+
+      showNotification(
+        bulkApproveRejectStatus,
+        'Successfully updated site review',
+        'Failed to update site review',
+      );
+    
+    } else {
+      // do nothing
+    }
+  }, [bulkApproveRejectStatus]);
+
+
+  
 
   const navigate = useNavigate();
   const onClickBackButton = () => {
@@ -316,6 +372,62 @@ const SiteDetails = () => {
     }
   }, [id, userType]);
 
+
+    useEffect(() => {
+      if (id && id !== '') {
+        checkForRecordsPendingReview(id);
+      }
+    }, [id]);
+
+
+  const checkForRecordsPendingReview = (siteId:string) => {
+
+    if(siteId && siteId !== '' && (isUserOfType(UserRoleType.SR)))
+    {
+
+    const params: IFetchParcelDescriptionParams = {
+      siteId: parseInt(siteId),
+      page: 1,
+      pageSize: 1000,
+      searchParam: '',
+      sortBy: '',
+      sortByDir: '',
+      showPending: true,
+    };
+
+     Promise.all([
+      
+      dispatch(
+        fetchPendingSitesDetailsFprApproval({ siteId, showPending: true }),
+      ),
+
+      dispatch(fetchPendingSiteNotationBySiteId({ siteId, showPending: true })),
+      dispatch(
+        fetchPendingSiteParticipantsForApproval({ siteId, showPending: true }),
+      ),
+
+      dispatch(
+        fetchPendingLandUses({
+          siteId,
+          searchTerm: '',
+          sortDirection: 'ASC',
+          showPending: true,
+        }),
+      ),
+
+      dispatch(fetchPendingDocumentsForApproval({ siteId, showPending: true })),
+
+      dispatch(fetchPendingSiteDisclosure({ siteId, showPending: true })),
+
+      dispatch(fetchPendingAssociatedSites({ siteId, showPending: true })),
+
+      dispatch(fetchLandUseCodes()),
+      
+      dispatch(fetchParcelDescriptionsForApproval(params))
+     ])
+    }
+  }
+
   useEffect(() => {
     if (srUpdateRequestStatus === RequestStatus.success) {
       if (id) {
@@ -354,6 +466,30 @@ const SiteDetails = () => {
         setEdit(false);
         setViewMode(SiteDetailsMode.ViewOnlyMode);
         dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+        break;
+      case SiteActionBtn.ApproveAll:
+        setEdit(false);    
+        SetConfirmSiteReview(true);  
+        // if(id)
+        // dispatch(
+        //   bulkAproveRejectChanges({
+        //     sites: [{siteId: id, changes: 'summary, notation, notation participants, site participants, documents, associated sites, land histories, site profiles, parcel description', whoUpdated: auth.user?.profile?.given_name ?? '', whenUpdated: new Date(), address:'', id : '1' }],
+        //     isApproved: true,
+        //     fromSiteDetails: true
+        //   }),
+        // );
+        break;
+      case SiteActionBtn.RejectAll:
+        setEdit(false);      
+        SetConfirmSiteReview(false);  
+        // if(id)
+        //   dispatch(
+        //     bulkAproveRejectChanges({
+        //       sites: [{siteId: id, changes: 'summary, notation, notation participants, site participants, documents, associated sites, land histories, site profiles, parcel description', whoUpdated: auth.user?.profile?.given_name ?? '', whenUpdated: new Date(), address:'', id : '1' }],
+        //       isApproved: false,
+        //       fromSiteDetails: true
+        //     }),
+        //   );
         break;
       default:
         break;
@@ -405,6 +541,13 @@ const SiteDetails = () => {
     }
   };
 
+
+  const getActionItemsToRender = ()=> {   
+    let userTypeSR :boolean= isUserOfType(UserRoleType.SR)??false;
+    let includeSRApprovalActions = userTypeSR && !hasNoPendingUpdatesFromState;
+    return getActionItems(includeSRApprovalActions);
+  }
+
   if (isLoading || snapshot.status === RequestStatus.loading) {
     return (
       <div className="loading-overlay">
@@ -447,7 +590,7 @@ const SiteDetails = () => {
               userType === UserType.Internal && (
                 <Actions
                   label="Actions"
-                  items={ActionItems}
+                  items={getActionItemsToRender()}
                   onItemClick={handleItemClick}
                 />
               )}
@@ -532,6 +675,21 @@ const SiteDetails = () => {
         </div>
       )}
       <PageContainer role="details">
+        {confirmSiteReview != null &&  (confirmSiteReview === false || confirmSiteReview === true) && (
+          <ModalDialog           
+            label={`Are you sure to proceed`}
+            closeHandler={(response) => {
+              if (response) {
+                alert(confirmSiteReview);
+                if (confirmSiteReview) {
+                  //handleRemoveAssociate(response);
+                 
+                }
+              }
+              SetConfirmSiteReview(null);
+            }}
+          />
+        )}
         {save && (
           <ModalDialog
             closeHandler={(response) => {
@@ -586,7 +744,7 @@ const SiteDetails = () => {
                 userType === UserType.Internal && (
                   <Actions
                     label="Actions"
-                    items={ActionItems}
+                    items={getActionItemsToRender()}
                     onItemClick={handleItemClick}
                   />
                 )}

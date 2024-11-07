@@ -19,7 +19,7 @@ const SearchInput: React.FC<ISearchInput> = ({
   createNewLabel,
   createNewHandler,
   placeHolderText,
-  loading = true,
+  loading,
 }) => {
   const handler = optionSelectHandler ?? ((e) => {});
 

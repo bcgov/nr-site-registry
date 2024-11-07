@@ -46,7 +46,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
   handleItemClick,
   approveRejectHandler,
   showApproveRejectSection,
-  hideLabelForWidget
+  hideLabelForWidget,
 }) => {
   showApproveRejectSection = showApproveRejectSection ?? false;
 
@@ -56,7 +56,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
       console.log('Approve/Reject Handler not provided');
     });
 
-    hideLabelForWidget = hideLabelForWidget ?? false;
+  hideLabelForWidget = hideLabelForWidget ?? false;
   return (
     <React.Fragment>
       <Widget

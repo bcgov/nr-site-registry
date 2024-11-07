@@ -112,7 +112,7 @@ export class BulkApproveRejectChangesDTO {
   isApproved: boolean;
 
   @Field(() => Boolean)
-  @IsBoolean() 
+  @IsBoolean()
   fromSiteDetails: boolean;
 
   @Field(() => [SiteRecordsForSRAction])

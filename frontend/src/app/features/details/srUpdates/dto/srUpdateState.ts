@@ -18,7 +18,7 @@ export class SitePendingApprovalDTO {
   whoUpdated: string = '';
   whenUpdated: Date = new Date();
   address: string = '';
-  id: string = ''
+  id: string = '';
 }
 
 export class BulkApproveRejectChangesDTO {

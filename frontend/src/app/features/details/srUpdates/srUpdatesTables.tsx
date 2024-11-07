@@ -95,7 +95,7 @@ const SRUpdatesTables = () => {
         bulkAproveRejectChanges({
           sites: selectedRows,
           isApproved: false,
-          fromSiteDetails: false
+          fromSiteDetails: false,
         }),
       );
     }
@@ -107,7 +107,7 @@ const SRUpdatesTables = () => {
         bulkAproveRejectChanges({
           sites: selectedRows,
           isApproved: true,
-          fromSiteDetails: false
+          fromSiteDetails: false,
         }),
       );
     }
@@ -132,10 +132,11 @@ const SRUpdatesTables = () => {
   };
 
   useEffect(() => {
-
-    if(updateRequestStatus === RequestStatus.success || updateRequestStatus === RequestStatus.failed)
-    {
-       dispatch(resetBulkUpdateStatus(null));
+    if (
+      updateRequestStatus === RequestStatus.success ||
+      updateRequestStatus === RequestStatus.failed
+    ) {
+      dispatch(resetBulkUpdateStatus(null));
     }
 
     showNotification(

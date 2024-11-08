@@ -245,9 +245,7 @@ const SiteDetails = () => {
   const mode = useSelector(siteDetailsMode);
 
   useEffect(() => {
-    //alert(mode)
     setViewMode(mode);
-
     if (isUserOfType(UserRoleType.SR) && !hasNoPendingUpdatesFromState && mode !== SiteDetailsMode.EditMode) {
       SetNavComponents(getNavComponents(true));
       SetNavItems(getNavItems(true));

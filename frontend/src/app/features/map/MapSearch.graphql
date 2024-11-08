@@ -1,10 +1,31 @@
-query mapSearch($searchParam: String!) {
-    searchSites(searchParam: $searchParam, page: "1", pageSize: "100000") {
-        sites {
+query mapSearch($searchParam: String) {
+    mapSearch(searchParam: $searchParam) {
+        data {
             id
             addrLine_1
             latdeg
             longdeg
+        }
+    }
+}
+
+query MapSearch_findSiteBySiteId($siteId: String!) {
+    findSiteBySiteId(siteId: $siteId) {
+        data {
+            id
+            addrLine_1
+            addrLine_2
+            addrLine_3
+            addrLine_4
+            city
+            latDegrees
+            latMinutes
+            latSeconds
+            longDegrees
+            longMinutes
+            longSeconds
+            generalDescription
+            siteRiskCode
         }
     }
 }

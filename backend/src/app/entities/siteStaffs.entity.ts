@@ -1,5 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { PeopleOrgs } from './peopleOrgs.entity';
 
 @ObjectType()
@@ -9,13 +9,14 @@ import { PeopleOrgs } from './peopleOrgs.entity';
   unique: true,
 })
 @Entity('site_staffs')
+@Unique(['psnorgId', 'startDate'])
 export class SiteStaffs {
   @Field()
   @Column('bigint', { primary: true, name: 'id' })
   id: string;
 
   @Field()
-  @Column('bigint', { name: 'psnorg_id', unique: true })
+  @Column('bigint', { name: 'psnorg_id' })
   psnorgId: string;
 
   @Field()
@@ -63,7 +64,7 @@ export class SiteStaffs {
   regionCode: string | null;
 
   @Field()
-  @Column('timestamp without time zone', { name: 'start_date', unique: true })
+  @Column('timestamp without time zone', { name: 'start_date' })
   startDate: Date;
 
   @Field()

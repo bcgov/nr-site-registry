@@ -39,11 +39,15 @@ on:
         description: Paths used to trigger a deployment; e.g. ('./backend/' './frontend/)
         required: false
         type: string
-
+      db_user:
+        description: The database user
+        required: false
+        type: string
+        default: 'site'
       ### Usually a bad idea / not recommended
       timeout-minutes:
         description: 'Timeout minutes'
-        default: 15
+        default: 20
         required: false
         type: number
       values:
@@ -59,6 +63,7 @@ on:
 
 jobs:
   deployer:
+    timeout-minutes: ${{ inputs.timeout-minutes }}
     name: Helm
     environment: ${{ inputs.environment }}
     runs-on: ubuntu-24.04
@@ -155,12 +160,9 @@ jobs:
             --set-string global.secrets.keycloakRealm="${{ secrets.KEYCLOAK_REALM }}" \
             --set-string global.secrets.keycloakClientID="${{ secrets.KEYCLOAK_CLIENTID }}" \
             --set-string global.secrets.keycloakAuthURL="${{ secrets.KEYCLOAK_AUTH_URL }}" \
-            --set-string global.secrets.databaseAdminPassword="${{ secrets.DATABASE_ADMIN_PASSWORD }}" \
-            --set-string global.secrets.databasePassword="${{ secrets.DATABASE_PWD }}" \
-            --set-string crunchy.pgBackRest.s3.accessKey="${{ secrets.S3_BACKUP_ACCESS_KEY }}"  \
-            --set-string crunchy.pgBackRest.s3.secretKey="${{ secrets.S3_BACKUP_SECRET_KEY }}"  \
+            --set-string global.config.dbUser=${{ inputs.db_user }} \
             ${{ inputs.params }} \
-            --install --wait --atomic ${{ steps.vars.outputs.release }} \
+            --install --wait --atomic ${{ steps.vars.outputs.release }} --debug \
             --timeout "$DEPLOY_TIMEOUT"m  \
             --values ${{ inputs.values }} \
             ./${{ github.event.repository.name }}-${{ steps.pr.outputs.pr || steps.vars.outputs.version }}.tgz

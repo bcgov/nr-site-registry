@@ -53,7 +53,7 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
   handleItemClick,
   showApproveRejectSection,
   approveRejectHandler,
-  hideLabelForWidget
+  hideLabelForWidget,
 }) => {
   showApproveRejectSection = showApproveRejectSection ?? false;
   hideLabelForWidget = hideLabelForWidget ?? false;

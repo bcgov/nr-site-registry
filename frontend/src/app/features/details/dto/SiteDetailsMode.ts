@@ -6,6 +6,11 @@ export enum SiteDetailsMode {
   ViewOnlyMode = 'normal',
 }
 
+export enum SiteActionBtn {
+  ApproveAll = 'approve_all',
+  RejectAll = 'reject_all',
+}
+
 export interface SaveSiteDetails {
   saveRequestStatus: RequestStatus;
   notationData: any;

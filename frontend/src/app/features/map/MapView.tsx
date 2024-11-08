@@ -50,7 +50,7 @@ function MapView() {
           className={clsx(osmGrayscale && 'osm--grayscale')}
         />
         {/* <MyLocationMarker/> */}
-        <SiteMarkers sites={data?.searchSites.sites || []} />
+        <SiteMarkers sites={data?.mapSearch.data || []} />
       </MapContainer>
       <MapSearch />
       <SiteDetailsDrawer />

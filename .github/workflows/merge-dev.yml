@@ -21,13 +21,20 @@ jobs:
       - name: Echo PR number
         run: |
           echo "PR: ${{ steps.vars.outputs.pr }}"
-          
 
+  deploy_db:
+    name: Deploys Database
+    uses: ./.github/workflows/.dbdeployer.yml
+    secrets: inherit
+    with:
+      environment: test
+      values: 'values-test.yaml'
+      app_values: 'values.yaml' # TEST env specific values file for the APP
   deploys:
     name: Deploys to TEST
     uses: ./.github/workflows/.deployer.yml
     secrets: inherit
-    needs: [get-pr-info]
+    needs: [get-pr-info, deploy_db]
     with:
       environment: test
       tag:  '${{ needs.get-pr-info.outputs.pr }}'

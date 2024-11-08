@@ -78,7 +78,6 @@ import { IFetchParcelDescriptionParams } from '../parcelDescriptions/parcelDescr
 import { columns as columnConfigForParcelDescription } from '../parcelDescriptions/parcelDescriptionsConfig';
 
 const SRUpdates = () => {
-
   const dispatch = useDispatch<AppDispatch>();
 
   const {
@@ -173,7 +172,6 @@ const SRUpdates = () => {
   const notationClass = useSelector(notationClassDrpdown);
   const { landUseCodes } = useSelector(selectLandUseCodes);
 
-
   const { id } = useParams();
   const [siteId, SetSiteId] = useState<string>('');
   const [landUseTableColumn, SetLandUseTableColumns] = useState<any>();
@@ -199,11 +197,10 @@ const SRUpdates = () => {
   ]);
 
   const [notationFormRowsInternalLocal, SetNotationFormRowsInternalLocal] =
-  useState(notationFormRowsInternal);
+    useState(notationFormRowsInternal);
 
-const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
-  useState(notationColumnInternal);
-
+  const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
+    useState(notationColumnInternal);
 
   useEffect(() => {
     if (particRoleDropdwn) {
@@ -220,9 +217,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
     }
   }, [particRoleDropdwn]);
 
-
   useEffect(() => {
-   
     const indexToUpdateExt = notationFormRowsInternal.findIndex((row) =>
       row.some((field) => field.graphQLPropertyName === 'etypCode'),
     );
@@ -271,7 +266,7 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       const uniquePsnOrgs: any = Array.from(
         new Map(psnOrgs.map((item: any) => [item.key, item])).values(),
       );
-  
+
       SetNotationColumnInternalLocal((prev) =>
         updateTableColumn(prev, {
           indexToUpdate: prev.findIndex(
@@ -310,14 +305,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
     }
   }, [siteParticipantData]);
 
-
-
   useEffect(() => {
     if (id !== undefined) SetSiteId(id);
   }, [id]);
 
-   useEffect(() => {
-  
+  useEffect(() => {
     if (updateRequestStatusFromState === RequestStatus.success) {
       showNotification(
         updateRequestStatusFromState,
@@ -365,47 +357,6 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       dispatch(fetchParcelDescriptionsForApproval(params));
     }
   }, [updateRequestStatusFromState]);
-
-  useEffect(() => {
-    if (siteId !== '') {
-      dispatch(
-        fetchPendingSitesDetailsFprApproval({ siteId, showPending: true }),
-      );
-
-      dispatch(fetchPendingSiteNotationBySiteId({ siteId, showPending: true }));
-      dispatch(
-        fetchPendingSiteParticipantsForApproval({ siteId, showPending: true }),
-      );
-
-      dispatch(
-        fetchPendingLandUses({
-          siteId,
-          searchTerm: '',
-          sortDirection: 'ASC',
-          showPending: true,
-        }),
-      );
-
-      dispatch(fetchPendingDocumentsForApproval({ siteId, showPending: true }));
-
-      dispatch(fetchPendingSiteDisclosure({ siteId, showPending: true }));
-
-      dispatch(fetchPendingAssociatedSites({ siteId, showPending: true }));
-
-      dispatch(fetchLandUseCodes());
-
-      const params: IFetchParcelDescriptionParams = {
-        siteId: parseInt(siteId),
-        page: 1,
-        pageSize: 1000,
-        searchParam: '',
-        sortBy: '',
-        sortByDir: '',
-        showPending: true,
-      };
-      dispatch(fetchParcelDescriptionsForApproval(params));
-    }
-  }, [siteId]);
 
   const handleChange = (event: any) => {
     console.log('No Change Hanlder Required Here', event);
@@ -676,7 +627,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
   return (
     <div data-testid="srreviewtab-component">
       {siteSummaryData && (
-        <ApproveReject name="Summary" testId="site-summary-component" link="?summary">
+        <ApproveReject
+          name="Summary"
+          testId="site-summary-component"
+          link="?summary"
+        >
           <SummaryInfo
             siteData={siteSummaryData}
             location={location}
@@ -692,7 +647,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       {notationData &&
         notationData.map((notation: any, index: number) => {
           return (
-            <ApproveReject name="Notations" testId="srupdates-notation-component" link="?notations">
+            <ApproveReject
+              name="Notations"
+              testId="srupdates-notation-component"
+              link="?notations"
+            >
               <Notation
                 index={index}
                 notation={notation}
@@ -726,7 +685,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
         })}
 
       {siteParticipantData && siteParticipantData.length > 0 && (
-        <ApproveReject name="Participants" testId="srupdates-participant-component" link="?participants">
+        <ApproveReject
+          name="Participants"
+          testId="srupdates-participant-component"
+          link="?participants"
+        >
           <ParticipantTable
             handleTableChange={handleParticipantsApproveRejectHandler}
             handleWidgetCheckBox={handleChange}
@@ -751,7 +714,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       {documentsData &&
         documentsData.map((document: any, index: number) => {
           return (
-            <ApproveReject name="Documents" testId="srupdates-documents-component" link="?documents">
+            <ApproveReject
+              name="Documents"
+              testId="srupdates-documents-component"
+              link="?documents"
+            >
               <Document
                 index={index}
                 userType={UserType.Internal}
@@ -778,7 +745,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
         })}
 
       {associatedSitesData && associatedSitesData.length > 0 && (
-        <ApproveReject name="Site Associations"  testId="srupdates-siteassociations-component"  link="?associated">
+        <ApproveReject
+          name="Site Associations"
+          testId="srupdates-siteassociations-component"
+          link="?associated"
+        >
           <AssociateSiteComponent
             handleTableChange={handleAssociatedSiteApproveRejectHandler}
             handleWidgetCheckBox={handleChange}
@@ -804,7 +775,11 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
       )}
 
       {landUsesData && (
-        <ApproveReject name="LandUses"  testId="srupdates-landuses-component" link="?landuses">
+        <ApproveReject
+          name="LandUses"
+          testId="srupdates-landuses-component"
+          link="?landuses"
+        >
           <LandUseTable
             onTableChange={approveRejectHandlerForLandUses}
             tableColumns={landUseTableColumn}
@@ -820,23 +795,28 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
         </ApproveReject>
       )}
 
-      {parcelDescriptionData?.data.length > 0 && parcelDescriptionData?.data && (
-        <ApproveReject name="Parcel Description"  testId="srupdates-parceldesc-component" link="?parceldesc">
-          <ParcelDescriptionTable
-            tableChangeHandler={handleParcelDescriptionApproveRejectHandler}
-            showPageOptions={false}
-            requestStatus={RequestStatus.success}
-            columns={parcelDescriptionColumn}
-            data={parcelDescriptionData.data}
-            totalResults={[].length}
-            handleSelectPage={handleChange}
-            handleChangeResultsPerPage={handleChange}
-            currentPage={1}
-            resultsPerPage={undefined}
-            handleTableSortChange={handleChange}
-          />
-        </ApproveReject>
-      )}
+      {parcelDescriptionData?.data.length > 0 &&
+        parcelDescriptionData?.data && (
+          <ApproveReject
+            name="Parcel Description"
+            testId="srupdates-parceldesc-component"
+            link="?parceldesc"
+          >
+            <ParcelDescriptionTable
+              tableChangeHandler={handleParcelDescriptionApproveRejectHandler}
+              showPageOptions={false}
+              requestStatus={RequestStatus.success}
+              columns={parcelDescriptionColumn}
+              data={parcelDescriptionData.data}
+              totalResults={[].length}
+              handleSelectPage={handleChange}
+              handleChangeResultsPerPage={handleChange}
+              currentPage={1}
+              resultsPerPage={undefined}
+              handleTableSortChange={handleChange}
+            />
+          </ApproveReject>
+        )}
 
       {disclosureData && (
         <ApproveReject name="Disclosure" link="?disclosure">
@@ -871,6 +851,18 @@ const [notationColumnInternalLocal, SetNotationColumnInternalLocal] =
           />
         </ApproveReject>
       )}
+      {!disclosureData &&
+        (!parcelDescriptionData || parcelDescriptionData.data.length === 0) &&
+        (!landUsesData || landUsesData.length === 0) &&
+        (!associatedSitesData || associatedSitesData.length === 0) &&
+        (!documentsData || documentsData.length === 0) &&
+        (!siteParticipantData || siteParticipantData.length === 0) &&
+        (!notationData || notationData.length === 0) &&
+        !siteSummaryData && (
+          <div>
+            <span> No updates to review</span>
+          </div>
+        )}
     </div>
   );
 };

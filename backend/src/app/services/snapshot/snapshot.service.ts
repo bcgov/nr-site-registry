@@ -153,12 +153,16 @@ export class SnapshotsService {
   }
 
   getNotatioParticipantsForSnapshotCreation = async (notationId: string) => {
-    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start');  
+    this.sitesLogger.log(
+      'SnapshotsService.getNotatioParticipantsForSnapshotCreation() start',
+    );
     try {
       if (notationId === '' || notationId === null) {
         throw Error('notation id cannot be empty');
       }
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end');  
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
+      );
       return await this.eventsParticipantsRepo.find({
         where: {
           eventId: notationId,
@@ -166,120 +170,172 @@ export class SnapshotsService {
         },
       });
     } catch (error) {
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' +
+          JSON.stringify(error),
+      );
       throw error;
     }
   };
 
   getNotationsForSnapshotCreation = async (siteId: string) => {
-    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    this.sitesLogger.log(
+      'SnapshotsService.getNotatioParticipantsForSnapshotCreation() start',
+    );
     try {
       if (siteId === '' || siteId === null) {
         throw Error('site id cannot be empty');
       }
 
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
+      );
       return await this.eventsRepositoryRepo.find({
         where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
       });
     } catch (error) {
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' +
+          JSON.stringify(error),
+      );
       throw error;
     }
   };
 
   getSiteParticipantsForSnapshotCreation = async (siteId: string) => {
-    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    this.sitesLogger.log(
+      'SnapshotsService.getNotatioParticipantsForSnapshotCreation() start',
+    );
     try {
       if (siteId === '' || siteId === null) {
         throw Error('site id cannot be empty');
       }
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
+      );
       return await this.siteParticipantsRepo.find({
         where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
       });
     } catch (error) {
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' +
+          JSON.stringify(error),
+      );
       throw error;
     }
   };
 
   getSiteDocumentsForSnapshotCreation = async (siteId: string) => {
-    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    this.sitesLogger.log(
+      'SnapshotsService.getNotatioParticipantsForSnapshotCreation() start',
+    );
     try {
       if (siteId === '' || siteId === null) {
         throw Error('site id cannot be empty');
       }
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
+      );
       return await this.siteDocumentsRepo.find({
         where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
       });
     } catch (error) {
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' +
+          JSON.stringify(error),
+      );
       throw error;
     }
   };
 
   getLandHisotoriesForSnapshotCreation = async (siteId: string) => {
-    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    this.sitesLogger.log(
+      'SnapshotsService.getNotatioParticipantsForSnapshotCreation() start',
+    );
     try {
       if (siteId === '' || siteId === null) {
         throw Error('site id cannot be empty');
       }
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
+      );
       return this.landHistoriesRepo.find({
         where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
       });
     } catch (error) {
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' +
+          JSON.stringify(error),
+      );
       throw error;
     }
   };
 
   getDisclosureForSnapshotCreation = async (siteId: string) => {
-    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    this.sitesLogger.log(
+      'SnapshotsService.getNotatioParticipantsForSnapshotCreation() start',
+    );
     try {
       if (siteId === '' || siteId === null) {
         throw Error('site id cannot be empty');
       }
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
+      );
       return this.siteProfilesRepo.find({
         where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
       });
     } catch (error) {
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' +
+          JSON.stringify(error),
+      );
       throw error;
     }
   };
 
   getSubDivisionsForSnapshotCreation = async (siteId: string) => {
-    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    this.sitesLogger.log(
+      'SnapshotsService.getNotatioParticipantsForSnapshotCreation() start',
+    );
     try {
       if (siteId === '' || siteId === null) {
         throw Error('site id cannot be empty');
       }
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
+      );
       return await this.siteSubDivisionsRepo.find({
         where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
       });
     } catch (error) {
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' +
+          JSON.stringify(error),
+      );
       throw error;
     }
   };
 
   getSiteAssociationsForSnapshotCreation = async (siteId: string) => {
-    this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() start'); 
+    this.sitesLogger.log(
+      'SnapshotsService.getNotatioParticipantsForSnapshotCreation() start',
+    );
     try {
       if (siteId === '' || siteId === null) {
         throw Error('site id cannot be empty');
       }
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() end'); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
+      );
       return await this.siteAssociationsRepo.find({
         where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
       });
     } catch (error) {
-      this.sitesLogger.log('SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' + JSON.stringify(error)); 
+      this.sitesLogger.log(
+        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' +
+          JSON.stringify(error),
+      );
       throw error;
     }
   };
@@ -345,10 +401,14 @@ export class SnapshotsService {
 
             snapShotsToBeSaved.push(newSnapshot);
           } else {
-            this.sitesLogger.log('SnapshotsService.createSnapshotForSites() Site id is empty');          
+            this.sitesLogger.log(
+              'SnapshotsService.createSnapshotForSites() Site id is empty',
+            );
           }
         } else {
-           this.sitesLogger.log('SnapshotsService.createSnapshotForSites() createSnapshotForUser dto is null');
+          this.sitesLogger.log(
+            'SnapshotsService.createSnapshotForSites() createSnapshotForUser dto is null',
+          );
         }
       });
 

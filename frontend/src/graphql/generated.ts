@@ -22,6 +22,12 @@ export type Scalars = {
   link__Import: { input: any; output: any; }
 };
 
+export type AddSiteToFolioDto = {
+  /** Primary key column of Folio talbe, not `folioId` */
+  id: Scalars['Float']['input'];
+  siteId: Scalars['String']['input'];
+};
+
 export type AssociatedSiteDto = {
   __typename?: 'AssociatedSiteDto';
   effectiveDate: Scalars['DateTime']['output'];
@@ -61,6 +67,7 @@ export type BceRegionCd = {
 };
 
 export type BulkApproveRejectChangesDto = {
+  fromSiteDetails: Scalars['Boolean']['input'];
   isApproved: Scalars['Boolean']['input'];
   sites: Array<SiteRecordsForSrAction>;
 };
@@ -316,7 +323,7 @@ export type FolioContentResponse = {
 export type FolioContents = {
   __typename?: 'FolioContents';
   folio: Folio;
-  folioId: Scalars['String']['output'];
+  folioId: Scalars['Float']['output'];
   id: Scalars['String']['output'];
   site: Sites;
   siteId: Scalars['String']['output'];
@@ -431,6 +438,15 @@ export type Mailout = {
   whoUpdated: Scalars['String']['output'];
 };
 
+export type MapSearchResponse = {
+  __typename?: 'MapSearchResponse';
+  data: Array<Sites>;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   addCartItem: CartResponse;
@@ -464,7 +480,7 @@ export type MutationAddRecentViewArgs = {
 
 
 export type MutationAddSiteToFolioArgs = {
-  folioDTO: Array<FolioContentDto>;
+  addSiteToFolioDTO: Array<AddSiteToFolioDto>;
 };
 
 
@@ -666,6 +682,7 @@ export type Query = {
   getSnapshotsById: SnapshotResponse;
   getSnapshotsBySiteId: SnapshotResponse;
   getSnapshotsByUserId: SnapshotResponse;
+  mapSearch: MapSearchResponse;
   searchSiteIds: DropdownResponse;
   searchSites: SearchSiteResponse;
   sites: FetchSiteResponse;
@@ -690,11 +707,6 @@ export type QueryGetBannerTypeArgs = {
 
 
 export type QueryGetCartItemsForUserArgs = {
-  userId: Scalars['String']['input'];
-};
-
-
-export type QueryGetFolioItemsForUserArgs = {
   userId: Scalars['String']['input'];
 };
 
@@ -777,6 +789,11 @@ export type QueryGetSnapshotsBySiteIdArgs = {
 
 export type QueryGetSnapshotsByUserIdArgs = {
   userId: Scalars['String']['input'];
+};
+
+
+export type QueryMapSearchArgs = {
+  searchParam?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1200,12 +1217,12 @@ export type SiteSummaryDto = {
   id: Scalars['String']['input'];
   latDegrees?: InputMaybe<Scalars['Float']['input']>;
   latMinutes?: InputMaybe<Scalars['Float']['input']>;
-  latSeconds?: InputMaybe<Scalars['String']['input']>;
+  latSeconds?: InputMaybe<Scalars['Float']['input']>;
   latdeg?: InputMaybe<Scalars['Float']['input']>;
   latlongReliabilityFlag?: InputMaybe<Scalars['String']['input']>;
   longDegrees?: InputMaybe<Scalars['Float']['input']>;
   longMinutes?: InputMaybe<Scalars['Float']['input']>;
-  longSeconds?: InputMaybe<Scalars['String']['input']>;
+  longSeconds?: InputMaybe<Scalars['Float']['input']>;
   longdeg?: InputMaybe<Scalars['Float']['input']>;
   postalCode?: InputMaybe<Scalars['String']['input']>;
   provState?: InputMaybe<Scalars['String']['input']>;
@@ -1247,12 +1264,12 @@ export type Sites = {
   landHistories: Array<LandHistories>;
   latDegrees?: Maybe<Scalars['Float']['output']>;
   latMinutes?: Maybe<Scalars['Float']['output']>;
-  latSeconds?: Maybe<Scalars['String']['output']>;
+  latSeconds?: Maybe<Scalars['Float']['output']>;
   latdeg?: Maybe<Scalars['Float']['output']>;
   latlongReliabilityFlag: Scalars['String']['output'];
   longDegrees?: Maybe<Scalars['Float']['output']>;
   longMinutes?: Maybe<Scalars['Float']['output']>;
-  longSeconds?: Maybe<Scalars['String']['output']>;
+  longSeconds?: Maybe<Scalars['Float']['output']>;
   longdeg?: Maybe<Scalars['Float']['output']>;
   mailouts: Array<Mailout>;
   postalCode?: Maybe<Scalars['String']['output']>;
@@ -1316,17 +1333,24 @@ export enum Link__Purpose {
 }
 
 export type MapSearchQueryVariables = Exact<{
-  searchParam: Scalars['String']['input'];
+  searchParam?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type MapSearchQuery = { __typename?: 'Query', searchSites: { __typename?: 'SearchSiteResponse', sites: Array<{ __typename?: 'Sites', id: string, addrLine_1: string, latdeg?: number | null, longdeg?: number | null }> } };
+export type MapSearchQuery = { __typename?: 'Query', mapSearch: { __typename?: 'MapSearchResponse', data: Array<{ __typename?: 'Sites', id: string, addrLine_1: string, latdeg?: number | null, longdeg?: number | null }> } };
+
+export type MapSearch_FindSiteBySiteIdQueryVariables = Exact<{
+  siteId: Scalars['String']['input'];
+}>;
+
+
+export type MapSearch_FindSiteBySiteIdQuery = { __typename?: 'Query', findSiteBySiteId: { __typename?: 'FetchSiteDetail', data?: { __typename?: 'Sites', id: string, addrLine_1: string, addrLine_2?: string | null, addrLine_3?: string | null, addrLine_4?: string | null, city: string, latDegrees?: number | null, latMinutes?: number | null, latSeconds?: number | null, longDegrees?: number | null, longMinutes?: number | null, longSeconds?: number | null, generalDescription?: string | null, siteRiskCode: string } | null } };
 
 
 export const MapSearchDocument = gql`
-    query mapSearch($searchParam: String!) {
-  searchSites(searchParam: $searchParam, page: "1", pageSize: "100000") {
-    sites {
+    query mapSearch($searchParam: String) {
+  mapSearch(searchParam: $searchParam) {
+    data {
       id
       addrLine_1
       latdeg
@@ -1352,7 +1376,7 @@ export const MapSearchDocument = gql`
  *   },
  * });
  */
-export function useMapSearchQuery(baseOptions: Apollo.QueryHookOptions<MapSearchQuery, MapSearchQueryVariables> & ({ variables: MapSearchQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useMapSearchQuery(baseOptions?: Apollo.QueryHookOptions<MapSearchQuery, MapSearchQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<MapSearchQuery, MapSearchQueryVariables>(MapSearchDocument, options);
       }
@@ -1368,3 +1392,58 @@ export type MapSearchQueryHookResult = ReturnType<typeof useMapSearchQuery>;
 export type MapSearchLazyQueryHookResult = ReturnType<typeof useMapSearchLazyQuery>;
 export type MapSearchSuspenseQueryHookResult = ReturnType<typeof useMapSearchSuspenseQuery>;
 export type MapSearchQueryResult = Apollo.QueryResult<MapSearchQuery, MapSearchQueryVariables>;
+export const MapSearch_FindSiteBySiteIdDocument = gql`
+    query MapSearch_findSiteBySiteId($siteId: String!) {
+  findSiteBySiteId(siteId: $siteId) {
+    data {
+      id
+      addrLine_1
+      addrLine_2
+      addrLine_3
+      addrLine_4
+      city
+      latDegrees
+      latMinutes
+      latSeconds
+      longDegrees
+      longMinutes
+      longSeconds
+      generalDescription
+      siteRiskCode
+    }
+  }
+}
+    `;
+
+/**
+ * __useMapSearch_FindSiteBySiteIdQuery__
+ *
+ * To run a query within a React component, call `useMapSearch_FindSiteBySiteIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMapSearch_FindSiteBySiteIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMapSearch_FindSiteBySiteIdQuery({
+ *   variables: {
+ *      siteId: // value for 'siteId'
+ *   },
+ * });
+ */
+export function useMapSearch_FindSiteBySiteIdQuery(baseOptions: Apollo.QueryHookOptions<MapSearch_FindSiteBySiteIdQuery, MapSearch_FindSiteBySiteIdQueryVariables> & ({ variables: MapSearch_FindSiteBySiteIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MapSearch_FindSiteBySiteIdQuery, MapSearch_FindSiteBySiteIdQueryVariables>(MapSearch_FindSiteBySiteIdDocument, options);
+      }
+export function useMapSearch_FindSiteBySiteIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MapSearch_FindSiteBySiteIdQuery, MapSearch_FindSiteBySiteIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MapSearch_FindSiteBySiteIdQuery, MapSearch_FindSiteBySiteIdQueryVariables>(MapSearch_FindSiteBySiteIdDocument, options);
+        }
+export function useMapSearch_FindSiteBySiteIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MapSearch_FindSiteBySiteIdQuery, MapSearch_FindSiteBySiteIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MapSearch_FindSiteBySiteIdQuery, MapSearch_FindSiteBySiteIdQueryVariables>(MapSearch_FindSiteBySiteIdDocument, options);
+        }
+export type MapSearch_FindSiteBySiteIdQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdQuery>;
+export type MapSearch_FindSiteBySiteIdLazyQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdLazyQuery>;
+export type MapSearch_FindSiteBySiteIdSuspenseQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdSuspenseQuery>;
+export type MapSearch_FindSiteBySiteIdQueryResult = Apollo.QueryResult<MapSearch_FindSiteBySiteIdQuery, MapSearch_FindSiteBySiteIdQueryVariables>;

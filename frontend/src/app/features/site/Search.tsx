@@ -20,7 +20,6 @@ import {
 import SearchResults from './SearchResults';
 import {
   ShoppingCartIcon,
-  FolderPlusIcon,
   FileExportIcon,
   TableColumnsIcon,
   FilterIcon,
@@ -67,7 +66,6 @@ const Search = () => {
   ]);
   const [showMobileTableMenu, SetShowMobileTableMenu] = useState(false);
   const [selectedRows, SetSelectedRows] = useState<any[]>([]);
-  const [showAddToFolio, SetShowAddToFolio] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<
     { key: string; value: string; label: string }[]
   >([]);
@@ -507,27 +505,10 @@ const Search = () => {
                 </div>
               )}
               {!isUserOfType(UserRoleType.INTERNAL) && (
-                <div
-                  className={`search-result-actions-btn ${selectedRows.length === 0 ? 'disabled-btn' : 'search-result-actions-btn-highlight'}`}
-                  onClick={() => {
-                    let loggedInUser = getUser();
-                    if (loggedInUser === null) {
-                      auth.signinRedirect({
-                        extraQueryParams: { kc_idp_hint: 'bceid' },
-                      });
-                    } else {
-                      SetShowAddToFolio(!showAddToFolio);
-                    }
-                  }}
-                >
-                  <FolderPlusIcon />
-                  <span>Add Selected To Folio</span>
-                </div>
-              )}
-              {showAddToFolio && (
                 <AddToFolio
-                  className="pos-absolute-search"
-                  selectedRows={selectedRows}
+                  label="Add Selected To Folio"
+                  disabled={selectedRows.length === 0}
+                  selectedSiteIds={selectedRows.map((row) => row.id)}
                 />
               )}
 

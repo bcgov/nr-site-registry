@@ -25,7 +25,7 @@ export class FolioContents extends BaseAuditEntity {
 
   @Field()
   @Column('bigint', { name: 'folio_id' })
-  folioId: string;
+  folioId: number;
 
   @Field(() => Folio, { nullable: false })
   @ManyToOne(() => Folio, (folio) => folio.folioContents, { eager: true })

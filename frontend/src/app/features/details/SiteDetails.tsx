@@ -6,8 +6,6 @@ import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
 import {
   AngleLeft,
-  DropdownIcon,
-  FolderPlusIcon,
   ShoppingCartIcon,
   SpinnerIcon,
 } from '../../components/common/icon';
@@ -56,15 +54,6 @@ import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
 import { fetchNotationParticipants } from './notations/NotationSlice';
 import { fetchDocuments } from './documents/DocumentsSlice';
-import SearchInput from '../../components/search/SearchInput';
-import {
-  addSiteToFolio,
-  addSiteToFolioRequest,
-  fetchFolioItems,
-  folioItems,
-  resetFolioItemAddedStatus,
-} from '../folios/redux/FolioSlice';
-import { Folio, FolioContentDTO } from '../folios/dto/Folio';
 import {
   fetchSnapshots,
   snapshots,
@@ -81,10 +70,6 @@ import {
   fetchParticipantRoleCd,
   fetchPeopleOrgsCd,
 } from './dropdowns/DropdownSlice';
-import {
-  FormFieldType,
-  IFormField,
-} from '../../components/input-controls/IFormField';
 import BannerDetails from '../../components/banners/BannerDetails';
 import {
   resetSaveSiteDetails,
@@ -94,6 +79,7 @@ import {
   setupSiteIdForSaving,
 } from './SaveSiteDetailsSlice';
 import { fetchAssociatedSites } from './associates/AssociateSlice';
+import AddToFolio from '../folios/AddToFolio';
 import {
   fetchParcelDescriptionsForApproval,
   fetchPendingAssociatedSites,
@@ -131,10 +117,6 @@ const SiteDetails = () => {
     SetNavComponents(getNavComponents(false));
     SetNavItems(getNavItems(false));
     SetDropDownNavItems(getDropDownNavItems(false));
-
-    if (isUserOfType(UserRoleType.CLIENT)) {
-      dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
-    }
   }, [auth.user]);
 
   useEffect(() => {
@@ -148,59 +130,6 @@ const SiteDetails = () => {
       SetDropDownNavItems(getDropDownNavItems(false));
     }
   }, [hasNoPendingUpdatesFromState]);
-
-  const [folioSearchTerm, SetFolioSearchTeam] = useState('');
-
-  const folioDetails = useSelector(folioItems);
-
-  const addSiteToFolioRequestStatus = useSelector(addSiteToFolioRequest);
-
-  const handleFolioSelect = (folioId: string) => {
-    let selectedFolio = folioDetails.filter(
-      (x: any) => x.folioId === folioId,
-    )[0];
-    let dto: FolioContentDTO = {
-      siteId: details.id,
-      folioId: selectedFolio.id + '',
-      id: parseInt(selectedFolio.id),
-      whoCreated: loggedInUser?.profile.given_name ?? '',
-      userId: loggedInUser?.profile.sub ?? '',
-    };
-    dispatch(addSiteToFolio([dto])).unwrap();
-  };
-
-  useEffect(() => {
-    if (addSiteToFolioRequestStatus === RequestStatus.success) {
-      //dispatch(resetFolioItemAddedStatus(null));
-      showNotification(
-        addSiteToFolioRequestStatus,
-        'Successfully added site to folio',
-        'Unable to add to folio',
-      );
-    }
-  }, [addSiteToFolioRequestStatus]);
-
-  const folioDropdown: IFormField = {
-    type: FormFieldType.DropDownWithSearch,
-    label: '',
-    isLabel: false,
-    graphQLPropertyName: 'folioId',
-    placeholder: 'Please enter folio .',
-    value: '',
-    options: [],
-    colSize: 'col-lg-6 col-md-6 col-sm-12',
-    customLabelCss: 'custom-participant-lbl-text',
-    customInputTextCss: 'custom-participant-input-text',
-    customEditLabelCss: 'custom-participant-edit-label',
-    customEditInputTextCss: 'custom-participant-edit-input',
-    tableMode: true,
-  };
-
-  const arr: IFormField[] = [folioDropdown];
-
-  const arr2: IFormField[][] = [arr];
-
-  const [addToFolioVisible, SetAddToFolioVisible] = useState(false);
 
   const [isVisible, setIsVisible] = useState(false);
   const snapshot = useSelector(snapshots);
@@ -629,53 +558,9 @@ const SiteDetails = () => {
                     <ShoppingCartIcon className="btn-icon" />
                     <span className="btn-cart-lbl"> Add to Cart</span>
                   </div>
-                  <div
-                    className="d-flex btn-folio align-items-center"
-                    onClick={() => {
-                      if (loggedInUser === null) {
-                        auth.signinRedirect({
-                          extraQueryParams: { kc_idp_hint: 'bceid' },
-                        });
-                      } else {
-                        SetAddToFolioVisible(!addToFolioVisible);
-                      }
-                    }}
-                  >
-                    <FolderPlusIcon className="btn-folio-icon" />
-                    <span className="btn-folio-lbl"> Add to Folio</span>
-                    <DropdownIcon className="btn-folio-icon" />
-                  </div>
-                  {addToFolioVisible && (
-                    <div className="pos-absolute">
-                      <SearchInput
-                        label={'Search Folios'}
-                        placeHolderText={'Search Folios'}
-                        searchTerm={folioSearchTerm}
-                        clearSearch={() => {
-                          SetFolioSearchTeam('');
-                          //SetAddToFolioVisible(false);
-                        }}
-                        handleSearchChange={(e) => {
-                          if (e.target) {
-                            SetFolioSearchTeam(e.target.value);
-                          } else {
-                            SetFolioSearchTeam(e);
-                          }
-                        }}
-                        options={folioDetails
-                          .filter(
-                            (y: any) =>
-                              y.folioId
-                                .toLowerCase()
-                                .indexOf(folioSearchTerm.toLowerCase()) !== -1,
-                          )
-                          .map((x: any) => x.folioId)}
-                        optionSelectHandler={(value) => {
-                          handleFolioSelect(value);
-                          SetAddToFolioVisible(false);
-                        }}
-                      />
-                    </div>
+
+                  {id && (
+                    <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
                   )}
                 </>
               )}
@@ -783,54 +668,8 @@ const SiteDetails = () => {
                       <ShoppingCartIcon className="btn-icon" />
                       <span className="btn-cart-lbl"> Add to Cart</span>
                     </div>
-                    <div
-                      className="d-flex btn-folio align-items-center"
-                      onClick={() => {
-                        if (loggedInUser === null) {
-                          auth.signinRedirect({
-                            extraQueryParams: { kc_idp_hint: 'bceid' },
-                          });
-                        } else {
-                          SetAddToFolioVisible(!addToFolioVisible);
-                        }
-                      }}
-                    >
-                      <FolderPlusIcon className="btn-folio-icon" />
-                      <span className="btn-folio-lbl"> Add to Folio</span>
-                      <DropdownIcon className="btn-folio-icon" />
-                    </div>
-                    {addToFolioVisible && (
-                      <div className="pos-absolute">
-                        <SearchInput
-                          label={'Search Folios'}
-                          placeHolderText={'Search Folios'}
-                          searchTerm={folioSearchTerm}
-                          clearSearch={() => {
-                            SetFolioSearchTeam('');
-                            //SetAddToFolioVisible(false);
-                          }}
-                          handleSearchChange={(e) => {
-                            if (e.target) {
-                              SetFolioSearchTeam(e.target.value);
-                            } else {
-                              SetFolioSearchTeam(e);
-                            }
-                          }}
-                          options={folioDetails
-                            .filter(
-                              (y: any) =>
-                                y.folioId
-                                  .toLowerCase()
-                                  .indexOf(folioSearchTerm.toLowerCase()) !==
-                                -1,
-                            )
-                            .map((x: any) => x.folioId)}
-                          optionSelectHandler={(value) => {
-                            handleFolioSelect(value);
-                            SetAddToFolioVisible(false);
-                          }}
-                        />
-                      </div>
+                    {id && (
+                      <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
                     )}
                   </>
                 )}

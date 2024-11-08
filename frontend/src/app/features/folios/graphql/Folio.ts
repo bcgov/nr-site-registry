@@ -2,8 +2,8 @@ import gql from 'graphql-tag';
 
 export const getFolioItemsForUserQL = () => {
   return gql`
-    query getFolioItemsForUser($userId: String!) {
-      getFolioItemsForUser(userId: $userId) {
+    query getFolioItemsForUser {
+      getFolioItemsForUser {
         message
         httpStatusCode
         data {

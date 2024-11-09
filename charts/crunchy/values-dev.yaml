@@ -3,7 +3,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     dataVolumeClaimSpec:
       storage: 2000Mi
       storageClassName: netapp-block-standard
-      walStorage: 800Mi
+      walStorage: 500Mi
   clone:
     enabled: false # enable it when the dev cluster needs to be cloned from test
     s3:
@@ -13,7 +13,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     path: /backups/test/cluster/version/1 # provide the proper path to source the cluster. ex: /backups/cluster/version/1, if
   pgBackRest:
     backupPath: /backups/dev/cluster/version
-    clusterCounter: 2 # since it is a repo switch , it is better to go to a new cluster.
+    clusterCounter: 3 # since it is a repo switch , it is better to go to a new cluster.
     s3:
       enabled: true # if enabled, below must be provided, in dev environment, it's not necessary to enable s3.
       retention: 1 # one weeks backup in object store.
@@ -28,5 +28,5 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       incrementalBackupSchedule: 0 0,12 * * * # every 12 hour incremental
       volume:
         accessModes: "ReadWriteOnce"
-        storage: 6Gi
+        storage: 1Gi
         storageClassName: netapp-file-backup

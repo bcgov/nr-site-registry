@@ -45,6 +45,7 @@ import { useParams } from 'react-router-dom';
 import SummaryInfo from './SummaryInfo';
 import { hasUserPurchasedSnapshot } from '../snapshot/SnapshotSlice';
 import { UserType } from '../../../helpers/requests/userType';
+import AddToFolio from '../../folios/AddToFolio';
 
 const Summary = () => {
   const auth = useAuth();
@@ -469,11 +470,7 @@ const Summary = () => {
                       SetParcelSearchTeam('');
                     }}
                     handleSearchChange={(e) => {
-                      if (e.target) {
-                        SetParcelSearchTeam(e.target.value);
-                      } else {
-                        SetParcelSearchTeam(e);
-                      }
+                      SetParcelSearchTeam(e.target.value || '');
                     }}
                     options={['1213', '12313', '123132']}
                     optionSelectHandler={(value) => {
@@ -558,11 +555,14 @@ const Summary = () => {
                 Purchase Site Details
               </span>
             </button>
-            <button className="d-flex btn-folio align-items-center">
-              <FolderPlusIcon className="btn-folio-icon" />
-              <span className="btn-folio-lbl"> Add to Folio</span>
-              <DropdownIcon className="btn-folio-icon" />
-            </button>
+            {id && (
+              <AddToFolio
+                selectedSiteIds={[id]}
+                label="Add to Folio"
+                popupPlacement="top-start"
+                triggerClassName="btn-folio"
+              />
+            )}
           </div>
         </div>
       )}

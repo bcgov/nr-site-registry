@@ -2,8 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FolioContents } from '../../entities/folioContents.entity';
 import { Repository } from 'typeorm';
-import { FolioContentDTO } from '../../dto/folioContent.dto';
 import { LoggerService } from '../../logger/logger.service';
+import { AddSiteToFolioDTO } from 'src/app/dto/folio.dto';
 
 @Injectable()
 export class FolioContentsService {
@@ -13,7 +13,7 @@ export class FolioContentsService {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  async getSiteForFolio(folioId: string): Promise<FolioContents[]> {
+  async getSiteForFolio(folioId: number): Promise<FolioContents[]> {
     this.sitesLogger.log('FolioContentsService.getSiteForFolio() start');
     this.sitesLogger.debug('FolioContentsService.getSiteForFolio() start');
     try {
@@ -36,10 +36,13 @@ export class FolioContentsService {
     }
   }
 
-  async addFolioContent(inputDTO: FolioContentDTO): Promise<boolean> {
+  async addFolioContent(
+    inputDTO: AddSiteToFolioDTO,
+    userInfo: any,
+  ): Promise<boolean> {
     this.sitesLogger.log('FolioContentsService.addFolioContent() start');
     this.sitesLogger.debug('FolioContentsService.addFolioContent() start');
-    const { siteId, folioId } = inputDTO;
+    const { siteId, id: folioId } = inputDTO;
     try {
       const existingRecord = await this.folioContentRepository.findOne({
         where: { siteId, folioId },
@@ -51,28 +54,28 @@ export class FolioContentsService {
         return false;
       } else {
         const folioContent = {
-          siteId: inputDTO.siteId,
-          folioId: inputDTO.folioId,
-          whoCreated: inputDTO.whoCreated,
-          userId: inputDTO.userId,
+          siteId,
+          folioId,
+          whenCreated: new Date(),
+          whoCreated: userInfo.name,
+          userId: userInfo.sub,
         };
 
         const result = await this.folioContentRepository.save(folioContent);
 
         this.sitesLogger.log('FolioContentsService.addFolioContent() end');
         this.sitesLogger.debug('FolioContentsService.addFolioContent() end');
-        if (result) {
-          return true;
-        } else {
-          return false;
-        }
+        return Boolean(result);
       }
     } catch (error) {
       this.sitesLogger.error(
         'Exception occured in FolioContentsService.addFolioContent() end',
         JSON.stringify(error),
       );
-      throw new HttpException(`Failed to add folio`, HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        `Failed to add folio`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -103,11 +106,11 @@ export class FolioContentsService {
     }
   }
 
-  async deleteSitesInFolio(folioId: string, siteId: string): Promise<boolean> {
+  async deleteSitesInFolio(folioId: number, siteId: string): Promise<boolean> {
     this.sitesLogger.log('FolioContentsService.deleteSitesInFolio() start');
     this.sitesLogger.debug('FolioContentsService.deleteSitesInFolio() start');
     try {
-      if (folioId && siteId && folioId !== '' && siteId !== '') {
+      if (folioId && siteId) {
         const result = await this.folioContentRepository.delete({
           folioId: folioId,
           siteId: siteId,
@@ -134,13 +137,13 @@ export class FolioContentsService {
     }
   }
 
-  async deleteAllSitesInFolio(folioId: string): Promise<boolean> {
+  async deleteAllSitesInFolio(folioId: number): Promise<boolean> {
     this.sitesLogger.log('FolioContentsService.deleteAllSitesInFolio() start');
     this.sitesLogger.debug(
       'FolioContentsService.deleteAllSitesInFolio() start',
     );
     try {
-      if (folioId && folioId !== '') {
+      if (folioId) {
         const result = await this.folioContentRepository.delete({
           folioId: folioId,
         });

@@ -14,11 +14,6 @@ RUN npm ci
 
 # Bundle app source
 COPY . .
-#build to make the compilation happens to JS
-RUN npm run build
-
-# move src folder from dist to src and overwrite the existing src folder
-RUN mv dist/src src
 # Install postgresql-client
 RUN apk add --no-cache postgresql-client
 

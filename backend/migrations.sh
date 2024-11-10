@@ -3,12 +3,10 @@
 #Make sure you change line endings to LF
 # In openShift, the .env file is not used. Instead, the environment variables are set in the deployment configuration.
 # the command used in openshift and local are different so we initialize migration command here.
-MIGRATION_CMD="node /app/node_modules/typeorm/cli.js migration:run -d /app/dist/typeOrm.config.js"
 if [ ! "$POSTGRESQL_HOST" ];
 then
    echo 'Sourcing from .env'
    . ./.env
-   MIGRATION_CMD="npm run typeorm:run-migrations" # This is the command used in local
 else
     echo 'Environment variables set...'
 fi
@@ -34,9 +32,8 @@ psql "user=$POSTGRES_ADMIN_USERNAME password=$POSTGRES_ADMIN_PASSWORD host=$POST
 
 echo "schema created"
 
-# run type orm migrations by executing MIGRATION_CMD
-echo "running migrations"
-$MIGRATION_CMD
+# run type orm migrations
+npm run typeorm:run-migrations
 
 
 echo "migrations completed"

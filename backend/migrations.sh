@@ -19,8 +19,8 @@ for i in {1..10}; do
     if PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql "user=$POSTGRES_ADMIN_USERNAME password=$POSTGRES_ADMIN_PASSWORD host=$POSTGRESQL_HOST port=$POSTGRESQL_PORT dbname=$POSTGRES_DATABASE" -c '\q'; then
         break
     fi
-    echo "Postgres is not up yet. Retrying in $((2**i)) seconds..."
-    sleep $((2**i))
+    echo "Postgres is not up yet. Retrying in $((2*i)) seconds..."
+    sleep $((2*i))
     if [ "$i" -eq 10 ]; then
         echo "Postgres is not up yet. Exiting..."
         exit 1

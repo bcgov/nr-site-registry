@@ -188,11 +188,11 @@ spec:
         pgbackrest:
           resources:
             requests:
-              cpu: {{ .Values.crunchy.pgBackRest.sidecars.requests.cpu }}
-              memory: {{ .Values.crunchy.pgBackRest.sidecars.requests.memory }}
+              cpu: {{ .Values.crunchy.pgBackRest.sidecars.pgBackRest.requests.cpu }}
+              memory: {{ .Values.crunchy.pgBackRest.sidecars.pgBackRest.requests.memory }}
             limits:
-              cpu: {{ .Values.crunchy.pgBackRest.sidecars.limits.cpu }}
-              memory: {{ .Values.crunchy.pgBackRest.sidecars.limits.memory }}
+              cpu: {{ .Values.crunchy.pgBackRest.sidecars.pgBackRest.limits.cpu }}
+              memory: {{ .Values.crunchy.pgBackRest.sidecars.pgBackRest.limits.memory }}
         pgbackrestConfig:
           resources:
             requests:

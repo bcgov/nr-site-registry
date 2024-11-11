@@ -25,7 +25,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       retention: 1 # one day hot active backup in pvc
       retentionFullType: count
       fullBackupSchedule: 0 8 * * * # full backup at 8 AM GMT everyday
-      incrementalBackupSchedule: 0 0/1 * * * # every 1 hour incremental
+      incrementalBackupSchedule: 5 0/1 * * * # every 1 hour incremental at 5th minute
       volume:
         accessModes: "ReadWriteOnce"
         storage: 6Gi

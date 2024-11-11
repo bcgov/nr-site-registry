@@ -13,19 +13,19 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     path: /backups/test/cluster/version/1 # provide the proper path to source the cluster. ex: /backups/cluster/version/1, if
   pgBackRest:
     backupPath: /backups/dev/cluster/version
-    clusterCounter: 3 # since it is a repo switch , it is better to go to a new cluster.
+    clusterCounter: 4 # since it is a repo switch , it is better to go to a new cluster.
     s3:
       enabled: true # if enabled, below must be provided, in dev environment, it's not necessary to enable s3.
       retention: 1 # one weeks backup in object store.
       bucket: nrsitetst
       endpoint: nrs.objectstore.gov.bc.ca
       fullBackupSchedule: 0 9 * * * # full backup at GMT 9
-      incrementalBackupSchedule: 0/30 * * * * # every half hour
+      incrementalBackupSchedule: 0/15 * * * * # every fifteen minutes
     pvc:
       retention: 1 # one day hot active backup in pvc
       retentionFullType: count
-      fullBackupSchedule: 0 8 * * 0 # full backup at 8 AM every Sunday* *
-      incrementalBackupSchedule: 0 0,12 * * * # every 12 hour incremental
+      fullBackupSchedule: 0 8 * * * # full backup at 8 AM GMT everyday
+      incrementalBackupSchedule: 0 0/1 * * * # every 1 hour incremental
       volume:
         accessModes: "ReadWriteOnce"
         storage: 6Gi

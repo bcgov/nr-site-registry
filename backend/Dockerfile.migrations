@@ -14,8 +14,6 @@ RUN npm ci
 
 # Bundle app source
 COPY . .
-#test
-
 # Install postgresql-client
 RUN apk add --no-cache postgresql-client
 

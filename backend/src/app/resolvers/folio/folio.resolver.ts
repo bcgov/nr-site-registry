@@ -9,7 +9,12 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { Folio } from '../../entities/folio.entity';
 import { FolioService } from '../../services/folio/folio.service';
-import { FolioDTO, FolioMinDTO, FolioResponse } from '../../dto/folio.dto';
+import {
+  AddSiteToFolioDTO,
+  FolioDTO,
+  FolioMinDTO,
+  FolioResponse,
+} from '../../dto/folio.dto';
 import {
   FolioContentDTO,
   FolioContentResponse,
@@ -33,12 +38,11 @@ export class FolioResolver {
   @Query(() => FolioResponse, { name: 'getFolioItemsForUser' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getFolioItemsForUser(
-    @Args('userId', { type: () => String }) userId: string,
     @AuthenticatedUser()
     user: any,
   ) {
     this.sitesLogger.log(
-      'FolioResolver.getFolioItemsForUser() start userId:' + ' ' + userId,
+      'FolioResolver.getFolioItemsForUser() start userId:' + ' ' + user?.id,
     );
     const result = await this.folioService.getFoliosForUser(user);
 
@@ -53,7 +57,7 @@ export class FolioResolver {
     } else {
       this.sitesLogger.log('FolioResolver.getFolioItemsForUser() RES:404 end');
       return this.genericResponseProvider.createResponse(
-        `Folio not found for user id: ${userId}`,
+        `Folio not found for user id: ${user?.id}`,
         HttpStatus.NOT_FOUND,
         true,
         [],
@@ -131,18 +135,22 @@ export class FolioResolver {
   @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => FolioResponse, { name: 'addSiteToFolio' })
   async addSiteToFolio(
-    @Args('folioDTO', { type: () => [FolioContentDTO] }, new ValidationPipe())
-    folioContentDTO: [FolioContentDTO],
+    @Args(
+      'addSiteToFolioDTO',
+      { type: () => [AddSiteToFolioDTO] },
+      new ValidationPipe(),
+    )
+    addSiteToFolioDTO: [AddSiteToFolioDTO],
     @AuthenticatedUser()
     user: any,
   ) {
     this.sitesLogger.log(
       'FolioResolver.addSiteToFolio() start folioContentDTO:' +
         ' ' +
-        JSON.stringify(folioContentDTO),
+        JSON.stringify(addSiteToFolioDTO),
     );
     const message = await this.folioService.addSiteToFolio(
-      folioContentDTO,
+      addSiteToFolioDTO,
       user,
     );
 

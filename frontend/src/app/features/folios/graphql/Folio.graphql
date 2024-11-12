@@ -1,0 +1,20 @@
+query Folio_getFolioItemsForUser {
+  getFolioItemsForUser {
+    data {
+      id
+      userId
+      folioId
+      description
+      whoCreated
+      whenUpdated
+    }
+  }
+}
+
+mutation Folio_addSiteToFolio($addSiteToFolioDTO: [AddSiteToFolioDTO!]!) {
+    addSiteToFolio(addSiteToFolioDTO: $addSiteToFolioDTO) {
+      message
+      httpStatusCode
+      success
+    }
+}

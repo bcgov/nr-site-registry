@@ -1,10 +1,7 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { FolioContentDTO } from './folioContent.dto';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { ResponseDto } from './response/response.dto';
 import { Folio } from '../entities/folio.entity';
-
-import { FolioContents } from '../entities/folioContents.entity';
-import { IsNumber, IsOptional, isString, IsString } from 'class-validator';
 
 @InputType()
 export class FolioDTO {
@@ -56,4 +53,15 @@ export class FolioMinDTO {
 export class FolioResponse extends ResponseDto {
   @Field(() => [Folio], { nullable: true })
   data: Folio[] | null;
+}
+
+@InputType()
+export class AddSiteToFolioDTO {
+  @Field({ description: 'Primary key column of Folio talbe, not `folioId`' })
+  @IsNumber()
+  id: number;
+
+  @Field()
+  @IsString()
+  siteId: string;
 }

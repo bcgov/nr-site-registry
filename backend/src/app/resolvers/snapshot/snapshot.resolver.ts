@@ -175,9 +175,7 @@ export class SnapshotsResolver {
   }
 
   @Roles({
-    roles: [
-      CustomRoles.External,
-    ],
+    roles: [CustomRoles.External],
     mode: RoleMatchingMode.ANY,
   })
   @Mutation(() => SnapshotResponse, { name: 'createSnapshotForSites' })

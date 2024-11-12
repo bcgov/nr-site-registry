@@ -14,7 +14,7 @@ interface IParcelDescriptionTable {
   resultsPerPage: number | undefined;
   handleTableSortChange: (column: TableColumn, descending: boolean) => void;
   showPageOptions: boolean;
-  tableChangeHandler: (event:any) => void;
+  tableChangeHandler: (event: any) => void;
 }
 
 const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
@@ -28,7 +28,7 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
   resultsPerPage,
   handleTableSortChange,
   showPageOptions,
-  tableChangeHandler
+  tableChangeHandler,
 }) => {
   return (
     <Table

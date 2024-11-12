@@ -212,7 +212,7 @@ const FolioContents = () => {
             <span>Remove Selected From Folio</span>
           </div>
         </div>
-        <div className='col-12 overflow-auto w-100'>
+        <div className="col-12 overflow-auto w-100">
           <Table
             label="Folios"
             isLoading={RequestStatus.success}
@@ -235,7 +235,7 @@ const FolioContents = () => {
             idColumnName="id"
             deleteHandler={() => {}}
           />
-        </div>        
+        </div>
       </div>
 
       {showDeleteConfirmModal && (

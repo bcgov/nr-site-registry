@@ -171,7 +171,6 @@ const SRUpdates = () => {
   const notationTypeDropdownData = useSelector(notationTypeDrpdown);
   const notationClass = useSelector(notationClassDrpdown);
   const { landUseCodes } = useSelector(selectLandUseCodes);
- 
 
   const { id } = useParams();
   const [siteId, SetSiteId] = useState<string>('');
@@ -359,7 +358,7 @@ const SRUpdates = () => {
     }
   }, [updateRequestStatusFromState]);
 
-   const handleChange = (event: any) => {
+  const handleChange = (event: any) => {
     console.log('No Change Hanlder Required Here', event);
   };
   const handleAndReturnBoolean = (event: any): boolean => {

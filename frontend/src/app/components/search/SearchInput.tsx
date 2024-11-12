@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { CircleXMarkIcon, MagnifyingGlassIcon } from '../common/icon';
+import {
+  CircleXMarkIcon,
+  MagnifyingGlassIcon,
+  SpinnerIcon,
+} from '../common/icon';
 import { ISearchInput } from './ISearchInput';
 import './SearchInput.css';
 import React from 'react';
@@ -15,6 +19,7 @@ const SearchInput: React.FC<ISearchInput> = ({
   createNewLabel,
   createNewHandler,
   placeHolderText,
+  loading,
 }) => {
   const handler = optionSelectHandler ?? ((e) => {});
 
@@ -36,13 +41,17 @@ const SearchInput: React.FC<ISearchInput> = ({
   return (
     <div>
       {label && (
-        <label
-          htmlFor={searchId}
-          className="form-label custom-search-label"
-          aria-labelledby={label}
-        >
-          {label}
-        </label>
+        <div>
+          <label
+            htmlFor={searchId}
+            className="form-label custom-search-label"
+            aria-labelledby={label}
+          >
+            {label}
+
+            {loading && <SpinnerIcon className="fa-spin mx-2" />}
+          </label>
+        </div>
       )}
       <div className="search-box-container">
         <div className="d-flex align-items-center justify-content-center w-100 position-relative search-box ">
@@ -88,7 +97,7 @@ const SearchInput: React.FC<ISearchInput> = ({
                       handleClose();
                     }}
                   >
-                    {option}
+                    {typeof option === 'string' ? option : option.label}
                   </div>
                 );
               })}

@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Folio } from '../../entities/folio.entity';
 import { Repository } from 'typeorm';
-import { FolioDTO, FolioMinDTO } from '../../dto/folio.dto';
+import { AddSiteToFolioDTO, FolioDTO, FolioMinDTO } from '../../dto/folio.dto';
 import { plainToInstance } from 'class-transformer';
 import { FolioContentsService } from './folioContents.service';
 import { FolioContentDTO } from '../../dto/folioContent.dto';
@@ -59,7 +59,7 @@ export class FolioService {
       if (folio) {
         this.sitesLogger.log('FolioService.getSitesForFolio() end');
         this.sitesLogger.debug('FolioService.getSitesForFolio() end');
-        return this.folioContentService.getSiteForFolio(folio.id.toString());
+        return this.folioContentService.getSiteForFolio(folio.id);
       } else {
         this.sitesLogger.log('FolioService.getSitesForFolio() end');
         this.sitesLogger.debug('FolioService.getSitesForFolio() end');
@@ -178,7 +178,7 @@ export class FolioService {
       });
 
       if (savedFolio != null) {
-        await this.folioContentService.deleteAllSitesInFolio(id.toString());
+        await this.folioContentService.deleteAllSitesInFolio(id);
         const result = await this.folioRepository.delete({ id });
         this.sitesLogger.log('FolioService.deleteFolio() end');
         this.sitesLogger.debug('FolioService.deleteFolio() end');
@@ -203,7 +203,7 @@ export class FolioService {
   }
 
   async addSiteToFolio(
-    inputDTO: [FolioContentDTO],
+    inputDTO: [AddSiteToFolioDTO],
     userInfo: any,
   ): Promise<boolean> {
     this.sitesLogger.log('FolioService.addSiteToFolio() start');
@@ -212,16 +212,7 @@ export class FolioService {
       if (inputDTO?.length > 0) {
         inputDTO.forEach((item) => {
           if (item != null) {
-            const userId = userInfo.sub;
-            const { id } = item;
-            this.folioRepository
-              .findOne({ where: { id, userId } })
-              .then((folio) => {
-                if (folio) {
-                  item.folioId = folio.id.toString();
-                  this.folioContentService.addFolioContent(item);
-                }
-              });
+            this.folioContentService.addFolioContent(item, userInfo);
           }
         });
       }
@@ -257,9 +248,8 @@ export class FolioService {
               .findOne({ where: { id, userId } })
               .then((folio) => {
                 if (folio) {
-                  item.folioId = folio.id.toString();
                   this.folioContentService.deleteSitesInFolio(
-                    item.folioId,
+                    folio.id,
                     item.siteId,
                   );
                 }

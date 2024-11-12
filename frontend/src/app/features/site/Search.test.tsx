@@ -5,6 +5,7 @@ import Search from './Search';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { RequestStatus } from '../../helpers/requests/status';
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 
 const mockStore = configureStore([thunk]);
 
@@ -13,12 +14,16 @@ jest.mock('react-oidc-context', () => ({
 }));
 
 describe('Search Component', () => {
-  let store;
+  let store: any;
+
+  const client = new ApolloClient({
+    cache: new InMemoryCache(),
+  });
 
   beforeEach(() => {
     store = mockStore({
       sites: {
-        sites: []
+        sites: [],
       },
       error: '',
       fetchStatus: RequestStatus.idle,
@@ -31,7 +36,9 @@ describe('Search Component', () => {
   test('renders search input', () => {
     const { getByPlaceholderText } = render(
       <Provider store={store}>
-        <Search />
+        <ApolloProvider client={client}>
+          <Search />
+        </ApolloProvider>
       </Provider>,
     );
     const searchInput = screen.getByPlaceholderText('Search');

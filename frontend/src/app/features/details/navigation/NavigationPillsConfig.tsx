@@ -25,23 +25,25 @@ export interface IComponentProps {
   showPending?: boolean;
 }
 
-export const getNavItems = (includeUpdatesTab:boolean) =>
-  isUserOfType(UserRoleType.SR) && includeUpdatesTab ? ['Updates', ...mainNavItems] : mainNavItems;
+export const getNavItems = (includeUpdatesTab: boolean) =>
+  isUserOfType(UserRoleType.SR) && includeUpdatesTab
+    ? ['Updates', ...mainNavItems]
+    : mainNavItems;
 
 const mainNavComponents = [
- { key:"summary", component:  <Summary />},
- { key:"notations", component: <Notations />},
- { key:"participants", component: <Participants />},
- { key:"documents", component: <Documents /> },
- { key:"associated", component: <Associate /> },
- { key:"landuses", component: <LandUses /> },
- { key:"parceldesc", component: <ParcelDescriptions /> },
- { key:"disclosure", component: <Disclosure /> },
+  { key: 'summary', component: <Summary /> },
+  { key: 'notations', component: <Notations /> },
+  { key: 'participants', component: <Participants /> },
+  { key: 'documents', component: <Documents /> },
+  { key: 'associated', component: <Associate /> },
+  { key: 'landuses', component: <LandUses /> },
+  { key: 'parceldesc', component: <ParcelDescriptions /> },
+  { key: 'disclosure', component: <Disclosure /> },
 ];
 
-export const getNavComponents = (includeUpdatesTab:boolean) =>
+export const getNavComponents = (includeUpdatesTab: boolean) =>
   isUserOfType(UserRoleType.SR) && includeUpdatesTab
-    ? [{ key:"updates", component:  <SRUpdates />}, ...mainNavComponents]
+    ? [{ key: 'updates', component: <SRUpdates /> }, ...mainNavComponents]
     : mainNavComponents;
 
 export const mainDropDownNavItems = [
@@ -79,7 +81,7 @@ export const mainDropDownNavItems = [
   },
 ];
 
-export const getDropDownNavItems = (includeUpdatesTab:boolean) =>
+export const getDropDownNavItems = (includeUpdatesTab: boolean) =>
   isUserOfType(UserRoleType.SR) && includeUpdatesTab
     ? [
         {

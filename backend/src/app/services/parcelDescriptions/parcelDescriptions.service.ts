@@ -21,10 +21,6 @@ import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
 export class ParcelDescriptionsService {
   constructor(
     @InjectEntityManager() private readonly entityManager: EntityManager,
-    @InjectRepository(Subdivisions)
-    private subdivisionsRepository: Repository<Subdivisions>,
-    @InjectRepository(SiteSubdivisions)
-    private siteSubdivisionsRepository: Repository<SiteSubdivisions>,
     private snapshotService: SnapshotsService,
     private readonly sitesLogger: LoggerService,
   ) {}
@@ -186,10 +182,21 @@ export class ParcelDescriptionsService {
     );
   }
 
+  /**
+   * Commit a collection of added, updated, and deleted Parcel Descriptions to
+   * the database.
+   * @param siteId The id of the site that the parcel descriptions belong to.
+   * @param parcelDescriptions A collection of parcel descriptions to commit.
+   * @param userInfo An object that minimally contains the logged in user's given_name
+   * @param transactionalEntityManager This function MUST be called from within a database transaction. This is the transaction's entity manager.
+   * @returns void
+   * @throws BadRequestException
+   */
   async saveParcelDescriptionsForSite(
     siteId: string,
     parcelDescriptions: ParcelDescriptionInputDTO[],
     userInfo: any,
+    transactionalEntityManager: EntityManager,
   ) {
     this.sitesLogger.log(
       'parcelDescriptionService.saveParcelDescriptionsForSite() start',
@@ -203,10 +210,11 @@ export class ParcelDescriptionsService {
       },
     );
     if (parcelDescriptionsToUpdate.length > 0) {
-      await this.updateParcelDescriptionsForSite(
+      await this._updateParcelDescriptionsForSite(
         siteId,
         parcelDescriptionsToUpdate,
         userInfo,
+        transactionalEntityManager,
       );
     }
     const parcelDescriptionsToAdd = parcelDescriptions.filter(
@@ -215,10 +223,11 @@ export class ParcelDescriptionsService {
       },
     );
     if (parcelDescriptionsToAdd.length > 0) {
-      await this.addParcelDescriptionsForSite(
+      await this._addParcelDescriptionsForSite(
         siteId,
         parcelDescriptionsToAdd,
         userInfo,
+        transactionalEntityManager,
       );
     }
     const parcelDescriptionsToDelete = parcelDescriptions.filter(
@@ -227,9 +236,10 @@ export class ParcelDescriptionsService {
       },
     );
     if (parcelDescriptionsToDelete.length > 0) {
-      await this.deleteParcelDescriptionsForSite(
+      await this._deleteParcelDescriptionsForSite(
         siteId,
         parcelDescriptionsToDelete,
+        transactionalEntityManager,
       );
     }
     this.sitesLogger.log(
@@ -240,10 +250,11 @@ export class ParcelDescriptionsService {
     );
   }
 
-  async addParcelDescriptionsForSite(
+  async _addParcelDescriptionsForSite(
     siteId: string,
     parcelDescriptions: ParcelDescriptionInputDTO[],
     userInfo: any,
+    transactionalEntityManager: EntityManager,
   ) {
     this.sitesLogger.log(
       'parcelDescriptionService.addParcelDescriptionsForSite() start',
@@ -294,7 +305,7 @@ export class ParcelDescriptionsService {
       // There is a bug with TypeORM where it will only return columns for the
       // first parent entity of an entity that uses inheritence. Here I'm using
       // the querybuilder to work around it.
-      insertResult = await this.subdivisionsRepository
+      insertResult = await transactionalEntityManager
         .createQueryBuilder()
         .insert()
         .into(Subdivisions)
@@ -334,10 +345,11 @@ export class ParcelDescriptionsService {
 
     // Commit the new siteSubdivisions to the database.
     try {
-      await this.siteSubdivisionsRepository.insert(siteSubdivisions);
+      await transactionalEntityManager.insert(
+        SiteSubdivisions,
+        siteSubdivisions,
+      );
     } catch (error) {
-      // This code is called within a transaction in the site service, so the
-      // previous insert should be rolled back if there is a failure here.
       this.sitesLogger.error(
         'Exception occured in parcelDescriptionService.addParcelDescriptionsForSite() end',
         JSON.stringify(error),
@@ -353,10 +365,11 @@ export class ParcelDescriptionsService {
     );
   }
 
-  async updateParcelDescriptionsForSite(
+  async _updateParcelDescriptionsForSite(
     siteId: string,
     parcelDescriptions: ParcelDescriptionInputDTO[],
     userInfo: any,
+    transactionalEntityManager: EntityManager,
   ) {
     this.sitesLogger.log(
       'parcelDescriptionService.updateParcelDescriptionsForSite() start',
@@ -370,13 +383,16 @@ export class ParcelDescriptionsService {
     const subdivIds = parcelDescriptions.map((parcelDescription) => {
       return parcelDescription.id;
     });
-    let subdivisions = await this.subdivisionsRepository.findBy({
+    let subdivisions = await transactionalEntityManager.findBy(Subdivisions, {
       id: In(subdivIds),
     });
-    let siteSubdivisions = await this.siteSubdivisionsRepository.findBy({
-      subdivId: In(subdivIds),
-      siteId: siteId,
-    });
+    let siteSubdivisions = await transactionalEntityManager.findBy(
+      SiteSubdivisions,
+      {
+        subdivId: In(subdivIds),
+        siteId: siteId,
+      },
+    );
 
     // Parse each parcel description's properties into its subdivision and
     // siteSubdivision database entities.
@@ -429,7 +445,7 @@ export class ParcelDescriptionsService {
 
     // Commit the updates.
     try {
-      await this.subdivisionsRepository.save(subdivisions);
+      await transactionalEntityManager.save(subdivisions);
     } catch (error) {
       this.sitesLogger.error(
         'Exception occured in parcelDescriptionService.updateParcelDescriptionsForSite() end',
@@ -438,10 +454,8 @@ export class ParcelDescriptionsService {
       throw new BadRequestException('Failed to update Parcel Description.');
     }
     try {
-      await this.siteSubdivisionsRepository.save(siteSubdivisions);
+      await transactionalEntityManager.save(siteSubdivisions);
     } catch (error) {
-      // This code is called within a transaction in the site service, so the
-      // previous save should be rolled back if there is a failure here.
       this.sitesLogger.error(
         'Exception occured in parcelDescriptionService.updateParcelDescriptionsForSite() end',
         JSON.stringify(error),
@@ -457,9 +471,10 @@ export class ParcelDescriptionsService {
     );
   }
 
-  async deleteParcelDescriptionsForSite(
+  async _deleteParcelDescriptionsForSite(
     siteId: string,
     parcelDescriptions: ParcelDescriptionInputDTO[],
+    transactionalEntityManager: EntityManager,
   ) {
     // TODO: Implementation to come in another pull request
   }

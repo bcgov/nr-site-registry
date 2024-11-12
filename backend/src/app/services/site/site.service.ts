@@ -318,7 +318,7 @@ export class SiteService {
 
     if (pending) {
       const result = await this.siteRepository.findOne({
-        where: { id: siteId, srAction: SRApprovalStatusEnum.PENDING},
+        where: { id: siteId, srAction: SRApprovalStatusEnum.PENDING },
       });
 
       response.data = result ? result : null;
@@ -485,6 +485,7 @@ export class SiteService {
         inputDTO.siteId,
         parcelDescriptions,
         userInfo,
+        transactionalEntityManager,
       );
     } else {
       this.sitesLogger.log(
@@ -628,10 +629,11 @@ export class SiteService {
                   changes: {
                     ...existingDocument,
                     ...siteDocument,
-                    userAction: document.srAction === SRApprovalStatusEnum.PUBLIC ||
-                    document.srAction === SRApprovalStatusEnum.PRIVATE
-                      ? UserActionEnum.DEFAULT
-                      : UserActionEnum.UPDATED,                   
+                    userAction:
+                      document.srAction === SRApprovalStatusEnum.PUBLIC ||
+                      document.srAction === SRApprovalStatusEnum.PRIVATE
+                        ? UserActionEnum.DEFAULT
+                        : UserActionEnum.UPDATED,
                     whenUpdated: new Date(),
                     whoUpdated: userInfo ? userInfo.givenName : '',
                   },
@@ -648,10 +650,11 @@ export class SiteService {
                     changes: {
                       ...existingDocumentParticipant,
                       ...siteDocumentParticipant,
-                      userAction: document.srAction === SRApprovalStatusEnum.PUBLIC ||
-                      document.srAction === SRApprovalStatusEnum.PRIVATE
-                        ? UserActionEnum.DEFAULT
-                        : UserActionEnum.UPDATED,                     
+                      userAction:
+                        document.srAction === SRApprovalStatusEnum.PUBLIC ||
+                        document.srAction === SRApprovalStatusEnum.PRIVATE
+                          ? UserActionEnum.DEFAULT
+                          : UserActionEnum.UPDATED,
                       whenUpdated: new Date(),
                       whoUpdated: userInfo ? userInfo.givenName : '',
                     },
@@ -1536,11 +1539,9 @@ export class SiteService {
         );
         return false;
       } else {
-        const { isApproved, sites , fromSiteDetails } = inputDTO;
+        const { isApproved, sites, fromSiteDetails } = inputDTO;
 
-
-        for (const site of sites)
-        {
+        for (const site of sites) {
           await this.entityManager.transaction(
             async (transactionalEntityManager: EntityManager) => {
               if (
@@ -1558,7 +1559,7 @@ export class SiteService {
               );
             },
           );
-        }        
+        }
         return true;
       }
     } catch (error) {
@@ -1587,11 +1588,20 @@ export class SiteService {
       }
 
       if (site.changes.indexOf('summary') !== -1) {
-        const sitesForUpdates = !fromSiteDetails? await transactionalEntityManager.find(Sites, {
-          where: { id: site.siteId, whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING },
-        }):await transactionalEntityManager.find(Sites, {
-          where: { id: site.siteId, srAction: SRApprovalStatusEnum.PENDING },
-        });
+        const sitesForUpdates = !fromSiteDetails
+          ? await transactionalEntityManager.find(Sites, {
+              where: {
+                id: site.siteId,
+                whoUpdated: site.whoUpdated,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            })
+          : await transactionalEntityManager.find(Sites, {
+              where: {
+                id: site.siteId,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            });
 
         if (sitesForUpdates?.length > 0) {
           sitesForUpdates.forEach((site) => {
@@ -1606,11 +1616,20 @@ export class SiteService {
       }
 
       if (site.changes.indexOf('notation') !== -1) {
-        const events = !fromSiteDetails?await transactionalEntityManager.find(Events, {
-          where: { siteId: site.siteId, whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING },
-        }):await transactionalEntityManager.find(Events, {
-          where: { siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING},
-        });
+        const events = !fromSiteDetails
+          ? await transactionalEntityManager.find(Events, {
+              where: {
+                siteId: site.siteId,
+                whoUpdated: site.whoUpdated,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            })
+          : await transactionalEntityManager.find(Events, {
+              where: {
+                siteId: site.siteId,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            });
 
         if (events?.length > 0) {
           events.forEach((event) => {
@@ -1621,24 +1640,20 @@ export class SiteService {
 
           const eventIds = events.map((event) => event.id);
 
-          const eventsParticipants = !fromSiteDetails?await transactionalEntityManager.find(
-            EventPartics,
-            {
-              where: {
-                eventId: In(eventIds),
-                whoUpdated: site.whoUpdated,
-                srAction: SRApprovalStatusEnum.PENDING
-              },
-            },
-          ):await transactionalEntityManager.find(
-            EventPartics,
-            {
-              where: {
-                eventId: In(eventIds) ,
-                srAction: SRApprovalStatusEnum.PENDING            
-              },
-            },
-          );
+          const eventsParticipants = !fromSiteDetails
+            ? await transactionalEntityManager.find(EventPartics, {
+                where: {
+                  eventId: In(eventIds),
+                  whoUpdated: site.whoUpdated,
+                  srAction: SRApprovalStatusEnum.PENDING,
+                },
+              })
+            : await transactionalEntityManager.find(EventPartics, {
+                where: {
+                  eventId: In(eventIds),
+                  srAction: SRApprovalStatusEnum.PENDING,
+                },
+              });
 
           if (eventsParticipants?.length > 0) {
             eventsParticipants.forEach((eventsParticipant) => {
@@ -1662,22 +1677,20 @@ export class SiteService {
       }
 
       if (site.changes.indexOf('site participants') !== -1) {
-        const siteParticipants = !fromSiteDetails?await transactionalEntityManager.find(
-          SitePartics,
-          {
-            where: {
-              siteId: site.siteId,
-              whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING
-            },
-          },
-        ):await transactionalEntityManager.find(
-          SitePartics,
-          {
-            where: {
-              siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING
-            },
-          },
-        );
+        const siteParticipants = !fromSiteDetails
+          ? await transactionalEntityManager.find(SitePartics, {
+              where: {
+                siteId: site.siteId,
+                whoUpdated: site.whoUpdated,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            })
+          : await transactionalEntityManager.find(SitePartics, {
+              where: {
+                siteId: site.siteId,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            });
 
         if (siteParticipants?.length > 0) {
           siteParticipants.forEach((siteParticipant) => {
@@ -1693,16 +1706,20 @@ export class SiteService {
       }
 
       if (site.changes.indexOf('documents') !== -1) {
-        const siteDocs = !fromSiteDetails?await transactionalEntityManager.find(SiteDocs, {
-          where: {
-            siteId: site.siteId,
-            whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING
-          },
-        }):await transactionalEntityManager.find(SiteDocs, {
-          where: {
-            siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING
-          },
-        });
+        const siteDocs = !fromSiteDetails
+          ? await transactionalEntityManager.find(SiteDocs, {
+              where: {
+                siteId: site.siteId,
+                whoUpdated: site.whoUpdated,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            })
+          : await transactionalEntityManager.find(SiteDocs, {
+              where: {
+                siteId: site.siteId,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            });
 
         if (siteDocs?.length > 0) {
           siteDocs.forEach((doc) => {
@@ -1718,22 +1735,20 @@ export class SiteService {
       }
 
       if (site.changes.indexOf('associated sites') !== -1) {
-        const siteAssociations = !fromSiteDetails?await transactionalEntityManager.find(
-          SiteAssocs,
-          {
-            where: {
-              siteId: site.siteId,
-              whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING
-            },
-          },
-        ):await transactionalEntityManager.find(
-          SiteAssocs,
-          {
-            where: {
-              siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING
-            },
-          },
-        );
+        const siteAssociations = !fromSiteDetails
+          ? await transactionalEntityManager.find(SiteAssocs, {
+              where: {
+                siteId: site.siteId,
+                whoUpdated: site.whoUpdated,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            })
+          : await transactionalEntityManager.find(SiteAssocs, {
+              where: {
+                siteId: site.siteId,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            });
 
         if (siteAssociations?.length > 0) {
           siteAssociations.forEach((siteAssociation) => {
@@ -1749,22 +1764,20 @@ export class SiteService {
       }
 
       if (site.changes.indexOf('land histories') !== -1) {
-        const landHistories = !fromSiteDetails?await transactionalEntityManager.find(
-          LandHistories,
-          {
-            where: {
-              siteId: site.siteId,
-              whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING
-            },
-          },
-        ):await transactionalEntityManager.find(
-          LandHistories,
-          {
-            where: {
-              siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING             
-            },
-          },
-        );
+        const landHistories = !fromSiteDetails
+          ? await transactionalEntityManager.find(LandHistories, {
+              where: {
+                siteId: site.siteId,
+                whoUpdated: site.whoUpdated,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            })
+          : await transactionalEntityManager.find(LandHistories, {
+              where: {
+                siteId: site.siteId,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            });
 
         if (landHistories?.length > 0) {
           landHistories.forEach((history) => {
@@ -1780,16 +1793,20 @@ export class SiteService {
       }
 
       if (site.changes.indexOf('site profiles') !== -1) {
-        const profiles = !fromSiteDetails?await transactionalEntityManager.find(SiteProfiles, {
-          where: {
-            siteId: site.siteId,
-            whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING
-          },
-        }):await transactionalEntityManager.find(SiteProfiles, {
-          where: {
-            siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING
-          },
-        });
+        const profiles = !fromSiteDetails
+          ? await transactionalEntityManager.find(SiteProfiles, {
+              where: {
+                siteId: site.siteId,
+                whoUpdated: site.whoUpdated,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            })
+          : await transactionalEntityManager.find(SiteProfiles, {
+              where: {
+                siteId: site.siteId,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            });
 
         if (profiles?.length > 0) {
           profiles.forEach((profile) => {
@@ -1805,37 +1822,38 @@ export class SiteService {
       }
 
       if (site.changes.indexOf('parcel description') !== -1) {
-        const siteSubDivisions = !fromSiteDetails?await transactionalEntityManager.find(
-          SiteSubdivisions,
-          {
-            where: {
-              siteId: site.siteId,
-              whoUpdated: site.whoUpdated, srAction: SRApprovalStatusEnum.PENDING
-            },
-          },
-        ):await transactionalEntityManager.find(
-          SiteSubdivisions,
-          {
-            where: {
-              siteId: site.siteId, srAction: SRApprovalStatusEnum.PENDING
-            },
-          },
-        );
+        const siteSubDivisions = !fromSiteDetails
+          ? await transactionalEntityManager.find(SiteSubdivisions, {
+              where: {
+                siteId: site.siteId,
+                whoUpdated: site.whoUpdated,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            })
+          : await transactionalEntityManager.find(SiteSubdivisions, {
+              where: {
+                siteId: site.siteId,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            });
 
         if (siteSubDivisions?.length > 0) {
           const subDivIds = siteSubDivisions.map((x) => x.subdivId);
 
-          const subDivisions = !fromSiteDetails?await transactionalEntityManager.find(
-            Subdivisions,
-            {
-              where: { id: In(subDivIds), whoUpdated: site.whoUpdated , srAction: SRApprovalStatusEnum.PENDING},
-            },
-          ):await transactionalEntityManager.find(
-            Subdivisions,
-            {
-              where: { id: In(subDivIds), srAction: SRApprovalStatusEnum.PENDING}
-            },
-          );
+          const subDivisions = !fromSiteDetails
+            ? await transactionalEntityManager.find(Subdivisions, {
+                where: {
+                  id: In(subDivIds),
+                  whoUpdated: site.whoUpdated,
+                  srAction: SRApprovalStatusEnum.PENDING,
+                },
+              })
+            : await transactionalEntityManager.find(Subdivisions, {
+                where: {
+                  id: In(subDivIds),
+                  srAction: SRApprovalStatusEnum.PENDING,
+                },
+              });
 
           if (subDivisions?.length > 0) {
             subDivisions.forEach((sub) => {

@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, isValidElement, ReactElement, useEffect, useState } from 'react';
 import SearchInput from '../../components/search/SearchInput';
 import { FolderPlusIcon, XmarkIcon } from '../../components/common/icon';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
@@ -11,6 +11,7 @@ import { getUser } from '../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
 import { Placement } from 'react-bootstrap/esm/types';
 import clsx from 'clsx';
+import { ModalDialogWrapperWithHeader } from '../../components/modaldialog/ModalDialog';
 
 interface AddToFolioProps {
   label?: string;
@@ -19,7 +20,7 @@ interface AddToFolioProps {
   popupPlacement?: Placement;
   triggerClassName?: string;
   showSearchBoxOnly?: boolean;
-  handleClose?: (event: any) => void;
+  triggerElement?: ReactElement;
 }
 
 const AddToFolio: FC<AddToFolioProps> = ({
@@ -29,11 +30,11 @@ const AddToFolio: FC<AddToFolioProps> = ({
   popupPlacement = 'bottom-start',
   triggerClassName,
   showSearchBoxOnly = false,
-  handleClose,
+
+  triggerElement,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-
-  handleClose = handleClose ?? ((event: any) => {});
+  const [show, setShow] = useState(false);
 
   const auth = useAuth();
 
@@ -47,7 +48,10 @@ const AddToFolio: FC<AddToFolioProps> = ({
   }, []);
 
   const [addSiteToFolio] = useFolio_AddSiteToFolioMutation({
-    onCompleted: () => notifySuccess('Successfully added site to folio'),
+    onCompleted: () => {
+      notifySuccess('Successfully added site to folio');
+      setShow(false);
+    },
     onError: () => notifyError('Unable to add to folio'),
   });
 
@@ -92,7 +96,7 @@ const AddToFolio: FC<AddToFolioProps> = ({
         options={searchOptions}
         optionSelectHandler={(value) => {
           if (value === 'close') {
-            handleClose && handleClose(null);
+            setShow(false);
           } else {
             handleFolioSelect(value);
           }
@@ -115,22 +119,39 @@ const AddToFolio: FC<AddToFolioProps> = ({
     });
   };
 
-  if (!showSearchBoxOnly) {
-    return (
-      <OverlayTrigger
-        trigger="click"
-        placement={popupPlacement}
-        rootClose // closes the popover on outside click
-        transition={false}
-        onToggle={(open) => {
-          if (open && checkUserAuthentication()) {
-            getFolioItems();
-          }
-        }}
-        overlay={
-          <Popover className="folio-popover">{renderSearchInput()}</Popover>
+  return (
+    <OverlayTrigger
+      show={show}
+      trigger="click"
+      placement={popupPlacement}
+      rootClose // closes the popover on outside click
+      transition={false}
+      onToggle={(open) => {
+        setShow(open);
+        if (open && checkUserAuthentication()) {
+          getFolioItems();
         }
-      >
+      }}
+      overlay={
+        // TODO: add media query hook
+        // <Popover className="folio-popover">{renderSearchInput()}</Popover>
+        <ModalDialogWrapperWithHeader closeHandler={() => {}}>
+          <div className="d-flex  flex-column justify-content-center">
+            {renderSearchInput(true)}
+            <div
+              onClick={() => setShow(false)}
+              className="d-flex flex-row align-items-center pt-2 justify-content-center "
+            >
+              <XmarkIcon className="custom-search-label"></XmarkIcon>
+              <span className="custom-search-label">Close</span>
+            </div>
+          </div>
+        </ModalDialogWrapperWithHeader>
+      }
+    >
+      {isValidElement(triggerElement) ? (
+        triggerElement
+      ) : (
         <button
           className={clsx([
             'search-result-actions-btn',
@@ -142,22 +163,9 @@ const AddToFolio: FC<AddToFolioProps> = ({
           <FolderPlusIcon />
           <span>{label}</span>
         </button>
-      </OverlayTrigger>
-    );
-  } else {
-    return (
-      <div className="d-flex  flex-column justify-content-center">
-        {renderSearchInput(true)}
-        <div
-          onClick={handleClose}
-          className="d-flex flex-row align-items-center pt-2 justify-content-center "
-        >
-          <XmarkIcon className="custom-search-label"></XmarkIcon>
-          <span className="custom-search-label">Close</span>
-        </div>
-      </div>
-    );
-  }
+      )}
+    </OverlayTrigger>
+  );
 };
 
 export default AddToFolio;

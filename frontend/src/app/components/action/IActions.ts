@@ -1,3 +1,4 @@
+import { ReactElement } from 'react';
 import { SiteDetailsMode } from '../../features/details/dto/SiteDetailsMode';
 
 export interface DropdownItem {
@@ -7,7 +8,7 @@ export interface DropdownItem {
 
 export interface IActions {
   label: string;
-  items: DropdownItem[];
+  items: Array<DropdownItem | ReactElement>;
   disable?: boolean;
   customCssToggleBtn?: string;
   customCssMenu?: string;

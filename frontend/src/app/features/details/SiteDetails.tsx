@@ -24,9 +24,7 @@ import {
   getNavComponents,
   getNavItems,
 } from './navigation/NavigationPillsConfig';
-import ModalDialog, {
-  ModalDialogWrapperWithHeader,
-} from '../../components/modaldialog/ModalDialog';
+import ModalDialog from '../../components/modaldialog/ModalDialog';
 import {
   CancelButton,
   SaveButton,
@@ -103,8 +101,6 @@ import {
 } from './srUpdates/state/srUpdatesTableSlice';
 
 const SiteDetails = () => {
-  const [showAddFoliosForMobile, SetShowAddFoliosForMobile] =
-    useState<Boolean>(false);
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
     null,
   );
@@ -508,19 +504,19 @@ const SiteDetails = () => {
     ) {
       return (
         <>
-          {' '}
           <div className="d-block d-sm-none">
             <Actions
               label="Actions"
               items={[
                 { label: 'Add To Cart', value: 'cart' },
-                { label: 'Add To Folio', value: 'folio' },
+                <AddToFolio
+                  selectedSiteIds={[id || '']}
+                  triggerElement={<span>Add to Folio</span>}
+                />,
               ]}
               onItemClick={(value) => {
                 if (value === 'cart') {
                   handleAddToCart();
-                } else if (value === 'folio') {
-                  SetShowAddFoliosForMobile(true);
                 }
               }}
             />
@@ -600,18 +596,6 @@ const SiteDetails = () => {
         </div>
       )}
       <PageContainer role="details">
-        {showAddFoliosForMobile === true && id && (
-          <ModalDialogWrapperWithHeader closeHandler={() => {}}>
-            <AddToFolio
-              selectedSiteIds={[id]}
-              label="Add to Folio"
-              showSearchBoxOnly={true}
-              handleClose={() => {
-                SetShowAddFoliosForMobile(false);
-              }}
-            />
-          </ModalDialogWrapperWithHeader>
-        )}
         {confirmSiteReview != null &&
           (confirmSiteReview === false || confirmSiteReview === true) && (
             <ModalDialog

@@ -53,8 +53,7 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
   return (
     <div>
       {open && (
-        <div className="custom-modal">
-          <div className="custom-modal-content">
+          <ModalDialogWrapper closeHandler={handleClose}>
             <div className="custom-modal-header">
               <span className="custom-modal-header-text">{displayLabel}</span>
               <XmarkIcon
@@ -86,11 +85,46 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
                 <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
               </div>
             )}
-          </div>
-        </div>
+         </ModalDialogWrapper>
       )}
     </div>
   );
 };
 
 export default ModalDialog;
+
+export const ModalDialogWrapper: React.FC<ModalDialogCloseHandlerProps> = ({
+  closeHandler,
+  children,
+}) => {
+  return (
+    <div>
+      <div className="custom-modal">
+        <div className="custom-modal-content">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const ModalDialogHeaderOnly: React.FC<ModalDialogCloseHandlerProps> = ({
+  closeHandler,
+  children,
+}) => {
+  return <div className="custom-modal-header">{children}</div>;
+};
+
+export const ModalDialogWrapperWithHeader: React.FC<
+  ModalDialogCloseHandlerProps
+> = ({ closeHandler, children }) => {
+  return (
+    <div>
+      <ModalDialogWrapper closeHandler={ModalDialogHeaderOnly}>
+        <ModalDialogHeaderOnly closeHandler={ModalDialogHeaderOnly} >
+          {children}
+          </ModalDialogHeaderOnly>
+      </ModalDialogWrapper>
+    </div>
+  );
+};

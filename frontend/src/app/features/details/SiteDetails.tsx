@@ -24,7 +24,7 @@ import {
   getNavComponents,
   getNavItems,
 } from './navigation/NavigationPillsConfig';
-import ModalDialog from '../../components/modaldialog/ModalDialog';
+import ModalDialog, { ModalDialogWrapperWithHeader } from '../../components/modaldialog/ModalDialog';
 import {
   CancelButton,
   SaveButton,
@@ -101,6 +101,8 @@ import {
 } from './srUpdates/state/srUpdatesTableSlice';
 
 const SiteDetails = () => {
+
+  const [showAddFoliosForMobile, SetShowAddFoliosForMobile] = useState<Boolean>(false);
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
     null,
   );
@@ -497,6 +499,49 @@ const SiteDetails = () => {
   if (snapshot.status === RequestStatus.failed)
     return <div>Error: {snapshot.error || 'Failed to load data'}</div>;
 
+
+  const renderOptionsForExternalUser = () => {
+    if(viewMode === SiteDetailsMode.ViewOnlyMode &&
+      userType === UserType.External)
+      { return ( <> <div className='d-block d-sm-none'>
+        <Actions label='Actions' items={[
+          {label:"Add To Cart", value: "cart"},
+          {label:"Add To Folio", value: "folio"},
+        ]}
+        onItemClick={(value)=>{
+
+          if(value ===  'cart')
+          {
+            handleAddToCart();
+          }
+          else if ( value === 'folio')
+          {
+            SetShowAddFoliosForMobile(true);
+          }
+
+        }}
+        />
+    </div>  
+        <div className='d-none d-sm-block'>
+          <div className='d-flex gap-2'>
+          <div
+            className="d-flex btn-cart align-items-center "
+            onClick={() => handleAddToCart()}
+          >
+            <ShoppingCartIcon className="btn-icon" />
+            <span className="btn-cart-lbl"> Add to Cart</span>
+          </div>
+
+          {id && (
+            <div><AddToFolio selectedSiteIds={[id]} label="Add to Folio" /></div>
+          )}
+        </div>
+        </div></>)
+      
+  }
+}
+
+
   return (
     <>
       {isVisible && (
@@ -545,29 +590,18 @@ const SiteDetails = () => {
                 </>
               )}
             </div>
-
-            {/* For Cart /Folio Controls*/}
-            {!edit &&
-              viewMode === SiteDetailsMode.ViewOnlyMode &&
-              userType === UserType.External && (
-                <>
-                  <div
-                    className="d-flex btn-cart align-items-center "
-                    onClick={() => handleAddToCart()}
-                  >
-                    <ShoppingCartIcon className="btn-icon" />
-                    <span className="btn-cart-lbl"> Add to Cart</span>
-                  </div>
-
-                  {id && (
-                    <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
-                  )}
-                </>
-              )}
+            { renderOptionsForExternalUser()}
+           
           </div>
         </div>
       )}
       <PageContainer role="details">
+      { showAddFoliosForMobile === true && (
+             id && 
+             <ModalDialogWrapperWithHeader closeHandler={()=>{}}>
+               <AddToFolio selectedSiteIds={[id]} label="Add to Folio" showSearchBoxOnly={true} handleClose={()=>{ SetShowAddFoliosForMobile(false)}} />
+             </ModalDialogWrapperWithHeader>
+          )}
         {confirmSiteReview != null &&
           (confirmSiteReview === false || confirmSiteReview === true) && (
             <ModalDialog
@@ -656,23 +690,8 @@ const SiteDetails = () => {
                 )}
               </div>
 
-              {/* For Cart /Folio Controls*/}
-              {!edit &&
-                viewMode === SiteDetailsMode.ViewOnlyMode &&
-                userType === UserType.External && (
-                  <>
-                    <div
-                      className="d-flex btn-cart align-items-center"
-                      onClick={() => handleAddToCart()}
-                    >
-                      <ShoppingCartIcon className="btn-icon" />
-                      <span className="btn-cart-lbl"> Add to Cart</span>
-                    </div>
-                    {id && (
-                      <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
-                    )}
-                  </>
-                )}
+              {/* For Cart /Folio Controls*/}              
+                {renderOptionsForExternalUser()}
             </div>
           </div>
         )}

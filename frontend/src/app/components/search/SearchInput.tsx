@@ -3,6 +3,7 @@ import {
   CircleXMarkIcon,
   MagnifyingGlassIcon,
   SpinnerIcon,
+  XmarkIcon,
 } from '../common/icon';
 import { ISearchInput } from './ISearchInput';
 import './SearchInput.css';
@@ -20,6 +21,7 @@ const SearchInput: React.FC<ISearchInput> = ({
   createNewHandler,
   placeHolderText,
   loading,
+  showCloseBtnInDropdownOptions
 }) => {
   const handler = optionSelectHandler ?? ((e) => {});
 
@@ -60,6 +62,7 @@ const SearchInput: React.FC<ISearchInput> = ({
               <MagnifyingGlassIcon />
             </span>
           )}
+          <div>
           <input
             id={searchId}
             data-testid={searchId}
@@ -84,9 +87,12 @@ const SearchInput: React.FC<ISearchInput> = ({
               <CircleXMarkIcon />
             </span>
           )}
+          </div>
+          
 
           {searchTerm && !createMode && options && options.length > 0 && (
             <div className="search-options">
+              <div className="search-options-results">
               {options.map((option, index) => {
                 return (
                   <div
@@ -101,6 +107,17 @@ const SearchInput: React.FC<ISearchInput> = ({
                   </div>
                 );
               })}
+              </div>
+                {showCloseBtnInDropdownOptions && <div
+                    key={10000}
+                    className="search-option-item"
+                    onClick={(e) => {   
+                      handler('close');                  
+                      handleClose();
+                    }}
+                  >
+                    <XmarkIcon/> Close
+                  </div>}
               {createNewLabel && (
                 <div
                   className="search-create-new-section"

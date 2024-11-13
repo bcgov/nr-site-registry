@@ -11,4 +11,5 @@ export interface ISearchInput {
   createNewHandler?: (event: any) => void;
   placeHolderText?: string;
   loading?: boolean;
+  showCloseBtnInDropdownOptions?: boolean;
 }

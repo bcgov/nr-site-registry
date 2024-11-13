@@ -1,6 +1,6 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import SearchInput from '../../components/search/SearchInput';
-import { FolderPlusIcon } from '../../components/common/icon';
+import { FolderPlusIcon, XmarkIcon } from '../../components/common/icon';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import {
   useFolio_GetFolioItemsForUserLazyQuery,
@@ -18,6 +18,8 @@ interface AddToFolioProps {
   selectedSiteIds: string[];
   popupPlacement?: Placement;
   triggerClassName?: string;
+  showSearchBoxOnly?: boolean;
+  handleClose?: (event:any)=>void;
 }
 
 const AddToFolio: FC<AddToFolioProps> = ({
@@ -26,13 +28,23 @@ const AddToFolio: FC<AddToFolioProps> = ({
   selectedSiteIds,
   popupPlacement = 'bottom-start',
   triggerClassName,
+  showSearchBoxOnly = false,
+  handleClose
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+
+  handleClose = handleClose ??( (event:any)=>{});
 
   const auth = useAuth();
 
   const [getFolioItems, { loading, data }] =
     useFolio_GetFolioItemsForUserLazyQuery();
+
+   useEffect(()=>{
+    if (showSearchBoxOnly) {
+      getFolioItems();
+    }
+   }, []) 
 
   const [addSiteToFolio] = useFolio_AddSiteToFolioMutation({
     onCompleted: () => notifySuccess('Successfully added site to folio'),
@@ -64,6 +76,34 @@ const AddToFolio: FC<AddToFolioProps> = ({
     };
   });
 
+
+  const renderSearchInput = (showCloseBtnInDropdownOptions?: boolean) => {
+   return <SearchInput
+        loading={loading}
+        label={'Search Folios'}
+        placeHolderText={'Search Folios'}
+        searchTerm={searchTerm}
+        clearSearch={() => {
+          setSearchTerm('');
+        }}
+        handleSearchChange={(e) => {
+          setSearchTerm(e.target.value);
+        }}
+        options={searchOptions}
+        optionSelectHandler={(value) => {
+          if(value==='close')
+          {
+            handleClose && handleClose(null);
+          }
+          else
+          {
+          handleFolioSelect(value);
+          }
+        }}
+       showCloseBtnInDropdownOptions={showCloseBtnInDropdownOptions}
+      />
+  }
+
   const handleFolioSelect = (selectedFolio: (typeof searchOptions)[number]) => {
     addSiteToFolio({
       variables: {
@@ -77,51 +117,52 @@ const AddToFolio: FC<AddToFolioProps> = ({
     });
   };
 
-  return (
-    <OverlayTrigger
-      trigger="click"
-      placement={popupPlacement}
-      rootClose // closes the popover on outside click
-      transition={false}
-      onToggle={(open) => {
-        if (open && checkUserAuthentication()) {
-          getFolioItems();
+  if (!showSearchBoxOnly) {
+    return (
+      <OverlayTrigger
+        trigger="click"
+        placement={popupPlacement}
+        rootClose // closes the popover on outside click
+        transition={false}
+        onToggle={(open) => {
+          if (open && checkUserAuthentication()) {
+            getFolioItems();
+          }
+        }}
+        overlay={
+          <Popover className="folio-popover">
+            {renderSearchInput()}
+          </Popover>
         }
-      }}
-      overlay={
-        <Popover className="folio-popover">
-          <SearchInput
-            loading={loading}
-            label={'Search Folios'}
-            placeHolderText={'Search Folios'}
-            searchTerm={searchTerm}
-            clearSearch={() => {
-              setSearchTerm('');
-            }}
-            handleSearchChange={(e) => {
-              setSearchTerm(e.target.value);
-            }}
-            options={searchOptions}
-            optionSelectHandler={(value) => {
-              handleFolioSelect(value);
-            }}
-          />
-        </Popover>
-      }
-    >
-      <button
-        className={clsx([
-          'search-result-actions-btn',
-          'search-result-actions-btn-highlight',
-          triggerClassName,
-        ])}
-        disabled={disabled}
       >
-        <FolderPlusIcon />
-        <span>{label}</span>
-      </button>
-    </OverlayTrigger>
+        <button
+          className={clsx([
+            'search-result-actions-btn',
+            'search-result-actions-btn-highlight',
+            triggerClassName,
+          ])}
+          disabled={disabled}
+        >
+          <FolderPlusIcon />
+          <span>{label}</span>
+        </button>
+      </OverlayTrigger>
+    );
+  } else {
+    
+  return (
+    <div className="d-flex  flex-column justify-content-center">
+        {renderSearchInput(true)}
+      <div
+        onClick={handleClose}
+        className="d-flex flex-row align-items-center pt-2 justify-content-center "      >        
+        <XmarkIcon className="custom-search-label"></XmarkIcon>
+        <span className='custom-search-label'>Close</span>
+      </div>
+    </div>
   );
+
+  }
 };
 
 export default AddToFolio;

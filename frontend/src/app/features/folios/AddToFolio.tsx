@@ -12,6 +12,7 @@ import { useAuth } from 'react-oidc-context';
 import { Placement } from 'react-bootstrap/esm/types';
 import clsx from 'clsx';
 import { ModalDialogWrapperWithHeader } from '../../components/modaldialog/ModalDialog';
+import useMediaQuery from '../../hooks/useMediaQuery';
 
 interface AddToFolioProps {
   label?: string;
@@ -19,7 +20,6 @@ interface AddToFolioProps {
   selectedSiteIds: string[];
   popupPlacement?: Placement;
   triggerClassName?: string;
-  showSearchBoxOnly?: boolean;
   triggerElement?: ReactElement;
 }
 
@@ -29,10 +29,9 @@ const AddToFolio: FC<AddToFolioProps> = ({
   selectedSiteIds,
   popupPlacement = 'bottom-start',
   triggerClassName,
-  showSearchBoxOnly = false,
-
   triggerElement,
 }) => {
+  const isSmallDevices = useMediaQuery('(max-width: 575px)');
   const [searchTerm, setSearchTerm] = useState('');
   const [show, setShow] = useState(false);
 
@@ -40,12 +39,6 @@ const AddToFolio: FC<AddToFolioProps> = ({
 
   const [getFolioItems, { loading, data }] =
     useFolio_GetFolioItemsForUserLazyQuery();
-
-  useEffect(() => {
-    if (showSearchBoxOnly) {
-      getFolioItems();
-    }
-  }, []);
 
   const [addSiteToFolio] = useFolio_AddSiteToFolioMutation({
     onCompleted: () => {
@@ -133,20 +126,22 @@ const AddToFolio: FC<AddToFolioProps> = ({
         }
       }}
       overlay={
-        // TODO: add media query hook
-        // <Popover className="folio-popover">{renderSearchInput()}</Popover>
-        <ModalDialogWrapperWithHeader closeHandler={() => {}}>
-          <div className="d-flex  flex-column justify-content-center">
-            {renderSearchInput(true)}
-            <div
-              onClick={() => setShow(false)}
-              className="d-flex flex-row align-items-center pt-2 justify-content-center "
-            >
-              <XmarkIcon className="custom-search-label"></XmarkIcon>
-              <span className="custom-search-label">Close</span>
+        !isSmallDevices ? (
+          <Popover className="folio-popover">{renderSearchInput()}</Popover>
+        ) : (
+          <ModalDialogWrapperWithHeader closeHandler={() => {}}>
+            <div className="d-flex  flex-column justify-content-center">
+              {renderSearchInput(true)}
+              <div
+                onClick={() => setShow(false)}
+                className="d-flex flex-row align-items-center pt-2 justify-content-center "
+              >
+                <XmarkIcon className="custom-search-label"></XmarkIcon>
+                <span className="custom-search-label">Close</span>
+              </div>
             </div>
-          </div>
-        </ModalDialogWrapperWithHeader>
+          </ModalDialogWrapperWithHeader>
+        )
       }
     >
       {isValidElement(triggerElement) ? (

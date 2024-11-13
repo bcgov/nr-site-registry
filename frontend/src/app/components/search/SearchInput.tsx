@@ -21,7 +21,7 @@ const SearchInput: React.FC<ISearchInput> = ({
   createNewHandler,
   placeHolderText,
   loading,
-  showCloseBtnInDropdownOptions
+  showCloseBtnInDropdownOptions,
 }) => {
   const handler = optionSelectHandler ?? ((e) => {});
 
@@ -63,61 +63,62 @@ const SearchInput: React.FC<ISearchInput> = ({
             </span>
           )}
           <div>
-          <input
-            id={searchId}
-            data-testid={searchId}
-            aria-label={label}
-            onChange={(event) => {
-              handleSearchChange(event);
-            }}
-            placeholder={placeHolderText}
-            value={searchTerm}
-            type="text"
-            className={`no-border-shadow-outline form-control custom-search ${
-              searchTerm.length > 0 ? 'ps-2' : ''
-            }`}
-          />
-          {!createMode && searchTerm.trim().length < 1 ? null : (
-            <span
-              data-testid="clear-icon"
-              id="clear-icon"
-              className="clear-icon custom-icon position-absolute px-2"
-              onClick={handleClose}
-            >
-              <CircleXMarkIcon />
-            </span>
-          )}
+            <input
+              id={searchId}
+              data-testid={searchId}
+              aria-label={label}
+              onChange={(event) => {
+                handleSearchChange(event);
+              }}
+              placeholder={placeHolderText}
+              value={searchTerm}
+              type="text"
+              className={`no-border-shadow-outline form-control custom-search ${
+                searchTerm.length > 0 ? 'ps-2' : ''
+              }`}
+            />
+            {!createMode && searchTerm.trim().length < 1 ? null : (
+              <span
+                data-testid="clear-icon"
+                id="clear-icon"
+                className="clear-icon custom-icon position-absolute px-2"
+                onClick={handleClose}
+              >
+                <CircleXMarkIcon />
+              </span>
+            )}
           </div>
-          
 
           {searchTerm && !createMode && options && options.length > 0 && (
             <div className="search-options">
               <div className="search-options-results">
-              {options.map((option, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="search-option-item"
-                    onClick={(e) => {
-                      handler(option);
-                      handleClose();
-                    }}
-                  >
-                    {typeof option === 'string' ? option : option.label}
-                  </div>
-                );
-              })}
+                {options.map((option, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="search-option-item"
+                      onClick={(e) => {
+                        handler(option);
+                        handleClose();
+                      }}
+                    >
+                      {typeof option === 'string' ? option : option.label}
+                    </div>
+                  );
+                })}
               </div>
-                {showCloseBtnInDropdownOptions && <div
-                    key={10000}
-                    className="search-option-item"
-                    onClick={(e) => {   
-                      handler('close');                  
-                      handleClose();
-                    }}
-                  >
-                    <XmarkIcon/> Close
-                  </div>}
+              {showCloseBtnInDropdownOptions && (
+                <div
+                  key={10000}
+                  className="search-option-item"
+                  onClick={(e) => {
+                    handler('close');
+                    handleClose();
+                  }}
+                >
+                  <XmarkIcon /> Close
+                </div>
+              )}
               {createNewLabel && (
                 <div
                   className="search-create-new-section"

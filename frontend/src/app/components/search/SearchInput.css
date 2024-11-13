@@ -58,16 +58,16 @@
 
 .search-options-results {
   max-height: 200px;
-  overflow-y: scroll; 
-  scrollbar-width: thin; 
+  overflow-y: scroll;
+  scrollbar-width: thin;
 }
 
 .search-options-results::-webkit-scrollbar {
-  width: 8px; 
+  width: 8px;
 }
 
 .search-options-results::-webkit-scrollbar-thumb {
-  background-color: #888; 
+  background-color: #888;
   border-radius: 4px;
 }
 

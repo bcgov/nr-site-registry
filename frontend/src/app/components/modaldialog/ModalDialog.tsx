@@ -53,39 +53,33 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
   return (
     <div>
       {open && (
-          <ModalDialogWrapper closeHandler={handleClose}>
-            <div className="custom-modal-header">
-              <span className="custom-modal-header-text">{displayLabel}</span>
-              <XmarkIcon
-                className="custom-modal-header-close"
-                onClick={handleClose}
-              ></XmarkIcon>
+        <ModalDialogWrapper closeHandler={handleClose}>
+          <div className="custom-modal-header">
+            <span className="custom-modal-header-text">{displayLabel}</span>
+            <XmarkIcon
+              className="custom-modal-header-close"
+              onClick={handleClose}
+            ></XmarkIcon>
+          </div>
+          {children && <div className="custom-modal-data">{children}</div>}
+          {!discardOption && (
+            <div className="custom-modal-actions-footer">
+              <CancelButton clickHandler={handleClose} label={cancelBtnLabel} />
+              <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
             </div>
-            {children && <div className="custom-modal-data">{children}</div>}
-            {!discardOption && (
-              <div className="custom-modal-actions-footer">
-                <CancelButton
-                  clickHandler={handleClose}
-                  label={cancelBtnLabel}
-                />
-                <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
-              </div>
-            )}
-            {discardOption && (
-              <div className="custom-modal-actions-footer">
-                <CancelButton
-                  clickHandler={handleClose}
-                  label={cancelBtnLabel}
-                />
-                <DiscardButton
-                  clickHandler={handleDiscard}
-                  label={dicardBtnLabel}
-                  showIcon={false}
-                />
-                <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
-              </div>
-            )}
-         </ModalDialogWrapper>
+          )}
+          {discardOption && (
+            <div className="custom-modal-actions-footer">
+              <CancelButton clickHandler={handleClose} label={cancelBtnLabel} />
+              <DiscardButton
+                clickHandler={handleDiscard}
+                label={dicardBtnLabel}
+                showIcon={false}
+              />
+              <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
+            </div>
+          )}
+        </ModalDialogWrapper>
       )}
     </div>
   );
@@ -100,9 +94,7 @@ export const ModalDialogWrapper: React.FC<ModalDialogCloseHandlerProps> = ({
   return (
     <div>
       <div className="custom-modal">
-        <div className="custom-modal-content">
-          {children}
-        </div>
+        <div className="custom-modal-content">{children}</div>
       </div>
     </div>
   );
@@ -121,9 +113,9 @@ export const ModalDialogWrapperWithHeader: React.FC<
   return (
     <div>
       <ModalDialogWrapper closeHandler={ModalDialogHeaderOnly}>
-        <ModalDialogHeaderOnly closeHandler={ModalDialogHeaderOnly} >
+        <ModalDialogHeaderOnly closeHandler={ModalDialogHeaderOnly}>
           {children}
-          </ModalDialogHeaderOnly>
+        </ModalDialogHeaderOnly>
       </ModalDialogWrapper>
     </div>
   );

@@ -19,7 +19,7 @@ interface AddToFolioProps {
   popupPlacement?: Placement;
   triggerClassName?: string;
   showSearchBoxOnly?: boolean;
-  handleClose?: (event:any)=>void;
+  handleClose?: (event: any) => void;
 }
 
 const AddToFolio: FC<AddToFolioProps> = ({
@@ -29,22 +29,22 @@ const AddToFolio: FC<AddToFolioProps> = ({
   popupPlacement = 'bottom-start',
   triggerClassName,
   showSearchBoxOnly = false,
-  handleClose
+  handleClose,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  handleClose = handleClose ??( (event:any)=>{});
+  handleClose = handleClose ?? ((event: any) => {});
 
   const auth = useAuth();
 
   const [getFolioItems, { loading, data }] =
     useFolio_GetFolioItemsForUserLazyQuery();
 
-   useEffect(()=>{
+  useEffect(() => {
     if (showSearchBoxOnly) {
       getFolioItems();
     }
-   }, []) 
+  }, []);
 
   const [addSiteToFolio] = useFolio_AddSiteToFolioMutation({
     onCompleted: () => notifySuccess('Successfully added site to folio'),
@@ -76,9 +76,9 @@ const AddToFolio: FC<AddToFolioProps> = ({
     };
   });
 
-
   const renderSearchInput = (showCloseBtnInDropdownOptions?: boolean) => {
-   return <SearchInput
+    return (
+      <SearchInput
         loading={loading}
         label={'Search Folios'}
         placeHolderText={'Search Folios'}
@@ -91,18 +91,16 @@ const AddToFolio: FC<AddToFolioProps> = ({
         }}
         options={searchOptions}
         optionSelectHandler={(value) => {
-          if(value==='close')
-          {
+          if (value === 'close') {
             handleClose && handleClose(null);
-          }
-          else
-          {
-          handleFolioSelect(value);
+          } else {
+            handleFolioSelect(value);
           }
         }}
-       showCloseBtnInDropdownOptions={showCloseBtnInDropdownOptions}
+        showCloseBtnInDropdownOptions={showCloseBtnInDropdownOptions}
       />
-  }
+    );
+  };
 
   const handleFolioSelect = (selectedFolio: (typeof searchOptions)[number]) => {
     addSiteToFolio({
@@ -130,9 +128,7 @@ const AddToFolio: FC<AddToFolioProps> = ({
           }
         }}
         overlay={
-          <Popover className="folio-popover">
-            {renderSearchInput()}
-          </Popover>
+          <Popover className="folio-popover">{renderSearchInput()}</Popover>
         }
       >
         <button
@@ -149,19 +145,18 @@ const AddToFolio: FC<AddToFolioProps> = ({
       </OverlayTrigger>
     );
   } else {
-    
-  return (
-    <div className="d-flex  flex-column justify-content-center">
+    return (
+      <div className="d-flex  flex-column justify-content-center">
         {renderSearchInput(true)}
-      <div
-        onClick={handleClose}
-        className="d-flex flex-row align-items-center pt-2 justify-content-center "      >        
-        <XmarkIcon className="custom-search-label"></XmarkIcon>
-        <span className='custom-search-label'>Close</span>
+        <div
+          onClick={handleClose}
+          className="d-flex flex-row align-items-center pt-2 justify-content-center "
+        >
+          <XmarkIcon className="custom-search-label"></XmarkIcon>
+          <span className="custom-search-label">Close</span>
+        </div>
       </div>
-    </div>
-  );
-
+    );
   }
 };
 

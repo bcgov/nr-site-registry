@@ -1,33 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans');
 
-.reset-button {
-  border-radius: var(--surface-border-radius-medium);
-  padding: var(--layout-padding-small) var(--layout-padding-medium)
-    var(--layout-padding-small) var(--layout-padding-medium);
-  border: 1px solid var(--surface-border-dark, #353433);
-  margin: var(--layout-margin-small);
-  color: var(--typography-color-primary);
-}
-
-.submit-button {
-  padding: var(--layout-padding-small) var(--layout-padding-medium)
-    var(--layout-padding-small) var(--layout-padding-medium);
-  border-radius: var(--surface-border-radius-medium);
-  background-color: var(--surface-primary-default);
-  color: var(--typography-color-primary-invert);
-  margin: var(--layout-margin-small);
-}
-
-.cancel-button {
-  padding: var(--layout-padding-small) var(--layout-padding-medium)
-    var(--layout-padding-small) var(--layout-padding-medium);
-  border-radius: var(--surface-border-radius-medium);
-  color: var(--typography-color-primary);
-  background-color: var(--surface-tertiary-default);
-  border: var(--surface-tertiary-default);
-  margin: var(--layout-margin-small);
-}
-
 .selected-filter {
   gap: var(--layout-margin-xsmall);
 }

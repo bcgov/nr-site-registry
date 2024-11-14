@@ -120,7 +120,7 @@ const SiteDetails = () => {
   }, [auth.user]);
 
   useEffect(() => {
-    if (isUserOfType(UserRoleType.SR) && !hasNoPendingUpdatesFromState) {
+    if (isUserOfType(UserRoleType.SR) && !hasNoPendingUpdatesFromState && viewMode !== SiteDetailsMode.EditMode) {
       SetNavComponents(getNavComponents(true));
       SetNavItems(getNavItems(true));
       SetDropDownNavItems(getDropDownNavItems(true));
@@ -246,6 +246,17 @@ const SiteDetails = () => {
 
   useEffect(() => {
     setViewMode(mode);
+    if (isUserOfType(UserRoleType.SR) && !hasNoPendingUpdatesFromState && mode !== SiteDetailsMode.EditMode) {
+      SetNavComponents(getNavComponents(true));
+      SetNavItems(getNavItems(true));
+      SetDropDownNavItems(getDropDownNavItems(true));
+    } else {
+      SetNavComponents(getNavComponents(false));
+      SetNavItems(getNavItems(false));
+      SetDropDownNavItems(getDropDownNavItems(false));
+    }
+
+
   }, [mode]);
 
   useEffect(() => {
@@ -481,7 +492,7 @@ const SiteDetails = () => {
 
   const getActionItemsToRender = () => {
     let userTypeSR: boolean = isUserOfType(UserRoleType.SR) ?? false;
-    let includeSRApprovalActions = userTypeSR && !hasNoPendingUpdatesFromState;
+    let includeSRApprovalActions = userTypeSR && !hasNoPendingUpdatesFromState && viewMode !== SiteDetailsMode.EditMode;
     return getActionItems(includeSRApprovalActions);
   };
 

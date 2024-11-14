@@ -30,6 +30,10 @@ export class LoggerService {
         logFormat,
       ),
       transports: [
+        new transports.Console({
+          level: process.env.LOG_LEVEL || 'info',
+          handleExceptions: true,
+        }),
         new transports.DailyRotateFile({
           level: process.env.LOG_LEVEL,
           filename: process.env.LOG_FILE_LOCATION,

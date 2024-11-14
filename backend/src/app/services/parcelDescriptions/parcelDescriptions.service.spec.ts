@@ -17,13 +17,11 @@ import { BadRequestException } from '@nestjs/common';
 jest.useFakeTimers();
 jest.mock('./parcelDescriptions.queryBuilder');
 
-describe('SiteSubdivisionsService', () => {
+describe('ParcelDescriptionsService', () => {
   let parcelDescriptionsService: ParcelDescriptionsService;
   let entityManager: EntityManager;
   let snapshotsService: SnapshotsService;
   let loggerService: LoggerService;
-  let subdivisionsRepository: Repository<Subdivisions>;
-  let siteSubdivisionsRepository: Repository<SiteSubdivisions>;
 
   let logMock: jest.Mock;
   let debugMock: jest.Mock;
@@ -68,12 +66,6 @@ describe('SiteSubdivisionsService', () => {
       ParcelDescriptionsService,
     );
     entityManager = testingModule.get<EntityManager>(EntityManager);
-    subdivisionsRepository = testingModule.get<Repository<Subdivisions>>(
-      getRepositoryToken(Subdivisions),
-    );
-    siteSubdivisionsRepository = testingModule.get<
-      Repository<SiteSubdivisions>
-    >(getRepositoryToken(SiteSubdivisions));
     snapshotsService = testingModule.get<SnapshotsService>(SnapshotsService);
     loggerService = testingModule.get<LoggerService>(LoggerService);
 
@@ -529,10 +521,6 @@ describe('SiteSubdivisionsService', () => {
   });
 
   describe('saveParcelDescriptionsForSite', () => {
-    let updateParcelDescriptionsForSiteMock: jest.Mock;
-    let addParcelDescriptionsForSiteMock: jest.Mock;
-    let deleteParcelDescriptionsForSiteMock: jest.Mock;
-
     let idForUpdatedParcelDescription: string;
     let idForAddedParcelDescription: string;
     let idForDeletedParcelDescription: string;
@@ -543,6 +531,12 @@ describe('SiteSubdivisionsService', () => {
     let siteId: string;
     let inputParcelDescriptions: ParcelDescriptionInputDTO[];
     let userInfo: any;
+
+    let updateParcelDescriptionsForSiteMock: jest.Mock;
+    let addParcelDescriptionsForSiteMock: jest.Mock;
+    let deleteParcelDescriptionsForSiteMock: jest.Mock;
+
+    let transactionalEntityManager: EntityManager;
 
     beforeEach(async () => {
       idForUpdatedParcelDescription = '1';
@@ -592,11 +586,15 @@ describe('SiteSubdivisionsService', () => {
       addParcelDescriptionsForSiteMock = jest.fn();
       deleteParcelDescriptionsForSiteMock = jest.fn();
 
-      parcelDescriptionsService.updateParcelDescriptionsForSite =
+      // Reusing the injected entity manager as the passed-in entity manager
+      // isn't strictly accurate, but it makes the mocking process much easier.
+      transactionalEntityManager = entityManager;
+
+      parcelDescriptionsService._updateParcelDescriptionsForSite =
         updateParcelDescriptionsForSiteMock;
-      parcelDescriptionsService.addParcelDescriptionsForSite =
+      parcelDescriptionsService._addParcelDescriptionsForSite =
         addParcelDescriptionsForSiteMock;
-      parcelDescriptionsService.deleteParcelDescriptionsForSite =
+      parcelDescriptionsService._deleteParcelDescriptionsForSite =
         deleteParcelDescriptionsForSiteMock;
     });
 
@@ -605,6 +603,7 @@ describe('SiteSubdivisionsService', () => {
         siteId,
         inputParcelDescriptions,
         userInfo,
+        transactionalEntityManager,
       );
 
       expect(logMock).toHaveBeenCalledWith(
@@ -626,6 +625,7 @@ describe('SiteSubdivisionsService', () => {
         siteId,
         inputParcelDescriptions,
         userInfo,
+        transactionalEntityManager,
       );
 
       expect(updateParcelDescriptionsForSiteMock).toHaveBeenCalledWith(
@@ -636,6 +636,7 @@ describe('SiteSubdivisionsService', () => {
           }),
         ]),
         userInfo,
+        transactionalEntityManager,
       );
     });
 
@@ -644,6 +645,7 @@ describe('SiteSubdivisionsService', () => {
         siteId,
         inputParcelDescriptions,
         userInfo,
+        transactionalEntityManager,
       );
 
       expect(addParcelDescriptionsForSiteMock).toHaveBeenCalledWith(
@@ -654,6 +656,7 @@ describe('SiteSubdivisionsService', () => {
           }),
         ]),
         userInfo,
+        transactionalEntityManager,
       );
     });
 
@@ -662,6 +665,7 @@ describe('SiteSubdivisionsService', () => {
         siteId,
         inputParcelDescriptions,
         userInfo,
+        transactionalEntityManager,
       );
 
       expect(deleteParcelDescriptionsForSiteMock).toHaveBeenCalledWith(
@@ -671,6 +675,7 @@ describe('SiteSubdivisionsService', () => {
             id: idForDeletedParcelDescription,
           }),
         ]),
+        transactionalEntityManager,
       );
     });
 
@@ -687,6 +692,7 @@ describe('SiteSubdivisionsService', () => {
           siteId,
           inputParcelDescriptions,
           userInfo,
+          transactionalEntityManager,
         );
 
         expect(updateParcelDescriptionsForSiteMock).not.toHaveBeenCalled();
@@ -706,6 +712,7 @@ describe('SiteSubdivisionsService', () => {
           siteId,
           inputParcelDescriptions,
           userInfo,
+          transactionalEntityManager,
         );
 
         expect(addParcelDescriptionsForSiteMock).not.toHaveBeenCalled();
@@ -725,6 +732,7 @@ describe('SiteSubdivisionsService', () => {
           siteId,
           inputParcelDescriptions,
           userInfo,
+          transactionalEntityManager,
         );
 
         expect(deleteParcelDescriptionsForSiteMock).not.toHaveBeenCalled();
@@ -732,7 +740,7 @@ describe('SiteSubdivisionsService', () => {
     });
   });
 
-  describe('addParcelDescriptionsForSite', () => {
+  describe('_addParcelDescriptionsForSite', () => {
     let today: Date;
 
     let siteId: string;
@@ -748,14 +756,16 @@ describe('SiteSubdivisionsService', () => {
     let subdivisionInsertResult: InsertResult;
     let siteSubdivisionInsertResult: InsertResult;
 
-    let subdivisionCreateQueryBuilderMock: jest.Mock;
-    let subdivisionInsertMock: jest.Mock;
-    let subdivisionIntoMock: jest.Mock;
-    let subdivisionValuesMock: jest.Mock;
-    let subdivisionReturningMock: jest.Mock;
-    let subdivisionExecuteMock: jest.Mock;
+    let createQueryBuilderMock: jest.Mock;
+    let queryBuilderInsertMock: jest.Mock;
+    let queryBuilderIntoMock: jest.Mock;
+    let queryBuilderValuesMock: jest.Mock;
+    let queryBuilderReturningMock: jest.Mock;
+    let queryBuilderExecuteMock: jest.Mock;
 
-    let siteSubdivisionInsertMock: jest.Mock;
+    let insertMock: jest.Mock;
+
+    let transactionalEntityManager: EntityManager;
 
     beforeEach(() => {
       today = new Date();
@@ -816,37 +826,38 @@ describe('SiteSubdivisionsService', () => {
         raw: {}, // Value is disregarded.
       };
 
-      subdivisionInsertMock = jest.fn().mockReturnThis();
-      subdivisionIntoMock = jest.fn().mockReturnThis();
-      subdivisionValuesMock = jest.fn().mockReturnThis();
-      subdivisionReturningMock = jest.fn().mockReturnThis();
-      subdivisionExecuteMock = jest
+      queryBuilderInsertMock = jest.fn().mockReturnThis();
+      queryBuilderIntoMock = jest.fn().mockReturnThis();
+      queryBuilderValuesMock = jest.fn().mockReturnThis();
+      queryBuilderReturningMock = jest.fn().mockReturnThis();
+      queryBuilderExecuteMock = jest
         .fn()
         .mockResolvedValue(subdivisionInsertResult);
-      subdivisionCreateQueryBuilderMock = jest.fn().mockImplementation(() => {
+      createQueryBuilderMock = jest.fn().mockImplementation(() => {
         return {
-          insert: subdivisionInsertMock,
-          into: subdivisionIntoMock,
-          values: subdivisionValuesMock,
-          returning: subdivisionReturningMock,
-          execute: subdivisionExecuteMock,
+          insert: queryBuilderInsertMock,
+          into: queryBuilderIntoMock,
+          values: queryBuilderValuesMock,
+          returning: queryBuilderReturningMock,
+          execute: queryBuilderExecuteMock,
         };
       });
 
-      siteSubdivisionInsertMock = jest
-        .fn()
-        .mockResolvedValue(siteSubdivisionInsertResult);
+      insertMock = jest.fn().mockResolvedValue(siteSubdivisionInsertResult);
 
-      subdivisionsRepository.createQueryBuilder =
-        subdivisionCreateQueryBuilderMock;
-      siteSubdivisionsRepository.insert = siteSubdivisionInsertMock;
+      // Reusing the injected entity manager as the passed-in entity manager
+      // isn't strictly accurate, but it makes the mocking process much easier.
+      transactionalEntityManager = entityManager;
+      transactionalEntityManager.createQueryBuilder = createQueryBuilderMock;
+      transactionalEntityManager.insert = insertMock;
     });
 
     it('logs the call to addParcelDescriptionsForSite', async () => {
-      await parcelDescriptionsService.addParcelDescriptionsForSite(
+      await parcelDescriptionsService._addParcelDescriptionsForSite(
         siteId,
         inputParcelDescriptions,
         userInfo,
+        transactionalEntityManager,
       );
 
       expect(logMock).toHaveBeenCalledWith(
@@ -864,53 +875,58 @@ describe('SiteSubdivisionsService', () => {
     });
 
     it('inserts the expected subdivision into the database', async () => {
-      await parcelDescriptionsService.addParcelDescriptionsForSite(
+      await parcelDescriptionsService._addParcelDescriptionsForSite(
         siteId,
         inputParcelDescriptions,
         userInfo,
+        transactionalEntityManager,
       );
-      expect(subdivisionCreateQueryBuilderMock).toHaveBeenCalled();
-      expect(subdivisionInsertMock).toHaveBeenCalled();
-      expect(subdivisionIntoMock).toHaveBeenCalledWith(Subdivisions);
-      expect(subdivisionValuesMock).toHaveBeenCalledWith(
+      expect(createQueryBuilderMock).toHaveBeenCalled();
+      expect(queryBuilderInsertMock).toHaveBeenCalled();
+      expect(queryBuilderIntoMock).toHaveBeenCalledWith(Subdivisions);
+      expect(queryBuilderValuesMock).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining(addedSubdivision)]),
       );
-      expect(subdivisionReturningMock).toHaveBeenCalledWith('*');
-      expect(subdivisionExecuteMock).toHaveBeenCalled();
+      expect(queryBuilderReturningMock).toHaveBeenCalledWith('*');
+      expect(queryBuilderExecuteMock).toHaveBeenCalled();
     });
+
     it('inserts the expected site subdivision into the database', async () => {
-      await parcelDescriptionsService.addParcelDescriptionsForSite(
+      await parcelDescriptionsService._addParcelDescriptionsForSite(
         siteId,
         inputParcelDescriptions,
         userInfo,
+        transactionalEntityManager,
       );
-      expect(siteSubdivisionInsertMock).toHaveBeenCalledWith(
+      expect(insertMock).toHaveBeenCalledWith(
+        SiteSubdivisions,
         expect.arrayContaining([expect.objectContaining(addedSiteSubdivision)]),
       );
     });
 
     describe('when the subdivision fails to insert', () => {
       beforeEach(() => {
-        subdivisionExecuteMock = jest.fn().mockImplementation(() => {
+        queryBuilderExecuteMock = jest.fn().mockImplementation(() => {
           throw new Error('A bad thing happened!');
         });
-        subdivisionCreateQueryBuilderMock = jest.fn().mockImplementation(() => {
+        createQueryBuilderMock = jest.fn().mockImplementation(() => {
           return {
-            insert: subdivisionInsertMock,
-            into: subdivisionIntoMock,
-            values: subdivisionValuesMock,
-            returning: subdivisionReturningMock,
-            execute: subdivisionExecuteMock,
+            insert: queryBuilderInsertMock,
+            into: queryBuilderIntoMock,
+            values: queryBuilderValuesMock,
+            returning: queryBuilderReturningMock,
+            execute: queryBuilderExecuteMock,
           };
         });
       });
 
       it('logs and throws the error', async () => {
         expect(async () => {
-          await parcelDescriptionsService.addParcelDescriptionsForSite(
+          await parcelDescriptionsService._addParcelDescriptionsForSite(
             siteId,
             inputParcelDescriptions,
             userInfo,
+            transactionalEntityManager,
           );
         }).rejects.toThrow(BadRequestException);
 
@@ -927,18 +943,19 @@ describe('SiteSubdivisionsService', () => {
 
     describe('when the sitesubdivision fails to insert', () => {
       beforeEach(() => {
-        siteSubdivisionInsertMock = jest.fn().mockImplementation(() => {
+        insertMock = jest.fn().mockImplementation(() => {
           throw new Error('A bad thing happened!');
         });
-        siteSubdivisionsRepository.insert = siteSubdivisionInsertMock;
+        transactionalEntityManager.insert = insertMock;
       });
 
       it('logs and throws the error', async () => {
         expect(async () => {
-          await parcelDescriptionsService.addParcelDescriptionsForSite(
+          await parcelDescriptionsService._addParcelDescriptionsForSite(
             siteId,
             inputParcelDescriptions,
             userInfo,
+            transactionalEntityManager,
           );
         }).rejects.toThrow(BadRequestException);
 
@@ -974,10 +991,10 @@ describe('SiteSubdivisionsService', () => {
     let updatedSubdivision: any;
     let updatedSiteSubdivision: any;
 
-    let subdivisionFindByMock: jest.Mock;
-    let subdivisionSaveMock: jest.Mock;
-    let siteSubdivisionFindByMock: jest.Mock;
-    let siteSubdivisionSaveMock: jest.Mock;
+    let findByMock: jest.Mock;
+    let saveMock: jest.Mock;
+
+    let transactionalEntityManager: EntityManager;
 
     beforeEach(() => {
       today = new Date();
@@ -1087,28 +1104,29 @@ describe('SiteSubdivisionsService', () => {
         subdivision: databaseSubdivision,
       };
 
-      subdivisionFindByMock = jest
+      findByMock = jest
         .fn()
-        .mockResolvedValue(subdivisionFindByResult);
-      subdivisionSaveMock = jest.fn().mockResolvedValue(subdivisionSaveResult);
-      siteSubdivisionFindByMock = jest
+        .mockResolvedValueOnce(subdivisionFindByResult)
+        .mockResolvedValueOnce(siteSubdivisionFindByResult);
+      saveMock = jest
         .fn()
-        .mockResolvedValue(siteSubdivisionFindByResult);
-      siteSubdivisionSaveMock = jest
-        .fn()
-        .mockResolvedValue(siteSubdivisionSaveResult);
+        .mockResolvedValueOnce(subdivisionSaveResult)
+        .mockResolvedValueOnce(siteSubdivisionSaveResult);
 
-      subdivisionsRepository.save = subdivisionSaveMock;
-      subdivisionsRepository.findBy = subdivisionFindByMock;
-      siteSubdivisionsRepository.save = siteSubdivisionSaveMock;
-      siteSubdivisionsRepository.findBy = siteSubdivisionFindByMock;
+      // Reusing the injected entity manager as the passed-in entity manager
+      // isn't strictly accurate, but it makes the mocking process much easier.
+      transactionalEntityManager = entityManager;
+
+      transactionalEntityManager.save = saveMock;
+      transactionalEntityManager.findBy = findByMock;
     });
 
     it('logs the call to updateParcelDescriptionsForSite', async () => {
-      await parcelDescriptionsService.updateParcelDescriptionsForSite(
+      await parcelDescriptionsService._updateParcelDescriptionsForSite(
         siteId,
         inputParcelDescriptions,
         userInfo,
+        transactionalEntityManager,
       );
 
       expect(logMock).toHaveBeenCalledWith(
@@ -1126,48 +1144,50 @@ describe('SiteSubdivisionsService', () => {
     });
 
     it('saves an updated subdivision to the database.', async () => {
-      await parcelDescriptionsService.updateParcelDescriptionsForSite(
+      await parcelDescriptionsService._updateParcelDescriptionsForSite(
         siteId,
         inputParcelDescriptions,
         userInfo,
+        transactionalEntityManager,
       );
 
-      expect(subdivisionSaveMock).toHaveBeenCalledWith(
+      expect(saveMock).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining(updatedSubdivision)]),
       );
-      let whenupdated: Date =
-        subdivisionSaveMock.mock.calls[0][0][0].whenUpdated;
+      let whenupdated: Date = saveMock.mock.calls[0][0][0].whenUpdated;
       expect(whenupdated.getTime()).toBeGreaterThan(yesterday.getTime());
     });
 
     it('saves the updated site subdivision to the database.', async () => {
-      await parcelDescriptionsService.updateParcelDescriptionsForSite(
+      await parcelDescriptionsService._updateParcelDescriptionsForSite(
         siteId,
         inputParcelDescriptions,
         userInfo,
+        transactionalEntityManager,
       );
 
-      expect(siteSubdivisionSaveMock).toHaveBeenCalledWith(
+      expect(saveMock).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining(updatedSiteSubdivision),
         ]),
       );
-      let whenupdated: Date =
-        siteSubdivisionSaveMock.mock.calls[0][0][0].whenUpdated;
+      let whenupdated: Date = saveMock.mock.calls[0][0][0].whenUpdated;
       expect(whenupdated.getTime()).toBeGreaterThan(yesterday.getTime());
     });
 
     describe('when the subdivision to update does not exist', () => {
       beforeEach(() => {
-        subdivisionFindByMock.mockResolvedValue([]);
+        findByMock = jest.fn().mockResolvedValue([]);
+        transactionalEntityManager.findBy = findByMock;
       });
 
       it('throws an exception and logs the error', async () => {
         expect(async () => {
-          await parcelDescriptionsService.updateParcelDescriptionsForSite(
+          await parcelDescriptionsService._updateParcelDescriptionsForSite(
             siteId,
             inputParcelDescriptions,
             userInfo,
+            transactionalEntityManager,
           );
         }).rejects.toThrow(BadRequestException);
 
@@ -1184,18 +1204,19 @@ describe('SiteSubdivisionsService', () => {
 
     describe('when the subdivision fails to save', () => {
       beforeEach(() => {
-        subdivisionSaveMock = jest.fn().mockImplementation(() => {
+        saveMock = jest.fn().mockImplementation(() => {
           throw new Error('A bad thing happened!');
         });
-        subdivisionsRepository.save = subdivisionSaveMock;
+        transactionalEntityManager.save = saveMock;
       });
 
       it('logs and throws the error', async () => {
         expect(async () => {
-          await parcelDescriptionsService.updateParcelDescriptionsForSite(
+          await parcelDescriptionsService._updateParcelDescriptionsForSite(
             siteId,
             inputParcelDescriptions,
             userInfo,
+            transactionalEntityManager,
           );
         }).rejects.toThrow(BadRequestException);
 
@@ -1212,18 +1233,28 @@ describe('SiteSubdivisionsService', () => {
 
     describe('when the site subdivision fails to save', () => {
       beforeEach(() => {
-        siteSubdivisionSaveMock = jest.fn().mockImplementation(() => {
-          throw new Error('A bad thing happened!');
+        // This is a cheap and hacky way to make it throw an exception on the
+        // second run.
+        let siteSubdivisionRun = false;
+        saveMock = jest.fn().mockImplementation(() => {
+          if (siteSubdivisionRun === false) {
+            // subdivision save is run first.
+            siteSubdivisionRun = true;
+          } else {
+            // throw the error on the second run.
+            throw new Error('A bad thing happened!');
+          }
         });
-        siteSubdivisionsRepository.save = siteSubdivisionSaveMock;
+        transactionalEntityManager.save = saveMock;
       });
 
       it('logs and throws the error', async () => {
         expect(async () => {
-          await parcelDescriptionsService.updateParcelDescriptionsForSite(
+          await parcelDescriptionsService._updateParcelDescriptionsForSite(
             siteId,
             inputParcelDescriptions,
             userInfo,
+            transactionalEntityManager,
           );
         }).rejects.toThrow(BadRequestException);
 

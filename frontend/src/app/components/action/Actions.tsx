@@ -2,6 +2,7 @@ import { IActions } from './IActions';
 import Dropdown from 'react-bootstrap/Dropdown';
 import './Actions.css';
 import { DropdownIcon } from '../common/icon';
+import { Button } from '../button/Button';
 
 const Actions: React.FC<IActions> = ({
   label,
@@ -15,9 +16,9 @@ const Actions: React.FC<IActions> = ({
   return (
     <Dropdown>
       <Dropdown.Toggle
-        variant=""
         id="dropdown-action"
-        className={`${customCssToggleBtn ?? 'custom-action-btn'} d-flex align-items-center gap-1`}
+        as={Button}
+        className={`${customCssToggleBtn ?? ''} d-flex align-items-center gap-1`}
         disabled={disable}
       >
         {label}

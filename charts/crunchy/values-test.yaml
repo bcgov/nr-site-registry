@@ -7,7 +7,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       walStorage: 350Mi
 
   pgBackRest:
-    clusterCounter: 2 # for some reason 1, did not work, putting it to 2 worked, so updating it in pipelines.
+    clusterCounter: 3 # for some reason 1, did not work, putting it to 2 worked, so updating it in pipelines.
     backupPath: /backups/test/cluster/version # change it for PROD, create values-prod.yaml
     s3:
       enabled: true
@@ -17,7 +17,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       accessKey: ~
       secretKey: ~
       fullBackupSchedule: 0 9 * * * # full backup at GMT 9
-      incrementalBackupSchedule: 0 0/8 * * * # every hour
+      incrementalBackupSchedule: 0/30 * * * * # every half hour
     pvc:
       volume:
         storage: 1024Mi

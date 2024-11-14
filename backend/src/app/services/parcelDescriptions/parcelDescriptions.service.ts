@@ -476,6 +476,51 @@ export class ParcelDescriptionsService {
     parcelDescriptions: ParcelDescriptionInputDTO[],
     transactionalEntityManager: EntityManager,
   ) {
-    // TODO: Implementation to come in another pull request
+    this.sitesLogger.log(
+      'parcelDescriptionService.deleteParcelDescriptionsForSite() start',
+    );
+    this.sitesLogger.debug(
+      'parcelDescriptionService.deleteParcelDescriptionsForSite() start',
+    );
+
+    const subdivIds = parcelDescriptions.map((parcelDescription) => {
+      return parcelDescription.id;
+    });
+    let subdivisions = await transactionalEntityManager.findBy(Subdivisions, {
+      id: In(subdivIds),
+    });
+    let siteSubdivisions = await transactionalEntityManager.findBy(
+      SiteSubdivisions,
+      { subdivId: In(subdivIds), siteId: siteId },
+    );
+
+    try {
+      await transactionalEntityManager.remove(subdivisions);
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in parcelDescriptionService.deleteParcelDescriptionsForSite() end',
+        JSON.stringify(error),
+      );
+      throw new BadRequestException('Failed removing Parcel Description.');
+    }
+
+    try {
+      await transactionalEntityManager.remove(siteSubdivisions);
+    } catch (error) {
+      // This code is called within a transaction in the site service, so the
+      // previous save should be rolled back if there is a failure here.
+      this.sitesLogger.error(
+        'Exception occured in parcelDescriptionService.deleteParcelDescriptionsForSite() end',
+        JSON.stringify(error),
+      );
+      throw new BadRequestException('Failed removing Parcel Description.');
+    }
+
+    this.sitesLogger.log(
+      'parcelDescriptionService.deleteParcelDescriptionsForSite() end',
+    );
+    this.sitesLogger.debug(
+      'parcelDescriptionService.deleteParcelDescriptionsForSite() end',
+    );
   }
 }

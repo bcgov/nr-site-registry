@@ -109,7 +109,7 @@ const SearchInput: React.FC<ISearchInput> = ({
               </div>
               {showCloseBtnInDropdownOptions && (
                 <div
-                  key={10000}
+                  key={v4()}
                   className="search-option-item"
                   onClick={(e) => {
                     handler('close');

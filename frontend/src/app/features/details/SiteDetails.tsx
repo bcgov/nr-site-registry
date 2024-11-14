@@ -518,6 +518,52 @@ const SiteDetails = () => {
   if (snapshot.status === RequestStatus.failed)
     return <div>Error: {snapshot.error || 'Failed to load data'}</div>;
 
+  const renderOptionsForExternalUser = () => {
+    if (
+      viewMode === SiteDetailsMode.ViewOnlyMode &&
+      userType === UserType.External
+    ) {
+      return (
+        <>
+          <div className="d-block d-sm-none">
+            <Actions
+              label="Actions"
+              items={[
+                { label: 'Add To Cart', value: 'cart' },
+                <AddToFolio
+                  selectedSiteIds={[id || '']}
+                  triggerElement={<span>Add to Folio</span>}
+                />,
+              ]}
+              onItemClick={(value) => {
+                if (value === 'cart') {
+                  handleAddToCart();
+                }
+              }}
+            />
+          </div>
+          <div className="d-none d-sm-block">
+            <div className="d-flex gap-2">
+              <div
+                className="d-flex btn-cart align-items-center "
+                onClick={() => handleAddToCart()}
+              >
+                <ShoppingCartIcon className="btn-icon" />
+                <span className="btn-cart-lbl"> Add to Cart</span>
+              </div>
+
+              {id && (
+                <div>
+                  <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      );
+    }
+  };
+
   return (
     <>
       {isVisible && (

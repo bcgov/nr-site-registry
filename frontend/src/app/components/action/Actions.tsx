@@ -3,6 +3,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import './Actions.css';
 import { DropdownIcon } from '../common/icon';
 import { Button } from '../button/Button';
+import { isValidElement } from 'react';
 
 const Actions: React.FC<IActions> = ({
   label,
@@ -30,15 +31,27 @@ const Actions: React.FC<IActions> = ({
         className={`${customCssMenu ?? 'custom-action-menu'}`}
         align={'end'}
       >
-        {items.map((item, index) => (
-          <Dropdown.Item
-            key={index}
-            onClick={() => onItemClick(item.value, index)}
-            className={`disable ${customCssMenuItem ?? 'custom-action-item'}`}
-          >
-            {item.label}
-          </Dropdown.Item>
-        ))}
+        {items.map((item, index) => {
+          if (!isValidElement(item) && 'value' in item) {
+            return (
+              <Dropdown.Item
+                key={index}
+                onClick={() => onItemClick(item.value, index)}
+                className={`disable ${customCssMenuItem ?? 'custom-action-item'}`}
+              >
+                {item.label}
+              </Dropdown.Item>
+            );
+          }
+          return (
+            <Dropdown.Item
+              key={index}
+              className={`disable ${customCssMenuItem ?? 'custom-action-item'}`}
+            >
+              {item}
+            </Dropdown.Item>
+          );
+        })}
       </Dropdown.Menu>
     </Dropdown>
   );

@@ -1,4 +1,5 @@
 import { SiteDetailsMode } from '../../features/details/dto/SiteDetailsMode';
+import { ButtonVariant } from '../button/Button';
 
 export interface DropdownItem {
   label: string;
@@ -13,4 +14,5 @@ export interface IActions {
   customCssMenu?: string;
   customCssMenuItem?: string;
   onItemClick: (value: string, index?: any) => void;
+  toggleButtonVariant?: ButtonVariant;
 }

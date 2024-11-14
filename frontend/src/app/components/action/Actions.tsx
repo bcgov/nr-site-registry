@@ -12,6 +12,7 @@ const Actions: React.FC<IActions> = ({
   customCssMenuItem,
   customCssToggleBtn,
   onItemClick,
+  toggleButtonVariant = 'primary',
 }) => {
   return (
     <Dropdown>
@@ -20,6 +21,7 @@ const Actions: React.FC<IActions> = ({
         as={Button}
         className={`${customCssToggleBtn ?? ''} d-flex align-items-center gap-1`}
         disabled={disable}
+        variant={toggleButtonVariant}
       >
         {label}
         <DropdownIcon />

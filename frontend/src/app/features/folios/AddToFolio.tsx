@@ -11,6 +11,7 @@ import { getUser } from '../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
 import { Placement } from 'react-bootstrap/esm/types';
 import clsx from 'clsx';
+import { Button } from '../../components/button/Button';
 
 interface AddToFolioProps {
   label?: string;
@@ -109,17 +110,13 @@ const AddToFolio: FC<AddToFolioProps> = ({
         </Popover>
       }
     >
-      <button
-        className={clsx([
-          'search-result-actions-btn',
-          'search-result-actions-btn-highlight',
-          triggerClassName,
-        ])}
+      <Button
+        variant="secondary"
+        className={triggerClassName}
         disabled={disabled}
       >
-        <FolderPlusIcon />
-        <span>{label}</span>
-      </button>
+        <FolderPlusIcon /> <span>{label}</span>
+      </Button>
     </OverlayTrigger>
   );
 };

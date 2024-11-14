@@ -10,6 +10,7 @@ import { TableColumn } from '../../../components/table/TableColumn';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { DropdownItem } from '../../../components/action/IActions';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
+import { Button } from '../../../components/button/Button';
 
 interface INotationProps {
   index: number;
@@ -152,36 +153,22 @@ const Notation: React.FC<INotationProps> = ({
             {viewMode === SiteDetailsMode.EditMode &&
               userType === UserType.Internal && (
                 <div className="d-flex gap-2 flex-wrap " key={notation.id}>
-                  <button
-                    id="add-participant-btn"
-                    className=" d-flex align-items-center notation-btn"
-                    type="button"
+                  <Button
+                    variant="secondary"
                     onClick={() => handleAddParticipant(notation.id)}
-                    aria-label={'Add Participant'}
                   >
-                    <UserPlus className="btn-user-icon" />
-                    <span className="notation-btn-lbl">
-                      {'Add Participant'}
-                    </span>
-                  </button>
+                    <UserPlus />
+                    Add Participant
+                  </Button>
 
-                  <button
-                    id="delete-participant-btn"
-                    className={`d-flex align-items-center ${isAnyParticipantSelected(notation.id) ? `notation-btn` : `notation-btn-disable`}`}
+                  <Button
+                    variant="secondary"
                     disabled={!isAnyParticipantSelected(notation.id)}
-                    type="button"
                     onClick={() => handleRemoveParticipant(notation)}
-                    aria-label={'Remove Participant'}
                   >
-                    <UserMinus
-                      className={`${isAnyParticipantSelected(notation.id) ? `btn-user-icon` : `btn-user-icon-disabled`}`}
-                    />
-                    <span
-                      className={`${isAnyParticipantSelected(notation.id) ? `notation-btn-lbl` : `notation-btn-lbl-disabled`}`}
-                    >
-                      {'Remove Participant'}
-                    </span>
-                  </button>
+                    <UserMinus />
+                    Remove Participant
+                  </Button>
                 </div>
               )}
             {viewMode === SiteDetailsMode.SRMode &&

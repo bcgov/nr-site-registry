@@ -1,0 +1,35 @@
+/* Style for the avatar image */
+.avatar-image {
+  /* Make the image circular by setting a 100% border-radius */
+  border-radius: 100px;
+  
+  /* Set the height of the avatar to 44px */
+  height: 44px;
+  
+  /* Set the width of the avatar to 44px (same as height for a circular shape) */
+  width: 44px;
+  
+  /* Border around the avatar with a light color, customizable using the CSS variable */
+  border: 1px solid var(--surface-border-light, #d8d8d8);
+  
+  /* Set background color of the avatar, also customizable using the CSS variable */
+  background: var(--surface-brand-blue-10, #f1f8fe);
+}
+
+/* Style for the avatar text */
+.avatar-txt {
+  /* Set the font size for the avatar text to 18px */
+  font-size: 18px;
+  
+  /* Set the font weight for the avatar text to normal (400) */
+  font-weight: 400;
+  
+  /* Set the line height for the avatar text to ensure good vertical spacing */
+  line-height: 30.61px;
+  
+  /* Center-align the text within the avatar container */
+  text-align: center;
+  
+  /* Set the color of the avatar text using a CSS variable, default is a dark grey */
+  color: var(--typography-color-secondary, #474543);
+}

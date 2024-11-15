@@ -1,0 +1,92 @@
+/* Modal styles */
+
+/* The overall modal container */
+.custom-modal {
+  display: flex; /* Center the modal content horizontally and vertically */
+  align-items: center; /* Align items in the vertical center */
+  justify-content: center; /* Align items in the horizontal center */
+  position: fixed; /* Fix the modal in place relative to the viewport */
+  z-index: 10000; /* Ensure the modal appears above other content */
+  left: 0; /* Align modal to the left edge of the screen */
+  top: 0; /* Align modal to the top edge of the screen */
+  width: 100%; /* Full width of the screen */
+  height: 100%; /* Full height of the screen */
+  overflow: auto; /* Allow scrolling if the modal content exceeds the screen height */
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent dark background */
+}
+
+/* Modal content container */
+.custom-modal-content {
+  /* padding: 20px; */
+  /* border: 1px solid #888; */
+  width: 50%; /* Set the modal width to 50% of the screen */
+  max-width: 50%; /* Prevent the modal from exceeding 50% width */
+  /* margin: auto;  */
+  position: relative; /* Relative positioning for child elements */
+  border-radius: var(--layout-border-width-medium); /* Rounded corners */
+  background: var(--surface-background-white); /* White background */
+}
+
+/* Modal header section */
+.custom-modal-header {
+  padding: var(--layout-padding-large); /* Large padding around the header */
+  gap: var(--layout-margin-medium); /* Medium gap between header elements */
+  display: flex; /* Use flexbox to position child elements */
+  justify-content: space-between; /* Space out header elements */
+  align-items: center; /* Center the items vertically */
+}
+
+/* Close button style in the modal header */
+.custom-modal-header-close {
+  font-size: 24px; /* Make the close button larger */
+}
+
+/* Modal data section (content inside the modal) */
+.custom-modal-data {
+  padding: var(--layout-padding-large) var(--layout-padding-large) 
+    var(--layout-padding-xlarge) var(--layout-padding-large); /* Padding for content */
+  gap: var(--layout-margin-medium); /* Medium gap between elements */
+  display: flex; /* Flexbox for content layout */
+  flex-direction: column; /* Arrange the items vertically */
+  border-bottom: 1px solid grey; /* Bottom border for separation */
+  border-top: 1px solid grey; /* Top border for separation */
+}
+
+/* Modal header text style */
+.custom-modal-header-text {
+  font-size: 20px; /* Larger font size for the header text */
+  font-weight: 700; /* Bold text */
+  line-height: 34px; /* Adjust line height for readability */
+  text-align: left; /* Align text to the left */
+  color: #000000; /* Black text color */
+}
+
+/* Modal content text style */
+.custom-modal-data-text {
+  font-size: 16px; /* Set a smaller font size for content text */
+  font-weight: 400; /* Normal weight text */
+  line-height: 27.01px; /* Adjust line height for better readability */
+  text-align: left; /* Align text to the left */
+  color: #000000; /* Black text color */
+}
+
+/* Footer section for actions (buttons, etc.) */
+.custom-modal-actions-footer {
+  padding: var(--layout-padding-medium) var(--layout-padding-large)
+    var(--layout-padding-medium) var(--layout-padding-large); /* Padding around footer */
+  gap: var(--layout-margin-xsmall); /* Small gap between footer elements */
+  display: flex; /* Flexbox for layout */
+  justify-content: flex-end; /* Align the footer content to the right */
+}
+
+/* Responsive design: adjusts footer layout on small screens */
+@media (max-width: 576px) {
+  .custom-modal-actions-footer {
+    padding: var(--layout-padding-medium) var(--layout-padding-large)
+      var(--layout-padding-medium) var(--layout-padding-large); /* Same padding as before */
+    gap: var(--layout-margin-xsmall); /* Small gap between elements */
+    display: flex; /* Flexbox for layout */
+    justify-content: flex-end; /* Align items to the right */
+    flex-direction: column; /* Stack footer elements vertically on small screens */
+  }
+}

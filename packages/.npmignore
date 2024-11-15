@@ -1,0 +1,8 @@
+node_modules
+src
+scripts
+rollup.config.js
+tsconfig.json
+package.json
+.gitignore
+*.md

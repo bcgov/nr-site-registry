@@ -1,0 +1,338 @@
+/* Custom label styling */
+.custom-label {
+  color: var(--typography-color-primary); /* Sets the text color from a CSS variable */
+  font-size: 12px; /* Sets the font size to 12px */
+  font-weight: 400; /* Normal font weight */
+  line-height: 16px; /* Line height for the text */
+  text-align: left; /* Aligns the text to the left */
+}
+
+/* Custom input field styling */
+.custom-input {
+  border: 1px solid var(--surface-color-border-light, #d8d8d8) !important; /* Light border color with fallback */
+  background-color: var(--surface-background-white, #ffffff) !important; /* White background with fallback */
+  padding: var(--layout-padding-small) var(--layout-padding-medium) var(--layout-padding-small) var(--layout-padding-medium) !important; /* Padding with variables */
+  border-radius: var(--layout-margin-xsmall) !important; /* Small border radius */
+}
+
+/* Styling for input text (e.g., text inside input fields) */
+.custom-input-text {
+  font-size: 16px !important; /* Larger font size for input text */
+  font-weight: 400 !important; /* Normal font weight */
+  line-height: 24px !important; /* Increased line height for readability */
+  text-align: left; /* Left-align the text */
+  color: var(--typography-color-secondary) !important; /* Secondary color for the text */
+  text-wrap: wrap; /* Allow text to wrap */
+  word-wrap: break-word; /* Break long words */
+  text-overflow: ellipsis; /* Add ellipsis if text overflows */
+}
+
+/* Placeholder text styling for custom inputs */
+.custom-input::placeholder {
+  font-size: 16px; /* Size of placeholder text */
+  font-weight: 400; /* Normal font weight */
+  line-height: 24px; /* Line height for placeholder */
+  text-align: left; /* Left-aligned placeholder text */
+  color: var(--typography-color-disabled); /* Disabled color for placeholder */
+}
+
+/* Custom date range picker styling */
+.custom-date-range .rs-input-group {
+  border: 1px solid var(--surface-color-border-light, #d8d8d8) !important; /* Border styling for the input group */
+  background-color: var(--surface-background-white) !important; /* White background */
+  padding: 3px 0px 3px var(--layout-padding-medium); /* Padding with some specific values */
+  border-radius: var(--layout-margin-xsmall) !important; /* Border radius */
+}
+
+.custom-date-range .rs-input {
+  padding: 0; /* No padding for the input */
+}
+
+.custom-date-range.rs-picker-toggle-wrapper {
+  display: block; /* Makes sure the date picker wrapper is block-level */
+}
+
+/* Placeholder styling for the rs-input (DatePicker or similar) */
+.rs-input::placeholder {
+  font-size: 16px; /* Size of placeholder text */
+  font-weight: 400; /* Normal font weight */
+  line-height: 24px; /* Line height for placeholder */
+  text-align: left; /* Left-aligned text */
+  color: var(--typography-color-disabled); /* Disabled color for placeholder */
+}
+
+/* Custom select dropdown styling */
+.custom-select {
+  background-image: url('../assets/dropdown.png') !important; /* Background image for the dropdown icon */
+  background-repeat: no-repeat !important; /* Prevent the background image from repeating */
+  background-position: right 0.75rem center !important; /* Position the background image to the right */
+  background-size: 12px !important; /* Size of the dropdown icon */
+  font-size: 16px !important; /* Font size */
+  font-weight: 400 !important; /* Normal font weight */
+  line-height: 24px !important; /* Line height for text */
+  text-align: left; /* Left-aligned text */
+}
+
+/* Disabled option in select dropdown */
+.custom-disabled-option {
+  color: var(--typography-color-disabled) !important; /* Disabled text color */
+}
+
+/* Primary option in select dropdown */
+.custom-primary-option {
+  color: var(--typography-color-primary) !important; /* Primary text color */
+}
+
+/* General option styling in custom select dropdown */
+.custom-option {
+  font-size: 16px !important; /* Font size */
+  font-weight: 400 !important; /* Normal font weight */
+  line-height: 24px !important; /* Line height */
+  text-align: left; /* Left-aligned text */
+}
+
+/* Input error styling for custom inputs (e.g., focus state with error) */
+.custom-input.error:focus {
+  border-color: red; /* Red border on error */
+  box-shadow: 0 0 0 0.25rem rgba(255, 0, 0, 0.25); /* Red box-shadow on focus */
+}
+
+/* Custom image styling for form elements */
+.custom-form-image {
+  border-radius: 100px; /* Circular shape */
+  height: 27px; /* Height */
+  width: 27px; /* Width */
+  border: 1px solid var(--surface-border-light, #d8d8d8); /* Border color */
+  background: var(--surface-brand-blue-10, #f1f8fe); /* Background color */
+}
+
+/* Text inside form image */
+.custom-form-image-txt {
+  font-size: 10px; /* Smaller font size */
+  font-weight: 400; /* Normal font weight */
+  line-height: 18px; /* Line height */
+  text-align: center; /* Center the text */
+  color: var(--typography-color-secondary, #474543); /* Secondary text color */
+}
+
+/* Custom checkbox border */
+.custom-checkbox {
+  border-color: #313132; /* Dark border color */
+}
+
+/* Custom checkbox view mode checked styling */
+.custom-checkbox-viewMode:checked {
+  background-color: #313132; /* Dark background when checked */
+  border-color: transparent !important; /* Transparent border */
+}
+
+/* Custom checkbox checked state */
+.custom-checkbox[type='checkbox']:checked {
+  background-color: #313132; /* Dark background when checked */
+  border-color: transparent !important; /* Transparent border */
+}
+
+/* Custom checkbox focus state */
+.custom-checkbox[type='checkbox']:focus {
+  box-shadow: none !important; /* No box-shadow on focus */
+}
+
+/* Styling for elements that show "not found" text */
+.custom-not-found {
+  color: var(--surface-primary-default, #053662); /* Color for the not found message */
+  font-size: 12px; /* Font size */
+  font-style: normal; /* Normal font style */
+  font-weight: 400; /* Normal font weight */
+  line-height: 16px; /* Line height */
+}
+
+/* Removes the default dropdown icon used in React-Bootstrap */
+.dropdown-toggle::after {
+  content: none !important; /* Removes the dropdown icon */
+}
+
+/* Custom dropdown hover styling */
+.custom-dropdown:hover {
+  color: var(--typography-color-primary) !important; /* Hover color */
+}
+
+/* General custom dropdown styling */
+.custom-dropdown {
+  color: var(--typography-color-primary) !important; /* Primary color for dropdown text */
+}
+
+/* Custom textarea styling */
+.custom-textarea {
+  min-height: calc(1.5em + 0.75rem + 5px) !important; /* Minimum height calculation */
+}
+
+/* Search input label styling */
+.custom-search-input-label {
+  color: var(--typography-color-primary); /* Primary color for label */
+  font-size: 12px; /* Font size */
+  font-weight: 400; /* Normal font weight */
+  line-height: 16px; /* Line height */
+  text-align: left; /* Left-align the label text */
+}
+
+/* Placeholder styling for various input elements */
+select::placeholder,
+option::placeholder,
+textarea::placeholder,
+input::placeholder {
+  color: var(--typography-color-disabled) !important; /* Disabled color for placeholder */
+  font-size: 12px !important; /* Font size */
+  font-weight: 400 !important; /* Normal font weight */
+  line-height: 16px !important; /* Line height */
+  text-align: left !important; /* Left-aligned placeholder text */
+}
+
+/* Custom search input field styling */
+.custom-search-input {
+  border: 1px solid var(--surface-color-border-light, #d8d8d8) !important; /* Border color */
+  background-color: var(--surface-background-white, #ffffff) !important; /* White background */
+  padding: var(--layout-padding-small) var(--layout-padding-medium) var(--layout-padding-small) var(--layout-padding-medium) !important; /* Padding */
+  border-radius: var(--layout-margin-xsmall) !important; /* Small border radius */
+}
+
+/* Positioning of the search icon inside the input */
+.custom-search-icon-position {
+  left: 10px; /* Left position */
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Align vertically to the middle */
+}
+
+/* Styling for the search icon */
+.custom-search-icon {
+  font-size: 16px; /* Font size */
+  font-weight: 900; /* Bold font weight */
+  line-height: 20px; /* Line height */
+  text-align: center; /* Center the icon */
+  color: var(--icons-color-disabled, #9f9d9c); /* Disabled icon color */
+}
+
+/* Positioning of the clear icon inside the search box */
+.custom-clear-icon-position {
+  right: 10px; /* Right position */
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Align vertically to the middle */
+  cursor: pointer; /* Pointer cursor for the clear icon */
+}
+
+/* Container for the search input box */
+.custom-search-box-container {
+  display: flex; /* Flexbox layout */
+  flex-direction: row; /* Arrange items in a row */
+  gap: var(--layout-margin-small); /* Gap between items */
+}
+
+/* Individual search input item */
+.custom-search-input-item {
+  padding: var(--layout-padding-small) var(--layout-padding-medium) var(--layout-padding-small) var(--layout-padding-medium); /* Padding */
+  gap: var(--layout-margin-medium); /* Gap between elements */
+  color: var(--typography-color-primary); /* Primary text color */
+}
+
+/* Hover state for search input item */
+.custom-search-input-item:hover {
+  background-color: var(--surface-secondary-hover); /* Hover background color */
+  color: var(--typography-color-secondary); /* Hover text color */
+}
+
+/* First child of the search input item (can apply specific styles) */
+.custom-search-input-item-first-child {
+  display: flex; /* Flexbox layout */
+  padding: var(--layout-padding-small) var(--layout-padding-medium) var(--layout-padding-small) var(--layout-padding-medium); /* Padding */
+  gap: var(--layout-margin-medium); /* Gap between elements */
+}
+
+/* Label styling for search input items */
+.custom-search-input-item-label {
+  color: var(--typography-color-disabled); /* Disabled label color */
+  font: var(--typography-regular-label); /* Regular label font */
+}
+
+/* Custom dropdown search menu styling */
+.custom-dropdown-search-menu {
+  position: relative !important; /* Relative positioning */
+  height: auto; /* Auto height */
+  max-height: 220px; /* Maximum height */
+  min-width: 100%; /* Full width */
+  overflow-y: auto; /* Vertical scroll */
+  overflow-x: hidden; /* Hide horizontal overflow */
+}
+
+/* Minimum height for custom elements */
+.custom-min-height {
+  min-height: 30px; /* Minimum height */
+}
+
+/* Styling for the search input menu */
+.custom-search-input-menu {
+  height: auto; /* Auto height */
+  max-height: 220px; /* Maximum height */
+  min-width: 100%; /* Full width */
+  overflow-y: auto; /* Vertical scroll */
+  overflow-x: hidden; /* Hide horizontal overflow */
+  border-radius: var(--surface-border-radius-medium); /* Medium border radius */
+  padding: var(--layout-padding-medium) 0px var(--layout-padding-medium) 0px; /* Padding */
+  box-shadow: var(--surface-shadow-medium); /* Shadow effect */
+  background-color: var(--surface-background-white); /* White background */
+  position: absolute; /* Absolute positioning */
+  z-index: 9999 !important; /* Ensure it appears above other content */
+}
+
+/* Custom dropdown positioning for when there is enough space below */
+.custom-search-input-menu-bottom {
+  top: 100%; /* Position below */
+  left: 0; /* Align to the left */
+}
+
+/* Custom dropdown positioning for when there isn't enough space below */
+.custom-search-input-menu-top {
+  bottom: 100%; /* Position above */
+  left: 0; /* Align to the left */
+}
+
+/* Custom horizontal line styling */
+.custom-horizontal-line {
+  color: rgba(0, 0, 0, 0.175); /* Light grey color */
+}
+
+/* Loading overlay styling */
+.custom-loading-overlay {
+  position: absolute; /* Absolute positioning */
+  top: 0; /* Align to the top */
+  left: 0; /* Align to the left */
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  display: flex; /* Flexbox layout */
+  align-items: center; /* Center items vertically */
+  justify-content: center; /* Center items horizontally */
+  z-index: 1050; /* Ensure the loading overlay appears above other content */
+}
+
+/* Spinning animation for the loading icon */
+.custom-fa-spin {
+  animation: spin 1s infinite linear; /* Continuous spin animation */
+}
+
+/* Keyframes for spinning animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg); /* Start at 0 degrees */
+  }
+  100% {
+    transform: rotate(360deg); /* Rotate to 360 degrees */
+  }
+}
+
+/* Custom dropdown menu styling */
+.custom-dropdown-menu {
+  padding: var(--layout-padding-medium) 0px var(--layout-margin-medium) 0px; /* Padding */
+  gap: 8px; /* Gap between items */
+  border-radius: var(--surface-border-radius-medium); /* Medium border radius */
+  background: var(--surface-color-background-white, #ffffff); /* White background */
+  box-shadow: 0px 6.4px 14.4px 0px #00000021; /* Shadow effect */
+  box-shadow: 0px 1.2px 3.6px 0px #0000001a; /* Lighter shadow effect (overrides above) */
+}

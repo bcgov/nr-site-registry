@@ -1,0 +1,63 @@
+/* Root level custom properties (CSS variables) */
+:root {
+  /* Max height for elements, can be used for limiting container height */
+  --max-height: 700px;
+  
+  /* Overflow behavior for scrollable content */
+  --overflow: auto;
+  
+  /* Default font size for text */
+  --font-size: 16px;
+  
+  /* Font weight, 700 indicates bold */
+  --font-weight: 700;
+  
+  /* Line height to control the space between lines of text */
+  --line-height: 18px;
+}
+
+/* Widget container class */
+.widget-container {
+  /* Small gap between child elements in the container */
+  gap: var(--layout-margin-small);
+}
+
+/* Label style for the widget (typically the widget title or header) */
+.widget-lbl {
+  /* Padding on top and bottom, using a small layout margin variable */
+  padding: var(--layout-padding-small) 0px var(--layout-padding-small) 0px;
+  
+  /* A border-bottom with a light surface border color (default: #d8d8d8) */
+  border-bottom: 1px solid var(--surface-border-light, #d8d8d8);
+  
+  /* Text color for the label, using primary typography color */
+  color: var(--typography-color-primary);
+  
+  /* Font size for the label */
+  font-size: var(--font-size);
+  
+  /* Font weight for the label text */
+  font-weight: var(--font-weight);
+  
+  /* Line height for the label text */
+  line-height: var(--line-height);
+  
+  /* Aligning the text to the left */
+  text-align: left;
+  
+  /* Ensuring there is no margin below the label */
+  margin-bottom: 0;
+}
+
+/* Table container class (used to contain and style the table) */
+.widget-table-container {
+  /* Applying the max height (with overflow) to allow scrollable content */
+  max-height: var(--max-height);
+  overflow: var(--overflow);
+}
+
+/* Overflow class for a table container that handles content overflow */
+.widget-table-conatiner-overflow {
+  /* Ensures that the content within the container will scroll if it overflows */
+  overflow: var(--overflow);
+}

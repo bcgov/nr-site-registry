@@ -1,0 +1,95 @@
+/* Custom button styles */
+.custom-action-btn {
+  /* Set rounded corners using a custom border radius variable */
+  border-radius: var(--surface-border-radius-medium);
+
+  /* Set background color with a fallback value */
+  background: var(--surface-primary-default, #1e5189) !important;
+
+  /* Padding with top/bottom and left/right values */
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium);
+
+  /* Font properties */
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  text-align: center;
+
+  /* Text color with a fallback for inversion */
+  color: var(--typography-color-primary-invert, #ffffff) !important;
+}
+
+/* Hover state for the custom button */
+.custom-action-btn:hover {
+  /* Set border color on hover */
+  border: 3px solid var(--surface-color-primary-activeBorder, #2e5dd7) !important;
+
+  /* Change background color on hover */
+  background: var(--surface-color-primary-hover, #1e5189) !important;
+}
+
+/* Custom action menu styles */
+.custom-action-menu {
+  /* Set rounded corners */
+  border-radius: var(--surface-border-radius-medium) !important;
+
+  /* Padding for top/bottom of the menu */
+  padding: var(--layout-padding-medium) 0px var(--layout-padding-medium) 0px !important;
+
+  /* Background color for the menu */
+  background-color: var(--surface-background-white) !important;
+
+  /* Shadow effect for the menu */
+  box-shadow: var(--surface-shadow-medium);
+
+  /* Remove the border */
+  border: none !important;
+
+  /* Set a fixed width for the menu */
+  width: 17rem;
+}
+
+/* Style for each item inside the custom action menu */
+.custom-action-item {
+  /* Use flexbox for alignment */
+  display: flex !important;
+
+  /* Padding for each menu item */
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium) !important;
+
+  /* Gap between flex items */
+  gap: var(--layout-margin-medium);
+
+  /* Font properties */
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 27.01px;
+
+  /* Text color for the item */
+  color: var(--typography-color-primary) !important;
+}
+
+/* Hover state for the action menu items */
+.custom-action-item:hover {
+  /* Change background color on hover */
+  background: var(--surface-color-secondary-hover, #edebe9) !important;
+
+  /* Change text color on hover */
+  color: var(--typography-color-secondary, #474543) !important;
+}
+
+/* Media query for responsive design on large screens */
+@media screen and (max-width: 992px) {
+  /* Adjust width of the custom action menu on smaller screens */
+  .custom-action-menu {
+    width: 7.06rem; /* Width for large screens */
+    min-width: 7.06rem !important;
+  }
+
+  /* Adjust button width for smaller screens */
+  .custom-action-btn {
+    width: 6.63rem;
+  }
+}

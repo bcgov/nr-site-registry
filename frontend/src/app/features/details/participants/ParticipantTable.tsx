@@ -8,6 +8,7 @@ import { UserMinus, UserPlus } from '../../../components/common/icon';
 import Actions from '../../../components/action/Actions';
 import { DropdownItem } from '../../../components/action/IActions';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
+import { Button } from '../../../components/button/Button';
 
 interface IParticipantTableProps {
   handleTableChange: (event: any) => void;
@@ -95,37 +96,20 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
       >
         {viewMode === SiteDetailsMode.EditMode &&
           userType === UserType.Internal && (
-            <div className="d-flex gap-2 flex-wrap ">
-              <button
-                id="add-participant-btn"
-                className=" d-flex align-items-center participant-btn"
-                type="button"
-                onClick={handleAddParticipant}
-                aria-label={'Add Participant'}
-              >
-                <UserPlus className="btn-user-icon" />
-                <span className="participant-btn-lbl">{'Add Participant'}</span>
-              </button>
+            <div className="d-flex gap-2 flex-wrap">
+              <Button variant="secondary" onClick={handleAddParticipant}>
+                <UserPlus />
+                Add Participant
+              </Button>
 
-              <button
-                id="delete-participant-btn"
-                className={`d-flex align-items-center ${selectedRows.length > 0 ? `participant-btn` : `participant-btn-disable`}`}
+              <Button
+                variant="secondary"
+                onClick={() => handleRemoveParticipant()}
                 disabled={selectedRows.length <= 0}
-                type="button"
-                onClick={() => {
-                  handleRemoveParticipant();
-                }}
-                aria-label={'Remove Participant'}
               >
-                <UserMinus
-                  className={`${selectedRows.length > 0 ? `btn-user-icon` : `btn-user-icon-disabled`}`}
-                />
-                <span
-                  className={`${selectedRows.length > 0 ? `participant-btn-lbl` : `participant-btn-lbl-disabled`}`}
-                >
-                  {'Remove Participant'}
-                </span>
-              </button>
+                <UserMinus />
+                Remove Participant
+              </Button>
             </div>
           )}
         {viewMode === SiteDetailsMode.SRMode &&
@@ -134,10 +118,8 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
               label="Set SR Visibility"
               items={srVisibilityParcticConfig}
               onItemClick={handleItemClick}
-              customCssToggleBtn={
-                false ? `participant-sr-btn` : `participant-sr-btn-disable`
-              }
               disable={viewMode === SiteDetailsMode.SRMode}
+              toggleButtonVariant="secondary"
             />
           )}
       </Widget>

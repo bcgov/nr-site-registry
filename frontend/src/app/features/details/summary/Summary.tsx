@@ -46,6 +46,7 @@ import SummaryInfo from './SummaryInfo';
 import { hasUserPurchasedSnapshot } from '../snapshot/SnapshotSlice';
 import { UserType } from '../../../helpers/requests/userType';
 import AddToFolio from '../../folios/AddToFolio';
+import { Button } from '../../../components/button/Button';
 
 const Summary = () => {
   const auth = useAuth();
@@ -548,19 +549,14 @@ const Summary = () => {
             </span>
           </div>
           <div className="external-purchase-buttons">
-            <button className="d-flex btn-cart align-items-center">
-              <ShoppingCartIcon className="btn-icon btn-icon-color-white" />
-              <span className="btn-cart-lbl" onClick={() => handleAddToCart()}>
-                {' '}
-                Purchase Site Details
-              </span>
-            </button>
+            <Button onClick={handleAddToCart}>
+              <ShoppingCartIcon /> Purchase Site Details
+            </Button>
             {id && (
               <AddToFolio
                 selectedSiteIds={[id]}
                 label="Add to Folio"
                 popupPlacement="top-start"
-                triggerClassName="btn-folio"
               />
             )}
           </div>

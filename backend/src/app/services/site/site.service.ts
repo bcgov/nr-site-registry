@@ -485,6 +485,7 @@ export class SiteService {
         inputDTO.siteId,
         parcelDescriptions,
         userInfo,
+        transactionalEntityManager,
       );
     } else {
       this.sitesLogger.log(

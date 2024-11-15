@@ -9,6 +9,20 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 
 const mockStore = configureStore([thunk]);
 
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
 jest.mock('react-oidc-context', () => ({
   useAuth: jest.fn().mockReturnValue({ isAuthenticated: false }),
 }));

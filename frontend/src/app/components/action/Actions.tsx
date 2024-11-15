@@ -13,7 +13,8 @@ const Actions: React.FC<IActions> = ({
   customCssMenuItem,
   customCssToggleBtn,
   onItemClick,
-  toggleButtonVariant = 'primary',
+  toggleButtonVariant,
+  toggleButtonSize,
 }) => {
   return (
     <Dropdown>
@@ -23,6 +24,9 @@ const Actions: React.FC<IActions> = ({
         className={`${customCssToggleBtn ?? ''} d-flex align-items-center gap-1`}
         disabled={disable}
         variant={toggleButtonVariant}
+        // @ts-expect-error We're passing the size prop to the Button component (`as` prop),
+        // which is not compatible with the Dropdown.Toggle `size` prop
+        size={toggleButtonSize}
       >
         {label}
         <DropdownIcon />

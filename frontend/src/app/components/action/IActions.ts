@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
 import { SiteDetailsMode } from '../../features/details/dto/SiteDetailsMode';
-import { ButtonVariant } from '../button/Button';
+import { ButtonSize, ButtonVariant } from '../button/Button';
 
 export interface DropdownItem {
   label: string;
@@ -16,4 +16,5 @@ export interface IActions {
   customCssMenuItem?: string;
   onItemClick: (value: string, index?: any) => void;
   toggleButtonVariant?: ButtonVariant;
+  toggleButtonSize?: ButtonSize;
 }

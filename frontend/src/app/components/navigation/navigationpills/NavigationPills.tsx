@@ -4,6 +4,7 @@ import { INavigationPills } from './INavigationPills';
 import { Link, useLocation } from 'react-router-dom';
 import Actions from '../../action/Actions';
 import { Button } from '../../button/Button';
+import useMediaQuery from '../../../hooks/useMediaQuery';
 
 const NavigationPills: React.FC<INavigationPills> = ({
   items,
@@ -14,6 +15,8 @@ const NavigationPills: React.FC<INavigationPills> = ({
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   const location = useLocation();
+
+  const isMobileScreen = useMediaQuery('(max-width: 786px)');
 
   useEffect(() => {
     if (location?.search !== '') {
@@ -58,6 +61,7 @@ const NavigationPills: React.FC<INavigationPills> = ({
               customCssMenu={'custom-nav-action-menu'}
               disable={isDisable}
               toggleButtonVariant={'secondary'}
+              toggleButtonSize={isMobileScreen ? 'medium' : 'small'}
             />
           </div>
           <div>
@@ -75,18 +79,17 @@ const NavigationPills: React.FC<INavigationPills> = ({
                 ></span>
               </div>
               <div className="ps-3 pe-2 m-0 p-0 w-100 text-center">
-                {items.map((item, index) => (
-                  <>
-                    <Button
-                      size="small"
-                      className={
-                        index !== activeIndex ? 'd-none' : 'custom-nav-pill'
-                      }
-                    >
-                      {item}
-                    </Button>
-                  </>
-                ))}
+                {items.map(
+                  (item, index) =>
+                    index === activeIndex && (
+                      <Button
+                        size={isMobileScreen ? 'medium' : 'small'}
+                        className="custom-nav-pill"
+                      >
+                        {item}
+                      </Button>
+                    ),
+                )}
               </div>
               <div className="m-0">
                 <span

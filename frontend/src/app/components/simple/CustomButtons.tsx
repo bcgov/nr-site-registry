@@ -1,9 +1,10 @@
 import React from 'react';
 import { FloppyDisk, XmarkIcon } from '../common/icon';
 import './CustomButtons.css';
+import { Button } from '../button/Button';
 
 interface ButtonProps {
-  clickHandler: (event: React.MouseEvent<HTMLDivElement>) => void;
+  clickHandler: (event: React.MouseEvent<HTMLButtonElement>) => void;
   label?: string;
   showIcon?: boolean;
 }
@@ -20,10 +21,10 @@ export const SaveButton: React.FC<ButtonProps> = ({
 }) => {
   showIcon = showIcon ?? true;
   return (
-    <div className="custom-save-btn" onClick={clickHandler}>
+    <Button onClick={clickHandler}>
       {showIcon && <FloppyDisk />}
       {label && label !== '' ? label : 'Save'}
-    </div>
+    </Button>
   );
 };
 
@@ -34,10 +35,10 @@ export const CancelButton: React.FC<ButtonProps> = ({
 }) => {
   showIcon = showIcon ?? true;
   return (
-    <div className="custom-cancel-btn" onClick={(e) => clickHandler(e)}>
+    <Button variant="tertiary" onClick={clickHandler}>
       {showIcon && <XmarkIcon />}
       {label && label !== '' ? label : 'Cancel'}
-    </div>
+    </Button>
   );
 };
 
@@ -48,10 +49,10 @@ export const DiscardButton: React.FC<ButtonProps> = ({
 }) => {
   showIcon = showIcon ?? true;
   return (
-    <div className="discard-button-border" onClick={(e) => clickHandler(e)}>
+    <Button variant="secondary" onClick={clickHandler}>
       {showIcon && <XmarkIcon />}
       {label && label !== '' ? label : 'Dicard Changes'}
-    </div>
+    </Button>
   );
 };
 

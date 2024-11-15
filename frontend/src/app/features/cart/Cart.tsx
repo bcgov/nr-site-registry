@@ -108,7 +108,7 @@ const Cart = () => {
       <div>
         <CustomLabel label="Cart" labelType="b-h1" />
       </div>
-      <div className="col-12 overflow-scroll ">
+      <div className="col-12">
         <Table
           label="Cart"
           isLoading={RequestStatus.success}

@@ -203,7 +203,7 @@ const FolioContents = () => {
             }}
           >
             <TrashCanIcon />
-            Remove Selected From Foli
+            Remove Selected From Folio
           </Button>
         </div>
         <div className="col-12 overflow-auto w-100">

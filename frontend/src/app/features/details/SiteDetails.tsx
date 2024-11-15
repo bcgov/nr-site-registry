@@ -120,7 +120,11 @@ const SiteDetails = () => {
   }, [auth.user]);
 
   useEffect(() => {
-    if (isUserOfType(UserRoleType.SR) && !hasNoPendingUpdatesFromState && viewMode !== SiteDetailsMode.EditMode) {
+    if (
+      isUserOfType(UserRoleType.SR) &&
+      !hasNoPendingUpdatesFromState &&
+      viewMode !== SiteDetailsMode.EditMode
+    ) {
       SetNavComponents(getNavComponents(true));
       SetNavItems(getNavItems(true));
       SetDropDownNavItems(getDropDownNavItems(true));
@@ -246,7 +250,11 @@ const SiteDetails = () => {
 
   useEffect(() => {
     setViewMode(mode);
-    if (isUserOfType(UserRoleType.SR) && !hasNoPendingUpdatesFromState && mode !== SiteDetailsMode.EditMode) {
+    if (
+      isUserOfType(UserRoleType.SR) &&
+      !hasNoPendingUpdatesFromState &&
+      mode !== SiteDetailsMode.EditMode
+    ) {
       SetNavComponents(getNavComponents(true));
       SetNavItems(getNavItems(true));
       SetDropDownNavItems(getDropDownNavItems(true));
@@ -255,8 +263,6 @@ const SiteDetails = () => {
       SetNavItems(getNavItems(false));
       SetDropDownNavItems(getDropDownNavItems(false));
     }
-
-
   }, [mode]);
 
   useEffect(() => {
@@ -492,7 +498,10 @@ const SiteDetails = () => {
 
   const getActionItemsToRender = () => {
     let userTypeSR: boolean = isUserOfType(UserRoleType.SR) ?? false;
-    let includeSRApprovalActions = userTypeSR && !hasNoPendingUpdatesFromState && viewMode !== SiteDetailsMode.EditMode;
+    let includeSRApprovalActions =
+      userTypeSR &&
+      !hasNoPendingUpdatesFromState &&
+      viewMode !== SiteDetailsMode.EditMode;
     return getActionItems(includeSRApprovalActions);
   };
 
@@ -534,6 +543,11 @@ const SiteDetails = () => {
           </div>
           <div className="d-none d-sm-block">
             <div className="d-flex gap-2">
+              {id && (
+                <div>
+                  <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
+                </div>
+              )}
               <div
                 className="d-flex btn-cart align-items-center "
                 onClick={() => handleAddToCart()}
@@ -541,12 +555,6 @@ const SiteDetails = () => {
                 <ShoppingCartIcon className="btn-icon" />
                 <span className="btn-cart-lbl"> Add to Cart</span>
               </div>
-
-              {id && (
-                <div>
-                  <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
-                </div>
-              )}
             </div>
           </div>
         </>

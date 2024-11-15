@@ -104,6 +104,7 @@ const SRUpdatesTableFilter: React.FC<ISRUpdatesTableFilter> = ({
               handleReset();
               closeSection();
             }}
+            data-testid="cancel-filter"
           >
             Cancel
           </Button>

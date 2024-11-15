@@ -35,6 +35,7 @@ import { useBlocker } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
 
 import { notifyError, notifySuccess } from '../../components/alert/Alert';
+import { Button } from '../../components/button/Button';
 
 const Folios = () => {
   let blocker = useBlocker(
@@ -157,37 +158,28 @@ const Folios = () => {
       <div className="folio-actions">
         <div className="folio-add-new">
           {!editMode && (
-            <div
-              className="folio-add-new-btn"
-              onClick={() => handleAddNewFolio()}
-            >
+            <Button onClick={handleAddNewFolio}>
               <FolderPlusIcon />
-              <span>Create New Folio</span>
-            </div>
+              Create New Folio
+            </Button>
           )}
 
           {!editMode && (
-            <div className="folio-edit-btn" onClick={() => SetEditMode(true)}>
+            <Button variant="secondary" onClick={() => SetEditMode(true)}>
               <PencilIcon />
-              <span>Edit Folios</span>
-            </div>
+              Edit Folios
+            </Button>
           )}
           {editMode && (
             <>
-              <div
-                className="folio-edit-btn"
-                onClick={() => SetEditMode(false)}
-              >
+              <Button variant="secondary" onClick={() => SetEditMode(false)}>
                 <XmarkIcon />
-                <span>Cancel</span>
-              </div>{' '}
-              <div
-                className="folio-add-new-btn"
-                onClick={() => handleSaveChanges()}
-              >
+                Cancel
+              </Button>
+              <Button onClick={handleSaveChanges}>
                 <RegFloppyDisk />
-                <span>Save Changes</span>
-              </div>{' '}
+                Save Changes
+              </Button>
             </>
           )}
         </div>

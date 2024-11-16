@@ -99,6 +99,7 @@ import {
   bulkUpdateApproveRejectStatus,
   resetBulkUpdateStatus,
 } from './srUpdates/state/srUpdatesTableSlice';
+import { Button } from '../../components/button/Button';
 
 const SiteDetails = () => {
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
@@ -120,7 +121,11 @@ const SiteDetails = () => {
   }, [auth.user]);
 
   useEffect(() => {
-    if (isUserOfType(UserRoleType.SR) && !hasNoPendingUpdatesFromState) {
+    if (
+      isUserOfType(UserRoleType.SR) &&
+      !hasNoPendingUpdatesFromState &&
+      viewMode !== SiteDetailsMode.EditMode
+    ) {
       SetNavComponents(getNavComponents(true));
       SetNavItems(getNavItems(true));
       SetDropDownNavItems(getDropDownNavItems(true));
@@ -246,6 +251,19 @@ const SiteDetails = () => {
 
   useEffect(() => {
     setViewMode(mode);
+    if (
+      isUserOfType(UserRoleType.SR) &&
+      !hasNoPendingUpdatesFromState &&
+      mode !== SiteDetailsMode.EditMode
+    ) {
+      SetNavComponents(getNavComponents(true));
+      SetNavItems(getNavItems(true));
+      SetDropDownNavItems(getDropDownNavItems(true));
+    } else {
+      SetNavComponents(getNavComponents(false));
+      SetNavItems(getNavItems(false));
+      SetDropDownNavItems(getDropDownNavItems(false));
+    }
   }, [mode]);
 
   useEffect(() => {
@@ -481,7 +499,10 @@ const SiteDetails = () => {
 
   const getActionItemsToRender = () => {
     let userTypeSR: boolean = isUserOfType(UserRoleType.SR) ?? false;
-    let includeSRApprovalActions = userTypeSR && !hasNoPendingUpdatesFromState;
+    let includeSRApprovalActions =
+      userTypeSR &&
+      !hasNoPendingUpdatesFromState &&
+      viewMode !== SiteDetailsMode.EditMode;
     return getActionItems(includeSRApprovalActions);
   };
 
@@ -497,18 +518,61 @@ const SiteDetails = () => {
   if (snapshot.status === RequestStatus.failed)
     return <div>Error: {snapshot.error || 'Failed to load data'}</div>;
 
+  const renderOptionsForExternalUser = () => {
+    if (
+      viewMode === SiteDetailsMode.ViewOnlyMode &&
+      userType === UserType.External
+    ) {
+      return (
+        <>
+          <div className="d-block d-sm-none">
+            <Actions
+              label="Actions"
+              items={[
+                { label: 'Add To Cart', value: 'cart' },
+                <AddToFolio
+                  selectedSiteIds={[id || '']}
+                  triggerElement={<span>Add to Folio</span>}
+                />,
+              ]}
+              onItemClick={(value) => {
+                if (value === 'cart') {
+                  handleAddToCart();
+                }
+              }}
+            />
+          </div>
+          <div className="d-none d-sm-block">
+            <div className="d-flex gap-2">
+              <div
+                className="d-flex btn-cart align-items-center "
+                onClick={() => handleAddToCart()}
+              >
+                <ShoppingCartIcon className="btn-icon" />
+                <span className="btn-cart-lbl"> Add to Cart</span>
+              </div>
+
+              {id && (
+                <div>
+                  <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      );
+    }
+  };
+
   return (
     <>
       {isVisible && (
         <div className="d-flex justify-content-between align-items-center custom-sticky-header w-100">
           <div className="d-flex gap-2 flex-wrap align-items-center">
-            <button
-              className="d-flex btn-back align-items-center me-3"
-              onClick={onClickBackButton}
-            >
-              <AngleLeft className="btn-icon" />
-              <span className="btn-back-lbl">Back </span>
-            </button>
+            <Button variant="secondary" onClick={onClickBackButton}>
+              <AngleLeft />
+              Back
+            </Button>
             <div className="d-flex flex-wrap align-items-center gap-2 pe-3 custom-sticky-header-lbl">
               Site ID:{' '}
               <span className="custom-sticky-header-txt">{id ?? ''}</span>
@@ -551,14 +615,10 @@ const SiteDetails = () => {
               viewMode === SiteDetailsMode.ViewOnlyMode &&
               userType === UserType.External && (
                 <>
-                  <div
-                    className="d-flex btn-cart align-items-center "
-                    onClick={() => handleAddToCart()}
-                  >
-                    <ShoppingCartIcon className="btn-icon" />
-                    <span className="btn-cart-lbl"> Add to Cart</span>
-                  </div>
-
+                  <Button variant="secondary" onClick={handleAddToCart}>
+                    <ShoppingCartIcon />
+                    Add to Cart
+                  </Button>
                   {id && (
                     <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
                   )}
@@ -623,13 +683,10 @@ const SiteDetails = () => {
 
         {!isVisible && (
           <div className="d-flex justify-content-between">
-            <button
-              className="d-flex btn-back align-items-center"
-              onClick={onClickBackButton}
-            >
-              <AngleLeft className="btn-icon" />
-              <span className="btn-back-lbl">Back to</span>
-            </button>
+            <Button variant="secondary" onClick={onClickBackButton}>
+              <AngleLeft /> Back to
+            </Button>
+
             <div className="d-flex gap-2 justify-align-center pe-2 pos-relative">
               {/* For Action Dropdown*/}
               {!edit &&
@@ -661,13 +718,10 @@ const SiteDetails = () => {
                 viewMode === SiteDetailsMode.ViewOnlyMode &&
                 userType === UserType.External && (
                   <>
-                    <div
-                      className="d-flex btn-cart align-items-center"
-                      onClick={() => handleAddToCart()}
-                    >
-                      <ShoppingCartIcon className="btn-icon" />
-                      <span className="btn-cart-lbl"> Add to Cart</span>
-                    </div>
+                    <Button onClick={handleAddToCart}>
+                      <ShoppingCartIcon />
+                      Add to Cart
+                    </Button>
                     {id && (
                       <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
                     )}

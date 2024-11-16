@@ -2,6 +2,7 @@ import React from 'react';
 import { getSiteSearchResultsColumns } from '../dto/Columns';
 import { TableColumn } from '../../../components/table/TableColumn';
 import './Column.css';
+import { Button } from '../../../components/button/Button';
 
 interface ColumnProps {
   toggleColumnSelectionForDisplay: (item: TableColumn) => void;
@@ -66,23 +67,13 @@ const Column: React.FC<ColumnProps> = ({
         </div>
       </div>
       <div className="row">
-        <div className="col-12">
-          <input
-            type="button"
-            value={'Reset Columns'}
-            className="reset-btn"
-            onClick={() => {
-              reset();
-            }}
-          ></input>
-          <input
-            type="button"
-            value="Close"
-            className="close-btn"
-            onClick={() => {
-              close();
-            }}
-          ></input>
+        <div className="col-12 d-flex gap-2">
+          <Button variant="secondary" onClick={reset}>
+            Reset Columns
+          </Button>
+          <Button variant="secondary" onClick={close}>
+            Close
+          </Button>
         </div>
       </div>
     </div>

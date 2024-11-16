@@ -52,8 +52,6 @@ The `NavigationPills` component accepts the following props:
 | `components`                   | `object[]`    | Array of objects containing `key` (string) and `component` (JSX) for each pill. |
 | `dropdownItems`                | `string[]?`   | Array of strings for dropdown items to be displayed in a dropdown menu (optional). |
 | `isDisable`                    | `boolean?`    | A flag to disable pill navigation (optional). Defaults to `false`.           |
-| `customNavPillsCss`            | `string?`     | Custom CSS class for the pills (optional).                                  |
-| `customMobileNavPillsCss`      | `string?`     | Custom CSS class for pills in mobile view (optional).                       |
 | `customDropdownMenuCss`        | `string?`     | Custom CSS class for the dropdown menu (optional).                          |
 | `customDropdownToggleBtnCss`   | `string?`     | Custom CSS class for the dropdown toggle button (optional).                |
 | `customNavCarouselLeftIconCss` | `string?`     | Custom CSS class for the left carousel icon (optional).                    |
@@ -80,7 +78,6 @@ const App = () => {
         components={components}
         dropdownItems={['Option 1', 'Option 2']}
         isDisable={false}
-        customNavPillsCss="custom-nav-pill"
       />
     </div>
   );
@@ -89,37 +86,6 @@ const App = () => {
 export default App;
 ```
 
-## CSS Customization
-You can customize the appearance of the pills, carousel icons, and dropdown buttons by passing custom CSS classes as props. For example, to change the color of the active pill, use the `customNavPillsCss` prop.
-
-```css
-.custom-nav-pill {
-  padding: 10px 20px;
-  border-radius: 5px;
-  background-color: #4CAF50; /* Green */
-  color: white;
-  font-weight: bold;
-}
-
-.custom-nav-pill.active {
-  background-color: #ff5722; /* Orange */
-}
-
-.custom-nav-pill.disabled {
-  background-color: #9e9e9e; /* Grey */
-  color: #ccc;
-}
-```
-
-## Responsive Design
-- **Desktop View**: The pills are displayed horizontally.
-- **Mobile View**: A carousel-style navigation allows users to scroll through the pills, with left and right arrows to navigate between pills.
-The component automatically adjusts for different screen sizes using the following media queries:
-```css
-@media screen and (max-width: 786px) {
-  /* Adjust styles for mobile view */
-}
-```
 ## Dependencies
 - `react-router-dom`: For navigation and location management.
 - `CSS Variables`: The component relies on CSS variables for theming and styling. Make sure your project supports CSS variables or define them as needed.

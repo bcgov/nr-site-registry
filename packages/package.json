@@ -64,6 +64,7 @@
   },
   "dependencies": {
     "@types/uuid": "^9.0.8",
+    "clsx": "^2.1.1",
     "react-bootstrap": "2.10.2",
     "react-icons": "^4.12.0"
   }

@@ -1,5 +1,6 @@
 // Import ReactNode from react to support any type of React element as part of the props
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
+import { ButtonSize, ButtonVariant } from '../button/Button';
 
 // Interface for individual dropdown items
 export interface DropdownItem {
@@ -36,4 +37,6 @@ export interface IActions {
   // Callback function to handle the click event of a dropdown item
   // It receives the value of the clicked item and optionally its index
   onItemClick: (value: string, index?: any) => void;
+  toggleButtonVariant?: ButtonVariant;
+  toggleButtonSize?: ButtonSize;
 }

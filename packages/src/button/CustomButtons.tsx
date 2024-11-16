@@ -1,8 +1,8 @@
 import React from 'react';
 import './CustomButtons.css';
 import { FaXmark, FaFloppyDisk } from 'react-icons/fa6';
+import { Button } from '../button/Button';
 import { IButtonProps, IButtonWithLabelProps } from './ICustomButton';
-
 
 export const SaveButton: React.FC<IButtonProps> = ({
   clickHandler,
@@ -11,10 +11,10 @@ export const SaveButton: React.FC<IButtonProps> = ({
 }) => {
   showIcon = showIcon ?? true;
   return (
-    <div className="custom-save-btn" onClick={clickHandler}>
+    <Button onClick={clickHandler}>
       {showIcon && <FaFloppyDisk />}
       {label && label !== '' ? label : 'Save'}
-    </div>
+    </Button>
   );
 };
 
@@ -25,10 +25,10 @@ export const CancelButton: React.FC<IButtonProps> = ({
 }) => {
   showIcon = showIcon ?? true;
   return (
-    <div className="custom-cancel-btn" onClick={(e) => clickHandler(e)}>
+    <Button variant="tertiary" onClick={clickHandler}>
       {showIcon && <FaXmark />}
       {label && label !== '' ? label : 'Cancel'}
-    </div>
+    </Button>
   );
 };
 
@@ -39,10 +39,10 @@ export const DiscardButton: React.FC<IButtonProps> = ({
 }) => {
   showIcon = showIcon ?? true;
   return (
-    <div className="discard-button-border" onClick={(e) => clickHandler(e)}>
+    <Button variant="secondary" onClick={clickHandler}>
       {showIcon && <FaXmark />}
       {label && label !== '' ? label : 'Dicard Changes'}
-    </div>
+    </Button>
   );
 };
 
@@ -51,7 +51,7 @@ export const CustomPillButton: React.FC<IButtonWithLabelProps> = ({
   label,
 }) => {
   return (
-    <div className="custom-pill-button" onClick={() => clickHandler(label)}>
+    <div className="custom-pill-button" onClick={(e) => clickHandler(label)}>
       <span className="custom-pill-button-label">{label}</span>
       <FaXmark className="custom-pill-close-btn" />
     </div>

@@ -49,78 +49,36 @@ export default MyComponent;
 ```
 
 ## Props Overview
-The Actions component accepts the following props:
 
-| **Prop Name**               | **Type**                           | **Description**                                                                                               |
-|-----------------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| `label`                     | `string`                           | **Required**. The label displayed on the dropdown toggle button. Example: `"Choose Action"`                     |
-| `items`                     | `DropdownItem[]`                   | **Required**. Array of items to display in the dropdown. Each item must have a `label` and a `value` property. Example: `<DropdownItem label="Edit" value="edit" />` |
-| `disable`                   | `boolean`                          | **Optional**. If `true`, the dropdown button will be disabled. Default is `false`.                             |
-| `customCssToggleBtn`        | `string`                           | **Optional**. Custom CSS class for the dropdown toggle button. Default is `'custom-action-btn'`.               |
-| `customCssMenu`             | `string`                           | **Optional**. Custom CSS class for the dropdown menu. Default is `'custom-action-menu'`.                      |
-| `customCssMenuItem`         | `string`                           | **Optional**. Custom CSS class for each dropdown item. Default is `'custom-action-item'`.                     |
-| `customDropdownIcon`        | `ReactNode`                        | **Optional**. A custom icon to display next to the label in the dropdown toggle button. Example: `<FaEdit />`   |
-| `onItemClick`               | `(value: string, index?: any) => void` | **Required**. Callback function triggered when an item is clicked. Receives the `value` and optionally the `index` of the clicked item. |
-| `customCssMenuItem`         | `string`                           | **Optional**. Custom CSS class for each menu item in the dropdown.                                           |
+The `Actions` component accepts the following props:
 
-## Prop Descriptions
-```label``` **(string)**
-- **Required**
-The text displayed on the dropdown button. This is usually something like "Select Action" or "Choose Option."
-```items``` **(DropdownItem[])**
-- **Required**
-An array of ```DropdownItem``` objects. Each item should have a ```label``` (the text displayed) and a ```value``` (the value associated with the item). Example:
+| **Prop Name**               | **Type**                           | **Description**                                                                                               | **Required?** |
+|-----------------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------|---------------|
+| `label`                     | `string`                           | The label displayed on the dropdown toggle button. Example: `"Choose Action"`                                 | Yes           |
+| `items`                     | `DropdownItem[]`                   | Array of items to display in the dropdown. Each item must have a `label` (string) and a `value` (any).        | Yes           |
+| `disable`                   | `boolean`                          | If `true`, the dropdown button will be disabled, preventing users from interacting with it. Default is `false`.| No            |
+| `customCssToggleBtn`        | `string`                           | Custom CSS class for the dropdown toggle button. Default is `'custom-action-btn'`.                           | No            |
+| `customCssMenu`             | `string`                           | Custom CSS class for the dropdown menu. Default is `'custom-action-menu'`.                                    | No            |
+| `customCssMenuItem`         | `string`                           | Custom CSS class for each dropdown item. Default is `'custom-action-item'`.                                   | No            |
+| `customDropdownIcon`        | `ReactNode`                        | A custom icon to display next to the label in the dropdown toggle button. Example: `<FaEdit />`               | No            |
+| `onItemClick`               | `(value: string, index?: any) => void` | Callback function triggered when an item is clicked. Receives the `value` and optionally the `index`.         | Yes           |
+| `toggleButtonVariant`       | `ButtonVariant`                    | Variant for the dropdown button, such as `primary`, `secondary`.                                             | No            |
+| `toggleButtonSize`          | `ButtonSize`                       | Size of the dropdown button, such as `sm`, `lg`.                                                             | No            |
 
-```ts
-const items = [
-  { label: 'Edit', value: 'edit' },
-  { label: 'Delete', value: 'delete' }
-];
-```
-```disable``` **(boolean)**
-- **Optional**
-If ```true```, the dropdown toggle button will be disabled, preventing users from interacting with it. Default is ```false```.
-```customCssToggleBtn``` **(string)**
-- **Optional**
-A custom CSS class to apply to the dropdown toggle button. This allows you to override the default styling. For example:
-```tsx
-customCssToggleBtn="my-custom-toggle-btn"
-```
+### Prop Descriptions
 
-```customCssMenu``` **(string)**
-- **Optional**
-A custom CSS class to apply to the dropdown menu. Useful if you want to style the dropdown differently. Example:
-```tsx
-customCssMenu="my-custom-menu"
-```
-```customCssMenuItem``` **(string)**
-- **Optional**
-A custom CSS class to apply to each menu item. This helps in customizing the individual items' appearance. Example:
-```tsx
-customCssMenuItem="my-custom-item"
-```
+- **`label`** (`string`)  
+  **Required**: The text displayed on the dropdown button. This is usually something like "Select Action" or "Choose Option."
 
-```customDropdownIcon``` **(ReactNode)**
-- **Optional**
-A custom React element, such as an icon, to be displayed next to the label in the dropdown toggle button. Example:
+- **`items`** (`DropdownItem[]`)  
+  **Required**: An array of `DropdownItem` objects. Each item should have a `label` (the text displayed) and a `value` (the value associated with the item). Example:
 
-```tsx
-customDropdownIcon={<FaEdit />}
-```
-```onItemClick``` **(function)**
-- **Required**
-A callback function triggered when a menu item is clicked. It receives two arguments:
-
-- ```value```: The value of the clicked item.
-- ```index``` (optional): The index of the clicked item in the items array.
-
-Example:
-```tsx
-const handleItemClick = (value: string, index?: any) => {
-  console.log(`Item clicked: ${value} at index ${index}`);
-};
-```
-
+  ```ts
+  const items = [
+    { label: 'Edit', value: 'edit' },
+    { label: 'Delete', value: 'delete' }
+  ];
+  ```
 ## Example
 Here’s a complete example of using the Actions component with custom styles and icons:
 ```tsx

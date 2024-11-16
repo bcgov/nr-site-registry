@@ -1,71 +1,12 @@
-/* Base styles for the custom navigation pill */
-.custom-nav-pill {
-  /* Padding: horizontal small and vertical xsmall */
-  padding: var(--layout-padding-xsmall) var(--layout-padding-small)
-    var(--layout-padding-xsmall) var(--layout-padding-small);
-  
-  /* Rounded corners for the pill */
-  border-radius: var(--surface-border-radius-medium);
-  
-  /* Font properties */
-  font-size: 12px;
-  font-weight: 400; /* Regular weight */
-  line-height: 16px;
-  
-  /* Center align text */
-  text-align: center;
-  
-  /* Remove text decoration (e.g., underline) */
-  text-decoration: none;
-}
-
-/* Default style for the first navigation pill (often used for a "home" or "main" pill) */
-.custom-nav-pill.default:first-child {
-  background: var(--surface-primary-default, #053662); /* Primary background color */
-  color: var(--typography-color-primary-invert, #ffffff); /* White text */
-}
-
-/* Style for the active navigation pill (typically the currently selected one) */
-.custom-nav-pill.active {
-  background: var(--surface-primary-default, #053662); /* Active background color */
-  color: var(--typography-color-primary-invert, #ffffff); /* Active text color */
-}
-
-/* Style for disabled pills, making text appear in a disabled color */
-.custom-nav-pill.disabled {
-  color: var(--typography-color-disabled); /* Disabled text color */
-}
-
-/* Style for enabled pills, overriding the default text color */
-.custom-nav-pill.enabled {
-  color: var(--typography-color-primary, #2d2d2d) !important; /* Strong primary color for enabled pills */
-}
-
-/* Styles for a custom navigation button */
-.custom-nav-btn {
-  display: flex !important; /* Flexbox layout to center align */
-  justify-content: center; /* Horizontally center content */
-  align-items: center; /* Vertically center content */
-  border: 1px solid var(--surface-border-dark, #353433) !important; /* Border around button */
-  padding: var(--layout-padding-xsmall) var(--layout-padding-small)
-    var(--layout-padding-xsmall) var(--layout-padding-small) !important; /* Padding around button */
-  border-radius: var(--surface-border-radius-medium) !important; /* Rounded corners */
-  gap: var(--layout-margin-xsmall); /* Small gap between button content */
-  background: var(--surface-background-white, #ffffff); /* White background */
-  color: var(--typography-color-primary, #2d2d2d) !important; /* Primary text color */
-  text-align: center !important; /* Text aligned to center */
-  font-size: 12px !important; /* Font size */
-  font-style: normal !important; /* Normal font style */
-  font-weight: 400 !important; /* Regular font weight */
-  line-height: 16px !important; /* Line height */
-}
-
 /* Style for the left carousel navigation icon (used in a carousel-style navigation) */
 .custom-nav-carousel-left-icon {
   background-image: url('../assets/carousel-left-button.svg') !important; /* Left arrow icon */
   padding: var(--layout-padding-xsmall) var(--layout-padding-small)
     var(--layout-padding-xsmall) var(--layout-padding-small) !important; /* Padding for the icon */
-  color: var(--typography-color-primary, #2d2d2d); /* Primary color for the icon */
+  color: var(
+    --typography-color-primary,
+    #2d2d2d
+  ); /* Primary color for the icon */
   font-size: 14px; /* Icon font size */
   font-weight: 900; /* Bold weight for the icon */
   line-height: 16px; /* Line height */
@@ -77,7 +18,10 @@
   background-position: left center !important; /* Icon alignment */
   padding: var(--layout-padding-xsmall) var(--layout-padding-small)
     var(--layout-padding-xsmall) var(--layout-padding-small) !important; /* Padding for the icon */
-  color: var(--typography-color-primary, #2d2d2d); /* Primary color for the icon */
+  color: var(
+    --typography-color-primary,
+    #2d2d2d
+  ); /* Primary color for the icon */
   font-size: 14px; /* Icon font size */
   font-weight: 900; /* Bold weight for the icon */
   line-height: 16px; /* Line height */
@@ -87,35 +31,15 @@
 @media screen and (max-width: 786px) {
   /* Adjusted styles for the custom navigation button on mobile */
   .custom-nav-btn {
-    display: flex !important; /* Flexbox for mobile layout */
     justify-content: space-between; /* Distribute space between button content */
-    align-items: center; /* Align items vertically */
-    border: 1px solid var(--surface-border-dark, #353433) !important; /* Border for button */
-    padding: var(--layout-padding-small) var(--layout-padding-medium)
-      var(--layout-padding-small) var(--layout-padding-medium) !important; /* Larger padding on mobile */
-    border-radius: var(--surface-border-radius-medium) !important; /* Rounded corners */
-    gap: var(--layout-margin-small); /* Gap between content */
-    background: var(--surface-background-white, #ffffff); /* White background */
-    color: var(--typography-color-primary, #2d2d2d) !important; /* Primary color for text */
-    text-align: center !important; /* Center text */
-    font-size: 16px !important; /* Larger font size on mobile */
-    font-style: normal !important; /* Normal font style */
-    font-weight: 400 !important; /* Regular weight */
-    line-height: 24px !important; /* Increased line height for readability */
     width: 100%; /* Button takes full width on mobile */
     margin-bottom: 16px; /* Margin at the bottom of the button */
   }
 
   /* Adjusted padding and font size for navigation pills on mobile */
   .custom-nav-pill {
-    padding: var(--layout-padding-small) var(--layout-padding-medium)
-      var(--layout-padding-small) var(--layout-padding-medium) !important; /* Larger padding */
-    border-radius: var(--surface-border-radius-medium); /* Rounded corners */
-    font-size: 16px; /* Larger font size */
-    font-weight: 400; /* Regular weight */
-    line-height: 24px; /* Increased line height */
-    text-align: center; /* Center text */
-    text-decoration: none; /* Remove underline */
+    width: 100%;
+    justify-content: center;
   }
 
   /* Adjusted styles for the left carousel icon on mobile */
@@ -143,9 +67,13 @@
 
   /* Styles for a custom navigation action menu on mobile */
   .custom-nav-action-menu {
-    border-radius: var(--surface-border-radius-medium) !important; /* Rounded corners */
+    border-radius: var(
+      --surface-border-radius-medium
+    ) !important; /* Rounded corners */
     padding: var(--layout-padding-medium) 0px var(--layout-padding-medium) 0px !important; /* Vertical padding */
-    background-color: var(--surface-background-white) !important; /* White background */
+    background-color: var(
+      --surface-background-white
+    ) !important; /* White background */
     box-shadow: var(--surface-shadow-medium); /* Medium shadow for depth */
     border: none !important; /* Remove border */
     width: 100%; /* Full width */

@@ -9,6 +9,7 @@ import {
   FaHouse,
   FaMapLocation,
   FaMagnifyingGlass,
+  FaMagnifyingGlassPlus,
   FaScrewdriverWrench,
   FaBook,
   FaFolder,
@@ -65,6 +66,7 @@ export const SpinnerIcon = FaSpinner;
 export const HouseIcon = FaHouse;
 export const MapLocationIcon = FaMapLocation;
 export const MagnifyingGlassIcon = FaMagnifyingGlass;
+export const MagnifyingGlassPlusIcon = FaMagnifyingGlassPlus;
 export const ScrewdriverWrenchIcon = FaScrewdriverWrench;
 export const BookIcon = FaBook;
 export const FolderIcon = FaFolder;

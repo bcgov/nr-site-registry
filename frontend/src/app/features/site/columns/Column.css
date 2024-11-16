@@ -16,33 +16,6 @@
   gap: var(--layout-margin-large);
 }
 
-.reset-btn {
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 24px;
-  text-align: center;
-  border: 1px solid #353433;
-  padding: var(--layout-padding-small) var(--layout-padding-medium)
-    var(--layout-padding-small) var(--layout-padding-medium);
-  border-radius: var(--surface-border-radius-medium);
-}
-
-.close-btn {
-  padding: var(--layout-padding-small) var(--layout-padding-medium)
-    var(--layout-padding-small) var(--layout-padding-medium);
-  gap: var(--layout-margin-small);
-  border-radius: var(--layout-border-radius-medium);
-  background: #ffffff;
-
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 24px;
-  text-align: center;
-  color: var(--typography-color-primary);
-
-  border: 0px;
-}
-
 .checkbox-color {
   accent-color: var(--icons-icons-info) !important;
 }

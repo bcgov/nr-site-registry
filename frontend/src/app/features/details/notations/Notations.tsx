@@ -61,6 +61,7 @@ import { UserActionEnum } from '../../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { IComponentProps } from '../navigation/NavigationPillsConfig';
 import Notation from './Notation';
+import { Button } from '../../../components/button/Button';
 
 const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   const {
@@ -713,10 +714,13 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     };
 
     // Add the new notation to formData
-    setFormData((prevData) => [newNotation, ...prevData]);
-    dispatch(updateSiteNotation([newNotation, ...formData]));
+    setFormData((prevData) => [newNotation, ...(prevData || [])]);
+    dispatch(updateSiteNotation([newNotation, ...(formData || [])]));
     dispatch(
-      setupNotationDataForSaving([newNotation, ...(trackNotation ?? formData)]),
+      setupNotationDataForSaving([
+        newNotation,
+        ...(trackNotation ?? (formData || [])),
+      ]),
     );
     const tracker = new ChangeTracker(IChangeType.Added, 'New Notation Added');
     dispatch(trackChanges(tracker.toPlainObject()));
@@ -904,15 +908,13 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
             (viewMode === SiteDetailsMode.EditMode ||
               viewMode === SiteDetailsMode.SRMode) && (
               <div className="col-lg-6 col-md-12 py-4">
-                <button
-                  className={`d-flex align-items-center ${viewMode === SiteDetailsMode.EditMode ? `btn-add-notation` : `btn-add-notation-disable`} `}
+                <Button
                   disabled={viewMode === SiteDetailsMode.SRMode}
                   onClick={handleOnAddNotation}
-                  aria-label="Add Notation"
                 >
-                  <Plus className="btn-notation-icon" />
-                  <span>Add Notation</span>
-                </button>
+                  <Plus />
+                  Add Notation
+                </Button>
               </div>
             )}
           <div

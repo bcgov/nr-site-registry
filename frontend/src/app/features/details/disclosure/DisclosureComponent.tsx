@@ -9,6 +9,7 @@ import { Minus, Plus } from '../../../components/common/icon';
 import Actions from '../../../components/action/Actions';
 import { DropdownItem } from '../../../components/action/IActions';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
+import { Button } from '../../../components/button/Button';
 
 interface IDisclosureComponent {
   viewMode: SiteDetailsMode;
@@ -153,34 +154,21 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
               {viewMode === SiteDetailsMode.EditMode &&
                 userType === UserType.Internal && (
                   <div className="d-flex gap-2" key={formData.id}>
-                    <button
-                      id="add-schedule-btn"
-                      className=" d-flex align-items-center disclosure-add-btn"
-                      type="button"
+                    <Button
+                      variant="secondary"
                       onClick={() => handleAddDisclosureSchedule(formData.id)}
-                      aria-label={'Add'}
                     >
-                      <Plus className="btn-user-icon" />
-                      <span className="disclosure-btn-lbl">{'Add'}</span>
-                    </button>
-
-                    <button
-                      id="delete-schedule-btn"
-                      className={`d-flex align-items-center ${isAnyDisclosureScheduleSelected(formData.id) ? `disclosure-add-btn` : `disclosure-btn-disable`}`}
-                      disabled={!isAnyDisclosureScheduleSelected(formData.id)}
-                      type="button"
+                      <Plus />
+                      Add
+                    </Button>
+                    <Button
+                      variant="secondary"
                       onClick={() => handleRemoveDisclosureSchedule(formData)}
-                      aria-label={'Remove Disclosure Schedule'}
+                      disabled={!isAnyDisclosureScheduleSelected(formData.id)}
                     >
-                      <Minus
-                        className={`${isAnyDisclosureScheduleSelected(formData.id) ? `btn-user-icon` : `btn-user-icon-disabled`}`}
-                      />
-                      <span
-                        className={`${isAnyDisclosureScheduleSelected(formData.id) ? `disclosure-btn-lbl` : `disclosure-btn-lbl-disabled`}`}
-                      >
-                        {'Remove'}
-                      </span>
-                    </button>
+                      <Minus />
+                      Remove
+                    </Button>
                   </div>
                 )}
               {viewMode === SiteDetailsMode.SRMode &&
@@ -193,6 +181,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                       true ? `disclosure-sr-btn` : `disclosure-sr-btn-disable`
                     }
                     disable={viewMode !== SiteDetailsMode.SRMode}
+                    toggleButtonVariant="secondary"
                   />
                 )}
             </Widget>

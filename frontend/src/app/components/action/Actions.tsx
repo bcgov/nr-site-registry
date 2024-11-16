@@ -2,6 +2,7 @@ import { IActions } from './IActions';
 import Dropdown from 'react-bootstrap/Dropdown';
 import './Actions.css';
 import { DropdownIcon } from '../common/icon';
+import { Button } from '../button/Button';
 import { isValidElement } from 'react';
 
 const Actions: React.FC<IActions> = ({
@@ -12,14 +13,20 @@ const Actions: React.FC<IActions> = ({
   customCssMenuItem,
   customCssToggleBtn,
   onItemClick,
+  toggleButtonVariant,
+  toggleButtonSize,
 }) => {
   return (
     <Dropdown>
       <Dropdown.Toggle
-        variant=""
         id="dropdown-action"
-        className={`${customCssToggleBtn ?? 'custom-action-btn'} d-flex align-items-center gap-1`}
+        as={Button}
+        className={`${customCssToggleBtn ?? ''} d-flex align-items-center gap-1`}
         disabled={disable}
+        variant={toggleButtonVariant}
+        // @ts-expect-error We're passing the size prop to the Button component (`as` prop),
+        // which is not compatible with the Dropdown.Toggle `size` prop
+        size={toggleButtonSize}
       >
         {label}
         <DropdownIcon />

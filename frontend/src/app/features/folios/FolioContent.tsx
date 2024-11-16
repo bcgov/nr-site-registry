@@ -32,6 +32,7 @@ import {
 } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
+import { Button } from '../../components/button/Button';
 
 const FolioContents = () => {
   const { id } = useParams();
@@ -168,13 +169,10 @@ const FolioContents = () => {
   return (
     <PageContainer role="Folio Contents">
       <div className="d-flex folio-actions folio-actions-gap">
-        <button
-          className="d-flex btn-back align-items-center back-btn-fc"
-          onClick={onClickBackButton}
-        >
-          <AngleLeft className="btn-icon" />
-          <span className="btn-back-lbl">Back to Folios</span>
-        </button>
+        <Button variant="secondary" onClick={onClickBackButton}>
+          <AngleLeft />
+          Back to Folios
+        </Button>
         <div className="folio-description">
           <div>
             <span className="folio-details-bold">Folio ID: </span>{' '}
@@ -193,24 +191,20 @@ const FolioContents = () => {
           <CustomLabel label="Folio Contents" labelType="b-h1" />
         </div>
         <div className="folio-content-actions">
-          <div
-            className="folio-content-actions-btn"
-            onClick={() => {
-              handleAddToShoppingCart();
-            }}
-          >
+          <Button onClick={handleAddToShoppingCart}>
             <ShoppingCartIcon />
-            <span>Add Selected To Cart</span>
-          </div>
-          <div
-            className="folio-content-actions-btn"
+            Add Selected To Cart
+          </Button>
+
+          <Button
+            variant="secondary"
             onClick={() => {
               SetShowDeleteConfirmModal(true);
             }}
           >
             <TrashCanIcon />
-            <span>Remove Selected From Folio</span>
-          </div>
+            Remove Selected From Folio
+          </Button>
         </div>
         <div className="col-12 overflow-auto w-100">
           <Table

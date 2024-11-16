@@ -1,32 +1,25 @@
 crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single postgres
   instances:
     dataVolumeClaimSpec:
-      storage: 2000Mi
+      storage: 1500Mi
       storageClassName: netapp-block-standard
-      walStorage: 500Mi
+      walStorage: 400Mi
   clone:
     enabled: false # enable it when the dev cluster needs to be cloned from test
     s3:
       enabled: true
     pvc:
       enabled: false
-    path: /backups/test/cluster/version/1 # provide the proper path to source the cluster. ex: /backups/cluster/version/1, if
+    path: ~ #/backups/test/cluster/version/1 # provide the proper path to source the cluster. ex: /backups/cluster/version/1, if
   pgBackRest:
     backupPath: /backups/dev/cluster/version
-    clusterCounter: 4 # since it is a repo switch , it is better to go to a new cluster.
+    clusterCounter: 5 # each time a namespace change or crunchy recreated from scratch, update this counter. Otherwise, it will NOT start the backups and cluster wont work.
     s3:
       enabled: true # if enabled, below must be provided, in dev environment, it's not necessary to enable s3.
       retention: 1 # one weeks backup in object store.
       bucket: nrsitetst
       endpoint: nrs.objectstore.gov.bc.ca
       fullBackupSchedule: 0 9 * * * # full backup at GMT 9
-      incrementalBackupSchedule: 0/15 * * * * # every fifteen minutes
+      incrementalBackupSchedule: 15,30,45 * * * * # every fifteen minutes except 0th minute
     pvc:
-      retention: 1 # one day hot active backup in pvc
-      retentionFullType: count
-      fullBackupSchedule: 0 8 * * * # full backup at 8 AM GMT everyday
-      incrementalBackupSchedule: 5 0/1 * * * # every 1 hour incremental at 5th minute
-      volume:
-        accessModes: "ReadWriteOnce"
-        storage: 6Gi
-        storageClassName: netapp-file-backup
+      enabled: false

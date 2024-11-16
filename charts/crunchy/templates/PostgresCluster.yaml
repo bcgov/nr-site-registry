@@ -138,8 +138,10 @@ spec:
             name: {{ .Release.Name }}-s3-secret
       {{- end }}
       global:
+        {{- if .Values.crunchy.pgBackRest.pvc.enabled}}
         repo2-retention-full: {{ .Values.crunchy.pgBackRest.pvc.retention | quote }}
         repo2-retention-full-type: {{ .Values.crunchy.pgBackRest.pvc.retentionFullType }}
+        {{- end }}
         repo1-retention-full: {{ .Values.crunchy.pgBackRest.s3.retention | quote }}
         repo1-retention-full-type: {{ .Values.crunchy.pgBackRest.retentionFullType }}
         repo1-path: '{{ .Values.crunchy.pgBackRest.backupPath }}/{{ .Values.crunchy.pgBackRest.clusterCounter}}'
@@ -153,6 +155,7 @@ spec:
             bucket: {{ .Values.crunchy.pgBackRest.s3.bucket | quote }}
             endpoint: {{ .Values.crunchy.pgBackRest.s3.endpoint | quote }}
             region: "ca-central-1"
+        {{- if .Values.crunchy.pgBackRest.pvc.enabled}}
         - name: repo2
           schedules:
             full: {{ .Values.crunchy.pgBackRest.pvc.fullBackupSchedule }}
@@ -165,7 +168,7 @@ spec:
                 requests:
                   storage: {{ .Values.crunchy.pgBackRest.pvc.volume.storage }}
               storageClassName: {{ .Values.crunchy.pgBackRest.pvc.volume.storageClassName }}
-
+          {{- end }}
       {{- if and .Values.crunchy.restore .Values.crunchy.restore.enabled }}
       restore:
         enabled: {{ .Values.crunchy.restore.enabled }}

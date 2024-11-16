@@ -3,6 +3,7 @@ import { formRows } from '../dto/SiteFilterConfig';
 import './SiteFilterForm.css';
 import 'rsuite/DateRangePicker/styles/index.css';
 import Form from '../../../components/form/Form';
+import { Button } from '../../../components/button/Button';
 
 interface SiteFilterProps {
   formData: { [key: string]: any | [Date, Date] };
@@ -29,33 +30,25 @@ const SiteFilterForm: React.FC<SiteFilterProps> = ({
         />
         <div className="d-flex flex-wrap justify-content-between w-100 mt-3">
           <div>
-            <button
-              type="reset"
-              className="reset-button"
+            <Button
+              variant="secondary"
               onClick={onReset}
               data-testid="Reset Filters"
             >
               Reset Filters
-            </button>
+            </Button>
           </div>
-          <div>
-            {/* Submit button */}
-            <button
-              type="submit"
-              className=" submit-button"
-              data-testid="Submit"
-            >
+          <div className="d-flex gap-2">
+            <Button type="submit" data-testid="Submit">
               Submit
-            </button>
-            {/* Cancel button */}
-            <button
-              type="button"
-              className=" cancel-button"
+            </Button>
+            <Button
+              variant="tertiary"
               onClick={cancelSearchFilter}
               data-testid="Cancel"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       </form>

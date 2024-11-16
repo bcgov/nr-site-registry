@@ -20,7 +20,6 @@ import {
 import SearchResults from './SearchResults';
 import {
   ShoppingCartIcon,
-  FolderPlusIcon,
   FileExportIcon,
   TableColumnsIcon,
   FilterIcon,
@@ -47,6 +46,7 @@ import AddToFolio from '../folios/AddToFolio';
 import { downloadCSV } from '../../helpers/csvExport/csvExport';
 import FilterPills from './filters/FilterPills';
 import { formRows } from './dto/SiteFilterConfig';
+import { Button } from '../../components/button/Button';
 
 const Search = () => {
   const auth = useAuth();
@@ -67,7 +67,6 @@ const Search = () => {
   ]);
   const [showMobileTableMenu, SetShowMobileTableMenu] = useState(false);
   const [selectedRows, SetSelectedRows] = useState<any[]>([]);
-  const [showAddToFolio, SetShowAddToFolio] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState<
     { key: string; value: string; label: string }[]
   >([]);
@@ -498,46 +497,30 @@ const Search = () => {
             ) : null}
             <div className="search-result-actions">
               {!isUserOfType(UserRoleType.INTERNAL) && (
-                <div
-                  className={`search-result-actions-btn ${selectedRows.length === 0 ? 'disabled-btn' : 'search-result-actions-btn-highlight'}`}
-                  onClick={() => handleAddToShoppingCart()}
+                <Button
+                  onClick={handleAddToShoppingCart}
+                  disabled={selectedRows.length === 0}
                 >
                   <ShoppingCartIcon />
-                  <span>Add Selected To Cart</span>
-                </div>
+                  Add Selected To Cart
+                </Button>
               )}
               {!isUserOfType(UserRoleType.INTERNAL) && (
-                <div
-                  className={`search-result-actions-btn ${selectedRows.length === 0 ? 'disabled-btn' : 'search-result-actions-btn-highlight'}`}
-                  onClick={() => {
-                    let loggedInUser = getUser();
-                    if (loggedInUser === null) {
-                      auth.signinRedirect({
-                        extraQueryParams: { kc_idp_hint: 'bceid' },
-                      });
-                    } else {
-                      SetShowAddToFolio(!showAddToFolio);
-                    }
-                  }}
-                >
-                  <FolderPlusIcon />
-                  <span>Add Selected To Folio</span>
-                </div>
-              )}
-              {showAddToFolio && (
                 <AddToFolio
-                  className="pos-absolute-search"
-                  selectedRows={selectedRows}
+                  label="Add Selected To Folio"
+                  disabled={selectedRows.length === 0}
+                  selectedSiteIds={selectedRows.map((row) => row.id)}
                 />
               )}
 
-              <div
-                className={`search-result-actions-btn ${selectedRows.length === 0 ? 'disabled-btn' : 'search-result-actions-btn-highlight'}`}
+              <Button
+                variant="secondary"
                 onClick={handleExport}
+                disabled={selectedRows.length === 0}
               >
                 <FileExportIcon />
-                <span>Export Results As File</span>
-              </div>
+                Export Results As File
+              </Button>
             </div>
           </div>
           <FilterPills
@@ -560,10 +543,6 @@ const Search = () => {
         </div>
       )}
     </PageContainer>
-
-    // <div className="siteSearchContainer" role="search">
-
-    // </div>
   );
 };
 

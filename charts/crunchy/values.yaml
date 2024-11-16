@@ -98,6 +98,13 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       limits:
         cpu: 20m
         memory: 64Mi
+      pgBackRest: # little more as these container in the statefulset pods do the pvc backups
+        requests:
+          cpu: 25m
+          memory: 128Mi
+        limits:
+          cpu: 50m
+          memory: 256Mi
     jobs:
       requests:
         cpu: 20m

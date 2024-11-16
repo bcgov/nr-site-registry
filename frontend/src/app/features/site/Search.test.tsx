@@ -5,15 +5,34 @@ import Search from './Search';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { RequestStatus } from '../../helpers/requests/status';
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 
 const mockStore = configureStore([thunk]);
+
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
 
 jest.mock('react-oidc-context', () => ({
   useAuth: jest.fn().mockReturnValue({ isAuthenticated: false }),
 }));
 
 describe('Search Component', () => {
-  let store;
+  let store: any;
+
+  const client = new ApolloClient({
+    cache: new InMemoryCache(),
+  });
 
   beforeEach(() => {
     store = mockStore({
@@ -31,7 +50,9 @@ describe('Search Component', () => {
   test('renders search input', () => {
     const { getByPlaceholderText } = render(
       <Provider store={store}>
-        <Search />
+        <ApolloProvider client={client}>
+          <Search />
+        </ApolloProvider>
       </Provider>,
     );
     const searchInput = screen.getByPlaceholderText('Search');

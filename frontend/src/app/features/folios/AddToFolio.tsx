@@ -1,92 +1,162 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC, isValidElement, ReactElement, useEffect, useState } from 'react';
 import SearchInput from '../../components/search/SearchInput';
-import { useDispatch, useSelector } from 'react-redux';
+import { FolderPlusIcon, XmarkIcon } from '../../components/common/icon';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
 import {
-  addSiteToFolio,
-  addSiteToFolioRequest,
-  fetchFolioItems,
-  folioItems,
-} from './redux/FolioSlice';
-import { getUser, showNotification } from '../../helpers/utility';
-import { AppDispatch } from '../../Store';
+  useFolio_GetFolioItemsForUserLazyQuery,
+  useFolio_AddSiteToFolioMutation,
+} from '../../../graphql/generated';
+import { notifyError, notifySuccess } from '../../components/alert/Alert';
+import { getUser } from '../../helpers/utility';
+import { useAuth } from 'react-oidc-context';
+import { Placement } from 'react-bootstrap/esm/types';
+import clsx from 'clsx';
+import { Button } from '../../components/button/Button';
+import { ModalDialogWrapperWithHeader } from '../../components/modaldialog/ModalDialog';
+import useMediaQuery from '../../hooks/useMediaQuery';
 
-interface ColumnProps {
-  className: string;
-  selectedRows: any[];
+interface AddToFolioProps {
+  label?: string;
+  disabled?: boolean;
+  selectedSiteIds: string[];
+  popupPlacement?: Placement;
+  triggerClassName?: string;
+  triggerElement?: ReactElement;
 }
 
-const AddToFolio: FC<ColumnProps> = ({ className, selectedRows }) => {
-  const [folioSearchTerm, SetFolioSearchTeam] = useState('');
-  const folioDetails = useSelector(folioItems);
+const AddToFolio: FC<AddToFolioProps> = ({
+  label,
+  disabled = false,
+  selectedSiteIds,
+  popupPlacement = 'bottom-start',
+  triggerClassName,
+  triggerElement,
+}) => {
+  const isSmallDevices = useMediaQuery('(max-width: 575px)');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [show, setShow] = useState(false);
 
-  const loggedInUser = getUser();
-  const dispatch = useDispatch<AppDispatch>();
+  const auth = useAuth();
 
-  const addSiteToFolioRequestStatus = useSelector(addSiteToFolioRequest);
+  const [getFolioItems, { loading, data }] =
+    useFolio_GetFolioItemsForUserLazyQuery();
 
-  const handleFolioSelect = (folioId: string) => {
-    let selectedFolio = folioDetails.filter(
-      (x: any) => x.folioId === folioId,
-    )[0];
+  const [addSiteToFolio] = useFolio_AddSiteToFolioMutation({
+    onCompleted: () => {
+      notifySuccess('Successfully added site to folio');
+      setShow(false);
+    },
+    onError: () => notifyError('Unable to add to folio'),
+  });
 
-    if (selectedRows.length === 0) {
-      alert('Please select one or more sites to be added to folio');
-      return;
+  const checkUserAuthentication = () => {
+    const loggedInUser = getUser();
+    if (loggedInUser === null) {
+      auth.signinRedirect({
+        extraQueryParams: { kc_idp_hint: 'bceid' },
+      });
+      return false;
     }
 
-    let rows = selectedRows.map((row) => {
-      return {
-        siteId: row.id,
-        folioId: selectedFolio.id + '',
-        id: parseInt(selectedFolio.id),
-        whoCreated: loggedInUser?.profile.given_name ?? '',
-        userId: loggedInUser?.profile.sub ?? '',
-      };
-    });
-
-    dispatch(addSiteToFolio(rows)).unwrap();
+    return true;
   };
 
-  useEffect(() => {
-    dispatch(fetchFolioItems(loggedInUser?.profile.sub ?? ''));
-  }, []);
+  const folioItems =
+    data?.getFolioItemsForUser.data?.filter((folio) => {
+      const regex = new RegExp(searchTerm, 'i');
+      return regex.test(folio.folioId);
+    }) || [];
 
-  useEffect(() => {
-    showNotification(
-      addSiteToFolioRequestStatus,
-      'Successfully added site to folio',
-      'Unable to add to folio',
-    );
-  }, [addSiteToFolioRequestStatus]);
+  const searchOptions = folioItems.map((folio) => {
+    return {
+      label: folio.folioId,
+      value: folio.id,
+    };
+  });
 
-  return (
-    <div className={className}>
+  const renderSearchInput = (showCloseBtnInDropdownOptions?: boolean) => {
+    return (
       <SearchInput
+        loading={loading}
         label={'Search Folios'}
         placeHolderText={'Search Folios'}
-        searchTerm={folioSearchTerm}
+        searchTerm={searchTerm}
         clearSearch={() => {
-          SetFolioSearchTeam('');
+          setSearchTerm('');
         }}
         handleSearchChange={(e) => {
-          if (e.target) {
-            SetFolioSearchTeam(e.target.value);
+          setSearchTerm(e.target.value);
+        }}
+        options={searchOptions}
+        optionSelectHandler={(value) => {
+          if (value === 'close') {
+            setShow(false);
           } else {
-            SetFolioSearchTeam(e);
+            handleFolioSelect(value);
           }
         }}
-        options={folioDetails
-          .filter(
-            (y: any) =>
-              y.folioId.toLowerCase().indexOf(folioSearchTerm.toLowerCase()) !==
-              -1,
-          )
-          .map((x: any) => x.folioId)}
-        optionSelectHandler={(value) => {
-          handleFolioSelect(value);
-        }}
+        showCloseBtnInDropdownOptions={showCloseBtnInDropdownOptions}
       />
-    </div>
+    );
+  };
+
+  const handleFolioSelect = (selectedFolio: (typeof searchOptions)[number]) => {
+    addSiteToFolio({
+      variables: {
+        addSiteToFolioDTO: selectedSiteIds.map((siteId) => {
+          return {
+            id: selectedFolio.value,
+            siteId,
+          };
+        }),
+      },
+    });
+  };
+
+  return (
+    <OverlayTrigger
+      show={show}
+      trigger="click"
+      placement={popupPlacement}
+      rootClose // closes the popover on outside click
+      transition={false}
+      onToggle={(open) => {
+        setShow(open);
+        if (open && checkUserAuthentication()) {
+          getFolioItems();
+        }
+      }}
+      overlay={
+        !isSmallDevices ? (
+          <Popover className="folio-popover">{renderSearchInput()}</Popover>
+        ) : (
+          <ModalDialogWrapperWithHeader closeHandler={() => {}}>
+            <div className="d-flex  flex-column justify-content-center">
+              {renderSearchInput(true)}
+              <div
+                onClick={() => setShow(false)}
+                className="d-flex flex-row align-items-center pt-2 justify-content-center "
+              >
+                <XmarkIcon className="custom-search-label"></XmarkIcon>
+                <span className="custom-search-label">Close</span>
+              </div>
+            </div>
+          </ModalDialogWrapperWithHeader>
+        )
+      }
+    >
+      {isValidElement(triggerElement) ? (
+        triggerElement
+      ) : (
+        <Button
+          variant="secondary"
+          className={triggerClassName}
+          disabled={disabled}
+        >
+          <FolderPlusIcon /> <span>{label}</span>
+        </Button>
+      )}
+    </OverlayTrigger>
   );
 };
 

@@ -446,7 +446,7 @@ export const hasNoPendingUpdates = (state: any) => {
   return (
     !state.srUpdates.disclosure &&
     (!state.srUpdates.parcelDescriptionData ||
-      state.srUpdates.parcelDescriptionData.data.length === 0) &&
+      state.srUpdates.parcelDescriptionData?.data?.length === 0) &&
     (!state.srUpdates.landUsesData ||
       state.srUpdates.landUsesData.length === 0) &&
     (!state.srUpdates.siteAssociations ||

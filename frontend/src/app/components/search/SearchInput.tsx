@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { CircleXMarkIcon, MagnifyingGlassIcon } from '../common/icon';
+import {
+  CircleXMarkIcon,
+  MagnifyingGlassIcon,
+  SpinnerIcon,
+  XmarkIcon,
+} from '../common/icon';
 import { ISearchInput } from './ISearchInput';
 import './SearchInput.css';
 import React from 'react';
@@ -15,6 +20,8 @@ const SearchInput: React.FC<ISearchInput> = ({
   createNewLabel,
   createNewHandler,
   placeHolderText,
+  loading,
+  showCloseBtnInDropdownOptions,
 }) => {
   const handler = optionSelectHandler ?? ((e) => {});
 
@@ -36,13 +43,17 @@ const SearchInput: React.FC<ISearchInput> = ({
   return (
     <div>
       {label && (
-        <label
-          htmlFor={searchId}
-          className="form-label custom-search-label"
-          aria-labelledby={label}
-        >
-          {label}
-        </label>
+        <div>
+          <label
+            htmlFor={searchId}
+            className="form-label custom-search-label"
+            aria-labelledby={label}
+          >
+            {label}
+
+            {loading && <SpinnerIcon className="fa-spin mx-2" />}
+          </label>
+        </div>
       )}
       <div className="search-box-container">
         <div className="d-flex align-items-center justify-content-center w-100 position-relative search-box ">
@@ -51,47 +62,63 @@ const SearchInput: React.FC<ISearchInput> = ({
               <MagnifyingGlassIcon />
             </span>
           )}
-          <input
-            id={searchId}
-            data-testid={searchId}
-            aria-label={label}
-            onChange={(event) => {
-              handleSearchChange(event);
-            }}
-            placeholder={placeHolderText}
-            value={searchTerm}
-            type="text"
-            className={`no-border-shadow-outline form-control custom-search ${
-              searchTerm.length > 0 ? 'ps-2' : ''
-            }`}
-          />
-          {!createMode && searchTerm.trim().length < 1 ? null : (
-            <span
-              data-testid="clear-icon"
-              id="clear-icon"
-              className="clear-icon custom-icon position-absolute px-2"
-              onClick={handleClose}
-            >
-              <CircleXMarkIcon />
-            </span>
-          )}
+          <div>
+            <input
+              id={searchId}
+              data-testid={searchId}
+              aria-label={label}
+              onChange={(event) => {
+                handleSearchChange(event);
+              }}
+              placeholder={placeHolderText}
+              value={searchTerm}
+              type="text"
+              className={`no-border-shadow-outline form-control custom-search ${
+                searchTerm.length > 0 ? 'ps-2' : ''
+              }`}
+            />
+            {!createMode && searchTerm.trim().length < 1 ? null : (
+              <span
+                data-testid="clear-icon"
+                id="clear-icon"
+                className="clear-icon custom-icon position-absolute px-2"
+                onClick={handleClose}
+              >
+                <CircleXMarkIcon />
+              </span>
+            )}
+          </div>
 
           {searchTerm && !createMode && options && options.length > 0 && (
             <div className="search-options">
-              {options.map((option, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="search-option-item"
-                    onClick={(e) => {
-                      handler(option);
-                      handleClose();
-                    }}
-                  >
-                    {option}
-                  </div>
-                );
-              })}
+              <div className="search-options-results">
+                {options.map((option, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="search-option-item"
+                      onClick={(e) => {
+                        handler(option);
+                        handleClose();
+                      }}
+                    >
+                      {typeof option === 'string' ? option : option.label}
+                    </div>
+                  );
+                })}
+              </div>
+              {showCloseBtnInDropdownOptions && (
+                <div
+                  key={v4()}
+                  className="search-option-item"
+                  onClick={(e) => {
+                    handler('close');
+                    handleClose();
+                  }}
+                >
+                  <XmarkIcon /> Close
+                </div>
+              )}
               {createNewLabel && (
                 <div
                   className="search-create-new-section"

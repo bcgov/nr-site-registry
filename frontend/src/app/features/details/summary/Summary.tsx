@@ -45,6 +45,8 @@ import { useParams } from 'react-router-dom';
 import SummaryInfo from './SummaryInfo';
 import { hasUserPurchasedSnapshot } from '../snapshot/SnapshotSlice';
 import { UserType } from '../../../helpers/requests/userType';
+import AddToFolio from '../../folios/AddToFolio';
+import { Button } from '../../../components/button/Button';
 
 const Summary = () => {
   const auth = useAuth();
@@ -469,11 +471,7 @@ const Summary = () => {
                       SetParcelSearchTeam('');
                     }}
                     handleSearchChange={(e) => {
-                      if (e.target) {
-                        SetParcelSearchTeam(e.target.value);
-                      } else {
-                        SetParcelSearchTeam(e);
-                      }
+                      SetParcelSearchTeam(e.target.value || '');
                     }}
                     options={['1213', '12313', '123132']}
                     optionSelectHandler={(value) => {
@@ -551,18 +549,16 @@ const Summary = () => {
             </span>
           </div>
           <div className="external-purchase-buttons">
-            <button className="d-flex btn-cart align-items-center">
-              <ShoppingCartIcon className="btn-icon btn-icon-color-white" />
-              <span className="btn-cart-lbl" onClick={() => handleAddToCart()}>
-                {' '}
-                Purchase Site Details
-              </span>
-            </button>
-            <button className="d-flex btn-folio align-items-center">
-              <FolderPlusIcon className="btn-folio-icon" />
-              <span className="btn-folio-lbl"> Add to Folio</span>
-              <DropdownIcon className="btn-folio-icon" />
-            </button>
+            <Button onClick={handleAddToCart}>
+              <ShoppingCartIcon /> Purchase Site Details
+            </Button>
+            {id && (
+              <AddToFolio
+                selectedSiteIds={[id]}
+                label="Add to Folio"
+                popupPlacement="top-start"
+              />
+            )}
           </div>
         </div>
       )}

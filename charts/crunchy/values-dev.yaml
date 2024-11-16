@@ -13,7 +13,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     path: ~ #/backups/test/cluster/version/1 # provide the proper path to source the cluster. ex: /backups/cluster/version/1, if
   pgBackRest:
     backupPath: /backups/dev/cluster/version
-    clusterCounter: 5 # each time a namespace change or crunchy recreated from scratch, update this counter. Otherwise, it will NOT start the backups and cluster wont work.
+    clusterCounter: 6 # each time a namespace change or crunchy recreated from scratch, update this counter. Otherwise, it will NOT start the backups and cluster wont work.
     s3:
       enabled: true # if enabled, below must be provided, in dev environment, it's not necessary to enable s3.
       retention: 1 # one weeks backup in object store.

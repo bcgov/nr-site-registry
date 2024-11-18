@@ -19,11 +19,12 @@
   justify-content: space-between;
   min-height: calc(100vh - 65px) !important;
   border-right: 1px solid var(--surface-border-light, #d8d8d8);
+  min-width: 84px;
+  z-index: 9999;
 }
 
 .side-bar:hover {
-  width: 160px;
-  z-index: 1000;
+  width: 240px;
   position: sticky;
 }
 

@@ -74,7 +74,7 @@ import {
 } from '../landUses/LandUsesSlice';
 import { getLandUseColumns } from '../landUses/LandUseColumnConfiguration';
 import ParcelDescriptionTable from '../parcelDescriptions/ParcelDescriptionTable';
-import { IFetchParcelDescriptionParams } from '../parcelDescriptions/parcelDescriptionsSlice';
+import { IFetchParcelDescriptionParams } from '../parcelDescriptions/parcelDescriptionsInterfaces';
 import { columns as columnConfigForParcelDescription } from '../parcelDescriptions/parcelDescriptionsConfig';
 
 const SRUpdates = () => {

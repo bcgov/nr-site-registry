@@ -93,7 +93,7 @@ import {
   updateRequestStatus,
 } from './srUpdates/srUpdatesSlice';
 import { fetchLandUseCodes } from './landUses/LandUsesSlice';
-import { IFetchParcelDescriptionParams } from './parcelDescriptions/parcelDescriptionsSlice';
+import { IFetchParcelDescriptionParams } from './parcelDescriptions/parcelDescriptionsInterfaces';
 import {
   bulkAproveRejectChanges,
   bulkUpdateApproveRejectStatus,

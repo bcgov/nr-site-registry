@@ -6,71 +6,86 @@ import configureStore, {
 } from 'redux-mock-store';
 import ParcelDescriptions from './parcelDescriptions';
 import { RequestStatus } from '../../../helpers/requests/status';
-import { IParcelDescriptionState } from './parcelDescriptionsSlice';
+import { IParcelDescriptionsState } from './parcelDescriptionsInterfaces';
 import thunk from 'redux-thunk';
+import { initialParcelDescriptionsState } from './parcelDescriptionsSlice';
+
+type TestState = { parcelDescriptions: IParcelDescriptionsState };
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useParams: () => ({ id: '1' }),
+}));
 
 describe('Parcel Descriptions Component', () => {
-  const mockStore: MockStoreCreator<unknown, {}> = configureStore([thunk]);
-
+  let mockStore: MockStoreCreator<unknown, {}>;
   let store: MockStoreEnhanced<unknown, {}>;
-  let siteId = 1;
-  let currentPage = 1;
-  let resultsPerPage = 5;
-  let totalResults = 10;
 
-  type TestState = { parcelDescriptions: IParcelDescriptionState };
-  let testState: TestState = {
-    parcelDescriptions: {
-      siteId: siteId,
-      data: [
-        {
-          id: 11,
-          descriptionType: 'Parcel ID',
-          idPinNumber: '123456',
-          dateNoted: 'June 26th, 2023',
-          landDescription: 'first land description',
-        },
-        {
-          id: 12,
-          descriptionType: 'Crown Land PIN',
-          idPinNumber: '654321',
-          dateNoted: 'June 25th, 2023',
-          landDescription: 'second land description',
-        },
-        {
-          id: 13,
-          descriptionType: 'Crown Land File Number',
-          idPinNumber: 'ax213456',
-          dateNoted: 'June 24th, 2023',
-          landDescription: 'third land description',
-        },
-        {
-          id: 14,
-          descriptionType: 'Parcel ID',
-          idPinNumber: '789012',
-          dateNoted: 'June 23rd, 2023',
-          landDescription: 'fourth land description',
-        },
-        {
-          id: 15,
-          descriptionType: 'Crown Land PIN',
-          idPinNumber: '210987',
-          dateNoted: 'June 22nd, 2023',
-          landDescription: 'fifth land description',
-        },
-      ],
-      requestStatus: RequestStatus.idle,
-      totalResults: totalResults,
-      currentPage: currentPage,
-      resultsPerPage: resultsPerPage,
-      searchParam: '',
-      sortBy: 'id',
-      sortByDir: 'ASC',
-      sortByInputValue: {},
-    },
-  };
+  let siteId: number;
+  let currentPage: number;
+  let resultsPerPage: number;
+  let totalResults: number;
+  let testState: TestState;
 
   beforeEach(() => {
+    mockStore = configureStore([thunk]);
+
+    siteId = 1;
+    currentPage = 1;
+    resultsPerPage = 5;
+    totalResults = 10;
+    testState = {
+      parcelDescriptions: {
+        siteId: siteId,
+        data: [
+          {
+            id: 11,
+            descriptionType: 'Parcel ID',
+            idPinNumber: '123456',
+            dateNoted: '2023-06-15T00:00:00Z',
+            landDescription: 'first land description',
+          },
+          {
+            id: 12,
+            descriptionType: 'Crown Land PIN',
+            idPinNumber: '654321',
+            dateNoted: '2023-06-16T00:00:00Z',
+            landDescription: 'second land description',
+          },
+          {
+            id: 13,
+            descriptionType: 'Crown Land File Number',
+            idPinNumber: 'ax213456',
+            dateNoted: '2023-06-17T00:00:00Z',
+            landDescription: 'third land description',
+          },
+          {
+            id: 14,
+            descriptionType: 'Parcel ID',
+            idPinNumber: '789012',
+            dateNoted: '2023-06-18T00:00:00Z',
+            landDescription: 'fourth land description',
+          },
+          {
+            id: 15,
+            descriptionType: 'Crown Land PIN',
+            idPinNumber: '210987',
+            dateNoted: '2023-06-19T00:00:00Z',
+            landDescription: 'fifth land description',
+          },
+        ],
+        requestStatus: RequestStatus.idle,
+        totalResults: totalResults,
+        currentPage: currentPage,
+        resultsPerPage: resultsPerPage,
+        searchParam: '',
+        sortBy: 'id',
+        sortByDir: 'ASC',
+        sortByInputValue: {},
+        needsUpdate: false,
+      },
+    };
+
     store = mockStore(testState);
   });
 
@@ -106,8 +121,14 @@ describe('Parcel Descriptions Component', () => {
     expect(actions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          type: 'parcelDescriptions/setCurrentPage',
-          payload: newPage,
+          type: 'parcelDescriptions/fetchParcelDescriptions/pending',
+          meta: expect.objectContaining({
+            arg: expect.objectContaining({
+              currentPage: newPage,
+              requestStatus: RequestStatus.loading,
+              needsUpdate: true,
+            }),
+          }),
         }),
       ]),
     );
@@ -132,8 +153,14 @@ describe('Parcel Descriptions Component', () => {
     expect(actions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          type: 'parcelDescriptions/setResultsPerPage',
-          payload: newResultsPerPage,
+          type: 'parcelDescriptions/fetchParcelDescriptions/pending',
+          meta: expect.objectContaining({
+            arg: expect.objectContaining({
+              resultsPerPage: newResultsPerPage,
+              requestStatus: RequestStatus.loading,
+              needsUpdate: true,
+            }),
+          }),
         }),
       ]),
     );
@@ -154,8 +181,14 @@ describe('Parcel Descriptions Component', () => {
     expect(actions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          type: 'parcelDescriptions/setSearchParam',
-          payload: newSearchParam,
+          type: 'parcelDescriptions/fetchParcelDescriptions/pending',
+          meta: expect.objectContaining({
+            arg: expect.objectContaining({
+              searchParam: newSearchParam,
+              requestStatus: RequestStatus.loading,
+              needsUpdate: true,
+            }),
+          }),
         }),
       ]),
     );
@@ -176,16 +209,16 @@ describe('Parcel Descriptions Component', () => {
     expect(actions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          type: 'parcelDescriptions/setSortByInputValue',
-          payload: { sortBy: newSortBy },
-        }),
-        expect.objectContaining({
-          type: 'parcelDescriptions/setSortBy',
-          payload: 'date_noted',
-        }),
-        expect.objectContaining({
-          type: 'parcelDescriptions/setSortByDir',
-          payload: 'DESC',
+          type: 'parcelDescriptions/fetchParcelDescriptions/pending',
+          meta: expect.objectContaining({
+            arg: expect.objectContaining({
+              sortByInputValue: { sortBy: newSortBy },
+              sortBy: 'date_noted',
+              sortByDir: 'DESC',
+              requestStatus: RequestStatus.loading,
+              needsUpdate: true,
+            }),
+          }),
         }),
       ]),
     );
@@ -206,16 +239,16 @@ describe('Parcel Descriptions Component', () => {
     expect(actions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          type: 'parcelDescriptions/setSortByInputValue',
-          payload: { sortBy: newSortBy },
-        }),
-        expect.objectContaining({
-          type: 'parcelDescriptions/setSortBy',
-          payload: 'date_noted',
-        }),
-        expect.objectContaining({
-          type: 'parcelDescriptions/setSortByDir',
-          payload: 'ASC',
+          type: 'parcelDescriptions/fetchParcelDescriptions/pending',
+          meta: expect.objectContaining({
+            arg: expect.objectContaining({
+              sortByInputValue: { sortBy: newSortBy },
+              sortBy: 'date_noted',
+              sortByDir: 'ASC',
+              requestStatus: RequestStatus.loading,
+              needsUpdate: true,
+            }),
+          }),
         }),
       ]),
     );
@@ -236,16 +269,16 @@ describe('Parcel Descriptions Component', () => {
     expect(actions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          type: 'parcelDescriptions/setSortByInputValue',
-          payload: { sortBy: newSortBy },
-        }),
-        expect.objectContaining({
-          type: 'parcelDescriptions/setSortBy',
-          payload: 'id',
-        }),
-        expect.objectContaining({
-          type: 'parcelDescriptions/setSortByDir',
-          payload: 'ASC',
+          type: 'parcelDescriptions/fetchParcelDescriptions/pending',
+          meta: expect.objectContaining({
+            arg: expect.objectContaining({
+              sortByInputValue: { sortBy: newSortBy },
+              sortBy: 'id',
+              sortByDir: 'ASC',
+              requestStatus: RequestStatus.loading,
+              needsUpdate: true,
+            }),
+          }),
         }),
       ]),
     );
@@ -266,14 +299,50 @@ describe('Parcel Descriptions Component', () => {
     expect(actions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          payload: 'description_type',
-          type: 'parcelDescriptions/setSortBy',
-        }),
-        expect.objectContaining({
-          payload: 'DESC',
-          type: 'parcelDescriptions/setSortByDir',
+          type: 'parcelDescriptions/fetchParcelDescriptions/pending',
+          meta: expect.objectContaining({
+            arg: expect.objectContaining({
+              sortBy: 'description_type',
+              sortByDir: 'DESC',
+              requestStatus: RequestStatus.loading,
+              needsUpdate: true,
+            }),
+          }),
         }),
       ]),
     );
+  });
+
+  describe('when the site id has changed', () => {
+    beforeEach(() => {
+      siteId = 2;
+      testState.parcelDescriptions.siteId = siteId;
+    });
+
+    it('resets the parcel descriptions state to its initial value', () => {
+      const newSiteId = 1;
+
+      render(
+        <Provider store={store}>
+          <ParcelDescriptions />
+        </Provider>,
+      );
+
+      const actions = store.getActions();
+      expect(actions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: 'parcelDescriptions/fetchParcelDescriptions/pending',
+            meta: expect.objectContaining({
+              arg: expect.objectContaining({
+                ...initialParcelDescriptionsState,
+                requestStatus: RequestStatus.loading,
+                siteId: newSiteId,
+              }),
+            }),
+          }),
+        ]),
+      );
+    });
   });
 });

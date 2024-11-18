@@ -13,12 +13,12 @@ import { getLandHistoriesForSiteQuery } from '../landUses/graphql/LandUses';
 import { graphQLSiteDocumentsBySiteId } from '../../site/graphql/Document';
 import { graphQLSiteDisclosureBySiteId } from '../../site/graphql/Disclosure';
 import { graphQLAssociatedSitesBySiteId } from '../../site/graphql/Associate';
-import { IFetchParcelDescriptionParams } from '../parcelDescriptions/parcelDescriptionsSlice';
+import { IFetchParcelDescriptionParams } from '../parcelDescriptions/parcelDescriptionsInterfaces';
 import { graphQLParcelDescriptionBySiteId } from '../../site/graphql/ParcelDescriptions';
 import {
   IParcelDescriptionDto,
   IParcelDescriptionResponseDto,
-} from '../parcelDescriptions/parcelDescriptionDto';
+} from '../parcelDescriptions/parcelDescriptionsInterfaces';
 import { format } from 'date-fns';
 
 const initialState: SRUpdatesState = {

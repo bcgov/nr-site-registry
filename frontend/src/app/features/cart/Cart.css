@@ -10,6 +10,7 @@
   border-radius: var(--layout-margin-xsmall);
   background: var(--surface-primary-default, #053662);
   display: flex;
+  width: 247px;
 }
 
 .payment-text {
@@ -31,4 +32,14 @@
   display: flex;
   gap: var(--layout-margin-medium);
   align-items: center;
+}
+
+@media screen and (max-width: 767px) {
+  .cart-total {
+    order: -1 !important;
+  }
+
+  .cart-actions {
+    flex-direction: column;
+  }
 }

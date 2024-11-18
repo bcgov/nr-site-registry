@@ -22,7 +22,7 @@ function App() {
     <div className="container-fluid p-0">
       <Header />
       <div className="row m-0 p-0">
-        <div className="col-md-1 p-0 display-from-medium max-width-for-sidebar">
+        <div className="col-md-1 p-0 display-from-medium">
           <SideBar />
         </div>
         <div className="col-md-11  p-0">

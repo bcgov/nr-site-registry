@@ -544,6 +544,11 @@ const SiteDetails = () => {
           </div>
           <div className="d-none d-sm-block">
             <div className="d-flex gap-2">
+              {id && (
+                <div>
+                  <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
+                </div>
+              )}
               <div
                 className="d-flex btn-cart align-items-center "
                 onClick={() => handleAddToCart()}
@@ -551,12 +556,6 @@ const SiteDetails = () => {
                 <ShoppingCartIcon className="btn-icon" />
                 <span className="btn-cart-lbl"> Add to Cart</span>
               </div>
-
-              {id && (
-                <div>
-                  <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
-                </div>
-              )}
             </div>
           </div>
         </>

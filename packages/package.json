@@ -4,7 +4,7 @@
   "author": "Jaspal Singh",
   "homepage": "https://github.com/jaspalsingh-aot/epd-react-components",
   "bugs": "https://github.com/jaspalsingh-aot/epd-react-components/issues",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",

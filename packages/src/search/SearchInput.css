@@ -1,109 +1,148 @@
+/* Style for the label of the search input */
 .custom-search-label {
-  color: var(--typography-color-primary);
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 16px;
-  text-align: left;
+  color: var(--typography-color-primary); /* Primary text color */
+  font-size: 12px; /* Font size for the label */
+  font-weight: 400; /* Normal font weight */
+  line-height: 16px; /* Line height for the label text */
+  text-align: left; /* Align the label text to the left */
 }
+
+/* General styling for the search input */
 .custom-search {
-  border: 1px solid var(--surface-color-border-light, #d8d8d8) !important;
-  background-color: var(--surface-background-white, #ffffff) !important;
+  border: 1px solid var(--surface-color-border-light, #d8d8d8) !important; /* Light border color for the search input */
+  background-color: var(
+    --surface-background-white,
+    #ffffff
+  ) !important; /* White background for the input */
   padding: var(--layout-padding-small) var(--layout-padding-medium)
-    var(--layout-padding-small) var(--layout-padding-medium) !important;
-  border-radius: var(--layout-margin-xsmall) !important;
+    var(--layout-padding-small) var(--layout-padding-medium) !important; /* Padding around the input */
+  border-radius: var(
+    --layout-margin-xsmall
+  ) !important; /* Small border radius for rounded corners */
 }
 
+/* Placeholder styling inside the search input */
 .custom-search::placeholder {
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 24px;
-  text-align: left;
-  color: var(--typography-color-disabled);
+  font-size: 16px; /* Font size for the placeholder text */
+  font-weight: 400; /* Normal font weight for the placeholder */
+  line-height: 24px; /* Line height for the placeholder text */
+  text-align: left; /* Align placeholder text to the left */
+  color: var(
+    --typography-color-disabled
+  ); /* Disabled text color for the placeholder */
 }
 
+/* General icon styling used for the search and clear icons */
 .custom-icon {
-  font-size: 16px;
-  font-weight: 900;
-  line-height: 20px;
-  text-align: center;
-  color: var(--icons-color-disabled, #9f9d9c);
+  font-size: 16px; /* Font size for the icons */
+  font-weight: 900; /* Bold weight for the icons */
+  line-height: 20px; /* Line height for the icons */
+  text-align: center; /* Center the icon */
+  color: var(--icons-color-disabled, #9f9d9c); /* Disabled icon color */
 }
 
+/* Styling for the search icon inside the input field */
 .search-icon {
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 10px; /* Position the search icon 10px from the left */
+  top: 50%; /* Vertically center the icon */
+  transform: translateY(
+    -50%
+  ); /* Adjust vertical alignment to center the icon */
 }
 
+/* Styling for the clear icon inside the input field */
 .clear-icon {
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
+  right: 10px; /* Position the clear icon 10px from the right */
+  top: 50%; /* Vertically center the clear icon */
+  transform: translateY(
+    -50%
+  ); /* Adjust vertical alignment to center the icon */
+  cursor: pointer; /* Change cursor to pointer when hovering over the clear icon */
 }
 
+/* Dropdown container for search options */
 .search-options {
-  position: absolute;
-  z-index: 1000;
-  top: 42px;
-  width: 100%;
-  background: white;
-  padding: var(--layout-padding-medium) 0px var(--layout-padding-medium) 0px;
-  gap: 8px;
-  border-radius: var(--layout-border-radius-medium);
-  background: var(--surface-background-white, #ffffff);
-  /* box-shadow: 0px 6.4px 14.4px 0px #00000021; */
-  box-shadow: 0px 1.2px 3.6px 0px #0000001a;
+  position: absolute; /* Absolute positioning to place it relative to the parent */
+  z-index: 1000; /* Ensure the dropdown appears above other elements */
+  top: 42px; /* Position the dropdown 42px below the input field */
+  width: 100%; /* Make the dropdown width 100% of the parent container */
+  background: white; /* White background for the dropdown */
+  padding: var(--layout-padding-medium) 0px var(--layout-padding-medium) 0px; /* Padding inside the dropdown */
+  gap: 8px; /* Space between items in the dropdown */
+  border-radius: var(
+    --layout-border-radius-medium
+  ); /* Rounded corners for the dropdown */
+  box-shadow: 0px 1.2px 3.6px 0px #0000001a; /* Subtle shadow for the dropdown */
 }
 
+/* Styling for individual search option items in the dropdown */
 .search-option-item {
-  height: 43px;
+  height: 43px; /* Set the height of each option item */
   padding: var(--layout-padding-small) var(--layout-padding-medium)
-    var(--layout-padding-small) var(--layout-padding-medium);
-  gap: var(--layout-margin-medium);
-  cursor: pointer;
+    var(--layout-padding-small) var(--layout-padding-medium); /* Padding for the option items */
+  gap: var(
+    --layout-margin-medium
+  ); /* Space between the option text and other elements (if any) */
+  cursor: pointer; /* Change cursor to pointer when hovering over options */
 }
 
+/* Hover effect for search option items */
 .search-option-item:hover {
-  background: var(--surface-secondary-hover, #edebe9);
+  background: var(
+    --surface-secondary-hover,
+    #edebe9
+  ); /* Light background color on hover */
 }
 
-.search-option-item:hover {
-  background: var(--surface-secondary-hover, #edebe9);
-}
-
+/* Styling for the "Create New" section in the dropdown */
 .search-create-new-section {
-  display: flex;
-  gap: var(--layout-margin-medium);
+  display: flex; /* Use flexbox for layout */
+  gap: var(--layout-margin-medium); /* Space between the icon and the text */
   padding: var(--layout-padding-small) var(--layout-padding-medium)
-    var(--layout-padding-small) var(--layout-padding-medium);
-  border-top: 1px solid var(--surface-border-light, #d8d8d8);
+    var(--layout-padding-small) var(--layout-padding-medium); /* Padding for the create new section */
+  border-top: 1px solid var(--surface-border-light, #d8d8d8); /* Border separating the section from the options */
 }
 
+/* Container for the entire search input box */
 .search-box-container {
-  display: flex;
-  flex-direction: row;
-  gap: var(--layout-margin-small);
+  display: flex; /* Use flexbox for layout */
+  flex-direction: row; /* Items will be arranged in a horizontal row */
+  gap: var(
+    --layout-margin-small
+  ); /* Space between the search input and other elements */
 }
 
+/* Styling for the "Add New" button in the search input */
 .search-add-new {
   padding: var(--layout-padding-small) var(--layout-padding-medium)
-    var(--layout-padding-small) var(--layout-padding-medium);
-  border-radius: var(--layout-border-radius-medium);
-  background-color: var(--surface-primary-default, #053662);
-  display: flex;
-  color: white;
-  min-width: 136px;
+    var(--layout-padding-small) var(--layout-padding-medium); /* Padding inside the button */
+  border-radius: var(
+    --layout-border-radius-medium
+  ); /* Rounded corners for the button */
+  background-color: var(
+    --surface-primary-default,
+    #053662
+  ); /* Dark blue background for the button */
+  display: flex; /* Use flexbox for layout */
+  color: white; /* White text color for the button */
+  min-width: 136px; /* Set a minimum width for the button */
 }
 
+/* Custom search box styling */
 .search-box {
-  background-color: var(--surface-background-white, #ffffff) !important;
-  border: 1px solid var(--surface-color-border-light, #d8d8d8) !important;
-  border-radius: var(--layout-margin-xsmall) !important;
+  background-color: var(
+    --surface-background-white,
+    #ffffff
+  ) !important; /* White background for the search box */
+  border: 1px solid var(--surface-color-border-light, #d8d8d8) !important; /* Light border around the search box */
+  border-radius: var(
+    --layout-margin-xsmall
+  ) !important; /* Small rounded corners */
 }
 
+/* Style for search input with no border, shadow, or outline */
 .no-border-shadow-outline {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+  border: none !important; /* Remove border */
+  outline: none !important; /* Remove outline */
+  box-shadow: none !important; /* Remove box shadow */
 }

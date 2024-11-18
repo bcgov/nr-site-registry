@@ -1,5 +1,6 @@
 {
-  "name": "bcgov-epd-components",
+  "name": "@bcgov-epd-components",
+
   "description": "A modular React component library for building flexible and customizable srs web applications with built-in support for common UI elements like headers, form, table, and more.",
   "author": "Jaspal Singh",
   "homepage": "https://github.com/jaspalsingh-aot/epd-react-components",
@@ -18,10 +19,8 @@
     "postpublish": "echo 'Successfully published to npm!'",
     "test": "jest --passWithNoTests"
   },
-  "keywords": [
-    "@govbc",
-    "EPD"
-  ],
+
+  "keywords": ["@govbc", "EPD"],
   "devDependencies": {
     "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-commonjs": "^28.0.1",

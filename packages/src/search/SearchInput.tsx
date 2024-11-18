@@ -5,17 +5,17 @@ import React from 'react';
 import { v4 } from 'uuid';
 
 const SearchInput: React.FC<ISearchInput> = ({
-  label,
-  searchTerm,
-  handleSearchChange,
-  clearSearch,
-  options,
-  optionSelectHandler,
-  createNewLabel,
-  createNewHandler,
-  placeHolderText,
-  customLeftIcon,
-  customRightIcon
+  label, // Optional label for the search input
+  searchTerm, // The current search term entered by the user
+  handleSearchChange, // Function to handle changes to the search input field
+  clearSearch, // Function to clear the search input
+  options, // Optional list of search options to display in a dropdown
+  optionSelectHandler, // Function to handle the selection of a search option
+  createNewLabel, // Optional label for creating a new item (e.g., "Create New Category")
+  createNewHandler, // Function to handle the creation of a new item
+  placeHolderText, // Placeholder text for the search input field
+  customLeftIcon, // Optional custom left icon to be displayed inside the input
+  customRightIcon, // Optional custom right icon to be displayed inside the input
 }) => {
   const [createMode, SetCreateMode] = useState(false);
   const handler = optionSelectHandler ?? (() => {});
@@ -44,7 +44,7 @@ const SearchInput: React.FC<ISearchInput> = ({
         </label>
       )}
       <div className="search-box-container">
-        <div className="d-flex align-items-center justify-content-center w-100 position-relative search-box ">
+        <div className="d-flex align-items-center w-100 position-relative search-box ">
           {!createMode && searchTerm.trim().length < 1 && (
             <span id="search-icon" className="custom-icon px-2">
               {customLeftIcon && customLeftIcon}
@@ -105,7 +105,12 @@ const SearchInput: React.FC<ISearchInput> = ({
           )}
         </div>
         {createMode && createNewLabel && (
-          <div className="search-add-new" onClick={() => {addNewHandler(searchTerm);}}>
+          <div
+            className="search-add-new"
+            onClick={() => {
+              addNewHandler(searchTerm);
+            }}
+          >
             Add {createNewLabel}
           </div>
         )}

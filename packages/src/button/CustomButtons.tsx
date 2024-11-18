@@ -51,7 +51,7 @@ export const CustomPillButton: React.FC<IButtonWithLabelProps> = ({
   label,
 }) => {
   return (
-    <div className="custom-pill-button" onClick={(e) => clickHandler(label)}>
+    <div className="custom-pill-button" onClick={() => clickHandler(label)}>
       <span className="custom-pill-button-label">{label}</span>
       <FaXmark className="custom-pill-close-btn" />
     </div>

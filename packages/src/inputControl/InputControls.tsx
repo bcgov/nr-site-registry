@@ -1,8 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FormFieldType, IFormField } from './IFormField';
-import { formatDate, formatDateRange } from './uitility';
+import { formatDate, formatDateRange } from './utility';
 import { DatePicker, DateRangePicker } from 'rsuite';
-import {FaCalendar, FaMagnifyingGlass, FaRegCircleXmark, FaSpinner, FaTrashCan } from 'react-icons/fa6';
+import {
+  FaCalendar,
+  FaMagnifyingGlass,
+  FaRegCircleXmark,
+  FaSpinner,
+  FaTrashCan,
+} from 'react-icons/fa6';
 import { Link as RouterLink } from 'react-router-dom';
 import { v4 } from 'uuid';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -46,18 +52,21 @@ export const Link: React.FC<InputProps> = ({
   href,
 }) => {
   const childComponent = (
-                            <RouterLink to={href + value} className={`d-flex pt-1 ${customInputTextCss ?? ''}`}  aria-label={`${label + ' ' + value}`}>
-                              {!isPrefixcustomLinkValue && customIcon && customIcon}{' '}
-                              <span className={`${customLabelCss ? customLabelCss : "ps-1"}`}>{customLinkValue ?? value}</span>
-                              {isPrefixcustomLinkValue && customIcon && customIcon}{' '}
-                            </RouterLink>
-                          );
-  if(tableMode)
-  {
+    <RouterLink
+      to={href + value}
+      className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
+      aria-label={`${label + ' ' + value}`}
+    >
+      {!isPrefixcustomLinkValue && customIcon && customIcon}{' '}
+      <span className={`${customLabelCss ? customLabelCss : 'ps-1'}`}>
+        {customLinkValue ?? value}
+      </span>
+      {isPrefixcustomLinkValue && customIcon && customIcon}{' '}
+    </RouterLink>
+  );
+  if (tableMode) {
     return renderTableCell(childComponent, stickyCol);
-  }
-  else
-  {
+  } else {
     return childComponent;
   }
 };
@@ -77,10 +86,7 @@ export const IconButton: React.FC<InputProps> = ({
   );
 };
 
-export const DeleteIcon: React.FC<InputProps> = ({
-  label,
-  onChange,
-}) => {
+export const DeleteIcon: React.FC<InputProps> = ({ label, onChange }) => {
   return renderTableCell(
     <div onClick={onChange}>
       <FaTrashCan title="Remove" />
@@ -183,7 +189,7 @@ export const TextInput: React.FC<InputProps> = ({
               htmlFor={inputTxtId}
               className={`${
                 !isEditing
-                  ? customLabelCss ?? ''
+                  ? (customLabelCss ?? '')
                   : `form-label ${customEditLabelCss ?? 'custom-label'}`
               }`}
             >
@@ -274,7 +280,7 @@ export const DropdownInput: React.FC<InputProps> = ({
           htmlFor={drdownId}
           className={`${
             !isEditing
-              ? customLabelCss ?? ''
+              ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
           aria-labelledby={label}
@@ -369,15 +375,12 @@ export const GroupInput: React.FC<InputProps> = ({
   let currentConcatenatedValue;
 
   if (!isEditing) {
-    currentConcatenatedValue = children?.reduce(
-      (accumulator, currentValue) => {
-        if (currentValue.value) {
-          accumulator = accumulator + currentValue.value + currentValue.suffix;
-        }
-        return accumulator;
-      },
-      '',
-    );
+    currentConcatenatedValue = children?.reduce((accumulator, currentValue) => {
+      if (currentValue.value) {
+        accumulator = accumulator + currentValue.value + currentValue.suffix;
+      }
+      return accumulator;
+    }, '');
   }
   const validateInput = (
     inputValue: string,
@@ -437,7 +440,7 @@ export const GroupInput: React.FC<InputProps> = ({
         htmlFor={groupId}
         className={`${
           !isEditing
-            ? customLabelCss ?? ''
+            ? (customLabelCss ?? '')
             : `form-label ${customEditLabelCss ?? 'custom-label'}`
         }`}
       >
@@ -453,7 +456,7 @@ export const GroupInput: React.FC<InputProps> = ({
                 {isChildLabel && (
                   <label
                     htmlFor={grpId}
-                    className={`${!isEditing ? customLabelCss ?? '' : `form-label ${customEditLabelCss ?? 'custom-label'}`}`}
+                    className={`${!isEditing ? (customLabelCss ?? '') : `form-label ${customEditLabelCss ?? 'custom-label'}`}`}
                   >
                     {child.label}
                   </label>
@@ -539,7 +542,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
           htmlFor={dateRangeId}
           className={`${
             !isEditing
-              ? customLabelCss ?? ''
+              ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
         >
@@ -621,7 +624,7 @@ export const DateInput: React.FC<InputProps> = ({
           htmlFor={dateRangeId}
           className={`${
             !isEditing
-              ? customLabelCss ?? ''
+              ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
         >
@@ -709,7 +712,7 @@ export const CheckBoxInput: React.FC<InputProps> = ({
             htmlFor={inputTxtId}
             className={`${
               !isEditing
-                ? customLabelCss ?? ''
+                ? (customLabelCss ?? '')
                 : `px-1 form-label ${customEditLabelCss ?? 'custom-label'}`
             }`}
           >
@@ -766,7 +769,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
               htmlFor={textAreaId}
               className={`${
                 !isEditing
-                  ? customLabelCss ?? ''
+                  ? (customLabelCss ?? '')
                   : `form-label ${customEditLabelCss ?? 'custom-label'}`
               }`}
             >
@@ -892,7 +895,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
           htmlFor={drdownId}
           className={`${
             !isEditing
-              ? customLabelCss ?? ''
+              ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
         >
@@ -1120,7 +1123,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
           htmlFor={inputTxtId}
           className={`${
             !isEditing
-              ? customLabelCss ?? ''
+              ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
           }`}
         >

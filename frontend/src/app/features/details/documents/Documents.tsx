@@ -49,6 +49,7 @@ import {
 } from '../SaveSiteDetailsSlice';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { UserActionEnum } from '../../../common/userActionEnum';
+import { Button } from '../../../components/button/Button';
 
 const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   const {
@@ -371,13 +372,13 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
           apiAction: UserActionEnum.added,
           srAction: SRApprovalStatusEnum.Pending,
         };
-        const updatedDocuments = [newDocument, ...formData];
+        const updatedDocuments = [newDocument, ...(formData || [])];
         setFormData(updatedDocuments);
         dispatch(updateSiteDocument(updatedDocuments));
         dispatch(
           setupDocumentsDataForSaving([
             newDocument,
-            ...(trackDocuments ?? formData),
+            ...(trackDocuments ?? (formData || [])),
           ]),
         );
         const tracker = new ChangeTracker(
@@ -577,18 +578,15 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
         {userType === UserType.Internal &&
           viewMode === SiteDetailsMode.EditMode && (
             <div className="col-lg-6 col-md-12 py-4 d-flex flex-column flex-sm-row ">
-              <button
-                className={`d-flex align-items-center btn-upload-document justify-content-center`}
-                data-testid="Upload Document"
-                aria-label="Upload Document"
-              >
+              <Button data-testid="Upload Document">
                 <label
                   htmlFor="input-file"
-                  className="d-flex align-items-center gap-2"
+                  className="d-flex align-items-center gap-2 cursor-pointer"
                 >
-                  <UploadFileIcon className="btn-document-icon cursor-pointer" />
-                  <span className="cursor-pointer">Upload Document</span>
+                  <UploadFileIcon />
+                  Upload Document
                 </label>
+
                 <input
                   aria-label="input-file"
                   type="file"
@@ -597,7 +595,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                   style={{ display: 'none' }}
                   onChange={(e) => handleOnUploadDocument(e)}
                 />
-              </button>
+              </Button>
             </div>
           )}
 

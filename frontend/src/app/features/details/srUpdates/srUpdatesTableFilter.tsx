@@ -10,6 +10,7 @@ import { AppDispatch } from '../../../Store';
 import { useDispatch } from 'react-redux';
 import { fetchInternalUserNameForDropdown } from '../dropdowns/DropdownSlice';
 import SRUpdatesTableConfiguration from './srUpdatesTableConfiguration';
+import { Button } from '../../../components/button/Button';
 
 interface ISRUpdatesTableFilter {
   closeSection: () => void;
@@ -87,32 +88,26 @@ const SRUpdatesTableFilter: React.FC<ISRUpdatesTableFilter> = ({
       />
       <div className="d-flex flex-wrap justify-content-between w-100 mt-3">
         <div>
-          <button
-            type="reset"
-            className="reset-button"
+          <Button
+            variant="secondary"
             onClick={handleReset}
             data-testid="reset-filter"
           >
             Reset Filters
-          </button>
+          </Button>
         </div>
         <div>
-          {/* Submit button */}
-          <button type="submit" className=" submit-button">
-            Submit
-          </button>
-          {/* Cancel button */}
-          <button
-            type="button"
-            className=" cancel-button"
-            data-testid="cancel-filter"
+          <Button type="submit">Submit</Button>
+          <Button
+            variant="tertiary"
             onClick={() => {
               handleReset();
               closeSection();
             }}
+            data-testid="cancel-filter"
           >
             Cancel
-          </button>
+          </Button>
         </div>
       </div>
     </form>

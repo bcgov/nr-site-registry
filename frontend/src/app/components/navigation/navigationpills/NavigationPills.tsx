@@ -3,6 +3,8 @@ import './NavigationPills.css';
 import { INavigationPills } from './INavigationPills';
 import { Link, useLocation } from 'react-router-dom';
 import Actions from '../../action/Actions';
+import { Button } from '../../button/Button';
+import useMediaQuery from '../../../hooks/useMediaQuery';
 
 const NavigationPills: React.FC<INavigationPills> = ({
   items,
@@ -13,6 +15,8 @@ const NavigationPills: React.FC<INavigationPills> = ({
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   const location = useLocation();
+
+  const isMobileScreen = useMediaQuery('(max-width: 786px)');
 
   useEffect(() => {
     if (location?.search !== '') {
@@ -32,19 +36,19 @@ const NavigationPills: React.FC<INavigationPills> = ({
 
   return (
     <div className="pt-5">
-      <div className="d-flex d-xxl-flex d-xl-flex gap-2 d-none ">
+      <div className="d-flex d-xxl-flex d-xl-flex gap-2 d-none">
         {items.map((item, index) => (
-          <Link
-            key={index}
-            to="#"
-            className={`d-flex gap-2 custom-nav-pill ${isDisable ? 'disabled default' : index === activeIndex ? 'active' : 'enabled'}`}
-            onClick={isDisable ? () => {} : () => handlePillClick(index)}
+          <Button
+            size="small"
+            disabled={isDisable && index !== activeIndex}
+            variant={index === activeIndex ? 'primary' : 'tertiary'}
+            onClick={() => handlePillClick(index)}
           >
             {item}
-          </Link>
+          </Button>
         ))}
       </div>
-      <div className="d-flex d-xl-none d-lg-flex d-md-flex d-sm-flex d-xs-flex justify-content-between px-2 align-items-center w-100">
+      <div className="d-flex d-xl-none d-lg-flex d-md-flex d-sm-flex d-xs-flex justify-content-between align-items-center w-100">
         <div className="d-flex justify-content-between w-100 flex-column flex-sm-row">
           <div>
             <Actions
@@ -56,6 +60,8 @@ const NavigationPills: React.FC<INavigationPills> = ({
               customCssToggleBtn={'custom-nav-btn'}
               customCssMenu={'custom-nav-action-menu'}
               disable={isDisable}
+              toggleButtonVariant={'secondary'}
+              toggleButtonSize={isMobileScreen ? 'medium' : 'small'}
             />
           </div>
           <div>
@@ -73,14 +79,17 @@ const NavigationPills: React.FC<INavigationPills> = ({
                 ></span>
               </div>
               <div className="ps-3 pe-2 m-0 p-0 w-100 text-center">
-                {items.map((item, index) => (
-                  <div
-                    key={index}
-                    className={`custom-nav-pill ${index === activeIndex ? 'd-block active' : 'd-none'}`}
-                  >
-                    {item}
-                  </div>
-                ))}
+                {items.map(
+                  (item, index) =>
+                    index === activeIndex && (
+                      <Button
+                        size={isMobileScreen ? 'medium' : 'small'}
+                        className="custom-nav-pill"
+                      >
+                        {item}
+                      </Button>
+                    ),
+                )}
               </div>
               <div className="m-0">
                 <span

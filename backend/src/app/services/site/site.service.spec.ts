@@ -543,6 +543,7 @@ describe('SiteService', () => {
           inputDTO.siteId,
           inputDTO.parcelDescriptions,
           userInfo,
+          entityManager,
         );
       });
 

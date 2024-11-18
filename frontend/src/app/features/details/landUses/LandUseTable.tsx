@@ -6,6 +6,7 @@ import { ApproveRejectButtons } from '../../../components/approve/ApproveReject'
 import Widget from '../../../components/widget/Widget';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { Minus, Plus } from '../../../components/common/icon';
+import { Button } from '../../../components/button/Button';
 
 interface ILandUseTable {
   approveRejectHandler?: (value: boolean) => void;
@@ -50,26 +51,19 @@ const LandUseTable: React.FC<ILandUseTable> = ({
     >
       {editModeEnabled && (
         <div className="d-flex gap-2 flex-wrap ">
-          <button
-            className="d-flex align-items-center land-uses-btn"
-            type="button"
-            onClick={handleAddLandUse}
-            aria-label={'Add Land Use'}
-          >
+          <Button variant="secondary" onClick={handleAddLandUse}>
             <Plus />
-            <span className="land-uses-lbl">Add Land Use</span>
-          </button>
+            Add Land Use
+          </Button>
 
-          <button
-            className={`d-flex align-items-center land-uses-btn ${selectedRowIds.size <= 0 && 'land-uses-btn-disabled'}`}
-            disabled={selectedRowIds.size <= 0}
-            type="button"
+          <Button
+            variant="secondary"
             onClick={handleRemoveLandUse}
-            aria-label={'Remove Land Use'}
+            disabled={selectedRowIds.size <= 0}
           >
             <Minus />
-            <span>Remove Land Use</span>
-          </button>
+            Remove Land Use
+          </Button>
         </div>
       )}
     </Widget>

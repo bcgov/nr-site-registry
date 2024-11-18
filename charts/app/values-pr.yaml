@@ -36,7 +36,7 @@ frontend:
   pdb:
     enabled: false # enable it in PRODUCTION for having pod disruption budget.
   config:
-    REACT_APP_BACKEND_API: "https://nr-site-registry-dev-backend.apps.silver.devops.gov.bc.ca"
+    REACT_APP_BACKEND_API: ~
     REACT_APP_AUTH_AUTHORITY: "https://epd-keycloak-dev.apps.silver.devops.gov.bc.ca/auth/realms/forms-flow-ai/"
     REACT_APP_AUTH_CLIENT_ID: "site-web"
     REACT_APP_AUTH_REDIRECT_URI: "https://nr-site-registry-dev-frontend.apps.silver.devops.gov.bc.ca"

@@ -29,9 +29,6 @@ export const fetchCartItems = createAsyncThunk(
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(getCartItemsForUserQL()),
-        variables: {
-          userId: userId,
-        },
       });
       return response.data;
     } catch (error) {

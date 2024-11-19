@@ -2,8 +2,8 @@ import gql from 'graphql-tag';
 
 export const getCartItemsForUserQL = () => {
   return gql`
-    query getCartItemsForUser($userId: String!) {
-      getCartItemsForUser(userId: $userId) {
+    query getCartItemsForUser {
+      getCartItemsForUser {
         httpStatusCode
         message
         data {

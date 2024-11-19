@@ -1,4 +1,5 @@
-import { LatLngTuple } from 'leaflet';
+import { useRef } from 'react';
+import { LatLngTuple, Map } from 'leaflet';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -34,6 +35,8 @@ function MapView() {
     },
   });
 
+  const mapRef = useRef<Map>(null);
+
   return (
     <div
       className={clsx('map-view', isSmall && 'map-view--small')}
@@ -44,6 +47,7 @@ function MapView() {
         zoom={6}
         zoomControl={false}
         className="map-container"
+        ref={mapRef}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -55,7 +59,7 @@ function MapView() {
         <SiteMarkers sites={data?.mapSearch.data || []} />
       </MapContainer>
       <MapSearch />
-      <SiteDetailsDrawer />
+      <SiteDetailsDrawer mapRef={mapRef} />
     </div>
   );
 }

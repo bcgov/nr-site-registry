@@ -157,6 +157,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                     <Button
                       variant="secondary"
                       onClick={() => handleAddDisclosureSchedule(formData.id)}
+                      disabled={!isAnyDisclosureScheduleSelected(formData.id)}
                     >
                       <Plus />
                       Add

@@ -1356,7 +1356,7 @@ export type MapSearch_FindSiteBySiteIdQueryVariables = Exact<{
 }>;
 
 
-export type MapSearch_FindSiteBySiteIdQuery = { __typename?: 'Query', findSiteBySiteId: { __typename?: 'FetchSiteDetail', data?: { __typename?: 'Sites', id: string, addrLine_1: string, addrLine_2?: string | null, addrLine_3?: string | null, addrLine_4?: string | null, city: string, latDegrees?: number | null, latMinutes?: number | null, latSeconds?: number | null, longDegrees?: number | null, longMinutes?: number | null, longSeconds?: number | null, generalDescription?: string | null, siteRiskCode: string } | null } };
+export type MapSearch_FindSiteBySiteIdQuery = { __typename?: 'Query', findSiteBySiteId: { __typename?: 'FetchSiteDetail', data?: { __typename?: 'Sites', id: string, addrLine_1: string, addrLine_2?: string | null, addrLine_3?: string | null, addrLine_4?: string | null, city: string, latdeg?: number | null, longdeg?: number | null, latDegrees?: number | null, latMinutes?: number | null, latSeconds?: number | null, longDegrees?: number | null, longMinutes?: number | null, longSeconds?: number | null, generalDescription?: string | null, siteRiskCode: string } | null } };
 
 
 export const Folio_GetFolioItemsForUserDocument = gql`
@@ -1495,6 +1495,8 @@ export const MapSearch_FindSiteBySiteIdDocument = gql`
       addrLine_3
       addrLine_4
       city
+      latdeg
+      longdeg
       latDegrees
       latMinutes
       latSeconds

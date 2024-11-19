@@ -56,7 +56,7 @@ const SearchInput: React.FC<ISearchInput> = ({
         </div>
       )}
       <div className="search-box-container">
-        <div className="d-flex align-items-center justify-content-center w-100 position-relative search-box ">
+        <div className="d-flex align-items-center w-100 position-relative search-box ">
           {!createMode && searchTerm.trim().length < 1 && (
             <span id="search-icon" className="custom-icon px-2">
               <MagnifyingGlassIcon />

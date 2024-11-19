@@ -107,10 +107,10 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     jobs:
       requests:
         cpu: 20m
-        memory: 128Mi
+        memory: 256Mi
       limits:
         cpu: 100m
-        memory: 256Mi
+        memory: 512Mi
 
   patroni:
     postgresql:

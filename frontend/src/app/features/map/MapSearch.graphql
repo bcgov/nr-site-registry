@@ -18,6 +18,8 @@ query MapSearch_findSiteBySiteId($siteId: String!) {
             addrLine_3
             addrLine_4
             city
+            latdeg
+            longdeg
             latDegrees
             latMinutes
             latSeconds

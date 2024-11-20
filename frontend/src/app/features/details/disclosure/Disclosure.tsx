@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import {
@@ -23,12 +23,9 @@ import {
 } from '../../../components/common/IChangeType';
 import {
   flattenFormRows,
-  getAxiosInstance,
   getUser,
-  resultCache,
   serializeDate,
   sortArray,
-  updateFields,
 } from '../../../helpers/utility';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import {
@@ -39,15 +36,11 @@ import {
 import { useParams } from 'react-router-dom';
 import { IComponentProps } from '../navigation/NavigationPillsConfig';
 import DisclosureComponent from './DisclosureComponent';
-import { GRAPHQL } from '../../../helpers/endpoints';
-import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
-import { print } from 'graphql';
 import {
   getSiteDisclosure,
   saveRequestStatus,
   setupSiteDisclosureDataForSaving,
 } from '../SaveSiteDetailsSlice';
-import infoIcon from '../../../images/info-icon.png';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';

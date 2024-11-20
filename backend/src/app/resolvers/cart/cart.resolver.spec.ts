@@ -84,7 +84,9 @@ describe('CartResolver', () => {
     ];
 
     it('should return cart Items for valid userId', async () => {
-      const userId = '1';
+      const user = {
+        sub: '1',
+      };
       const expectedResult = {
         httpStatusCode: 200,
         message: 'Success',
@@ -95,7 +97,7 @@ describe('CartResolver', () => {
         .spyOn(service, 'getCartItemsForUser')
         .mockResolvedValueOnce(expectedResult.data);
 
-      const result = await resolver.getCartItemsForUser(userId, '');
+      const result = await resolver.getCartItemsForUser(user);
 
       expect(result.data.length).toEqual(1);
     });

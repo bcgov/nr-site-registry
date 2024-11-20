@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import L from 'leaflet';
+import { useEffect, useRef, RefObject } from 'react';
+import L, { Map } from 'leaflet';
 import { Circle, Tooltip, useMap } from 'react-leaflet';
 
 import { useMyLocation } from '../../../hooks/useMyLocation';
@@ -25,21 +25,27 @@ export function myLocationIcon() {
 
 const locationIcon = myLocationIcon();
 
-function MyLocationMarkerContent() {
-  const map = useMap();
+interface MyLocationMarkerContentProps {
+  mapRef: RefObject<Map | null>;
+  isVisible: boolean;
+}
+
+function MyLocationMarkerContent({ mapRef }: MyLocationMarkerContentProps) {
+  // const map = useMap();
   const hasZoomedToMyLocationRef = useRef(false);
   const { position, accuracy = 0 } = useMyLocation();
 
   // The first time my location changes - zoom to that location
   useEffect(() => {
-    if (position && !hasZoomedToMyLocationRef.current) {
+    console.log('nupur - mapfef', mapRef);
+    if (position && !hasZoomedToMyLocationRef.current && mapRef.current) {
       hasZoomedToMyLocationRef.current = true;
-      map.flyTo(position, Math.max(map.getZoom(), 14), {
+      mapRef.current.flyTo(position, Math.max(mapRef.current.getZoom(), 14), {
         animate: true,
         duration: 1,
       });
     }
-  }, [map, position]);
+  }, [mapRef, position]);
 
   return position ? (
     <>
@@ -57,7 +63,12 @@ function MyLocationMarkerContent() {
   ) : null;
 }
 
-export function MyLocationMarker() {
-  const isVisible = useMyLocationVisible();
-  return isVisible ? <MyLocationMarkerContent /> : null;
+export function MyLocationMarker({
+  mapRef,
+  isVisible,
+}: MyLocationMarkerContentProps) {
+  //const isVisible = useMyLocationVisible();
+  return isVisible ? (
+    <MyLocationMarkerContent mapRef={mapRef} isVisible={isVisible} />
+  ) : null;
 }

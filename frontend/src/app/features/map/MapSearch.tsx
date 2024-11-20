@@ -67,7 +67,11 @@ const componentProps = {
   },
 };
 
-export function MapSearch() {
+interface MapSearchProps {
+  mapRef: React.RefObject<any>;
+}
+
+export function MapSearch({ mapRef }: MapSearchProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const theme = useTheme();
   const isLarge = useMediaQuery(theme.breakpoints.up('lg'));
@@ -104,7 +108,7 @@ export function MapSearch() {
               className="search-autocomplete"
               componentsProps={componentProps}
             />
-            <FindMeButton />
+            <FindMeButton mapRef={mapRef} />
           </Stack>
         ) : (
           <TextSearchButton />

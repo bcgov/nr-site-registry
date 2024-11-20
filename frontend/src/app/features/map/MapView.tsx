@@ -36,7 +36,7 @@ function MapView() {
   });
 
   const mapRef = useRef<Map>(null);
-
+  console.log('nupur - mapfef in mapview', mapRef);
   return (
     <div
       className={clsx('map-view', isSmall && 'map-view--small')}
@@ -54,11 +54,12 @@ function MapView() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           className={clsx(osmGrayscale && 'osm--grayscale')}
         />
-        <MapControls />
-        <MyLocationMarker />
+
         <SiteMarkers sites={data?.mapSearch.data || []} />
       </MapContainer>
-      <MapSearch />
+      <MapControls />
+      {/* <MyLocationMarker mapRef={mapRef} /> */}
+      <MapSearch mapRef={mapRef} />
       <SiteDetailsDrawer mapRef={mapRef} />
     </div>
   );

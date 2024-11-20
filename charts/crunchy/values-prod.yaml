@@ -16,7 +16,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       accessKey: ~
       secretKey: ~
       fullBackupSchedule: 0 0/4 * * * # full backup every 4 hours
-      incrementalBackupSchedule: 0/15 * * * * # every 15 minutes incremental backup
+      incrementalBackupSchedule: 15,30,45 * * * * # every fifteen minutes except 0th 
     pvc:
       volume:
         storage: 1024Mi

@@ -105,10 +105,8 @@ describe('CartResolver', () => {
 
   describe('addCartItem', () => {
     const cartItemDTO: CartDTO = {
-      userId: '1',
       siteId: '1',
       price: 200,
-      whoCreated: 'Midhun',
     };
 
     it('should add cart item for valid input', async () => {

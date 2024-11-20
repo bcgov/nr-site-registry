@@ -84,18 +84,20 @@ describe('CartSerive', () => {
   it('should insert a new cart Item', async () => {
     // Prepare test data
     const cartItemDTO: CartDTO = {
-      userId: '1',
       siteId: '1',
       price: 200,
-      whoCreated: 'Midhun',
     };
 
+    const user = {
+      sub: '2',
+      givenName: 'test',
+    };
     const cartItem: DeepPartial<Cart[]> = [
       {
         userId: '2',
         siteId: '2',
         price: 200,
-        whoCreated: 'Midhun',
+        whoCreated: 'test',
         site: null,
       },
     ];
@@ -106,7 +108,7 @@ describe('CartSerive', () => {
       .spyOn(cartRepository, 'save')
       .mockResolvedValueOnce([cartItemDTO] as any); // Mock save method
     // Execute the method
-    const result = await cartService.addCartItem([cartItemDTO], '');
+    const result = await cartService.addCartItem([cartItemDTO], user);
 
     // Assert the result
     expect(result).toBe(true);
@@ -118,6 +120,11 @@ describe('CartSerive', () => {
       raw: null,
     };
 
+    const user = {
+      sub: '1',
+      givenName: 'test',
+    };
+
     // Mock recentViewsRepository methods
     jest.spyOn(cartRepository, 'delete').mockResolvedValue(deleteResult);
     const cartItems: CartDeleteDTO = {
@@ -125,7 +132,7 @@ describe('CartSerive', () => {
       cartId: '1',
     };
     // Execute the method
-    const result = await cartService.deleteCartItem([cartItems], '');
+    const result = await cartService.deleteCartItem([cartItems], user.sub);
 
     // Assert the result
     expect(result).toBe(true);

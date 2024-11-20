@@ -29,13 +29,9 @@ export class CartResolver {
 
   @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Query(() => CartResponse, { name: 'getCartItemsForUser' })
-  @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
-  async getCartItemsForUser(
-    @Args('userId', { type: () => String }) userId: string,
-    @AuthenticatedUser() user: any,
-  ) {
+  async getCartItemsForUser(@AuthenticatedUser() user: any) {
     this.sitesLogger.log(
-      'CartResolver.getCartItemsForUser() start userId:' + ' ' + userId,
+      'CartResolver.getCartItemsForUser() start userId:' + ' ' + user?.sub,
     );
     const result = await this.cartService.getCartItemsForUser(user?.sub);
     if (result?.length > 0) {
@@ -49,7 +45,7 @@ export class CartResolver {
     } else {
       this.sitesLogger.log('CartResolver.getCartItemsForUser() RES:200 end');
       return this.genericResponseProvider.createResponse(
-        `Cart items not found for user id: ${userId}`,
+        `Cart items not found for user id: ${user?.sub}`,
         HttpStatus.NOT_FOUND,
         true,
         [],
@@ -69,7 +65,7 @@ export class CartResolver {
         ' ' +
         JSON.stringify(cartDTO),
     );
-    const result = await this.cartService.addCartItem(cartDTO, user?.sub);
+    const result = await this.cartService.addCartItem(cartDTO, user);
     if (result) {
       this.sitesLogger.log('CartResolver.addCartItem() RES:201 end');
       return this.genericResponseProvider.createResponse(

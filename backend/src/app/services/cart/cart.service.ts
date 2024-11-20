@@ -41,11 +41,16 @@ export class CartService {
     }
   }
 
-  async addCartItem(list: CartDTO[], userId: string): Promise<boolean> {
+  async addCartItem(list: CartDTO[], user: any): Promise<boolean> {
     this.sitesLogger.log('CartService.addCartItem() start');
     this.sitesLogger.debug('CartService.addCartItem() start');
     try {
       const cartItemsToInsert = [];
+      if (!user) {
+        throw new Error('User Not Found');
+      }
+      const userId = user?.sub;
+      const userGivenName = user?.givenName;
       const existingRecords = await this.cartRepository.find({
         where: list.map((cartDTO) => ({
           userId: userId,
@@ -58,11 +63,14 @@ export class CartService {
       );
 
       for (const cartDTO of list) {
-        const { userId, siteId } = cartDTO;
+        const { siteId } = cartDTO;
 
         const recordKey = `${userId}-${siteId}`;
         if (!existingRecordSet.has(recordKey)) {
           const cartItem = plainToInstance(Cart, cartDTO);
+          cartItem.whoCreated = userGivenName;
+          cartItem.whenCreated = new Date();
+          cartItem.userId = userId;
           cartItemsToInsert.push(cartItem);
         }
       }

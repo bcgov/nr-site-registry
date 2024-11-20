@@ -196,9 +196,7 @@ const Search = () => {
     } else {
       const cartItems = selectedRows.map((row) => {
         return {
-          userId: loggedInUser.profile.sub,
           siteId: row.id,
-          whoCreated: loggedInUser.profile.given_name ?? '',
           price: 200.11,
         };
       });

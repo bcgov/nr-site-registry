@@ -435,9 +435,7 @@ const Summary = () => {
       dispatch(
         addCartItem([
           {
-            userId: loggedInUser.profile.sub,
             siteId: editSiteDetailsObject.id,
-            whoCreated: loggedInUser?.profile.given_name ?? '',
             price: 200.11,
           },
         ]),
@@ -523,7 +521,7 @@ const Summary = () => {
       {isUserPurchasedSite && (
         <div className="summary-details-border">
           <span className="summary-details-header">Activity Log</span>
-          <div className="col-12 overflow-auto w-100">
+          <div className="col-12">
             <Table
               label="Activity Log"
               isLoading={RequestStatus.success}

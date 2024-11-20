@@ -65,7 +65,7 @@ export class CartResolver {
         ' ' +
         JSON.stringify(cartDTO),
     );
-    const result = await this.cartService.addCartItem(cartDTO, user?.sub);
+    const result = await this.cartService.addCartItem(cartDTO, user);
     if (result) {
       this.sitesLogger.log('CartResolver.addCartItem() RES:201 end');
       return this.genericResponseProvider.createResponse(

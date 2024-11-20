@@ -113,17 +113,15 @@ const FolioContents = () => {
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
-      const foliosToAdd = selectedRows.map((folio) => {
+      const cartItem = selectedRows.map((folio) => {
         return {
-          userId: loggedInUser.profile.sub,
           siteId: folio.siteId,
-          whoCreated: loggedInUser.profile.given_name ?? '',
           price: 200.11,
         };
       });
 
       dispatch(resetCartItemAddedStatus(null));
-      dispatch(addCartItem(foliosToAdd)).unwrap();
+      dispatch(addCartItem(cartItem)).unwrap();
     }
   };
 

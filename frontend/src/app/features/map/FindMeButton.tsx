@@ -4,14 +4,15 @@ import clsx from 'clsx';
 import { FindMe } from '../../components/common/icon';
 import { useGeolocationPermission } from '../../../hooks/useMyLocation';
 
-import { useState } from 'react';
-
 interface FindMeButtonProps {
+  isLocationVisible: boolean;
   setLocationVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function FindMeButton({ setLocationVisible }: FindMeButtonProps) {
-  const [isMarkerVisible, setIsMarkerVisible] = useState(false);
+export function FindMeButton({
+  isLocationVisible,
+  setLocationVisible,
+}: FindMeButtonProps) {
   const state = useGeolocationPermission();
 
   if (state === 'denied') {
@@ -19,11 +20,7 @@ export function FindMeButton({ setLocationVisible }: FindMeButtonProps) {
   }
 
   const onClick = () => {
-    setLocationVisible((prev) => {
-      const newValue = !prev;
-      setIsMarkerVisible(newValue);
-      return newValue;
-    });
+    setLocationVisible((prev) => !prev);
   };
 
   return (
@@ -34,7 +31,7 @@ export function FindMeButton({ setLocationVisible }: FindMeButtonProps) {
       className={clsx(
         'map-button',
         'map-button--large',
-        isMarkerVisible && 'map-button--active',
+        isLocationVisible && 'map-button--active',
       )}
       startIcon={<FindMe title="Find me icon" className="find-me-icon" />}
       onClick={onClick}

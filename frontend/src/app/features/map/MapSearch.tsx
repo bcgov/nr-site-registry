@@ -59,10 +59,14 @@ const componentProps = {
 };
 
 interface MapSearchProps {
+  isLocationVisible: boolean;
   setLocationVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function MapSearch({ setLocationVisible }: MapSearchProps) {
+export function MapSearch({
+  isLocationVisible,
+  setLocationVisible,
+}: MapSearchProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const theme = useTheme();
   const isLarge = useMediaQuery(theme.breakpoints.up('lg'));
@@ -96,7 +100,10 @@ export function MapSearch({ setLocationVisible }: MapSearchProps) {
               className="search-autocomplete"
               componentsProps={componentProps}
             />
-            <FindMeButton setLocationVisible={setLocationVisible} />
+            <FindMeButton
+              isLocationVisible={isLocationVisible}
+              setLocationVisible={setLocationVisible}
+            />
           </Stack>
         ) : (
           <TextSearchButton />

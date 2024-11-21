@@ -16,10 +16,14 @@ import './MapControl.css';
 import { FindMeControl } from './controls/FindMeControl';
 
 interface MapControlsProps {
+  isLocationVisible: boolean;
   setLocationVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function MapControls({ setLocationVisible }: MapControlsProps) {
+export function MapControls({
+  isLocationVisible,
+  setLocationVisible,
+}: MapControlsProps) {
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
   const isMedium = useMediaQuery(theme.breakpoints.down('lg'));
@@ -47,7 +51,12 @@ export function MapControls({ setLocationVisible }: MapControlsProps) {
 
   return (
     <Control position="bottomright" className="map-controls" style={style}>
-      {isMedium && <FindMeControl setLocationVisible={setLocationVisible} />}
+      {isMedium && (
+        <FindMeControl
+          isLocationVisible={isLocationVisible}
+          setLocationVisible={setLocationVisible}
+        />
+      )}
     </Control>
   );
 }

@@ -55,11 +55,17 @@ function MapView() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           className={clsx(osmGrayscale && 'osm--grayscale')}
         />
-        <MapControls setLocationVisible={setLocationVisible} />
+        <MapControls
+          isLocationVisible={isLocationVisible}
+          setLocationVisible={setLocationVisible}
+        />
         {<MyLocationMarker isLocationVisible={isLocationVisible} />}
         <SiteMarkers sites={data?.mapSearch.data || []} />
       </MapContainer>
-      <MapSearch setLocationVisible={setLocationVisible} />
+      <MapSearch
+        isLocationVisible={isLocationVisible}
+        setLocationVisible={setLocationVisible}
+      />
       <SiteDetailsDrawer mapRef={mapRef} />
     </div>
   );

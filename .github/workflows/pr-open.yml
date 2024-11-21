@@ -61,7 +61,7 @@ jobs:
       triggers: ('backend/' 'frontend/' 'charts/' '.github/workflows/')
       values: 'values-pr.yaml' # PR specific values file.
       db_user: site-${{ github.event.number }}
-
+      timeout-minutes: '20'
 
   results:
     name: PR Results

@@ -41,31 +41,17 @@ export class FolioContentDTO {
 
   folioId: string | undefined = '';
 
-  userId: string = '';
-
-  whoCreated: string = '';
-
   site?: any = null;
 
   folio?: any = null;
 
-  constructor(
-    siteId: string,
-    userId: string,
-    folioId: string,
-    id: number,
-    whoCreated: string,
-  ) {
-    this.userId = userId;
+  constructor(siteId: string, folioId: string, id: number) {
     this.folioId = folioId;
     this.siteId = siteId;
-    this.whoCreated = whoCreated;
     this.id = id;
   }
 }
 
 export class FolioMinDTO {
   id: number = 0;
-
-  userId: string = '';
 }

@@ -83,6 +83,10 @@ export class FolioService {
     try {
       const { folioId } = inputDTO;
 
+      if (!userInfo) {
+        throw new Error('User Not Found');
+      }
+
       const userId = userInfo.sub;
 
       const existingRecord = await this.folioRepository.findOne({
@@ -93,6 +97,8 @@ export class FolioService {
         const folio = plainToInstance(Folio, inputDTO);
         folio.whenCreated = new Date();
         folio.whenUpdated = new Date();
+        folio.whoCreated = userInfo.givenName;
+        folio.userId = userInfo.sub;
         const result = await this.folioRepository.save(folio);
 
         if (result) {

@@ -183,7 +183,12 @@ const folioSlice = createSlice({
         state.fetchRequestStatus = RequestStatus.failed;
       })
       .addCase(addFolioItem.fulfilled, (state, action) => {
-        if (action?.payload?.data?.addFolioItem?.httpStatusCode === 400)
+        if (
+          action?.payload?.data?.addFolioItem?.httpStatusCode === 400 ||
+          action?.payload?.data?.addFolioItem?.httpStatusCode === 404
+        )
+          state.addRequestStatus = RequestStatus.failed;
+        else if (action?.payload?.errors?.length > 0)
           state.addRequestStatus = RequestStatus.failed;
         else state.addRequestStatus = RequestStatus.success;
       })

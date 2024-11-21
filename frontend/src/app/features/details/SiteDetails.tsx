@@ -19,11 +19,7 @@ import {
 } from '../site/dto/SiteSlice';
 import { AppDispatch } from '../../Store';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
-import {
-  getDropDownNavItems,
-  getNavComponents,
-  getNavItems,
-} from './navigation/NavigationPillsConfig';
+import { getNavComponents } from './navigation/NavigationPillsConfig';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import {
   CancelButton,
@@ -116,8 +112,6 @@ const SiteDetails = () => {
 
   useEffect(() => {
     SetNavComponents(getNavComponents(false));
-    SetNavItems(getNavItems(false));
-    SetDropDownNavItems(getDropDownNavItems(false));
   }, [auth.user]);
 
   useEffect(() => {
@@ -127,12 +121,8 @@ const SiteDetails = () => {
       viewMode !== SiteDetailsMode.EditMode
     ) {
       SetNavComponents(getNavComponents(true));
-      SetNavItems(getNavItems(true));
-      SetDropDownNavItems(getDropDownNavItems(true));
     } else {
       SetNavComponents(getNavComponents(false));
-      SetNavItems(getNavItems(false));
-      SetDropDownNavItems(getDropDownNavItems(false));
     }
   }, [hasNoPendingUpdatesFromState]);
 
@@ -257,12 +247,8 @@ const SiteDetails = () => {
       mode !== SiteDetailsMode.EditMode
     ) {
       SetNavComponents(getNavComponents(true));
-      SetNavItems(getNavItems(true));
-      SetDropDownNavItems(getDropDownNavItems(true));
     } else {
       SetNavComponents(getNavComponents(false));
-      SetNavItems(getNavItems(false));
-      SetDropDownNavItems(getDropDownNavItems(false));
     }
   }, [mode]);
 
@@ -487,9 +473,7 @@ const SiteDetails = () => {
       dispatch(
         addCartItem([
           {
-            userId: loggedInUser.profile.sub,
             siteId: details.id,
-            whoCreated: loggedInUser.profile.given_name ?? '',
             price: 200.11,
           },
         ]),
@@ -760,9 +744,7 @@ const SiteDetails = () => {
           )}
         </div>
         <NavigationPills
-          items={navItems ?? []}
           components={navComponents}
-          dropdownItems={dropDownNavItems}
           isDisable={
             getUser() === null ||
             (UserType.External === userType &&

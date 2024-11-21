@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import './NavigationPills.css';
 import { INavigationPills } from './INavigationPills';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Actions from '../../action/Actions';
 import { Button } from '../../button/Button';
 import useMediaQuery from '../../../hooks/useMediaQuery';
 
 const NavigationPills: React.FC<INavigationPills> = ({
-  items,
   components,
-  dropdownItems,
   isDisable,
 }) => {
-  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [activeTabKey, setactiveTabKey] = useState<string>('');
 
   const location = useLocation();
 
@@ -20,31 +18,66 @@ const NavigationPills: React.FC<INavigationPills> = ({
 
   useEffect(() => {
     if (location?.search !== '') {
-      const componentIndex = components.findIndex(
-        (item: any) => item.key === location?.search.replace('?', ''),
+      const component = components.find(
+        (item: any) => item.value === location?.search.replace('?', ''),
       );
 
-      if (componentIndex > -1) {
-        handlePillClick(componentIndex);
+      if (component !== null) {
+        handlePillClick(component.value);
       }
     }
-  }, [location]);
+  }, [location, components]);
 
-  const handlePillClick = (index: number) => {
-    setActiveIndex(index);
+  const handlePillClick = (tabKey: string) => {
+    setactiveTabKey(tabKey);
+  };
+
+  const getCurrentElementIndex = useCallback(() => {
+    const currentComponentIndex = components.findIndex(
+      (tab: any) => tab.value === activeTabKey,
+    );
+
+    return currentComponentIndex;
+  }, [components, activeTabKey]);
+
+  useEffect(() => {
+    if (
+      (activeTabKey === '' && components.length > 0) ||
+      getCurrentElementIndex() === -1
+    ) {
+      handlePillClick(components[0].value);
+    }
+  }, [activeTabKey, components, getCurrentElementIndex]);
+
+  const isActiveTabFirstPosition = () => {
+    return getCurrentElementIndex() === 0;
+  };
+
+  const isActiveTabLastPosition = () => {
+    return getCurrentElementIndex() + 1 === components.length;
+  };
+
+  const getNextElement = () => {
+    const currentComponentindex = getCurrentElementIndex();
+    return components[currentComponentindex + 1].value;
+  };
+
+  const getPreviousElement = () => {
+    const currentComponentindex = getCurrentElementIndex();
+    return components[currentComponentindex - 1].value;
   };
 
   return (
     <div className="pt-5">
       <div className="d-flex d-xxl-flex d-xl-flex gap-2 d-none">
-        {items.map((item, index) => (
+        {components.map((item: any) => (
           <Button
             size="small"
-            disabled={isDisable && index !== activeIndex}
-            variant={index === activeIndex ? 'primary' : 'tertiary'}
-            onClick={() => handlePillClick(index)}
+            disabled={isDisable && item !== activeTabKey}
+            variant={item.value === activeTabKey ? 'primary' : 'tertiary'}
+            onClick={() => handlePillClick(item.value)}
           >
-            {item}
+            {item.label}
           </Button>
         ))}
       </div>
@@ -53,9 +86,9 @@ const NavigationPills: React.FC<INavigationPills> = ({
           <div>
             <Actions
               label="Select Page"
-              items={dropdownItems}
+              items={components}
               onItemClick={
-                isDisable ? () => {} : (value, index) => handlePillClick(index)
+                isDisable ? () => {} : (value) => handlePillClick(value)
               }
               customCssToggleBtn={'custom-nav-btn'}
               customCssMenu={'custom-nav-action-menu'}
@@ -68,39 +101,40 @@ const NavigationPills: React.FC<INavigationPills> = ({
             <div className="d-flex align-items-center">
               <div className="m-0">
                 <span
-                  className={`custom-nav-carousel-left-icon ${activeIndex === 0 ? 'd-none' : ''}`}
+                  className={`custom-nav-carousel-left-icon ${isActiveTabFirstPosition() ? 'd-none' : ''}`}
                   aria-hidden="true"
                   onClick={
                     isDisable
                       ? () => {}
                       : () =>
-                          activeIndex > 0 && handlePillClick(activeIndex - 1)
+                          !isActiveTabFirstPosition() &&
+                          handlePillClick(getPreviousElement())
                   }
                 ></span>
               </div>
               <div className="ps-3 pe-2 m-0 p-0 w-100 text-center">
-                {items.map(
-                  (item, index) =>
-                    index === activeIndex && (
+                {components.map(
+                  (tab: any) =>
+                    tab.value === activeTabKey && (
                       <Button
                         size={isMobileScreen ? 'medium' : 'small'}
                         className="custom-nav-pill"
                       >
-                        {item}
+                        {tab.label}
                       </Button>
                     ),
                 )}
               </div>
               <div className="m-0">
                 <span
-                  className={`custom-nav-carousel-right-icon m-0 ${activeIndex === items.length - 1 ? 'd-none' : ''}`}
+                  className={`custom-nav-carousel-right-icon m-0 ${isActiveTabLastPosition() ? 'd-none' : ''}`}
                   aria-hidden="true"
                   onClick={
                     isDisable
                       ? () => {}
                       : () =>
-                          activeIndex < items.length - 1 &&
-                          handlePillClick(activeIndex + 1)
+                          !isActiveTabLastPosition() &&
+                          handlePillClick(getNextElement())
                   }
                 ></span>
               </div>
@@ -110,11 +144,12 @@ const NavigationPills: React.FC<INavigationPills> = ({
       </div>
       <div className="mt-4">
         {components &&
-          components?.map((tabComponent: any, index: number) =>
-            index === activeIndex ? (
+          activeTabKey !== '' &&
+          components?.map((tabComponent: any, index: number) => {
+            return tabComponent.value === activeTabKey ? (
               <div key={index}>{tabComponent.component}</div>
-            ) : null,
-          )}
+            ) : null;
+          })}
       </div>
     </div>
   );

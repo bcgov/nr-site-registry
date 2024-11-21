@@ -14,20 +14,10 @@ export class CartDTO {
   @Field()
   @IsNotEmpty()
   @IsString()
-  userId: string;
-
-  @Field()
-  @IsNotEmpty()
-  @IsString()
   siteId: string;
 
   @Field()
   price: number;
-
-  @Field()
-  @IsOptional()
-  @IsString()
-  whoCreated: string;
 }
 
 @InputType()

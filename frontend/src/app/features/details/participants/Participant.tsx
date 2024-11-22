@@ -73,8 +73,9 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [externalRow, setExternalRow] = useState(participantColumnExternal);
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
-  const [formData, setFormData] =
-    useState<{ [key: string]: any | [Date, Date] }[]>(siteParticipant);
+  const [formData, setFormData] = useState<
+    { [key: string]: any | [Date, Date] }[]
+  >(siteParticipant ?? []);
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [searchSiteParticipant, setSearchSiteParticipant] = useState('');

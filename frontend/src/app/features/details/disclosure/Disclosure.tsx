@@ -59,7 +59,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const [formData, setFormData] = useState<{
     [key: string]: any | [Date, Date];
-  }>(disclosureData);
+  }>(disclosureData ?? {});
   const [selectedRows, setSelectedRows] = useState<
     { disclosureId: any; scheduleId: any }[]
   >([]);

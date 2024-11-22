@@ -233,8 +233,12 @@ describe('SiteResolver', () => {
   describe('findSiteBySiteId', () => {
     it('should call siteService.findSiteBySiteId with the provided siteId', () => {
       const siteId = '123';
-      siteResolver.findSiteBySiteId(siteId, false);
-      expect(siteService.findSiteBySiteId).toHaveBeenCalledWith(siteId, false);
+      siteResolver.findSiteBySiteId(siteId, false, null);
+      expect(siteService.findSiteBySiteId).toHaveBeenCalledWith(
+        siteId,
+        false,
+        null,
+      );
     });
 
     it('finds a matching site id', async () => {
@@ -244,7 +248,7 @@ describe('SiteResolver', () => {
       (siteService.findSiteBySiteId as jest.Mock).mockResolvedValue(
         expectedResult,
       );
-      const result = await siteResolver.findSiteBySiteId(siteId, false);
+      const result = await siteResolver.findSiteBySiteId(siteId, false, null);
       expect(result).toEqual(expectedResult);
     });
 
@@ -255,7 +259,7 @@ describe('SiteResolver', () => {
       (siteService.findSiteBySiteId as jest.Mock).mockResolvedValue(
         expectedResult,
       );
-      const result = await siteResolver.findSiteBySiteId(siteId, false);
+      const result = await siteResolver.findSiteBySiteId(siteId, false, null);
       expect(result).toEqual(expectedResult);
     });
   });

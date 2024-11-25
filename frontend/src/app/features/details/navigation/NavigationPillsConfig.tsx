@@ -10,84 +10,33 @@ import SRUpdates from '../srUpdates/srUpdates';
 
 import Summary from '../summary/Summary';
 
-const mainNavItems = [
-  'Summary',
-  'Notations',
-  'Site Participants',
-  'Documents',
-  'Associated Sites',
-  'Suspect Land Uses',
-  'Parcel Description',
-  'Site Disclosure',
-];
-
 export interface IComponentProps {
   showPending?: boolean;
 }
 
-export const getNavItems = (includeUpdatesTab: boolean) =>
-  isUserOfType(UserRoleType.SR) && includeUpdatesTab
-    ? ['Updates', ...mainNavItems]
-    : mainNavItems;
-
 const mainNavComponents = [
-  { key: 'summary', component: <Summary /> },
-  { key: 'notations', component: <Notations /> },
-  { key: 'participants', component: <Participants /> },
-  { key: 'documents', component: <Documents /> },
-  { key: 'associated', component: <Associate /> },
-  { key: 'landuses', component: <LandUses /> },
-  { key: 'parceldesc', component: <ParcelDescriptions /> },
-  { key: 'disclosure', component: <Disclosure /> },
+  { label: 'Summary', value: 'summary', component: <Summary /> },
+  { label: 'Notations', value: 'notations', component: <Notations /> },
+  {
+    label: 'Site Participants',
+    value: 'participants',
+    component: <Participants />,
+  },
+  { label: 'Documents', value: 'documents', component: <Documents /> },
+  { label: 'Associated Sites', value: 'associated', component: <Associate /> },
+  { label: 'Suspect Land Uses', value: 'landuses', component: <LandUses /> },
+  {
+    label: 'Parcel Description',
+    value: 'parceldesc',
+    component: <ParcelDescriptions />,
+  },
+  { label: 'Site Disclosure', value: 'disclosure', component: <Disclosure /> },
 ];
 
 export const getNavComponents = (includeUpdatesTab: boolean) =>
   isUserOfType(UserRoleType.SR) && includeUpdatesTab
-    ? [{ key: 'updates', component: <SRUpdates /> }, ...mainNavComponents]
-    : mainNavComponents;
-
-export const mainDropDownNavItems = [
-  {
-    label: 'Summary',
-    value: 'Summary',
-  },
-  {
-    label: 'Notations',
-    value: 'Notations',
-  },
-  {
-    label: 'Site Participants',
-    value: 'Site Participants',
-  },
-  {
-    label: 'Documents',
-    value: 'Documents',
-  },
-  {
-    label: 'Associated Sites',
-    value: 'Associated Sites',
-  },
-  {
-    label: 'Suspect Land Uses',
-    value: 'Suspect Land Uses',
-  },
-  {
-    label: 'Parcel Description',
-    value: 'Parcel Description',
-  },
-  {
-    label: 'Site Disclosure',
-    value: 'Site Disclosure',
-  },
-];
-
-export const getDropDownNavItems = (includeUpdatesTab: boolean) =>
-  isUserOfType(UserRoleType.SR) && includeUpdatesTab
     ? [
-        {
-          label: 'Updated',
-          value: 'SRUpdates',
-        },
-        ...mainDropDownNavItems,
+        { label: 'Updates', value: 'updates', component: <SRUpdates /> },
+        ...mainNavComponents,
       ]
-    : mainDropDownNavItems;
+    : mainNavComponents;

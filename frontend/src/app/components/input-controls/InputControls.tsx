@@ -563,12 +563,21 @@ export const DateRangeInput: React.FC<InputProps> = ({
   const ContainerElement = tableMode ? 'td' : 'div';
   let dateRangeValue;
   if (value.length > 0) {
-    dateRangeValue = formatDateRange(value);
+    const [startDate, endDate] = value;
+    const isStartDateValid =
+      startDate instanceof Date && !isNaN(startDate.getTime());
+    const isEndDateValid = endDate instanceof Date && !isNaN(endDate.getTime());
+    if (isStartDateValid && isEndDateValid) {
+      dateRangeValue = formatDateRange(value);
+    } else {
+      dateRangeValue = ''; // Set an empty string or fallback value if invalid
+    }
   }
 
   const handleCheckBoxChange = (isChecked: boolean) => {
     onChange(isChecked);
   };
+
   // Replace any spaces in the label with underscores to create a valid id
   const dateRangeId = label.replace(/\s+/g, '_') + '_' + v4();
   return (
@@ -605,11 +614,12 @@ export const DateRangeInput: React.FC<InputProps> = ({
           aria-label={label}
           className={` w-100  ${customPlaceholderCss ?? ''} ${customEditInputTextCss ?? 'custom-date-range'}`}
           placeholder={placeholder}
-          format="MM/dd/yy"
+          format="MM/dd/yyyy"
           character=" - "
           caretAs={CalendarIcon}
           value={value ?? []}
           onChange={(value) => onChange(value)}
+          editable={true}
         />
       ) : (
         <span
@@ -651,6 +661,17 @@ export const DateInput: React.FC<InputProps> = ({
     onChange(isChecked);
   };
 
+  const handleDateChange = (newDate: Date | null) => {
+    // Check if the new value is a valid date
+    if (newDate instanceof Date && !isNaN(newDate.getTime())) {
+      // Pass valid date to the parent onChange function
+      onChange(newDate);
+    } else {
+      // Handle invalid date entry (Optional: error message, etc.)
+      onChange(null); // Optionally set the value to null if invalid
+    }
+  };
+
   // Replace any spaces in the label with underscores to create a valid id
   const dateRangeId = label.replace(/\s+/g, '_') + '_' + v4();
   return (
@@ -686,10 +707,10 @@ export const DateInput: React.FC<InputProps> = ({
           aria-label={label}
           className={` w-100  ${customPlaceholderCss ?? ''} ${customEditInputTextCss ?? 'custom-date-range'}`}
           placeholder={placeholder}
-          format="MMMM d, yyyy"
+          format="MMM dd, yyyy"
           caretAs={CalendarIcon}
           value={value ?? null}
-          onChange={(value) => onChange(value)}
+          onChange={handleDateChange}
           oneTap
           readOnly={isDisabled}
         />

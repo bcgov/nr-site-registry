@@ -7,16 +7,7 @@ import {
   MAP_CONTROLS_RIGHT_SM,
   MAP_CONTROLS_RIGHT_XL,
 } from '../../constants/Constant';
-//import { useActiveTool } from '@/features/map/map-slice'
-// import { DataLayersButton } from './DataLayersButton'
-// import { FilterByButton } from './FilterByButton'
-// import { FindMeButton } from './FindMeButton'
-// import { PointSearch } from './PointSearch'
-// import { PointSearchButton } from './PointSearchButton'
-// import { PolygonSearchButton } from './PolygonSearchButton'
-// import { PolygonSearch } from './PolygonSearch'
-// import { SearchByButton } from './SearchByButton'
-//import { SearchAutocomplete } from './SearchAutocomplete'
+
 import { TextSearchButton } from './search/TextSearchButton';
 
 import './MapSearch.css';
@@ -24,7 +15,7 @@ import { SearchInput } from './search/SearchInput';
 import React, { useState } from 'react';
 import { FindMeButton } from './FindMeButton';
 import { useMapSearchQuery } from '../../../graphql/generated';
-import { HorizontalScroller } from './HorizontalScroller';
+import { HorizontalScroller } from './controls/HorizontalScroller';
 import { PolygonSearchButton } from './search/PolygonSearchButton';
 import { RadiusSearchButton } from './search/RadiusSearchButton';
 
@@ -67,14 +58,19 @@ const componentProps = {
   },
 };
 
-export function MapSearch() {
+interface MapSearchProps {
+  isLocationVisible: boolean;
+  setLocationVisible: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function MapSearch({
+  isLocationVisible,
+  setLocationVisible,
+}: MapSearchProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const theme = useTheme();
   const isLarge = useMediaQuery(theme.breakpoints.up('lg'));
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
-  //const activeTool = useActiveTool()
-  // const isPolygonTool = activeTool === ActiveToolEnum.polygonSearch
-  // const isPointTool = activeTool === ActiveToolEnum.pointSearch
 
   const clearSearch = () => {
     setSearchTerm('');
@@ -104,7 +100,10 @@ export function MapSearch() {
               className="search-autocomplete"
               componentsProps={componentProps}
             />
-            <FindMeButton />
+            <FindMeButton
+              isLocationVisible={isLocationVisible}
+              setLocationVisible={setLocationVisible}
+            />
           </Stack>
         ) : (
           <TextSearchButton />

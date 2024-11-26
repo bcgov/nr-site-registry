@@ -225,10 +225,9 @@ input::placeholder {
   position: relative !important;
   height: auto;
   max-height: 220px;
-
   min-width: 100%;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 .custom-min-height {
   min-height: 30px;
@@ -236,7 +235,6 @@ input::placeholder {
 .custom-search-input-menu {
   height: auto;
   max-height: 220px;
-  min-width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   border-radius: var(--surface-border-radius-medium);
@@ -298,4 +296,9 @@ input::placeholder {
   background: var(--surface-color-background-white, #ffffff);
   box-shadow: 0px 6.4px 14.4px 0px #00000021;
   box-shadow: 0px 1.2px 3.6px 0px #0000001a;
+  max-width: 100%;
+}
+
+.dropdown {
+  position: unset !important;
 }

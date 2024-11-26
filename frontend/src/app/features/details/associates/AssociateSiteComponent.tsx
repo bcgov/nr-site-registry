@@ -103,7 +103,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
 
               <Button
                 variant="secondary"
-                onClick={handleRemoveAssociate}
+                onClick={() => handleRemoveAssociate()}
                 disabled={selectedRows.length <= 0}
               >
                 <UserMinus />

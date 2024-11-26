@@ -63,8 +63,3 @@
   text-align: left !important;
   transform: translateX(25px) translateY(2px) !important;
 }
-
-.tableWidth {
-  width: 100%;
-  overflow: unset;
-}

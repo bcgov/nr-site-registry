@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import { Circle, Tooltip, useMap } from 'react-leaflet';
 
-//import { useMyLocationVisible } from '@/features/map/map-slice'
 import { useMyLocation } from '../../../hooks/useMyLocation';
 import { IconMarker } from './IconMarker';
 
@@ -41,7 +40,6 @@ function MyLocationMarkerContent() {
     }
   }, [map, position]);
 
-  console.log('nupur - MyLocationMarkerContent is at position: ', position);
   return position ? (
     <>
       {Math.round(accuracy) >= 1 && (
@@ -52,17 +50,16 @@ function MyLocationMarkerContent() {
         />
       )}
       <IconMarker position={position} icon={locationIcon} zIndexOffset={1000}>
-        console.log("nupur - MyLocationMarkerContent is at position: ",
-        position)
         <Tooltip direction="top">My location</Tooltip>
       </IconMarker>
     </>
   ) : null;
 }
 
-export function MyLocationMarker() {
-  //TODO - Implement useMyLocationVisible
-  //   const isVisible = useMyLocationVisible()
-  //   return isVisible ? <MyLocationMarkerContent /> : null
-  return <MyLocationMarkerContent />;
+interface MyLocationMarkerProps {
+  isLocationVisible: boolean;
+}
+export function MyLocationMarker({ isLocationVisible }: MyLocationMarkerProps) {
+  //const isVisible = useMyLocationVisible();
+  return isLocationVisible ? <MyLocationMarkerContent /> : null;
 }

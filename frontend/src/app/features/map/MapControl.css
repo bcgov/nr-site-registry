@@ -19,13 +19,10 @@
   align-items: center;
   border-radius: 6px;
   background: var(--surface-color-background-white);
-  color: var(--icons-color-secondary);
+  color: var(--surface-color-primary-hover);
+  border: 1px var(--surface-color-primary-hover) solid;
   box-shadow: var(--box-shadow-small);
   transition: all ease-in-out 0.3s;
-}
-
-.map-controls button.map-control-button:hover {
-  color: var(--icons-color-info);
 }
 
 .map-controls button.map-control-button:focus {
@@ -33,10 +30,11 @@
 }
 
 .map-controls button.map-control-button--active {
-  background-color: var(--surface-color-primary-active-border);
+  background-color: var(--surface-color-primary-hover);
   color: var(--surface-color-background-white);
 }
 
-.map-controls button.map-control-button--active:hover {
-  color: var(--surface-color-secondary-hover);
+.map-controls .map-control-button:hover {
+  background-color: var(--surface-color-primary-hover);
+  color: var(--surface-color-background-white);
 }

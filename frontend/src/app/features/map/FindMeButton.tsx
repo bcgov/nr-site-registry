@@ -33,7 +33,15 @@ export function FindMeButton({
         'map-button--large',
         isLocationVisible && 'map-button--active',
       )}
-      startIcon={<FindMe title="Find me icon" className="find-me-icon" />}
+      startIcon={
+        <FindMe
+          title="Find me icon"
+          className={clsx(
+            'find-me-icon',
+            isLocationVisible && 'find-me-icon--active',
+          )}
+        />
+      }
       onClick={onClick}
     >
       Find Me

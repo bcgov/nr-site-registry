@@ -236,7 +236,9 @@ export class SiteResolver {
         data,
       );
     } catch (e) {
-      this.sitesLogger.log('SiteResolver.mapSearch() failed');
+      this.sitesLogger.log(
+        `SiteResolver.mapSearch() failed, ${JSON.stringify(e)}`,
+      );
       return this.mapSearchGenericResponseProvider.createResponse(
         'Error fetching sites for map',
         HttpStatus.INTERNAL_SERVER_ERROR,

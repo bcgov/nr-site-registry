@@ -13,7 +13,7 @@ export interface IParcelDescriptionResponseDto {
   count: number;
   data: IParcelDescriptionDto[];
 }
-export interface IFetchParcelDescriptionParams {
+export interface IFetchParcelDescriptionsParams {
   siteId: number;
   page: number;
   pageSize: number;
@@ -34,5 +34,4 @@ export interface IParcelDescriptionsState {
   sortBy: string;
   sortByDir: string;
   sortByInputValue: { [key: string]: any };
-  needsUpdate: boolean;
 }

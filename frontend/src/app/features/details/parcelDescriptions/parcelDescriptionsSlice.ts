@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RequestStatus } from '../../../helpers/requests/status';
 import {
+  IFetchParcelDescriptionsParams,
   IParcelDescriptionResponseDto,
   IParcelDescriptionsState,
 } from './parcelDescriptionsInterfaces';
@@ -20,88 +21,103 @@ export const initialParcelDescriptionsState: IParcelDescriptionsState = {
   sortBy: 'id',
   sortByDir: 'ASC',
   sortByInputValue: {},
-  needsUpdate: true,
 };
 
 export const fetchParcelDescriptions = createAsyncThunk(
   'parcelDescriptions/fetchParcelDescriptions',
-  async (currentState: IParcelDescriptionsState) => {
-    if (!currentState.needsUpdate) {
-      return currentState;
-    }
+  async (params: IFetchParcelDescriptionsParams) => {
     const axios = getAxiosInstance();
     let response;
     try {
       response = await axios.post(GRAPHQL, {
         query: print(graphQLParcelDescriptionBySiteId()),
         variables: {
-          siteId: currentState.siteId,
-          page: currentState.currentPage,
-          pageSize: currentState.resultsPerPage,
-          searchParam: currentState.searchParam,
-          sortBy: currentState.sortBy,
-          sortByDir: currentState.sortByDir,
-          pending: false, // This is only used for SR approval in the site details component.
+          siteId: params.siteId,
+          page: params.page,
+          pageSize: params.pageSize,
+          searchParam: params.searchParam,
+          sortBy: params.sortBy,
+          sortByDir: params.sortByDir,
+          pending: params.showPending, // This is only used for SR approval in the site details component.
         },
       });
     } catch (error) {
       throw error;
     }
-    if (response?.status != 200) {
-      return { ...currentState, requestStatus: RequestStatus.failed };
-    }
-
-    const responseData = response.data?.data
-      ?.getParcelDescriptionsBySiteId as IParcelDescriptionResponseDto;
-
-    if (!responseData) {
-      return { ...currentState, requestStatus: RequestStatus.failed };
-    }
-
-    const newParcelDescriptionsState: IParcelDescriptionsState = {
-      siteId: currentState.siteId,
-      currentPage: responseData.page,
-      resultsPerPage: responseData.pageSize,
-      searchParam: currentState.searchParam,
-      totalResults: responseData.count,
-      data: responseData.data,
-      sortBy: currentState.sortBy,
-      sortByDir: currentState.sortByDir,
-      sortByInputValue: currentState.sortByInputValue,
-      requestStatus: RequestStatus.success,
-      needsUpdate: false,
-    };
-
-    return newParcelDescriptionsState;
+    return response;
   },
 );
 
 export const parcelDescriptionsSlice = createSlice({
   name: 'parcelDescriptions',
   initialState: initialParcelDescriptionsState,
-  reducers: {},
+  reducers: {
+    updateCurrentPage: (state, action) => {
+      state.currentPage = action.payload;
+    },
+    updateResultsPerPage: (state, action) => {
+      state.resultsPerPage = action.payload;
+    },
+    updateSearchParam: (state, action) => {
+      state.searchParam = action.payload;
+    },
+    updateSortBy: (state, action) => {
+      state.sortBy = action.payload;
+    },
+    updateSortByDir: (state, action) => {
+      state.sortByDir = action.payload;
+    },
+    updateSortByInputValue: (state, action) => {
+      state.sortByInputValue = action.payload;
+    },
+    resetAllDataForSite: (state, action) => {
+      state.siteId = action.payload;
+      state.currentPage = initialParcelDescriptionsState.currentPage;
+      state.data = initialParcelDescriptionsState.data;
+      state.requestStatus = initialParcelDescriptionsState.requestStatus;
+      state.resultsPerPage = initialParcelDescriptionsState.resultsPerPage;
+      state.searchParam = initialParcelDescriptionsState.searchParam;
+      state.sortBy = initialParcelDescriptionsState.sortBy;
+      state.sortByDir = initialParcelDescriptionsState.sortByDir;
+      state.sortByInputValue = initialParcelDescriptionsState.sortByInputValue;
+      state.totalResults = initialParcelDescriptionsState.totalResults;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchParcelDescriptions.pending, (state) => {
         state.requestStatus = RequestStatus.loading;
       })
       .addCase(fetchParcelDescriptions.fulfilled, (state, action) => {
-        state.siteId = action.payload.siteId;
-        state.currentPage = action.payload.currentPage;
-        state.resultsPerPage = action.payload.resultsPerPage;
-        state.searchParam = action.payload.searchParam;
-        state.totalResults = action.payload.totalResults;
-        state.data = action.payload.data;
-        state.sortBy = action.payload.sortBy;
-        state.sortByDir = action.payload.sortByDir;
-        state.sortByInputValue = action.payload.sortByInputValue;
-        state.requestStatus = action.payload.requestStatus;
-        state.needsUpdate = action.payload.needsUpdate;
+        const responseData = action.payload.data?.data
+          ?.getParcelDescriptionsBySiteId as IParcelDescriptionResponseDto;
+        if (!responseData) {
+          state.requestStatus = RequestStatus.failed;
+        } else {
+          state.currentPage = responseData.page;
+          state.resultsPerPage = responseData.pageSize;
+          state.totalResults = responseData.count;
+          state.data = responseData.data;
+          state.requestStatus = RequestStatus.success;
+        }
       })
       .addCase(fetchParcelDescriptions.rejected, (state, action) => {
         state.requestStatus = RequestStatus.failed;
       });
   },
 });
+
+export const parcelDescriptions = (state: any): IParcelDescriptionsState =>
+  state.parcelDescriptions;
+
+export const {
+  updateCurrentPage,
+  updateResultsPerPage,
+  updateSearchParam,
+  updateSortBy,
+  updateSortByDir,
+  updateSortByInputValue,
+  resetAllDataForSite,
+} = parcelDescriptionsSlice.actions;
 
 export default parcelDescriptionsSlice.reducer;

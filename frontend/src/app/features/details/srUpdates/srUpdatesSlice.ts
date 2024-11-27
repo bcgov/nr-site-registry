@@ -13,7 +13,7 @@ import { getLandHistoriesForSiteQuery } from '../landUses/graphql/LandUses';
 import { graphQLSiteDocumentsBySiteId } from '../../site/graphql/Document';
 import { graphQLSiteDisclosureBySiteId } from '../../site/graphql/Disclosure';
 import { graphQLAssociatedSitesBySiteId } from '../../site/graphql/Associate';
-import { IFetchParcelDescriptionParams } from '../parcelDescriptions/parcelDescriptionsInterfaces';
+import { IFetchParcelDescriptionsParams } from '../parcelDescriptions/parcelDescriptionsInterfaces';
 import { graphQLParcelDescriptionBySiteId } from '../../site/graphql/ParcelDescriptions';
 import {
   IParcelDescriptionDto,
@@ -49,7 +49,7 @@ export const updateSiteDetailsForApproval = createAsyncThunk(
 
 export const fetchParcelDescriptionsForApproval = createAsyncThunk(
   'parcelDescriptions/fetchParcelDescriptionsForApproval',
-  async (params: IFetchParcelDescriptionParams) => {
+  async (params: IFetchParcelDescriptionsParams) => {
     const axios = getAxiosInstance();
     let response;
     try {

@@ -73,7 +73,7 @@ export const SiteDetailsDrawer: FC<SiteDetailsDrawerProps> = ({ mapRef }) => {
       return;
 
     const lat = siteData.latdeg;
-    const lng = siteData.longdeg * -1;
+    const lng = siteData.longdeg;
 
     mapRef.current.flyTo({ lat, lng }, Math.max(mapRef.current.getZoom(), 14), {
       animate: true,

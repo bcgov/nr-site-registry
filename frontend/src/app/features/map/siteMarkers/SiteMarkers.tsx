@@ -1,11 +1,11 @@
-import { FC, useCallback, useMemo } from 'react';
-import { MapSearchQuery } from '../../../../graphql/generated';
+import { FC, useCallback, useContext, useMemo } from 'react';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { SiteMarker } from './SiteMarker';
-import { StringParam, useQueryParam } from 'use-query-params';
 import { useMap } from 'react-leaflet';
+import { getZoom, MAP_FLY_OPTIONS } from '../mapOptions';
+import { Site } from '../MapView';
+import { MapSearchQueryParamsContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
 
-type Site = MapSearchQuery['mapSearch']['data'][number];
 interface SiteMarkersProps {
   sites: Site[];
 }
@@ -13,10 +13,7 @@ interface SiteMarkersProps {
 export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
   const map = useMap();
 
-  const [selectedSiteId, setSelectedSiteId] = useQueryParam(
-    'site',
-    StringParam,
-  );
+  const { selectedSiteId, setQuery } = useContext(MapSearchQueryParamsContext);
 
   const moveToSiteLocation = useCallback(
     (site: Site) => {
@@ -27,11 +24,8 @@ export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
           lat: site.latdeg,
           lng: site.longdeg,
         },
-        Math.max(map.getZoom(), 14),
-        {
-          animate: true,
-          duration: 1,
-        },
+        getZoom(map),
+        MAP_FLY_OPTIONS,
       );
     },
     [map],
@@ -39,10 +33,10 @@ export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
 
   const onSiteMarkerClick = useCallback(
     (site: Site) => {
-      setSelectedSiteId(site.id);
+      setQuery({ site: site.id });
       moveToSiteLocation(site);
     },
-    [moveToSiteLocation, setSelectedSiteId],
+    [moveToSiteLocation, setQuery],
   );
 
   const markers = useMemo(() => {

@@ -30,6 +30,14 @@ describe('FindMeButton component', () => {
     expect(button).not.toBeInTheDocument();
   });
 
+  it('should display location when button is clicked', () => {
+    renderComponent('granted', false);
+    const button = screen.getByRole('button');
+    fireEvent.click(button);
+    const location = screen.getByTitle('Find me icon');
+    expect(location).toBeInTheDocument();
+  });
+
   it('should call setLocationVisible handler when clicked', () => {
     renderComponent('granted', false);
     const button = screen.getByRole('button');

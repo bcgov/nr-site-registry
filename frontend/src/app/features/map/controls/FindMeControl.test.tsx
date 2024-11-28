@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FindMeControl } from './FindMeControl'; // Adjust the import path as necessary
 import { useGeolocationPermission } from '../../../../hooks/useMyLocation';
@@ -42,7 +41,26 @@ describe('FindMeControl component', () => {
     renderComponent('granted', false);
     const button = screen.getByRole('button');
     fireEvent.click(button);
-    const location = screen.getByText('Show my location on the map');
+    const location = screen.getByTitle('Show my location on the map');
     expect(location).toBeInTheDocument();
+  });
+
+  it('should call useGeolocationPermission hook', () => {
+    renderComponent('granted', false);
+    expect(useGeolocationPermission).toHaveBeenCalled();
+  });
+
+  it('should have the correct classes when isLocationVisible is false', () => {
+    renderComponent('granted', false);
+    const button = screen.getByRole('button');
+    expect(button).toHaveClass('map-control-button');
+    expect(button).not.toHaveClass('map-control-button--active');
+  });
+
+  it('should have the correct classes when isLocationVisible is true', () => {
+    renderComponent('granted', true);
+    const button = screen.getByRole('button');
+    expect(button).toHaveClass('map-control-button');
+    expect(button).toHaveClass('map-control-button--active');
   });
 });

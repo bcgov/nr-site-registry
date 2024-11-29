@@ -1,7 +1,7 @@
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
 import { TableColumn } from '../../../components/table/TableColumn';
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../Store';
 import {
@@ -46,31 +46,34 @@ const ParcelDescriptions = () => {
     dispatch(fetchParcelDescriptions(fetchParams));
   }
 
-  const [data, setData] = useState<IParcelDescriptionDto[]>(reduxState.data);
-  const [currentPage, setCurrentPage] = useState<number>(
+  const [data, setData] = React.useState<IParcelDescriptionDto[]>(
+    reduxState.data,
+  );
+  const [currentPage, setCurrentPage] = React.useState<number>(
     reduxState.currentPage,
   );
-  const [resultsPerPage, setResultsPerPage] = useState<number>(
+  const [resultsPerPage, setResultsPerPage] = React.useState<number>(
     reduxState.resultsPerPage,
   );
-  const [totalResults, setTotalResults] = useState<number>(
+  const [totalResults, setTotalResults] = React.useState<number>(
     reduxState.totalResults,
   );
-  const [searchParam, setSearchParam] = useState<string>(
+  const [searchParam, setSearchParam] = React.useState<string>(
     reduxState.searchParam,
   );
-  const [sortBy, setSortBy] = useState<string>(reduxState.sortBy);
-  const [sortByDir, setSortByDir] = useState<string>(reduxState.sortByDir);
-  const [sortByInputValue, setSortByInputValue] = useState<{
+  const [sortBy, setSortBy] = React.useState<string>(reduxState.sortBy);
+  const [sortByDir, setSortByDir] = React.useState<string>(
+    reduxState.sortByDir,
+  );
+  const [sortByInputValue, setSortByInputValue] = React.useState<{
     [key: string]: any;
   }>(reduxState.sortByInputValue);
-  const [requestStatus, setRequestStatus] = useState<RequestStatus>(
+  const [requestStatus, setRequestStatus] = React.useState<RequestStatus>(
     reduxState.requestStatus,
   );
 
   const handleSelectPage = (newPage: number) => {
     if (newPage !== currentPage) {
-      setCurrentPage(newPage);
       dispatch(updateCurrentPage(newPage));
       fetchNewParcelDescriptions({ newPage: newPage });
     }
@@ -78,7 +81,6 @@ const ParcelDescriptions = () => {
 
   const handleChangeResultsPerPage = (newResultsPerPage: number) => {
     if (newResultsPerPage !== resultsPerPage) {
-      setResultsPerPage(newResultsPerPage);
       dispatch(updateResultsPerPage(newResultsPerPage));
       fetchNewParcelDescriptions({ newPageSize: newResultsPerPage });
     }
@@ -87,18 +89,16 @@ const ParcelDescriptions = () => {
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSearchParam = event.target.value;
     if (newSearchParam !== searchParam) {
-      setSearchParam(newSearchParam);
       dispatch(updateSearchParam(newSearchParam));
       fetchNewParcelDescriptions({ newSearchParam: newSearchParam });
     }
   };
 
   const handleSearchClear = () => {
-    if (searchParam !== initialParcelDescriptionsState.searchParam) {
-      setSearchParam(initialParcelDescriptionsState.searchParam);
-      dispatch(updateSearchParam(initialParcelDescriptionsState.searchParam));
+    if (searchParam !== '') {
+      dispatch(updateSearchParam(''));
       fetchNewParcelDescriptions({
-        newSearchParam: initialParcelDescriptionsState.searchParam,
+        newSearchParam: '',
       });
     }
   };
@@ -128,12 +128,6 @@ const ParcelDescriptions = () => {
         break;
     }
     if (sortByInputValue[graphQLPropertyName] !== newSortByInputValue) {
-      setSortBy(newSortBy);
-      setSortByDir(newSortByDir);
-      setSortByInputValue({
-        ...sortByInputValue,
-        [graphQLPropertyName]: newSortByInputValue,
-      });
       dispatch(updateSortBy(newSortBy));
       dispatch(updateSortByDir(newSortByDir));
       dispatch(
@@ -168,8 +162,6 @@ const ParcelDescriptions = () => {
     }
 
     if (newSortBy !== sortBy) {
-      setSortBy(newSortBy);
-      setSortByDir(newSortByDir);
       dispatch(updateSortBy(newSortBy));
       dispatch(updateSortByDir(newSortByDir));
       fetchNewParcelDescriptions({
@@ -186,25 +178,25 @@ const ParcelDescriptions = () => {
     newSortBy,
     newSortByDir,
   }: {
-    newPage?: number | null;
-    newPageSize?: number | null;
-    newSearchParam?: string | null;
-    newSortBy?: string | null;
-    newSortByDir?: string | null;
+    newPage?: number;
+    newPageSize?: number;
+    newSearchParam?: string;
+    newSortBy?: string;
+    newSortByDir?: string;
   }) => {
     const fetchParams: IFetchParcelDescriptionsParams = {
       siteId: siteId,
-      page: newPage || currentPage,
-      pageSize: newPageSize || resultsPerPage,
-      searchParam: newSearchParam || searchParam,
-      sortBy: newSortBy || sortBy,
-      sortByDir: newSortByDir || sortByDir,
+      page: newPage !== undefined ? newPage : currentPage,
+      pageSize: newPageSize !== undefined ? newPageSize : resultsPerPage,
+      searchParam: newSearchParam !== undefined ? newSearchParam : searchParam,
+      sortBy: newSortBy !== undefined ? newSortBy : sortBy,
+      sortByDir: newSortByDir !== undefined ? newSortByDir : sortByDir,
       showPending: false, // Unused in this component.
     };
     dispatch(fetchParcelDescriptions(fetchParams));
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Update local state with redux state.
     setData(reduxState.data);
     setCurrentPage(reduxState.currentPage);

@@ -2,9 +2,9 @@
 crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single postgres
   instances:
     dataVolumeClaimSpec:
-      storage: 220Mi
+      storage: 200Mi
       storageClassName: netapp-block-standard
-      walStorage: 250Mi
+      walStorage: 220Mi
 
   pgBackRest:
     clusterCounter: 4 # for some reason 1, did not work, putting it to 2 worked, so updating it in pipelines.
@@ -17,7 +17,6 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       accessKey: ~
       secretKey: ~
       fullBackupSchedule: 0 9 * * * # full backup at GMT 9
-      incrementalBackupSchedule: 0 8 * * * # every fifteen minutes except 0th
+      incrementalBackupSchedule: 0 0/4 * * * # every fifteen minutes except 0th
     pvc:
-      volume:
-        storage: 256Mi
+      enabled: false

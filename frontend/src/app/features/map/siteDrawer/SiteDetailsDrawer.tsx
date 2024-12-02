@@ -1,13 +1,20 @@
-import { FC } from 'react';
-
+import { FC, RefObject } from 'react';
+import { Link } from 'react-router-dom';
+import { Map } from 'leaflet';
 import {
   useMapSearch_FindSiteBySiteIdQuery,
   MapSearch_FindSiteBySiteIdQuery,
 } from '../../../../graphql/generated';
 import { StringParam, useQueryParam } from 'use-query-params';
-import { SpinnerIcon } from '../../../components/common/icon';
+import {
+  MagnifyingGlassPlusIcon,
+  ShoppingCartIcon,
+  SpinnerIcon,
+} from '../../../components/common/icon';
 import { Drawer } from '../../../components/drawer/Drawer';
 import './SiteDetailsDrawer.css';
+import { Button } from '../../../components/button/Button';
+import AddToFolio from '../../folios/AddToFolio';
 
 const SummaryItem = ({
   label,
@@ -44,18 +51,35 @@ const formatCoordinates = (coords: Array<number | undefined | null>) => {
   return result;
 };
 
-export const SiteDetailsDrawer: FC = () => {
+interface SiteDetailsDrawerProps {
+  mapRef: RefObject<Map | null>;
+}
+export const SiteDetailsDrawer: FC<SiteDetailsDrawerProps> = ({ mapRef }) => {
   const [selectedSiteId, setSelectedSiteId] = useQueryParam(
     'site',
     StringParam,
   );
 
-  const { data, loading } = useMapSearch_FindSiteBySiteIdQuery({
-    variables: { siteId: selectedSiteId || '' },
-    skip: !selectedSiteId,
-  });
+  const { data, loading: siteDetailsLoading } =
+    useMapSearch_FindSiteBySiteIdQuery({
+      variables: { siteId: selectedSiteId || '' },
+      skip: !selectedSiteId,
+    });
 
   const siteData = data?.findSiteBySiteId.data;
+
+  const zoomToSite = () => {
+    if (!mapRef.current || !siteData || !siteData.latdeg || !siteData.longdeg)
+      return;
+
+    const lat = siteData.latdeg;
+    const lng = siteData.longdeg;
+
+    mapRef.current.flyTo({ lat, lng }, Math.max(mapRef.current.getZoom(), 14), {
+      animate: true,
+      duration: 1,
+    });
+  };
 
   return (
     <Drawer
@@ -65,42 +89,79 @@ export const SiteDetailsDrawer: FC = () => {
       }}
       title="Selected Site"
     >
-      <div className="mb-2">
-        <span className="fw-bold mb-2">Site ID:</span> {selectedSiteId}
-      </div>
-      {loading && <SpinnerIcon size={20} className="site-fa-spin" />}
-      {!loading && (
-        <div className="d-grid gap-3">
-          <h4 className="fw-bold">{formatAddress(siteData)}</h4>
-          <div className="site-drawer-info-summary">
-            <SummaryItem
-              label="Latitude"
-              value={formatCoordinates([
-                siteData?.latDegrees,
-                siteData?.latMinutes,
-                siteData?.latSeconds,
-              ])}
+      <div className="d-flex flex-column gap-3">
+        <div className="d-flex gap-2 flex-column flex-sm-row justify-content-between">
+          <Button
+            onClick={zoomToSite}
+            variant="secondary"
+            className="justify-content-center"
+            disabled={siteDetailsLoading}
+          >
+            <MagnifyingGlassPlusIcon />
+            Zoom To
+          </Button>
+          <div className="d-flex justify-content-end gap-2 flex-column flex-sm-row">
+            <Link
+              to={`/site/details/${selectedSiteId}`}
+              className="justify-content-center"
+            >
+              <Button
+                variant="secondary"
+                className="justify-content-center w-100"
+              >
+                View Site Details
+              </Button>
+            </Link>
+            <AddToFolio
+              selectedSiteIds={[selectedSiteId || '']}
+              label="Add to Folio"
+              triggerClassName="justify-content-center"
             />
-            <SummaryItem
-              label="Site Risk Classification"
-              value={siteData?.siteRiskCode || 'N/A'}
-            />
-            <SummaryItem
-              label="Longitude"
-              value={formatCoordinates([
-                siteData?.longDegrees,
-                siteData?.longMinutes,
-                siteData?.longSeconds,
-              ])}
-            />
-            <SummaryItem label="Region" value={siteData?.city} />
-          </div>
-          <div>
-            <div className="fw-bold mb-2">Location Description</div>
-            <div>{siteData?.generalDescription}</div>
+            <Button className="justify-content-center">
+              <ShoppingCartIcon />
+              Add to Cart
+            </Button>
           </div>
         </div>
-      )}
+        <div className="">
+          <span className="fw-bold">Site ID:</span> {selectedSiteId}
+        </div>
+        {siteDetailsLoading && (
+          <SpinnerIcon size={20} className="site-fa-spin" />
+        )}
+        {!siteDetailsLoading && (
+          <div className="d-grid gap-3">
+            <h4 className="fw-bold">{formatAddress(siteData)}</h4>
+            <div className="site-drawer-info-summary">
+              <SummaryItem
+                label="Latitude"
+                value={formatCoordinates([
+                  siteData?.latDegrees,
+                  siteData?.latMinutes,
+                  siteData?.latSeconds,
+                ])}
+              />
+              <SummaryItem
+                label="Site Risk Classification"
+                value={siteData?.siteRiskCode || 'N/A'}
+              />
+              <SummaryItem
+                label="Longitude"
+                value={formatCoordinates([
+                  siteData?.longDegrees,
+                  siteData?.longMinutes,
+                  siteData?.longSeconds,
+                ])}
+              />
+              <SummaryItem label="Region" value={siteData?.city} />
+            </div>
+            <div>
+              <div className="fw-bold mb-2">Location Description</div>
+              <div>{siteData?.generalDescription}</div>
+            </div>
+          </div>
+        )}
+      </div>
     </Drawer>
   );
 };

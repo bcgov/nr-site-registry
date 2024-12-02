@@ -42,14 +42,35 @@ export const serializeDate = (data: any) => {
 
 export const formatDateRange = (range: [Date, Date]) => {
   const [startDate, endDate] = range;
+
+  // Validate the start and end dates
+  if (!(startDate instanceof Date) || isNaN(startDate.getTime())) {
+    console.error('Invalid start date');
+    return ''; // Return empty string or some fallback
+  }
+
+  if (!(endDate instanceof Date) || isNaN(endDate.getTime())) {
+    console.error('Invalid end date');
+    return ''; // Return empty string or some fallback
+  }
+
+  // If both dates are valid, format them
   const formattedStartDate = format(startDate, 'MMMM do, yyyy');
   const formattedEndDate = format(endDate, 'MMMM do, yyyy');
+
   return `${formattedStartDate} - ${formattedEndDate}`;
 };
 
 export const formatDate = (date: Date) => {
+  // Validate the date
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    console.error('Invalid date');
+    return ''; // Return empty string or some fallback
+  }
+
+  // If the date is valid, format it
   const formattedDate = format(date, 'MMMM do, yyyy');
-  return `${formattedDate}`;
+  return formattedDate;
 };
 
 /*

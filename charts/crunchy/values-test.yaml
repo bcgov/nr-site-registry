@@ -17,7 +17,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     backupPath: /backups/test/cluster/version # change it for PROD, create values-prod.yaml
     s3:
       enabled: true
-      retention: 1 # one weeks backup in object store for test environment
+      retention: 1 # one day backup in object store for test environment
       bucket: nrsitetst
       endpoint: nrs.objectstore.gov.bc.ca
       accessKey: ~

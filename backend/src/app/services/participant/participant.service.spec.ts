@@ -8,12 +8,15 @@ import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { plainToInstance } from 'class-transformer';
 import { v4 } from 'uuid';
 import { LoggerService } from '../../logger/logger.service';
+import { UserTypeEum } from '../../common/userType';
+import { SnapshotsService } from '../snapshot/snapshot.service';
 
 // Mock SitePartics entity and its Repository
 jest.mock('../../entities/sitePartics.entity');
-
+jest.mock('../snapshot/snapshot.service');
 describe('ParticipantService', () => {
   let service: ParticipantService;
+  let snapshotService: SnapshotsService;
   let siteParticsRepository: Repository<SitePartics>;
   let sitesLogger: LoggerService;
 
@@ -22,6 +25,7 @@ describe('ParticipantService', () => {
       providers: [
         ParticipantService,
         LoggerService,
+        SnapshotsService,
         {
           provide: getRepositoryToken(SitePartics),
           useClass: Repository,
@@ -30,6 +34,7 @@ describe('ParticipantService', () => {
     }).compile();
 
     service = module.get<ParticipantService>(ParticipantService);
+    snapshotService = module.get<SnapshotsService>(SnapshotsService);
     sitesLogger = module.get<LoggerService>(LoggerService);
     siteParticsRepository = module.get<Repository<SitePartics>>(
       getRepositoryToken(SitePartics),
@@ -70,8 +75,14 @@ describe('ParticipantService', () => {
       jest
         .spyOn(siteParticsRepository, 'find')
         .mockResolvedValueOnce(mockSitePartics as SitePartics[]);
-
-      const result = await service.getSiteParticipantsBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await service.getSiteParticipantsBySiteId(
+        siteId,
+        false,
+        user,
+      );
 
       const expectedTransformedObjects = mockSitePartics.flatMap((item) =>
         item.siteParticRoles.map((role) => ({
@@ -100,9 +111,11 @@ describe('ParticipantService', () => {
         `Failed to retrieve site participants by siteId: ${siteId}`,
       );
       jest.spyOn(siteParticsRepository, 'find').mockRejectedValueOnce(error);
-
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
       await expect(
-        service.getSiteParticipantsBySiteId(siteId, false),
+        service.getSiteParticipantsBySiteId(siteId, false, user),
       ).rejects.toThrowError(
         `Failed to retrieve site participants by siteId: ${siteId}`,
       );

@@ -168,6 +168,7 @@ export class SnapshotsService {
           eventId: notationId,
           srAction: SRApprovalStatusEnum.PUBLIC,
         },
+        relations: ['psnorg'], // Load related 'psnorg' data to include displayName
       });
     } catch (error) {
       this.sitesLogger.log(
@@ -352,6 +353,7 @@ export class SnapshotsService {
       const createSnapShotContent = inputDto.map(async (dto) => {
         if (dto) {
           const { siteId } = dto;
+          let eventPartics = [];
           if (siteId !== '') {
             const snapShotContent: SnapshotSiteContent =
               new SnapshotSiteContent();
@@ -365,12 +367,16 @@ export class SnapshotsService {
 
             await Promise.all(
               snapShotContent.events.map(async (event) => {
-                snapShotContent.eventsParticipants =
+                let response =
                   await this.getNotatioParticipantsForSnapshotCreation(
                     event.id,
                   );
+                if (response?.length > 0) {
+                  eventPartics.push(...response);
+                }
               }),
             );
+            snapShotContent.eventsParticipants = eventPartics;
 
             snapShotContent.siteParticipants =
               await this.getSiteParticipantsForSnapshotCreation(siteId);

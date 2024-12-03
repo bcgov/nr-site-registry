@@ -31,3 +31,12 @@ query MapSearch_findSiteBySiteId($siteId: String!) {
         }
     }
 }
+
+mutation MapSearch_addCartItem($siteId: String!) {
+    addCartItem(cartDTO:  {
+       siteId: $siteId,
+       price: 0
+    }) {
+        success
+    }
+}

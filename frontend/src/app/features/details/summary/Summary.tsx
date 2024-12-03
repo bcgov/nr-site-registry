@@ -59,7 +59,7 @@ const Summary = () => {
 
   useEffect(() => {
     if (isUserOfType(UserRoleType.CLIENT) && user !== null) {
-      dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
+      dispatch(fetchCartItems());
     }
   }, [addCartItemStatus]);
   const { id } = useParams();

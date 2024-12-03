@@ -214,8 +214,20 @@ export class SnapshotsService {
       this.sitesLogger.log(
         'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
       );
+
       return await this.siteParticipantsRepo.find({
-        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
+        join: {
+          alias: 'siteParticipant',
+          innerJoinAndSelect: {
+            siteParticRoles: 'siteParticipant.siteParticRoles',
+          },
+        },
+        where: {
+          siteId,
+          srAction: SRApprovalStatusEnum.PUBLIC, // Condition for the main table
+          siteParticRoles: { srAction: SRApprovalStatusEnum.PUBLIC }, // Condition for related 'siteParticRoles'
+        },
       });
     } catch (error) {
       this.sitesLogger.log(

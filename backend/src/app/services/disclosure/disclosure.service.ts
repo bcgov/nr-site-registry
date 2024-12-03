@@ -6,6 +6,8 @@ import { LoggerService } from '../../logger/logger.service';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { plainToInstance } from 'class-transformer';
+import { SnapshotsService } from '../snapshot/snapshot.service';
+import { UserTypeEum } from '../../common/userType';
 
 @Injectable()
 export class DisclosureService {
@@ -13,6 +15,7 @@ export class DisclosureService {
     @InjectRepository(SiteProfiles)
     private readonly disclosureRepository: Repository<SiteProfiles>,
     private readonly sitesLogger: LoggerService,
+    private snapshotService: SnapshotsService,
   ) {}
 
   /**
@@ -25,6 +28,7 @@ export class DisclosureService {
   async getSiteDisclosureBySiteId(
     siteId: string,
     showPending: boolean,
+    user: any,
   ): Promise<SiteProfiles[]> {
     try {
       this.sitesLogger.log(
@@ -32,20 +36,38 @@ export class DisclosureService {
       );
       // Fetch site profiles based on the provided siteId
       let result: SiteProfiles[] = [];
-
-      if (showPending) {
-        result = await this.disclosureRepository.find({
-          where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
-        });
+      if (user?.identity_provider === UserTypeEum.IDIR) {
+        if (showPending) {
+          result = await this.disclosureRepository.find({
+            where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
+          });
+        } else {
+          result = await this.disclosureRepository.find({ where: { siteId } });
+        }
       } else {
-        result = await this.disclosureRepository.find({
-          where: { siteId },
-        });
+        const userId: string = user?.sub ? user.sub : '';
+        if (userId?.length === 0) {
+          this.sitesLogger.log(
+            'An invalid user was passed into DisclosureService.getSiteDisclosureBySiteId() end',
+          );
+          return [];
+        } else {
+          const snapshot = await this.snapshotService.getMostRecentSnapshot(
+            siteId,
+            userId,
+          );
+          if (!snapshot) {
+            return [];
+          } else {
+            result = snapshot?.snapshotData?.profiles;
+          }
+        }
       }
+
       if (!result?.length) {
         return [];
       } else {
-        const res = result.map((res) => {
+        const res = result?.map((res) => {
           return {
             ...res,
             srAction:

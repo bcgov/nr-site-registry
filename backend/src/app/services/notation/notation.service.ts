@@ -9,7 +9,7 @@ import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { EventPartics } from '../../entities/eventPartics.entity';
 import { LoggerService } from '../../logger/logger.service';
 import { SnapshotsService } from '../snapshot/snapshot.service';
-import { UserTypeEum } from 'src/app/common/userType';
+import { UserTypeEum } from '../../common/userType';
 
 @Injectable()
 export class NotationService {
@@ -50,14 +50,16 @@ export class NotationService {
           events = await this.notationRepository.find({ where: { siteId } });
         }
 
-        // Extract event IDs to fetch related participants in a single query
-        const eventIds = events.map((event) => event.id);
+        if (events?.length > 0) {
+          // Extract event IDs to fetch related participants in a single query
+          const eventIds = events.map((event) => event.id);
 
-        // Fetch event participants related to the retrieved events
-        eventPartics = await this.notationParticRepository.find({
-          where: { eventId: In(eventIds) },
-          relations: ['psnorg'], // Load related 'psnorg' data to include displayName
-        });
+          // Fetch event participants related to the retrieved events
+          eventPartics = await this.notationParticRepository.find({
+            where: { eventId: In(eventIds) },
+            relations: ['psnorg'], // Load related 'psnorg' data to include displayName
+          });
+        }
       } else {
         const userId: string = user?.sub ? user.sub : '';
         if (userId?.length === 0) {

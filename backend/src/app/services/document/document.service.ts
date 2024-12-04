@@ -70,16 +70,28 @@ export class DocumentService {
 
       // Process and format the documents
       const response = result.flatMap((res) => {
+        const submissionDate = res?.submissionDate;
+        const formattedSubmissionDate = submissionDate
+          ? new Date(submissionDate) instanceof Date &&
+            !isNaN(new Date(submissionDate).getTime())
+            ? new Date(submissionDate).toISOString() // Convert to ISO string if valid
+            : null // Set to null if it's not a valid date
+          : null; // Handle null or undefined effectiveDate
+        const documentDate = res?.documentDate;
+        const formattedDocumentDate = submissionDate
+          ? new Date(documentDate) instanceof Date &&
+            !isNaN(new Date(documentDate).getTime())
+            ? new Date(documentDate).toISOString() // Convert to ISO string if valid
+            : null // Set to null if it's not a valid date
+          : null; // Handle null or undefined effectiveDate
         // Base document structure
         const document = {
           id: res.id,
           siteId: res.siteId,
           title: res.title,
-          submissionDate: res.submissionDate.toISOString(),
+          submissionDate: formattedSubmissionDate,
           srAction: res.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
-          documentDate: res.documentDate
-            ? res.documentDate.toISOString()
-            : null,
+          documentDate: formattedDocumentDate,
         };
 
         // If there are associated siteDocPartics, map them

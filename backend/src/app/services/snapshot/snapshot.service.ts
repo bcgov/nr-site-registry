@@ -255,6 +255,7 @@ export class SnapshotsService {
           alias: 'siteDocument',
           innerJoinAndSelect: {
             siteDocPartics: 'siteDocument.siteDocPartics',
+            psnorg: 'siteDocPartics.psnorg',
           },
         },
         where: {

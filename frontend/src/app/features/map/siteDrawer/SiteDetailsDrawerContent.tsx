@@ -1,9 +1,11 @@
 import { FC, RefObject, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { Map } from 'leaflet';
 import {
   useMapSearch_FindSiteBySiteIdQuery,
   MapSearch_FindSiteBySiteIdQuery,
+  useMapSearch_AddCartItemMutation,
 } from '../../../../graphql/generated';
 import {
   MagnifyingGlassPlusIcon,
@@ -15,6 +17,9 @@ import { Button } from '../../../components/button/Button';
 import AddToFolio from '../../folios/AddToFolio';
 import { getZoom, MAP_FLY_OPTIONS } from '../mapOptions';
 import { MapSearchQueryParamsContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { AppDispatch } from '../../../Store';
+import { fetchCartItems } from '../../cart/CartSlice';
+import { notifyError, notifySuccess } from '../../../components/alert/Alert';
 
 const SummaryItem = ({
   label,
@@ -59,11 +64,32 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
 }) => {
   const { selectedSiteId } = useContext(MapSearchQueryParamsContext);
 
+  const dispatch = useDispatch<AppDispatch>();
+
   const { data, loading: siteDetailsLoading } =
     useMapSearch_FindSiteBySiteIdQuery({
       variables: { siteId: selectedSiteId || '' },
       skip: !selectedSiteId,
     });
+
+  const [addCartItem, { loading: addCartItemLoading }] =
+    useMapSearch_AddCartItemMutation({
+      onCompleted: () => {
+        dispatch(fetchCartItems()); // updates cart items count in the sidebar
+        notifySuccess('Successfully added the site to cart');
+      },
+      onError: () => notifyError('Failed to add the site to cart'),
+    });
+
+  const handleAddCartItemClick = () => {
+    if (!selectedSiteId) return;
+
+    addCartItem({
+      variables: {
+        siteId: selectedSiteId,
+      },
+    });
+  };
 
   const siteData = data?.findSiteBySiteId.data;
 
@@ -110,7 +136,11 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
             label="Add to Folio"
             triggerClassName="justify-content-center"
           />
-          <Button className="justify-content-center">
+          <Button
+            onClick={handleAddCartItemClick}
+            disabled={addCartItemLoading}
+            className="justify-content-center"
+          >
             <ShoppingCartIcon />
             Add to Cart
           </Button>

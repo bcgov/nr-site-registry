@@ -128,9 +128,9 @@ export const GetNotationConfig = () => {
     [
       {
         type: FormFieldType.DropDown,
-        label: 'Notation Type',
-        placeholder: 'Notation Type',
-        graphQLPropertyName: 'etypCode',
+        label: 'Notation Class',
+        placeholder: 'Notation Class',
+        graphQLPropertyName: 'eclsCode',
         options: [],
         value: '',
         colSize: 'col-lg-11 col-md-11 col-sm-11 col-10',
@@ -143,9 +143,9 @@ export const GetNotationConfig = () => {
     [
       {
         type: FormFieldType.DropDown,
-        label: 'Notation Class',
-        placeholder: 'Notation Class',
-        graphQLPropertyName: 'eclsCode',
+        label: 'Notation Type',
+        placeholder: 'Notation Type',
+        graphQLPropertyName: 'etypCode',
         options: [],
         value: '',
         colSize: 'col-lg-12 col-md-12 col-sm-12',
@@ -365,19 +365,6 @@ export const GetNotationConfig = () => {
   const notationFormRowsFirstChild: IFormField[][] = [
     [
       {
-        type: FormFieldType.DropDown,
-        label: 'Notation Type',
-        placeholder: 'Notation Type',
-        graphQLPropertyName: 'etypCode',
-        options: [],
-        value: '',
-        colSize: 'col-xxl-5 col-xl-5 col-lg-8 col-md-6 col-sm-12',
-        customLabelCss: 'custom-notation-lbl-text',
-        customInputTextCss: 'custom-notation-input-text',
-        customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-input',
-      },
-      {
         type: FormFieldType.Date,
         label: 'Initiated Date',
         placeholder: 'MM/DD/YY',
@@ -410,19 +397,6 @@ export const GetNotationConfig = () => {
   const notationFormRowsFirstChildIsRequired: IFormField[][] = [
     [
       {
-        type: FormFieldType.DropDown,
-        label: 'Notation Type',
-        placeholder: 'Notation Type',
-        graphQLPropertyName: 'etypCode',
-        options: [],
-        value: '',
-        colSize: 'col-xxl-5 col-xl-5 col-lg-8 col-md-6 col-sm-12',
-        customLabelCss: 'custom-notation-lbl-text',
-        customInputTextCss: 'custom-notation-input-text',
-        customEditLabelCss: 'custom-notation-edit-label',
-        customEditInputTextCss: 'custom-notation-edit-input',
-      },
-      {
         type: FormFieldType.Date,
         label: 'Initiated Date',
         placeholder: 'MM/DD/YY',
@@ -437,9 +411,9 @@ export const GetNotationConfig = () => {
       },
       {
         type: FormFieldType.Date,
-        label: 'Completed Date',
+        label: 'Required Date',
         placeholder: 'MM/DD/YY',
-        graphQLPropertyName: 'completionDate',
+        graphQLPropertyName: 'requirementDueDate',
         value: [],
         colSize:
           'col-lg-4 col-md-6 col-sm-12 d-none d-xl-block d-xxl-block d-lg-block d-md-block',

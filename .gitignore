@@ -134,3 +134,4 @@ schema.graphql
 
 # MacOS Desktop Service Storage files
 .DS_Store
+.idea

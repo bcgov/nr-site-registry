@@ -6,9 +6,13 @@ import { SiteDocs } from '../../entities/siteDocs.entity';
 import { sampleSites } from '../../mockData/site.mockData';
 import { PeopleOrgs } from '../../entities/peopleOrgs.entity';
 import { LoggerService } from '../../logger/logger.service';
+import { SnapshotsService } from '../snapshot/snapshot.service';
+import { UserTypeEum } from '../../common/userType';
 
+jest.mock('../snapshot/snapshot.service');
 describe('DocumentService', () => {
   let service: DocumentService;
+  let snapshotService: SnapshotsService;
   let siteDocsRepository: Repository<SiteDocs>;
   let sitesLogger: LoggerService;
 
@@ -17,6 +21,7 @@ describe('DocumentService', () => {
       providers: [
         DocumentService,
         LoggerService,
+        SnapshotsService,
         {
           provide: getRepositoryToken(SiteDocs),
           useClass: Repository,
@@ -25,6 +30,7 @@ describe('DocumentService', () => {
     }).compile();
 
     service = module.get<DocumentService>(DocumentService);
+    snapshotService = module.get<SnapshotsService>(SnapshotsService);
     sitesLogger = module.get<LoggerService>(LoggerService);
     siteDocsRepository = module.get<Repository<SiteDocs>>(
       getRepositoryToken(SiteDocs),
@@ -108,8 +114,14 @@ describe('DocumentService', () => {
       jest
         .spyOn(siteDocsRepository, 'find')
         .mockResolvedValueOnce(mockSiteDocs);
-
-      const result = await service.getSiteDocumentsBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await service.getSiteDocumentsBySiteId(
+        siteId,
+        false,
+        user,
+      );
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -127,8 +139,14 @@ describe('DocumentService', () => {
     it('should return empty array when siteId does not exist', async () => {
       const siteId = 'nonExistentSite';
       jest.spyOn(siteDocsRepository, 'find').mockResolvedValueOnce([]);
-
-      const result = await service.getSiteDocumentsBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await service.getSiteDocumentsBySiteId(
+        siteId,
+        false,
+        user,
+      );
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -141,9 +159,11 @@ describe('DocumentService', () => {
         `Failed to retrieve site documents by site ID: ${siteId}`,
       );
       jest.spyOn(siteDocsRepository, 'find').mockRejectedValueOnce(mockError);
-
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
       await expect(
-        service.getSiteDocumentsBySiteId(siteId, false),
+        service.getSiteDocumentsBySiteId(siteId, false, user),
       ).rejects.toThrow(mockError);
     });
   });
@@ -218,8 +238,10 @@ describe('DocumentService', () => {
       },
     ];
     jest.spyOn(siteDocsRepository, 'find').mockResolvedValueOnce(mockSiteDocs);
-
-    const result = await service.getSiteDocumentsBySiteId(siteId, false);
+    const user = {
+      identity_provider: UserTypeEum.IDIR,
+    };
+    const result = await service.getSiteDocumentsBySiteId(siteId, false, user);
 
     expect(result).toBeDefined();
     expect(Array.isArray(result)).toBeTruthy();

@@ -168,6 +168,7 @@ export class SnapshotsService {
           eventId: notationId,
           srAction: SRApprovalStatusEnum.PUBLIC,
         },
+        relations: ['psnorg'], // Load related 'psnorg' data to include displayName
       });
     } catch (error) {
       this.sitesLogger.log(
@@ -213,8 +214,20 @@ export class SnapshotsService {
       this.sitesLogger.log(
         'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
       );
+
       return await this.siteParticipantsRepo.find({
-        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
+        join: {
+          alias: 'siteParticipant',
+          innerJoinAndSelect: {
+            siteParticRoles: 'siteParticipant.siteParticRoles',
+          },
+        },
+        where: {
+          siteId,
+          srAction: SRApprovalStatusEnum.PUBLIC, // Condition for the main table
+          siteParticRoles: { srAction: SRApprovalStatusEnum.PUBLIC }, // Condition for related 'siteParticRoles'
+        },
       });
     } catch (error) {
       this.sitesLogger.log(
@@ -237,7 +250,20 @@ export class SnapshotsService {
         'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
       );
       return await this.siteDocumentsRepo.find({
-        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
+        join: {
+          alias: 'siteDocument',
+          innerJoinAndSelect: {
+            siteDocPartics: 'siteDocument.siteDocPartics',
+          },
+        },
+        where: {
+          siteId, // Filter for main table
+          srAction: SRApprovalStatusEnum.PUBLIC, // Filter for main table
+          siteDocPartics: {
+            srAction: SRApprovalStatusEnum.PUBLIC, // Filter for related siteDocPartics
+          },
+        },
       });
     } catch (error) {
       this.sitesLogger.log(
@@ -352,6 +378,7 @@ export class SnapshotsService {
       const createSnapShotContent = inputDto.map(async (dto) => {
         if (dto) {
           const { siteId } = dto;
+          let eventPartics = [];
           if (siteId !== '') {
             const snapShotContent: SnapshotSiteContent =
               new SnapshotSiteContent();
@@ -365,12 +392,16 @@ export class SnapshotsService {
 
             await Promise.all(
               snapShotContent.events.map(async (event) => {
-                snapShotContent.eventsParticipants =
+                let response =
                   await this.getNotatioParticipantsForSnapshotCreation(
                     event.id,
                   );
+                if (response?.length > 0) {
+                  eventPartics.push(...response);
+                }
               }),
             );
+            snapShotContent.eventsParticipants = eventPartics;
 
             snapShotContent.siteParticipants =
               await this.getSiteParticipantsForSnapshotCreation(siteId);

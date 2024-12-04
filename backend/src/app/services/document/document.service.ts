@@ -7,6 +7,8 @@ import { DocumentDto } from '../../dto/document.dto';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { LoggerService } from '../../logger/logger.service';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { SnapshotsService } from '../snapshot/snapshot.service';
+import { UserTypeEum } from '../../common/userType';
 
 @Injectable()
 export class DocumentService {
@@ -14,6 +16,7 @@ export class DocumentService {
     @InjectRepository(SiteDocs)
     private siteDocsRepository: Repository<SiteDocs>,
     private readonly sitesLogger: LoggerService,
+    private snapshotService: SnapshotsService,
   ) {}
 
   /**
@@ -22,23 +25,47 @@ export class DocumentService {
    * @returns A promise that resolves to an array of DocumentDto objects.
    * @throws Error if there is an issue retrieving the data.
    */
-  async getSiteDocumentsBySiteId(siteId: string, showPending: boolean) {
+  async getSiteDocumentsBySiteId(
+    siteId: string,
+    showPending: boolean,
+    user: any,
+  ) {
     try {
       this.sitesLogger.log('DocumentService.getSiteDocumentsBySiteId() start');
       this.sitesLogger.debug(
         'DocumentService.getSiteDocumentsBySiteId() start',
       );
       let result: SiteDocs[] = [];
-      if (showPending) {
-        result = await this.siteDocsRepository.find({
-          where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
-          relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
-        });
+      if (user?.identity_provider === UserTypeEum.IDIR) {
+        if (showPending) {
+          result = await this.siteDocsRepository.find({
+            where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
+            relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
+          });
+        } else {
+          result = await this.siteDocsRepository.find({
+            where: { siteId },
+            relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
+          });
+        }
       } else {
-        result = await this.siteDocsRepository.find({
-          where: { siteId },
-          relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
-        });
+        const userId: string = user?.sub ? user.sub : '';
+        if (userId?.length === 0) {
+          this.sitesLogger.log(
+            'An invalid user was passed into DocumentService.getSiteDocumentsBySiteId() end',
+          );
+          return [];
+        } else {
+          const snapshot = await this.snapshotService.getMostRecentSnapshot(
+            siteId,
+            userId,
+          );
+          if (!snapshot) {
+            return [];
+          } else {
+            result = snapshot?.snapshotData?.documents;
+          }
+        }
       }
 
       // Process and format the documents

@@ -88,8 +88,6 @@ export type Cart = {
 export type CartDto = {
   price: Scalars['Float']['input'];
   siteId: Scalars['String']['input'];
-  userId: Scalars['String']['input'];
-  whoCreated: Scalars['String']['input'];
 };
 
 export type CartDeleteDto = {
@@ -703,11 +701,6 @@ export type QueryGetAssociatedSitesBySiteIdArgs = {
 
 export type QueryGetBannerTypeArgs = {
   siteId: Scalars['String']['input'];
-};
-
-
-export type QueryGetCartItemsForUserArgs = {
-  userId: Scalars['String']['input'];
 };
 
 
@@ -1358,6 +1351,13 @@ export type MapSearch_FindSiteBySiteIdQueryVariables = Exact<{
 
 export type MapSearch_FindSiteBySiteIdQuery = { __typename?: 'Query', findSiteBySiteId: { __typename?: 'FetchSiteDetail', data?: { __typename?: 'Sites', id: string, addrLine_1: string, addrLine_2?: string | null, addrLine_3?: string | null, addrLine_4?: string | null, city: string, latdeg?: number | null, longdeg?: number | null, latDegrees?: number | null, latMinutes?: number | null, latSeconds?: number | null, longDegrees?: number | null, longMinutes?: number | null, longSeconds?: number | null, generalDescription?: string | null, siteRiskCode: string } | null } };
 
+export type MapSearch_AddCartItemMutationVariables = Exact<{
+  siteId: Scalars['String']['input'];
+}>;
+
+
+export type MapSearch_AddCartItemMutation = { __typename?: 'Mutation', addCartItem: { __typename?: 'CartResponse', success?: boolean | null } };
+
 
 export const Folio_GetFolioItemsForUserDocument = gql`
     query Folio_getFolioItemsForUser {
@@ -1542,3 +1542,36 @@ export type MapSearch_FindSiteBySiteIdQueryHookResult = ReturnType<typeof useMap
 export type MapSearch_FindSiteBySiteIdLazyQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdLazyQuery>;
 export type MapSearch_FindSiteBySiteIdSuspenseQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdSuspenseQuery>;
 export type MapSearch_FindSiteBySiteIdQueryResult = Apollo.QueryResult<MapSearch_FindSiteBySiteIdQuery, MapSearch_FindSiteBySiteIdQueryVariables>;
+export const MapSearch_AddCartItemDocument = gql`
+    mutation MapSearch_addCartItem($siteId: String!) {
+  addCartItem(cartDTO: {siteId: $siteId, price: 0}) {
+    success
+  }
+}
+    `;
+export type MapSearch_AddCartItemMutationFn = Apollo.MutationFunction<MapSearch_AddCartItemMutation, MapSearch_AddCartItemMutationVariables>;
+
+/**
+ * __useMapSearch_AddCartItemMutation__
+ *
+ * To run a mutation, you first call `useMapSearch_AddCartItemMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMapSearch_AddCartItemMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [mapSearchAddCartItemMutation, { data, loading, error }] = useMapSearch_AddCartItemMutation({
+ *   variables: {
+ *      siteId: // value for 'siteId'
+ *   },
+ * });
+ */
+export function useMapSearch_AddCartItemMutation(baseOptions?: Apollo.MutationHookOptions<MapSearch_AddCartItemMutation, MapSearch_AddCartItemMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MapSearch_AddCartItemMutation, MapSearch_AddCartItemMutationVariables>(MapSearch_AddCartItemDocument, options);
+      }
+export type MapSearch_AddCartItemMutationHookResult = ReturnType<typeof useMapSearch_AddCartItemMutation>;
+export type MapSearch_AddCartItemMutationResult = Apollo.MutationResult<MapSearch_AddCartItemMutation>;
+export type MapSearch_AddCartItemMutationOptions = Apollo.BaseMutationOptions<MapSearch_AddCartItemMutation, MapSearch_AddCartItemMutationVariables>;

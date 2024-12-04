@@ -62,7 +62,7 @@ const SearchInput: React.FC<ISearchInput> = ({
               <MagnifyingGlassIcon />
             </span>
           )}
-          <div>
+          <div className="w-100">
             <input
               id={searchId}
               data-testid={searchId}

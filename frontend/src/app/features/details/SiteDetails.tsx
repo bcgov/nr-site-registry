@@ -89,7 +89,7 @@ import {
   updateRequestStatus,
 } from './srUpdates/srUpdatesSlice';
 import { fetchLandUseCodes } from './landUses/LandUsesSlice';
-import { IFetchParcelDescriptionParams } from './parcelDescriptions/parcelDescriptionsSlice';
+import { IFetchParcelDescriptionsParams } from './parcelDescriptions/parcelDescriptionsInterfaces';
 import {
   bulkAproveRejectChanges,
   bulkUpdateApproveRejectStatus,
@@ -321,7 +321,7 @@ const SiteDetails = () => {
 
   const checkForRecordsPendingReview = (siteId: string) => {
     if (siteId && siteId !== '' && isUserOfType(UserRoleType.SR)) {
-      const params: IFetchParcelDescriptionParams = {
+      const params: IFetchParcelDescriptionsParams = {
         siteId: parseInt(siteId),
         page: 1,
         pageSize: 1000,

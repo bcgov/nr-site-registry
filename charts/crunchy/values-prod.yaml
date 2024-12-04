@@ -10,13 +10,13 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     backupPath: /backups/prod/cluster/version # change it for PROD, create values-prod.yaml
     s3:
       enabled: true
-      retention: 14 # one weeks backup in object store for prod environment
+      retention: 7 # one week backup in object store for prod environment
       bucket: nrsiteprd
       endpoint: nrs.objectstore.gov.bc.ca
       accessKey: ~
       secretKey: ~
       fullBackupSchedule: 0 0/4 * * * # full backup every 4 hours
-      incrementalBackupSchedule: 15,30,45 * * * * # every fifteen minutes except 0th 
+      incrementalBackupSchedule: 0 1,6,11,17,23 * * * * # incremental backup every 5 hours
     pvc:
       volume:
         storage: 1024Mi

@@ -1,6 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { FormFieldType, IFormField } from './IFormField';
-import infoIcon from '../../images/info-icon.png';
 import { formatDate, formatDateRange } from '../../helpers/utility';
 import { DatePicker, DateRangePicker } from 'rsuite';
 import {
@@ -558,12 +563,21 @@ export const DateRangeInput: React.FC<InputProps> = ({
   const ContainerElement = tableMode ? 'td' : 'div';
   let dateRangeValue;
   if (value.length > 0) {
-    dateRangeValue = formatDateRange(value);
+    const [startDate, endDate] = value;
+    const isStartDateValid =
+      startDate instanceof Date && !isNaN(startDate.getTime());
+    const isEndDateValid = endDate instanceof Date && !isNaN(endDate.getTime());
+    if (isStartDateValid && isEndDateValid) {
+      dateRangeValue = formatDateRange(value);
+    } else {
+      dateRangeValue = ''; // Set an empty string or fallback value if invalid
+    }
   }
 
   const handleCheckBoxChange = (isChecked: boolean) => {
     onChange(isChecked);
   };
+
   // Replace any spaces in the label with underscores to create a valid id
   const dateRangeId = label.replace(/\s+/g, '_') + '_' + v4();
   return (
@@ -600,11 +614,12 @@ export const DateRangeInput: React.FC<InputProps> = ({
           aria-label={label}
           className={` w-100  ${customPlaceholderCss ?? ''} ${customEditInputTextCss ?? 'custom-date-range'}`}
           placeholder={placeholder}
-          format="MM/dd/yy"
+          format="MM/dd/yyyy"
           character=" - "
           caretAs={CalendarIcon}
           value={value ?? []}
           onChange={(value) => onChange(value)}
+          editable={true}
         />
       ) : (
         <span
@@ -646,6 +661,17 @@ export const DateInput: React.FC<InputProps> = ({
     onChange(isChecked);
   };
 
+  const handleDateChange = (newDate: Date | null) => {
+    // Check if the new value is a valid date
+    if (newDate instanceof Date && !isNaN(newDate.getTime())) {
+      // Pass valid date to the parent onChange function
+      onChange(newDate);
+    } else {
+      // Handle invalid date entry (Optional: error message, etc.)
+      onChange(null); // Optionally set the value to null if invalid
+    }
+  };
+
   // Replace any spaces in the label with underscores to create a valid id
   const dateRangeId = label.replace(/\s+/g, '_') + '_' + v4();
   return (
@@ -681,10 +707,10 @@ export const DateInput: React.FC<InputProps> = ({
           aria-label={label}
           className={` w-100  ${customPlaceholderCss ?? ''} ${customEditInputTextCss ?? 'custom-date-range'}`}
           placeholder={placeholder}
-          format="MMMM d, yyyy"
+          format="MMM dd, yyyy"
           caretAs={CalendarIcon}
           value={value ?? null}
-          onChange={(value) => onChange(value)}
+          onChange={handleDateChange}
           oneTap
           readOnly={isDisabled}
         />
@@ -1047,7 +1073,10 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   const divRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [hasinfoMsg, setHasInfoMsg] = useState<React.ReactNode | null>(null);
-
+  const [menuPositionStyle, setMenuPositionStyle] = useState<CSSProperties>({
+    top: '0px',
+    left: '0px',
+  });
   useEffect(() => {
     if (React.isValidElement(customInfoMessage)) {
       const elementProps = (customInfoMessage as React.ReactElement).props;
@@ -1118,18 +1147,56 @@ export const SearchCustomInput: React.FC<InputProps> = ({
 
   const adjustMenuPosition = () => {
     if (inputRef.current && divRef.current) {
-      const rect = inputRef.current.getBoundingClientRect();
-      const menuHeight = divRef.current.offsetHeight + 100;
-      const windowHeight = window.innerHeight;
+      const rect = inputRef.current.getBoundingClientRect(); // Get the position of the input
+      const menuHeight = divRef.current.offsetHeight; // Height of the dropdown menu
+      const menuWidth = divRef.current.offsetWidth; // Width of the dropdown menu
+      const windowHeight = window.innerHeight; // Height of the window
+      const windowWidth = window.innerWidth; // Width of the window
+      const windowScrollTop = window.scrollY; // Scroll position (for handling scrolling)
 
-      // Check if there's enough space below the input
-      if (windowHeight - rect.bottom < menuHeight) {
-        setMenuPosition('top'); // Not enough space below, position above
-      } else {
-        setMenuPosition('bottom'); // Enough space below, position below
+      // Calculate available space
+      const spaceBelow = windowHeight - rect.bottom; // Space available below the input
+      const spaceAbove = rect.top; // Space available above the input
+
+      // Position for the dropdown (it will initially open below the input)
+      let menuTop = rect.bottom + windowScrollTop; // Position the menu below the input
+      let menuLeft = rect.left + window.scrollX; // Align the left side of the dropdown with the input
+
+      // If there's not enough space below the input, position the menu above
+      if (spaceBelow < menuHeight && spaceAbove >= menuHeight) {
+        menuTop = rect.top + windowScrollTop - menuHeight; // Position the menu above
       }
+
+      // If there's insufficient space on the left or right, adjust left position
+      if (rect.left + menuWidth > windowWidth) {
+        menuLeft = windowWidth - menuWidth; // Align to the right side of the screen
+      }
+
+      // Dynamically apply 'top' or 'bottom' positioning depending on the available space
+      let positionStyle: CSSProperties = {
+        top: `${menuTop}px`,
+        left: `${menuLeft}px`,
+        width: `${rect.width}px`, // Ensure the menu width matches the input field's width
+      };
+
+      setMenuPositionStyle(positionStyle); // Update the state with the new position
     }
   };
+
+  // Handle window resize
+  const handleWindowResize = useCallback(() => {
+    if (isOpen) {
+      adjustMenuPosition(); // Recalculate position on window resize
+    }
+  }, [isOpen]);
+
+  // Add event listener for window resize
+  useEffect(() => {
+    window.addEventListener('resize', handleWindowResize);
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, [handleWindowResize]);
 
   // Function to handle clicks outside the div element
   const handleClickOutside = (event: MouseEvent) => {
@@ -1174,7 +1241,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
         </label>
       )}
       {isEditing ? (
-        <div className="d-flex align-items-center justify-content-center w-100 position-relative custom-search-box-container ">
+        <div className="d-flex align-items-center justify-content-center w-100 ">
           <input
             ref={inputRef}
             type={type}
@@ -1190,93 +1257,92 @@ export const SearchCustomInput: React.FC<InputProps> = ({
             aria-label={label} // Accessibility
             required={error ? true : false}
           />
-          {value.length <= 0 ? (
-            <span
-              id="right-icon"
-              data-testid="right-icon"
-              className={`${customRightIconCss ?? 'custom-search-icon-position custom-search-icon position-absolute px-2'}`}
-            >
-              <MagnifyingGlassIcon />
-            </span>
-          ) : (
-            <span
-              data-testid="left-icon"
-              id="left-icon"
-              className={`${customLeftIconCss ?? 'custom-clear-icon-position custom-search-icon position-absolute px-2'}`}
-              onClick={closeSearch}
-            >
-              <CircleXMarkIcon />
-            </span>
-          )}
+          <div className="d-flex align-items-center justify-content-center position-relative custom-search-box-container ">
+            {value.length <= 0 ? (
+              <span
+                id="right-icon"
+                data-testid="right-icon"
+                className={`${customRightIconCss ?? 'custom-search-icon-position custom-search-icon position-absolute px-2'}`}
+              >
+                <MagnifyingGlassIcon />
+              </span>
+            ) : (
+              <span
+                data-testid="left-icon"
+                id="left-icon"
+                className={`${customLeftIconCss ?? 'custom-clear-icon-position custom-search-icon position-absolute px-2'}`}
+                onClick={closeSearch}
+              >
+                <CircleXMarkIcon />
+              </span>
+            )}
+          </div>
 
           {/* Dropdown menu */}
-          {
-            options && options?.length >= 0 && isOpen && (
-              // <div className='position-relative'>
-              <div
-                id="menu"
-                className={`custom-search-input-menu  ${
-                  menuPosition === 'bottom'
-                    ? 'custom-search-input-menu-bottom'
-                    : 'custom-search-input-menu-top'
-                }`}
-                role="menu"
-                aria-labelledby="search-input-dropdown"
-                ref={divRef}
-              >
-                {/* Language options */}
-                {options && options.length > 0 && (
-                  <>
-                    <div role="none">
-                      {/* Default option */}
-                      <div
-                        id="menu-item"
-                        className="custom-search-input-item-first-child w-100"
-                        role="menuitem"
-                        aria-disabled="true"
-                        tabIndex={-1} // Prevent tab focus on disabled items
-                      >
-                        <div className="custom-search-input-item-label pb-1">
-                          {customMenuMessage && customMenuMessage}
-                          {customInfoMessage && customInfoMessage}
-                        </div>
-                      </div>
-                    </div>
-                    <hr className="m-0 custom-horizontal-line" />
-                  </>
-                )}
-                {isLoading === RequestStatus.loading && isOpen ? (
-                  <div className="custom-loading-overlay">
-                    <div className="text-center">
-                      <SpinnerIcon
-                        data-testid="loading-spinner"
-                        className="custom-fa-spin"
-                      />
-                    </div>
-                  </div>
-                ) : options && options.length > 0 ? (
-                  options.map((item) => (
+          {options && options?.length >= 0 && isOpen && (
+            <div
+              id="menu"
+              className={`custom-search-input-menu  ${
+                menuPosition === 'bottom'
+                  ? 'custom-search-input-menu-bottom'
+                  : 'custom-search-input-menu-top'
+              }`}
+              style={menuPositionStyle}
+              role="menu"
+              aria-labelledby="search-input-dropdown"
+              ref={divRef}
+            >
+              {/* Language options */}
+              {options && options.length > 0 && (
+                <>
+                  <div role="none">
+                    {/* Default option */}
                     <div
                       id="menu-item"
-                      className="custom-search-input-item d-flex align-items-center w-100"
+                      className="custom-search-input-item-first-child w-100"
                       role="menuitem"
-                      aria-label={item.value}
-                      tabIndex={0} // Allow keyboard focus
-                      key={item.key}
-                      onClick={() => {
-                        handleSelectInputChange(item);
-                      }}
+                      aria-disabled="true"
+                      tabIndex={-1} // Prevent tab focus on disabled items
                     >
-                      <span>{item.value}</span>
+                      <div className="custom-search-input-item-label pb-1">
+                        {customMenuMessage && customMenuMessage}
+                        {customInfoMessage && customInfoMessage}
+                      </div>
                     </div>
-                  ))
-                ) : (
-                  <div className="p-2">{customInfoMessage}</div>
-                )}
-              </div>
-            )
-            // </div>
-          }
+                  </div>
+                  <hr className="m-0 custom-horizontal-line" />
+                </>
+              )}
+              {isLoading === RequestStatus.loading && isOpen ? (
+                <div className="custom-loading-overlay">
+                  <div className="text-center">
+                    <SpinnerIcon
+                      data-testid="loading-spinner"
+                      className="custom-fa-spin"
+                    />
+                  </div>
+                </div>
+              ) : options && options.length > 0 ? (
+                options.map((item) => (
+                  <div
+                    id="menu-item"
+                    className="custom-search-input-item d-flex align-items-center w-100"
+                    role="menuitem"
+                    aria-label={item.value}
+                    tabIndex={0} // Allow keyboard focus
+                    key={item.key}
+                    onClick={() => {
+                      handleSelectInputChange(item);
+                    }}
+                  >
+                    <span>{item.value}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="p-2">{customInfoMessage}</div>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         <span className={`d-flex ${customInputTextCss ?? ''}`}>{value}</span>

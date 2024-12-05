@@ -6,9 +6,13 @@ import { NotationService } from './notation.service';
 import { Events } from '../../entities/events.entity';
 import { EventPartics } from '../../entities/eventPartics.entity';
 import { LoggerService } from '../../logger/logger.service';
+import { UserTypeEum } from '../../common/userType';
+import { SnapshotsService } from '../snapshot/snapshot.service';
 
+jest.mock('../snapshot/snapshot.service');
 describe('NotationService', () => {
   let service: NotationService;
+  let snapshotService: SnapshotsService;
   let notationRepository: Repository<Events>;
   let notationParticRepository: Repository<EventPartics>;
   let sitesLogger: LoggerService;
@@ -18,6 +22,7 @@ describe('NotationService', () => {
       providers: [
         NotationService,
         LoggerService,
+        SnapshotsService,
         {
           provide: getRepositoryToken(Events),
           useClass: Repository,
@@ -30,6 +35,7 @@ describe('NotationService', () => {
     }).compile();
 
     service = module.get<NotationService>(NotationService);
+    snapshotService = module.get<SnapshotsService>(SnapshotsService);
     sitesLogger = module.get<LoggerService>(LoggerService);
     notationRepository = module.get<Repository<Events>>(
       getRepositoryToken(Events),
@@ -125,8 +131,10 @@ describe('NotationService', () => {
       jest
         .spyOn(notationParticRepository, 'find')
         .mockResolvedValueOnce(mockEvents[0].eventPartics);
-
-      const result = await service.getSiteNotationBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await service.getSiteNotationBySiteId(siteId, false, user);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -142,8 +150,10 @@ describe('NotationService', () => {
     it('should return empty array when siteId does not exist', async () => {
       const siteId = 'nonExistentSite';
       jest.spyOn(notationRepository, 'find').mockResolvedValueOnce([]);
-
-      const result = await service.getSiteNotationBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await service.getSiteNotationBySiteId(siteId, false, user);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -156,9 +166,11 @@ describe('NotationService', () => {
         `Failed to retrieve site notations by site ID: ${siteId}`,
       );
       jest.spyOn(notationRepository, 'find').mockRejectedValueOnce(mockError);
-
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
       await expect(
-        service.getSiteNotationBySiteId(siteId, false),
+        service.getSiteNotationBySiteId(siteId, false, user),
       ).rejects.toThrow(mockError);
     });
 
@@ -273,8 +285,10 @@ describe('NotationService', () => {
       jest
         .spyOn(notationParticRepository, 'find')
         .mockResolvedValueOnce(mockEvents[0].eventPartics);
-
-      const result = await service.getSiteNotationBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await service.getSiteNotationBySiteId(siteId, false, user);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -286,8 +300,10 @@ describe('NotationService', () => {
     it('should return empty array when no events are found for siteId', async () => {
       const siteId = 'site_without_events';
       jest.spyOn(notationRepository, 'find').mockResolvedValueOnce([]);
-
-      const result = await service.getSiteNotationBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await service.getSiteNotationBySiteId(siteId, false, user);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -375,8 +391,10 @@ describe('NotationService', () => {
       jest
         .spyOn(notationParticRepository, 'find')
         .mockResolvedValueOnce(mockEvents[0].eventPartics);
-
-      const result = await service.getSiteNotationBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await service.getSiteNotationBySiteId(siteId, false, user);
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBeTruthy();
@@ -397,9 +415,11 @@ describe('NotationService', () => {
         `Failed to retrieve site notations by site ID: ${siteId}`,
       );
       jest.spyOn(notationRepository, 'find').mockRejectedValueOnce(mockError);
-
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
       await expect(
-        service.getSiteNotationBySiteId(siteId, false),
+        service.getSiteNotationBySiteId(siteId, false, user),
       ).rejects.toThrow(mockError);
     });
   });

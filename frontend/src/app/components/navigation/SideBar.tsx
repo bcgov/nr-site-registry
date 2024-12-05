@@ -29,7 +29,7 @@ function SideBar() {
   }, [user]);
 
   useEffect(() => {
-    dispatch(fetchCartItems(user?.profile.sub || ''));
+    dispatch(fetchCartItems());
   }, [cartItemAdded, cartItemDeleted, user]);
 
   useEffect(() => {

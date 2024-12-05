@@ -8,6 +8,8 @@ import { UserActionEnum } from '../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { EventPartics } from '../../entities/eventPartics.entity';
 import { LoggerService } from '../../logger/logger.service';
+import { SnapshotsService } from '../snapshot/snapshot.service';
+import { UserTypeEum } from '../../common/userType';
 
 @Injectable()
 export class NotationService {
@@ -16,6 +18,7 @@ export class NotationService {
     private notationRepository: Repository<Events>,
     @InjectRepository(EventPartics)
     private notationParticRepository: Repository<EventPartics>,
+    private snapshotService: SnapshotsService,
     private readonly sitesLogger: LoggerService,
   ) {}
 
@@ -26,49 +29,79 @@ export class NotationService {
    * @returns An array of NotationDto objects, each containing event and participant details.
    * @throws Error if there's an issue retrieving the data.
    */
-  async getSiteNotationBySiteId(siteId: string, showPending: boolean) {
+  async getSiteNotationBySiteId(
+    siteId: string,
+    showPending: boolean,
+    user: any,
+  ) {
     this.sitesLogger.log('NotationService.getSiteNotationBySiteId() start');
     this.sitesLogger.debug('NotationService.getSiteNotationBySiteId() start');
 
     try {
       // Retrieve events associated with the given siteId
       let events: Events[] = [];
+      let eventPartics: EventPartics[] = [];
+      if (user?.identity_provider === UserTypeEum.IDIR) {
+        if (showPending) {
+          events = await this.notationRepository.find({
+            where: { siteId, userAction: UserActionEnum.UPDATED },
+          });
+        } else {
+          events = await this.notationRepository.find({ where: { siteId } });
+        }
 
-      if (showPending) {
-        events = await this.notationRepository.find({
-          where: { siteId, userAction: UserActionEnum.UPDATED },
-        });
+        if (events?.length > 0) {
+          // Extract event IDs to fetch related participants in a single query
+          const eventIds = events.map((event) => event.id);
+
+          // Fetch event participants related to the retrieved events
+          eventPartics = await this.notationParticRepository.find({
+            where: { eventId: In(eventIds) },
+            relations: ['psnorg'], // Load related 'psnorg' data to include displayName
+          });
+        }
       } else {
-        events = await this.notationRepository.find({ where: { siteId } });
+        const userId: string = user?.sub ? user.sub : '';
+        if (userId?.length === 0) {
+          this.sitesLogger.log(
+            'An invalid user was passed into NotationService.getSiteNotationBySiteId() end',
+          );
+          return [];
+        } else {
+          const snapshot = await this.snapshotService.getMostRecentSnapshot(
+            siteId,
+            userId,
+          );
+          if (!snapshot) {
+            return [];
+          } else {
+            events = snapshot?.snapshotData?.events;
+            eventPartics =
+              events.length > 0 && snapshot?.snapshotData?.eventsParticipants;
+          }
+        }
       }
 
       // If no events are found, return an empty array
       if (!events?.length) {
         return [];
       } else {
-        // Extract event IDs to fetch related participants in a single query
-        const eventIds = events.map((event) => event.id);
-
-        // Fetch event participants related to the retrieved events
-        const eventPartics = await this.notationParticRepository.find({
-          where: { eventId: In(eventIds) },
-          relations: ['psnorg'], // Load related 'psnorg' data to include displayName
-        });
-
         // Create a mapping from event ID to its participants for quick lookup
-        const eventParticsMap = eventPartics.reduce(
-          (map, partic) => {
-            if (!map[partic.eventId]) {
-              map[partic.eventId] = [];
-            }
-            map[partic.eventId].push(partic);
-            return map;
-          },
-          {} as { [key: string]: EventPartics[] },
-        );
+        const eventParticsMap =
+          eventPartics.length > 0 &&
+          eventPartics?.reduce(
+            (map, partic) => {
+              if (!map[partic.eventId]) {
+                map[partic.eventId] = [];
+              }
+              map[partic.eventId].push(partic);
+              return map;
+            },
+            {} as { [key: string]: EventPartics[] },
+          );
 
         // Transform events and their participants
-        const transformedObjects = events.map((event) => {
+        const transformedObjects = events?.map((event) => {
           // Get participants for the current event
           const eventParticsForEvent = eventParticsMap[event.id] || [];
 
@@ -90,7 +123,7 @@ export class NotationService {
             userAction: event.userAction ?? UserActionEnum.DEFAULT,
             srAction:
               event.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
-            notationParticipant: eventParticsForEvent.map((partic) => ({
+            notationParticipant: eventParticsForEvent?.map((partic) => ({
               eventParticId: partic.id,
               eventId: partic.eventId,
               spId: partic.spId,

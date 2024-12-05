@@ -9,6 +9,8 @@ export enum SiteDetailsMode {
 export enum SiteActionBtn {
   ApproveAll = 'approve_all',
   RejectAll = 'reject_all',
+  SAVE = 'save',
+  CANCEL = 'cancel',
 }
 
 export interface SaveSiteDetails {

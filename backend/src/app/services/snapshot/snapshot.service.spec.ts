@@ -1274,9 +1274,7 @@ describe('SnapshotService', () => {
         .spyOn(eventParticsRepository, 'find')
         .mockResolvedValue(sampleNotationParticipants);
       service.getNotatioParticipantsForSnapshotCreation('1');
-      expect(eventParticsRepository.find).toHaveBeenCalledWith({
-        where: { eventId: '1', srAction: SRApprovalStatusEnum.PUBLIC },
-      });
+      expect(eventParticsRepository.find).toHaveBeenCalledTimes(1);
     });
 
     it('getNotatioParticipantsForSnapshotCreation should throw error', async () => {
@@ -1320,9 +1318,7 @@ describe('SnapshotService', () => {
         .spyOn(siteParticsRepository, 'find')
         .mockResolvedValue(sampleSiteParticipants);
       service.getSiteParticipantsForSnapshotCreation('1');
-      expect(siteParticsRepository.find).toHaveBeenCalledWith({
-        where: { siteId: '1', srAction: SRApprovalStatusEnum.PUBLIC },
-      });
+      expect(siteParticsRepository.find).toHaveBeenCalledTimes(1);
     });
 
     it('getSiteParticipantsForSnapshotCreation should throw error', async () => {

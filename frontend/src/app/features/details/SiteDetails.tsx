@@ -433,6 +433,12 @@ const SiteDetails = () => {
         //     }),
         //   );
         break;
+      case SiteActionBtn.SAVE:
+        setSave(true);
+        break;
+      case SiteActionBtn.CANCEL:
+        handleCancelButton();
+        break;
       default:
         break;
     }
@@ -580,19 +586,39 @@ const SiteDetails = () => {
               )}
 
             {/* For Edit / SR Dropdown*/}
-            <div className="d-flex gap-3 align-items-center">
+            <div className="gap-3 align-items-center d-none d-md-flex d-lg-flex d-xl-flex">
               {edit && userType === UserType.Internal && (
                 <>
                   <CustomLabel
                     labelType="c-b"
                     label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
                   />
-                  <SaveButton clickHandler={() => setSave(true)} />
+                  <SaveButton
+                    variant="light"
+                    clickHandler={() => setSave(true)}
+                  />
                   <CancelButton clickHandler={handleCancelButton} />
                 </>
               )}
             </div>
-
+            {edit && userType === UserType.Internal && (
+              <div className="d-flex d-md-none d-lg-none d-xl-none">
+                <Actions
+                  label="Actions"
+                  items={[
+                    {
+                      label: 'Save',
+                      value: 'save',
+                    },
+                    {
+                      label: 'Cancel',
+                      value: 'cancel',
+                    },
+                  ]}
+                  onItemClick={handleItemClick}
+                />
+              </div>
+            )}
             {/* For Cart /Folio Controls*/}
             {!edit &&
               viewMode === SiteDetailsMode.ViewOnlyMode &&
@@ -683,19 +709,39 @@ const SiteDetails = () => {
                 )}
 
               {/* For Edit / SR Dropdown*/}
-              <div className="d-flex gap-3 align-items-center">
+              <div className="gap-3 align-items-center d-none d-md-flex d-lg-flex d-xl-flex">
                 {edit && userType === UserType.Internal && (
                   <>
                     <CustomLabel
                       labelType="c-b"
                       label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
                     />
-                    <SaveButton clickHandler={() => setSave(true)} />
+                    <SaveButton
+                      variant="light"
+                      clickHandler={() => setSave(true)}
+                    />
                     <CancelButton clickHandler={handleCancelButton} />
                   </>
                 )}
               </div>
-
+              {edit && userType === UserType.Internal && (
+                <div className="d-flex d-md-none d-lg-none d-xl-none">
+                  <Actions
+                    label="Actions"
+                    items={[
+                      {
+                        label: 'Save',
+                        value: 'save',
+                      },
+                      {
+                        label: 'Cancel',
+                        value: 'cancel',
+                      },
+                    ]}
+                    onItemClick={handleItemClick}
+                  />
+                </div>
+              )}
               {/* For Cart /Folio Controls*/}
               {!edit &&
                 viewMode === SiteDetailsMode.ViewOnlyMode &&

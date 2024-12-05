@@ -7,6 +7,7 @@ interface ButtonProps {
   clickHandler: (event: React.MouseEvent<HTMLButtonElement>) => void;
   label?: string;
   showIcon?: boolean;
+  isDisabled?: boolean;
   variant?: ButtonVariant;
 }
 
@@ -20,10 +21,11 @@ export const SaveButton: React.FC<ButtonProps> = ({
   label,
   showIcon,
   variant,
+  isDisabled,
 }) => {
   showIcon = showIcon ?? true;
   return (
-    <Button variant={variant} onClick={clickHandler}>
+    <Button variant={variant} onClick={clickHandler} disabled={isDisabled}>
       {showIcon && <FloppyDisk />}
       {label && label !== '' ? label : 'Save'}
     </Button>

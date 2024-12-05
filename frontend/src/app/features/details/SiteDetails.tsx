@@ -89,7 +89,7 @@ import {
   updateRequestStatus,
 } from './srUpdates/srUpdatesSlice';
 import { fetchLandUseCodes } from './landUses/LandUsesSlice';
-import { IFetchParcelDescriptionParams } from './parcelDescriptions/parcelDescriptionsSlice';
+import { IFetchParcelDescriptionsParams } from './parcelDescriptions/parcelDescriptionsInterfaces';
 import {
   bulkAproveRejectChanges,
   bulkUpdateApproveRejectStatus,
@@ -321,7 +321,7 @@ const SiteDetails = () => {
 
   const checkForRecordsPendingReview = (siteId: string) => {
     if (siteId && siteId !== '' && isUserOfType(UserRoleType.SR)) {
-      const params: IFetchParcelDescriptionParams = {
+      const params: IFetchParcelDescriptionsParams = {
         siteId: parseInt(siteId),
         page: 1,
         pageSize: 1000,
@@ -432,6 +432,12 @@ const SiteDetails = () => {
         //       fromSiteDetails: true
         //     }),
         //   );
+        break;
+      case SiteActionBtn.SAVE:
+        setSave(true);
+        break;
+      case SiteActionBtn.CANCEL:
+        handleCancelButton();
         break;
       default:
         break;
@@ -580,19 +586,39 @@ const SiteDetails = () => {
               )}
 
             {/* For Edit / SR Dropdown*/}
-            <div className="d-flex gap-3 align-items-center">
+            <div className="gap-3 align-items-center d-none d-md-flex d-lg-flex d-xl-flex">
               {edit && userType === UserType.Internal && (
                 <>
                   <CustomLabel
                     labelType="c-b"
                     label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
                   />
-                  <SaveButton clickHandler={() => setSave(true)} />
+                  <SaveButton
+                    variant="light"
+                    clickHandler={() => setSave(true)}
+                  />
                   <CancelButton clickHandler={handleCancelButton} />
                 </>
               )}
             </div>
-
+            {edit && userType === UserType.Internal && (
+              <div className="d-flex d-md-none d-lg-none d-xl-none">
+                <Actions
+                  label="Actions"
+                  items={[
+                    {
+                      label: 'Save',
+                      value: 'save',
+                    },
+                    {
+                      label: 'Cancel',
+                      value: 'cancel',
+                    },
+                  ]}
+                  onItemClick={handleItemClick}
+                />
+              </div>
+            )}
             {/* For Cart /Folio Controls*/}
             {!edit &&
               viewMode === SiteDetailsMode.ViewOnlyMode &&
@@ -683,19 +709,39 @@ const SiteDetails = () => {
                 )}
 
               {/* For Edit / SR Dropdown*/}
-              <div className="d-flex gap-3 align-items-center">
+              <div className="gap-3 align-items-center d-none d-md-flex d-lg-flex d-xl-flex">
                 {edit && userType === UserType.Internal && (
                   <>
                     <CustomLabel
                       labelType="c-b"
                       label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
                     />
-                    <SaveButton clickHandler={() => setSave(true)} />
+                    <SaveButton
+                      variant="light"
+                      clickHandler={() => setSave(true)}
+                    />
                     <CancelButton clickHandler={handleCancelButton} />
                   </>
                 )}
               </div>
-
+              {edit && userType === UserType.Internal && (
+                <div className="d-flex d-md-none d-lg-none d-xl-none">
+                  <Actions
+                    label="Actions"
+                    items={[
+                      {
+                        label: 'Save',
+                        value: 'save',
+                      },
+                      {
+                        label: 'Cancel',
+                        value: 'cancel',
+                      },
+                    ]}
+                    onItemClick={handleItemClick}
+                  />
+                </div>
+              )}
               {/* For Cart /Folio Controls*/}
               {!edit &&
                 viewMode === SiteDetailsMode.ViewOnlyMode &&

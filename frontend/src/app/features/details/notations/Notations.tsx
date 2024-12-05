@@ -865,15 +865,49 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   };
 
   const handleNotationFormRowFirstChild = (metaData?: any) => {
+    const notationType = {
+      type: FormFieldType.DropDown,
+      label: 'Notation Type',
+      placeholder: 'Notation Type',
+      graphQLPropertyName: 'etypCode',
+      options: [],
+      value: '',
+      colSize: `${viewMode === SiteDetailsMode.EditMode ? 'col-lg-12 col-md-12 col-sm-12' : 'col-xxl-5 col-xl-5 col-lg-8 col-md-6 col-sm-12'}`,
+      customLabelCss: 'custom-notation-lbl-text',
+      customInputTextCss: 'custom-notation-input-text',
+      customEditLabelCss: 'custom-notation-edit-label',
+      customEditInputTextCss: 'custom-notation-edit-input',
+    };
+
+    const notationClass = {
+      type: FormFieldType.DropDown,
+      label: 'Notation Class',
+      placeholder: 'Notation Class',
+      graphQLPropertyName: 'eclsCode',
+      options: [],
+      value: '',
+      colSize: 'col-xxl-5 col-xl-5 col-lg-8 col-md-6 col-sm-12',
+      customLabelCss: 'custom-notation-lbl-text',
+      customInputTextCss: 'custom-notation-input-text',
+      customEditLabelCss: 'custom-notation-edit-label',
+      customEditInputTextCss: 'custom-notation-edit-input',
+    };
     if (metaData && metaData.requiredDate) {
       return updateOptionsBasedOnMetaData(
-        notationFormRowsFirstChildIsRequired,
+        viewMode === SiteDetailsMode.EditMode
+          ? [
+              [notationClass, ...notationFormRowsFirstChildIsRequired[0]],
+              [notationType],
+            ]
+          : [[notationType, ...notationFormRowsFirstChildIsRequired[0]]],
         metaData,
         'eclsCode',
       );
     } else {
       return updateOptionsBasedOnMetaData(
-        notationFormRowsFirstChild,
+        viewMode === SiteDetailsMode.EditMode
+          ? [[notationClass, ...notationFormRowsFirstChild[0]], [notationType]]
+          : [[notationType, ...notationFormRowsFirstChild[0]]],
         metaData,
         'eclsCode',
       );

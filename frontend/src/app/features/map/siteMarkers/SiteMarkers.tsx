@@ -20,10 +20,12 @@ export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
 
   const moveToSiteLocation = useCallback(
     (site: Site) => {
+      if (!site.latdeg || !site.longdeg) return;
+
       map.flyTo(
         {
-          lat: site.latdeg || 0,
-          lng: site.longdeg ? site.longdeg * -1 : 0,
+          lat: site.latdeg,
+          lng: site.longdeg,
         },
         Math.max(map.getZoom(), 14),
         {
@@ -45,13 +47,14 @@ export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
 
   const markers = useMemo(() => {
     return sites.map((site) => {
+      if (!site.latdeg || !site.longdeg) return null;
       return (
         <SiteMarker
           key={site.id}
           isSelected={site.id === selectedSiteId}
           position={{
-            lat: site.latdeg || 0,
-            lng: site.longdeg ? site.longdeg * -1 : 0,
+            lat: site.latdeg,
+            lng: site.longdeg,
           }}
           onClick={() => onSiteMarkerClick(site)}
         />

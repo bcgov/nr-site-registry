@@ -64,13 +64,21 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
           {children && <div className="custom-modal-data">{children}</div>}
           {!discardOption && (
             <div className="custom-modal-actions-footer">
-              <CancelButton clickHandler={handleClose} label={cancelBtnLabel} />
+              <CancelButton
+                variant="tertiary"
+                clickHandler={handleClose}
+                label={cancelBtnLabel}
+              />
               <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
             </div>
           )}
           {discardOption && (
             <div className="custom-modal-actions-footer">
-              <CancelButton clickHandler={handleClose} label={cancelBtnLabel} />
+              <CancelButton
+                variant="tertiary"
+                clickHandler={handleClose}
+                label={cancelBtnLabel}
+              />
               <DiscardButton
                 clickHandler={handleDiscard}
                 label={dicardBtnLabel}

@@ -1,11 +1,11 @@
-import { FC, useCallback, useMemo } from 'react';
-import { MapSearchQuery } from '../../../../graphql/generated';
+import { FC, useCallback, useContext, useMemo } from 'react';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { SiteMarker } from './SiteMarker';
-import { StringParam, useQueryParam } from 'use-query-params';
 import { useMap } from 'react-leaflet';
+import { getZoom, MAP_FLY_OPTIONS } from '../mapOptions';
+import { Site } from '../MapView';
+import { MapSearchQueryParamsContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
 
-type Site = MapSearchQuery['mapSearch']['data'][number];
 interface SiteMarkersProps {
   sites: Site[];
 }
@@ -13,23 +13,19 @@ interface SiteMarkersProps {
 export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
   const map = useMap();
 
-  const [selectedSiteId, setSelectedSiteId] = useQueryParam(
-    'site',
-    StringParam,
-  );
+  const { selectedSiteId, setQuery } = useContext(MapSearchQueryParamsContext);
 
   const moveToSiteLocation = useCallback(
     (site: Site) => {
+      if (!site.latdeg || !site.longdeg) return;
+
       map.flyTo(
         {
-          lat: site.latdeg || 0,
-          lng: site.longdeg ? site.longdeg * -1 : 0,
+          lat: site.latdeg,
+          lng: site.longdeg,
         },
-        Math.max(map.getZoom(), 14),
-        {
-          animate: true,
-          duration: 1,
-        },
+        getZoom(map),
+        MAP_FLY_OPTIONS,
       );
     },
     [map],
@@ -37,21 +33,22 @@ export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
 
   const onSiteMarkerClick = useCallback(
     (site: Site) => {
-      setSelectedSiteId(site.id);
+      setQuery({ site: site.id });
       moveToSiteLocation(site);
     },
-    [moveToSiteLocation, setSelectedSiteId],
+    [moveToSiteLocation, setQuery],
   );
 
   const markers = useMemo(() => {
     return sites.map((site) => {
+      if (!site.latdeg || !site.longdeg) return null;
       return (
         <SiteMarker
           key={site.id}
           isSelected={site.id === selectedSiteId}
           position={{
-            lat: site.latdeg || 0,
-            lng: site.longdeg ? site.longdeg * -1 : 0,
+            lat: site.latdeg,
+            lng: site.longdeg,
           }}
           onClick={() => onSiteMarkerClick(site)}
         />

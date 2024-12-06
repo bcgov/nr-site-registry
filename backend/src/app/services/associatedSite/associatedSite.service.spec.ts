@@ -7,12 +7,15 @@ import { plainToInstance } from 'class-transformer';
 import { v4 } from 'uuid';
 import { AssociatedSiteService } from './associatedSite.service';
 import { LoggerService } from '../../logger/logger.service';
+import { UserTypeEum } from '../../common/userType';
+import { SnapshotsService } from '../snapshot/snapshot.service';
 
 // Mock SiteAssocs entity and its Repository
 jest.mock('../../entities/siteAssocs.entity');
-
+jest.mock('../snapshot/snapshot.service');
 describe('AssociatedSiteService', () => {
   let service: AssociatedSiteService;
+  let snapshotService: SnapshotsService;
   let assocSiteRepository: Repository<SiteAssocs>;
   let sitesLogger: LoggerService;
   beforeEach(async () => {
@@ -20,6 +23,7 @@ describe('AssociatedSiteService', () => {
       providers: [
         AssociatedSiteService,
         LoggerService,
+        SnapshotsService,
         {
           provide: getRepositoryToken(SiteAssocs),
           useClass: Repository,
@@ -28,6 +32,7 @@ describe('AssociatedSiteService', () => {
     }).compile();
 
     service = module.get<AssociatedSiteService>(AssociatedSiteService);
+    snapshotService = module.get<SnapshotsService>(SnapshotsService);
     sitesLogger = module.get<LoggerService>(LoggerService);
     assocSiteRepository = module.get<Repository<SiteAssocs>>(
       getRepositoryToken(SiteAssocs),
@@ -54,8 +59,14 @@ describe('AssociatedSiteService', () => {
       jest
         .spyOn(assocSiteRepository, 'find')
         .mockResolvedValueOnce(mockSiteAssocs as SiteAssocs[]);
-
-      const result = await service.getAssociatedSitesBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await service.getAssociatedSitesBySiteId(
+        siteId,
+        false,
+        user,
+      );
 
       const expectedTransformedObjects = mockSiteAssocs.map((item) => ({
         guid: v4(),
@@ -80,9 +91,11 @@ describe('AssociatedSiteService', () => {
         `Failed to retrieve associated sites by site ID: ${siteId}`,
       );
       jest.spyOn(assocSiteRepository, 'find').mockRejectedValueOnce(error);
-
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
       await expect(
-        service.getAssociatedSitesBySiteId(siteId, false),
+        service.getAssociatedSitesBySiteId(siteId, false, user),
       ).rejects.toThrowError(
         `Failed to retrieve associated sites by site ID: ${siteId}`,
       );

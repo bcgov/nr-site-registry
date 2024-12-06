@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { LatLngTuple, Map } from 'leaflet';
+import { useContext, useRef, useState } from 'react';
+import { LatLngBounds, LatLngTuple, Map } from 'leaflet';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -12,13 +12,20 @@ import { MyLocationMarker } from './MyLocationMarker'; // Import the MyLocationM
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 import { MapSearch } from './MapSearch';
-import { useMapSearchQuery } from '../../../graphql/generated';
+import { MapSearchQuery, useMapSearchQuery } from '../../../graphql/generated';
 import { SiteMarkers } from './siteMarkers/SiteMarkers';
-import { SiteDetailsDrawer } from './siteDrawer/SiteDetailsDrawer';
 import { MapControls } from './MapControls';
+import { MAP_FLY_OPTIONS } from './mapOptions';
+import {
+  MapSearchQueryParamsContext,
+  MapSearchQueryProvider,
+} from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { MapSearchDrawer } from './siteDrawer/MapSearchDrawer';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
+
+export type Site = MapSearchQuery['mapSearch']['data'][number];
 
 /**
  * Renders a map with a marker at the supplied location
@@ -29,11 +36,31 @@ function MapView() {
   // Feature flag for turning OpenStreetMap tiles gray
   const osmGrayscale = false;
 
-  const { data } = useMapSearchQuery({
+  const { searchTerm } = useContext(MapSearchQueryParamsContext);
+
+  const { data, loading: sitesLoading } = useMapSearchQuery({
     variables: {
-      searchParam: '',
+      searchParam: searchTerm || '',
+    },
+    onCompleted: ({ mapSearch: { data } }) => {
+      flyToSiteBounds(data);
     },
   });
+
+  const flyToSiteBounds = (sites: Site[]) => {
+    if (!searchTerm || !mapRef.current) return;
+
+    const bounds = new LatLngBounds([]);
+    sites.forEach((site) => {
+      if (!site.latdeg || !site.longdeg) return;
+      const lat = site.latdeg;
+      const lng = site.longdeg;
+      bounds.extend({ lat, lng });
+    });
+    if (bounds.isValid()) {
+      mapRef.current.flyToBounds(bounds, MAP_FLY_OPTIONS);
+    }
+  };
 
   const mapRef = useRef<Map>(null);
   const [isLocationVisible, setLocationVisible] = useState(false);
@@ -66,9 +93,20 @@ function MapView() {
         isLocationVisible={isLocationVisible}
         setLocationVisible={setLocationVisible}
       />
-      <SiteDetailsDrawer mapRef={mapRef} />
+
+      <MapSearchDrawer
+        mapRef={mapRef}
+        sites={data?.mapSearch.data || []}
+        sitesLoading={sitesLoading}
+      />
     </div>
   );
 }
 
-export default MapView;
+const MapViewWithProviders = () => (
+  <MapSearchQueryProvider>
+    <MapView />
+  </MapSearchQueryProvider>
+);
+
+export default MapViewWithProviders;

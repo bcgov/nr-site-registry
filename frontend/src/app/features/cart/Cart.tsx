@@ -61,8 +61,7 @@ const Cart = () => {
   }, [createSnapshotRequestStatus]);
 
   useEffect(() => {
-    if (deleteStatus === RequestStatus.success)
-      dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
+    if (deleteStatus === RequestStatus.success) dispatch(fetchCartItems());
   }, [deleteStatus]);
 
   useEffect(() => {

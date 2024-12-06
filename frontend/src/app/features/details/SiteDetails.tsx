@@ -594,8 +594,9 @@ const SiteDetails = () => {
                     label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
                   />
                   <SaveButton
-                    variant="light"
+                    variant="secondary"
                     clickHandler={() => setSave(true)}
+                    isDisabled={savedChanges?.length > 0 ? false : true}
                   />
                   <CancelButton clickHandler={handleCancelButton} />
                 </>
@@ -717,8 +718,9 @@ const SiteDetails = () => {
                       label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
                     />
                     <SaveButton
-                      variant="light"
+                      variant="secondary"
                       clickHandler={() => setSave(true)}
+                      isDisabled={savedChanges?.length > 0 ? false : true}
                     />
                     <CancelButton clickHandler={handleCancelButton} />
                   </>

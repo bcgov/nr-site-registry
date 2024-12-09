@@ -4,11 +4,14 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { LoggerService } from '../../logger/logger.service';
+import { UserTypeEum } from '../../common/userType';
+import { SnapshotsService } from '../snapshot/snapshot.service';
 
 jest.mock('../../entities/siteProfiles.entity');
-
+jest.mock('../snapshot/snapshot.service');
 describe('DisclosureService', () => {
   let service: DisclosureService;
+  let snapshotService: SnapshotsService;
   let repository: Repository<SiteProfiles>;
   let sitesLogger: LoggerService;
 
@@ -17,6 +20,7 @@ describe('DisclosureService', () => {
       providers: [
         DisclosureService,
         LoggerService,
+        SnapshotsService,
         {
           provide: getRepositoryToken(SiteProfiles),
           useClass: Repository,
@@ -25,6 +29,7 @@ describe('DisclosureService', () => {
     }).compile();
 
     service = module.get<DisclosureService>(DisclosureService);
+    snapshotService = module.get<SnapshotsService>(SnapshotsService);
     sitesLogger = module.get<LoggerService>(LoggerService);
     repository = module.get<Repository<SiteProfiles>>(
       getRepositoryToken(SiteProfiles),
@@ -45,8 +50,14 @@ describe('DisclosureService', () => {
       jest
         .spyOn(repository, 'find')
         .mockResolvedValueOnce(mockSiteProfile as []);
-
-      const result = await service.getSiteDisclosureBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await service.getSiteDisclosureBySiteId(
+        siteId,
+        false,
+        user,
+      );
 
       expect(result[0].whoCreated).toEqual(mockSiteProfile[0].whoCreated);
       expect(repository.find).toBeCalledWith({ where: { siteId } });
@@ -58,9 +69,11 @@ describe('DisclosureService', () => {
         `Failed to retrieve site disclosures for siteId ${siteId}`,
       );
       jest.spyOn(repository, 'find').mockRejectedValueOnce(error);
-
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
       await expect(
-        service.getSiteDisclosureBySiteId(siteId, false),
+        service.getSiteDisclosureBySiteId(siteId, false, user),
       ).rejects.toThrow(error);
     });
   });

@@ -43,7 +43,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "concurrently \"react-scripts start\" \"graphql-codegen --watch\"",
+    "start": "concurrently \"PORT=4000 react-scripts start\" \"graphql-codegen --watch\"",
     "build": "react-scripts build",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!@react-parcelmap-bc)/\"  ",
     "eject": "react-scripts eject",

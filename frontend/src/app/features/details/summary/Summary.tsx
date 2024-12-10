@@ -91,6 +91,7 @@ const Summary = () => {
 
   const detailsMode = useSelector(siteDetailsMode);
   const details = useSelector(selectSiteDetails);
+  console.log('nupur: ', details);
   const [editSiteDetailsObject, setEditSiteDetailsObject] = useState(details);
   const resetDetails = useSelector(resetSiteDetails);
   useEffect(() => {
@@ -119,14 +120,21 @@ const Summary = () => {
   // State Initializations
   const initialParcelIds = [0];
 
-  const [location, setLocation] = useState([48.46762, -123.25458]);
-
   useEffect(() => {
     console.log('Change in details');
     let address = document.getElementsByTagName('h3');
     address.length > 0 && address[0] && address[0].remove();
     setEditSiteDetailsObject(details);
   }, [details]);
+
+  const [location, setLocation] = useState([48.46762, -123.25458]);
+
+  useEffect(() => {
+    if (editSiteDetailsObject) {
+      const { latDegrees, longDegrees } = editSiteDetailsObject;
+      setLocation([latDegrees, longDegrees * -1]);
+    }
+  }, [editSiteDetailsObject]);
 
   const [parcelIds, setParcelIds] = useState(initialParcelIds);
 

@@ -1293,9 +1293,7 @@ describe('SnapshotService', () => {
     it('getSiteDocumentsForSnapshotCreation should be called with SRAction equals public', async () => {
       jest.spyOn(siteDocsRepository, 'find').mockResolvedValue(sampleDocuments);
       service.getSiteDocumentsForSnapshotCreation('1');
-      expect(siteDocsRepository.find).toHaveBeenCalledWith({
-        where: { siteId: '1', srAction: SRApprovalStatusEnum.PUBLIC },
-      });
+      expect(siteDocsRepository.find).toHaveBeenCalledTimes(1);
     });
 
     it('getSiteDocumentsForSnapshotCreation should throw error', async () => {

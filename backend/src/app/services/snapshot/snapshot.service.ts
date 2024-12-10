@@ -250,7 +250,21 @@ export class SnapshotsService {
         'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
       );
       return await this.siteDocumentsRepo.find({
-        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
+        join: {
+          alias: 'siteDocument',
+          innerJoinAndSelect: {
+            siteDocPartics: 'siteDocument.siteDocPartics',
+            psnorg: 'siteDocPartics.psnorg',
+          },
+        },
+        where: {
+          siteId, // Filter for main table
+          srAction: SRApprovalStatusEnum.PUBLIC, // Filter for main table
+          siteDocPartics: {
+            srAction: SRApprovalStatusEnum.PUBLIC, // Filter for related siteDocPartics
+          },
+        },
       });
     } catch (error) {
       this.sitesLogger.log(

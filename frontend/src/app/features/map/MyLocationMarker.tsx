@@ -6,6 +6,7 @@ import { useMyLocation } from '../../../hooks/useMyLocation';
 import { IconMarker } from './IconMarker';
 
 import './MyLocationMarker.css';
+import { getZoom, MAP_FLY_OPTIONS } from './mapOptions';
 
 export function myLocationIcon() {
   const size = 24;
@@ -33,10 +34,7 @@ function MyLocationMarkerContent() {
   useEffect(() => {
     if (position && !hasZoomedToMyLocationRef.current) {
       hasZoomedToMyLocationRef.current = true;
-      map.flyTo(position, Math.max(map.getZoom(), 14), {
-        animate: true,
-        duration: 1,
-      });
+      map.flyTo(position, getZoom(map), MAP_FLY_OPTIONS);
     }
   }, [map, position]);
 

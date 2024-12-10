@@ -1,6 +1,10 @@
 import { HttpStatus, UsePipes } from '@nestjs/common';
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import {
+  AuthenticatedUser,
+  RoleMatchingMode,
+  Roles,
+} from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SiteAssocs } from '../../entities/siteAssocs.entity';
@@ -36,6 +40,7 @@ export class AssociatedSiteResolver {
     @Args('siteId', { type: () => String }) siteId: string,
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
+    @AuthenticatedUser() user: any,
   ) {
     this.sitesLogger.log(
       'AssociatedSiteResolver.getAssociatedSitesBySiteId() start siteID:' +
@@ -47,6 +52,7 @@ export class AssociatedSiteResolver {
     const result = await this.associatedSiteService.getAssociatedSitesBySiteId(
       siteId,
       showPending,
+      user,
     );
     if (result?.length > 0) {
       this.sitesLogger.log(

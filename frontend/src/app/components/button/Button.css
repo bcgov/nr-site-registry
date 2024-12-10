@@ -75,19 +75,3 @@
 .SITE-Button.tertiary:hover:not(:disabled) {
   background-color: var(--surface-tertiary-hover);
 }
-
-/* Variant - Light */
-.SITE-Button.light {
-  background-color: var(--surface-tertiary-disabled);
-  color: var(--typography-color-disabled);
-}
-.SITE-Button.light:disabled {
-  background-color: var(--surface-secondary-disabled);
-  border-color: var(--surface-secondary-disabled);
-  color: var(--typography-color-disabled);
-}
-.SITE-Button.light:hover:not(:disabled) {
-  background-color: var(--surface-secondary-default);
-  border: 1px solid var(--surface-border-dark);
-  color: var(--typography-color-primary);
-}

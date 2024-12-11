@@ -127,15 +127,6 @@ const Summary = () => {
     setEditSiteDetailsObject(details);
   }, [details]);
 
-  const [location, setLocation] = useState([48.46762, -123.25458]);
-
-  useEffect(() => {
-    if (editSiteDetailsObject) {
-      const { latDegrees, longDegrees } = editSiteDetailsObject;
-      setLocation([latDegrees, longDegrees * -1]);
-    }
-  }, [editSiteDetailsObject]);
-
   const [parcelIds, setParcelIds] = useState(initialParcelIds);
 
   // Utility Functions

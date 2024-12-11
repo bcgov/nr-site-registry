@@ -62,7 +62,7 @@ const SummaryInfo: React.FC<ISummaryInfo> = ({
 
   const MapWithMarker = ({ site }: { site: any }) => {
     const map = useMap();
-    //const onSiteMarkerClick = (site: any) => {
+
     useEffect(() => {
       if (!site.latdeg || !site.longdeg) return;
       map.flyTo(

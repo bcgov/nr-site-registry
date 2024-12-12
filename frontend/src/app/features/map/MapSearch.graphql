@@ -32,6 +32,38 @@ query MapSearch_findSiteBySiteId($siteId: String!) {
     }
 }
 
+query MapSearch_filterSearchResults($siteIds: [String!]) {
+  searchSites(searchParam: "", page: 1, pageSize: 100, siteIds: $siteIds) {
+    sites {
+      id
+      addrLine_1
+      addrLine_2
+      addrLine_3
+      city
+      srStatus
+      siteRiskCode
+      generalDescription
+      commonName
+      latdeg
+      latDegrees
+      latMinutes
+      latSeconds
+      longdeg
+      longDegrees
+      longMinutes
+      longSeconds
+      latlongReliabilityFlag
+      whoCreated
+      whenCreated
+      whenCreated
+      consultantSubmitted
+    }
+    count
+    page
+    pageSize
+  }
+}
+
 mutation MapSearch_addCartItem($siteId: String!) {
     addCartItem(cartDTO:  {
        siteId: $siteId,

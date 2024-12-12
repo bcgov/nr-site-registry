@@ -120,13 +120,20 @@ export class SiteService {
     longSeconds?: string,
     whenCreated?: Date,
     whenUpdated?: Date,
+    siteIds?: string[],
   ) {
     this.sitesLogger.log('SiteService.searchSites() start');
     this.sitesLogger.debug('SiteService.searchSites() start');
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
 
-    const query = this.siteRepository.createQueryBuilder('sites').where(
+    const query = this.siteRepository.createQueryBuilder('sites');
+
+    if (siteIds?.length) {
+      query.whereInIds(siteIds);
+    }
+
+    query.andWhere(
       new Brackets((qb) => {
         qb.where('CAST(sites.id AS TEXT) LIKE :searchParam', {
           searchParam: `%${searchParam}%`,

@@ -17,7 +17,7 @@ export const graphQlSiteQuery = (filter: {}) => {
   }
 
   return gql`
-query searchSites($searchParam: String!,  $page: String!, $pageSize: String!, ${fieldsArgString}){ 
+query searchSites($searchParam: String!,  $page: Int!, $pageSize: Int!, ${fieldsArgString}){ 
     searchSites(searchParam: $searchParam, , page: $page, pageSize: $pageSize, ${fieldsString}) {
        sites
        {

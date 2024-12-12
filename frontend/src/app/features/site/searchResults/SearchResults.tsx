@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
 import { SpinnerIcon, SortIcon } from '../../../components/common/icon';
-import './SearchResults.css';
 import { loadingState } from '../dto/SiteSlice';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { useSelector } from 'react-redux';

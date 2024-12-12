@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import PanelWithUpDown from '../../../components/simple/PanelWithUpDown';
-// const Map: any = require('../../../../../node_modules/react-parcelmap-bc/dist/Map').default;
 // @ts-ignore
 import SummaryForm from '../SummaryForm';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
@@ -9,7 +8,6 @@ import { TileLayer } from 'react-leaflet';
 import { SiteMarker } from '../../map/siteMarkers/SiteMarker';
 import './Summary.css';
 import 'leaflet/dist/leaflet.css';
-import { set } from 'date-fns';
 
 export interface ISummaryInfo {
   siteData: any;
@@ -47,7 +45,7 @@ const SummaryInfo: React.FC<ISummaryInfo> = ({
                 lat: siteData.latdeg,
                 lng: siteData.longdeg,
               }}
-              zoom={6}
+              zoom={14}
               zoomControl={false}
               className="map-container"
             >

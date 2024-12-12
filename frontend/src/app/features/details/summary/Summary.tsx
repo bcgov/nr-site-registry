@@ -91,7 +91,6 @@ const Summary = () => {
 
   const detailsMode = useSelector(siteDetailsMode);
   const details = useSelector(selectSiteDetails);
-  console.log('nupur: ', details);
   const [editSiteDetailsObject, setEditSiteDetailsObject] = useState(details);
   const resetDetails = useSelector(resetSiteDetails);
   useEffect(() => {

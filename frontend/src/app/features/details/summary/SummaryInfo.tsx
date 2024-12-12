@@ -73,8 +73,7 @@ const SummaryInfo: React.FC<ISummaryInfo> = ({
         getZoom(map),
         map_fly_options,
       );
-    }),
-      [site, map];
+    }, [site, map]);
 
     return (
       site && <SiteMarker position={{ lat: site.latdeg, lng: site.longdeg }} />

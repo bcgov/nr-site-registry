@@ -622,8 +622,6 @@ const SRUpdates = () => {
     dispatch(updateSiteDetailsForApproval(saveDTO));
   };
 
-  const [location] = useState([48.46762, -123.25458]);
-
   return (
     <div data-testid="srreviewtab-component">
       {siteSummaryData && (
@@ -634,7 +632,6 @@ const SRUpdates = () => {
         >
           <SummaryInfo
             siteData={siteSummaryData}
-            location={location}
             edit={false}
             srMode={false}
             handleInputChange={handleChange}

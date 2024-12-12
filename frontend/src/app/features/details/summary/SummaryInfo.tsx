@@ -48,35 +48,36 @@ const SummaryInfo: React.FC<ISummaryInfo> = ({
       console.log('Approve Handler Not Provided');
     });
 
-  const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
+  //const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
 
   const { data } = useMapSearch_FindSiteBySiteIdQuery({
     variables: { siteId: siteData.id },
   });
 
   const selectedSiteData = data?.findSiteBySiteId.data;
-  const mapRef = useRef<Map>(null);
-  const map_fly_options = { animate: false, duration: 0.2 };
 
-  const MapWithMarker = ({ site }: { site: any }) => {
-    const map = useMap();
+  // const mapRef = useRef<Map>(null);
+  // const map_fly_options = { animate: false, duration: 0.2 };
 
-    useEffect(() => {
-      if (!site.latdeg || !site.longdeg) return;
-      map.flyTo(
-        {
-          lat: site.latdeg,
-          lng: site.longdeg,
-        },
-        getZoom(map),
-        map_fly_options,
-      );
-    }, [site, map]);
+  // const MapWithMarker = ({ site }: { site: any }) => {
+  //   const map = useMap();
 
-    return (
-      site && <SiteMarker position={{ lat: site.latdeg, lng: site.longdeg }} />
-    );
-  };
+  //   useEffect(() => {
+  //     if (!site.latdeg || !site.longdeg) return;
+  //     map.flyTo(
+  //       {
+  //         lat: site.latdeg,
+  //         lng: site.longdeg,
+  //       },
+  //       getZoom(map),
+  //       map_fly_options,
+  //     );
+  //   }, [site, map]);
+
+  //   return (
+  //     site && <SiteMarker position={{ lat: site.latdeg, lng: site.longdeg }} />
+  //   );
+  // };
 
   return (
     <PanelWithUpDown
@@ -85,17 +86,25 @@ const SummaryInfo: React.FC<ISummaryInfo> = ({
         <div className="row w-100">
           <div className="col-12 col-lg-6">
             <MapContainer
-              center={CENTER_OF_BC}
+              center={{
+                lat: selectedSiteData?.latdeg ?? 0,
+                lng: selectedSiteData?.longdeg ?? 0,
+              }}
               zoom={6}
               zoomControl={false}
-              ref={mapRef}
+              //ref={mapRef}
               className="map-container"
             >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {<MapWithMarker site={selectedSiteData} />}
+              <SiteMarker
+                position={{
+                  lat: selectedSiteData?.latdeg ?? 0,
+                  lng: selectedSiteData?.longdeg ?? 0,
+                }}
+              />
             </MapContainer>
           </div>
 

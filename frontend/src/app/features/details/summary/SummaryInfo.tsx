@@ -24,7 +24,6 @@ import { Site } from '../../map/MapView';
 import { set } from 'date-fns';
 
 export interface ISummaryInfo {
-  location: any;
   siteData: any;
   edit: boolean;
   srMode: boolean;
@@ -34,7 +33,6 @@ export interface ISummaryInfo {
 }
 
 const SummaryInfo: React.FC<ISummaryInfo> = ({
-  location,
   siteData,
   edit,
   srMode,

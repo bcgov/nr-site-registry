@@ -445,7 +445,6 @@ const Summary = () => {
     <div className="summary-section-details">
       <SummaryInfo
         siteData={editSiteDetailsObject}
-        location={location}
         edit={edit}
         srMode={srMode}
         handleInputChange={handleInputChange}

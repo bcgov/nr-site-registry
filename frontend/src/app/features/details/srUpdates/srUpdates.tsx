@@ -632,7 +632,6 @@ const SRUpdates = () => {
         >
           <SummaryInfo
             siteData={siteSummaryData}
-            location={location}
             edit={false}
             srMode={false}
             handleInputChange={handleChange}

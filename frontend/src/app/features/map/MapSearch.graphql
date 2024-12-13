@@ -32,8 +32,8 @@ query MapSearch_findSiteBySiteId($siteId: String!) {
     }
 }
 
-query MapSearch_filterSearchResults($siteIds: [String!]) {
-  searchSites(searchParam: "", page: 1, pageSize: 100, siteIds: $siteIds) {
+query MapSearch_filterSearchResults($siteIds: [String!], $page: Int!, $pageSize: Int!) {
+  searchSites(searchParam: "", page: $page, pageSize: $pageSize, siteIds: $siteIds) {
     sites {
       id
       addrLine_1

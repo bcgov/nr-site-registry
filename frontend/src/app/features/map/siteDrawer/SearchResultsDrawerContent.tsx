@@ -6,10 +6,19 @@ import { SearchResultsActions } from '../../site/searchResults/SearchResultsActi
 import FilterPills from '../../site/filters/FilterPills';
 import { getSiteSearchResultsColumns } from '../../site/dto/Columns';
 import { TableColumn } from '../../../components/table/TableColumn';
-import { useMapSearch_FilterSearchResultsQuery } from '../../../../graphql/generated';
+import {
+  MapSearch_FilterSearchResultsQuery,
+  useMapSearch_FilterSearchResultsQuery,
+} from '../../../../graphql/generated';
 import { SpinnerIcon } from '../../../components/common/icon';
+import useDebouncedValue from '../../../helpers/useDebouncedValue';
 
 const defaultColumns = getSiteSearchResultsColumns();
+
+type Pagination = {
+  page: number;
+  pageSize: number;
+};
 
 interface SearchResultsDrawerContentProps {
   sites: Site[];
@@ -19,13 +28,36 @@ export const SearchResultsDrawerContent: FC<
   SearchResultsDrawerContentProps
 > = ({ sites, loading: siteIdsLoading }) => {
   const siteIds = sites.map((site) => site.id);
+  // Saving fetched data to local state allows us avoid table component flickering
+  // when a refetch with new variables takes place
+  const [searchResults, setSearchResults] = useState<
+    MapSearch_FilterSearchResultsQuery['searchSites']
+  >({
+    sites: [],
+    pageSize: 0,
+    count: 0,
+    page: 1,
+  });
 
-  const { data, loading: siteDetailsLoading } =
-    useMapSearch_FilterSearchResultsQuery({
+  const [pagination, setPagination] = useState<Pagination>({
+    page: 1,
+    pageSize: 5,
+  });
+
+  const { loading: siteDetailsLoading } = useMapSearch_FilterSearchResultsQuery(
+    {
       variables: {
         siteIds,
+        page: pagination.page,
+        pageSize: pagination.pageSize,
       },
-    });
+      onCompleted: (data) => {
+        setSearchResults(data.searchSites);
+      },
+    },
+  );
+
+  const siteDetailsLoadingDebounced = useDebouncedValue(siteDetailsLoading);
 
   const [columnsToDisplay, setColumnsToDisplay] =
     useState<TableColumn[]>(defaultColumns);
@@ -72,7 +104,7 @@ export const SearchResultsDrawerContent: FC<
     }
   };
 
-  const loading = siteIdsLoading || siteDetailsLoading;
+  const loading = siteIdsLoading || siteDetailsLoadingDebounced;
 
   return (
     <div className="d-flex flex-column gap-3">
@@ -91,15 +123,13 @@ export const SearchResultsDrawerContent: FC<
 
       {loading && <SpinnerIcon size={20} className="site-fa-spin" />}
 
-      {!siteDetailsLoading && (
-        <SearchResults
-          pageChange={() => console.log('todo')}
-          data={data?.searchSites.sites || []}
-          columns={columnsToDisplay.filter((x) => x.isChecked === true)}
-          totalRecords={0}
-          changeHandler={changeHandler}
-        />
-      )}
+      <SearchResults
+        pageChange={(page, pageSize) => setPagination({ page, pageSize })}
+        data={searchResults.sites}
+        columns={columnsToDisplay.filter((x) => x.isChecked === true)}
+        totalRecords={searchResults.count}
+        changeHandler={changeHandler}
+      />
     </div>
   );
 };

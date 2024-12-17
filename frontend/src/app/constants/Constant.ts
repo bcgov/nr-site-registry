@@ -11,3 +11,14 @@ export const MAP_CONTROLS_RIGHT_LG = 48;
 export const MAP_CONTROLS_RIGHT_SM = 24;
 export const MAP_CONTROLS_BOTTOM_LG = 40;
 export const MAP_CONTROLS_BOTTOM_SM = 24;
+
+/**
+ * The smallest allowed radius in meters for the Radius Search feature.
+ */
+export const MIN_CIRCLE_RADIUS = 500;
+
+export enum ActiveToolEnum {
+  dataLayers = 'dataLayers',
+  radiusSearch = 'radiusSearch',
+  polygonSearch = 'polygonSearch',
+}

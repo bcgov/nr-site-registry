@@ -4,6 +4,7 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { AssociatedSiteDto } from '../../dto/associatedSite.dto';
 import { AssociatedSiteResolver } from './associatedSite.resolver';
 import { LoggerService } from '../../logger/logger.service';
+import { UserTypeEum } from '../../common/userType';
 
 describe('AssociatedSiteResolver', () => {
   let resolver: AssociatedSiteResolver;
@@ -80,8 +81,14 @@ describe('AssociatedSiteResolver', () => {
           data: expectedResult,
         },
       );
-
-      const result = await resolver.getAssociatedSitesBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await resolver.getAssociatedSitesBySiteId(
+        siteId,
+        false,
+        user,
+      );
 
       expect(result.message).toBe('Associated sites fetched successfully');
       expect(result.httpStatusCode).toBe(200);
@@ -103,7 +110,14 @@ describe('AssociatedSiteResolver', () => {
         },
       );
 
-      const result = await resolver.getAssociatedSitesBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await resolver.getAssociatedSitesBySiteId(
+        siteId,
+        false,
+        user,
+      );
 
       expect(result.message).toBe(
         `Associated sites data not found for site id: ${siteId}`,

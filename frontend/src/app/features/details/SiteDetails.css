@@ -109,7 +109,7 @@
 
 @media (max-width: 768px) {
   .custom-sticky-header {
-    align-items: baseline !important;
+    align-items: flex-start !important;
   }
 }
 

@@ -74,7 +74,7 @@ import {
 } from '../landUses/LandUsesSlice';
 import { getLandUseColumns } from '../landUses/LandUseColumnConfiguration';
 import ParcelDescriptionTable from '../parcelDescriptions/ParcelDescriptionTable';
-import { IFetchParcelDescriptionParams } from '../parcelDescriptions/parcelDescriptionsSlice';
+import { IFetchParcelDescriptionsParams } from '../parcelDescriptions/parcelDescriptionsInterfaces';
 import { columns as columnConfigForParcelDescription } from '../parcelDescriptions/parcelDescriptionsConfig';
 
 const SRUpdates = () => {
@@ -345,7 +345,7 @@ const SRUpdates = () => {
 
       dispatch(fetchPendingAssociatedSites({ siteId, showPending: true }));
 
-      const params: IFetchParcelDescriptionParams = {
+      const params: IFetchParcelDescriptionsParams = {
         siteId: parseInt(siteId),
         page: 1,
         pageSize: 1000,
@@ -622,8 +622,6 @@ const SRUpdates = () => {
     dispatch(updateSiteDetailsForApproval(saveDTO));
   };
 
-  const [location] = useState([48.46762, -123.25458]);
-
   return (
     <div data-testid="srreviewtab-component">
       {siteSummaryData && (
@@ -634,7 +632,6 @@ const SRUpdates = () => {
         >
           <SummaryInfo
             siteData={siteSummaryData}
-            location={location}
             edit={false}
             srMode={false}
             handleInputChange={handleChange}

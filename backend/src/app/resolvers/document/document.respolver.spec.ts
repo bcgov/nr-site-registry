@@ -4,6 +4,7 @@ import { DocumentService } from '../../services/document/document.service';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { DocumentDto, DocumentResponse } from '../../dto/document.dto';
 import { LoggerService } from '../../logger/logger.service';
+import { UserTypeEum } from '../../common/userType';
 
 describe('DocumentResolver', () => {
   let resolver: DocumentResolver;
@@ -86,8 +87,10 @@ describe('DocumentResolver', () => {
     jest
       .spyOn(documentService, 'getSiteDocumentsBySiteId')
       .mockResolvedValueOnce(mockDocuments);
-
-    const result = await resolver.getSiteDocumentsBySiteId(siteId, false);
+    const user = {
+      identity_provider: UserTypeEum.IDIR,
+    };
+    const result = await resolver.getSiteDocumentsBySiteId(siteId, false, user);
 
     expect(result).toEqual(expectedResult);
     expect(mockDocuments[0].id).toEqual('1');
@@ -95,6 +98,7 @@ describe('DocumentResolver', () => {
     expect(documentService.getSiteDocumentsBySiteId).toHaveBeenCalledWith(
       siteId,
       false,
+      user,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       'Documents fetched successfully.',
@@ -117,13 +121,16 @@ describe('DocumentResolver', () => {
     jest
       .spyOn(documentService, 'getSiteDocumentsBySiteId')
       .mockResolvedValueOnce(mockEmptyDocuments);
-
-    const result = await resolver.getSiteDocumentsBySiteId(siteId, false);
+    const user = {
+      identity_provider: UserTypeEum.IDIR,
+    };
+    const result = await resolver.getSiteDocumentsBySiteId(siteId, false, user);
 
     expect(result).toEqual(expectedResult);
     expect(documentService.getSiteDocumentsBySiteId).toHaveBeenCalledWith(
       siteId,
       false,
+      user,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       `Documents not found for site id ${siteId}`,
@@ -140,10 +147,13 @@ describe('DocumentResolver', () => {
     jest
       .spyOn(documentService, 'getSiteDocumentsBySiteId')
       .mockResolvedValueOnce(mockEmptyDocuments);
-
+    const user = {
+      identity_provider: UserTypeEum.IDIR,
+    };
     const result = await resolver.getSiteDocumentsBySiteId(
       siteId as any,
       false,
+      user,
     );
 
     expect(result.httpStatusCode).toEqual(404);
@@ -156,8 +166,10 @@ describe('DocumentResolver', () => {
   it('should return an error for empty siteId parameter', async () => {
     const siteId = '';
     const mockEmptyDocuments: DocumentDto[] = [];
-
-    const result = await resolver.getSiteDocumentsBySiteId(siteId, false);
+    const user = {
+      identity_provider: UserTypeEum.IDIR,
+    };
+    const result = await resolver.getSiteDocumentsBySiteId(siteId, false, user);
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
@@ -184,8 +196,10 @@ describe('DocumentResolver', () => {
     jest
       .spyOn(documentService, 'getSiteDocumentsBySiteId')
       .mockResolvedValueOnce(mockLargeDocuments);
-
-    const result = await resolver.getSiteDocumentsBySiteId(siteId, false);
+    const user = {
+      identity_provider: UserTypeEum.IDIR,
+    };
+    const result = await resolver.getSiteDocumentsBySiteId(siteId, false, user);
 
     expect(result.success).toEqual(true);
     expect(result.data).toHaveLength(1000);

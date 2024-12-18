@@ -4,6 +4,7 @@ import { ParticipantService } from '../../services/participant/participant.servi
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { SiteParticsDto } from '../../dto/sitePartics.dto';
 import { LoggerService } from '../../logger/logger.service';
+import { UserTypeEum } from '../../common/userType';
 
 describe('ParticipantResolver', () => {
   let resolver: ParticipantResolver;
@@ -81,8 +82,14 @@ describe('ParticipantResolver', () => {
           data: expectedResult,
         },
       );
-
-      const result = await resolver.getSiteParticipantsBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await resolver.getSiteParticipantsBySiteId(
+        siteId,
+        false,
+        user,
+      );
 
       expect(result.message).toBe('Participants fetched successfully');
       expect(result.httpStatusCode).toBe(200);
@@ -102,8 +109,14 @@ describe('ParticipantResolver', () => {
           success: false,
         },
       );
-
-      const result = await resolver.getSiteParticipantsBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await resolver.getSiteParticipantsBySiteId(
+        siteId,
+        false,
+        user,
+      );
 
       expect(result.message).toBe(
         `Participants data not found for site id: ${siteId}`,

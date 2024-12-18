@@ -4,6 +4,7 @@ import { NotationService } from '../../services/notation/notation.service';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { NotationDto, NotationResponse } from '../../dto/notation.dto';
 import { LoggerService } from '../../logger/logger.service';
+import { UserTypeEum } from '../../common/userType';
 
 describe('NotationResolver', () => {
   let resolver: NotationResolver;
@@ -109,8 +110,10 @@ describe('NotationResolver', () => {
     jest
       .spyOn(notationService, 'getSiteNotationBySiteId')
       .mockResolvedValueOnce(mockNotations);
-
-    const result = await resolver.getSiteNotationBySiteId(siteId, false);
+    const user = {
+      identity_provider: UserTypeEum.IDIR,
+    };
+    const result = await resolver.getSiteNotationBySiteId(siteId, false, user);
 
     expect(result).toEqual(expectedResult);
     expect(mockNotations[0].id).toEqual('1');
@@ -121,6 +124,7 @@ describe('NotationResolver', () => {
     expect(notationService.getSiteNotationBySiteId).toHaveBeenCalledWith(
       siteId,
       false,
+      user,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       'Site Notation fetched successfully',
@@ -143,13 +147,16 @@ describe('NotationResolver', () => {
     jest
       .spyOn(notationService, 'getSiteNotationBySiteId')
       .mockResolvedValueOnce(mockEmptyNotations);
-
-    const result = await resolver.getSiteNotationBySiteId(siteId, false);
+    const user = {
+      identity_provider: UserTypeEum.IDIR,
+    };
+    const result = await resolver.getSiteNotationBySiteId(siteId, false, user);
 
     expect(result).toEqual(expectedResult);
     expect(notationService.getSiteNotationBySiteId).toHaveBeenCalledWith(
       siteId,
       false,
+      user,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       `Site Notation data not found for site id: ${siteId}`,
@@ -166,8 +173,14 @@ describe('NotationResolver', () => {
     jest
       .spyOn(notationService, 'getSiteNotationBySiteId')
       .mockResolvedValueOnce(mockEmptyNotations);
-
-    const result = await resolver.getSiteNotationBySiteId(siteId as any, false);
+    const user = {
+      identity_provider: UserTypeEum.IDIR,
+    };
+    const result = await resolver.getSiteNotationBySiteId(
+      siteId as any,
+      false,
+      user,
+    );
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
@@ -179,8 +192,10 @@ describe('NotationResolver', () => {
   it('should return an error for empty siteId parameter', async () => {
     const siteId = '';
     const mockEmptyNotations: NotationDto[] = [];
-
-    const result = await resolver.getSiteNotationBySiteId(siteId, false);
+    const user = {
+      identity_provider: UserTypeEum.IDIR,
+    };
+    const result = await resolver.getSiteNotationBySiteId(siteId, false, user);
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
@@ -215,8 +230,10 @@ describe('NotationResolver', () => {
     jest
       .spyOn(notationService, 'getSiteNotationBySiteId')
       .mockResolvedValueOnce(mockLargeNotations);
-
-    const result = await resolver.getSiteNotationBySiteId(siteId, false);
+    const user = {
+      identity_provider: UserTypeEum.IDIR,
+    };
+    const result = await resolver.getSiteNotationBySiteId(siteId, false, user);
 
     expect(result.success).toEqual(true);
     expect(result.data).toHaveLength(1000);

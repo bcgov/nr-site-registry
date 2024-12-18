@@ -12,12 +12,12 @@ import { TextSearchButton } from './search/TextSearchButton';
 
 import './MapSearch.css';
 import { SearchInput } from './search/SearchInput';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { FindMeButton } from './FindMeButton';
-import { useMapSearchQuery } from '../../../graphql/generated';
 import { HorizontalScroller } from './controls/HorizontalScroller';
 import { PolygonSearchButton } from './search/PolygonSearchButton';
 import { RadiusSearchButton } from './search/RadiusSearchButton';
+import { MapSearchQueryParamsContext } from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
 
 const styles = {
   marginTop: {
@@ -67,20 +67,27 @@ export function MapSearch({
   isLocationVisible,
   setLocationVisible,
 }: MapSearchProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+  const { searchTerm, setQuery, clearQuery } = useContext(
+    MapSearchQueryParamsContext,
+  );
+
+  const [searchValue, setSearchValue] = useState(searchTerm);
   const theme = useTheme();
   const isLarge = useMediaQuery(theme.breakpoints.up('lg'));
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
 
   const clearSearch = () => {
-    setSearchTerm('');
+    setSearchValue('');
+    clearQuery();
   };
 
-  const options: any[] = [];
-
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = event.target.value;
-    setSearchTerm(searchTerm);
+    setSearchValue(event.target.value);
+  };
+
+  const submitSearchOnEnterPress = (e: React.KeyboardEvent) => {
+    if (e.key !== 'Enter' || searchValue === null) return;
+    setQuery({ search: searchValue }, 'replace');
   };
 
   return (
@@ -93,9 +100,20 @@ export function MapSearch({
         {isLarge ? (
           <Stack direction="row" className="map-search-row">
             <Autocomplete
-              options={options}
-              renderInput={() => {
-                return <SearchInput sx={searchInputStyles} />;
+              options={[]}
+              value={searchValue}
+              onKeyDown={submitSearchOnEnterPress}
+              freeSolo
+              renderInput={(params) => {
+                return (
+                  <SearchInput
+                    {...params}
+                    onChange={handleSearchChange}
+                    value={searchValue}
+                    sx={searchInputStyles}
+                    onClear={clearSearch}
+                  />
+                );
               }}
               className="search-autocomplete"
               componentsProps={componentProps}

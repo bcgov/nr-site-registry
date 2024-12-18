@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { LoggerService } from '../../logger/logger.service';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { SnapshotsService } from '../snapshot/snapshot.service';
+import { UserTypeEum } from '../../common/userType';
 
 @Injectable()
 export class ParticipantService {
@@ -14,6 +16,7 @@ export class ParticipantService {
     @InjectRepository(SitePartics)
     private readonly siteParticsRepository: Repository<SitePartics>,
     private readonly sitesLogger: LoggerService,
+    private snapshotService: SnapshotsService,
   ) {}
 
   /**
@@ -26,6 +29,7 @@ export class ParticipantService {
   async getSiteParticipantsBySiteId(
     siteId: string,
     showPending: boolean,
+    user: any,
   ): Promise<SiteParticsDto[]> {
     try {
       this.sitesLogger.log(
@@ -37,23 +41,43 @@ export class ParticipantService {
 
       // Fetch site participants based on the given siteId
       let result = [];
-
-      if (showPending)
-        result = await this.siteParticsRepository.find({
-          where: { siteId, userAction: UserActionEnum.UPDATED },
-          relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
-        });
-      else
-        result = await this.siteParticsRepository.find({
-          where: { siteId },
-          relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
-        });
+      if (user?.identity_provider === UserTypeEum.IDIR) {
+        if (showPending) {
+          result = await this.siteParticsRepository.find({
+            where: { siteId, userAction: UserActionEnum.UPDATED },
+            relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
+          });
+        } else {
+          result = await this.siteParticsRepository.find({
+            where: { siteId },
+            relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
+          });
+        }
+      } else {
+        const userId: string = user?.sub ? user.sub : '';
+        if (userId?.length === 0) {
+          this.sitesLogger.log(
+            'An invalid user was passed into ParticipantService.getSiteParticipantsBySiteId() end',
+          );
+          return [];
+        } else {
+          const snapshot = await this.snapshotService.getMostRecentSnapshot(
+            siteId,
+            userId,
+          );
+          if (!snapshot) {
+            return [];
+          } else {
+            result = snapshot?.snapshotData?.siteParticipants;
+          }
+        }
+      }
 
       if (!result?.length) {
         return [];
       } else {
         // Transform the fetched site participants into the desired format
-        const transformedObjects = result.flatMap((item) =>
+        const transformedObjects = result?.flatMap((item) =>
           item.siteParticRoles.map((role) => ({
             particRoleId: role.id,
             id: item.id,

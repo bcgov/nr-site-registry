@@ -42,13 +42,17 @@ import {
   isUserOfType,
   showNotification,
   UserRoleType,
+  validateForm,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import { fetchSiteParticipants } from './participants/ParticipantSlice';
 import { fetchSiteDisclosure } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
-import { fetchNotationParticipants } from './notations/NotationSlice';
+import {
+  fetchNotationParticipants,
+  notationParticipants,
+} from './notations/NotationSlice';
 import { fetchDocuments } from './documents/DocumentsSlice';
 import {
   fetchSnapshots,
@@ -96,6 +100,8 @@ import {
   resetBulkUpdateStatus,
 } from './srUpdates/state/srUpdatesTableSlice';
 import { Button } from '../../components/button/Button';
+import { IFormField } from '../../components/input-controls/IFormField';
+import { GetNotationConfig } from './notations/NotationsConfig';
 
 const SiteDetails = () => {
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
@@ -134,6 +140,12 @@ const SiteDetails = () => {
   const [showLocationDetails, SetShowLocationDetails] = useState(false);
   const [showParcelDetails, SetShowParcelDetails] = useState(false);
   const [save, setSave] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [errorList, setErrorList] = useState<any[]>([]);
+  const savedChanges = useSelector(trackedChanges);
+  const siteNotation = useSelector(notationParticipants);
+  const { notationFormRowEditMode, notationColumnInternal } =
+    GetNotationConfig();
   const [userType, setUserType] = useState<UserType | null>(null);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
@@ -236,7 +248,6 @@ const SiteDetails = () => {
     }
   }, [loggedInUser]);
 
-  const savedChanges = useSelector(trackedChanges);
   const mode = useSelector(siteDetailsMode);
 
   useEffect(() => {
@@ -392,7 +403,7 @@ const SiteDetails = () => {
     }
   }, [details]);
 
-  const handleItemClick = (value: string) => {
+  const handleItemClick = async (value: string) => {
     switch (value) {
       case SiteDetailsMode.EditMode:
         setEdit(true);
@@ -434,7 +445,16 @@ const SiteDetails = () => {
         //   );
         break;
       case SiteActionBtn.SAVE:
-        setSave(true);
+        const errors = await validateSiteForms();
+        if (errors.length > 0) {
+          setErrorList(errors);
+          setHasError(true);
+          setSave(false);
+        } else {
+          setErrorList([]);
+          setHasError(false);
+          setSave(true);
+        }
         break;
       case SiteActionBtn.CANCEL:
         handleCancelButton();
@@ -444,10 +464,92 @@ const SiteDetails = () => {
     }
   };
 
+  const validateSiteForms = async () => {
+    try {
+      // Run all validation functions in parallel using Promise.all
+      const [errors] = await Promise.all([validateNotationsForm()]);
+
+      // Combine all errors into one list
+      const allErrors = [...errors];
+
+      // You can now use `allErrors` for further processing
+      return allErrors;
+    } catch (error) {
+      return []; // Return empty array in case of error to avoid breaking further logic
+    }
+  };
+
+  const validateNotationsForm = async () => {
+    try {
+      // Run both validations in parallel and wait for them to finish
+      const [notationErrors, notationParticipantErrors] = await Promise.all([
+        validateNotations(), // Async function handling Notation validation
+        validateNotationParticipants(), // Async function handling Notation Participant validation
+      ]);
+
+      // Combine and return the errors from both functions
+      return [...notationErrors, ...notationParticipantErrors];
+    } catch (error) {
+      return []; // Return empty array in case of error to avoid breaking further logic
+    }
+  };
+
+  const validateNotations = async () => {
+    // Directly return the result of validateForm if it's not async
+    return validateForm(
+      notationFormRowEditMode,
+      siteNotation?.siteNotation,
+      'Notation',
+    );
+  };
+
+  const validateNotationParticipants = async () => {
+    const notationParticipantTable: IFormField[][] = [
+      notationColumnInternal
+        .map((column) => column.displayType)
+        .filter(
+          (displayType): displayType is IFormField => displayType !== undefined,
+        ),
+    ];
+
+    const notationParticipantErrors: any[] = [];
+
+    // Loop through siteNotation and their notationParticipants
+    for (const [index, notation] of siteNotation?.siteNotation.entries()) {
+      if (
+        notation?.notationParticipant &&
+        notation?.notationParticipant?.length > 0
+      ) {
+        for (const [
+          participantIndex,
+          notationParticipant,
+        ] of notation.notationParticipant.entries()) {
+          // Validate and accumulate errors for each notation participant
+          const errors = await validateForm(
+            notationParticipantTable,
+            notationParticipant,
+            `Notation [${index + 1}] Notation Participant [${participantIndex + 1}]`,
+          );
+          notationParticipantErrors.push(...errors);
+        }
+      } else {
+        notationParticipantErrors.push({
+          label: 'Notation Participants',
+          objectId: 'Notation Participants',
+          errorMessage: `Notation [${index + 1}] Atleast one  Notation Participant is required.`,
+        });
+      }
+    }
+
+    // Return the accumulated errors
+    return notationParticipantErrors;
+  };
+
   const handleCancelButton = () => {
     dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
     dispatch(clearTrackChanges({}));
     setSave(false);
+    setHasError(false);
     setEdit(false);
   };
 
@@ -595,7 +697,7 @@ const SiteDetails = () => {
                   />
                   <SaveButton
                     variant="secondary"
-                    clickHandler={() => setSave(true)}
+                    clickHandler={() => handleItemClick(SiteActionBtn.SAVE)}
                     isDisabled={savedChanges?.length > 0 ? false : true}
                   />
                   <CancelButton clickHandler={handleCancelButton} />
@@ -653,7 +755,7 @@ const SiteDetails = () => {
               }}
             />
           )}
-        {save && (
+        {/* {save && !error && errors?.length === 0 && (
           <ModalDialog
             closeHandler={(response) => {
               setSave(false);
@@ -691,6 +793,98 @@ const SiteDetails = () => {
           </ModalDialog>
         )}
 
+        {save && error && errors?.length > 0 && (
+          <ModalDialog
+            closeHandler={(response) => {
+              setError(false);
+              if (response) {
+                // dispatch(saveSiteDetails()).unwrap();
+              }
+            }}>
+              <React.Fragment>
+                <div>
+                  <span className="custom-modal-data-text text-danger">
+                    The following fields have errors:
+                  </span>
+                </div>
+                <div>
+                  <ul className="custom-modal-data-text text-danger">
+                    {errors.map((item: any) => (
+                      <li key={item.label}>
+                        {IChangeType[item.changeType]} {item.label}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </React.Fragment>
+          </ModalDialog>
+        )} */}
+        {(save || hasError) && (
+          <ModalDialog
+            errorOption={hasError}
+            customHeaderCss={hasError ? 'custom-modal-error-header-text' : ''}
+            headerLabel={hasError ? 'Please fix the errors' : ''}
+            closeHandler={(response) => {
+              setSave(false);
+              if (response && errorList?.length === 0) {
+                // Proceed with saving if there are no errors
+                dispatch(saveSiteDetails()).unwrap();
+              } else {
+                // If there are errors, you can handle accordingly (perhaps reset or keep showing the errors)
+                setHasError(false);
+              }
+            }}
+          >
+            {/* Show error message if errors exist */}
+            {hasError && errorList && errorList?.length > 0 ? (
+              <React.Fragment>
+                <div>
+                  <span className="custom-modal-data-text text-danger">
+                    The following fields have errors:
+                  </span>
+                </div>
+                <div
+                  style={{
+                    maxHeight: '200px', // Adjust based on your modal size
+                    overflowY: 'auto',
+                  }}
+                >
+                  <ul className="custom-modal-data-text text-danger">
+                    {errorList.map((item: any, index) => (
+                      <li key={index}>
+                        {/* Assuming item has changeType and label */}
+                        {IChangeType[item.changeType]} {item.errorMessage}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </React.Fragment>
+            ) : (
+              // Show success message or saved changes if there are no errors
+              <React.Fragment>
+                <div>
+                  <span className="custom-modal-data-text">
+                    {savedChanges.length > 0
+                      ? 'The following fields will be updated:'
+                      : 'No changes to save'}
+                  </span>
+                </div>
+                {savedChanges.length > 0 && (
+                  <div>
+                    <ul className="custom-modal-data-text">
+                      {savedChanges.map((item: any) => (
+                        <li key={item.label}>
+                          {IChangeType[item.changeType]} {item.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </React.Fragment>
+            )}
+          </ModalDialog>
+        )}
+
         {!isVisible && (
           <div className="d-flex justify-content-between">
             <Button variant="secondary" onClick={onClickBackButton}>
@@ -719,7 +913,7 @@ const SiteDetails = () => {
                     />
                     <SaveButton
                       variant="secondary"
-                      clickHandler={() => setSave(true)}
+                      clickHandler={() => handleItemClick(SiteActionBtn.SAVE)}
                       isDisabled={savedChanges?.length > 0 ? false : true}
                     />
                     <CancelButton clickHandler={handleCancelButton} />

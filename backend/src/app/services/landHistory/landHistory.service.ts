@@ -9,6 +9,7 @@ import { LoggerService } from '../../logger/logger.service';
 
 import { UserActionEnum } from '../../common/userActionEnum';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 export class LandHistoryService {
   constructor(
@@ -67,6 +68,8 @@ export class LandHistoryService {
       const result = (await query.getMany()).map((landHistory) => ({
         ...landHistory,
         guid: v4(),
+        srValue:
+          landHistory.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
       }));
       this.sitesLogger.log('LandHistoryService.getLandHistoriesForSite() end');
       this.sitesLogger.debug(

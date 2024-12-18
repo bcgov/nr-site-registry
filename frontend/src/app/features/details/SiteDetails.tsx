@@ -6,6 +6,7 @@ import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
 import {
   AngleLeft,
+  CircleExclamationIconFa,
   ShoppingCartIcon,
   SpinnerIcon,
 } from '../../components/common/icon';
@@ -73,6 +74,7 @@ import {
   saveRequestStatus,
   saveSiteDetails,
   setupSiteIdForSaving,
+  setupSiteSummaryForSaving,
 } from './SaveSiteDetailsSlice';
 import { fetchAssociatedSites } from './associates/AssociateSlice';
 import AddToFolio from '../folios/AddToFolio';
@@ -96,6 +98,8 @@ import {
   resetBulkUpdateStatus,
 } from './srUpdates/state/srUpdatesTableSlice';
 import { Button } from '../../components/button/Button';
+import { UserActionEnum } from '../../common/userActionEnum';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 const SiteDetails = () => {
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
@@ -202,6 +206,11 @@ const SiteDetails = () => {
   const { id } = useParams();
 
   const details = useSelector(selectSiteDetails);
+  const [siteDetailsForSRMode, SetSiteDetailsForSRMode] = useState(details);
+
+  useEffect(() => {
+    SetSiteDetailsForSRMode(details);
+  }, [details]);
 
   const loggedInUser = getUser();
 
@@ -547,6 +556,26 @@ const SiteDetails = () => {
     }
   };
 
+  const handleSiteSRVisiblity = (event: any) => {
+    SetSiteDetailsForSRMode({
+      ...siteDetailsForSRMode,
+      srAction:
+        event?.target?.checked === true
+          ? SRApprovalStatusEnum.Public
+          : SRApprovalStatusEnum.Private,
+    });
+    dispatch(
+      setupSiteSummaryForSaving({
+        ...details,
+        userAction: UserActionEnum.updated,
+        srAction:
+          event?.target?.checked === true
+            ? SRApprovalStatusEnum.Public
+            : SRApprovalStatusEnum.Private,
+      }),
+    );
+  };
+
   return (
     <>
       {isVisible && (
@@ -730,8 +759,47 @@ const SiteDetails = () => {
 
           {!isVisible && (
             <>
+              {viewMode === SiteDetailsMode.SRMode && (
+                <div className="sr-mode-content">
+                  <div className="sr-mode-info-banner">
+                    <div className="sr-mode-info-content-layout">
+                      <div>
+                        <CircleExclamationIconFa className="sr-mode-info-icon-color" />
+                      </div>
+                      <div className="sr-mode-text-content">
+                        <span className="sr-mode-text sr-mode-text-bold">
+                          You are in SR Mode.
+                        </span>
+                        <span className="sr-mode-text sr-mode-text-light">
+                          Select items to show in Site Registry.
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="form-check form-switch">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="flexSwitchCheckChecked"
+                      checked={
+                        siteDetailsForSRMode?.srAction ===
+                        SRApprovalStatusEnum.Public
+                      }
+                      onChange={(event) => handleSiteSRVisiblity(event)}
+                    />
+                    <label className="form-check-label">
+                      {siteDetailsForSRMode?.srAction ===
+                      SRApprovalStatusEnum.Public
+                        ? 'Site Published to Site Registry'
+                        : 'Publish Page To Site Registry'}
+                    </label>
+                  </div>
+                </div>
+              )}
+
               <div>
-                <CustomLabel label="Site ID: " labelType="b-h5" />
+                <CustomLabel label="Site ID1: " labelType="b-h5" />
                 <CustomLabel label={id ?? ''} labelType="r-h5" />
               </div>
               <div>

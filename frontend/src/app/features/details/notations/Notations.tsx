@@ -382,73 +382,118 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     setFormData(notations);
   };
 
+  const updateNotationsForSRMode = (
+    notations: any,
+    id: number,
+    isChecked: boolean,
+  ) => {
+    return notations.map((notation: any) => {
+      if (notation.id === id) {
+        let updatedNotation = {
+          ...notation,
+          apiAction: notation?.apiAction ?? UserActionEnum.updated,
+          srAction: isChecked
+            ? SRApprovalStatusEnum.Public
+            : SRApprovalStatusEnum.Private,
+        };
+
+        return updatedNotation;
+      }
+      return notation;
+    });
+  };
+
+  const updateNotations = (
+    notations: any,
+    id: number,
+    graphQLPropertyName: any,
+    value: String | [Date, Date],
+  ) => {
+    return notations.map((notation: any) => {
+      if (notation.id === id) {
+        let updatedNotation = {
+          ...notation,
+          [graphQLPropertyName]: value,
+          apiAction: notation?.apiAction ?? UserActionEnum.updated,
+          srAction: SRApprovalStatusEnum.Pending,
+        };
+
+        if (graphQLPropertyName === 'eclsCode') {
+          setIsUpdated(true);
+          const updatedRow = [...notationFormRowEditMode].map((items) => {
+            return items.map((row) => ({
+              ...row,
+              options: notationType.data.find(
+                (item: any) => item.metaData === value,
+              ).dropdownDto,
+            }));
+          });
+          setUpdatedNotationFormRowEditMode(updatedRow);
+          updatedNotation['etypCode'] = '';
+        }
+
+        return updatedNotation;
+      }
+      return notation;
+    });
+  };
+
   const handleInputChange = (
     id: number,
     graphQLPropertyName: any,
     value: String | [Date, Date],
   ) => {
-    if (viewMode === SiteDetailsMode.SRMode) {
-      console.log({ [graphQLPropertyName]: value, id });
-    } else {
-      const updateNotations = (notations: any) => {
-        return notations.map((notation: any) => {
-          if (notation.id === id) {
-            let updatedNotation = {
-              ...notation,
-              [graphQLPropertyName]: value,
-              apiAction: notation?.apiAction ?? UserActionEnum.updated,
-              srAction: SRApprovalStatusEnum.Pending,
-            };
-
-            if (graphQLPropertyName === 'eclsCode') {
-              setIsUpdated(true);
-              const updatedRow = [...notationFormRowEditMode].map((items) => {
-                return items.map((row) => ({
-                  ...row,
-                  options: notationType.data.find(
-                    (item: any) => item.metaData === value,
-                  ).dropdownDto,
-                }));
-              });
-              setUpdatedNotationFormRowEditMode(updatedRow);
-              updatedNotation['etypCode'] = '';
-            }
-
-            return updatedNotation;
-          }
-          return notation;
-        });
-      };
-
-      // Update both formData and trackNotation in one go
-      const updatedNotation = updateNotations(formData);
-      const updatedTrackNotation = updateNotations(trackNotation ?? formData);
-
-      setFormData(updatedNotation);
-      dispatch(updateSiteNotation(updatedNotation));
-      dispatch(setupNotationDataForSaving(updatedTrackNotation));
-
-      const flattedArr = flattenFormRows(notationFormRowsInternal);
-      const currLabel =
-        flattedArr &&
-        flattedArr.find(
-          (row) => row.graphQLPropertyName === graphQLPropertyName,
-        );
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Notations: ' + currLabel?.label,
+    let updatedNotation = null;
+    let updatedTrackNotation = null;
+    if (
+      viewMode === SiteDetailsMode.SRMode &&
+      (value === 'checked' || value === 'unchecked')
+    ) {
+      updatedNotation = updateNotationsForSRMode(
+        formData,
+        id,
+        value === 'checked' ? true : false,
       );
-      dispatch(trackChanges(tracker.toPlainObject()));
+
+      updatedTrackNotation = updateNotationsForSRMode(
+        trackNotation ?? formData,
+        id,
+        value === 'checked' ? true : false,
+      );
+    } else {
+      // Update both formData and trackNotation in one go
+
+      updatedNotation = updateNotations(
+        formData,
+        id,
+        graphQLPropertyName,
+        value,
+      );
+
+      updatedTrackNotation = updateNotations(
+        trackNotation ?? formData,
+        id,
+        graphQLPropertyName,
+        value,
+      );
     }
+
+    setFormData(updatedNotation);
+    dispatch(updateSiteNotation(updatedNotation));
+    dispatch(setupNotationDataForSaving(updatedTrackNotation));
+
+    const flattedArr = flattenFormRows(notationFormRowsInternal);
+    const currLabel =
+      flattedArr &&
+      flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
+    const tracker = new ChangeTracker(
+      IChangeType.Modified,
+      'Notations: ' + currLabel?.label,
+    );
+    dispatch(trackChanges(tracker.toPlainObject()));
   };
 
-  const handleWidgetCheckBox = (event: any) => {
-    alert(event);
-  };
-
-  const handleParentChekBoxChange = (id: any, value: any) => {
-    alert(`${value}, ${id}`);
-  };
+  const handleWidgetCheckBox = (event: any) => {};
 
   const handleRemoveParticipant = (
     currNotation: any,
@@ -570,22 +615,53 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
                     event.value !== null &&
                     event.property === 'psnorgId';
 
-                  const updatedParticipant = isPsnorgId
-                    ? {
-                        ...participant,
-                        [event.property]: event.value.key,
-                        ['displayName']: event.value.value,
-                        apiAction:
-                          participant?.apiAction ?? UserActionEnum.updated,
-                        srAction: SRApprovalStatusEnum.Pending,
-                      }
-                    : {
-                        ...participant,
-                        [event.property]: event.value,
-                        apiAction:
-                          participant?.apiAction ?? UserActionEnum.updated,
-                        srAction: SRApprovalStatusEnum.Pending,
-                      };
+                  let updatedParticipant = null;
+
+                  if (
+                    viewMode === SiteDetailsMode.SRMode &&
+                    event &&
+                    event.property === 'srValue'
+                  ) {
+                    updatedParticipant = isPsnorgId
+                      ? {
+                          ...participant,
+                          [event.property]: event.value,
+                          ['displayName']: event.value.value,
+                          apiAction:
+                            participant?.apiAction ?? UserActionEnum.updated,
+                          srAction:
+                            event.value === true
+                              ? SRApprovalStatusEnum.Public
+                              : SRApprovalStatusEnum.Private,
+                        }
+                      : {
+                          ...participant,
+                          [event.property]: event.value,
+                          apiAction:
+                            participant?.apiAction ?? UserActionEnum.updated,
+                          srAction:
+                            event.value === true
+                              ? SRApprovalStatusEnum.Public
+                              : SRApprovalStatusEnum.Private,
+                        };
+                  } else {
+                    updatedParticipant = isPsnorgId
+                      ? {
+                          ...participant,
+                          [event.property]: event.value.key,
+                          ['displayName']: event.value.value,
+                          apiAction:
+                            participant?.apiAction ?? UserActionEnum.updated,
+                          srAction: SRApprovalStatusEnum.Pending,
+                        }
+                      : {
+                          ...participant,
+                          [event.property]: event.value,
+                          apiAction:
+                            participant?.apiAction ?? UserActionEnum.updated,
+                          srAction: SRApprovalStatusEnum.Pending,
+                        };
+                  }
 
                   if (isPsnorgId && updateParams) {
                     const params: UpdateDisplayTypeParams = {
@@ -959,8 +1035,16 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
                     type={FormFieldType.Checkbox}
                     label={''}
                     isLabel={false}
+                    isChecked={
+                      notation.srAction === 'true' ||
+                      notation.srAction === SRApprovalStatusEnum.Public
+                    }
                     onChange={(value) =>
-                      handleParentChekBoxChange(notation.id, value)
+                      handleInputChange(
+                        notation.id,
+                        '',
+                        value ? 'checked' : 'unchecked',
+                      )
                     }
                     srMode={viewMode === SiteDetailsMode.SRMode}
                   />

@@ -193,17 +193,33 @@ const LandUses: FC = () => {
         event.value,
     };
 
-    setEditLandUsesData((prev) => {
-      const data = new Map(prev);
+    if (viewMode === SiteDetailsMode.SRMode && event.property === 'srValue') {
+      setEditLandUsesData((prev) => {
+        const data = new Map(prev);
 
-      data.set(editedRowId, {
-        ...(data.get(editedRowId) ?? {}),
-        ...landUseUpdateInput,
-        userAction: UserActionEnum.updated,
-        srAction: SRApprovalStatusEnum.Pending,
+        data.set(editedRowId, {
+          ...(data.get(editedRowId) ?? {}),
+          ...landUseUpdateInput,
+          userAction: UserActionEnum.updated,
+          srAction: event.value
+            ? SRApprovalStatusEnum.Public
+            : SRApprovalStatusEnum.Private,
+        });
+        return data;
       });
-      return data;
-    });
+    } else {
+      setEditLandUsesData((prev) => {
+        const data = new Map(prev);
+
+        data.set(editedRowId, {
+          ...(data.get(editedRowId) ?? {}),
+          ...landUseUpdateInput,
+          userAction: UserActionEnum.updated,
+          srAction: SRApprovalStatusEnum.Pending,
+        });
+        return data;
+      });
+    }
 
     const tableColumn = tableColumns.find(
       (column) => column.graphQLPropertyName === event.property,

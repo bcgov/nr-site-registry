@@ -439,12 +439,27 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
               setIsRecordExist({});
               setCurrentRecordId('');
             }
-            return {
-              ...assoc,
-              [event.property]: event.value,
-              apiAction: assoc?.apiAction ?? UserActionEnum.updated,
-              srAction: SRApprovalStatusEnum.Pending,
-            };
+
+            if (
+              viewMode === SiteDetailsMode.SRMode &&
+              event.property === 'srValue'
+            ) {
+              return {
+                ...assoc,
+                [event.property]: event.value,
+                apiAction: assoc?.apiAction ?? UserActionEnum.updated,
+                srAction: event.value
+                  ? SRApprovalStatusEnum.Public
+                  : SRApprovalStatusEnum.Pending,
+              };
+            } else {
+              return {
+                ...assoc,
+                [event.property]: event.value,
+                apiAction: assoc?.apiAction ?? UserActionEnum.updated,
+                srAction: SRApprovalStatusEnum.Pending,
+              };
+            }
           }
           return assoc;
         });

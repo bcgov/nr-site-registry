@@ -141,10 +141,7 @@ const Notation: React.FC<INotationProps> = ({
               viewMode === SiteDetailsMode.EditMode &&
               userType === UserType.Internal
             }
-            srMode={
-              viewMode === SiteDetailsMode.SRMode &&
-              userType === UserType.Internal
-            }
+            srMode={false}
             primaryKeycolumnName="eventParticId"
             sortHandler={(row, ascDir) => {
               handleTableSort(row, ascDir, notation.id);

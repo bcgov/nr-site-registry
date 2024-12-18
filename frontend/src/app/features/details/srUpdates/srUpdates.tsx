@@ -852,12 +852,15 @@ const SRUpdates = () => {
         </ApproveReject>
       )}
       {!disclosureData &&
-        (!parcelDescriptionData || parcelDescriptionData.data.length === 0) &&
-        (!landUsesData || landUsesData.length === 0) &&
-        (!associatedSitesData || associatedSitesData.length === 0) &&
-        (!documentsData || documentsData.length === 0) &&
-        (!siteParticipantData || siteParticipantData.length === 0) &&
-        (!notationData || notationData.length === 0) &&
+        (!parcelDescriptionData ||
+          (parcelDescriptionData && parcelDescriptionData.data.length === 0)) &&
+        (!landUsesData || (landUsesData && landUsesData.length === 0)) &&
+        (!associatedSitesData ||
+          (associatedSitesData && associatedSitesData.length === 0)) &&
+        (!documentsData || (documentsData && documentsData.length === 0)) &&
+        (!siteParticipantData ||
+          (siteParticipantData && siteParticipantData.length === 0)) &&
+        (!notationData || (notationData && notationData.length === 0)) &&
         !siteSummaryData && (
           <div>
             <span> No updates to review</span>

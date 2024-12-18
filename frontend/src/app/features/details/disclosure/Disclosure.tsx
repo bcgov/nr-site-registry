@@ -269,10 +269,28 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     graphQLPropertyName: any,
     value: String | [Date, Date],
   ) => {
-    if (viewMode === SiteDetailsMode.SRMode) {
-      console.log({ [graphQLPropertyName]: value, id });
+    let updatedDisclosure = null;
+    if (
+      viewMode === SiteDetailsMode.SRMode &&
+      graphQLPropertyName === 'srCheckbox'
+    ) {
+      updatedDisclosure = (disclosure: any) => {
+        return {
+          ...disclosure,
+          id: disclosure.id ?? '',
+          siteId: disclosure.siteId ?? siteId,
+          apiAction:
+            disclosure.id === '' || disclosure.id === undefined
+              ? UserActionEnum.added
+              : UserActionEnum.updated,
+          srAction:
+            value === 'checked'
+              ? SRApprovalStatusEnum.Public
+              : SRApprovalStatusEnum.Private,
+        };
+      };
     } else {
-      const updatedDisclosure = (disclosure: any) => {
+      updatedDisclosure = (disclosure: any) => {
         return {
           ...disclosure,
           [graphQLPropertyName]: value,
@@ -285,14 +303,16 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
           srAction: SRApprovalStatusEnum.Pending,
         };
       };
-      const updatedFormData = updatedDisclosure(formData);
-      const updatedTrackDisclosure = updatedDisclosure(
-        trackSiteDisclosure ?? formData,
-      );
-      setFormData(updatedFormData);
-      dispatch(updateSiteDisclosure(serializeDate(updatedFormData)));
-      dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
     }
+
+    const updatedFormData = updatedDisclosure(formData);
+    const updatedTrackDisclosure = updatedDisclosure(
+      trackSiteDisclosure ?? formData,
+    );
+    setFormData(updatedFormData);
+    dispatch(updateSiteDisclosure(serializeDate(updatedFormData)));
+    dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
+
     const flattedArr = flattenFormRows([
       ...disclosureStatementConfig,
       ...disclosureCommentsConfig,

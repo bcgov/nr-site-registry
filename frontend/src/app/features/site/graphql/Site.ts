@@ -73,6 +73,7 @@ export const graphqlSiteDetailsQuery = () => {
           generalDescription
           siteRiskCode
           whenUpdated
+          srAction
         }
         httpStatusCode
       }

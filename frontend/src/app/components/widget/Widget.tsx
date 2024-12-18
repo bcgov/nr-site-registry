@@ -24,6 +24,8 @@ const Widget: React.FC<IWidget> = ({
   handleCheckBoxChange,
   sortHandler,
   showPageOptions,
+  widgetIschecked,
+  hideWidgetCheckbox,
 }) => {
   let widgetSortHandler = sortHandler ?? (() => {});
   const [widgetData, setWidgetData] = useState(tableData);
@@ -35,13 +37,14 @@ const Widget: React.FC<IWidget> = ({
     <div className={`d-flex flex-column widget-container`}>
       {!hideTitle && title && (
         <div className="d-flex align-items-center">
-          {srMode && (
+          {srMode && !hideWidgetCheckbox && (
             <CheckBoxInput
               type={FormFieldType.Checkbox}
               label={''}
               isLabel={false}
               onChange={handleCheckBoxChange ?? (() => {})}
               srMode={srMode}
+              isChecked={widgetIschecked}
             />
           )}
           <div className="w-100 me-1">

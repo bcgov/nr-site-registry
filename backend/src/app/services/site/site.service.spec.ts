@@ -503,6 +503,7 @@ describe('SiteService', () => {
               apiAction: 'pending',
               srAction: 'pending',
               notationParticipant: null,
+              srValue: true
             },
           ],
         };

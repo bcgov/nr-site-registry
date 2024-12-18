@@ -219,15 +219,6 @@ export const TextInput: React.FC<InputProps> = ({
     >
       {!tableMode && (
         <>
-          {srMode && (
-            <CheckBoxInput
-              type={FormFieldType.Checkbox}
-              label={inputTxtId}
-              isLabel={false}
-              onChange={handleCheckBoxChange}
-              srMode={srMode}
-            />
-          )}
           {!tableMode && (
             <label
               htmlFor={inputTxtId}
@@ -308,15 +299,6 @@ export const DropdownInput: React.FC<InputProps> = ({
     <ContainerElement
       className={tableMode ? 'table-border-light align-content-center' : 'mb-3'}
     >
-      {srMode && (
-        <CheckBoxInput
-          type={FormFieldType.Checkbox}
-          label={drdownId}
-          isLabel={false}
-          onChange={handleCheckBoxChange}
-          srMode={srMode}
-        />
-      )}
       {/* Create a label for the dropdown using the form-label class */}
 
       {!tableMode && (
@@ -473,15 +455,6 @@ export const GroupInput: React.FC<InputProps> = ({
     <div className="mb-3">
       {' '}
       {/* Container for the group input */}
-      {srMode && (
-        <CheckBoxInput
-          type={FormFieldType.Checkbox}
-          label={''}
-          isLabel={false}
-          onChange={handleCheckBoxChange}
-          srMode={srMode}
-        />
-      )}
       {/* Label for the group input */}
       <label
         htmlFor={groupId}
@@ -584,15 +557,6 @@ export const DateRangeInput: React.FC<InputProps> = ({
     <ContainerElement
       className={tableMode ? 'table-border-light align-content-center' : 'mb-3'}
     >
-      {srMode && (
-        <CheckBoxInput
-          type={FormFieldType.Checkbox}
-          label={dateRangeId}
-          isLabel={false}
-          onChange={handleCheckBoxChange}
-          srMode={srMode}
-        />
-      )}
       {!tableMode && (
         <label
           htmlFor={dateRangeId}
@@ -678,15 +642,6 @@ export const DateInput: React.FC<InputProps> = ({
     <ContainerElement
       className={tableMode ? 'table-border-light align-content-center' : 'mb-3'}
     >
-      {srMode && (
-        <CheckBoxInput
-          type={FormFieldType.Checkbox}
-          label={dateRangeId}
-          isLabel={false}
-          onChange={handleCheckBoxChange}
-          srMode={srMode}
-        />
-      )}
       {!tableMode && (
         <label
           htmlFor={dateRangeId}
@@ -824,15 +779,6 @@ export const TextAreaInput: React.FC<InputProps> = ({
     >
       {!tableMode && (
         <>
-          {srMode && (
-            <CheckBoxInput
-              type={FormFieldType.Checkbox}
-              label={textAreaId}
-              isLabel={false}
-              onChange={(isChecked) => onChange(isChecked)}
-              srMode={srMode}
-            />
-          )}
           {!tableMode && (
             <label
               htmlFor={textAreaId}
@@ -950,15 +896,6 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
     <ContainerElement
       className={`${tableMode ? 'table-border-light align-content-center' : 'mb-3'} ${tableMode && stickyCol ? 'position-sticky' : ''} `}
     >
-      {srMode && (
-        <CheckBoxInput
-          type={FormFieldType.Checkbox}
-          label={label}
-          isLabel={false}
-          onChange={(isChecked) => onChange(isChecked)}
-          srMode={srMode}
-        />
-      )}
       {!tableMode && (
         <label
           htmlFor={drdownId}

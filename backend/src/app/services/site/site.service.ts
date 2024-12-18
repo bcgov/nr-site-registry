@@ -155,6 +155,8 @@ export class SiteService {
       }),
     );
 
+    query.andWhere('sites.srStatus != :srStatus', { srStatus: 'private' });
+
     if (id) {
       query.andWhere('sites.id = :id', { id: id });
     }
@@ -769,6 +771,7 @@ export class SiteService {
               apiAction,
               particRoleId,
               srAction,
+              srValue,
               ...siteParticsData
             } = participant;
 
@@ -962,8 +965,13 @@ export class SiteService {
           participants: any[],
         ) => {
           const participantPromises = participants.map(async (partic) => {
-            const { eventParticId, displayName, apiAction, ...particData } =
-              partic;
+            const {
+              eventParticId,
+              displayName,
+              apiAction,
+              srValue,
+              ...particData
+            } = partic;
             switch (apiAction) {
               case UserActionEnum.ADDED:
                 return {
@@ -1150,7 +1158,7 @@ export class SiteService {
         const deleteSiteAssociates: { id: string }[] = [];
 
         const siteAssociatePromises = siteAccociated.map(async (asscos) => {
-          const { id, apiAction, ...siteAssocsData } = asscos;
+          const { id, apiAction, srValue, ...siteAssocsData } = asscos;
           const siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
           switch (apiAction) {
             case UserActionEnum.ADDED:

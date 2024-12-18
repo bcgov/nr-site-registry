@@ -102,6 +102,7 @@ describe('LandHistoryService', () => {
           srAction: '',
           userAction: '',
           apiAction: '',
+          srValue: true,
         },
       ];
 
@@ -139,6 +140,7 @@ describe('LandHistoryService', () => {
           srAction: '',
           userAction: '',
           apiAction: '',
+          srValue: true,
         },
       ];
 
@@ -172,6 +174,7 @@ describe('LandHistoryService', () => {
           srAction: '',
           userAction: '',
           apiAction: '',
+          srValue: true,
         },
       ];
 

@@ -57,8 +57,8 @@ export class AssociatedSiteService {
         siteIdAssociatedWith: assocs.siteIdAssociatedWith,
         effectiveDate: assocs.effectiveDate.toISOString(),
         note: assocs.note ? assocs.note.trim() : null, // Ensure note is trimmed
-        srAction:
-          assocs.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
+        srValue: assocs.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
+        srAction: assocs.srAction,
       }));
 
       // Convert the transformed objects into DTOs

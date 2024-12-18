@@ -428,15 +428,32 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
               setInternalRow(updateTableColumn(internalRow, params));
             }
 
-            return {
-              ...participant,
-              [event.property]: isPsnorgId ? event.value.key : event.value,
-              displayName: isPsnorgId
-                ? event.value.value
-                : participant.displayName,
-              apiAction: participant?.apiAction ?? UserActionEnum.updated,
-              srAction: SRApprovalStatusEnum.Pending,
-            };
+            if (
+              viewMode === SiteDetailsMode.SRMode &&
+              event.property === 'srValue'
+            ) {
+              return {
+                ...participant,
+                [event.property]: isPsnorgId ? event.value.key : event.value,
+                displayName: isPsnorgId
+                  ? event.value.value
+                  : participant.displayName,
+                apiAction: participant?.apiAction ?? UserActionEnum.updated,
+                srAction: event.value
+                  ? SRApprovalStatusEnum.Public
+                  : SRApprovalStatusEnum.Private,
+              };
+            } else {
+              return {
+                ...participant,
+                [event.property]: isPsnorgId ? event.value.key : event.value,
+                displayName: isPsnorgId
+                  ? event.value.value
+                  : participant.displayName,
+                apiAction: participant?.apiAction ?? UserActionEnum.updated,
+                srAction: SRApprovalStatusEnum.Pending,
+              };
+            }
           }
           return participant;
         });

@@ -98,8 +98,9 @@ export class NotationService {
               psnorgId: partic.psnorgId,
               displayName: partic.psnorg.displayName,
               userAction: partic.userAction ?? UserActionEnum.DEFAULT,
-              srAction:
+              srValue:
                 partic.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
+              srAction: partic.srAction,
             })),
           };
         });

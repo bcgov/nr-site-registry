@@ -65,11 +65,12 @@ export class ParticipantService {
             displayName: item.psnorg?.displayName?.trim() || '', // Safely access displayName with default value
             prCode: role.prCode.trim(),
             description: role.prCode2?.description?.trim() || '', // Safely access description with default value
-            srAction:
+            srValue:
               item.srAction === SRApprovalStatusEnum.PUBLIC ||
               role.srAction === SRApprovalStatusEnum.PUBLIC
                 ? true
                 : false,
+            srAction: role.srAction,
           })),
         );
 

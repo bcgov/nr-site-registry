@@ -13,7 +13,7 @@ import { ApproveRejectButtons } from '../../../components/approve/ApproveReject'
 import { Button } from '../../../components/button/Button';
 
 interface INotationProps {
-  index: number;
+  index?: number;
   notation: {
     [key: string]: any;
   };
@@ -47,7 +47,6 @@ interface INotationProps {
 }
 
 const Notation: React.FC<INotationProps> = ({
-  index,
   notation,
   handleNotationFormRowFirstChild,
   viewMode,
@@ -72,16 +71,12 @@ const Notation: React.FC<INotationProps> = ({
 }) => {
   showApproveRejectSection = showApproveRejectSection ?? false;
 
-  approveRejectHandler =
-    approveRejectHandler ??
-    ((value) => {
-      console.log('Approve/Reject Handler not provided');
-    });
+  approveRejectHandler = approveRejectHandler ?? (() => {});
 
   return (
     <PanelWithUpDown
       firstChild={
-        <div className="w-100" key={index}>
+        <div className="w-100" key={notation?.id}>
           <Form
             formRows={handleNotationFormRowFirstChild(notation)}
             formData={notation}
@@ -98,7 +93,7 @@ const Notation: React.FC<INotationProps> = ({
         </div>
       }
       secondChild={
-        <div className="w-100">
+        <div className="w-100" key={notation?.id}>
           <Form
             formRows={
               userType === UserType.External

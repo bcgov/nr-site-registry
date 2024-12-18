@@ -20,47 +20,44 @@ interface Props {
   [key: string]: any;
 }
 
-export const IconMarker = forwardRef<LeafletMarker, Props>(
-  (
-    {
-      position,
-      icon,
-      onClick,
-      onHover,
-      eventHandlers = {},
-      children = null,
-      riseOnHover = false,
-      ...rest
-    }: Props,
-    ref,
-  ) => {
-    if (onClick) {
-      eventHandlers = {
-        ...eventHandlers,
-        click: onClick,
-      };
-    }
+export const IconMarker = forwardRef<LeafletMarker, Props>((props, ref) => {
+  let {
+    position,
+    icon,
+    onClick,
+    onHover,
+    eventHandlers = {},
+    children = null,
+    riseOnHover = false,
+    ...rest
+  } = props;
 
-    if (onHover) {
-      eventHandlers = {
-        ...eventHandlers,
-        mouseover: () => onHover(true),
-        mouseout: () => onHover(false),
-      };
-    }
-    return (
-      <Marker
-        ref={ref}
-        position={position}
-        icon={icon}
-        eventHandlers={eventHandlers}
-        riseOnHover={riseOnHover}
-        {...rest}
-      >
-        {children}
-      </Marker>
-    );
-  },
-);
+  if (onClick) {
+    eventHandlers = {
+      ...eventHandlers,
+      click: onClick,
+    };
+  }
+
+  if (onHover) {
+    eventHandlers = {
+      ...eventHandlers,
+      mouseover: () => onHover(true),
+      mouseout: () => onHover(false),
+    };
+  }
+  return (
+    <Marker
+      ref={ref}
+      position={position}
+      icon={icon}
+      eventHandlers={eventHandlers}
+      riseOnHover={riseOnHover}
+      {...rest}
+    >
+      {children}
+    </Marker>
+  );
+});
 
 IconMarker.displayName = 'IconMarker';

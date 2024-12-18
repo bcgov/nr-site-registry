@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import PanelWithUpDown from '../../../components/simple/PanelWithUpDown';
-// const Map: any = require('../../../../../node_modules/react-parcelmap-bc/dist/Map').default;
 // @ts-ignore
-import Map from '../../../../../node_modules/react-parcelmap-bc/dist/Map';
 import SummaryForm from '../SummaryForm';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
+import { MapContainer, useMap } from 'react-leaflet';
+import { TileLayer } from 'react-leaflet';
+import { SiteMarker } from '../../map/siteMarkers/SiteMarker';
+import './Summary.css';
+import 'leaflet/dist/leaflet.css';
 
 export interface ISummaryInfo {
-  location: any;
   siteData: any;
   edit: boolean;
   srMode: boolean;
@@ -17,7 +19,6 @@ export interface ISummaryInfo {
 }
 
 const SummaryInfo: React.FC<ISummaryInfo> = ({
-  location,
   siteData,
   edit,
   srMode,
@@ -39,8 +40,28 @@ const SummaryInfo: React.FC<ISummaryInfo> = ({
       secondChild={
         <div className="row w-100">
           <div className="col-12 col-lg-6">
-            {/* <Map callback={() => {}} initLocation={location} readOnly={true} /> */}
+            <MapContainer
+              center={{
+                lat: siteData.latdeg,
+                lng: siteData.longdeg,
+              }}
+              zoom={14}
+              zoomControl={false}
+              className="map-container"
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <SiteMarker
+                position={{
+                  lat: siteData.latdeg,
+                  lng: siteData.longdeg,
+                }}
+              />
+            </MapContainer>
           </div>
+
           <div className="col-12 col-lg-6">
             {siteData != null && (
               <SummaryForm

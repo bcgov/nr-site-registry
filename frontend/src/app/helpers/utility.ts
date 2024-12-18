@@ -451,3 +451,67 @@ export function sortArray<T>(
     }
   });
 }
+
+export const validateForm = (
+  formRows: IFormField[][],
+  formData: any,
+  source: string,
+) => {
+  const errors: any[] = [];
+  const traverse = (
+    rows: IFormField[][],
+    data: any,
+    parentLabel: string = source,
+    parentIndex: string = '',
+    currentContext: string = '',
+  ) => {
+    rows.forEach((items) => {
+      items.forEach((row) => {
+        const propertyName = row.graphQLPropertyName;
+
+        // Ensure graphQLPropertyName exists
+        if (propertyName) {
+          const fieldValue = data[propertyName];
+
+          // Validate the current field
+          if (row.validation?.required && !fieldValue) {
+            // Building the error label with index
+            const errorLabel = parentIndex
+              ? `${parentLabel} [${parentIndex}] ${row?.validation.customMessage}`
+              : `${parentLabel} ${row?.validation.customMessage}`;
+
+            errors.push({
+              label: row.label,
+              objectId: propertyName,
+              errorMessage: errorLabel,
+            });
+          }
+
+          // Recursively handle children
+          if (row.children && Array.isArray(data[propertyName])) {
+            const childData = data[propertyName];
+            childData.forEach((child: any, index: number) => {
+              traverse(
+                row.children as any,
+                child,
+                `${parentLabel} [${parentIndex}] ${row.label}`,
+                `${++index}`,
+              );
+            });
+          }
+        }
+      });
+    });
+  };
+
+  // Handle both arrays and single objects
+  if (Array.isArray(formData)) {
+    formData.forEach((item, index) =>
+      traverse(formRows, item, source, `${++index}`),
+    );
+  } else {
+    traverse(formRows, formData, source);
+  }
+
+  return errors;
+};

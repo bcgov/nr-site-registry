@@ -1,17 +1,21 @@
-import { FC, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { Site } from '../MapView';
 import SearchResults from '../../site/searchResults/SearchResults';
 import { SearchResultsFilters } from '../../site/searchResults/SearchResultsFilters';
 import { SearchResultsActions } from '../../site/searchResults/SearchResultsActions';
-import FilterPills from '../../site/filters/FilterPills';
+import FilterPills, { FilterPill } from '../../site/filters/FilterPills';
 import { getSiteSearchResultsColumns } from '../../site/dto/Columns';
 import { TableColumn } from '../../../components/table/TableColumn';
 import {
   MapSearch_FilterSearchResultsQuery,
-  useMapSearch_FilterSearchResultsQuery,
+  SiteFilters,
+  useMapSearch_FilterSearchResultsLazyQuery,
 } from '../../../../graphql/generated';
 import { SpinnerIcon } from '../../../components/common/icon';
 import useDebouncedValue from '../../../helpers/useDebouncedValue';
+import { formRowsMap } from '../../site/dto/SiteFilterConfig';
+import { formatDateRange } from '../../../helpers/utility';
+import { FormFieldType } from '../../../components/input-controls/IFormField';
 
 const defaultColumns = getSiteSearchResultsColumns();
 
@@ -21,13 +25,12 @@ type Pagination = {
 };
 
 interface SearchResultsDrawerContentProps {
-  sites: Site[];
+  siteIds: Array<Site['id']>;
   loading: boolean;
 }
 export const SearchResultsDrawerContent: FC<
   SearchResultsDrawerContentProps
-> = ({ sites, loading: siteIdsLoading }) => {
-  const siteIds = sites.map((site) => site.id);
+> = ({ siteIds, loading: siteIdsLoading }) => {
   // Saving fetched data to local state allows us avoid table component flickering
   // when a refetch with new variables takes place
   const [searchResults, setSearchResults] = useState<
@@ -39,32 +42,44 @@ export const SearchResultsDrawerContent: FC<
     page: 1,
   });
 
+  const [columnsToDisplay, setColumnsToDisplay] =
+    useState<TableColumn[]>(defaultColumns);
+  const [filtersFormData, setFiltersFormData] = useState<SiteFilters>({});
+  const [queryFilters, setQueryFilters] = useState<SiteFilters>({});
+  const [selectedRows, setSelectedRows] = useState<any[]>([]);
+
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
     pageSize: 5,
   });
 
-  const { loading: siteDetailsLoading } = useMapSearch_FilterSearchResultsQuery(
-    {
-      variables: {
-        siteIds,
-        page: pagination.page,
-        pageSize: pagination.pageSize,
-      },
+  const [searchSitesQuery, { loading: siteDetailsLoading }] =
+    useMapSearch_FilterSearchResultsLazyQuery({
       onCompleted: (data) => {
         setSearchResults(data.searchSites);
       },
-    },
-  );
+    });
+
+  const searchSitesWithFilters = useCallback(() => {
+    searchSitesQuery({
+      variables: {
+        ...pagination,
+        filters: { siteIds, ...queryFilters },
+      },
+    });
+  }, [pagination, queryFilters, searchSitesQuery, siteIds]);
+
+  useEffect(() => {
+    searchSitesWithFilters();
+  }, [searchSitesWithFilters]);
+
+  useEffect(() => {
+    // If the set of sites returned by map search changed, we reset the pagination
+    // to prevent users from being stuck on pages that may be irrelevant to the new set
+    setPagination((prev) => ({ ...prev, page: 1 }));
+  }, [siteIds]);
 
   const siteDetailsLoadingDebounced = useDebouncedValue(siteDetailsLoading);
-
-  const [columnsToDisplay, setColumnsToDisplay] =
-    useState<TableColumn[]>(defaultColumns);
-  const [filtersFormData, setFiltersFormData] = useState<{
-    [key: string]: any | [Date, Date];
-  }>({});
-  const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
   const toggleColumnSelectionForDisplay = (column: TableColumn) => {
     setColumnsToDisplay((prevColumns) =>
@@ -84,8 +99,41 @@ export const SearchResultsDrawerContent: FC<
   };
 
   const onFiltersSubmit = (e: React.FormEvent) => {
-    console.log('TODO');
+    e.preventDefault();
+    setQueryFilters(filtersFormData);
+    setPagination((prev) => ({ ...prev, page: 1 }));
+    searchSitesWithFilters();
   };
+
+  const onFiltersReset = () => {
+    setFiltersFormData({});
+    setQueryFilters({});
+    setPagination((prev) => ({ ...prev, page: 1 }));
+    searchSitesWithFilters();
+  };
+
+  const onRemoveFilter = (filter: FilterPill) => {
+    const { [filter.key as keyof SiteFilters]: _, ...rest } = filtersFormData;
+    setFiltersFormData(rest);
+    setQueryFilters(rest);
+    searchSitesWithFilters();
+  };
+
+  const filterPillsData: FilterPill[] = Object.entries(queryFilters)
+    .map(([key, value]) => {
+      if (!value) return null;
+      const { label, type } = formRowsMap[key];
+
+      if (type === FormFieldType.DateRange) {
+        return {
+          key,
+          value: formatDateRange(value as [Date, Date]),
+          label,
+        };
+      }
+      return { key, value, label };
+    })
+    .filter((data): data is FilterPill => data !== null);
 
   const changeHandler = (event: any) => {
     if (!event) return;
@@ -115,11 +163,11 @@ export const SearchResultsDrawerContent: FC<
         filtersFormData={filtersFormData}
         onFiltersChange={onFiltersChange}
         onFiltersSubmit={onFiltersSubmit}
-        onFiltersReset={() => setFiltersFormData({})}
+        onFiltersReset={onFiltersReset}
       />
       <SearchResultsActions selectedRows={selectedRows} />
 
-      <FilterPills filters={[]} onRemoveFilter={() => console.log('todo')} />
+      <FilterPills filters={filterPillsData} onRemoveFilter={onRemoveFilter} />
 
       {loading && <SpinnerIcon size={20} className="site-fa-spin" />}
 

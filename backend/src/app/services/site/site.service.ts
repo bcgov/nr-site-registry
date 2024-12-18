@@ -35,6 +35,7 @@ import {
   SiteRecordsForSRAction,
 } from '../../dto/sitesPendingReview.dto';
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
+import { SiteFilters } from 'src/app/resolvers/site/sitePublic.resolver';
 
 /**
  * Nestjs Service For Region Entity
@@ -102,26 +103,29 @@ export class SiteService {
     searchParam: string,
     page: number,
     pageSize: number,
-    id?: string,
-    srStatus?: string,
-    siteRiskCode?: string,
-    commonName?: string,
-    addrLine_1?: string,
-    city?: string,
-    whoCreated?: string,
-    latlongReliabilityFlag?: string,
-    latdeg?: number,
-    latDegrees?: number,
-    latMinutes?: number,
-    latSeconds?: string,
-    longdeg?: number,
-    longDegrees?: number,
-    longMinutes?: number,
-    longSeconds?: string,
-    whenCreated?: Date,
-    whenUpdated?: Date,
-    siteIds?: string[],
+    filters: SiteFilters,
   ) {
+    const {
+      siteIds,
+      id,
+      srStatus,
+      siteRiskCode,
+      commonName,
+      addrLine_1,
+      city,
+      whoCreated,
+      latlongReliabilityFlag,
+      latdeg,
+      latDegrees,
+      latMinutes,
+      latSeconds,
+      longdeg,
+      longDegrees,
+      longMinutes,
+      longSeconds,
+      whenCreated,
+      whenUpdated,
+    } = filters;
     this.sitesLogger.log('SiteService.searchSites() start');
     this.sitesLogger.debug('SiteService.searchSites() start');
     const siteUtil: SiteUtil = new SiteUtil();
@@ -250,14 +254,16 @@ export class SiteService {
     }
 
     if (whenCreated) {
-      query.andWhere('sites.whenCreated = :whenCreated', {
-        whenCreated: whenCreated,
+      query.andWhere('sites.whenCreated BETWEEN :start AND :end', {
+        start: whenCreated[0],
+        end: whenCreated[1],
       });
     }
 
     if (whenUpdated) {
-      query.andWhere('sites.whenUpdated = :whenUpdated', {
-        whenUpdated: whenUpdated,
+      query.andWhere('sites.whenUpdated BETWEEN :start AND :end', {
+        start: whenUpdated[0],
+        end: whenUpdated[1],
       });
     }
     const result = await query

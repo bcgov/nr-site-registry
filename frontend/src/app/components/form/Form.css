@@ -302,3 +302,8 @@ input::placeholder {
 .dropdown {
   position: unset !important;
 }
+
+.required-field::after {
+  content: ' *';
+  color: red;
+}

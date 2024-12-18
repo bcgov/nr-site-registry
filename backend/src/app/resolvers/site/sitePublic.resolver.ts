@@ -74,6 +74,7 @@ export class SitePublicResolver {
   ) {
     this.sitesLogger.log('SiteResolver.searchSites() start ');
     return await this.siteService.searchSites(
+      null,
       searchParam,
       page,
       pageSize,

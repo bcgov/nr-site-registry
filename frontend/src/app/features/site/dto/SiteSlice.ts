@@ -1,7 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getAxiosInstance } from '../../../helpers/utility';
+import { getAxiosInstance, getUser } from '../../../helpers/utility';
 import { print } from 'graphql';
-import { graphQlSiteQuery, graphqlSiteDetailsQuery } from '../graphql/Site';
+import {
+  graphQlSiteQuery,
+  graphQlSiteQueryForAuthenticatedUsers,
+  graphqlSiteDetailsQuery,
+} from '../graphql/Site';
 import { SiteState } from './SiteState';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { SiteResultDto } from './Site';
@@ -73,7 +77,10 @@ export const fetchSites = createAsyncThunk(
       } = args;
       const state: any = getState();
       const response = await getAxiosInstance().post(GRAPHQL, {
-        query: print(graphQlSiteQuery(filter)),
+        query:
+          getUser() === null
+            ? print(graphQlSiteQuery(filter))
+            : print(graphQlSiteQueryForAuthenticatedUsers(filter)),
         variables: {
           searchParam: searchParam,
           page: '' + state.sites.currentPage,

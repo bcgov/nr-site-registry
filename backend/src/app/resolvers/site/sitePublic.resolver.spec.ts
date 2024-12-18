@@ -94,6 +94,7 @@ describe('SiteResolver', () => {
       const pageSize = 1;
       siteResolver.searchSites(searchParam, page, pageSize);
       expect(siteService.searchSites).toHaveBeenCalledWith(
+        null,
         searchParam,
         page,
         pageSize,
@@ -140,6 +141,7 @@ describe('SiteResolver', () => {
       );
 
       expect(siteService.searchSites).toHaveBeenCalledWith(
+        null,
         searchParam,
         page,
         pageSize,
@@ -204,6 +206,7 @@ describe('SiteResolver', () => {
       );
 
       expect(siteService.searchSites).toHaveBeenCalledWith(
+        null,
         searchParam,
         page,
         pageSize,

@@ -99,6 +99,7 @@ export class SiteService {
    * @returns sites where id or address matches the search param
    */
   async searchSites(
+    userInfo: any,
     searchParam: string,
     page: number,
     pageSize: number,
@@ -155,7 +156,8 @@ export class SiteService {
       }),
     );
 
-    query.andWhere('sites.srStatus != :srStatus', { srStatus: 'private' });
+    if (!userInfo || userInfo?.identity_provider !== 'idir')
+      query.andWhere('sites.srAction != :srAction', { srAction: 'private' });
 
     if (id) {
       query.andWhere('sites.id = :id', { id: id });

@@ -213,7 +213,11 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
           }),
         );
       }
-      setFormData(notations);
+
+      // Always update formData if different
+      if (JSON.stringify(formData) !== JSON.stringify(notations)) {
+        setFormData(notations);
+      }
     }
   }, [notations, status]);
 
@@ -312,7 +316,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
   // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
   useEffect(() => {
-    if (resetDetails) {
+    if (
+      resetDetails ||
+      saveSiteDetailsRequestStatus === RequestStatus.success
+    ) {
       dispatch(
         fetchNotationParticipants({
           siteId: siteId ?? '',

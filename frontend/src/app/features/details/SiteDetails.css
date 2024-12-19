@@ -143,6 +143,14 @@
   position: relative;
 }
 
+.custom-modal-error-header-text {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 34px;
+  text-align: left;
+  color: #f00;
+}
+
 .form-switch .form-check-input:checked {
   background-color: #053662;
   border-color: #053662;

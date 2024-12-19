@@ -502,8 +502,20 @@ describe('SiteService', () => {
               userAction: 'pending',
               apiAction: 'pending',
               srAction: 'pending',
-              notationParticipant: null,
-              srValue: true
+              srValue: true,
+              notationParticipant: [
+                {
+                  apiAction: UserActionEnum.ADDED,
+                  eventParticId: 'xxx-xxx',
+                  eventId: '1',
+                  eprCode: 'RVB',
+                  psnorgId: '1',
+                  displayName: 'SAGER, J.',
+                  srAction: 'false',
+                  userAction: 'pending',
+                  srValue: true
+                },
+              ],
             },
           ],
         };
@@ -1047,7 +1059,17 @@ describe('SiteService', () => {
           id: '1',
           etypCode: 'type',
           eclsCode: 'class',
-          notationParticipant: [],
+          notationParticipant: [
+            {
+              apiAction: UserActionEnum.ADDED,
+              eventParticId: 'xxx-xxx',
+              eventId: '1',
+              eprCode: 'RVB',
+              psnorgId: '1',
+              displayName: 'SAGER, J.',
+              srAction: 'false',
+            },
+          ],
         },
       ];
       const userInfo = { givenName: 'Updated User' };

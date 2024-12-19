@@ -22,6 +22,10 @@ export const GetNotationConfig = () => {
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
       {
         type: FormFieldType.Date,
@@ -35,6 +39,10 @@ export const GetNotationConfig = () => {
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss:
           'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
       {
         type: FormFieldType.Date,
@@ -64,6 +72,10 @@ export const GetNotationConfig = () => {
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
       {
         type: FormFieldType.Date,
@@ -90,6 +102,10 @@ export const GetNotationConfig = () => {
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
     ],
 
@@ -105,6 +121,10 @@ export const GetNotationConfig = () => {
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
     ],
 
@@ -120,6 +140,10 @@ export const GetNotationConfig = () => {
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
     ],
   ];
@@ -138,6 +162,10 @@ export const GetNotationConfig = () => {
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
+        validation: {
+          required: true,
+          customMessage: 'Notation Class is required.',
+        },
       },
     ],
     [
@@ -153,6 +181,10 @@ export const GetNotationConfig = () => {
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
+        validation: {
+          required: true,
+          customMessage: 'Notation Type is required.',
+        },
       },
     ],
     [
@@ -168,6 +200,10 @@ export const GetNotationConfig = () => {
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss:
           'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
+        validation: {
+          required: true,
+          customMessage: 'Initiated Date is required.',
+        },
       },
       {
         type: FormFieldType.Date,
@@ -208,6 +244,10 @@ export const GetNotationConfig = () => {
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
+        validation: {
+          required: true,
+          customMessage: 'Required Actions is required.',
+        },
       },
     ],
     [
@@ -222,6 +262,10 @@ export const GetNotationConfig = () => {
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
+        validation: {
+          required: true,
+          customMessage: 'Note is required.',
+        },
       },
     ],
     [
@@ -238,6 +282,10 @@ export const GetNotationConfig = () => {
         customInputTextCss: 'custom-notation-input-text',
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss: 'custom-notation-edit-input',
+        validation: {
+          required: true,
+          customMessage: 'Ministry Contact is required.',
+        },
       },
     ],
   ];
@@ -376,6 +424,10 @@ export const GetNotationConfig = () => {
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss:
           'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
+        validation: {
+          required: true,
+          customMessage: 'Initiated Date is required.',
+        },
       },
       {
         type: FormFieldType.Date,
@@ -408,6 +460,10 @@ export const GetNotationConfig = () => {
         customEditLabelCss: 'custom-notation-edit-label',
         customEditInputTextCss:
           'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
+        validation: {
+          required: true,
+          customMessage: 'Initiated Date is required.',
+        },
       },
       {
         type: FormFieldType.Date,
@@ -444,6 +500,10 @@ export const GetNotationConfig = () => {
         customEditInputTextCss: 'custom-notation-participant-input-text',
         tableMode: true,
         placeholder: 'Please select the role',
+        validation: {
+          required: true,
+          customMessage: 'Role is required.',
+        },
       },
       columnSize: ColumnSize.Default,
     },
@@ -470,6 +530,10 @@ export const GetNotationConfig = () => {
         filteredOptions: [],
         isLoading: RequestStatus.idle,
         handleSearch: () => {},
+        validation: {
+          required: true,
+          customMessage: 'Participant Name is required.',
+        },
       },
     },
     {

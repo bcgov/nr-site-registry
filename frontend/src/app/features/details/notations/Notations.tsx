@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import './Notations.css';
-import Widget from '../../../components/widget/Widget';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { UserType } from '../../../helpers/requests/userType';
 import { AppDispatch } from '../../../Store';
@@ -213,6 +212,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
             },
           }),
         );
+      }
+
+      // Always update formData if different
+      if (JSON.stringify(formData) !== JSON.stringify(notations)) {
         setFormData(notations);
       }
     }
@@ -313,7 +316,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
   // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
   useEffect(() => {
-    if (resetDetails) {
+    if (
+      resetDetails ||
+      saveSiteDetailsRequestStatus === RequestStatus.success
+    ) {
       dispatch(
         fetchNotationParticipants({
           siteId: siteId ?? '',
@@ -418,19 +424,21 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
           srAction: SRApprovalStatusEnum.Pending,
         };
 
-        if (graphQLPropertyName === 'eclsCode') {
-          setIsUpdated(true);
-          const updatedRow = [...notationFormRowEditMode].map((items) => {
-            return items.map((row) => ({
-              ...row,
-              options: notationType.data.find(
-                (item: any) => item.metaData === value,
-              ).dropdownDto,
-            }));
-          });
-          setUpdatedNotationFormRowEditMode(updatedRow);
-          updatedNotation['etypCode'] = '';
-        }
+            if (graphQLPropertyName === 'eclsCode') {
+              setIsUpdated(true);
+              const updatedRow = [...notationFormRowEditMode].map((items) => {
+                return items.map((row) => ({
+                  ...row,
+                  options:
+                    !!value &&
+                    notationType.data.find(
+                      (item: any) => item.metaData === value,
+                    ).dropdownDto,
+                }));
+              });
+              setUpdatedNotationFormRowEditMode(updatedRow);
+              updatedNotation['etypCode'] = '';
+            }
 
         return updatedNotation;
       }
@@ -769,9 +777,9 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       siteId: siteId,
       etypCode: '', // Default values for other properties
       requirementReceivedDate: new Date(),
-      completionDate: new Date(),
+      completionDate: null,
       eclsCode: '',
-      requirementDueDate: new Date(),
+      requirementDueDate: null,
       requiredAction: '',
       note: '',
       apiAction: UserActionEnum.added,
@@ -953,6 +961,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       customInputTextCss: 'custom-notation-input-text',
       customEditLabelCss: 'custom-notation-edit-label',
       customEditInputTextCss: 'custom-notation-edit-input',
+      validation: {
+        required: true,
+        customMessage: 'Notation Type is required.',
+      },
     };
 
     const notationClass = {
@@ -967,6 +979,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       customInputTextCss: 'custom-notation-input-text',
       customEditLabelCss: 'custom-notation-edit-label',
       customEditInputTextCss: 'custom-notation-edit-input',
+      validation: {
+        required: true,
+        customMessage: 'Notation Class is required.',
+      },
     };
     if (metaData && metaData.requiredDate) {
       return updateOptionsBasedOnMetaData(
@@ -1084,7 +1100,6 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
                   />
                 )}
               <Notation
-                index={index}
                 notation={notation}
                 handleNotationFormRowFirstChild={
                   handleNotationFormRowFirstChild

@@ -1100,6 +1100,14 @@ export class SiteService {
           // Process related participants regardless of event action
           if (notationParticipant?.length > 0) {
             await processParticipants(notationId, notationParticipant);
+          } else {
+            this.sitesLogger.warn(
+              `SiteService.processEvents(): There is no notation participants. Atleast every notation should have one notation participant.`,
+            );
+            throw new HttpException(
+              `Failed to process site notation participants. There is no notation participants. Atleast every notation should have one notation participant.`,
+              HttpStatus.NOT_FOUND,
+            );
           }
         });
 

@@ -18,7 +18,7 @@ const initialState: SaveSiteDetails = {
   siteParticipantData: null,
   documentsData: null,
   landHistoriesData: null,
-  subDivisionsData: null,
+  parcelDescriptionsData: null,
   profilesData: null,
   siteAssociationsData: null,
   siteId: '',
@@ -52,7 +52,7 @@ const siteDetailsSlice = createSlice({
       newState.siteParticipantData = null;
       newState.documentsData = null;
       newState.landHistoriesData = null;
-      newState.subDivisionsData = null;
+      newState.parcelDescriptionsData = null;
       newState.profilesData = null;
       newState.siteAssociationsData = null;
       newState.siteId = '';
@@ -109,11 +109,11 @@ const siteDetailsSlice = createSlice({
       newState.landHistoriesData = action.payload;
       return newState;
     },
-    setupSubDivisionsDataForSaving: (state, action) => {
+    setupParcelDescriptionsDataForSaving: (state, action) => {
       const newState = {
         ...state,
       };
-      newState.subDivisionsData = action.payload;
+      newState.parcelDescriptionsData = action.payload;
       return newState;
     },
     setupSiteAssociationDataForSaving: (state, action) => {
@@ -178,7 +178,7 @@ export const getSiteDetailsToBeSaved = (state: any) => {
         UserActionEnum.updated,
         UserActionEnum.deleted,
       ]),
-    subDivisions: state.siteDetails.subDivisions,
+    parcelDescriptions: state.siteDetails.parcelDescriptionsData,
     landHistories: state.siteDetails.landHistoriesData,
     profiles:
       state.siteDetails.profilesData &&
@@ -214,7 +214,7 @@ export const {
   setupLandHistoriesDataForSaving,
   setupSiteAssociationDataForSaving,
   setupSiteParticipantDataForSaving,
-  setupSubDivisionsDataForSaving,
+  setupParcelDescriptionsDataForSaving,
   setupSiteSummaryForSaving,
   setupSiteDisclosureDataForSaving,
 } = siteDetailsSlice.actions;

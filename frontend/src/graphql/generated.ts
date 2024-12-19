@@ -713,6 +713,7 @@ export type Query = {
   mapSearch: MapSearchResponse;
   searchSiteIds: DropdownResponse;
   searchSites: SearchSiteResponse;
+  searchSitesForAuthenticatedUsers: SearchSiteResponse;
   sites: FetchSiteResponse;
 };
 
@@ -826,6 +827,31 @@ export type QuerySearchSiteIdsArgs = {
 
 
 export type QuerySearchSitesArgs = {
+  addrLine_1?: InputMaybe<Scalars['String']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  commonName?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  latDegrees?: InputMaybe<Scalars['String']['input']>;
+  latMinutes?: InputMaybe<Scalars['String']['input']>;
+  latSeconds?: InputMaybe<Scalars['String']['input']>;
+  latdeg?: InputMaybe<Scalars['String']['input']>;
+  latlongReliabilityFlag?: InputMaybe<Scalars['String']['input']>;
+  longDegrees?: InputMaybe<Scalars['String']['input']>;
+  longMinutes?: InputMaybe<Scalars['String']['input']>;
+  longSeconds?: InputMaybe<Scalars['String']['input']>;
+  longdeg?: InputMaybe<Scalars['String']['input']>;
+  page: Scalars['String']['input'];
+  pageSize: Scalars['String']['input'];
+  searchParam: Scalars['String']['input'];
+  siteRiskCode?: InputMaybe<Scalars['String']['input']>;
+  srStatus?: InputMaybe<Scalars['String']['input']>;
+  whenCreated?: InputMaybe<Scalars['String']['input']>;
+  whenUpdated?: InputMaybe<Scalars['String']['input']>;
+  whoCreated?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QuerySearchSitesForAuthenticatedUsersArgs = {
   addrLine_1?: InputMaybe<Scalars['String']['input']>;
   city?: InputMaybe<Scalars['String']['input']>;
   commonName?: InputMaybe<Scalars['String']['input']>;

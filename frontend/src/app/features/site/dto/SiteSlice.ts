@@ -88,7 +88,8 @@ export const fetchSites = createAsyncThunk(
           ...filter,
         },
       });
-      return response.data.data.searchSites;
+      if (getUser() === null) return response.data.data.searchSites;
+      else return response.data.data.searchSitesForAuthenticatedUsers;
     } catch (error) {
       throw error;
     }

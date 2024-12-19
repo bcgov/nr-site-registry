@@ -17,6 +17,7 @@ import {
   clearTrackChanges,
   siteDetailsMode,
   updateSiteDetailsMode,
+  trackChanges,
 } from '../site/dto/SiteSlice';
 import { AppDispatch } from '../../Store';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
@@ -26,7 +27,10 @@ import {
   CancelButton,
   SaveButton,
 } from '../../components/simple/CustomButtons';
-import { IChangeType } from '../../components/common/IChangeType';
+import {
+  ChangeTracker,
+  IChangeType,
+} from '../../components/common/IChangeType';
 
 import './SiteDetails.css'; // Ensure this import is correct
 import { SiteActionBtn, SiteDetailsMode } from './dto/SiteDetailsMode';
@@ -682,6 +686,9 @@ const SiteDetails = () => {
             : SRApprovalStatusEnum.Private,
       }),
     );
+
+    const tracker = new ChangeTracker(IChangeType.Modified, 'Site : SR Status');
+    dispatch(trackChanges(tracker.toPlainObject()));
   };
 
   return (
@@ -1001,7 +1008,7 @@ const SiteDetails = () => {
 
           {!isVisible && (
             <>
-            {viewMode === SiteDetailsMode.SRMode && (
+              {viewMode === SiteDetailsMode.SRMode && (
                 <div className="sr-mode-content">
                   <div className="sr-mode-info-banner">
                     <div className="sr-mode-info-content-layout">

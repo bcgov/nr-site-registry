@@ -320,11 +320,23 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     const currLabel =
       flattedArr &&
       flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
-    const tracker = new ChangeTracker(
-      IChangeType.Modified,
-      'Site Disclosure: ' + currLabel?.label,
-    );
-    dispatch(trackChanges(tracker.toPlainObject()));
+
+    if (
+      viewMode === SiteDetailsMode.SRMode &&
+      graphQLPropertyName === 'srCheckbox'
+    ) {
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Site Disclosure: SR Status',
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    } else {
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Site Disclosure: ' + currLabel?.label,
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    }
   };
 
   /// not working yet as the actual source of table data is unknown.

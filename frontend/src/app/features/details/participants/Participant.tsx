@@ -474,11 +474,19 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
         participantColumnInternal.find(
           (row) => row.graphQLPropertyName === event.property,
         );
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Site Participant: ' + currLabel?.displayName,
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      if (viewMode === SiteDetailsMode.SRMode && event.property === 'srValue') {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          'Site Participant: SR Status',
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      } else {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          'Site Participant: ' + currLabel?.displayName,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     }
   };
 

@@ -225,11 +225,20 @@ const LandUses: FC = () => {
       (column) => column.graphQLPropertyName === event.property,
     );
     const propertyLabel = tableColumn?.displayName || '';
-    const tracker = new ChangeTracker(
-      IChangeType.Modified,
-      'Suspect Land Uses: ' + propertyLabel,
-    );
-    dispatch(trackChanges(tracker.toPlainObject()));
+
+    if (viewMode === SiteDetailsMode.SRMode && event.property === 'srValue') {
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Suspect Land Uses: SR Status',
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    } else {
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Suspect Land Uses: ' + propertyLabel,
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    }
 
     setTableData(updatedLandUses);
   };

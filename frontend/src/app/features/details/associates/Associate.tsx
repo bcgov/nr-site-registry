@@ -477,14 +477,25 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
       const currLabel = associateColumnInternal.find(
         (row) => row.graphQLPropertyName === event.property,
       );
-      dispatch(
-        trackChanges(
-          new ChangeTracker(
-            IChangeType.Modified,
-            'Associated Sites: ' + currLabel?.displayName,
-          ).toPlainObject(),
-        ),
-      );
+      if (viewMode === SiteDetailsMode.SRMode && event.property === 'srValue') {
+        dispatch(
+          trackChanges(
+            new ChangeTracker(
+              IChangeType.Modified,
+              'Associated Sites: SR Status',
+            ).toPlainObject(),
+          ),
+        );
+      } else {
+        dispatch(
+          trackChanges(
+            new ChangeTracker(
+              IChangeType.Modified,
+              'Associated Sites: ' + currLabel?.displayName,
+            ).toPlainObject(),
+          ),
+        );
+      }
     }
   };
 

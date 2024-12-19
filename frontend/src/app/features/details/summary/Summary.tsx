@@ -59,7 +59,7 @@ const Summary = () => {
 
   useEffect(() => {
     if (isUserOfType(UserRoleType.CLIENT) && user !== null) {
-      dispatch(fetchCartItems(user?.profile.sub ? user.profile.sub : ''));
+      dispatch(fetchCartItems());
     }
   }, [addCartItemStatus]);
   const { id } = useParams();
@@ -118,8 +118,6 @@ const Summary = () => {
 
   // State Initializations
   const initialParcelIds = [0];
-
-  const [location, setLocation] = useState([48.46762, -123.25458]);
 
   useEffect(() => {
     console.log('Change in details');
@@ -447,7 +445,6 @@ const Summary = () => {
     <div className="summary-section-details">
       <SummaryInfo
         siteData={editSiteDetailsObject}
-        location={location}
         edit={edit}
         srMode={srMode}
         handleInputChange={handleInputChange}

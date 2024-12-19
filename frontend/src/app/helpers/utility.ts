@@ -42,14 +42,35 @@ export const serializeDate = (data: any) => {
 
 export const formatDateRange = (range: [Date, Date]) => {
   const [startDate, endDate] = range;
+
+  // Validate the start and end dates
+  if (!(startDate instanceof Date) || isNaN(startDate.getTime())) {
+    console.error('Invalid start date');
+    return ''; // Return empty string or some fallback
+  }
+
+  if (!(endDate instanceof Date) || isNaN(endDate.getTime())) {
+    console.error('Invalid end date');
+    return ''; // Return empty string or some fallback
+  }
+
+  // If both dates are valid, format them
   const formattedStartDate = format(startDate, 'MMMM do, yyyy');
   const formattedEndDate = format(endDate, 'MMMM do, yyyy');
+
   return `${formattedStartDate} - ${formattedEndDate}`;
 };
 
 export const formatDate = (date: Date) => {
+  // Validate the date
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    console.error('Invalid date');
+    return ''; // Return empty string or some fallback
+  }
+
+  // If the date is valid, format it
   const formattedDate = format(date, 'MMMM do, yyyy');
-  return `${formattedDate}`;
+  return formattedDate;
 };
 
 /*
@@ -430,3 +451,67 @@ export function sortArray<T>(
     }
   });
 }
+
+export const validateForm = (
+  formRows: IFormField[][],
+  formData: any,
+  source: string,
+) => {
+  const errors: any[] = [];
+  const traverse = (
+    rows: IFormField[][],
+    data: any,
+    parentLabel: string = source,
+    parentIndex: string = '',
+    currentContext: string = '',
+  ) => {
+    rows.forEach((items) => {
+      items.forEach((row) => {
+        const propertyName = row.graphQLPropertyName;
+
+        // Ensure graphQLPropertyName exists
+        if (propertyName) {
+          const fieldValue = data[propertyName];
+
+          // Validate the current field
+          if (row.validation?.required && !fieldValue) {
+            // Building the error label with index
+            const errorLabel = parentIndex
+              ? `${parentLabel} [${parentIndex}] ${row?.validation.customMessage}`
+              : `${parentLabel} ${row?.validation.customMessage}`;
+
+            errors.push({
+              label: row.label,
+              objectId: propertyName,
+              errorMessage: errorLabel,
+            });
+          }
+
+          // Recursively handle children
+          if (row.children && Array.isArray(data[propertyName])) {
+            const childData = data[propertyName];
+            childData.forEach((child: any, index: number) => {
+              traverse(
+                row.children as any,
+                child,
+                `${parentLabel} [${parentIndex}] ${row.label}`,
+                `${++index}`,
+              );
+            });
+          }
+        }
+      });
+    });
+  };
+
+  // Handle both arrays and single objects
+  if (Array.isArray(formData)) {
+    formData.forEach((item, index) =>
+      traverse(formRows, item, source, `${++index}`),
+    );
+  } else {
+    traverse(formRows, formData, source);
+  }
+
+  return errors;
+};

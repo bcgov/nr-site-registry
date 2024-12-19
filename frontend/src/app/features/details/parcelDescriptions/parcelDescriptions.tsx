@@ -1,59 +1,106 @@
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
-import Table from '../../../components/table/Table';
-import { RequestStatus } from '../../../helpers/requests/status';
 import { TableColumn } from '../../../components/table/TableColumn';
-import { useEffect } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../../Store';
+import { AppDispatch } from '../../../Store';
 import {
   fetchParcelDescriptions,
-  IFetchParcelDescriptionParams,
-  IParcelDescriptionState,
-  setCurrentPage,
-  setResultsPerPage,
-  setSearchParam,
-  setSortBy,
-  setSortByDir,
-  setSortByInputValue,
+  initialParcelDescriptionsState,
+  parcelDescriptions,
+  resetAllDataForSite,
+  updateCurrentPage,
+  updateResultsPerPage,
+  updateSearchParam,
+  updateSortBy,
+  updateSortByDir,
+  updateSortByInputValue,
 } from './parcelDescriptionsSlice';
 import { columns } from './parcelDescriptionsConfig';
 import { useParams } from 'react-router-dom';
 import ParcelDescriptionTable from './ParcelDescriptionTable';
+import {
+  IFetchParcelDescriptionsParams,
+  IParcelDescriptionDto,
+} from './parcelDescriptionsInterfaces';
+import { RequestStatus } from '../../../helpers/requests/status';
 
 const ParcelDescriptions = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const parcelDescriptionsState: IParcelDescriptionState = useSelector(
-    (state: RootState) => state.parcelDescriptions,
-  );
+  const reduxState = useSelector(parcelDescriptions);
+
   const { id } = useParams();
   const siteId = Number(id);
+  if (reduxState.siteId !== siteId) {
+    // The redux cache has data from another site. Re-initialize everything.
+    dispatch(resetAllDataForSite(siteId));
+    const fetchParams: IFetchParcelDescriptionsParams = {
+      siteId: siteId,
+      page: initialParcelDescriptionsState.currentPage,
+      pageSize: initialParcelDescriptionsState.resultsPerPage,
+      searchParam: initialParcelDescriptionsState.searchParam,
+      sortBy: initialParcelDescriptionsState.sortBy,
+      sortByDir: initialParcelDescriptionsState.sortByDir,
+      showPending: false, // Unused in this component.
+    };
+    dispatch(fetchParcelDescriptions(fetchParams));
+  }
 
-  const data = parcelDescriptionsState.data;
-  const requestStatus = parcelDescriptionsState.requestStatus;
-  const totalResults = parcelDescriptionsState.totalResults;
-  const currentPage = parcelDescriptionsState.currentPage;
-  const resultsPerPage = parcelDescriptionsState.resultsPerPage;
-  const searchParam = parcelDescriptionsState.searchParam;
-  const sortBy = parcelDescriptionsState.sortBy;
-  const sortByDir = parcelDescriptionsState.sortByDir;
-  const sortByInputValue = parcelDescriptionsState.sortByInputValue;
+  const [data, setData] = React.useState<IParcelDescriptionDto[]>(
+    reduxState.data,
+  );
+  const [currentPage, setCurrentPage] = React.useState<number>(
+    reduxState.currentPage,
+  );
+  const [resultsPerPage, setResultsPerPage] = React.useState<number>(
+    reduxState.resultsPerPage,
+  );
+  const [totalResults, setTotalResults] = React.useState<number>(
+    reduxState.totalResults,
+  );
+  const [searchParam, setSearchParam] = React.useState<string>(
+    reduxState.searchParam,
+  );
+  const [sortBy, setSortBy] = React.useState<string>(reduxState.sortBy);
+  const [sortByDir, setSortByDir] = React.useState<string>(
+    reduxState.sortByDir,
+  );
+  const [sortByInputValue, setSortByInputValue] = React.useState<{
+    [key: string]: any;
+  }>(reduxState.sortByInputValue);
+  const [requestStatus, setRequestStatus] = React.useState<RequestStatus>(
+    reduxState.requestStatus,
+  );
 
   const handleSelectPage = (newPage: number) => {
-    dispatch(setCurrentPage(newPage));
+    if (newPage !== currentPage) {
+      dispatch(updateCurrentPage(newPage));
+      fetchNewParcelDescriptions({ newPage: newPage });
+    }
   };
 
   const handleChangeResultsPerPage = (newResultsPerPage: number) => {
-    dispatch(setResultsPerPage(newResultsPerPage));
+    if (newResultsPerPage !== resultsPerPage) {
+      dispatch(updateResultsPerPage(newResultsPerPage));
+      fetchNewParcelDescriptions({ newPageSize: newResultsPerPage });
+    }
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSearchParam = event.target.value;
-    dispatch(setSearchParam(newSearchParam));
+    if (newSearchParam !== searchParam) {
+      dispatch(updateSearchParam(newSearchParam));
+      fetchNewParcelDescriptions({ newSearchParam: newSearchParam });
+    }
   };
 
   const handleSearchClear = () => {
-    dispatch(setSearchParam(''));
+    if (searchParam !== '') {
+      dispatch(updateSearchParam(''));
+      fetchNewParcelDescriptions({
+        newSearchParam: '',
+      });
+    }
   };
 
   const tableChangeHandler = () => {
@@ -64,61 +111,103 @@ const ParcelDescriptions = () => {
     graphQLPropertyName: any,
     newSortByInputValue: string | [Date, Date],
   ) => {
-    dispatch(
-      setSortByInputValue({
-        ...sortByInputValue,
-        [graphQLPropertyName]: newSortByInputValue,
-      }),
-    );
+    let newSortBy: string;
+    let newSortByDir: string;
     switch (newSortByInputValue) {
       case 'newToOld':
-        dispatch(setSortBy('date_noted'));
-        dispatch(setSortByDir('DESC'));
+        newSortBy = 'date_noted';
+        newSortByDir = 'DESC';
         break;
       case 'oldTonew':
-        dispatch(setSortBy('date_noted'));
-        dispatch(setSortByDir('ASC'));
+        newSortBy = 'date_noted';
+        newSortByDir = 'ASC';
         break;
       default:
-        dispatch(setSortBy('id'));
-        dispatch(setSortByDir('ASC'));
+        newSortBy = 'id';
+        newSortByDir = 'ASC';
         break;
+    }
+    if (sortByInputValue[graphQLPropertyName] !== newSortByInputValue) {
+      dispatch(updateSortBy(newSortBy));
+      dispatch(updateSortByDir(newSortByDir));
+      dispatch(
+        updateSortByInputValue({
+          ...sortByInputValue,
+          [graphQLPropertyName]: newSortByInputValue,
+        }),
+      );
+      fetchNewParcelDescriptions({
+        newSortBy: newSortBy,
+        newSortByDir: newSortByDir,
+      });
     }
   };
 
   const handleTableSortChange = (column: TableColumn, descending: boolean) => {
+    let newSortBy = 'id';
+    let newSortByDir = descending ? 'DESC' : 'ASC';
     switch (column.graphQLPropertyName) {
       case 'descriptionType':
-        dispatch(setSortBy('description_type'));
+        newSortBy = 'description_type';
         break;
       case 'idPinNumber':
-        dispatch(setSortBy('id_pin_number'));
+        newSortBy = 'id_pin_number';
         break;
       case 'dateNoted':
-        dispatch(setSortBy('date_noted'));
+        newSortBy = 'date_noted';
         break;
       case 'landDescription':
-        dispatch(setSortBy('land_description'));
-        break;
-      default:
-        dispatch(setSortBy('id'));
+        newSortBy = 'land_description';
         break;
     }
-    dispatch(setSortByDir(descending ? 'DESC' : 'ASC'));
+
+    if (newSortBy !== sortBy) {
+      dispatch(updateSortBy(newSortBy));
+      dispatch(updateSortByDir(newSortByDir));
+      fetchNewParcelDescriptions({
+        newSortBy: newSortBy,
+        newSortByDir: newSortByDir,
+      });
+    }
   };
 
-  useEffect(() => {
-    const params: IFetchParcelDescriptionParams = {
+  const fetchNewParcelDescriptions = ({
+    newPage,
+    newPageSize,
+    newSearchParam,
+    newSortBy,
+    newSortByDir,
+  }: {
+    newPage?: number;
+    newPageSize?: number;
+    newSearchParam?: string;
+    newSortBy?: string;
+    newSortByDir?: string;
+  }) => {
+    const fetchParams: IFetchParcelDescriptionsParams = {
       siteId: siteId,
-      page: currentPage,
-      pageSize: resultsPerPage,
-      searchParam: searchParam,
-      sortBy: sortBy,
-      sortByDir: sortByDir,
-      showPending: false,
+      page: newPage !== undefined ? newPage : currentPage,
+      pageSize: newPageSize !== undefined ? newPageSize : resultsPerPage,
+      searchParam: newSearchParam !== undefined ? newSearchParam : searchParam,
+      sortBy: newSortBy !== undefined ? newSortBy : sortBy,
+      sortByDir: newSortByDir !== undefined ? newSortByDir : sortByDir,
+      showPending: false, // Unused in this component.
     };
-    dispatch(fetchParcelDescriptions(params));
-  }, [currentPage, resultsPerPage, searchParam, sortBy, sortByDir]);
+    dispatch(fetchParcelDescriptions(fetchParams));
+  };
+
+  React.useEffect(() => {
+    // Update local state with redux state.
+    setData(reduxState.data);
+    setCurrentPage(reduxState.currentPage);
+    setRequestStatus(reduxState.requestStatus);
+    setResultsPerPage(reduxState.resultsPerPage);
+    setSearchParam(reduxState.searchParam);
+    setSortBy(reduxState.sortBy);
+    setSortByDir(reduxState.sortByDir);
+    setSortByInputValue(reduxState.sortByInputValue);
+    setTotalResults(reduxState.totalResults);
+  }, [reduxState]);
 
   return (
     <div

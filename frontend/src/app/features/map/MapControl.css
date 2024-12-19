@@ -1,0 +1,40 @@
+.map-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 0 !important;
+  border-radius: 0;
+  max-height: calc(100vh - 80px);
+  transition: margin ease-in-out 0.5s;
+  position: relative;
+}
+
+.map-controls button.map-control-button {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  background: var(--surface-color-background-white);
+  color: var(--surface-color-primary-hover);
+  border: 1px var(--surface-color-primary-hover) solid;
+  box-shadow: var(--box-shadow-small);
+  transition: all ease-in-out 0.3s;
+}
+
+.map-controls button.map-control-button:focus {
+  outline: 2px solid rgba(46, 93, 215, 0.5);
+}
+
+.map-controls button.map-control-button--active {
+  background-color: var(--surface-color-primary-hover);
+  color: var(--surface-color-background-white);
+}
+
+.map-controls .map-control-button:hover {
+  background-color: var(--surface-color-primary-hover);
+  color: var(--surface-color-background-white);
+}

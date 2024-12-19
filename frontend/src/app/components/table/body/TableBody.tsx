@@ -216,6 +216,7 @@ const TableBody: FC<TableBodyProps> = ({
           isLoading={field.isLoading}
           customInfoMessage={field.customInfoMessage}
           customMenuMessage={field.customMenuMessage}
+          isDisabled={field.isDisabled}
         />
       );
     } else if (field.type === FormFieldType.Label) {
@@ -288,6 +289,7 @@ const TableBody: FC<TableBodyProps> = ({
           stickyCol={field.stickyCol}
           href={field.href}
           options={field.options}
+          isDisabled={field.isDisabled}
         />
       );
     } else if (field.type === FormFieldType.Checkbox) {
@@ -336,6 +338,8 @@ const TableBody: FC<TableBodyProps> = ({
           isEditing={editMode ?? true}
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
+          isDisabled={field.isDisabled ?? false}
+          validation={field.validation}
         />
       );
     } else if (field.type === FormFieldType.TextArea) {
@@ -361,6 +365,7 @@ const TableBody: FC<TableBodyProps> = ({
           textAreaColoum={field.textAreaColoum}
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
+          isDisabled={field.isDisabled}
         />
       );
     } else if (field.type === FormFieldType.DropDownWithSearch) {
@@ -387,6 +392,8 @@ const TableBody: FC<TableBodyProps> = ({
           filteredOptions={field.filteredOptions || []}
           isLoading={field.isLoading}
           customInfoMessage={field.customInfoMessage}
+          isDisabled={field.isDisabled}
+          validation={field.validation}
         />
       );
     } else if (field.type === FormFieldType.DeleteIcon) {
@@ -485,7 +492,7 @@ const TableBody: FC<TableBodyProps> = ({
 
     return (
       <React.Fragment key={rowIndex}>
-        <tr data-testid="table-row" key={rowIndex}>
+        <tr data-testid="table-row" key={checkboxId}>
           {allowRowsSelect && (
             <td className="table-border-light content-text positionSticky align-content-center">
               <input

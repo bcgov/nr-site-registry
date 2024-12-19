@@ -1,6 +1,10 @@
 import { HttpStatus, UsePipes } from '@nestjs/common';
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import {
+  AuthenticatedUser,
+  RoleMatchingMode,
+  Roles,
+} from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { SiteParticsDto, SiteParticsResponse } from '../../dto/sitePartics.dto';
 import { ParticipantService } from '../../services/participant/participant.service';
@@ -32,6 +36,7 @@ export class ParticipantResolver {
     @Args('siteId', { type: () => String }) siteId: string,
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
+    @AuthenticatedUser() user: any,
   ) {
     this.sitesLogger.log(
       'ParticipantResolver.getSiteParticipantsBySiteId() start siteId:' +
@@ -44,6 +49,7 @@ export class ParticipantResolver {
     const result = await this.participantService.getSiteParticipantsBySiteId(
       siteId,
       showPending,
+      user,
     );
     if (result?.length > 0) {
       this.sitesLogger.log(

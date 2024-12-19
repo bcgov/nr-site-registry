@@ -1,6 +1,10 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { HttpStatus, UsePipes } from '@nestjs/common';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import {
+  AuthenticatedUser,
+  RoleMatchingMode,
+  Roles,
+} from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { Events } from '../../entities/events.entity';
@@ -33,6 +37,7 @@ export class NotationResolver {
     @Args('siteId', { type: () => String }) siteId: string,
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
+    @AuthenticatedUser() user: any,
   ) {
     this.sitesLogger.log(
       'NotationResolver.getSiteNotationBySiteId() start siteId:' +
@@ -45,6 +50,7 @@ export class NotationResolver {
     const result = await this.notationService.getSiteNotationBySiteId(
       siteId,
       showPending,
+      user,
     );
     if (result?.length > 0) {
       this.sitesLogger.log(

@@ -84,6 +84,7 @@ export class FolioService {
       const { folioId } = inputDTO;
 
       if (!userInfo) {
+        this.sitesLogger.log('FolioService.addFolio() User Not Found');
         throw new Error('User Not Found');
       }
 

@@ -351,11 +351,12 @@ export class SiteService {
 
         response.data = result ? result : null;
       }
-      this.sitesLogger.log('SiteService.findSiteBySiteId() end');
-      this.sitesLogger.debug('SiteService.findSiteBySiteId() end');
     } else {
       response.data = snapShot.snapshotData?.sitesSummary;
     }
+
+    this.sitesLogger.log('SiteService.findSiteBySiteId() end');
+    this.sitesLogger.debug('SiteService.findSiteBySiteId() end');
 
     return response;
   }

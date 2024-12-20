@@ -89,8 +89,7 @@ export class AssociatedSiteService {
           siteIdAssociatedWith: assocs?.siteIdAssociatedWith,
           effectiveDate: formattedEffectiveDate,
           note: assocs?.note ? assocs?.note.trim() : null, // Ensure note is trimmed
-          srValue:
-            assocs.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
+          srValue: assocs.srAction === SRApprovalStatusEnum.PUBLIC,
           srAction: assocs.srAction,
         };
       });

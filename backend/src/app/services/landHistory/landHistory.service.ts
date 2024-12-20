@@ -68,8 +68,7 @@ export class LandHistoryService {
       const result = (await query.getMany()).map((landHistory) => ({
         ...landHistory,
         guid: v4(),
-        srValue:
-          landHistory.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
+        srValue: landHistory.srAction === SRApprovalStatusEnum.PUBLIC,
       }));
       this.sitesLogger.log('LandHistoryService.getLandHistoriesForSite() end');
       this.sitesLogger.debug(

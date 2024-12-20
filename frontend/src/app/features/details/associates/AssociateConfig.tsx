@@ -1,13 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { DropdownItem } from '../../../components/action/IActions';
-import {
-  CircleXMarkIcon,
-  MagnifyingGlassIcon,
-} from '../../../components/common/icon';
-import {
-  FormFieldType,
-  IFormField,
-} from '../../../components/input-controls/IFormField';
+import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import { RequestStatus } from '../../../helpers/requests/status';
@@ -45,10 +38,10 @@ export const GetAssociateConfig = () => {
         customMenuMessage: <span>Please select a site ID:</span>,
         customInfoMessage: null,
         validation: {
+          required: true,
           pattern: /^[0-9,\s]*$/,
-          customMessage: 'Site ID can only contain numbers.',
+          customMessage: 'Site ID is required and can only contain numbers.',
         },
-        allowNumbersOnly: true,
         tableMode: true,
       },
     },
@@ -71,6 +64,10 @@ export const GetAssociateConfig = () => {
         customEditInputTextCss:
           'custom-associate-edit-input .rs.input .rs-input-group-addon',
         tableMode: true,
+        validation: {
+          required: true,
+          customMessage: 'Date Noted is required.',
+        },
       },
     },
     {
@@ -131,6 +128,11 @@ export const GetAssociateConfig = () => {
         customEditInputTextCss: 'custom-associate-edit-input',
         tableMode: true,
         href: `${parentPath}/`,
+        validation: {
+          required: true,
+          pattern: /^[0-9,\s]*$/,
+          customMessage: 'Site ID is required and can only contain numbers.',
+        },
       },
       linkRedirectionURL: `${parentPath}/`,
     },
@@ -153,6 +155,10 @@ export const GetAssociateConfig = () => {
         customEditInputTextCss:
           'custom-associate-edit-input .rs.input .rs-input-group-addon',
         tableMode: true,
+        validation: {
+          required: true,
+          customMessage: 'Date Noted is required.',
+        },
       },
     },
     {
@@ -213,6 +219,11 @@ export const GetAssociateConfig = () => {
         customEditInputTextCss: 'custom-associate-edit-input',
         tableMode: true,
         href: `${parentPath}/`,
+        validation: {
+          required: true,
+          pattern: /^[0-9,\s]*$/,
+          customMessage: 'Site ID is required and can only contain numbers.',
+        },
       },
       linkRedirectionURL: `${parentPath}/`,
     },
@@ -235,6 +246,10 @@ export const GetAssociateConfig = () => {
         customEditInputTextCss:
           'custom-associate-edit-input .rs.input .rs-input-group-addon',
         tableMode: true,
+        validation: {
+          required: true,
+          customMessage: 'Date Noted is required.',
+        },
       },
     },
     {

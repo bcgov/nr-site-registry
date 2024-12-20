@@ -1278,25 +1278,24 @@ export const SearchCustomInput: React.FC<InputProps> = ({
     }
   }, [isOpen]);
 
-  // useEffect(() => {
-  //   if (resetDetails) {
-  //     setError(null);
-  //   }
-  // }, [resetDetails]);
-
   useEffect(() => {
     if (validation?.required) {
-      validateInput(value);
+      validateInput(value.trim());
     }
   }, []);
 
   const validateInput = (inputValue: any) => {
     if (validation) {
       if (inputValue === null || inputValue === undefined) {
+        setError(validation.customMessage || 'Invalid input');
         return false;
       }
       if (validation.pattern && !validation.pattern.test(inputValue)) {
         setError(validation.customMessage || 'Invalid input');
+        return false;
+      }
+      if (!inputValue.trim()) {
+        setError(validation?.customMessage || 'Invalid input');
         return false;
       }
     }
@@ -1306,11 +1305,12 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   };
 
   const handleTextInputChange = (value: any) => {
-    const inputValue = value;
-    if (validation?.required) {
-      validateInput(inputValue);
-    }
     setHasInfoMsg(null);
+    const inputValue = value;
+    let isValid = true;
+    if (validation?.required) {
+      isValid = validateInput(inputValue);
+    }
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
         if (inputValue.trim().toString() === '') {
@@ -1327,7 +1327,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
       }
     } else {
       setHasInfoMsg(null);
-      setIsOpen(true);
+      setIsOpen(isValid);
       onChange(inputValue);
     }
   };
@@ -1335,7 +1335,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   const handleSelectInputChange = (selectedValue: any) => {
     setHasInfoMsg(customInfoMessage);
     const { value } = selectedValue;
-    handleTextInputChange(value);
+    handleTextInputChange(value.trim());
   };
 
   const closeSearch = useCallback(() => {

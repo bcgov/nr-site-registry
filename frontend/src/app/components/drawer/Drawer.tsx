@@ -75,8 +75,8 @@ export const Drawer: FC<DrawerProps> = ({
   );
 
   useEffect(() => {
+    setOpen(isOpen);
     if (isOpen) {
-      setOpen(true);
       setIsVisible(true);
     }
   }, [isOpen]);

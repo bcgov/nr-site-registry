@@ -1,6 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { FormFieldType, IFormField } from './IFormField';
-import infoIcon from '../../images/info-icon.png';
 import { formatDate, formatDateRange } from '../../helpers/utility';
 import { DatePicker, DateRangePicker } from 'rsuite';
 import {
@@ -16,8 +21,6 @@ import Dropdown from 'react-bootstrap/Dropdown';
 
 import SearchInput from '../search/SearchInput';
 import Avatar from '../avatar/Avatar';
-import { useSelector } from 'react-redux';
-import { resetSiteDetails } from '../../features/site/dto/SiteSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 
 interface InputProps extends IFormField {
@@ -173,11 +176,21 @@ export const TextInput: React.FC<InputProps> = ({
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
   const [error, setError] = useState<string | null>(null);
-  // const [localValue, SetLocalValue] = useState(value);
+
+  useEffect(() => {
+    if (validation?.required) {
+      setError(null);
+      validateInput(value);
+    }
+  }, []);
 
   const validateInput = (inputValue: string) => {
     if (validation) {
-      if (validation.pattern && !validation.pattern.test(inputValue)) {
+      if (validation?.pattern && !validation.pattern?.test(inputValue)) {
+        setError(validation.customMessage || 'Invalid input');
+        return false;
+      }
+      if (validation.required && !inputValue.trim()) {
         setError(validation.customMessage || 'Invalid input');
         return false;
       }
@@ -189,9 +202,9 @@ export const TextInput: React.FC<InputProps> = ({
 
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-
-    validateInput(inputValue);
-    // SetLocalValue(inputValue);
+    if (validation?.required) {
+      validateInput(inputValue);
+    }
 
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
@@ -226,11 +239,7 @@ export const TextInput: React.FC<InputProps> = ({
           {!tableMode && (
             <label
               htmlFor={inputTxtId}
-              className={`${
-                !isEditing
-                  ? (customLabelCss ?? '')
-                  : `form-label ${customEditLabelCss ?? 'custom-label'}`
-              }`}
+              className={`${!isEditing ? (customLabelCss ?? '') : `form-label ${customEditLabelCss ?? 'custom-label'}`} ${validation?.required ? 'required-field' : ''}`}
             >
               {label}
             </label>
@@ -283,14 +292,40 @@ export const DropdownInput: React.FC<InputProps> = ({
   customPlaceholderCss,
   onChange,
   tableMode,
+  isDisabled,
+  customErrorCss,
+  validation,
 }) => {
+  const [error, setError] = useState<string | null>(null);
   const ContainerElement = tableMode ? 'td' : 'div';
   // Replace any spaces in the label with underscores to create a valid id
   const drdownId = label.replace(/\s+/g, '_') + '_' + v4();
   const [selected, setSelected] = useState<boolean>(false);
 
+  useEffect(() => {
+    if (validation?.required) {
+      setError(null);
+      validateInput(value);
+    }
+  }, []);
+
+  const validateInput = (inputValue: string) => {
+    if (validation) {
+      if (validation?.required && !inputValue.trim()) {
+        setError(validation?.customMessage || 'Invalid input');
+        return false;
+      }
+    }
+
+    setError(null);
+    return true;
+  };
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setError(null);
     const selectedOption = event.target.value.trim();
+    if (validation?.required) {
+      validateInput(selectedOption);
+    }
     setSelected(selectedOption !== '');
     onChange(selectedOption);
   };
@@ -321,7 +356,7 @@ export const DropdownInput: React.FC<InputProps> = ({
             !isEditing
               ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
-          }`}
+          } ${validation?.required ? 'required-field' : ''}`}
           aria-labelledby={label}
         >
           {label}
@@ -339,10 +374,11 @@ export const DropdownInput: React.FC<InputProps> = ({
             isFirstOptionGrey
               ? 'custom-disabled-option'
               : 'custom-primary-option'
-          }`}
+          }  ${error && 'error'}`}
           value={value.trim() ?? ''}
           onChange={handleSelectChange}
           aria-label={label}
+          disabled={isDisabled}
         >
           <option
             value=""
@@ -391,9 +427,16 @@ export const DropdownInput: React.FC<InputProps> = ({
           {options?.find((opt) => opt.key === value)?.value}
         </span>
       )}
+      {error && (
+        <span
+          aria-label="error-message"
+          className={` ${customErrorCss ?? 'text-danger  py-2 mx-1 small'}`}
+        >
+          {error}
+        </span>
+      )}
     </ContainerElement>
   );
-  // }
 };
 
 export const GroupInput: React.FC<InputProps> = ({
@@ -409,29 +452,34 @@ export const GroupInput: React.FC<InputProps> = ({
   isChildLabel,
   customErrorCss,
   onChange,
+  isDisabled,
 }) => {
   const [error, setError] = useState<string | null>(null);
   let currentConcatenatedValue;
+  useEffect(() => {
+    children?.forEach((child) => {
+      if (child?.validation?.required) {
+        validateInput(child?.value, child);
+      }
+    });
+  }, []);
 
   if (!isEditing) {
-    currentConcatenatedValue = children?.reduce(
-      (accumulator, currentValue, index) => {
-        if (currentValue.value) {
-          accumulator = accumulator + currentValue.value + currentValue.suffix;
-        }
-        return accumulator;
-      },
-      '',
-    );
+    currentConcatenatedValue = children?.reduce((accumulator, currentValue) => {
+      if (currentValue.value) {
+        accumulator = accumulator + currentValue.value + currentValue.suffix;
+      }
+      return accumulator;
+    }, '');
   }
-  const validateInput = (
-    inputValue: string,
-    validation?: RegExp,
-    customMessage?: string,
-  ) => {
-    if (validation) {
-      if (validation && !validation.test(inputValue)) {
-        setError(customMessage || 'Invalid input');
+  const validateInput = (inputValue: string, child: InputProps) => {
+    if (child?.validation) {
+      if (child?.validation && !child?.validation.pattern?.test(inputValue)) {
+        setError(child?.validation?.customMessage || 'Invalid input');
+        return false;
+      }
+      if (child?.validation?.required && !inputValue.trim()) {
+        setError(child?.validation?.customMessage || 'Invalid input');
         return false;
       }
     }
@@ -445,14 +493,11 @@ export const GroupInput: React.FC<InputProps> = ({
     child: InputProps,
   ) => {
     const inputValue = e.target.value.trim();
+    if (child?.validation?.required) {
+      validateInput(inputValue, child);
+    }
     if (child.allowNumbersOnly) {
-      if (
-        validateInput(
-          inputValue,
-          child.validation?.pattern,
-          child.validation?.customMessage,
-        )
-      ) {
+      if (validateInput(inputValue, child)) {
         child.onChange(inputValue); // Update parent component state only if validation passes
       }
     } else {
@@ -498,7 +543,7 @@ export const GroupInput: React.FC<InputProps> = ({
                 {isChildLabel && (
                   <label
                     htmlFor={grpId}
-                    className={`${!isEditing ? (customLabelCss ?? '') : `form-label ${customEditLabelCss ?? 'custom-label'}`}`}
+                    className={`${!isEditing ? (customLabelCss ?? '') : `form-label ${customEditLabelCss ?? 'custom-label'}`} ${child?.validation?.required ? 'required-field' : ''}`}
                   >
                     {child.label}
                   </label>
@@ -514,6 +559,7 @@ export const GroupInput: React.FC<InputProps> = ({
                   value={child.value ?? ''}
                   onChange={(e) => handleTextInputChange(e, child)}
                   aria-label={child.label} // Accessibility
+                  disabled={isDisabled}
                 />
               </div>
             );
@@ -554,8 +600,17 @@ export const DateRangeInput: React.FC<InputProps> = ({
   customPlaceholderCss,
   tableMode,
   onChange,
+  customErrorCss,
+  validation,
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (validation?.required) {
+      validateInput(value);
+    }
+  }, []);
+
   let dateRangeValue;
   if (value.length > 0) {
     const [startDate, endDate] = value;
@@ -568,6 +623,25 @@ export const DateRangeInput: React.FC<InputProps> = ({
       dateRangeValue = ''; // Set an empty string or fallback value if invalid
     }
   }
+
+  const validateInput = (inputValue: any) => {
+    if (validation) {
+      if (validation.required && !inputValue) {
+        setError(validation.customMessage || 'Invalid input');
+        return false;
+      }
+    }
+
+    setError(null);
+    return true;
+  };
+
+  const handleDateRange = (value: any) => {
+    if (validation?.required) {
+      validateInput(value);
+    }
+    onChange(value);
+  };
 
   const handleCheckBoxChange = (isChecked: boolean) => {
     onChange(isChecked);
@@ -607,13 +681,13 @@ export const DateRangeInput: React.FC<InputProps> = ({
           showOneCalendar
           ranges={[]}
           aria-label={label}
-          className={` w-100  ${customPlaceholderCss ?? ''} ${customEditInputTextCss ?? 'custom-date-range'}`}
+          className={` w-100  ${customPlaceholderCss ?? ''} ${customEditInputTextCss ?? 'custom-date-range'} ${error && 'rs-picker-error rs-picker-input-group'}`}
           placeholder={placeholder}
           format="MM/dd/yyyy"
           character=" - "
           caretAs={CalendarIcon}
           value={value ?? []}
-          onChange={(value) => onChange(value)}
+          onChange={(value) => handleDateRange(value)}
           editable={true}
         />
       ) : (
@@ -622,6 +696,14 @@ export const DateRangeInput: React.FC<InputProps> = ({
           className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
         >
           {dateRangeValue ?? ''}
+        </span>
+      )}
+      {error && (
+        <span
+          aria-label="error-message"
+          className={` ${customErrorCss ?? 'text-danger  py-2 mx-1 small'}`}
+        >
+          {error}
         </span>
       )}
     </ContainerElement>
@@ -642,7 +724,10 @@ export const DateInput: React.FC<InputProps> = ({
   tableMode,
   onChange,
   isDisabled,
+  customErrorCss,
+  validation,
 }) => {
+  const [error, setError] = useState<string | null>(null);
   const ContainerElement = tableMode ? 'td' : 'div';
   let dateValue;
 
@@ -656,7 +741,28 @@ export const DateInput: React.FC<InputProps> = ({
     onChange(isChecked);
   };
 
+  useEffect(() => {
+    if (validation?.required) {
+      validateInput(value);
+    }
+  }, []);
+
+  const validateInput = (inputValue: Date | null) => {
+    if (validation) {
+      if (validation.required && !inputValue) {
+        setError(validation.customMessage || 'Invalid input');
+        return false;
+      }
+    }
+
+    setError(null);
+    return true;
+  };
+
   const handleDateChange = (newDate: Date | null) => {
+    if (validation?.required) {
+      validateInput(newDate);
+    }
     // Check if the new value is a valid date
     if (newDate instanceof Date && !isNaN(newDate.getTime())) {
       // Pass valid date to the parent onChange function
@@ -689,7 +795,7 @@ export const DateInput: React.FC<InputProps> = ({
             !isEditing
               ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
-          }`}
+          } ${validation?.required ? 'required-field' : ''}`}
         >
           {label}
         </label>
@@ -700,7 +806,8 @@ export const DateInput: React.FC<InputProps> = ({
           id={dateRangeId}
           data-testid={dateRangeId}
           aria-label={label}
-          className={` w-100  ${customPlaceholderCss ?? ''} ${customEditInputTextCss ?? 'custom-date-range'}`}
+          className={` w-100  ${customPlaceholderCss ?? ''} ${customEditInputTextCss ?? 'custom-date-range'} 
+              ${error && 'rs-picker-error rs-picker-input-group'}`}
           placeholder={placeholder}
           format="MMM dd, yyyy"
           caretAs={CalendarIcon}
@@ -715,6 +822,14 @@ export const DateInput: React.FC<InputProps> = ({
           className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
         >
           {dateValue ?? ''}
+        </span>
+      )}
+      {error && (
+        <span
+          aria-label="error-message"
+          className={` ${customErrorCss ?? 'text-danger  py-2 mx-1 small'}`}
+        >
+          {error}
         </span>
       )}
     </ContainerElement>
@@ -803,15 +918,51 @@ export const TextAreaInput: React.FC<InputProps> = ({
   tableMode,
   textAreaRow,
   textAreaColoum,
+  validation,
+  allowNumbersOnly,
+  isDisabled,
+  customErrorCss,
 }) => {
-  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e.target.value);
-  };
-
   const textAreaId = label.replace(/\s+/g, '_') + '_' + v4();
   const ContainerElement = tableMode ? 'td' : 'div';
   const cols = textAreaColoum ?? undefined;
   const rows = textAreaRow ?? undefined;
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (validation?.required) {
+      validateInput(value);
+    }
+  }, []);
+
+  const validateInput = (inputValue: string) => {
+    if (validation) {
+      if (validation?.pattern && !validation.pattern?.test(inputValue)) {
+        setError(validation.customMessage || 'Invalid input');
+        return false;
+      }
+      if (validation.required && !inputValue.trim()) {
+        setError(validation.customMessage || 'Invalid input');
+        return false;
+      }
+    }
+
+    setError(null);
+    return true;
+  };
+
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const inputValue = e.target.value;
+    if (validation?.required) {
+      validateInput(inputValue);
+    }
+    if (allowNumbersOnly) {
+      if (validateInput(inputValue)) {
+        onChange(inputValue); // Update parent component state only if validation passes
+      }
+    } else {
+      onChange(inputValue);
+    }
+  };
 
   return (
     <ContainerElement
@@ -855,6 +1006,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
           aria-label={label}
           rows={rows}
           cols={cols}
+          disabled={isDisabled}
         />
       ) : (
         <span
@@ -862,6 +1014,14 @@ export const TextAreaInput: React.FC<InputProps> = ({
           className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
         >
           {value}
+        </span>
+      )}
+      {error && (
+        <span
+          aria-label="error-message"
+          className={` ${customErrorCss ?? 'text-danger  py-2 mx-1 small'}`}
+        >
+          {error}
         </span>
       )}
     </ContainerElement>
@@ -887,7 +1047,11 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
   filteredOptions = [],
   isLoading,
   customInfoMessage,
+  isDisabled,
+  customErrorCss,
+  validation,
 }) => {
+  const [error, setError] = useState<string | null>(null);
   const divRef = useRef<HTMLDivElement>(null);
   const ContainerElement = tableMode ? 'td' : 'div';
   const drdownId = label.replace(/\s+/g, '_') + '_' + v4();
@@ -896,8 +1060,29 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
     useState<{ key: any; value: any }[]>(filteredOptions);
   const [isClear, setIsClear] = useState(false);
 
+  useEffect(() => {
+    if (validation?.required) {
+      validateInput(value);
+    }
+  }, []);
+
+  const validateInput = (inputValue: string) => {
+    if (validation) {
+      if (validation?.required && !inputValue) {
+        setError(validation?.customMessage || 'Invalid input');
+        return false;
+      }
+    }
+
+    setError(null);
+    return true;
+  };
   const handleSelectChange = (selectedOption: any) => {
+    setError(null);
     onChange(selectedOption);
+    if (validation?.required) {
+      validateInput(selectedOption);
+    }
     setSearchTerm('');
     setFilteredOpts([]);
     handler('');
@@ -961,7 +1146,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
             !isEditing
               ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
-          }`}
+          } ${validation?.required ? 'required-field' : ''}`}
         >
           {label}
         </label>
@@ -1013,6 +1198,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
                     <Dropdown.Item
                       key={index}
                       onClick={() => handleSelectChange(option)}
+                      disabled={isDisabled}
                     >
                       {option.value}
                     </Dropdown.Item>
@@ -1030,6 +1216,14 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
           className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
         >
           {options?.find((opt) => opt.key === value)?.value}
+        </span>
+      )}
+      {error && (
+        <span
+          aria-label="error-message"
+          className={` ${customErrorCss ?? 'text-danger  py-2 mx-1 small'}`}
+        >
+          {error}
         </span>
       )}
     </ContainerElement>
@@ -1059,8 +1253,9 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   isLoading,
   onChange,
   tableMode,
+  isDisabled,
 }) => {
-  const resetDetails = useSelector(resetSiteDetails);
+  // const resetDetails = useSelector(resetSiteDetails);
   const ContainerElement = tableMode ? 'td' : 'div';
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -1068,7 +1263,10 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   const divRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [hasinfoMsg, setHasInfoMsg] = useState<React.ReactNode | null>(null);
-
+  const [menuPositionStyle, setMenuPositionStyle] = useState<CSSProperties>({
+    top: '0px',
+    left: '0px',
+  });
   useEffect(() => {
     if (React.isValidElement(customInfoMessage)) {
       const elementProps = (customInfoMessage as React.ReactElement).props;
@@ -1080,11 +1278,17 @@ export const SearchCustomInput: React.FC<InputProps> = ({
     }
   }, [isOpen]);
 
+  // useEffect(() => {
+  //   if (resetDetails) {
+  //     setError(null);
+  //   }
+  // }, [resetDetails]);
+
   useEffect(() => {
-    if (resetDetails) {
-      setError(null);
+    if (validation?.required) {
+      validateInput(value);
     }
-  }, [resetDetails]);
+  }, []);
 
   const validateInput = (inputValue: any) => {
     if (validation) {
@@ -1103,7 +1307,9 @@ export const SearchCustomInput: React.FC<InputProps> = ({
 
   const handleTextInputChange = (value: any) => {
     const inputValue = value;
-    validateInput(inputValue);
+    if (validation?.required) {
+      validateInput(inputValue);
+    }
     setHasInfoMsg(null);
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
@@ -1139,18 +1345,56 @@ export const SearchCustomInput: React.FC<InputProps> = ({
 
   const adjustMenuPosition = () => {
     if (inputRef.current && divRef.current) {
-      const rect = inputRef.current.getBoundingClientRect();
-      const menuHeight = divRef.current.offsetHeight + 100;
-      const windowHeight = window.innerHeight;
+      const rect = inputRef.current.getBoundingClientRect(); // Get the position of the input
+      const menuHeight = divRef.current.offsetHeight; // Height of the dropdown menu
+      const menuWidth = divRef.current.offsetWidth; // Width of the dropdown menu
+      const windowHeight = window.innerHeight; // Height of the window
+      const windowWidth = window.innerWidth; // Width of the window
+      const windowScrollTop = window.scrollY; // Scroll position (for handling scrolling)
 
-      // Check if there's enough space below the input
-      if (windowHeight - rect.bottom < menuHeight) {
-        setMenuPosition('top'); // Not enough space below, position above
-      } else {
-        setMenuPosition('bottom'); // Enough space below, position below
+      // Calculate available space
+      const spaceBelow = windowHeight - rect.bottom; // Space available below the input
+      const spaceAbove = rect.top; // Space available above the input
+
+      // Position for the dropdown (it will initially open below the input)
+      let menuTop = rect.bottom + windowScrollTop; // Position the menu below the input
+      let menuLeft = rect.left + window.scrollX; // Align the left side of the dropdown with the input
+
+      // If there's not enough space below the input, position the menu above
+      if (spaceBelow < menuHeight && spaceAbove >= menuHeight) {
+        menuTop = rect.top + windowScrollTop - menuHeight; // Position the menu above
       }
+
+      // If there's insufficient space on the left or right, adjust left position
+      if (rect.left + menuWidth > windowWidth) {
+        menuLeft = windowWidth - menuWidth; // Align to the right side of the screen
+      }
+
+      // Dynamically apply 'top' or 'bottom' positioning depending on the available space
+      let positionStyle: CSSProperties = {
+        top: `${menuTop}px`,
+        left: `${menuLeft}px`,
+        width: `${rect.width}px`, // Ensure the menu width matches the input field's width
+      };
+
+      setMenuPositionStyle(positionStyle); // Update the state with the new position
     }
   };
+
+  // Handle window resize
+  const handleWindowResize = useCallback(() => {
+    if (isOpen) {
+      adjustMenuPosition(); // Recalculate position on window resize
+    }
+  }, [isOpen]);
+
+  // Add event listener for window resize
+  useEffect(() => {
+    window.addEventListener('resize', handleWindowResize);
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  }, [handleWindowResize]);
 
   // Function to handle clicks outside the div element
   const handleClickOutside = (event: MouseEvent) => {
@@ -1189,13 +1433,13 @@ export const SearchCustomInput: React.FC<InputProps> = ({
             !isEditing
               ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
-          }`}
+          } ${validation?.required ? 'required-field' : ''}`}
         >
           {label}
         </label>
       )}
       {isEditing ? (
-        <div className="d-flex align-items-center justify-content-center w-100 position-relative custom-search-box-container ">
+        <div className="d-flex align-items-center justify-content-center w-100 ">
           <input
             ref={inputRef}
             type={type}
@@ -1210,94 +1454,94 @@ export const SearchCustomInput: React.FC<InputProps> = ({
             }}
             aria-label={label} // Accessibility
             required={error ? true : false}
+            disabled={isDisabled}
           />
-          {value.length <= 0 ? (
-            <span
-              id="right-icon"
-              data-testid="right-icon"
-              className={`${customRightIconCss ?? 'custom-search-icon-position custom-search-icon position-absolute px-2'}`}
-            >
-              <MagnifyingGlassIcon />
-            </span>
-          ) : (
-            <span
-              data-testid="left-icon"
-              id="left-icon"
-              className={`${customLeftIconCss ?? 'custom-clear-icon-position custom-search-icon position-absolute px-2'}`}
-              onClick={closeSearch}
-            >
-              <CircleXMarkIcon />
-            </span>
-          )}
+          <div className="d-flex align-items-center justify-content-center position-relative custom-search-box-container ">
+            {value.length <= 0 ? (
+              <span
+                id="right-icon"
+                data-testid="right-icon"
+                className={`${customRightIconCss ?? 'custom-search-icon-position custom-search-icon position-absolute px-2'}`}
+              >
+                <MagnifyingGlassIcon />
+              </span>
+            ) : (
+              <span
+                data-testid="left-icon"
+                id="left-icon"
+                className={`${customLeftIconCss ?? 'custom-clear-icon-position custom-search-icon position-absolute px-2'}`}
+                onClick={closeSearch}
+              >
+                <CircleXMarkIcon />
+              </span>
+            )}
+          </div>
 
           {/* Dropdown menu */}
-          {
-            options && options?.length >= 0 && isOpen && (
-              // <div className='position-relative'>
-              <div
-                id="menu"
-                className={`custom-search-input-menu  ${
-                  menuPosition === 'bottom'
-                    ? 'custom-search-input-menu-bottom'
-                    : 'custom-search-input-menu-top'
-                }`}
-                role="menu"
-                aria-labelledby="search-input-dropdown"
-                ref={divRef}
-              >
-                {/* Language options */}
-                {options && options.length > 0 && (
-                  <>
-                    <div role="none">
-                      {/* Default option */}
-                      <div
-                        id="menu-item"
-                        className="custom-search-input-item-first-child w-100"
-                        role="menuitem"
-                        aria-disabled="true"
-                        tabIndex={-1} // Prevent tab focus on disabled items
-                      >
-                        <div className="custom-search-input-item-label pb-1">
-                          {customMenuMessage && customMenuMessage}
-                          {customInfoMessage && customInfoMessage}
-                        </div>
-                      </div>
-                    </div>
-                    <hr className="m-0 custom-horizontal-line" />
-                  </>
-                )}
-                {isLoading === RequestStatus.loading && isOpen ? (
-                  <div className="custom-loading-overlay">
-                    <div className="text-center">
-                      <SpinnerIcon
-                        data-testid="loading-spinner"
-                        className="custom-fa-spin"
-                      />
-                    </div>
-                  </div>
-                ) : options && options.length > 0 ? (
-                  options.map((item) => (
+          {options && options?.length >= 0 && isOpen && (
+            <div
+              id="menu"
+              className={`custom-search-input-menu  ${
+                menuPosition === 'bottom'
+                  ? 'custom-search-input-menu-bottom'
+                  : 'custom-search-input-menu-top'
+              }`}
+              style={menuPositionStyle}
+              role="menu"
+              aria-labelledby="search-input-dropdown"
+              ref={divRef}
+            >
+              {/* Language options */}
+              {options && options.length > 0 && (
+                <>
+                  <div role="none">
+                    {/* Default option */}
                     <div
                       id="menu-item"
-                      className="custom-search-input-item d-flex align-items-center w-100"
+                      className="custom-search-input-item-first-child w-100"
                       role="menuitem"
-                      aria-label={item.value}
-                      tabIndex={0} // Allow keyboard focus
-                      key={item.key}
-                      onClick={() => {
-                        handleSelectInputChange(item);
-                      }}
+                      aria-disabled="true"
+                      tabIndex={-1} // Prevent tab focus on disabled items
                     >
-                      <span>{item.value}</span>
+                      <div className="custom-search-input-item-label pb-1">
+                        {customMenuMessage && customMenuMessage}
+                        {customInfoMessage && customInfoMessage}
+                      </div>
                     </div>
-                  ))
-                ) : (
-                  <div className="p-2">{customInfoMessage}</div>
-                )}
-              </div>
-            )
-            // </div>
-          }
+                  </div>
+                  <hr className="m-0 custom-horizontal-line" />
+                </>
+              )}
+              {isLoading === RequestStatus.loading && isOpen ? (
+                <div className="custom-loading-overlay">
+                  <div className="text-center">
+                    <SpinnerIcon
+                      data-testid="loading-spinner"
+                      className="custom-fa-spin"
+                    />
+                  </div>
+                </div>
+              ) : options && options.length > 0 ? (
+                options.map((item) => (
+                  <div
+                    id="menu-item"
+                    className="custom-search-input-item d-flex align-items-center w-100"
+                    role="menuitem"
+                    aria-label={item.value}
+                    tabIndex={0} // Allow keyboard focus
+                    key={item.key}
+                    onClick={() => {
+                      handleSelectInputChange(item);
+                    }}
+                  >
+                    <span>{item.value}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="p-2">{customInfoMessage}</div>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         <span className={`d-flex ${customInputTextCss ?? ''}`}>{value}</span>

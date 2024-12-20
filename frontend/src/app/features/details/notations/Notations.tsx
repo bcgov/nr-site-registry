@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import './Notations.css';
-import Widget from '../../../components/widget/Widget';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { UserType } from '../../../helpers/requests/userType';
 import { AppDispatch } from '../../../Store';
@@ -213,6 +212,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
             },
           }),
         );
+      }
+
+      // Always update formData if different
+      if (JSON.stringify(formData) !== JSON.stringify(notations)) {
         setFormData(notations);
       }
     }
@@ -313,7 +316,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
   // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
   useEffect(() => {
-    if (resetDetails) {
+    if (
+      resetDetails ||
+      saveSiteDetailsRequestStatus === RequestStatus.success
+    ) {
       dispatch(
         fetchNotationParticipants({
           siteId: siteId ?? '',
@@ -405,9 +411,11 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
               const updatedRow = [...notationFormRowEditMode].map((items) => {
                 return items.map((row) => ({
                   ...row,
-                  options: notationType.data.find(
-                    (item: any) => item.metaData === value,
-                  ).dropdownDto,
+                  options:
+                    !!value &&
+                    notationType.data.find(
+                      (item: any) => item.metaData === value,
+                    ).dropdownDto,
                 }));
               });
               setUpdatedNotationFormRowEditMode(updatedRow);
@@ -693,9 +701,9 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       siteId: siteId,
       etypCode: '', // Default values for other properties
       requirementReceivedDate: new Date(),
-      completionDate: new Date(),
+      completionDate: null,
       eclsCode: '',
-      requirementDueDate: new Date(),
+      requirementDueDate: null,
       requiredAction: '',
       note: '',
       apiAction: UserActionEnum.added,
@@ -865,15 +873,57 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   };
 
   const handleNotationFormRowFirstChild = (metaData?: any) => {
+    const notationType = {
+      type: FormFieldType.DropDown,
+      label: 'Notation Type',
+      placeholder: 'Notation Type',
+      graphQLPropertyName: 'etypCode',
+      options: [],
+      value: '',
+      colSize: `${viewMode === SiteDetailsMode.EditMode ? 'col-lg-12 col-md-12 col-sm-12' : 'col-xxl-5 col-xl-5 col-lg-8 col-md-6 col-sm-12'}`,
+      customLabelCss: 'custom-notation-lbl-text',
+      customInputTextCss: 'custom-notation-input-text',
+      customEditLabelCss: 'custom-notation-edit-label',
+      customEditInputTextCss: 'custom-notation-edit-input',
+      validation: {
+        required: true,
+        customMessage: 'Notation Type is required.',
+      },
+    };
+
+    const notationClass = {
+      type: FormFieldType.DropDown,
+      label: 'Notation Class',
+      placeholder: 'Notation Class',
+      graphQLPropertyName: 'eclsCode',
+      options: [],
+      value: '',
+      colSize: 'col-xxl-5 col-xl-5 col-lg-8 col-md-6 col-sm-12',
+      customLabelCss: 'custom-notation-lbl-text',
+      customInputTextCss: 'custom-notation-input-text',
+      customEditLabelCss: 'custom-notation-edit-label',
+      customEditInputTextCss: 'custom-notation-edit-input',
+      validation: {
+        required: true,
+        customMessage: 'Notation Class is required.',
+      },
+    };
     if (metaData && metaData.requiredDate) {
       return updateOptionsBasedOnMetaData(
-        notationFormRowsFirstChildIsRequired,
+        viewMode === SiteDetailsMode.EditMode
+          ? [
+              [notationClass, ...notationFormRowsFirstChildIsRequired[0]],
+              [notationType],
+            ]
+          : [[notationType, ...notationFormRowsFirstChildIsRequired[0]]],
         metaData,
         'eclsCode',
       );
     } else {
       return updateOptionsBasedOnMetaData(
-        notationFormRowsFirstChild,
+        viewMode === SiteDetailsMode.EditMode
+          ? [[notationClass, ...notationFormRowsFirstChild[0]], [notationType]]
+          : [[notationType, ...notationFormRowsFirstChild[0]]],
         metaData,
         'eclsCode',
       );
@@ -966,7 +1016,6 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
                   />
                 )}
               <Notation
-                index={index}
                 notation={notation}
                 handleNotationFormRowFirstChild={
                   handleNotationFormRowFirstChild

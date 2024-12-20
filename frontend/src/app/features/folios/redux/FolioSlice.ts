@@ -13,6 +13,7 @@ import {
   updateFolioItemQL,
 } from '../graphql/Folio';
 import { print } from 'graphql';
+import { HttpStatusCode } from '../../../common/httpStatusCode';
 
 const initialState: FolioState = {
   fetchRequestStatus: RequestStatus.idle,
@@ -184,8 +185,10 @@ const folioSlice = createSlice({
       })
       .addCase(addFolioItem.fulfilled, (state, action) => {
         if (
-          action?.payload?.data?.addFolioItem?.httpStatusCode === 400 ||
-          action?.payload?.data?.addFolioItem?.httpStatusCode === 404
+          action?.payload?.data?.addFolioItem?.httpStatusCode ===
+            HttpStatusCode.NOT_FOUND ||
+          action?.payload?.data?.addFolioItem?.httpStatusCode ===
+            HttpStatusCode.BAD_REQUEST
         )
           state.addRequestStatus = RequestStatus.failed;
         else if (action?.payload?.errors?.length > 0)

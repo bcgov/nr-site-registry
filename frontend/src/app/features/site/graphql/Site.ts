@@ -69,6 +69,8 @@ export const graphqlSiteDetailsQuery = () => {
           latDegrees
           latMinutes
           latSeconds
+          latdeg
+          longdeg
           city
           generalDescription
           siteRiskCode

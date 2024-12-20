@@ -1,23 +1,3 @@
-/* .map-search {
-    position: absolute;
-    top: 10;
-    left: 50;
-    right: 0;
-    z-index: 2000;
-    margin-top: 16px;
-    pointer-events: none;
-    transition: all 0.5s ease-in-out; 
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    flex-wrap: nowrap;
-    gap: 16px 8px;
-    /* background: var(--surface-background-white, #ffffff); */
-/* box-shadow: 0px 6.4px 14.4px 0px #00000021; */
-/* box-shadow: 0px 1.2px 3.6px 0px #0000001a; */
-/* width: 604px; 
-  } */
-
 .map-search {
   position: absolute;
   top: 10;
@@ -25,7 +5,6 @@
   right: 0;
   z-index: 2;
   margin-top: 16px;
-  pointer-events: none;
   transition: all 0.5s ease-in-out;
   display: flex;
   justify-content: flex-start;
@@ -39,16 +18,12 @@
   z-index: 2;
   top: 45px;
   left: 20px;
-  /* width: 60%; */
   background: var(--surface-background-white, #ffffff);
   gap: 8px;
-  /* border-radius: var(--layout-border-medium); */
   border: 0px;
   display: flex;
   box-shadow: 0px 6.4px 14.4px 0px #00000021;
   box-shadow: 0px 1.2px 3.6px 0px #0000001a;
-  /* padding: var(--layout-padding-xsmall) var(--layout-padding-xsmall)
-      var(--layout-padding-xsmall) var(--layout-padding-xsmall);  */
 }
 
 .map-search .MuiButton-root,
@@ -78,17 +53,20 @@ button.map-button {
   flex: 0 0 auto;
   gap: 8px;
   background-color: var(--surface-background-white);
-  color: var(--typography-color-secondary);
+  color: var(--typography-color-link);
   box-sizing: border-box;
   text-wrap: nowrap;
-  border-radius: var(--layout-border-radius-medium);
-  border: 1px solid var(--surface-color-border-light);
+  border-radius: var(--layout-margin-xsmall);
+  padding: var(--map-button-padding-medium) var(--map-button-padding-large)
+    var(--map-button-padding-medium) var(--map-button-padding-large);
+  border: 1px solid var(--surface-color-primary-hover);
   text-transform: none;
-  /* box-shadow: var(--box-shadow-small); */
 }
 
 button.map-button:hover {
-  border-color: var(--rs-gray-0);
+  background-color: var(--surface-color-primary-hover);
+  color: var(--surface-color-background-white);
+  border: 1px;
 }
 
 button.map-button.map-button--large {
@@ -104,17 +82,27 @@ button.map-button.map-button--medium {
 }
 
 button.map-button--active {
-  background-color: var(--rs-gray-0);
-  border: 3px solid var(--surface-color-primary-active-border);
+  background-color: var(--surface-color-primary-hover);
+  color: var(--surface-color-background-white);
+  border: 1px;
 }
 
 button.map-button--active:hover {
-  border-color: var(--rs-gray-0);
+  border-color: var(--surface-color-primary-active-border);
+  background-color: var(--surface-color-primary-hover);
 }
 
 .data-layers-icon,
 .find-me-icon {
-  color: var(--typography-color-secondary);
+  color: var(--typography-color-link);
+}
+
+.find-me-icon--active {
+  color: var(--typography-color-primary-invert);
+}
+
+.map-button:hover .find-me-icon {
+  color: var(--typography-color-primary-invert);
 }
 
 .polygon-search-icon,
@@ -216,13 +204,9 @@ p.point-search-slider-text {
 }
 
 .search-autocomplete .search-input {
-  /* min-width: 60px; */
   min-width: 350px;
   max-width: 632px;
   transition: width ease-in-out 0.3s;
-  /*border: 1px solid var(--surface-color-border-light);
-    /* padding: 7.5px 4px 7.5px 5px;*/
-  /* opacity: 1;  */
 }
 
 div.search-autocomplete.MuiAutocomplete-hasClearIcon .MuiInputBase-root {

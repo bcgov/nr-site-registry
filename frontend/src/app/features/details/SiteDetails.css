@@ -109,7 +109,7 @@
 
 @media (max-width: 768px) {
   .custom-sticky-header {
-    align-items: baseline !important;
+    align-items: flex-start !important;
   }
 }
 
@@ -141,4 +141,12 @@
 
 .pos-relative {
   position: relative;
+}
+
+.custom-modal-error-header-text {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 34px;
+  text-align: left;
+  color: #f00;
 }

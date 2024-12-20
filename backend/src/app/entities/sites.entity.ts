@@ -109,7 +109,16 @@ export class Sites extends ChangeAuditEntity {
   latdeg: number | null;
 
   @Field({ nullable: true })
-  @Column('double precision', { name: 'longdeg', nullable: true })
+  @Column('double precision', {
+    name: 'longdeg',
+    nullable: true,
+    transformer: {
+      // Convert positive longdeg values into negative (and therefore valid BC coordinates)
+      // In this context, `from` runs when reading from the database.
+      from: (value) => (value !== null && value > 0 ? -value : value),
+      to: (value) => value,
+    },
+  })
   longdeg: number | null;
 
   @Field({ nullable: true })

@@ -5,6 +5,7 @@ import { DisclosureResolver } from './disclosure.resolver';
 import { Test } from '@nestjs/testing';
 import { DisclosureResponse } from '../../dto/disclosure.dto';
 import { LoggerService } from '../../logger/logger.service';
+import { UserTypeEum } from '../../common/userType';
 
 describe('DisclosureResolver', () => {
   let resolver: DisclosureResolver;
@@ -85,7 +86,14 @@ describe('DisclosureResolver', () => {
         .spyOn(disclosureService, 'getSiteDisclosureBySiteId')
         .mockResolvedValueOnce(mockSiteProfile);
 
-      const result = await resolver.getSiteDisclosureBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await resolver.getSiteDisclosureBySiteId(
+        siteId,
+        false,
+        user,
+      );
 
       expect(result).toEqual(expectedResponse);
       expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
@@ -110,7 +118,14 @@ describe('DisclosureResolver', () => {
         .spyOn(disclosureService, 'getSiteDisclosureBySiteId')
         .mockResolvedValueOnce([]);
 
-      const result = await resolver.getSiteDisclosureBySiteId(siteId, false);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await resolver.getSiteDisclosureBySiteId(
+        siteId,
+        false,
+        user,
+      );
 
       expect(result).toEqual(expectedResponse);
       expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(

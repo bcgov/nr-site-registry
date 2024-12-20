@@ -8,7 +8,6 @@ import { GetNotationConfig } from './NotationsConfig';
 // Example of a Jest mock for GetNotationConfig
 jest.mock('./NotationsConfig', () => ({
   GetNotationConfig: jest.fn(() => {
-    console.log('GetNotationConfig called'); // Debugging log
     return {
       notationFormRowsInternal: [
         [

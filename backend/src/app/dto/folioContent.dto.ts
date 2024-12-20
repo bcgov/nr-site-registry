@@ -17,16 +17,6 @@ export class FolioContentDTO {
   @Field()
   @IsString()
   folioId: string;
-
-  @Field()
-  @IsOptional()
-  @IsString()
-  userId: string;
-
-  @Field()
-  @IsOptional()
-  @IsString()
-  whoCreated: string;
 }
 
 @ObjectType()

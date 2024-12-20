@@ -323,13 +323,11 @@ export class SiteService {
     let snapShot: Snapshots = null;
 
     if (!userInfo) {
-      this.sitesLogger.debug(
-        'SiteService.findSiteBySiteId() user not logged in',
-      );
+      this.sitesLogger.log('SiteService.findSiteBySiteId() user not logged in');
 
       snapShot = null;
     } else if (userInfo?.identity_provider === 'idir') {
-      this.sitesLogger.debug(
+      this.sitesLogger.log(
         'SiteService.findSiteBySiteId() idir user - no snapshot',
       );
     } else {

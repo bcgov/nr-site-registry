@@ -69,6 +69,36 @@ export const graphqlSiteDetailsQuery = () => {
           latDegrees
           latMinutes
           latSeconds
+          latdeg
+          longdeg
+          city
+          generalDescription
+          siteRiskCode
+          whenUpdated
+        }
+        httpStatusCode
+      }
+    }
+  `;
+};
+
+export const graphqlSiteDetailsQueryForLoggedIn = () => {
+  return gql`
+    query findSiteBySiteIdLoggedInUser($siteId: String!, $pending: Boolean) {
+      findSiteBySiteIdLoggedInUser(siteId: $siteId, pending: $pending) {
+        data {
+          id
+          commonName
+          addrLine_1
+          addrLine_2
+          addrLine_3
+          addrLine_4
+          longDegrees
+          longMinutes
+          longMinutes
+          latDegrees
+          latMinutes
+          latSeconds
           city
           generalDescription
           siteRiskCode

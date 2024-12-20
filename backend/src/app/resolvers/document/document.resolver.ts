@@ -1,7 +1,11 @@
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { SiteDocs } from '../../entities/siteDocs.entity';
 import { DocumentService } from '../../services/document/document.service';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import {
+  AuthenticatedUser,
+  RoleMatchingMode,
+  Roles,
+} from 'nest-keycloak-connect';
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { HttpStatus, UsePipes } from '@nestjs/common';
@@ -33,6 +37,7 @@ export class DocumentResolver {
     @Args('siteId', { type: () => String }) siteId: string,
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
+    @AuthenticatedUser() user: any,
   ) {
     this.sitesLogger.log(
       'DocumentResolver.getSiteDocumentsBySiteId() start siteId:' +
@@ -45,6 +50,7 @@ export class DocumentResolver {
     const response = await this.documentService.getSiteDocumentsBySiteId(
       siteId,
       showPending,
+      user,
     );
     if (response?.length > 0) {
       this.sitesLogger.log(

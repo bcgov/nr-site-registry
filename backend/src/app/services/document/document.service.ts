@@ -7,6 +7,8 @@ import { DocumentDto } from '../../dto/document.dto';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { LoggerService } from '../../logger/logger.service';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { SnapshotsService } from '../snapshot/snapshot.service';
+import { UserTypeEum } from '../../common/userType';
 
 @Injectable()
 export class DocumentService {
@@ -14,6 +16,7 @@ export class DocumentService {
     @InjectRepository(SiteDocs)
     private siteDocsRepository: Repository<SiteDocs>,
     private readonly sitesLogger: LoggerService,
+    private snapshotService: SnapshotsService,
   ) {}
 
   /**
@@ -22,37 +25,73 @@ export class DocumentService {
    * @returns A promise that resolves to an array of DocumentDto objects.
    * @throws Error if there is an issue retrieving the data.
    */
-  async getSiteDocumentsBySiteId(siteId: string, showPending: boolean) {
+  async getSiteDocumentsBySiteId(
+    siteId: string,
+    showPending: boolean,
+    user: any,
+  ) {
     try {
       this.sitesLogger.log('DocumentService.getSiteDocumentsBySiteId() start');
       this.sitesLogger.debug(
         'DocumentService.getSiteDocumentsBySiteId() start',
       );
       let result: SiteDocs[] = [];
-      if (showPending) {
-        result = await this.siteDocsRepository.find({
-          where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
-          relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
-        });
+      if (user?.identity_provider === UserTypeEum.IDIR) {
+        if (showPending) {
+          result = await this.siteDocsRepository.find({
+            where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
+            relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
+          });
+        } else {
+          result = await this.siteDocsRepository.find({
+            where: { siteId },
+            relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
+          });
+        }
       } else {
-        result = await this.siteDocsRepository.find({
-          where: { siteId },
-          relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
-        });
+        const userId: string = user?.sub ? user.sub : '';
+        if (userId?.length === 0) {
+          this.sitesLogger.log(
+            'An invalid user was passed into DocumentService.getSiteDocumentsBySiteId() end',
+          );
+          return [];
+        } else {
+          const snapshot = await this.snapshotService.getMostRecentSnapshot(
+            siteId,
+            userId,
+          );
+          if (!snapshot) {
+            return [];
+          } else {
+            result = snapshot?.snapshotData?.documents;
+          }
+        }
       }
 
       // Process and format the documents
       const response = result.flatMap((res) => {
+        const submissionDate = res?.submissionDate;
+        const formattedSubmissionDate = submissionDate
+          ? new Date(submissionDate) instanceof Date &&
+            !isNaN(new Date(submissionDate).getTime())
+            ? new Date(submissionDate).toISOString() // Convert to ISO string if valid
+            : null // Set to null if it's not a valid date
+          : null; // Handle null or undefined effectiveDate
+        const documentDate = res?.documentDate;
+        const formattedDocumentDate = submissionDate
+          ? new Date(documentDate) instanceof Date &&
+            !isNaN(new Date(documentDate).getTime())
+            ? new Date(documentDate).toISOString() // Convert to ISO string if valid
+            : null // Set to null if it's not a valid date
+          : null; // Handle null or undefined effectiveDate
         // Base document structure
         const document = {
           id: res.id,
           siteId: res.siteId,
           title: res.title,
-          submissionDate: res.submissionDate.toISOString(),
+          submissionDate: formattedSubmissionDate,
           srAction: res.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
-          documentDate: res.documentDate
-            ? res.documentDate.toISOString()
-            : null,
+          documentDate: formattedDocumentDate,
         };
 
         // If there are associated siteDocPartics, map them

@@ -6,6 +6,7 @@ import {
   Roles,
 } from 'nest-keycloak-connect';
 import {
+  FetchSiteDetail,
   FetchSiteResponse,
   SaveSiteDetailsResponse,
 } from '../../dto/response/genericResponse';
@@ -236,7 +237,9 @@ export class SiteResolver {
         data,
       );
     } catch (e) {
-      this.sitesLogger.log('SiteResolver.mapSearch() failed');
+      this.sitesLogger.log(
+        `SiteResolver.mapSearch() failed, ${JSON.stringify(e)}`,
+      );
       return this.mapSearchGenericResponseProvider.createResponse(
         'Error fetching sites for map',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -244,5 +247,31 @@ export class SiteResolver {
         [],
       );
     }
+  }
+
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => FetchSiteDetail, { name: 'findSiteBySiteIdLoggedInUser' })
+  findSiteBySiteIdLoggedInUser(
+    @Args('siteId', { type: () => String }) siteId: string,
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
+    @AuthenticatedUser() userInfo,
+  ) {
+    this.sitesLogger.log(
+      'SiteResolver.findSiteBySiteId() start siteId:' +
+        ' ' +
+        siteId +
+        ' showPending = ' +
+        showPending,
+    );
+
+    return this.siteService.findSiteBySiteId(siteId, showPending, userInfo);
   }
 }

@@ -1,12 +1,14 @@
 import React from 'react';
 import { FloppyDisk, XmarkIcon } from '../common/icon';
 import './CustomButtons.css';
-import { Button } from '../button/Button';
+import { Button, ButtonVariant } from '../button/Button';
 
 interface ButtonProps {
   clickHandler: (event: React.MouseEvent<HTMLButtonElement>) => void;
   label?: string;
   showIcon?: boolean;
+  isDisabled?: boolean;
+  variant?: ButtonVariant;
 }
 
 interface ButtonWithLabelProps {
@@ -18,10 +20,12 @@ export const SaveButton: React.FC<ButtonProps> = ({
   clickHandler,
   label,
   showIcon,
+  variant,
+  isDisabled,
 }) => {
   showIcon = showIcon ?? true;
   return (
-    <Button onClick={clickHandler}>
+    <Button variant={variant} onClick={clickHandler} disabled={isDisabled}>
       {showIcon && <FloppyDisk />}
       {label && label !== '' ? label : 'Save'}
     </Button>
@@ -32,10 +36,11 @@ export const CancelButton: React.FC<ButtonProps> = ({
   clickHandler,
   label,
   showIcon,
+  variant,
 }) => {
   showIcon = showIcon ?? true;
   return (
-    <Button variant="tertiary" onClick={clickHandler}>
+    <Button variant={variant} onClick={clickHandler}>
       {showIcon && <XmarkIcon />}
       {label && label !== '' ? label : 'Cancel'}
     </Button>

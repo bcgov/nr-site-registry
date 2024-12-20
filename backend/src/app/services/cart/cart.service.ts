@@ -47,6 +47,7 @@ export class CartService {
     try {
       const cartItemsToInsert = [];
       if (!user) {
+        this.sitesLogger.log('CartService.addCartItem() User Not Found');
         throw new Error('User Not Found');
       }
       const userId = user?.sub;

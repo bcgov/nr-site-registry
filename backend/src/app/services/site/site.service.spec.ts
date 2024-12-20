@@ -28,6 +28,7 @@ import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { ParcelDescriptionInputDTO } from 'src/app/dto/parcelDescriptionInput.dto';
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
 import { UserActionEnum } from '../../common/userActionEnum';
+import { SnapshotsService } from '../snapshot/snapshot.service';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -45,11 +46,16 @@ describe('SiteService', () => {
   let historyLogRepository: Repository<HistoryLog>;
   let loggerService: LoggerService;
   let parcelDescriptionService: ParcelDescriptionsService;
+  let snapShotService: SnapshotsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SiteService,
+        {
+          provide: SnapshotsService,
+          useValue: {},
+        },
         {
           provide: LandHistoryService,
           useValue: {},
@@ -377,6 +383,7 @@ describe('SiteService', () => {
     parcelDescriptionService = module.get<ParcelDescriptionsService>(
       ParcelDescriptionsService,
     );
+    snapShotService = module.get<SnapshotsService>(SnapshotsService);
   });
 
   afterEach(() => {
@@ -443,7 +450,7 @@ describe('SiteService', () => {
   describe.skip('findSiteBySiteId', () => {
     it('should call findOneOrFail method of the repository with the provided siteId', async () => {
       const siteId = '123';
-      await siteService.findSiteBySiteId(siteId, false);
+      await siteService.findSiteBySiteId(siteId, false, null);
       expect(siteRepository.findOneOrFail).toHaveBeenCalledWith({
         where: { id: siteId },
       });
@@ -459,7 +466,7 @@ describe('SiteService', () => {
         expectedResult,
       );
 
-      const result = await siteService.findSiteBySiteId(siteId, false);
+      const result = await siteService.findSiteBySiteId(siteId, false, null);
 
       expect(result).toBeInstanceOf(FetchSiteDetail);
       expect(result.httpStatusCode).toBe(200);
@@ -471,7 +478,7 @@ describe('SiteService', () => {
       const error = new Error('Site not found');
       (siteRepository.findOneOrFail as jest.Mock).mockRejectedValue(error);
       await expect(
-        siteService.findSiteBySiteId(siteId, false),
+        siteService.findSiteBySiteId(siteId, false, null),
       ).rejects.toThrowError(error);
     });
   });
@@ -502,7 +509,18 @@ describe('SiteService', () => {
               userAction: 'pending',
               apiAction: 'pending',
               srAction: 'pending',
-              notationParticipant: null,
+              notationParticipant: [
+                {
+                  apiAction: UserActionEnum.ADDED,
+                  eventParticId: 'xxx-xxx',
+                  eventId: '1',
+                  eprCode: 'RVB',
+                  psnorgId: '1',
+                  displayName: 'SAGER, J.',
+                  srAction: 'false',
+                  userAction: 'pending',
+                },
+              ],
             },
           ],
         };
@@ -1046,7 +1064,17 @@ describe('SiteService', () => {
           id: '1',
           etypCode: 'type',
           eclsCode: 'class',
-          notationParticipant: [],
+          notationParticipant: [
+            {
+              apiAction: UserActionEnum.ADDED,
+              eventParticId: 'xxx-xxx',
+              eventId: '1',
+              eprCode: 'RVB',
+              psnorgId: '1',
+              displayName: 'SAGER, J.',
+              srAction: 'false',
+            },
+          ],
         },
       ];
       const userInfo = { givenName: 'Updated User' };

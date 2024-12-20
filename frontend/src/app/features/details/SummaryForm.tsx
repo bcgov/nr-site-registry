@@ -52,6 +52,7 @@ const SummaryForm: FC<SummaryFormProps> = ({
         label: 'Latitude (D, M, S)',
         value: '',
         isChildLabel: true,
+        customLabelCss: 'custom-summary-lbl-text',
         children: [
           {
             type: FormFieldType.Text,
@@ -109,6 +110,7 @@ const SummaryForm: FC<SummaryFormProps> = ({
         label: 'Longitude (D, M, S)',
         value: '',
         isChildLabel: true,
+        customLabelCss: 'custom-summary-lbl-text',
         children: [
           {
             type: FormFieldType.Text,

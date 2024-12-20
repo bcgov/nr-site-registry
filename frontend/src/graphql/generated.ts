@@ -305,8 +305,6 @@ export type FolioContentDto = {
   folioId: Scalars['String']['input'];
   id: Scalars['Float']['input'];
   siteId: Scalars['String']['input'];
-  userId: Scalars['String']['input'];
-  whoCreated: Scalars['String']['input'];
 };
 
 export type FolioContentResponse = {
@@ -342,7 +340,6 @@ export type FolioDto = {
 
 export type FolioMinDto = {
   id: Scalars['Float']['input'];
-  userId: Scalars['String']['input'];
 };
 
 export type FolioResponse = {
@@ -656,6 +653,7 @@ export type Query = {
   __typename?: 'Query';
   _service: _Service;
   findSiteBySiteId: FetchSiteDetail;
+  findSiteBySiteIdLoggedInUser: FetchSiteDetail;
   getAssociatedSitesBySiteId: AssociatedSiteResponse;
   getBannerType: BannerTypeResponse;
   getCartItemsForUser: CartResponse;
@@ -688,6 +686,12 @@ export type Query = {
 
 
 export type QueryFindSiteBySiteIdArgs = {
+  pending?: InputMaybe<Scalars['Boolean']['input']>;
+  siteId: Scalars['String']['input'];
+};
+
+
+export type QueryFindSiteBySiteIdLoggedInUserArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };

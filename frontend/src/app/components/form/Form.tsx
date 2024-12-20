@@ -87,6 +87,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   isLoading={isLoading}
                   customInfoMessage={field.customInfoMessage}
                   customMenuMessage={field.customMenuMessage}
+                  isDisabled={field.isDisabled}
                 />
               )}
               {field.type === FormFieldType.TextArea && (
@@ -109,6 +110,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   srMode={srMode ?? false}
                   textAreaRow={field.textAreaRow}
                   textAreaColoum={field.textAreaColoum}
+                  isDisabled={field.isDisabled}
                 />
               )}
               {field.type === FormFieldType.DropDown && (
@@ -129,6 +131,8 @@ const Form: React.FC<IFormRendererProps> = ({
                   isEditing={editMode ?? true}
                   isImage={field.isImage}
                   srMode={srMode ?? false}
+                  validation={field.validation}
+                  isDisabled={field.isDisabled}
                 />
               )}
               {field.type === FormFieldType.DropDownWithSearch && (
@@ -152,6 +156,8 @@ const Form: React.FC<IFormRendererProps> = ({
                   filteredOptions={field.filteredOptions || []}
                   isLoading={field.isLoading}
                   customInfoMessage={field.customInfoMessage}
+                  isDisabled={field.isDisabled}
+                  validation={field.validation}
                 />
               )}
               {field.type === FormFieldType.DateRange && (
@@ -170,6 +176,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   type={field.type}
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
+                  validation={field.validation}
                 />
               )}
               {field.type === FormFieldType.Date && (
@@ -189,6 +196,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
                   isDisabled={field.isDisabled ?? false}
+                  validation={field.validation}
                 />
               )}
               {field.type === FormFieldType.Group && (
@@ -202,6 +210,7 @@ const Form: React.FC<IFormRendererProps> = ({
                     placeholder: child.placeholder,
                     value: formData[child.graphQLPropertyName ?? ''] || '',
                     suffix: child.suffix,
+                    isDisabled: child.isDisabled,
                     onChange: (value: any) =>
                       handleInputChange(child.graphQLPropertyName, value),
                   }))}
@@ -219,6 +228,8 @@ const Form: React.FC<IFormRendererProps> = ({
                   customEditInputTextCss={field.customEditInputTextCss}
                   customPlaceholderCss={field.customPlaceholderCss}
                   customInfoMessage={field.customInfoMessage}
+                  validation={field.validation}
+                  isDisabled={field.isDisabled}
                 />
               )}
               {field.type === FormFieldType.Checkbox && (
@@ -236,6 +247,7 @@ const Form: React.FC<IFormRendererProps> = ({
                     handleInputChange(field.graphQLPropertyName, value)
                   }
                   srMode={srMode}
+                  validation={field.validation}
                 />
               )}
             </div>

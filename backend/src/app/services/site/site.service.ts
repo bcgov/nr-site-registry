@@ -36,6 +36,9 @@ import {
 } from '../../dto/sitesPendingReview.dto';
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
 import { SiteFilters } from 'src/app/resolvers/site/sitePublic.resolver';
+import { SnapshotResponse } from '../../dto/snapshot.dto';
+import { SnapshotsService } from '../snapshot/snapshot.service';
+import { Snapshots } from '../../entities/snapshots.entity';
 
 /**
  * Nestjs Service For Region Entity
@@ -74,6 +77,7 @@ export class SiteService {
     private readonly parcelDescriptionService: ParcelDescriptionsService,
     private transactionManagerService: TransactionManagerService,
     private readonly sitesLogger: LoggerService,
+    private readonly snapShotService: SnapshotsService,
   ) {}
 
   /**
@@ -322,28 +326,51 @@ export class SiteService {
    * @param siteId site Id
    * @returns a single site matching the site ID
    */
-  async findSiteBySiteId(siteId: string, pending: boolean) {
+  async findSiteBySiteId(siteId: string, pending: boolean, userInfo: any) {
     this.sitesLogger.log('SiteService.findSiteBySiteId() start');
     this.sitesLogger.debug('SiteService.findSiteBySiteId() start');
     const response = new FetchSiteDetail();
 
     response.httpStatusCode = 200;
 
-    if (pending) {
-      const result = await this.siteRepository.findOne({
-        where: { id: siteId, srAction: SRApprovalStatusEnum.PENDING },
-      });
+    let snapShot: Snapshots = null;
 
-      response.data = result ? result : null;
+    if (!userInfo) {
+      this.sitesLogger.log('SiteService.findSiteBySiteId() user not logged in');
+
+      snapShot = null;
+    } else if (userInfo?.identity_provider === 'idir') {
+      this.sitesLogger.log(
+        'SiteService.findSiteBySiteId() idir user - no snapshot',
+      );
     } else {
-      const result = await this.siteRepository.findOne({
-        where: { id: siteId },
-      });
-
-      response.data = result ? result : null;
+      snapShot = await this.snapShotService.getMostRecentSnapshot(
+        siteId,
+        userInfo.sub,
+      );
     }
+
+    if (!snapShot) {
+      if (pending) {
+        const result = await this.siteRepository.findOne({
+          where: { id: siteId, srAction: SRApprovalStatusEnum.PENDING },
+        });
+
+        response.data = result ? result : null;
+      } else {
+        const result = await this.siteRepository.findOne({
+          where: { id: siteId },
+        });
+
+        response.data = result ? result : null;
+      }
+    } else {
+      response.data = snapShot.snapshotData?.sitesSummary;
+    }
+
     this.sitesLogger.log('SiteService.findSiteBySiteId() end');
     this.sitesLogger.debug('SiteService.findSiteBySiteId() end');
+
     return response;
   }
 
@@ -1103,6 +1130,14 @@ export class SiteService {
           // Process related participants regardless of event action
           if (notationParticipant?.length > 0) {
             await processParticipants(notationId, notationParticipant);
+          } else {
+            this.sitesLogger.warn(
+              `SiteService.processEvents(): There is no notation participants. Atleast every notation should have one notation participant.`,
+            );
+            throw new HttpException(
+              `Failed to process site notation participants. There is no notation participants. Atleast every notation should have one notation participant.`,
+              HttpStatus.NOT_FOUND,
+            );
           }
         });
 

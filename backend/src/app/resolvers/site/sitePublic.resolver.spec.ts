@@ -188,7 +188,11 @@ describe('SiteResolver', () => {
     it('should call siteService.findSiteBySiteId with the provided siteId', () => {
       const siteId = '123';
       siteResolver.findSiteBySiteId(siteId, false);
-      expect(siteService.findSiteBySiteId).toHaveBeenCalledWith(siteId, false);
+      expect(siteService.findSiteBySiteId).toHaveBeenCalledWith(
+        siteId,
+        false,
+        null,
+      );
     });
 
     it('finds a matching site id', async () => {

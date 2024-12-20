@@ -21,8 +21,6 @@ import Dropdown from 'react-bootstrap/Dropdown';
 
 import SearchInput from '../search/SearchInput';
 import Avatar from '../avatar/Avatar';
-import { useSelector } from 'react-redux';
-import { resetSiteDetails } from '../../features/site/dto/SiteSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 
 interface InputProps extends IFormField {
@@ -178,11 +176,21 @@ export const TextInput: React.FC<InputProps> = ({
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
   const [error, setError] = useState<string | null>(null);
-  // const [localValue, SetLocalValue] = useState(value);
+
+  useEffect(() => {
+    if (validation?.required) {
+      setError(null);
+      validateInput(value);
+    }
+  }, []);
 
   const validateInput = (inputValue: string) => {
     if (validation) {
-      if (validation.pattern && !validation.pattern.test(inputValue)) {
+      if (validation?.pattern && !validation.pattern?.test(inputValue)) {
+        setError(validation.customMessage || 'Invalid input');
+        return false;
+      }
+      if (validation.required && !inputValue.trim()) {
         setError(validation.customMessage || 'Invalid input');
         return false;
       }
@@ -194,9 +202,9 @@ export const TextInput: React.FC<InputProps> = ({
 
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-
-    validateInput(inputValue);
-    // SetLocalValue(inputValue);
+    if (validation?.required) {
+      validateInput(inputValue);
+    }
 
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
@@ -231,11 +239,7 @@ export const TextInput: React.FC<InputProps> = ({
           {!tableMode && (
             <label
               htmlFor={inputTxtId}
-              className={`${
-                !isEditing
-                  ? (customLabelCss ?? '')
-                  : `form-label ${customEditLabelCss ?? 'custom-label'}`
-              }`}
+              className={`${!isEditing ? (customLabelCss ?? '') : `form-label ${customEditLabelCss ?? 'custom-label'}`} ${validation?.required ? 'required-field' : ''}`}
             >
               {label}
             </label>
@@ -288,14 +292,40 @@ export const DropdownInput: React.FC<InputProps> = ({
   customPlaceholderCss,
   onChange,
   tableMode,
+  isDisabled,
+  customErrorCss,
+  validation,
 }) => {
+  const [error, setError] = useState<string | null>(null);
   const ContainerElement = tableMode ? 'td' : 'div';
   // Replace any spaces in the label with underscores to create a valid id
   const drdownId = label.replace(/\s+/g, '_') + '_' + v4();
   const [selected, setSelected] = useState<boolean>(false);
 
+  useEffect(() => {
+    if (validation?.required) {
+      setError(null);
+      validateInput(value);
+    }
+  }, []);
+
+  const validateInput = (inputValue: string) => {
+    if (validation) {
+      if (validation?.required && !inputValue.trim()) {
+        setError(validation?.customMessage || 'Invalid input');
+        return false;
+      }
+    }
+
+    setError(null);
+    return true;
+  };
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setError(null);
     const selectedOption = event.target.value.trim();
+    if (validation?.required) {
+      validateInput(selectedOption);
+    }
     setSelected(selectedOption !== '');
     onChange(selectedOption);
   };
@@ -326,7 +356,7 @@ export const DropdownInput: React.FC<InputProps> = ({
             !isEditing
               ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
-          }`}
+          } ${validation?.required ? 'required-field' : ''}`}
           aria-labelledby={label}
         >
           {label}
@@ -344,10 +374,11 @@ export const DropdownInput: React.FC<InputProps> = ({
             isFirstOptionGrey
               ? 'custom-disabled-option'
               : 'custom-primary-option'
-          }`}
+          }  ${error && 'error'}`}
           value={value.trim() ?? ''}
           onChange={handleSelectChange}
           aria-label={label}
+          disabled={isDisabled}
         >
           <option
             value=""
@@ -396,9 +427,16 @@ export const DropdownInput: React.FC<InputProps> = ({
           {options?.find((opt) => opt.key === value)?.value}
         </span>
       )}
+      {error && (
+        <span
+          aria-label="error-message"
+          className={` ${customErrorCss ?? 'text-danger  py-2 mx-1 small'}`}
+        >
+          {error}
+        </span>
+      )}
     </ContainerElement>
   );
-  // }
 };
 
 export const GroupInput: React.FC<InputProps> = ({
@@ -414,29 +452,34 @@ export const GroupInput: React.FC<InputProps> = ({
   isChildLabel,
   customErrorCss,
   onChange,
+  isDisabled,
 }) => {
   const [error, setError] = useState<string | null>(null);
   let currentConcatenatedValue;
+  useEffect(() => {
+    children?.forEach((child) => {
+      if (child?.validation?.required) {
+        validateInput(child?.value, child);
+      }
+    });
+  }, []);
 
   if (!isEditing) {
-    currentConcatenatedValue = children?.reduce(
-      (accumulator, currentValue, index) => {
-        if (currentValue.value) {
-          accumulator = accumulator + currentValue.value + currentValue.suffix;
-        }
-        return accumulator;
-      },
-      '',
-    );
+    currentConcatenatedValue = children?.reduce((accumulator, currentValue) => {
+      if (currentValue.value) {
+        accumulator = accumulator + currentValue.value + currentValue.suffix;
+      }
+      return accumulator;
+    }, '');
   }
-  const validateInput = (
-    inputValue: string,
-    validation?: RegExp,
-    customMessage?: string,
-  ) => {
-    if (validation) {
-      if (validation && !validation.test(inputValue)) {
-        setError(customMessage || 'Invalid input');
+  const validateInput = (inputValue: string, child: InputProps) => {
+    if (child?.validation) {
+      if (child?.validation && !child?.validation.pattern?.test(inputValue)) {
+        setError(child?.validation?.customMessage || 'Invalid input');
+        return false;
+      }
+      if (child?.validation?.required && !inputValue.trim()) {
+        setError(child?.validation?.customMessage || 'Invalid input');
         return false;
       }
     }
@@ -450,14 +493,11 @@ export const GroupInput: React.FC<InputProps> = ({
     child: InputProps,
   ) => {
     const inputValue = e.target.value.trim();
+    if (child?.validation?.required) {
+      validateInput(inputValue, child);
+    }
     if (child.allowNumbersOnly) {
-      if (
-        validateInput(
-          inputValue,
-          child.validation?.pattern,
-          child.validation?.customMessage,
-        )
-      ) {
+      if (validateInput(inputValue, child)) {
         child.onChange(parseFloat(inputValue)); // Update parent component state only if validation passes
       }
     } else {
@@ -503,7 +543,7 @@ export const GroupInput: React.FC<InputProps> = ({
                 {isChildLabel && (
                   <label
                     htmlFor={grpId}
-                    className={`${!isEditing ? (customLabelCss ?? '') : `form-label ${customEditLabelCss ?? 'custom-label'}`}`}
+                    className={`${!isEditing ? (customLabelCss ?? '') : `form-label ${customEditLabelCss ?? 'custom-label'}`} ${child?.validation?.required ? 'required-field' : ''}`}
                   >
                     {child.label}
                   </label>
@@ -519,6 +559,7 @@ export const GroupInput: React.FC<InputProps> = ({
                   value={child.value ?? ''}
                   onChange={(e) => handleTextInputChange(e, child)}
                   aria-label={child.label} // Accessibility
+                  disabled={isDisabled}
                 />
               </div>
             );
@@ -559,8 +600,17 @@ export const DateRangeInput: React.FC<InputProps> = ({
   customPlaceholderCss,
   tableMode,
   onChange,
+  customErrorCss,
+  validation,
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (validation?.required) {
+      validateInput(value);
+    }
+  }, []);
+
   let dateRangeValue;
   if (value.length > 0) {
     const [startDate, endDate] = value;
@@ -573,6 +623,25 @@ export const DateRangeInput: React.FC<InputProps> = ({
       dateRangeValue = ''; // Set an empty string or fallback value if invalid
     }
   }
+
+  const validateInput = (inputValue: any) => {
+    if (validation) {
+      if (validation.required && !inputValue) {
+        setError(validation.customMessage || 'Invalid input');
+        return false;
+      }
+    }
+
+    setError(null);
+    return true;
+  };
+
+  const handleDateRange = (value: any) => {
+    if (validation?.required) {
+      validateInput(value);
+    }
+    onChange(value);
+  };
 
   const handleCheckBoxChange = (isChecked: boolean) => {
     onChange(isChecked);
@@ -612,13 +681,13 @@ export const DateRangeInput: React.FC<InputProps> = ({
           showOneCalendar
           ranges={[]}
           aria-label={label}
-          className={` w-100  ${customPlaceholderCss ?? ''} ${customEditInputTextCss ?? 'custom-date-range'}`}
+          className={` w-100  ${customPlaceholderCss ?? ''} ${customEditInputTextCss ?? 'custom-date-range'} ${error && 'rs-picker-error rs-picker-input-group'}`}
           placeholder={placeholder}
           format="MM/dd/yyyy"
           character=" - "
           caretAs={CalendarIcon}
           value={value ?? []}
-          onChange={(value) => onChange(value)}
+          onChange={(value) => handleDateRange(value)}
           editable={true}
           menuStyle={{ zIndex: 1500 }}
         />
@@ -628,6 +697,14 @@ export const DateRangeInput: React.FC<InputProps> = ({
           className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
         >
           {dateRangeValue ?? ''}
+        </span>
+      )}
+      {error && (
+        <span
+          aria-label="error-message"
+          className={` ${customErrorCss ?? 'text-danger  py-2 mx-1 small'}`}
+        >
+          {error}
         </span>
       )}
     </ContainerElement>
@@ -648,7 +725,10 @@ export const DateInput: React.FC<InputProps> = ({
   tableMode,
   onChange,
   isDisabled,
+  customErrorCss,
+  validation,
 }) => {
+  const [error, setError] = useState<string | null>(null);
   const ContainerElement = tableMode ? 'td' : 'div';
   let dateValue;
 
@@ -662,7 +742,28 @@ export const DateInput: React.FC<InputProps> = ({
     onChange(isChecked);
   };
 
+  useEffect(() => {
+    if (validation?.required) {
+      validateInput(value);
+    }
+  }, []);
+
+  const validateInput = (inputValue: Date | null) => {
+    if (validation) {
+      if (validation.required && !inputValue) {
+        setError(validation.customMessage || 'Invalid input');
+        return false;
+      }
+    }
+
+    setError(null);
+    return true;
+  };
+
   const handleDateChange = (newDate: Date | null) => {
+    if (validation?.required) {
+      validateInput(newDate);
+    }
     // Check if the new value is a valid date
     if (newDate instanceof Date && !isNaN(newDate.getTime())) {
       // Pass valid date to the parent onChange function
@@ -695,7 +796,7 @@ export const DateInput: React.FC<InputProps> = ({
             !isEditing
               ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
-          }`}
+          } ${validation?.required ? 'required-field' : ''}`}
         >
           {label}
         </label>
@@ -706,7 +807,8 @@ export const DateInput: React.FC<InputProps> = ({
           id={dateRangeId}
           data-testid={dateRangeId}
           aria-label={label}
-          className={` w-100  ${customPlaceholderCss ?? ''} ${customEditInputTextCss ?? 'custom-date-range'}`}
+          className={` w-100  ${customPlaceholderCss ?? ''} ${customEditInputTextCss ?? 'custom-date-range'} 
+              ${error && 'rs-picker-error rs-picker-input-group'}`}
           placeholder={placeholder}
           format="MMM dd, yyyy"
           caretAs={CalendarIcon}
@@ -721,6 +823,14 @@ export const DateInput: React.FC<InputProps> = ({
           className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
         >
           {dateValue ?? ''}
+        </span>
+      )}
+      {error && (
+        <span
+          aria-label="error-message"
+          className={` ${customErrorCss ?? 'text-danger  py-2 mx-1 small'}`}
+        >
+          {error}
         </span>
       )}
     </ContainerElement>
@@ -809,15 +919,51 @@ export const TextAreaInput: React.FC<InputProps> = ({
   tableMode,
   textAreaRow,
   textAreaColoum,
+  validation,
+  allowNumbersOnly,
+  isDisabled,
+  customErrorCss,
 }) => {
-  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e.target.value);
-  };
-
   const textAreaId = label.replace(/\s+/g, '_') + '_' + v4();
   const ContainerElement = tableMode ? 'td' : 'div';
   const cols = textAreaColoum ?? undefined;
   const rows = textAreaRow ?? undefined;
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (validation?.required) {
+      validateInput(value);
+    }
+  }, []);
+
+  const validateInput = (inputValue: string) => {
+    if (validation) {
+      if (validation?.pattern && !validation.pattern?.test(inputValue)) {
+        setError(validation.customMessage || 'Invalid input');
+        return false;
+      }
+      if (validation.required && !inputValue.trim()) {
+        setError(validation.customMessage || 'Invalid input');
+        return false;
+      }
+    }
+
+    setError(null);
+    return true;
+  };
+
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const inputValue = e.target.value;
+    if (validation?.required) {
+      validateInput(inputValue);
+    }
+    if (allowNumbersOnly) {
+      if (validateInput(inputValue)) {
+        onChange(inputValue); // Update parent component state only if validation passes
+      }
+    } else {
+      onChange(inputValue);
+    }
+  };
 
   return (
     <ContainerElement
@@ -861,6 +1007,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
           aria-label={label}
           rows={rows}
           cols={cols}
+          disabled={isDisabled}
         />
       ) : (
         <span
@@ -868,6 +1015,14 @@ export const TextAreaInput: React.FC<InputProps> = ({
           className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
         >
           {value}
+        </span>
+      )}
+      {error && (
+        <span
+          aria-label="error-message"
+          className={` ${customErrorCss ?? 'text-danger  py-2 mx-1 small'}`}
+        >
+          {error}
         </span>
       )}
     </ContainerElement>
@@ -893,7 +1048,11 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
   filteredOptions = [],
   isLoading,
   customInfoMessage,
+  isDisabled,
+  customErrorCss,
+  validation,
 }) => {
+  const [error, setError] = useState<string | null>(null);
   const divRef = useRef<HTMLDivElement>(null);
   const ContainerElement = tableMode ? 'td' : 'div';
   const drdownId = label.replace(/\s+/g, '_') + '_' + v4();
@@ -902,8 +1061,29 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
     useState<{ key: any; value: any }[]>(filteredOptions);
   const [isClear, setIsClear] = useState(false);
 
+  useEffect(() => {
+    if (validation?.required) {
+      validateInput(value);
+    }
+  }, []);
+
+  const validateInput = (inputValue: string) => {
+    if (validation) {
+      if (validation?.required && !inputValue) {
+        setError(validation?.customMessage || 'Invalid input');
+        return false;
+      }
+    }
+
+    setError(null);
+    return true;
+  };
   const handleSelectChange = (selectedOption: any) => {
+    setError(null);
     onChange(selectedOption);
+    if (validation?.required) {
+      validateInput(selectedOption);
+    }
     setSearchTerm('');
     setFilteredOpts([]);
     handler('');
@@ -967,7 +1147,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
             !isEditing
               ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
-          }`}
+          } ${validation?.required ? 'required-field' : ''}`}
         >
           {label}
         </label>
@@ -1019,6 +1199,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
                     <Dropdown.Item
                       key={index}
                       onClick={() => handleSelectChange(option)}
+                      disabled={isDisabled}
                     >
                       {option.value}
                     </Dropdown.Item>
@@ -1036,6 +1217,14 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
           className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
         >
           {options?.find((opt) => opt.key === value)?.value}
+        </span>
+      )}
+      {error && (
+        <span
+          aria-label="error-message"
+          className={` ${customErrorCss ?? 'text-danger  py-2 mx-1 small'}`}
+        >
+          {error}
         </span>
       )}
     </ContainerElement>
@@ -1065,8 +1254,9 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   isLoading,
   onChange,
   tableMode,
+  isDisabled,
 }) => {
-  const resetDetails = useSelector(resetSiteDetails);
+  // const resetDetails = useSelector(resetSiteDetails);
   const ContainerElement = tableMode ? 'td' : 'div';
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -1089,11 +1279,17 @@ export const SearchCustomInput: React.FC<InputProps> = ({
     }
   }, [isOpen]);
 
+  // useEffect(() => {
+  //   if (resetDetails) {
+  //     setError(null);
+  //   }
+  // }, [resetDetails]);
+
   useEffect(() => {
-    if (resetDetails) {
-      setError(null);
+    if (validation?.required) {
+      validateInput(value);
     }
-  }, [resetDetails]);
+  }, []);
 
   const validateInput = (inputValue: any) => {
     if (validation) {
@@ -1112,7 +1308,9 @@ export const SearchCustomInput: React.FC<InputProps> = ({
 
   const handleTextInputChange = (value: any) => {
     const inputValue = value;
-    validateInput(inputValue);
+    if (validation?.required) {
+      validateInput(inputValue);
+    }
     setHasInfoMsg(null);
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
@@ -1236,7 +1434,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
             !isEditing
               ? (customLabelCss ?? '')
               : `form-label ${customEditLabelCss ?? 'custom-label'}`
-          }`}
+          } ${validation?.required ? 'required-field' : ''}`}
         >
           {label}
         </label>
@@ -1257,6 +1455,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
             }}
             aria-label={label} // Accessibility
             required={error ? true : false}
+            disabled={isDisabled}
           />
           <div className="d-flex align-items-center justify-content-center position-relative custom-search-box-container ">
             {value.length <= 0 ? (

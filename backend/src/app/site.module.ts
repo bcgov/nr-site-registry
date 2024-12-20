@@ -1,7 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SiteService } from './services/site/site.service';
-import { SiteController } from './controllers/site.controller';
 import { Sites } from './entities/sites.entity';
 import { Events } from './entities/events.entity';
 import { LandHistories } from './entities/landHistories.entity';
@@ -186,7 +185,7 @@ import { SitePublicResolver } from './resolvers/site/sitePublic.resolver';
     TransactionManagerService,
     LoggerService,
   ],
-  controllers: [SiteController],
+  controllers: [],
 })
 export class SiteModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

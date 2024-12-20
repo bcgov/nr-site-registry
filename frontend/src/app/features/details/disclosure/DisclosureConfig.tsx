@@ -21,6 +21,10 @@ export const disclosureStatementConfig: IFormField[][] = [
       customEditLabelCss: 'custom-disclosure-edit-label',
       customEditInputTextCss:
         'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
+      validation: {
+        required: true,
+        customMessage: 'Date Received is required.',
+      },
     },
     {
       type: FormFieldType.Date,
@@ -34,6 +38,10 @@ export const disclosureStatementConfig: IFormField[][] = [
       customEditLabelCss: 'custom-disclosure-edit-label',
       customEditInputTextCss:
         'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
+      validation: {
+        required: true,
+        customMessage: 'Date Completed is required.',
+      },
     },
     {
       type: FormFieldType.Date,

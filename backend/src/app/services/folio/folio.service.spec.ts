@@ -124,10 +124,7 @@ describe('FolioSerivce', () => {
 
     jest.spyOn(folioContentRepository, 'find').mockResolvedValue(folioContent);
 
-    const result = await folioSerivce.getSitesForFolio(
-      { id: 1, userId: '' },
-      user,
-    );
+    const result = await folioSerivce.getSitesForFolio({ id: 1 }, user);
 
     expect(result.length).toBeGreaterThan(0);
   });

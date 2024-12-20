@@ -257,7 +257,10 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
   // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
   useEffect(() => {
-    if (resetDetails) {
+    if (
+      resetDetails ||
+      saveSiteDetailsRequestStatus === RequestStatus.success
+    ) {
       dispatch(
         fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending }),
       );

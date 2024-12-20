@@ -1354,6 +1354,8 @@ export type MapSearch_FindSiteBySiteIdQuery = { __typename?: 'Query', findSiteBy
 
 export type MapSearch_FilterSearchResultsQueryVariables = Exact<{
   siteIds?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+  page: Scalars['Int']['input'];
+  pageSize: Scalars['Int']['input'];
 }>;
 
 
@@ -1551,8 +1553,13 @@ export type MapSearch_FindSiteBySiteIdLazyQueryHookResult = ReturnType<typeof us
 export type MapSearch_FindSiteBySiteIdSuspenseQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdSuspenseQuery>;
 export type MapSearch_FindSiteBySiteIdQueryResult = Apollo.QueryResult<MapSearch_FindSiteBySiteIdQuery, MapSearch_FindSiteBySiteIdQueryVariables>;
 export const MapSearch_FilterSearchResultsDocument = gql`
-    query MapSearch_filterSearchResults($siteIds: [String!]) {
-  searchSites(searchParam: "", page: 1, pageSize: 100, siteIds: $siteIds) {
+    query MapSearch_filterSearchResults($siteIds: [String!], $page: Int!, $pageSize: Int!) {
+  searchSites(
+    searchParam: ""
+    page: $page
+    pageSize: $pageSize
+    siteIds: $siteIds
+  ) {
     sites {
       id
       addrLine_1
@@ -1597,10 +1604,12 @@ export const MapSearch_FilterSearchResultsDocument = gql`
  * const { data, loading, error } = useMapSearch_FilterSearchResultsQuery({
  *   variables: {
  *      siteIds: // value for 'siteIds'
+ *      page: // value for 'page'
+ *      pageSize: // value for 'pageSize'
  *   },
  * });
  */
-export function useMapSearch_FilterSearchResultsQuery(baseOptions?: Apollo.QueryHookOptions<MapSearch_FilterSearchResultsQuery, MapSearch_FilterSearchResultsQueryVariables>) {
+export function useMapSearch_FilterSearchResultsQuery(baseOptions: Apollo.QueryHookOptions<MapSearch_FilterSearchResultsQuery, MapSearch_FilterSearchResultsQueryVariables> & ({ variables: MapSearch_FilterSearchResultsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<MapSearch_FilterSearchResultsQuery, MapSearch_FilterSearchResultsQueryVariables>(MapSearch_FilterSearchResultsDocument, options);
       }

@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
 import Pagination from './Pagination';
-import { text } from 'stream/consumers';
 
 describe('Pagination Component', () => {
   const selectPageMock = jest.fn(() => {});
@@ -22,12 +21,8 @@ describe('Pagination Component', () => {
       />,
     );
 
-    expect(
-      screen.getByText('1', { selector: '.pagination-page-active' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('100', { selector: '.pagination-page' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '1' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '100' })).toBeInTheDocument();
     // Add more assertions based on your component's logic
   });
 
@@ -42,10 +37,8 @@ describe('Pagination Component', () => {
       />,
     );
 
-    expect(
-      screen.getByText('1', { selector: '.pagination-page-active' }),
-    ).toBeInTheDocument();
-    fireEvent.click(screen.getByText('2', { selector: '.pagination-page' }));
+    expect(screen.getByRole('button', { name: '1' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '2' }));
     expect(selectPageMock).toHaveBeenCalledWith(2);
   });
 

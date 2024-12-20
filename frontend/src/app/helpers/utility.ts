@@ -463,7 +463,6 @@ export const validateForm = (
     data: any,
     parentLabel: string = source,
     parentIndex: string = '',
-    currentContext: string = '',
   ) => {
     rows.forEach((items) => {
       items.forEach((row) => {
@@ -482,7 +481,6 @@ export const validateForm = (
 
             errors.push({
               label: row.label,
-              objectId: propertyName,
               errorMessage: errorLabel,
             });
           }

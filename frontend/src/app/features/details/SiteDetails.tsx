@@ -46,7 +46,10 @@ import {
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import { fetchSiteParticipants } from './participants/ParticipantSlice';
-import { fetchSiteDisclosure } from './disclosure/DisclosureSlice';
+import {
+  fetchSiteDisclosure,
+  siteDisclosure,
+} from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
 import {
@@ -102,6 +105,7 @@ import {
 import { Button } from '../../components/button/Button';
 import { IFormField } from '../../components/input-controls/IFormField';
 import { GetNotationConfig } from './notations/NotationsConfig';
+import { disclosureStatementConfig } from './disclosure/DisclosureConfig';
 
 const SiteDetails = () => {
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
@@ -144,6 +148,7 @@ const SiteDetails = () => {
   const [errorList, setErrorList] = useState<any[]>([]);
   const savedChanges = useSelector(trackedChanges);
   const siteNotation = useSelector(notationParticipants);
+  const disclosure = useSelector(siteDisclosure);
   const { notationFormRowEditMode, notationColumnInternal } =
     GetNotationConfig();
   const [userType, setUserType] = useState<UserType | null>(null);
@@ -271,7 +276,6 @@ const SiteDetails = () => {
   // BY DOING THIS WE CAN STOP UNNECCESSARY CALL TO DATABASE
   // THERE ARE SOME CALLS WHICH MAY NOT REQUIRED ON DETAILS PAGE.
   useEffect(() => {
-    console.log('Calling From Site Details');
     setIsLoading(true); // Set loading state to true before starting API calls
     if (id) {
       dispatch(resetSaveSiteDetails(null));
@@ -467,16 +471,46 @@ const SiteDetails = () => {
   const validateSiteForms = async () => {
     try {
       // Run all validation functions in parallel using Promise.all
-      const [errors] = await Promise.all([validateNotationsForm()]);
+      const [notationErrors, siteDisclosureErrors] = await Promise.all([
+        validateNotationsForm(),
+        validateSiteDisclosure(),
+      ]);
 
       // Combine all errors into one list
-      const allErrors = [...errors];
+      const errors = [...notationErrors, ...siteDisclosureErrors];
 
       // You can now use `allErrors` for further processing
-      return allErrors;
+      return errors;
     } catch (error) {
       return []; // Return empty array in case of error to avoid breaking further logic
     }
+  };
+
+  const validateSiteDisclosure = async () => {
+    const siteDisclosureErrors: any[] = [];
+    siteDisclosureErrors.push(
+      ...validateForm(
+        disclosureStatementConfig,
+        disclosure?.siteDisclosure,
+        'Site Disclosure',
+      ),
+    );
+
+    const { siteRegDateRecd, dateCompleted } = disclosure?.siteDisclosure;
+    console.log(siteRegDateRecd, dateCompleted);
+
+    if (!!siteRegDateRecd && !!dateCompleted) {
+      if (
+        new Date(disclosure?.siteDisclosure?.dateCompleted) <
+        new Date(disclosure?.siteDisclosure?.siteRegDateRecd)
+      ) {
+        siteDisclosureErrors.push({
+          label: 'Site Disclosure',
+          errorMessage: `Site Disclosure Date Completed is always equal or greater than Date Received.`,
+        });
+      }
+    }
+    return siteDisclosureErrors;
   };
 
   const validateNotationsForm = async () => {
@@ -535,7 +569,6 @@ const SiteDetails = () => {
       } else {
         notationParticipantErrors.push({
           label: 'Notation Participants',
-          objectId: 'Notation Participants',
           errorMessage: `Notation [${index + 1}] Atleast one  Notation Participant is required.`,
         });
       }

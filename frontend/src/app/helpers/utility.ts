@@ -130,7 +130,7 @@ export const getAxiosInstance = () => {
     baseURL: API,
     // timeout: 2000,
     headers: {
-      Authorization: 'Bearer ' + user?.access_token,
+      Authorization: `Bearer ${user?.access_token || ''}`,
       requestID: generateRequestId(),
       'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json',

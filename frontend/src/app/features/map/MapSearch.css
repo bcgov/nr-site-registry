@@ -218,6 +218,14 @@ div.search-autocomplete.MuiAutocomplete-hasClearIcon .MuiInputBase-root {
   height: 16px;
 }
 
+.radius-search-cancel-button {
+  background-color: var(--surface-color-primary-default) !important;
+}
+
+.radius-search-set-radius {
+  background-color: var(--surface-color-primary-default) !important;
+}
+
 :root {
   --layout-margin-xsmall: 4px;
   --layout-margin-small: 8px;

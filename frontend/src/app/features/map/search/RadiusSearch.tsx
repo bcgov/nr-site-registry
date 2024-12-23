@@ -72,6 +72,7 @@ export function RadiusSearch({
             variant="contained"
             size="medium"
             onClick={onCancel}
+            className="radius-search-cancel-button"
             startIcon={<XmarkIcon className="point-cancel-icon" />}
           >
             Cancel
@@ -82,6 +83,7 @@ export function RadiusSearch({
             variant="contained"
             size="medium"
             menuClassName="point-search-menu"
+            className="radius-search-set-radius"
             dropdownContent={sliderBox}
           >
             Set Radius

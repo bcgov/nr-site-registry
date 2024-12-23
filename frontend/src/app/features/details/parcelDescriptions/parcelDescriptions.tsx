@@ -43,7 +43,6 @@ import {
 } from '../SaveSiteDetailsSlice';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
-import './parcelDescriptions.css';
 
 type ParcelDescriptionsChangeEvent = {
   property: 'descriptionType' | 'idPinNumber' | 'dateNoted';

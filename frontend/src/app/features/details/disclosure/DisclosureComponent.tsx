@@ -10,6 +10,7 @@ import Actions from '../../../components/action/Actions';
 import { DropdownItem } from '../../../components/action/IActions';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
 import { Button } from '../../../components/button/Button';
+import { v4 } from 'uuid';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 
 interface IDisclosureComponent {
@@ -59,11 +60,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
 }) => {
   showApproveRejectSection = showApproveRejectSection ?? false;
 
-  approveRejectHandler =
-    approveRejectHandler ??
-    ((value) => {
-      console.log('Approve/Reject Handler not provided');
-    });
+  approveRejectHandler = approveRejectHandler ?? (() => {});
 
   return (
     <div
@@ -103,6 +100,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
         >
           <div
             className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : ''}`}
+            key={v4()}
           >
             {formData && (
               <Form

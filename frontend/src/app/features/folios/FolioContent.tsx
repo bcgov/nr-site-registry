@@ -61,13 +61,13 @@ const FolioContents = () => {
   const [showDeleteConfirmModal, SetShowDeleteConfirmModal] = useState(false);
 
   useEffect(() => {
-    const dto = { id: parseInt(id ?? '0'), userId: user?.profile.sub ?? '' };
+    const dto = { id: parseInt(id ?? '0') };
 
     dispatch(getSiteForFolio(dto)).unwrap();
   }, []);
 
   useEffect(() => {
-    const dto = { id: parseInt(id ?? '0'), userId: user?.profile.sub ?? '' };
+    const dto = { id: parseInt(id ?? '0') };
 
     dispatch(getSiteForFolio(dto)).unwrap();
     showNotification(
@@ -134,10 +134,9 @@ const FolioContents = () => {
       const sitesinFolio = selectedRows.map((folio) => {
         return {
           id: parseInt(id ?? ''),
-          userId: loggedInUser.profile.sub,
+
           siteId: folio.siteId,
           folioId: id,
-          whoCreated: '',
         };
       });
 

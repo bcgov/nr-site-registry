@@ -3,15 +3,14 @@ import { getAxiosInstance, getUser } from '../../../helpers/utility';
 import { print } from 'graphql';
 import {
   graphQlSiteQuery,
-  graphQlSiteQueryForAuthenticatedUsers,
   graphqlSiteDetailsQuery,
+  graphqlSiteDetailsQueryForLoggedIn,
+  graphQlSiteQueryForAuthenticatedUsers,
 } from '../graphql/Site';
 import { SiteState } from './SiteState';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { SiteResultDto } from './Site';
 import { GRAPHQL } from '../../../helpers/endpoints';
-import { act } from 'react-dom/test-utils';
-import { useActionData } from 'react-router-dom';
 import { SiteDetailsMode } from '../../details/dto/SiteDetailsMode';
 import { UserType } from '../../../helpers/requests/userType';
 
@@ -42,15 +41,21 @@ export const fetchSitesDetails = createAsyncThunk(
   async (args: { siteId: string; showPending: Boolean }) => {
     try {
       const { siteId } = args;
-
+      const user = getUser();
       const response = await getAxiosInstance().post(GRAPHQL, {
-        query: print(graphqlSiteDetailsQuery()),
+        query: print(
+          user
+            ? graphqlSiteDetailsQueryForLoggedIn()
+            : graphqlSiteDetailsQuery(),
+        ),
         variables: {
           siteId: args.siteId,
           pending: args.showPending,
         },
       });
-      return response.data.data.findSiteBySiteId.data;
+      return user
+        ? response.data?.data?.findSiteBySiteIdLoggedInUser?.data
+        : response.data?.data?.findSiteBySiteId?.data;
     } catch (error) {
       throw error;
     }

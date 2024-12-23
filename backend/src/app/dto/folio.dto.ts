@@ -43,10 +43,6 @@ export class FolioMinDTO {
   @Field()
   @IsNumber()
   id: number;
-
-  @Field()
-  @IsString()
-  userId: string;
 }
 
 @ObjectType()

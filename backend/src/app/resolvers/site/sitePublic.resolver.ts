@@ -113,6 +113,6 @@ export class SitePublicResolver {
         showPending,
     );
 
-    return this.siteService.findSiteBySiteId(siteId, showPending);
+    return this.siteService.findSiteBySiteId(siteId, showPending, null);
   }
 }

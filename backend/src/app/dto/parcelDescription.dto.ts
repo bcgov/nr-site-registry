@@ -24,7 +24,7 @@ export type ParcelDescriptionTypeValue =
 @ObjectType()
 export class ParcelDescriptionDto {
   constructor(
-    id: number | null,
+    id: string | null,
     descriptionType: ParcelDescriptionTypeValue | null,
     idPinNumber: string | null,
     dateNoted: Date | null,
@@ -32,7 +32,7 @@ export class ParcelDescriptionDto {
     userAction: string | null,
     srAction: string | null,
   ) {
-    this.id = id ? id : 0;
+    this.id = id ? id : '0';
     this.descriptionType = descriptionType
       ? descriptionType
       : ParcelDescriptionType.Unknown;
@@ -44,7 +44,7 @@ export class ParcelDescriptionDto {
   }
   @Field()
   @IsInt()
-  id: number;
+  id: string;
 
   @Field()
   @IsString()

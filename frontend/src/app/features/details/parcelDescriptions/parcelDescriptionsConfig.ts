@@ -77,7 +77,6 @@ export const columns: TableColumn[] = [
       value: '',
       tableMode: true,
       isDisabled: true,
-      customEditInputTextCss: 'custom-land-description-disabled-input',
     },
   },
 ];

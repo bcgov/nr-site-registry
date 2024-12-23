@@ -162,7 +162,11 @@ export function MapSearch({
       {isLarge && (isPolygonTool || isRadiusTool) && (
         <div className="map-search-tool-row">
           <div className="map-search-tool-box">
-            {isPolygonTool ? <PolygonSearch /> : <RadiusSearch />}
+            {isPolygonTool ? (
+              <PolygonSearch />
+            ) : (
+              <RadiusSearch setActiveTool={setActiveTool} />
+            )}
           </div>
         </div>
       )}

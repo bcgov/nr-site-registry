@@ -1,3 +1,5 @@
+import React from 'react';
+
 export function PolygonSearch() {
-  return console.log('PolygonSearch');
+  return <div>Polygon Search</div>;
 }

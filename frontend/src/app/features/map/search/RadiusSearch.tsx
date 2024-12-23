@@ -1,38 +1,28 @@
-//import { useDispatch } from 'react-redux'
 import { Button, Slider, Typography } from '@mui/material';
 import clsx from 'clsx';
-import { MIN_CIRCLE_RADIUS } from '../../../constants/Constant';
+import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../../constants/Constant';
 import { XmarkIcon } from '../../../components/common/icon';
 import DropdownButton from '../DropDownButton';
 import { formatDistance } from '../../../helpers/utility';
 import { useState } from 'react';
 
-//import DropdownButton from '@/components/DropdownButton'
-
-// import { clearActiveTool } from '@/features/map/map-slice'
-// import {
-//   resetPointFilter,
-//   setPointFilterRadius,
-//   usePointFilterRadius,
-// } from '@/features/omrr/omrr-slice'
-// import { formatDistance } from '@/utils/utils'
-
-// import CloseIcon from '@/assets/svgs/fa-close.svg?react'
-
 interface Props {
   isSmall?: boolean;
   className?: string;
+  setActiveTool?: React.Dispatch<React.SetStateAction<ActiveToolEnum | null>>;
 }
 
-export function RadiusSearch({ isSmall = false, className }: Readonly<Props>) {
+export function RadiusSearch({
+  isSmall = false,
+  className,
+  setActiveTool,
+}: Readonly<Props>) {
   const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
 
-  //   const updateRadius = (newRadius) => {
-  //     setPointFilterRadius(newRadius);
-  //   };
-
+  const [isVisible, setIsVisible] = useState(true);
   const onCancel = () => {
-    setRadius(MIN_CIRCLE_RADIUS);
+    setIsVisible(false);
+    setActiveTool && setActiveTool(null);
   };
 
   const onRadiusChange = (_ev: any, value: number | number[]) => {
@@ -41,7 +31,6 @@ export function RadiusSearch({ isSmall = false, className }: Readonly<Props>) {
       MIN_CIRCLE_RADIUS,
     );
     setRadius(newRadius);
-    //dispatch(setPointFilterRadius(newRadius))
   };
 
   const sliderBox = (
@@ -76,25 +65,29 @@ export function RadiusSearch({ isSmall = false, className }: Readonly<Props>) {
     sliderBox
   ) : (
     <div className={clsx('point-search', className)}>
-      <Button
-        color="primary"
-        variant="contained"
-        size="medium"
-        onClick={onCancel}
-        startIcon={<XmarkIcon className="point-cancel-icon" />}
-      >
-        Cancel
-      </Button>
-      <DropdownButton
-        id="pointSearchSetRadiusButton"
-        color="primary"
-        variant="contained"
-        size="medium"
-        menuClassName="point-search-menu"
-        dropdownContent={sliderBox}
-      >
-        Set Radius
-      </DropdownButton>
+      {isVisible && (
+        <>
+          <Button
+            color="primary"
+            variant="contained"
+            size="medium"
+            onClick={onCancel}
+            startIcon={<XmarkIcon className="point-cancel-icon" />}
+          >
+            Cancel
+          </Button>
+          <DropdownButton
+            id="pointSearchSetRadiusButton"
+            color="primary"
+            variant="contained"
+            size="medium"
+            menuClassName="point-search-menu"
+            dropdownContent={sliderBox}
+          >
+            Set Radius
+          </DropdownButton>
+        </>
+      )}
     </div>
   );
 }

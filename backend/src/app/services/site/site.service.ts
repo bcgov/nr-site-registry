@@ -257,14 +257,22 @@ export class SiteService {
       });
     }
 
-    if (whenCreated) {
+    if (
+      whenCreated &&
+      whenCreated.length === 2 &&
+      whenCreated.every((date) => date instanceof Date)
+    ) {
       query.andWhere('sites.whenCreated BETWEEN :start AND :end', {
         start: whenCreated[0],
         end: whenCreated[1],
       });
     }
 
-    if (whenUpdated) {
+    if (
+      whenUpdated &&
+      whenUpdated.length === 2 &&
+      whenUpdated.every((date) => date instanceof Date)
+    ) {
       query.andWhere('sites.whenUpdated BETWEEN :start AND :end', {
         start: whenUpdated[0],
         end: whenUpdated[1],

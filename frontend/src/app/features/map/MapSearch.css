@@ -201,6 +201,7 @@ p.point-search-slider-text {
 
 .point-search-menu .MuiPaper-root {
   overflow: visible;
+  width: 400px;
 }
 
 .search-autocomplete .search-input {

@@ -1,11 +1,13 @@
 import { MouseEvent, MouseEventHandler, ReactNode, useState } from 'react';
-import { Button, ButtonProps, MenuProps } from '@mui/material';
+import { ButtonProps, MenuProps } from '@mui/material';
+
 import Menu from '@mui/material/Menu';
 import clsx from 'clsx';
 
 import { ArrowDownIcon } from '../../components/common/icon';
 
 import './DropdownButton.css';
+import { Button } from '../../components/button/Button';
 
 const defaultButtonStyles = {
   display: 'flex',
@@ -40,7 +42,6 @@ export function DropdownButton({
   ...rest
 }: Readonly<ButtonDropdownProps>) {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
   const isOpen = Boolean(anchorEl);
 
   const handleClick = (ev: MouseEvent<HTMLElement>) => {
@@ -58,23 +59,9 @@ export function DropdownButton({
 
   return (
     <div>
-      <Button
-        id={id}
-        className={clsx(className, isOpen && openClassName)}
-        style={{
-          ...defaultButtonStyles,
-          ...style,
-        }}
-        aria-label={typeof children === 'string' ? children : undefined}
-        endIcon={
-          showArrow ? (
-            <ArrowDownIcon title="Down arrow" {...arrowProps} />
-          ) : undefined
-        }
-        {...buttonProps}
-        onClick={handleClick}
-      >
+      <Button onClick={handleClick} size="medium">
         {children}
+        <ArrowDownIcon title="Down arrow" />
       </Button>
       <Menu
         anchorOrigin={{

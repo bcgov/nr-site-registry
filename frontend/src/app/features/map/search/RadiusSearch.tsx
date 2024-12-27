@@ -1,10 +1,12 @@
-import { Button, Slider, Typography } from '@mui/material';
+import { Slider, Typography } from '@mui/material';
+
 import clsx from 'clsx';
 import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../../constants/Constant';
 import { XmarkIcon } from '../../../components/common/icon';
 import DropdownButton from '../DropDownButton';
 import { formatDistance } from '../../../helpers/utility';
 import { useState } from 'react';
+import { Button } from '../../../components/button/Button';
 
 interface Props {
   isSmall?: boolean;
@@ -67,23 +69,13 @@ export function RadiusSearch({
     <div className={clsx('point-search', className)}>
       {isVisible && (
         <>
-          <Button
-            color="primary"
-            variant="contained"
-            size="medium"
-            onClick={onCancel}
-            className="radius-search-cancel-button"
-            startIcon={<XmarkIcon className="point-cancel-icon" />}
-          >
+          <Button size="medium" onClick={onCancel}>
+            <XmarkIcon />
             Cancel
           </Button>
           <DropdownButton
             id="pointSearchSetRadiusButton"
-            color="primary"
-            variant="contained"
-            size="medium"
             menuClassName="point-search-menu"
-            className="radius-search-set-radius"
             dropdownContent={sliderBox}
           >
             Set Radius

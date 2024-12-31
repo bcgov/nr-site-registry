@@ -68,9 +68,6 @@ spec:
                   key: user
                   name: postgres-crunchy-pguser-postgres
           resources: # this is optional
-            limits:
-              cpu: {{ .Values.backend.resources.limits.cpu }}
-              memory: {{ .Values.backend.resources.limits.memory }}
             requests:
               cpu: {{ .Values.backend.resources.requests.cpu }}
               memory: {{ .Values.backend.resources.requests.memory }}
@@ -128,9 +125,6 @@ spec:
             - name: SEED_DATA_PATH
               value: "/mnt/sql/data_migration.sql"
           resources: # this is optional
-            limits:
-              cpu: {{ .Values.backend.resources.limits.cpu }}
-              memory: {{ .Values.backend.resources.limits.memory }}
             requests:
               cpu: {{ .Values.backend.resources.requests.cpu }}
               memory: {{ .Values.backend.resources.requests.memory }}
@@ -217,9 +211,6 @@ spec:
             periodSeconds: 30
             timeoutSeconds: 5
           resources: # this is optional
-            limits:
-              cpu: {{ .Values.backend.resources.limits.cpu }}
-              memory: {{ .Values.backend.resources.limits.memory }}
             requests:
               cpu: {{ .Values.backend.resources.requests.cpu }}
               memory: {{ .Values.backend.resources.requests.memory }}

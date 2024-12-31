@@ -45,9 +45,6 @@ backend:
     #-- the target cpu utilization percentage, is from request cpu and NOT LIMIT CPU.
     targetCPUUtilizationPercentage: 80
   resources:
-    limits:
-      cpu: 150m
-      memory: 250Mi
     requests:
       cpu: 50m
       memory: 150Mi

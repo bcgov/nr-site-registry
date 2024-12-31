@@ -23,9 +23,6 @@ backend:
   pdb:
     enabled: false
   resources:
-    limits:
-      cpu: 100m
-      memory: 250Mi
     requests:
       cpu: 50m
       memory: 150Mi

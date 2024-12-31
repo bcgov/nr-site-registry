@@ -75,3 +75,23 @@
 .SITE-Button.tertiary:hover:not(:disabled) {
   background-color: var(--surface-tertiary-hover);
 }
+
+.SITE-Button.btn-icon {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--surface-primary-default);
+}
+.SITE-Button.btn-icon:hover:not(:disabled) {
+  background-color: var(--surface-color-brand-blue-20);
+}
+.SITE-Button.btn-icon:focus {
+  background-color: var(--surface-color-brand-blue-20);
+  border: 1px solid var(--surface-color-primary-active-border);
+}
+.SITE-Button.btn-icon.btn-active {
+  background: var(--surface-color-primary-default);
+  color: var(--typography-color-primary-invert);
+}
+.SITE-Button.btn-icon.btn-active:hover {
+  background: var(--surface-color-primary-default);
+}

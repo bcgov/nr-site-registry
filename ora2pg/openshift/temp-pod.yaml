@@ -11,9 +11,6 @@ spec:
     - name: sql-volume
       mountPath: /mnt/sql
     resources:
-      limits:
-        cpu: "80m"
-        memory: "128Mi"
       requests:
         cpu: "40m"
         memory: "64Mi"

@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import './Pagination.css';
 import { AngleLeft, AngleRight } from '../../common/icon';
+import { Button } from '../../button/Button';
 
 interface PaginationProps {
   selectPage?: (pageNumber: number) => void;
@@ -69,14 +70,13 @@ const Pagination: React.FC<PaginationProps> = ({
 
   const page = (pageNumber: number) => {
     return (
-      <div
+      <Button
         onClick={() => selectPage?.(pageNumber)}
-        className={`pagination-page ${
-          currentPage === pageNumber ? 'pagination-page-active' : ''
-        }`}
+        variant="icon"
+        active={currentPage === pageNumber}
       >
         {pageNumber}
-      </div>
+      </Button>
     );
   };
 
@@ -100,10 +100,9 @@ const Pagination: React.FC<PaginationProps> = ({
         <React.Fragment>
           {paginationDots}
           <div className="pagination-section">{page(totalPagesRequired)}</div>
-          <AngleRight
-            className="pagination-page"
-            onClick={() => selectPage?.(currentPage + 1)}
-          />
+          <Button variant="icon" onClick={() => selectPage?.(currentPage + 1)}>
+            <AngleRight size={18} />
+          </Button>
         </React.Fragment>
       );
     } else {
@@ -129,10 +128,9 @@ const Pagination: React.FC<PaginationProps> = ({
     if (startPage !== 1) {
       return (
         <React.Fragment>
-          <AngleLeft
-            className="pagination-page"
-            onClick={() => selectPage?.(currentPage - 1)}
-          />
+          <Button variant="icon" onClick={() => selectPage?.(currentPage - 1)}>
+            <AngleLeft size={18} />
+          </Button>
           <div className="pagination-section">{page(1)}</div>
           {paginationDots}
         </React.Fragment>

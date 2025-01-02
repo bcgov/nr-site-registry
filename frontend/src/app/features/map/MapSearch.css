@@ -93,22 +93,22 @@ button.map-button--active:hover {
 }
 
 .data-layers-icon,
-.find-me-icon {
+.find-me-icon,
+.polygon-search-icon,
+.radius-search-icon {
   color: var(--typography-color-link);
 }
 
-.find-me-icon--active {
+.find-me-icon--active,
+.radius-search-icon--active,
+.polygon-search-icon--active {
   color: var(--typography-color-primary-invert);
 }
 
-.map-button:hover .find-me-icon {
+.map-button:hover .find-me-icon,
+.map-button:hover .radius-search-icon,
+.map-button:hover .polygon-search-icon {
   color: var(--typography-color-primary-invert);
-}
-
-.polygon-search-icon,
-.point-search-icon,
-.radius-search-icon {
-  color: var(--typography-color-primary);
 }
 
 .dropdown-button-menu.data-layers-button-menu .MuiPaper-root {

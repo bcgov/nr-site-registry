@@ -16,12 +16,17 @@ export function RadiusSearchButton({ isActive, onClick }: Readonly<Props>) {
       className={clsx(
         'map-button',
         'map-button--medium',
-        'point-search-button',
         isActive && 'map-button--active',
       )}
       onClick={onClick}
       startIcon={
-        <MapPin title="Radius search icon" className="radius-search-icon" />
+        <MapPin
+          title="Radius search icon"
+          className={clsx(
+            'radius-search-icon',
+            isActive && 'radius-search-icon--active',
+          )}
+        />
       }
     >
       Radius Search

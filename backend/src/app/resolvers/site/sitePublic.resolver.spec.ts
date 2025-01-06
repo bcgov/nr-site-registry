@@ -116,6 +116,7 @@ describe('SiteResolver', () => {
         undefined,
         undefined,
         undefined,
+        undefined,
       );
     });
 
@@ -145,6 +146,7 @@ describe('SiteResolver', () => {
         searchParam,
         page,
         pageSize,
+        undefined,
         undefined,
         undefined,
         undefined,
@@ -210,6 +212,7 @@ describe('SiteResolver', () => {
         searchParam,
         page,
         pageSize,
+        undefined,
         undefined,
         undefined,
         undefined,

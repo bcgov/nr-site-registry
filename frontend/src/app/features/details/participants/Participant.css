@@ -55,6 +55,10 @@
   padding: 6px 8px !important;
 }
 
+.custom-participant-edit-input.rs-picker-toggle-wrapper {
+  display: inline;
+}
+
 .participant-fa-spin {
   animation: spin 1s infinite linear;
 }

@@ -59,11 +59,7 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
   showApproveRejectSection = showApproveRejectSection ?? false;
   hideLabelForWidget = hideLabelForWidget ?? false;
 
-  approveRejectHandler =
-    approveRejectHandler ??
-    ((value) => {
-      console.log('Approve/Reject Handler not provided');
-    });
+  approveRejectHandler = approveRejectHandler ?? (() => {});
 
   return (
     <div>

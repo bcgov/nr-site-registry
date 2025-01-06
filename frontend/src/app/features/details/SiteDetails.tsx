@@ -50,7 +50,10 @@ import {
   validateForm,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
-import { fetchSiteParticipants } from './participants/ParticipantSlice';
+import {
+  fetchSiteParticipants,
+  siteParticipants,
+} from './participants/ParticipantSlice';
 import {
   fetchSiteDisclosure,
   siteDisclosure,
@@ -87,7 +90,10 @@ import {
   setupSiteIdForSaving,
   setupSiteSummaryForSaving,
 } from './SaveSiteDetailsSlice';
-import { fetchAssociatedSites } from './associates/AssociateSlice';
+import {
+  associatedSites,
+  fetchAssociatedSites,
+} from './associates/AssociateSlice';
 import AddToFolio from '../folios/AddToFolio';
 import {
   fetchParcelDescriptionsForApproval,
@@ -112,6 +118,8 @@ import { Button } from '../../components/button/Button';
 import { IFormField } from '../../components/input-controls/IFormField';
 import { GetNotationConfig } from './notations/NotationsConfig';
 import { disclosureStatementConfig } from './disclosure/DisclosureConfig';
+import GetConfig from './participants/ParticipantConfig';
+import { GetAssociateConfig } from './associates/AssociateConfig';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
@@ -157,8 +165,12 @@ const SiteDetails = () => {
   const savedChanges = useSelector(trackedChanges);
   const siteNotation = useSelector(notationParticipants);
   const disclosure = useSelector(siteDisclosure);
+  const sitePartics = useSelector(siteParticipants);
+  const siteAssocs = useSelector(associatedSites);
   const { notationFormRowEditMode, notationColumnInternal } =
     GetNotationConfig();
+  const { participantColumnInternal } = GetConfig();
+  const { associateColumnInternal } = GetAssociateConfig();
   const [userType, setUserType] = useState<UserType | null>(null);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
@@ -484,13 +496,25 @@ const SiteDetails = () => {
   const validateSiteForms = async () => {
     try {
       // Run all validation functions in parallel using Promise.all
-      const [notationErrors, siteDisclosureErrors] = await Promise.all([
+      const [
+        notationErrors,
+        siteDisclosureErrors,
+        siteParticErrors,
+        siteAssocErrors,
+      ] = await Promise.all([
         validateNotationsForm(),
-        validateSiteDisclosure(),
+        validateSiteParticipantForm(),
+        validateAssociatedSitesForm(),
+        validateSiteDisclosureForm(),
       ]);
 
       // Combine all errors into one list
-      const errors = [...notationErrors, ...siteDisclosureErrors];
+      const errors = [
+        ...notationErrors,
+        ...siteParticErrors,
+        ...siteAssocErrors,
+        ...siteDisclosureErrors,
+      ];
 
       // You can now use `allErrors` for further processing
       return errors;
@@ -499,7 +523,39 @@ const SiteDetails = () => {
     }
   };
 
-  const validateSiteDisclosure = async () => {
+  const validateAssociatedSitesForm = async () => {
+    const associatedSiteTable: IFormField[][] = [
+      associateColumnInternal
+        .map((column) => column.displayType)
+        .filter(
+          (displayType): displayType is IFormField => displayType !== undefined,
+        ),
+    ];
+
+    return validateForm(
+      associatedSiteTable,
+      siteAssocs?.siteAssociate,
+      'Associated Sites',
+    );
+  };
+
+  const validateSiteParticipantForm = async () => {
+    const siteParticipantTable: IFormField[][] = [
+      participantColumnInternal
+        .map((column) => column.displayType)
+        .filter(
+          (displayType): displayType is IFormField => displayType !== undefined,
+        ),
+    ];
+
+    return validateForm(
+      siteParticipantTable,
+      sitePartics?.siteParticipants,
+      'Site Participant',
+    );
+  };
+
+  const validateSiteDisclosureForm = async () => {
     const siteDisclosureErrors: any[] = [];
     siteDisclosureErrors.push(
       ...validateForm(
@@ -510,8 +566,6 @@ const SiteDetails = () => {
     );
 
     const { siteRegDateRecd, dateCompleted } = disclosure?.siteDisclosure;
-    console.log(siteRegDateRecd, dateCompleted);
-
     if (!!siteRegDateRecd && !!dateCompleted) {
       if (
         new Date(disclosure?.siteDisclosure?.dateCompleted) <

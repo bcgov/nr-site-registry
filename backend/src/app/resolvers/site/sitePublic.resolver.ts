@@ -1,4 +1,4 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Int, Query, Resolver } from '@nestjs/graphql';
 import { Unprotected } from 'nest-keycloak-connect';
 import {
   FetchSiteDetail,
@@ -38,8 +38,8 @@ export class SitePublicResolver {
   @Query(() => SearchSiteResponse, { name: 'searchSites' })
   async searchSites(
     @Args('searchParam', { type: () => String }) searchParam: string,
-    @Args('page', { type: () => String }) page: number,
-    @Args('pageSize', { type: () => String }) pageSize: number,
+    @Args('page', { type: () => Int }) page: number,
+    @Args('pageSize', { type: () => Int }) pageSize: number,
     @Args('id', { type: () => String, nullable: true }) id?: string,
     @Args('srStatus', { type: () => String, nullable: true }) srStatus?: string,
     @Args('siteRiskCode', { type: () => String, nullable: true })
@@ -71,6 +71,13 @@ export class SitePublicResolver {
     whenCreated?: Date,
     @Args('whenUpdated', { type: () => String, nullable: true })
     whenUpdated?: Date,
+    @Args('siteIds', {
+      type: () => [String],
+      nullable: true,
+      description:
+        'If provided, only applies the filters to the specified sites',
+    })
+    siteIds?: string[],
   ) {
     this.sitesLogger.log('SiteResolver.searchSites() start ');
     return await this.siteService.searchSites(
@@ -96,6 +103,7 @@ export class SitePublicResolver {
       longSeconds,
       whenCreated,
       whenUpdated,
+      siteIds,
     );
   }
 

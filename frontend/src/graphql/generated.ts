@@ -840,9 +840,10 @@ export type QuerySearchSitesArgs = {
   longMinutes?: InputMaybe<Scalars['String']['input']>;
   longSeconds?: InputMaybe<Scalars['String']['input']>;
   longdeg?: InputMaybe<Scalars['String']['input']>;
-  page: Scalars['String']['input'];
-  pageSize: Scalars['String']['input'];
+  page: Scalars['Int']['input'];
+  pageSize: Scalars['Int']['input'];
   searchParam: Scalars['String']['input'];
+  siteIds?: InputMaybe<Array<Scalars['String']['input']>>;
   siteRiskCode?: InputMaybe<Scalars['String']['input']>;
   srStatus?: InputMaybe<Scalars['String']['input']>;
   whenCreated?: InputMaybe<Scalars['String']['input']>;
@@ -1412,6 +1413,15 @@ export type MapSearch_FindSiteBySiteIdQueryVariables = Exact<{
 
 export type MapSearch_FindSiteBySiteIdQuery = { __typename?: 'Query', findSiteBySiteId: { __typename?: 'FetchSiteDetail', data?: { __typename?: 'Sites', id: string, addrLine_1: string, addrLine_2?: string | null, addrLine_3?: string | null, addrLine_4?: string | null, city: string, latdeg?: number | null, longdeg?: number | null, latDegrees?: number | null, latMinutes?: number | null, latSeconds?: number | null, longDegrees?: number | null, longMinutes?: number | null, longSeconds?: number | null, generalDescription?: string | null, siteRiskCode: string } | null } };
 
+export type MapSearch_FilterSearchResultsQueryVariables = Exact<{
+  siteIds?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+  page: Scalars['Int']['input'];
+  pageSize: Scalars['Int']['input'];
+}>;
+
+
+export type MapSearch_FilterSearchResultsQuery = { __typename?: 'Query', searchSites: { __typename?: 'SearchSiteResponse', count: number, page: number, pageSize: number, sites: Array<{ __typename?: 'Sites', id: string, addrLine_1: string, addrLine_2?: string | null, addrLine_3?: string | null, city: string, srStatus: string, siteRiskCode: string, generalDescription?: string | null, commonName: string, latdeg?: number | null, latDegrees?: number | null, latMinutes?: number | null, latSeconds?: number | null, longdeg?: number | null, longDegrees?: number | null, longMinutes?: number | null, longSeconds?: number | null, latlongReliabilityFlag: string, whoCreated: string, whenCreated: any, consultantSubmitted?: string | null }> } };
+
 export type MapSearch_AddCartItemMutationVariables = Exact<{
   siteId: Scalars['String']['input'];
 }>;
@@ -1603,6 +1613,79 @@ export type MapSearch_FindSiteBySiteIdQueryHookResult = ReturnType<typeof useMap
 export type MapSearch_FindSiteBySiteIdLazyQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdLazyQuery>;
 export type MapSearch_FindSiteBySiteIdSuspenseQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdSuspenseQuery>;
 export type MapSearch_FindSiteBySiteIdQueryResult = Apollo.QueryResult<MapSearch_FindSiteBySiteIdQuery, MapSearch_FindSiteBySiteIdQueryVariables>;
+export const MapSearch_FilterSearchResultsDocument = gql`
+    query MapSearch_filterSearchResults($siteIds: [String!], $page: Int!, $pageSize: Int!) {
+  searchSites(
+    searchParam: ""
+    page: $page
+    pageSize: $pageSize
+    siteIds: $siteIds
+  ) {
+    sites {
+      id
+      addrLine_1
+      addrLine_2
+      addrLine_3
+      city
+      srStatus
+      siteRiskCode
+      generalDescription
+      commonName
+      latdeg
+      latDegrees
+      latMinutes
+      latSeconds
+      longdeg
+      longDegrees
+      longMinutes
+      longSeconds
+      latlongReliabilityFlag
+      whoCreated
+      whenCreated
+      whenCreated
+      consultantSubmitted
+    }
+    count
+    page
+    pageSize
+  }
+}
+    `;
+
+/**
+ * __useMapSearch_FilterSearchResultsQuery__
+ *
+ * To run a query within a React component, call `useMapSearch_FilterSearchResultsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMapSearch_FilterSearchResultsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMapSearch_FilterSearchResultsQuery({
+ *   variables: {
+ *      siteIds: // value for 'siteIds'
+ *      page: // value for 'page'
+ *      pageSize: // value for 'pageSize'
+ *   },
+ * });
+ */
+export function useMapSearch_FilterSearchResultsQuery(baseOptions: Apollo.QueryHookOptions<MapSearch_FilterSearchResultsQuery, MapSearch_FilterSearchResultsQueryVariables> & ({ variables: MapSearch_FilterSearchResultsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MapSearch_FilterSearchResultsQuery, MapSearch_FilterSearchResultsQueryVariables>(MapSearch_FilterSearchResultsDocument, options);
+      }
+export function useMapSearch_FilterSearchResultsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MapSearch_FilterSearchResultsQuery, MapSearch_FilterSearchResultsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MapSearch_FilterSearchResultsQuery, MapSearch_FilterSearchResultsQueryVariables>(MapSearch_FilterSearchResultsDocument, options);
+        }
+export function useMapSearch_FilterSearchResultsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MapSearch_FilterSearchResultsQuery, MapSearch_FilterSearchResultsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MapSearch_FilterSearchResultsQuery, MapSearch_FilterSearchResultsQueryVariables>(MapSearch_FilterSearchResultsDocument, options);
+        }
+export type MapSearch_FilterSearchResultsQueryHookResult = ReturnType<typeof useMapSearch_FilterSearchResultsQuery>;
+export type MapSearch_FilterSearchResultsLazyQueryHookResult = ReturnType<typeof useMapSearch_FilterSearchResultsLazyQuery>;
+export type MapSearch_FilterSearchResultsSuspenseQueryHookResult = ReturnType<typeof useMapSearch_FilterSearchResultsSuspenseQuery>;
+export type MapSearch_FilterSearchResultsQueryResult = Apollo.QueryResult<MapSearch_FilterSearchResultsQuery, MapSearch_FilterSearchResultsQueryVariables>;
 export const MapSearch_AddCartItemDocument = gql`
     mutation MapSearch_addCartItem($siteId: String!) {
   addCartItem(cartDTO: {siteId: $siteId, price: 0}) {

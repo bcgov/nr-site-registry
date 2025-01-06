@@ -26,7 +26,7 @@ const getSiteSearchResultsColumns = () => {
       isDefault: true,
       sortOrder: 1,
       isChecked: true,
-      displayType: getLinkColumnType('Site ID', 'id', '', 'site/details/'),
+      displayType: getLinkColumnType('Site ID', 'id', '', '/site/details/'),
       stickyCol: true,
     },
     new TableColumn(
@@ -259,7 +259,7 @@ const getSiteSearchResultsColumns = () => {
         'Details',
         'id',
         '',
-        'site/details/',
+        '/site/details/',
         'Details',
       ),
       linkRedirectionURL: 'site/details/',

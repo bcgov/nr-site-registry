@@ -14,9 +14,6 @@ import {
   IChangeType,
 } from '../../../components/common/IChangeType';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
-import Widget from '../../../components/widget/Widget';
-import { UserMinus, UserPlus } from '../../../components/common/icon';
-import Actions from '../../../components/action/Actions';
 import './Participant.css';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';

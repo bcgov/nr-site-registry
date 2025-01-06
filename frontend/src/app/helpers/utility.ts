@@ -452,6 +452,17 @@ export function sortArray<T>(
   });
 }
 
+export function formatDistance(meters: number, kmDigits = 2): string {
+  if (isNaN(meters)) {
+    return '';
+  }
+  if (meters <= 1000) {
+    return `${Math.round(meters)} m`;
+  }
+  const kms = Number((meters / 1000).toFixed(kmDigits));
+  return `${kms} km`;
+}
+
 export const validateForm = (
   formRows: IFormField[][],
   formData: any,

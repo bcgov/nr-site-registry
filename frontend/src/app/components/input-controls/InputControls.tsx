@@ -208,7 +208,7 @@ export const TextInput: React.FC<InputProps> = ({
 
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
-        onChange(inputValue); // Update parent component state only if validation passes
+        onChange(parseFloat(inputValue)); // Update parent component state only if validation passes
       }
     } else {
       onChange(inputValue);
@@ -498,7 +498,7 @@ export const GroupInput: React.FC<InputProps> = ({
     }
     if (child.allowNumbersOnly) {
       if (validateInput(inputValue, child)) {
-        child.onChange(inputValue); // Update parent component state only if validation passes
+        child.onChange(parseFloat(inputValue)); // Update parent component state only if validation passes
       }
     } else {
       child.onChange(inputValue);
@@ -689,6 +689,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
           value={value ?? []}
           onChange={(value) => handleDateRange(value)}
           editable={true}
+          menuStyle={{ zIndex: 1500 }}
         />
       ) : (
         <span

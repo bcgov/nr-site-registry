@@ -21,6 +21,9 @@ import {
   MapSearchQueryProvider,
 } from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
 import { MapSearchDrawer } from './siteDrawer/MapSearchDrawer';
+import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../constants/Constant';
+import { CircleLayer } from './CircleLayer';
+import { PointSearchLayer } from './layers/PointSearchLayer';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -64,6 +67,8 @@ function MapView() {
 
   const mapRef = useRef<Map>(null);
   const [isLocationVisible, setLocationVisible] = useState(false);
+  const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
+  const [activeTool, setActiveTool] = useState<ActiveToolEnum | null>(null);
 
   return (
     <div
@@ -88,10 +93,16 @@ function MapView() {
         />
         {<MyLocationMarker isLocationVisible={isLocationVisible} />}
         <SiteMarkers sites={data?.mapSearch.data || []} />
+        <PointSearchLayer activeTool={activeTool} radius={radius} />
       </MapContainer>
       <MapSearch
+        //mapRef={mapRef}
         isLocationVisible={isLocationVisible}
         setLocationVisible={setLocationVisible}
+        activeTool={activeTool}
+        setActiveTool={setActiveTool}
+        radius={radius}
+        setRadius={setRadius}
       />
 
       <MapSearchDrawer

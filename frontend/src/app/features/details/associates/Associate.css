@@ -55,6 +55,10 @@
   padding: 6px 8px !important;
 }
 
+.custom-associate-edit-input.rs-picker-toggle-wrapper {
+  display: inline;
+}
+
 .custom-associate-search-placeholder::placeholder {
   color: var(--typography-color-disabled) !important;
   font-size: 12px !important;

@@ -30,7 +30,10 @@ export const MapSearchDrawer: FC<MapSearchDrawerProps> = ({
       title={drawerTitle}
     >
       {searchTerm && !selectedSiteId && (
-        <SearchResultsDrawerContent sites={sites} loading={sitesLoading} />
+        <SearchResultsDrawerContent
+          siteIds={sites.map((site) => site.id)}
+          loading={sitesLoading}
+        />
       )}
       {selectedSiteId && <SiteDetailsDrawerContent mapRef={mapRef} />}
     </Drawer>

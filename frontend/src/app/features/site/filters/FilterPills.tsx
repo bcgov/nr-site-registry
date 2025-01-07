@@ -2,7 +2,7 @@ import React from 'react';
 import { XmarkIcon } from '../../../components/common/icon';
 import './SiteFilterForm.css';
 
-interface FilterPill {
+export interface FilterPill {
   key: string;
   value: string;
   label: string;

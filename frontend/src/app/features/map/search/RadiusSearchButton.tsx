@@ -2,7 +2,12 @@ import { Button } from '@mui/material';
 import clsx from 'clsx';
 import { MapPin } from '../../../components/common/icon';
 
-export function RadiusSearchButton() {
+interface Props {
+  isActive: boolean;
+  onClick: () => void;
+}
+
+export function RadiusSearchButton({ isActive, onClick }: Readonly<Props>) {
   return (
     <Button
       variant="contained"
@@ -11,11 +16,17 @@ export function RadiusSearchButton() {
       className={clsx(
         'map-button',
         'map-button--medium',
-        'point-search-button',
+        isActive && 'map-button--active',
       )}
-      //   onClick={onClick}
+      onClick={onClick}
       startIcon={
-        <MapPin title="Radius search icon" className="radius-search-icon" />
+        <MapPin
+          title="Radius search icon"
+          className={clsx(
+            'radius-search-icon',
+            isActive && 'radius-search-icon--active',
+          )}
+        />
       }
     >
       Radius Search

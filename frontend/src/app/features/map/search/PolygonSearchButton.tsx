@@ -2,7 +2,11 @@ import { Button } from '@mui/material';
 import clsx from 'clsx';
 import { DrawPolygon } from '../../../components/common/icon';
 
-export function PolygonSearchButton() {
+interface Props {
+  isActive: boolean;
+  onClick: () => void;
+}
+export function PolygonSearchButton({ isActive, onClick }: Readonly<Props>) {
   return (
     <Button
       color="secondary"
@@ -15,7 +19,7 @@ export function PolygonSearchButton() {
           className="polygon-search-icon"
         />
       }
-      //   onClick={onClick}
+      onClick={onClick}
     >
       Polygon Search
     </Button>

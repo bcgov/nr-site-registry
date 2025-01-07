@@ -9,22 +9,30 @@ import { useState } from 'react';
 import { Button } from '../../../components/button/Button';
 
 interface Props {
+  radius: number;
+  setRadius: React.Dispatch<React.SetStateAction<number>>;
   isSmall?: boolean;
   className?: string;
   setActiveTool?: React.Dispatch<React.SetStateAction<ActiveToolEnum | null>>;
 }
 
 export function RadiusSearch({
+  radius = MIN_CIRCLE_RADIUS,
+  setRadius,
   isSmall = false,
   className,
   setActiveTool,
 }: Readonly<Props>) {
-  const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
-
   const [isVisible, setIsVisible] = useState(true);
+
   const onCancel = () => {
     setIsVisible(false);
     setActiveTool && setActiveTool(null);
+    setRadius(MIN_CIRCLE_RADIUS);
+    console.log(
+      'nupur - RadiusSearch.tsx onCancel setRadius:',
+      MIN_CIRCLE_RADIUS,
+    );
   };
 
   const onRadiusChange = (_ev: any, value: number | number[]) => {
@@ -33,6 +41,10 @@ export function RadiusSearch({
       MIN_CIRCLE_RADIUS,
     );
     setRadius(newRadius);
+    console.log(
+      'nupur - RadiusSearch.tsx onRadiusChange newRadius:',
+      newRadius,
+    );
   };
 
   const sliderBox = (

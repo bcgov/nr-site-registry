@@ -1,14 +1,14 @@
 import { ActiveToolEnum } from '../../../constants/Constant';
 import { CircleLayer } from '../CircleLayer';
 
-interface PointSearchLayerProps {
+interface RadiusSearchLayerProps {
   activeTool: ActiveToolEnum | null;
   radius: number;
 }
-export function PointSearchLayer({
+export function RadiusSearchLayer({
   activeTool,
   radius,
-}: Readonly<PointSearchLayerProps>) {
+}: Readonly<RadiusSearchLayerProps>) {
   if (activeTool === ActiveToolEnum.radiusSearch) {
     return <CircleLayer radius={radius} />;
   }

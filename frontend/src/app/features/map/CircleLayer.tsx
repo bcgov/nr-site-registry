@@ -22,6 +22,9 @@ export function CircleLayer({ radius }: Readonly<CircleLayerProps>) {
   });
 
   const drawCircle = center && radius > 0;
+  console.log('drawCircle ', drawCircle);
+  console.log('center ', center);
+  console.log('radius ', radius);
   return (
     <>
       <CrosshairsTooltipMarker center={center}>

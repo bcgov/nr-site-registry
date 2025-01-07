@@ -7,6 +7,7 @@ import {
   MAP_CONTROLS_RIGHT_LG,
   MAP_CONTROLS_RIGHT_SM,
   MAP_CONTROLS_RIGHT_XL,
+  MIN_CIRCLE_RADIUS,
 } from '../../constants/Constant';
 
 import { TextSearchButton } from './search/TextSearchButton';
@@ -64,8 +65,8 @@ const componentProps = {
 interface MapSearchProps {
   activeTool?: ActiveToolEnum | null;
   setActiveTool?: React.Dispatch<React.SetStateAction<ActiveToolEnum | null>>;
-  radius?: number;
-  setRadius?: React.Dispatch<React.SetStateAction<number>>;
+  radius: number;
+  setRadius: React.Dispatch<React.SetStateAction<number>>;
   isLocationVisible: boolean;
   setLocationVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -122,6 +123,7 @@ export function MapSearch({
           ? null
           : ActiveToolEnum.radiusSearch,
       );
+      setRadius(MIN_CIRCLE_RADIUS);
     }
   };
 
@@ -177,7 +179,11 @@ export function MapSearch({
             {isPolygonTool ? (
               <PolygonSearch />
             ) : (
-              <RadiusSearch setActiveTool={setActiveTool} />
+              <RadiusSearch
+                radius={radius}
+                setRadius={setRadius}
+                setActiveTool={setActiveTool}
+              />
             )}
           </div>
         </div>

@@ -32,7 +32,7 @@ export class ParcelDescriptionDto {
     userAction: string | null,
     srAction: string | null,
   ) {
-    this.id = id ? id : '0';
+    this.id = id ? id : '';
     this.descriptionType = descriptionType
       ? descriptionType
       : ParcelDescriptionType.Unknown;

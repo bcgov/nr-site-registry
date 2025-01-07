@@ -80,16 +80,15 @@ export const fetchSites = createAsyncThunk(
         query:
           getUser() === null
             ? print(graphQlSiteQuery(filter))
-            : print(graphQlSiteQueryForAuthenticatedUsers(filter)),
+            : print(graphQlSiteQuery(filter)),
         variables: {
           searchParam: searchParam,
-          page: state.sites.currentPage,
-          pageSize: state.sites.pageSize,
+          page: parseInt(state.sites.currentPage),
+          pageSize: parseInt(state.sites.pageSize),
           ...filter,
         },
       });
-      if (getUser() === null) return response.data.data.searchSites;
-      else return response.data.data.searchSitesForAuthenticatedUsers;
+      return response.data.data.searchSites;
     } catch (error) {
       throw error;
     }

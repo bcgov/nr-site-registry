@@ -88,7 +88,6 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
             formData?.srAction === SRApprovalStatusEnum.Public
           }
           handleCheckBoxChange={(event) => {
-            console.log('event', event);
             handleInputChange(
               formData?.id,
               'srCheckbox',

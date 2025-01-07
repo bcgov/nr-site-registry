@@ -23,5 +23,5 @@ export class ChangeAuditObjectTypeDTO {
   srAction: string;
 
   @Field()
-  srValue: string;
+  srValue: boolean;
 }

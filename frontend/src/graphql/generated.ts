@@ -36,7 +36,7 @@ export type AssociatedSiteDto = {
   siteId: Scalars['String']['output'];
   siteIdAssociatedWith: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
-  srValue: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
 
@@ -156,7 +156,7 @@ export type DocumentDto = {
   psnorgId?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
-  srValue: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
   submissionDate: Scalars['String']['output'];
   title: Scalars['String']['output'];
   userAction: Scalars['String']['output'];
@@ -308,8 +308,6 @@ export type FolioContentDto = {
   folioId: Scalars['String']['input'];
   id: Scalars['Float']['input'];
   siteId: Scalars['String']['input'];
-  userId: Scalars['String']['input'];
-  whoCreated: Scalars['String']['input'];
 };
 
 export type FolioContentResponse = {
@@ -345,7 +343,6 @@ export type FolioDto = {
 
 export type FolioMinDto = {
   id: Scalars['Float']['input'];
-  userId: Scalars['String']['input'];
 };
 
 export type FolioResponse = {
@@ -389,7 +386,7 @@ export type LandHistoriesDto = {
   siteId: Scalars['String']['output'];
   siteProfile?: Maybe<Scalars['String']['output']>;
   srAction: Scalars['String']['output'];
-  srValue: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
@@ -566,7 +563,7 @@ export type NotationDto = {
   requirementReceivedDate?: Maybe<Scalars['DateTime']['output']>;
   siteId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
-  srValue: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
 
@@ -596,7 +593,7 @@ export type NotationParticipantDto = {
   eventParticId: Scalars['String']['output'];
   psnorgId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
-  srValue: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
 
@@ -686,6 +683,7 @@ export type Query = {
   __typename?: 'Query';
   _service: _Service;
   findSiteBySiteId: FetchSiteDetail;
+  findSiteBySiteIdLoggedInUser: FetchSiteDetail;
   getAssociatedSitesBySiteId: AssociatedSiteResponse;
   getBannerType: BannerTypeResponse;
   getCartItemsForUser: CartResponse;
@@ -713,12 +711,17 @@ export type Query = {
   mapSearch: MapSearchResponse;
   searchSiteIds: DropdownResponse;
   searchSites: SearchSiteResponse;
-  searchSitesForAuthenticatedUsers: SearchSiteResponse;
   sites: FetchSiteResponse;
 };
 
 
 export type QueryFindSiteBySiteIdArgs = {
+  pending?: InputMaybe<Scalars['Boolean']['input']>;
+  siteId: Scalars['String']['input'];
+};
+
+
+export type QueryFindSiteBySiteIdLoggedInUserArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
@@ -844,31 +847,6 @@ export type QuerySearchSitesArgs = {
   pageSize: Scalars['Int']['input'];
   searchParam: Scalars['String']['input'];
   siteIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  siteRiskCode?: InputMaybe<Scalars['String']['input']>;
-  srStatus?: InputMaybe<Scalars['String']['input']>;
-  whenCreated?: InputMaybe<Scalars['String']['input']>;
-  whenUpdated?: InputMaybe<Scalars['String']['input']>;
-  whoCreated?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type QuerySearchSitesForAuthenticatedUsersArgs = {
-  addrLine_1?: InputMaybe<Scalars['String']['input']>;
-  city?: InputMaybe<Scalars['String']['input']>;
-  commonName?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['String']['input']>;
-  latDegrees?: InputMaybe<Scalars['String']['input']>;
-  latMinutes?: InputMaybe<Scalars['String']['input']>;
-  latSeconds?: InputMaybe<Scalars['String']['input']>;
-  latdeg?: InputMaybe<Scalars['String']['input']>;
-  latlongReliabilityFlag?: InputMaybe<Scalars['String']['input']>;
-  longDegrees?: InputMaybe<Scalars['String']['input']>;
-  longMinutes?: InputMaybe<Scalars['String']['input']>;
-  longSeconds?: InputMaybe<Scalars['String']['input']>;
-  longdeg?: InputMaybe<Scalars['String']['input']>;
-  page: Scalars['String']['input'];
-  pageSize: Scalars['String']['input'];
-  searchParam: Scalars['String']['input'];
   siteRiskCode?: InputMaybe<Scalars['String']['input']>;
   srStatus?: InputMaybe<Scalars['String']['input']>;
   whenCreated?: InputMaybe<Scalars['String']['input']>;
@@ -1096,7 +1074,7 @@ export type SiteParticsDto = {
   psnorgId: Scalars['String']['output'];
   siteId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
-  srValue: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
 

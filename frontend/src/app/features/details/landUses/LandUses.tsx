@@ -193,52 +193,37 @@ const LandUses: FC = () => {
         event.value,
     };
 
-    if (viewMode === SiteDetailsMode.SRMode && event.property === 'srValue') {
-      setEditLandUsesData((prev) => {
-        const data = new Map(prev);
+    const srActionValue =
+      viewMode === SiteDetailsMode.SRMode && event.property === 'srValue'
+        ? event.value
+          ? SRApprovalStatusEnum.Public
+          : SRApprovalStatusEnum.Private
+        : SRApprovalStatusEnum.Pending;
 
-        data.set(editedRowId, {
-          ...(data.get(editedRowId) ?? {}),
-          ...landUseUpdateInput,
-          userAction: UserActionEnum.updated,
-          srAction: event.value
-            ? SRApprovalStatusEnum.Public
-            : SRApprovalStatusEnum.Private,
-        });
-        return data;
-      });
-    } else {
-      setEditLandUsesData((prev) => {
-        const data = new Map(prev);
+    setEditLandUsesData((prev) => {
+      const data = new Map(prev);
 
-        data.set(editedRowId, {
-          ...(data.get(editedRowId) ?? {}),
-          ...landUseUpdateInput,
-          userAction: UserActionEnum.updated,
-          srAction: SRApprovalStatusEnum.Pending,
-        });
-        return data;
+      data.set(editedRowId, {
+        ...(data.get(editedRowId) ?? {}),
+        ...landUseUpdateInput,
+        userAction: UserActionEnum.updated,
+        srAction: srActionValue,
       });
-    }
+      return data;
+    });
 
     const tableColumn = tableColumns.find(
       (column) => column.graphQLPropertyName === event.property,
     );
     const propertyLabel = tableColumn?.displayName || '';
 
-    if (viewMode === SiteDetailsMode.SRMode && event.property === 'srValue') {
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Suspect Land Uses: SR Status',
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
-    } else {
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Suspect Land Uses: ' + propertyLabel,
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
-    }
+    const description =
+      viewMode === SiteDetailsMode.SRMode && event.property === 'srValue'
+        ? 'Suspect Land Uses: SR Status'
+        : 'Suspect Land Uses: ' + propertyLabel;
+
+    const tracker = new ChangeTracker(IChangeType.Modified, description);
+    dispatch(trackChanges(tracker.toPlainObject()));
 
     setTableData(updatedLandUses);
   };

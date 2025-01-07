@@ -75,7 +75,7 @@ describe('DocumentResolver', () => {
         filePath: '',
         srAction: 'pending',
         userAction: 'pending',
-        srValue: 'false'
+        srValue: false,
       },
     ];
     const expectedResult: DocumentResponse = {

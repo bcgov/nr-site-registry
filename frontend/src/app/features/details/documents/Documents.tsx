@@ -545,7 +545,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
             srAction: srActionValue,
           };
         }
-        console.log('updatedDocument', updatedDocument);
         return updatedDocument;
       }
       return document;

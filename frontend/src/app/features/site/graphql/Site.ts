@@ -69,7 +69,7 @@ export const graphQlSiteQueryForAuthenticatedUsers = (filter: {}) => {
   }
 
   return gql`
-query searchSitesForAuthenticatedUsers($searchParam: String!,  $page: String!, $pageSize: String!, ${fieldsArgString}){ 
+query searchSitesForAuthenticatedUsers($searchParam: String!,  $page: Int!, $pageSize: Int!, ${fieldsArgString}){ 
     searchSitesForAuthenticatedUsers(searchParam: $searchParam, , page: $page, pageSize: $pageSize, ${fieldsString}) {
        sites
        {

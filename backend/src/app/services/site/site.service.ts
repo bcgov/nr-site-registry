@@ -38,6 +38,7 @@ import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescripti
 import { SnapshotResponse } from '../../dto/snapshot.dto';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Snapshots } from '../../entities/snapshots.entity';
+import { UserTypeEum } from 'src/app/common/userType';
 
 /**
  * Nestjs Service For Region Entity
@@ -167,8 +168,10 @@ export class SiteService {
       }),
     );
 
-    if (!userInfo || userInfo?.identity_provider !== 'idir')
-      query.andWhere('sites.srAction != :srAction', { srAction: 'private' });
+    if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR)
+      query.andWhere('sites.srAction != :srAction', {
+        srAction: SRApprovalStatusEnum.PRIVATE,
+      });
 
     if (id) {
       query.andWhere('sites.id = :id', { id: id });

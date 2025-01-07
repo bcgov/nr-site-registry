@@ -43,6 +43,7 @@ import {
 } from '../SaveSiteDetailsSlice';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
+import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 
 type ParcelDescriptionsChangeEvent = {
   property: 'descriptionType' | 'idPinNumber' | 'dateNoted';
@@ -219,7 +220,7 @@ const ParcelDescriptions = () => {
           return {
             ...newRow,
             apiAction: UserActionEnum.updated,
-            srAction: 'pending',
+            srAction: SRApprovalStatusEnum.Pending,
           } as IParcelDescriptionSaveDto;
         } else {
           return originalRow;

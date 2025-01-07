@@ -6,9 +6,13 @@ import { CrosshairsTooltipMarker } from './CrossHairToolTipMarker';
 
 interface CircleLayerProps {
   radius: number;
+  onCrossHairClick: () => void;
 }
 
-export function CircleLayer({ radius }: Readonly<CircleLayerProps>) {
+export function CircleLayer({
+  radius,
+  onCrossHairClick,
+}: Readonly<CircleLayerProps>) {
   const [center, setCenter] = useState<LatLngTuple | undefined>(undefined);
   const map = useMap();
   useMapCrosshairsCursor(map);
@@ -17,14 +21,12 @@ export function CircleLayer({ radius }: Readonly<CircleLayerProps>) {
     click: (ev: LeafletMouseEvent) => {
       const newCenter: LatLngTuple = [ev.latlng.lat, ev.latlng.lng];
       setCenter(newCenter);
-      //dispatch(setPointFilterCenter(newCenter))
+      onCrossHairClick();
     },
   });
 
   const drawCircle = center && radius > 0;
-  console.log('drawCircle ', drawCircle);
-  console.log('center ', center);
-  console.log('radius ', radius);
+
   return (
     <>
       <CrosshairsTooltipMarker center={center}>

@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { LatLngBounds, LatLngTuple, Map } from 'leaflet';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
@@ -66,6 +66,21 @@ function MapView() {
   const [isLocationVisible, setLocationVisible] = useState(false);
   const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
   const [activeTool, setActiveTool] = useState<ActiveToolEnum | null>(null);
+  const [sites, setSites] = useState<Site[] | null>(null);
+  const clearSites = () => setSites([]);
+  console.log('sites', sites);
+  console.log('type of clearSites', typeof clearSites);
+  useEffect(() => {
+    if (data?.mapSearch.data) {
+      setSites(data?.mapSearch.data);
+    }
+  }, [data?.mapSearch?.data]);
+
+  useEffect(() => {
+    if (activeTool === null) {
+      setSites(data?.mapSearch.data || []);
+    }
+  }, [activeTool]);
 
   return (
     <div
@@ -89,8 +104,12 @@ function MapView() {
           setLocationVisible={setLocationVisible}
         />
         {<MyLocationMarker isLocationVisible={isLocationVisible} />}
-        <SiteMarkers sites={data?.mapSearch.data || []} />
-        <RadiusSearchLayer activeTool={activeTool} radius={radius} />
+        <SiteMarkers sites={sites || []} />
+        <RadiusSearchLayer
+          activeTool={activeTool}
+          radius={radius}
+          onCrossHairClick={clearSites}
+        />
       </MapContainer>
       <MapSearch
         isLocationVisible={isLocationVisible}

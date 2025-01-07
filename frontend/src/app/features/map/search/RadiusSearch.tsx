@@ -8,7 +8,7 @@ import { formatDistance } from '../../../helpers/utility';
 import { useState } from 'react';
 import { Button } from '../../../components/button/Button';
 
-interface Props {
+interface RadiusSearchProps {
   radius: number;
   setRadius: React.Dispatch<React.SetStateAction<number>>;
   isSmall?: boolean;
@@ -22,17 +22,13 @@ export function RadiusSearch({
   isSmall = false,
   className,
   setActiveTool,
-}: Readonly<Props>) {
+}: Readonly<RadiusSearchProps>) {
   const [isVisible, setIsVisible] = useState(true);
 
   const onCancel = () => {
     setIsVisible(false);
     setActiveTool && setActiveTool(null);
     setRadius(MIN_CIRCLE_RADIUS);
-    console.log(
-      'nupur - RadiusSearch.tsx onCancel setRadius:',
-      MIN_CIRCLE_RADIUS,
-    );
   };
 
   const onRadiusChange = (_ev: any, value: number | number[]) => {
@@ -41,10 +37,6 @@ export function RadiusSearch({
       MIN_CIRCLE_RADIUS,
     );
     setRadius(newRadius);
-    console.log(
-      'nupur - RadiusSearch.tsx onRadiusChange newRadius:',
-      newRadius,
-    );
   };
 
   const sliderBox = (

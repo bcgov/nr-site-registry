@@ -23,7 +23,6 @@ export const MapSearchDrawer: FC<MapSearchDrawerProps> = ({
   let drawerTitle = '';
   if (searchTerm) drawerTitle = 'Search Results';
   if (selectedSiteId) drawerTitle = 'Selected Site';
-  console.log('nupur - mapref in MSDrawer: ' + mapRef);
   return (
     <Drawer
       isOpen={!!selectedSiteId || !!searchTerm}

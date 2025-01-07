@@ -92,31 +92,14 @@ describe('SiteResolver', () => {
       const searchParam = 'example';
       const page = 1;
       const pageSize = 1;
-      siteResolver.searchSites(searchParam, page, pageSize);
+      const filters = {};
+      siteResolver.searchSites(searchParam, page, pageSize, filters);
       expect(siteService.searchSites).toHaveBeenCalledWith(
         null,
         searchParam,
         page,
         pageSize,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
+        filters,
       );
     });
 
@@ -124,6 +107,7 @@ describe('SiteResolver', () => {
       const searchParam = '123';
       const page = 1;
       const pageSize = 1;
+      const filters = {};
       const expectedFilteredSites = new SearchSiteResponse();
       expectedFilteredSites.sites = [];
       expectedFilteredSites.sites.push(sampleSites[0]); // Only Site 1 matches the searchParam
@@ -139,6 +123,7 @@ describe('SiteResolver', () => {
         searchParam,
         page,
         pageSize,
+        filters,
       );
 
       expect(siteService.searchSites).toHaveBeenCalledWith(
@@ -146,25 +131,7 @@ describe('SiteResolver', () => {
         searchParam,
         page,
         pageSize,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
+        filters,
       );
       expect(result).toEqual(expectedFilteredSites);
     });
@@ -192,6 +159,7 @@ describe('SiteResolver', () => {
       const searchParam = 'example';
       const page = 1;
       const pageSize = 1;
+      const filters = {};
       const expectedFilteredSites = new SearchSiteResponse();
       expectedFilteredSites.sites = [];
       expectedFilteredSites.page = 1;
@@ -205,6 +173,7 @@ describe('SiteResolver', () => {
         searchParam,
         page,
         pageSize,
+        filters,
       );
 
       expect(siteService.searchSites).toHaveBeenCalledWith(
@@ -212,25 +181,7 @@ describe('SiteResolver', () => {
         searchParam,
         page,
         pageSize,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
+        filters,
       );
       expect(result).toEqual(expectedFilteredSites);
     });

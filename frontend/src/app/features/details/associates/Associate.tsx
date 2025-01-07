@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
 import { useDispatch, useSelector } from 'react-redux';
@@ -30,13 +30,6 @@ import {
 import { RequestStatus } from '../../../helpers/requests/status';
 import './Associate.css';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
-import Widget from '../../../components/widget/Widget';
-import Actions from '../../../components/action/Actions';
-import {
-  SpinnerIcon,
-  UserMinus,
-  UserPlus,
-} from '../../../components/common/icon';
 import { v4 } from 'uuid';
 import { useParams } from 'react-router-dom';
 import { GRAPHQL } from '../../../helpers/endpoints';
@@ -134,7 +127,8 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   }, [resetDetails, saveSiteDetailsRequestStatus]);
 
   const fetchSiteIds = useCallback(async (searchParam: string) => {
-    if (searchParam.trim()) {
+    const pattern = /^[0-9,\s]*$/;
+    if (searchParam.trim() && pattern.test(searchParam)) {
       try {
         // Check cache first
         if (resultCache[searchParam]) {
@@ -585,8 +579,8 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     const newAssoc = {
       id: v4(),
       siteId: id,
-      siteIdAssociatedWith: '',
-      effectiveDate: '',
+      siteIdAssociatedWith: null,
+      effectiveDate: null,
       note: '',
       apiAction: UserActionEnum.added,
       srAction: SRApprovalStatusEnum.Pending,

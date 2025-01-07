@@ -1,4 +1,4 @@
-import { Args, Int, Query, Resolver } from '@nestjs/graphql';
+import { Args, Field, InputType, Int, Query, Resolver } from '@nestjs/graphql';
 import { AuthenticatedUser, Unprotected } from 'nest-keycloak-connect';
 import {
   FetchSiteDetail,
@@ -11,6 +11,69 @@ import { DropdownDto } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { LoggerService } from '../../logger/logger.service';
 import { QueryResultForPendingSites } from '../../dto/sitesPendingReview.dto';
+
+@InputType()
+export class SiteFilters {
+  @Field({ nullable: true })
+  id?: string;
+
+  @Field({ nullable: true })
+  srStatus?: string;
+
+  @Field({ nullable: true })
+  siteRiskCode?: string;
+
+  @Field({ nullable: true })
+  commonName?: string;
+
+  @Field({ nullable: true })
+  addrLine_1?: string;
+
+  @Field({ nullable: true })
+  city?: string;
+
+  @Field({ nullable: true })
+  whoCreated?: string;
+
+  @Field({ nullable: true })
+  latlongReliabilityFlag?: string;
+
+  @Field({ nullable: true })
+  latdeg?: number;
+
+  @Field({ nullable: true })
+  latDegrees?: number;
+
+  @Field({ nullable: true })
+  latMinutes?: number;
+
+  @Field({ nullable: true })
+  latSeconds?: string;
+
+  @Field({ nullable: true })
+  longdeg?: number;
+
+  @Field({ nullable: true })
+  longDegrees?: number;
+
+  @Field({ nullable: true })
+  longMinutes?: number;
+
+  @Field({ nullable: true })
+  longSeconds?: string;
+
+  @Field(() => [Date, Date], { nullable: true })
+  whenCreated?: [Date, Date];
+
+  @Field(() => [Date, Date], { nullable: true })
+  whenUpdated?: [Date, Date];
+
+  @Field(() => [String], {
+    nullable: true,
+    description: 'If provided, only applies the filters to the specified sites',
+  })
+  siteIds?: string[];
+}
 
 /**
  * Resolver for Region
@@ -41,70 +104,17 @@ export class SitePublicResolver {
     @Args('searchParam', { type: () => String }) searchParam: string,
     @Args('page', { type: () => Int }) page: number,
     @Args('pageSize', { type: () => Int }) pageSize: number,
-    @Args('id', { type: () => String, nullable: true }) id?: string,
-    @Args('srStatus', { type: () => String, nullable: true }) srStatus?: string,
-    @Args('siteRiskCode', { type: () => String, nullable: true })
-    siteRiskCode?: string,
-    @Args('commonName', { type: () => String, nullable: true })
-    commonName?: string,
-    @Args('addrLine_1', { type: () => String, nullable: true })
-    addrLine_1?: string,
-    @Args('city', { type: () => String, nullable: true }) city?: string,
-    @Args('whoCreated', { type: () => String, nullable: true })
-    whoCreated?: string,
-    @Args('latlongReliabilityFlag', { type: () => String, nullable: true })
-    latlongReliabilityFlag?: string,
-    @Args('latdeg', { type: () => String, nullable: true }) latdeg?: number,
-    @Args('latDegrees', { type: () => String, nullable: true })
-    latDegrees?: number,
-    @Args('latMinutes', { type: () => String, nullable: true })
-    latMinutes?: number,
-    @Args('latSeconds', { type: () => String, nullable: true })
-    latSeconds?: string,
-    @Args('longdeg', { type: () => String, nullable: true }) longdeg?: number,
-    @Args('longDegrees', { type: () => String, nullable: true })
-    longDegrees?: number,
-    @Args('longMinutes', { type: () => String, nullable: true })
-    longMinutes?: number,
-    @Args('longSeconds', { type: () => String, nullable: true })
-    longSeconds?: string,
-    @Args('whenCreated', { type: () => String, nullable: true })
-    whenCreated?: Date,
-    @Args('whenUpdated', { type: () => String, nullable: true })
-    whenUpdated?: Date,
-    @Args('siteIds', {
-      type: () => [String],
-      nullable: true,
-      description:
-        'If provided, only applies the filters to the specified sites',
-    })
-    siteIds?: string[],
+    @Args('filters', { type: () => SiteFilters })
+    filters: SiteFilters,
   ) {
     this.sitesLogger.log('SiteResolver.searchSites() start ');
+
     return await this.siteService.searchSites(
       userInfo,
       searchParam,
       page,
       pageSize,
-      id,
-      srStatus,
-      siteRiskCode,
-      commonName,
-      addrLine_1,
-      city,
-      whoCreated,
-      latlongReliabilityFlag,
-      latdeg,
-      latDegrees,
-      latMinutes,
-      latSeconds,
-      longdeg,
-      longDegrees,
-      longMinutes,
-      longSeconds,
-      whenCreated,
-      whenUpdated,
-      siteIds,
+      filters,
     );
   }
 

@@ -77,15 +77,12 @@ export const fetchSites = createAsyncThunk(
       const { searchParam = '', filter = {} } = args;
       const state: any = getState();
       const response = await getAxiosInstance().post(GRAPHQL, {
-        query:
-          getUser() === null
-            ? print(graphQlSiteQuery(filter))
-            : print(graphQlSiteQuery(filter)),
+        query: print(graphQlSiteQuery()),
         variables: {
           searchParam: searchParam,
-          page: parseInt(state.sites.currentPage),
-          pageSize: parseInt(state.sites.pageSize),
-          ...filter,
+          page: state.sites.currentPage,
+          pageSize: state.sites.pageSize,
+          filters: filter,
         },
       });
       return response.data.data.searchSites;

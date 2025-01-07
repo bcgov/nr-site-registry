@@ -830,28 +830,10 @@ export type QuerySearchSiteIdsArgs = {
 
 
 export type QuerySearchSitesArgs = {
-  addrLine_1?: InputMaybe<Scalars['String']['input']>;
-  city?: InputMaybe<Scalars['String']['input']>;
-  commonName?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['String']['input']>;
-  latDegrees?: InputMaybe<Scalars['String']['input']>;
-  latMinutes?: InputMaybe<Scalars['String']['input']>;
-  latSeconds?: InputMaybe<Scalars['String']['input']>;
-  latdeg?: InputMaybe<Scalars['String']['input']>;
-  latlongReliabilityFlag?: InputMaybe<Scalars['String']['input']>;
-  longDegrees?: InputMaybe<Scalars['String']['input']>;
-  longMinutes?: InputMaybe<Scalars['String']['input']>;
-  longSeconds?: InputMaybe<Scalars['String']['input']>;
-  longdeg?: InputMaybe<Scalars['String']['input']>;
+  filters: SiteFilters;
   page: Scalars['Int']['input'];
   pageSize: Scalars['Int']['input'];
   searchParam: Scalars['String']['input'];
-  siteIds?: InputMaybe<Array<Scalars['String']['input']>>;
-  siteRiskCode?: InputMaybe<Scalars['String']['input']>;
-  srStatus?: InputMaybe<Scalars['String']['input']>;
-  whenCreated?: InputMaybe<Scalars['String']['input']>;
-  whenUpdated?: InputMaybe<Scalars['String']['input']>;
-  whoCreated?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type QueryResultForPendingSites = {
@@ -1025,6 +1007,29 @@ export type SiteDocs = {
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
   whoUpdated?: Maybe<Scalars['String']['output']>;
+};
+
+export type SiteFilters = {
+  addrLine_1?: InputMaybe<Scalars['String']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  commonName?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  latDegrees?: InputMaybe<Scalars['Float']['input']>;
+  latMinutes?: InputMaybe<Scalars['Float']['input']>;
+  latSeconds?: InputMaybe<Scalars['String']['input']>;
+  latdeg?: InputMaybe<Scalars['Float']['input']>;
+  latlongReliabilityFlag?: InputMaybe<Scalars['String']['input']>;
+  longDegrees?: InputMaybe<Scalars['Float']['input']>;
+  longMinutes?: InputMaybe<Scalars['Float']['input']>;
+  longSeconds?: InputMaybe<Scalars['String']['input']>;
+  longdeg?: InputMaybe<Scalars['Float']['input']>;
+  /** If provided, only applies the filters to the specified sites */
+  siteIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  siteRiskCode?: InputMaybe<Scalars['String']['input']>;
+  srStatus?: InputMaybe<Scalars['String']['input']>;
+  whenCreated?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  whenUpdated?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  whoCreated?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SiteParticRoles = {
@@ -1392,9 +1397,9 @@ export type MapSearch_FindSiteBySiteIdQueryVariables = Exact<{
 export type MapSearch_FindSiteBySiteIdQuery = { __typename?: 'Query', findSiteBySiteId: { __typename?: 'FetchSiteDetail', data?: { __typename?: 'Sites', id: string, addrLine_1: string, addrLine_2?: string | null, addrLine_3?: string | null, addrLine_4?: string | null, city: string, latdeg?: number | null, longdeg?: number | null, latDegrees?: number | null, latMinutes?: number | null, latSeconds?: number | null, longDegrees?: number | null, longMinutes?: number | null, longSeconds?: number | null, generalDescription?: string | null, siteRiskCode: string } | null } };
 
 export type MapSearch_FilterSearchResultsQueryVariables = Exact<{
-  siteIds?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
   page: Scalars['Int']['input'];
   pageSize: Scalars['Int']['input'];
+  filters: SiteFilters;
 }>;
 
 
@@ -1592,12 +1597,12 @@ export type MapSearch_FindSiteBySiteIdLazyQueryHookResult = ReturnType<typeof us
 export type MapSearch_FindSiteBySiteIdSuspenseQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdSuspenseQuery>;
 export type MapSearch_FindSiteBySiteIdQueryResult = Apollo.QueryResult<MapSearch_FindSiteBySiteIdQuery, MapSearch_FindSiteBySiteIdQueryVariables>;
 export const MapSearch_FilterSearchResultsDocument = gql`
-    query MapSearch_filterSearchResults($siteIds: [String!], $page: Int!, $pageSize: Int!) {
+    query MapSearch_filterSearchResults($page: Int!, $pageSize: Int!, $filters: SiteFilters!) {
   searchSites(
     searchParam: ""
     page: $page
     pageSize: $pageSize
-    siteIds: $siteIds
+    filters: $filters
   ) {
     sites {
       id
@@ -1642,9 +1647,9 @@ export const MapSearch_FilterSearchResultsDocument = gql`
  * @example
  * const { data, loading, error } = useMapSearch_FilterSearchResultsQuery({
  *   variables: {
- *      siteIds: // value for 'siteIds'
  *      page: // value for 'page'
  *      pageSize: // value for 'pageSize'
+ *      filters: // value for 'filters'
  *   },
  * });
  */

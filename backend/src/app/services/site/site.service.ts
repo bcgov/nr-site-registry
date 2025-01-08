@@ -35,11 +35,11 @@ import {
   SiteRecordsForSRAction,
 } from '../../dto/sitesPendingReview.dto';
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
-import { SiteFilters } from 'src/app/resolvers/site/sitePublic.resolver';
+import { SiteFilters } from '../../resolvers/site/sitePublic.resolver';
 import { SnapshotResponse } from '../../dto/snapshot.dto';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Snapshots } from '../../entities/snapshots.entity';
-import { UserTypeEum } from 'src/app/common/userType';
+import { UserTypeEum } from '../../common/userType';
 
 /**
  * Nestjs Service For Region Entity

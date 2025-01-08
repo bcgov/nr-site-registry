@@ -62,7 +62,7 @@ describe('LandHistoryResolver', () => {
 
   describe('getLandHistoriesForSite', () => {
     it('should return land histories when found', async () => {
-      const mockLandHistories = [{...new LandHistories(), srValue: 'true'}];
+      const mockLandHistories = [{ ...new LandHistories(), srValue: true }];
 
       const showPending = false;
 

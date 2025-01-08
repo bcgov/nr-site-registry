@@ -208,7 +208,7 @@ export const TextInput: React.FC<InputProps> = ({
 
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
-        onChange(inputValue); // Update parent component state only if validation passes
+        onChange(parseFloat(inputValue)); // Update parent component state only if validation passes
       }
     } else {
       onChange(inputValue);
@@ -498,7 +498,7 @@ export const GroupInput: React.FC<InputProps> = ({
     }
     if (child.allowNumbersOnly) {
       if (validateInput(inputValue, child)) {
-        child.onChange(inputValue); // Update parent component state only if validation passes
+        child.onChange(parseFloat(inputValue)); // Update parent component state only if validation passes
       }
     } else {
       child.onChange(inputValue);
@@ -689,6 +689,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
           value={value ?? []}
           onChange={(value) => handleDateRange(value)}
           editable={true}
+          menuStyle={{ zIndex: 1500 }}
         />
       ) : (
         <span
@@ -1274,25 +1275,24 @@ export const SearchCustomInput: React.FC<InputProps> = ({
     }
   }, [isOpen]);
 
-  // useEffect(() => {
-  //   if (resetDetails) {
-  //     setError(null);
-  //   }
-  // }, [resetDetails]);
-
   useEffect(() => {
     if (validation?.required) {
-      validateInput(value);
+      validateInput(value.trim());
     }
   }, []);
 
   const validateInput = (inputValue: any) => {
     if (validation) {
       if (inputValue === null || inputValue === undefined) {
+        setError(validation.customMessage || 'Invalid input');
         return false;
       }
       if (validation.pattern && !validation.pattern.test(inputValue)) {
         setError(validation.customMessage || 'Invalid input');
+        return false;
+      }
+      if (!inputValue.trim()) {
+        setError(validation?.customMessage || 'Invalid input');
         return false;
       }
     }
@@ -1302,11 +1302,12 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   };
 
   const handleTextInputChange = (value: any) => {
-    const inputValue = value;
-    if (validation?.required) {
-      validateInput(inputValue);
-    }
     setHasInfoMsg(null);
+    const inputValue = value;
+    let isValid = true;
+    if (validation?.required) {
+      isValid = validateInput(inputValue);
+    }
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
         if (inputValue.trim().toString() === '') {
@@ -1323,7 +1324,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
       }
     } else {
       setHasInfoMsg(null);
-      setIsOpen(true);
+      setIsOpen(isValid);
       onChange(inputValue);
     }
   };
@@ -1331,7 +1332,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   const handleSelectInputChange = (selectedValue: any) => {
     setHasInfoMsg(customInfoMessage);
     const { value } = selectedValue;
-    handleTextInputChange(value);
+    handleTextInputChange(value.trim());
   };
 
   const closeSearch = useCallback(() => {

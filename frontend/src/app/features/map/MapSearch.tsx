@@ -3,6 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import {
+  ActiveToolEnum,
   MAP_CONTROLS_RIGHT_LG,
   MAP_CONTROLS_RIGHT_SM,
   MAP_CONTROLS_RIGHT_XL,
@@ -18,6 +19,8 @@ import { HorizontalScroller } from './controls/HorizontalScroller';
 import { PolygonSearchButton } from './search/PolygonSearchButton';
 import { RadiusSearchButton } from './search/RadiusSearchButton';
 import { MapSearchQueryParamsContext } from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { RadiusSearch } from './search/RadiusSearch';
+import { PolygonSearch } from './search/PolygonSearch';
 
 const styles = {
   marginTop: {
@@ -90,6 +93,27 @@ export function MapSearch({
     setQuery({ search: searchValue }, 'replace');
   };
 
+  const [activeTool, setActiveTool] = useState<ActiveToolEnum | null>(null);
+  const isPolygonTool = activeTool === ActiveToolEnum.polygonSearch;
+  const isRadiusTool = activeTool === ActiveToolEnum.radiusSearch;
+
+  const handlePolygonToolClick = () => {
+    setActiveTool((prevTool) =>
+      prevTool === ActiveToolEnum.polygonSearch
+        ? null
+        : ActiveToolEnum.polygonSearch,
+    );
+  };
+
+  const handleRadiusToolClick = () => {
+    console.log('Radius tool clicked');
+    setActiveTool((prevTool) =>
+      prevTool === ActiveToolEnum.radiusSearch
+        ? null
+        : ActiveToolEnum.radiusSearch,
+    );
+  };
+
   return (
     <Box component="div" sx={styles} className="map-search">
       <HorizontalScroller
@@ -126,9 +150,26 @@ export function MapSearch({
         ) : (
           <TextSearchButton />
         )}
-        <PolygonSearchButton />
-        <RadiusSearchButton />
+        <PolygonSearchButton
+          isActive={isPolygonTool}
+          onClick={handlePolygonToolClick}
+        />
+        <RadiusSearchButton
+          isActive={isRadiusTool}
+          onClick={handleRadiusToolClick}
+        />
       </HorizontalScroller>
+      {isLarge && (isPolygonTool || isRadiusTool) && (
+        <div className="map-search-tool-row">
+          <div className="map-search-tool-box">
+            {isPolygonTool ? (
+              <PolygonSearch />
+            ) : (
+              <RadiusSearch setActiveTool={setActiveTool} />
+            )}
+          </div>
+        </div>
+      )}
     </Box>
   );
 }

@@ -544,7 +544,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
               ...document,
               [graphQLPropertyName]: isPsnorgId ? value.key : value,
               displayName: isPsnorgId ? value.value : document.displayName,
-              organization: isPsnorgId ? value?.metaData : '',
+              organizationName: isPsnorgId ? value?.metaData : '',
               apiAction: document?.apiAction ?? UserActionEnum.updated,
               srAction: SRApprovalStatusEnum.Pending,
             };

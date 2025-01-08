@@ -1,10 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RequestStatus } from '../../helpers/requests/status';
 
-import {
-  deepFilterByUserAction,
-  getAxiosInstance,
-} from '../../helpers/utility';
+import { getAxiosInstance } from '../../helpers/utility';
 import { GRAPHQL } from '../../helpers/endpoints';
 
 import { print } from 'graphql';
@@ -146,47 +143,13 @@ const siteDetailsSlice = createSlice({
 
 export const getSiteDetailsToBeSaved = (state: any) => {
   return {
-    events:
-      state.siteDetails.notationData &&
-      state.siteDetails.notationData.length > 0 &&
-      deepFilterByUserAction(state.siteDetails.notationData, [
-        UserActionEnum.added,
-        UserActionEnum.updated,
-        UserActionEnum.deleted,
-      ]),
-    siteParticipants:
-      state.siteDetails.siteParticipantData &&
-      state.siteDetails.siteParticipantData.length > 0 &&
-      deepFilterByUserAction(state.siteDetails.siteParticipantData, [
-        UserActionEnum.added,
-        UserActionEnum.updated,
-        UserActionEnum.deleted,
-      ]),
-    documents:
-      state.siteDetails.documentsData &&
-      state.siteDetails.documentsData.length > 0 &&
-      deepFilterByUserAction(state.siteDetails.documentsData, [
-        UserActionEnum.added,
-        UserActionEnum.updated,
-        UserActionEnum.deleted,
-      ]),
-    siteAssociations:
-      state.siteDetails.siteAssociationsData &&
-      state.siteDetails.siteAssociationsData.length > 0 &&
-      deepFilterByUserAction(state.siteDetails.siteAssociationsData, [
-        UserActionEnum.added,
-        UserActionEnum.updated,
-        UserActionEnum.deleted,
-      ]),
+    events: state.siteDetails?.notationData,
+    siteParticipants: state.siteDetails?.siteParticipantData,
+    documents: state.siteDetails?.documentsData,
+    siteAssociations: state.siteDetails?.siteAssociationsData,
     subDivisions: state.siteDetails.subDivisions,
     landHistories: state.siteDetails.landHistoriesData,
-    profiles:
-      state.siteDetails.profilesData &&
-      deepFilterByUserAction(state.siteDetails.profilesData, [
-        UserActionEnum.added,
-        UserActionEnum.updated,
-        UserActionEnum.deleted,
-      ]),
+    profiles: state.siteDetails?.profilesData,
     siteId: state.siteDetails.siteId,
     sitesSummary: state.siteDetails.sitesSummary,
   };

@@ -24,6 +24,7 @@ const Widget: React.FC<IWidget> = ({
   handleCheckBoxChange,
   sortHandler,
   showPageOptions,
+  isRequired,
 }) => {
   let widgetSortHandler = sortHandler ?? (() => {});
   const [widgetData, setWidgetData] = useState(tableData);
@@ -45,37 +46,31 @@ const Widget: React.FC<IWidget> = ({
             />
           )}
           <div className="w-100 me-1">
-            <h4 className={`${customLabelCss ?? `widget-lbl`}`}>{title}</h4>
+            <h4
+              className={`${customLabelCss ?? `widget-lbl`} ${isRequired ? 'widget-required-field' : ''}`}
+            >
+              {title}
+            </h4>
           </div>
         </div>
       )}
       {children && <div>{children}</div>}
       {!hideTable && (
-        <div
-          className={`${widgetData && widgetData.length > 12 ? 'widget-table-container' : 'widget-table-conatiner-overflow '}`}
-        >
-          {/* <div> */}
-          <div className="me-1">
-            <Table
-              label={title ?? ''}
-              isLoading={tableIsLoading ?? RequestStatus.idle}
-              columns={tableColumns ?? []}
-              data={widgetData}
-              showPageOptions={showPageOptions}
-              allowRowsSelect={allowRowsSelect}
-              changeHandler={
-                changeHandler ??
-                ((event: any) => {
-                  console.log('not handled', changeHandler, event);
-                })
-              }
-              editMode={editMode ?? false}
-              srMode={srMode ?? false}
-              idColumnName={primaryKeycolumnName ?? ''}
-              sortHandler={widgetSortHandler}
-              currentPage={currentPage}
-            />
-          </div>
+        <div className="me-1">
+          <Table
+            label={title ?? ''}
+            isLoading={tableIsLoading ?? RequestStatus.idle}
+            columns={tableColumns ?? []}
+            data={widgetData}
+            showPageOptions={showPageOptions}
+            allowRowsSelect={allowRowsSelect}
+            changeHandler={changeHandler ?? (() => {})}
+            editMode={editMode ?? false}
+            srMode={srMode ?? false}
+            idColumnName={primaryKeycolumnName ?? ''}
+            sortHandler={widgetSortHandler}
+            currentPage={currentPage}
+          />
         </div>
       )}
     </div>

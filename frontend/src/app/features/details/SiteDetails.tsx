@@ -59,7 +59,7 @@ import {
   fetchNotationParticipants,
   notationParticipants,
 } from './notations/NotationSlice';
-import { fetchDocuments } from './documents/DocumentsSlice';
+import { documents, fetchDocuments } from './documents/DocumentsSlice';
 import {
   fetchSnapshots,
   snapshots,
@@ -114,6 +114,7 @@ import { GetNotationConfig } from './notations/NotationsConfig';
 import { disclosureStatementConfig } from './disclosure/DisclosureConfig';
 import GetConfig from './participants/ParticipantConfig';
 import { GetAssociateConfig } from './associates/AssociateConfig';
+import { GetDocumentsConfig } from './documents/DocumentsConfig';
 
 const SiteDetails = () => {
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
@@ -159,10 +160,12 @@ const SiteDetails = () => {
   const disclosure = useSelector(siteDisclosure);
   const sitePartics = useSelector(siteParticipants);
   const siteAssocs = useSelector(associatedSites);
+  const siteDocuments = useSelector(documents);
   const { notationFormRowEditMode, notationColumnInternal } =
     GetNotationConfig();
   const { participantColumnInternal } = GetConfig();
   const { associateColumnInternal } = GetAssociateConfig();
+  const { documentFormRows } = GetDocumentsConfig();
   const [userType, setUserType] = useState<UserType | null>(null);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
@@ -485,12 +488,14 @@ const SiteDetails = () => {
       // Run all validation functions in parallel using Promise.all
       const [
         notationErrors,
-        siteDisclosureErrors,
         siteParticErrors,
+        siteDocErrors,
         siteAssocErrors,
+        siteDisclosureErrors,
       ] = await Promise.all([
         validateNotationsForm(),
         validateSiteParticipantForm(),
+        validateSiteDocumentsForm(),
         validateAssociatedSitesForm(),
         validateSiteDisclosureForm(),
       ]);
@@ -499,6 +504,7 @@ const SiteDetails = () => {
       const errors = [
         ...notationErrors,
         ...siteParticErrors,
+        ...siteDocErrors,
         ...siteAssocErrors,
         ...siteDisclosureErrors,
       ];
@@ -508,6 +514,14 @@ const SiteDetails = () => {
     } catch (error) {
       return []; // Return empty array in case of error to avoid breaking further logic
     }
+  };
+
+  const validateSiteDocumentsForm = async () => {
+    return validateForm(
+      documentFormRows,
+      siteDocuments?.siteDocuments,
+      'Documents',
+    );
   };
 
   const validateAssociatedSitesForm = async () => {

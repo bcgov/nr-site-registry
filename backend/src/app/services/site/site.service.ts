@@ -592,7 +592,7 @@ export class SiteService {
           const {
             displayName,
             psnorgId,
-            // dprCode,
+            organizationName,
             docParticId,
             apiAction,
             srAction,

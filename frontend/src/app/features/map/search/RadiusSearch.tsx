@@ -7,6 +7,7 @@ import DropdownButton from '../DropDownButton';
 import { formatDistance } from '../../../helpers/utility';
 import { useState } from 'react';
 import { Button } from '../../../components/button/Button';
+import { Site } from '../MapView';
 
 interface RadiusSearchProps {
   radius: number;

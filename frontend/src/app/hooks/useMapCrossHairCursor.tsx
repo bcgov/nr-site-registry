@@ -4,8 +4,7 @@ import L from 'leaflet';
 export function useMapCrosshairsCursor(map: L.Map, enabled = true) {
   // Show crosshairs cursor
   useEffect(() => {
-    // @ts-ignore
-    const container = map._container;
+    const container = map.getContainer();
     if (container) {
       if (enabled) {
         L.DomUtil.addClass(container, 'crosshairs-cursor');

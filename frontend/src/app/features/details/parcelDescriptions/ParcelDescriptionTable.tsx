@@ -2,6 +2,7 @@ import React from 'react';
 import Table from '../../../components/table/Table';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { TableColumn } from '../../../components/table/TableColumn';
+import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 
 interface IParcelDescriptionTable {
   requestStatus: RequestStatus;
@@ -14,6 +15,7 @@ interface IParcelDescriptionTable {
   resultsPerPage: number | undefined;
   handleTableSortChange: (column: TableColumn, descending: boolean) => void;
   showPageOptions: boolean;
+  viewMode: SiteDetailsMode;
   tableChangeHandler: (event: any) => void;
 }
 
@@ -28,6 +30,7 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
   resultsPerPage,
   handleTableSortChange,
   showPageOptions,
+  viewMode,
   tableChangeHandler,
 }) => {
   return (
@@ -42,9 +45,9 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
       changeResultsPerPage={handleChangeResultsPerPage}
       currentPage={currentPage}
       resultsPerPage={resultsPerPage}
-      allowRowsSelect={false}
+      allowRowsSelect={viewMode == SiteDetailsMode.EditMode}
       changeHandler={tableChangeHandler}
-      editMode={false}
+      editMode={viewMode === SiteDetailsMode.EditMode}
       idColumnName="id"
       sortHandler={handleTableSortChange}
     ></Table>

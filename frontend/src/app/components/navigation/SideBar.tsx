@@ -52,7 +52,7 @@ function SideBar() {
     const isCurrentPath = location.pathname === item.linkTo;
     const hasIcon = item.icon;
     const isCartLink = item.linkTo.includes('cart');
-    const displayCount = userCartItems.length > 0 ? userCartItems.length : '';
+    const displayCount = userCartItems.length > 0 ? userCartItems.length : '0';
 
     const linkContent = isCartLink ? displayCount : item.displayText;
     const isParentGroup: boolean = item.displayText && !item.icon;

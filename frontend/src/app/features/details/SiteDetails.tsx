@@ -37,6 +37,7 @@ import {
   formatDateWithNoTimzoneName,
   getUser,
   isUserOfType,
+  removeProperty,
   showNotification,
   UserRoleType,
   validateForm,
@@ -62,7 +63,6 @@ import {
   fetchNotationParticipantRoleCd,
   fetchNotationTypeCd,
   fetchParticipantRoleCd,
-  fetchPeopleOrgsCd,
 } from './dropdowns/DropdownSlice';
 import BannerDetails from '../../components/banners/BannerDetails';
 import {
@@ -156,11 +156,7 @@ const SiteDetails = () => {
   const sitePartics = useSelector(getSiteParticipants);
   const siteAssocs = useSelector(getSiteAssociated);
   const siteDocuments = useSelector(getSiteDocuments);
-  const userActions = [
-    UserActionEnum.added,
-    UserActionEnum.updated,
-    UserActionEnum.deleted,
-  ];
+  const userActions = [UserActionEnum.added, UserActionEnum.updated];
   const { notationFormRowEditMode, notationColumnInternal } =
     GetNotationConfig();
   const { participantColumnInternal } = GetConfig();
@@ -518,7 +514,7 @@ const SiteDetails = () => {
   const validateSiteDocumentsForm = async () => {
     try {
       if (siteDocuments?.length > 0) {
-        const updatedSiteDocs = deepFilterByUserAction(
+        let updatedSiteDocs = deepFilterByUserAction(
           siteDocuments,
           userActions,
         );
@@ -530,6 +526,7 @@ const SiteDetails = () => {
         if (errors?.length > 0) {
           return errors;
         } else {
+          updatedSiteDocs = removeProperty(updatedSiteDocs, 'position');
           dispatch(setupDocumentsDataForSaving(updatedSiteDocs));
           return [];
         }
@@ -553,10 +550,7 @@ const SiteDetails = () => {
                 displayType !== undefined,
             ),
         ];
-        const updatedSiteAssocs = deepFilterByUserAction(
-          siteAssocs,
-          userActions,
-        );
+        let updatedSiteAssocs = deepFilterByUserAction(siteAssocs, userActions);
         const errors = validateForm(
           associatedSiteTable,
           updatedSiteAssocs,
@@ -565,6 +559,7 @@ const SiteDetails = () => {
         if (errors?.length > 0) {
           return errors;
         } else {
+          updatedSiteAssocs = removeProperty(updatedSiteAssocs, 'position');
           dispatch(setupSiteAssociationDataForSaving(updatedSiteAssocs));
           return [];
         }
@@ -588,7 +583,7 @@ const SiteDetails = () => {
                 displayType !== undefined,
             ),
         ];
-        const updatedSitePartics = deepFilterByUserAction(
+        let updatedSitePartics = deepFilterByUserAction(
           sitePartics,
           userActions,
         );
@@ -600,6 +595,7 @@ const SiteDetails = () => {
         if (errors?.length > 0) {
           return errors;
         } else {
+          updatedSitePartics = removeProperty(updatedSitePartics, 'position');
           dispatch(setupSiteParticipantDataForSaving(updatedSitePartics));
           return [];
         }
@@ -620,7 +616,7 @@ const SiteDetails = () => {
         Object.keys(disclosure).length > 0
       ) {
         const siteDisclosureErrors: any[] = [];
-        const updatedSiteDisclosure = deepFilterByUserAction(
+        let updatedSiteDisclosure = deepFilterByUserAction(
           disclosure,
           userActions,
         );
@@ -648,6 +644,10 @@ const SiteDetails = () => {
         if (siteDisclosureErrors?.length > 0) {
           return siteDisclosureErrors;
         } else {
+          updatedSiteDisclosure = removeProperty(
+            updatedSiteDisclosure,
+            'position',
+          );
           dispatch(setupSiteDisclosureDataForSaving(updatedSiteDisclosure));
           return [];
         }
@@ -664,7 +664,7 @@ const SiteDetails = () => {
     try {
       // Run both validations in parallel and wait for them to finish
       if (siteNotation?.length > 0) {
-        const updatedSiteNotations = deepFilterByUserAction(
+        let updatedSiteNotations = deepFilterByUserAction(
           siteNotation,
           userActions,
         );
@@ -680,6 +680,10 @@ const SiteDetails = () => {
         if (siteNotationErrors.length > 0) {
           return siteNotationErrors;
         } else {
+          updatedSiteNotations = removeProperty(
+            updatedSiteNotations,
+            'position',
+          );
           dispatch(setupNotationDataForSaving(updatedSiteNotations));
           return [];
         }
@@ -732,14 +736,14 @@ const SiteDetails = () => {
             const errors = validateForm(
               notationParticipantTable,
               notationParticipant,
-              `Notation [${index + 1}] Notation Participant [${participantIndex + 1}]`,
+              `Notation [${notation?.position + 1}] Notation Participant [${notationParticipant?.position + 1}]`,
             );
             notationParticipantErrors.push(...errors);
           }
         } else {
           notationParticipantErrors.push({
             label: 'Notation Participants',
-            errorMessage: `Notation [${index + 1}] Atleast one  Notation Participant is required.`,
+            errorMessage: `Notation [${notation?.position + 1}] Atleast one  Notation Participant is required.`,
           });
         }
       }

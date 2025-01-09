@@ -16,18 +16,55 @@ import {
   updateSortByDir,
   updateSortByInputValue,
 } from './parcelDescriptionsSlice';
-import { columns } from './parcelDescriptionsConfig';
+import {
+  getParcelDescriptionsTableColumns,
+  ParcelDescriptionType,
+} from './parcelDescriptionsConfig';
 import { useParams } from 'react-router-dom';
 import ParcelDescriptionTable from './ParcelDescriptionTable';
 import {
   IFetchParcelDescriptionsParams,
   IParcelDescriptionDto,
+  IParcelDescriptionSaveDto,
 } from './parcelDescriptionsInterfaces';
 import { RequestStatus } from '../../../helpers/requests/status';
+import {
+  resetSiteDetails,
+  siteDetailsMode,
+  trackChanges,
+} from '../../site/dto/SiteSlice';
+import {
+  ChangeTracker,
+  IChangeType,
+} from '../../../components/common/IChangeType';
+import {
+  saveRequestStatus,
+  setupParcelDescriptionsDataForSaving,
+} from '../SaveSiteDetailsSlice';
+import { UserActionEnum } from '../../../common/userActionEnum';
+import { SiteDetailsMode } from '../dto/SiteDetailsMode';
+import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
+
+type ParcelDescriptionsChangeEvent = {
+  property: 'descriptionType' | 'idPinNumber' | 'dateNoted';
+  value:
+    | string
+    | boolean
+    | Date
+    | null
+    | IParcelDescriptionDto[]
+    | ParcelDescriptionType;
+  row?: IParcelDescriptionDto;
+  selected?: boolean;
+};
 
 const ParcelDescriptions = () => {
   const dispatch = useDispatch<AppDispatch>();
   const reduxState = useSelector(parcelDescriptions);
+  const viewMode: SiteDetailsMode = useSelector(siteDetailsMode);
+  const saveSiteDetailsRequestStatus: RequestStatus =
+    useSelector(saveRequestStatus);
+  const resetDetails = useSelector(resetSiteDetails);
 
   const { id } = useParams();
   const siteId = Number(id);
@@ -46,7 +83,7 @@ const ParcelDescriptions = () => {
     dispatch(fetchParcelDescriptions(fetchParams));
   }
 
-  const [data, setData] = React.useState<IParcelDescriptionDto[]>(
+  const [dbRows, setDbRows] = React.useState<IParcelDescriptionDto[]>(
     reduxState.data,
   );
   const [currentPage, setCurrentPage] = React.useState<number>(
@@ -70,6 +107,12 @@ const ParcelDescriptions = () => {
   }>(reduxState.sortByInputValue);
   const [requestStatus, setRequestStatus] = React.useState<RequestStatus>(
     reduxState.requestStatus,
+  );
+  const [updatedRows, setUpdatedRows] = React.useState<
+    IParcelDescriptionSaveDto[]
+  >([]);
+  const [mergedRows, setMergedRows] = React.useState<IParcelDescriptionDto[]>(
+    [],
   );
 
   const handleSelectPage = (newPage: number) => {
@@ -101,10 +144,6 @@ const ParcelDescriptions = () => {
         newSearchParam: '',
       });
     }
-  };
-
-  const tableChangeHandler = () => {
-    // To Be Implemented As Part Of EDIT functionality
   };
 
   const handleSortInputChange = (
@@ -171,6 +210,106 @@ const ParcelDescriptions = () => {
     }
   };
 
+  const handleRowUpdate = (newRow: IParcelDescriptionDto) => {
+    let rowExistsInMemory = false;
+    const newUpdatedRows: IParcelDescriptionSaveDto[] = updatedRows.map(
+      (originalRow) => {
+        // Try to replace the existing row with the updated row.
+        if (newRow.id === originalRow.id) {
+          rowExistsInMemory = true;
+          return {
+            ...newRow,
+            apiAction: UserActionEnum.updated,
+            srAction: SRApprovalStatusEnum.Pending,
+          } as IParcelDescriptionSaveDto;
+        } else {
+          return originalRow;
+        }
+      },
+    );
+    if (!rowExistsInMemory) {
+      // Add the newly edited row to the array of edited rows.
+      newUpdatedRows.push({
+        ...newRow,
+        apiAction: UserActionEnum.updated,
+      } as IParcelDescriptionSaveDto);
+    }
+
+    setUpdatedRows(newUpdatedRows);
+    dispatch(
+      trackChanges(
+        new ChangeTracker(
+          IChangeType.Modified,
+          `Parcel Descriptions: ${newRow.id}`,
+        ).toPlainObject(),
+      ),
+    );
+  };
+
+  const idPinNumberIsValid = (
+    newIdPinNumber: string,
+    descriptionType: ParcelDescriptionType,
+  ): boolean => {
+    switch (descriptionType) {
+      case ParcelDescriptionType.ParcelID:
+      case ParcelDescriptionType.CrownLandPIN:
+        return newIdPinNumber.length <= 9;
+      case ParcelDescriptionType.CrownLandFileNumber:
+        return newIdPinNumber.length <= 7;
+    }
+  };
+
+  const handleTableChange = (event: ParcelDescriptionsChangeEvent) => {
+    if (event.row !== undefined) {
+      let newRow: IParcelDescriptionDto;
+      switch (event.property) {
+        case 'descriptionType':
+          // There is an edge case where the user enters a 9 digit idPinNumber
+          // then changes the description type to Crown Land File Number, which
+          // only allows an input length of 7. Truncate the value.
+          const value = event.value as ParcelDescriptionType;
+          if (value === ParcelDescriptionType.CrownLandFileNumber) {
+            event.row.idPinNumber = event.row.idPinNumber.slice(0, 7);
+          }
+          newRow = {
+            ...event.row,
+            descriptionType: value,
+          };
+          handleRowUpdate(newRow);
+          break;
+        case 'idPinNumber':
+          if (
+            idPinNumberIsValid(
+              event.value as string,
+              event.row?.descriptionType as ParcelDescriptionType,
+            )
+          ) {
+            newRow = {
+              ...event.row,
+              idPinNumber: event.value as string,
+            };
+            handleRowUpdate(newRow);
+          }
+          break;
+        case 'dateNoted':
+          let newDateString: string;
+          if (event.value === null) {
+            // This happens when clearing the date widget.
+            newDateString = '';
+          } else {
+            const newDate = event.value as Date;
+            newDateString = newDate.toISOString();
+          }
+          newRow = {
+            ...event.row,
+            dateNoted: newDateString,
+          };
+          handleRowUpdate(newRow);
+          break;
+      }
+    }
+  };
+
   const fetchNewParcelDescriptions = ({
     newPage,
     newPageSize,
@@ -197,8 +336,38 @@ const ParcelDescriptions = () => {
   };
 
   React.useEffect(() => {
+    dispatch(setupParcelDescriptionsDataForSaving([...updatedRows]));
+  }, [updatedRows]);
+
+  React.useEffect(() => {
+    if (viewMode == SiteDetailsMode.EditMode) {
+      // Merge rows from DB with user edited rows upon the update of either.
+      const newMergedRows = dbRows.map((dbRow) => {
+        const match = updatedRows.find((updatedRow) => {
+          return updatedRow.id === dbRow.id;
+        });
+        if (match) {
+          return match as IParcelDescriptionDto;
+        } else {
+          return dbRow;
+        }
+      });
+      setMergedRows(newMergedRows);
+    } else {
+      setMergedRows(dbRows);
+    }
+  }, [dbRows, updatedRows, viewMode]);
+
+  React.useEffect(() => {
+    if (resetDetails) {
+      fetchNewParcelDescriptions({});
+      setUpdatedRows([]);
+    }
+  }, [resetDetails, saveSiteDetailsRequestStatus]);
+
+  React.useEffect(() => {
     // Update local state with redux state.
-    setData(reduxState.data);
+    setDbRows(reduxState.data);
     setCurrentPage(reduxState.currentPage);
     setRequestStatus(reduxState.requestStatus);
     setResultsPerPage(reduxState.resultsPerPage);
@@ -237,15 +406,16 @@ const ParcelDescriptions = () => {
         <ParcelDescriptionTable
           showPageOptions={true}
           requestStatus={requestStatus}
-          columns={columns}
-          data={data}
+          columns={getParcelDescriptionsTableColumns(viewMode)}
+          data={mergedRows}
           totalResults={totalResults}
           handleSelectPage={handleSelectPage}
           handleChangeResultsPerPage={handleChangeResultsPerPage}
           currentPage={currentPage}
           resultsPerPage={resultsPerPage}
           handleTableSortChange={handleTableSortChange}
-          tableChangeHandler={tableChangeHandler}
+          viewMode={viewMode}
+          tableChangeHandler={handleTableChange}
         />
       </div>
     </div>

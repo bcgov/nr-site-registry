@@ -32,6 +32,8 @@ export const graphQLParcelDescriptionBySiteId = () => {
           idPinNumber
           dateNoted
           landDescription
+          srAction
+          userAction
         }
       }
     }

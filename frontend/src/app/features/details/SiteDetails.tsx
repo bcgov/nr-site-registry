@@ -516,123 +516,146 @@ const SiteDetails = () => {
   };
 
   const validateSiteDocumentsForm = async () => {
-    if (siteDocuments?.length > 0) {
-      const updatedSiteDocs = deepFilterByUserAction(
-        siteDocuments,
-        userActions,
-      );
-      const errors = validateForm(
-        documentFormRows,
-        updatedSiteDocs,
-        'Documents',
-      );
-      if (errors?.length > 0) {
-        return errors;
+    try {
+      if (siteDocuments?.length > 0) {
+        const updatedSiteDocs = deepFilterByUserAction(
+          siteDocuments,
+          userActions,
+        );
+        const errors = validateForm(
+          documentFormRows,
+          updatedSiteDocs,
+          'Documents',
+        );
+        if (errors?.length > 0) {
+          return errors;
+        } else {
+          dispatch(setupDocumentsDataForSaving(updatedSiteDocs));
+          return [];
+        }
       } else {
-        dispatch(setupDocumentsDataForSaving(updatedSiteDocs));
         return [];
       }
-    } else {
+    } catch (error) {
+      console.error(error);
       return [];
     }
   };
 
   const validateAssociatedSitesForm = async () => {
-    if (siteAssocs?.length > 0) {
-      const associatedSiteTable: IFormField[][] = [
-        associateColumnInternal
-          .map((column) => column.displayType)
-          .filter(
-            (displayType): displayType is IFormField =>
-              displayType !== undefined,
-          ),
-      ];
-      const updatedSiteAssocs = deepFilterByUserAction(siteAssocs, userActions);
-      const errors = validateForm(
-        associatedSiteTable,
-        updatedSiteAssocs,
-        'Associated Sites',
-      );
-      if (errors?.length > 0) {
-        return errors;
+    try {
+      if (siteAssocs?.length > 0) {
+        const associatedSiteTable: IFormField[][] = [
+          associateColumnInternal
+            .map((column) => column.displayType)
+            .filter(
+              (displayType): displayType is IFormField =>
+                displayType !== undefined,
+            ),
+        ];
+        const updatedSiteAssocs = deepFilterByUserAction(
+          siteAssocs,
+          userActions,
+        );
+        const errors = validateForm(
+          associatedSiteTable,
+          updatedSiteAssocs,
+          'Associated Sites',
+        );
+        if (errors?.length > 0) {
+          return errors;
+        } else {
+          dispatch(setupSiteAssociationDataForSaving(updatedSiteAssocs));
+          return [];
+        }
       } else {
-        dispatch(setupSiteAssociationDataForSaving(updatedSiteAssocs));
         return [];
       }
-    } else {
+    } catch (error) {
+      console.error(error);
       return [];
     }
   };
 
   const validateSiteParticipantForm = async () => {
-    if (sitePartics?.length) {
-      const siteParticipantTable: IFormField[][] = [
-        participantColumnInternal
-          .map((column) => column.displayType)
-          .filter(
-            (displayType): displayType is IFormField =>
-              displayType !== undefined,
-          ),
-      ];
-      const updatedSitePartics = deepFilterByUserAction(
-        sitePartics,
-        userActions,
-      );
-      const errors = validateForm(
-        siteParticipantTable,
-        updatedSitePartics,
-        'Site Participant',
-      );
-      if (errors?.length > 0) {
-        return errors;
+    try {
+      if (sitePartics?.length) {
+        const siteParticipantTable: IFormField[][] = [
+          participantColumnInternal
+            .map((column) => column.displayType)
+            .filter(
+              (displayType): displayType is IFormField =>
+                displayType !== undefined,
+            ),
+        ];
+        const updatedSitePartics = deepFilterByUserAction(
+          sitePartics,
+          userActions,
+        );
+        const errors = validateForm(
+          siteParticipantTable,
+          updatedSitePartics,
+          'Site Participant',
+        );
+        if (errors?.length > 0) {
+          return errors;
+        } else {
+          dispatch(setupSiteParticipantDataForSaving(updatedSitePartics));
+          return [];
+        }
       } else {
-        dispatch(setupSiteParticipantDataForSaving(updatedSitePartics));
         return [];
       }
-    } else {
+    } catch (error) {
+      console.error(error);
       return [];
     }
   };
 
   const validateSiteDisclosureForm = async () => {
-    if (
-      disclosure &&
-      typeof disclosure === 'object' &&
-      Object.keys(disclosure).length > 0
-    ) {
-      const siteDisclosureErrors: any[] = [];
-      const updatedSiteDisclosure = deepFilterByUserAction(
-        disclosure,
-        userActions,
-      );
-      const errors = validateForm(
-        disclosureStatementConfig,
-        updatedSiteDisclosure,
-        'Site Disclosure',
-      );
-      if (errors?.length > 0) {
-        siteDisclosureErrors.push(...errors);
-      }
-      const { siteRegDateRecd, dateCompleted } = disclosure;
-      if (!!siteRegDateRecd && !!dateCompleted) {
-        if (
-          new Date(disclosure?.dateCompleted) <
-          new Date(disclosure?.siteRegDateRecd)
-        ) {
-          siteDisclosureErrors.push({
-            label: 'Site Disclosure',
-            errorMessage: `Site Disclosure Date Completed is always equal or greater than Date Received.`,
-          });
+    try {
+      if (
+        disclosure &&
+        typeof disclosure === 'object' &&
+        Object.keys(disclosure).length > 0
+      ) {
+        const siteDisclosureErrors: any[] = [];
+        const updatedSiteDisclosure = deepFilterByUserAction(
+          disclosure,
+          userActions,
+        );
+        const errors = validateForm(
+          disclosureStatementConfig,
+          updatedSiteDisclosure,
+          'Site Disclosure',
+        );
+        if (errors?.length > 0) {
+          siteDisclosureErrors.push(...errors);
         }
-      }
+        const { siteRegDateRecd, dateCompleted } = disclosure;
+        if (!!siteRegDateRecd && !!dateCompleted) {
+          if (
+            new Date(disclosure?.dateCompleted) <
+            new Date(disclosure?.siteRegDateRecd)
+          ) {
+            siteDisclosureErrors.push({
+              label: 'Site Disclosure',
+              errorMessage: `Site Disclosure Date Completed is always equal or greater than Date Received.`,
+            });
+          }
+        }
 
-      if (siteDisclosureErrors?.length > 0) {
-        return siteDisclosureErrors;
+        if (siteDisclosureErrors?.length > 0) {
+          return siteDisclosureErrors;
+        } else {
+          dispatch(setupSiteDisclosureDataForSaving(updatedSiteDisclosure));
+          return [];
+        }
       } else {
-        dispatch(setupSiteDisclosureDataForSaving(updatedSiteDisclosure));
         return [];
       }
-    } else {
+    } catch (error) {
+      console.error(error);
       return [];
     }
   };
@@ -664,57 +687,69 @@ const SiteDetails = () => {
         return [];
       }
     } catch (error) {
-      return []; // Return empty array in case of error to avoid breaking further logic
+      console.error(error);
+      return [];
     }
   };
 
   const validateNotations = async (updatedSiteNotations: any) => {
-    // Directly return the result of validateForm if it's not async
-    return validateForm(
-      notationFormRowEditMode,
-      updatedSiteNotations,
-      'Notation',
-    );
+    try {
+      // Directly return the result of validateForm if it's not async
+      return validateForm(
+        notationFormRowEditMode,
+        updatedSiteNotations,
+        'Notation',
+      );
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
   };
 
   const validateNotationParticipants = async (updatedSiteNotations: any) => {
-    const notationParticipantTable: IFormField[][] = [
-      notationColumnInternal
-        .map((column) => column.displayType)
-        .filter(
-          (displayType): displayType is IFormField => displayType !== undefined,
-        ),
-    ];
+    try {
+      const notationParticipantTable: IFormField[][] = [
+        notationColumnInternal
+          .map((column) => column.displayType)
+          .filter(
+            (displayType): displayType is IFormField =>
+              displayType !== undefined,
+          ),
+      ];
 
-    const notationParticipantErrors: any[] = [];
-    // Loop through siteNotation and their notationParticipants
-    for (const [index, notation] of updatedSiteNotations?.entries()) {
-      if (
-        notation?.notationParticipant &&
-        notation?.notationParticipant?.length > 0
-      ) {
-        for (const [
-          participantIndex,
-          notationParticipant,
-        ] of notation.notationParticipant.entries()) {
-          // Validate and accumulate errors for each notation participant
-          const errors = validateForm(
-            notationParticipantTable,
+      const notationParticipantErrors: any[] = [];
+      // Loop through siteNotation and their notationParticipants
+      for (const [index, notation] of updatedSiteNotations?.entries()) {
+        if (
+          notation?.notationParticipant &&
+          notation?.notationParticipant?.length > 0
+        ) {
+          for (const [
+            participantIndex,
             notationParticipant,
-            `Notation [${index + 1}] Notation Participant [${participantIndex + 1}]`,
-          );
-          notationParticipantErrors.push(...errors);
+          ] of notation.notationParticipant.entries()) {
+            // Validate and accumulate errors for each notation participant
+            const errors = validateForm(
+              notationParticipantTable,
+              notationParticipant,
+              `Notation [${index + 1}] Notation Participant [${participantIndex + 1}]`,
+            );
+            notationParticipantErrors.push(...errors);
+          }
+        } else {
+          notationParticipantErrors.push({
+            label: 'Notation Participants',
+            errorMessage: `Notation [${index + 1}] Atleast one  Notation Participant is required.`,
+          });
         }
-      } else {
-        notationParticipantErrors.push({
-          label: 'Notation Participants',
-          errorMessage: `Notation [${index + 1}] Atleast one  Notation Participant is required.`,
-        });
       }
-    }
 
-    // Return the accumulated errors
-    return notationParticipantErrors;
+      // Return the accumulated errors
+      return notationParticipantErrors;
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
   };
 
   const handleCancelButton = () => {

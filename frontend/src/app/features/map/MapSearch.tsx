@@ -22,6 +22,7 @@ import { RadiusSearchButton } from './search/RadiusSearchButton';
 import { MapSearchQueryParamsContext } from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
 import { RadiusSearch } from './search/RadiusSearch';
 import { PolygonSearch } from './search/PolygonSearch';
+import { Site } from './MapView';
 
 const styles = {
   marginTop: {
@@ -69,6 +70,8 @@ interface MapSearchProps {
   setRadius: React.Dispatch<React.SetStateAction<number>>;
   isLocationVisible: boolean;
   setLocationVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  sites: Site[];
+  setSites: React.Dispatch<React.SetStateAction<Site[]>> | null;
 }
 
 export function MapSearch({
@@ -78,6 +81,8 @@ export function MapSearch({
   setRadius,
   isLocationVisible,
   setLocationVisible,
+  sites,
+  setSites,
 }: MapSearchProps) {
   const { searchTerm, setQuery, clearQuery } = useContext(
     MapSearchQueryParamsContext,
@@ -183,6 +188,8 @@ export function MapSearch({
                 radius={radius}
                 setRadius={setRadius}
                 setActiveTool={setActiveTool}
+                sites={sites}
+                setSites={setSites}
               />
             )}
           </div>

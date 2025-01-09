@@ -16,6 +16,7 @@ export function RadiusSearchLayer({
   sites,
   setSites,
 }: Readonly<RadiusSearchLayerProps>) {
+  console.log('nupur - RadiusSearchLayerProps sites: ', sites);
   if (activeTool === ActiveToolEnum.radiusSearch) {
     return (
       <CircleLayer

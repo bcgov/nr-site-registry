@@ -16,6 +16,7 @@
     "axios": "^0.27.2",
     "bootstrap": "^5.2.2",
     "date-fns": "^2.29.3",
+    "geolib": "^3.3.4",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
     "keycloak-js": "^19.0.2",
@@ -43,7 +44,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "concurrently \"PORT=4000 react-scripts start\" \"graphql-codegen --watch\"",
+    "start": "concurrently \"react-scripts start\" \"graphql-codegen --watch\"",
     "build": "react-scripts build",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!@react-parcelmap-bc)/\"  ",
     "eject": "react-scripts eject",

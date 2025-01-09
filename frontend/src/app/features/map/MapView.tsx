@@ -103,6 +103,8 @@ function MapView() {
           activeTool={activeTool}
           radius={radius}
           onCrossHairClick={clearSites}
+          sites={sites}
+          setSites={setSites}
         />
       </MapContainer>
       <MapSearch
@@ -112,14 +114,16 @@ function MapView() {
         setActiveTool={setActiveTool}
         radius={radius}
         setRadius={setRadius}
-        sites={data?.mapSearch.data || []}
+        sites={sites}
         setSites={setSites}
       />
 
       <MapSearchDrawer
         mapRef={mapRef}
-        sites={data?.mapSearch.data || []}
+        sites={sites}
         sitesLoading={sitesLoading}
+        activeTool={activeTool}
+        radius={radius}
       />
     </div>
   );

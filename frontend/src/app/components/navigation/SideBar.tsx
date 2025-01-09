@@ -62,7 +62,7 @@ function SideBar() {
         aria-label={item.displayText}
         aria-roledescription="menu"
         role={isParentGroup ? 'group' : 'menuitem'}
-        className={`sideBar-NavItem ${isCurrentPath && hasIcon ? 'currentPath' : ''}`}
+        className={`sideBar-NavItem ${isCurrentPath && hasIcon ? 'currentPath' : ''} ${isParentGroup === false ? 'sideBar-menu-item-hover' : ''}`}
         key={item.id} // Use a unique key based on the item id
       >
         <div className="d-flex align-items-center">

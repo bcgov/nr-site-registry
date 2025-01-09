@@ -188,8 +188,6 @@ export function MapSearch({
                 radius={radius}
                 setRadius={setRadius}
                 setActiveTool={setActiveTool}
-                sites={sites}
-                setSites={setSites}
               />
             )}
           </div>

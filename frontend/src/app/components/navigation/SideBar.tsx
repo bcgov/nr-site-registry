@@ -105,7 +105,7 @@ function SideBar() {
         {navList
           .filter((item: any) => !item.lowerSection)
           .map((item: any, index: number) => (
-            <React.Fragment key={item.id}>
+            <div className="sidebar-menu-group" key={item.id}>
               {' '}
               {/* Use item.id for a unique key */}
               {renderMenuOption(item, index + 1)}
@@ -117,7 +117,7 @@ function SideBar() {
                     {renderMenuOption(child, index + 1)}
                   </React.Fragment>
                 ))}
-            </React.Fragment>
+            </div>
           ))}
       </div>
 
@@ -125,7 +125,7 @@ function SideBar() {
         {navList
           .filter((item: any) => item.lowerSection)
           .map((item: any, index: number) => (
-            <React.Fragment key={item.id}>
+            <div className="sidebar-menu-group" key={item.id}>
               {' '}
               {/* Use item.id for a unique key */}
               {renderMenuOption(item, index + 1)}
@@ -137,7 +137,7 @@ function SideBar() {
                     {renderMenuOption(child, index + 1)}
                   </React.Fragment>
                 ))}
-            </React.Fragment>
+            </div>
           ))}
       </div>
     </div>

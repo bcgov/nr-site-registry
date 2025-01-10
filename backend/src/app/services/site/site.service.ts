@@ -39,7 +39,7 @@ import { SiteFilters } from 'src/app/resolvers/site/sitePublic.resolver';
 import { SnapshotResponse } from '../../dto/snapshot.dto';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Snapshots } from '../../entities/snapshots.entity';
-import { Place } from 'src/app/entities/placeEntity';
+import { Place } from '../../entities/placeEntity';
 
 /**
  * Nestjs Service For Region Entity

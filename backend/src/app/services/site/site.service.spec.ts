@@ -29,6 +29,7 @@ import { ParcelDescriptionInputDTO } from 'src/app/dto/parcelDescriptionInput.dt
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SnapshotsService } from '../snapshot/snapshot.service';
+import { Place } from '../../entities/placeEntity';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -42,6 +43,7 @@ describe('SiteService', () => {
   let landHistoriesRepo: Repository<LandHistories>;
   let siteSubDivisionsRepo: Repository<SiteSubdivisions>;
   let siteProfilesRepo: Repository<SiteProfiles>;
+  let placersRepo: Repository<Place>;
   let entityManager: EntityManager;
   let historyLogRepository: Repository<HistoryLog>;
   let loggerService: LoggerService;
@@ -332,6 +334,10 @@ describe('SiteService', () => {
           },
         },
         {
+          provide: getRepositoryToken(Place),
+          useValue: {},
+        },
+        {
           provide: LoggerService,
           useValue: {
             log: jest.fn(),
@@ -378,6 +384,7 @@ describe('SiteService', () => {
     historyLogRepository = module.get<Repository<HistoryLog>>(
       getRepositoryToken(HistoryLog),
     );
+    placersRepo = module.get<Repository<Place>>(getRepositoryToken(Place));
     entityManager = module.get<EntityManager>(EntityManager);
     loggerService = module.get<LoggerService>(LoggerService);
     parcelDescriptionService = module.get<ParcelDescriptionsService>(

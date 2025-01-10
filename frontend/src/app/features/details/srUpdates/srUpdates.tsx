@@ -810,6 +810,7 @@ const SRUpdates = () => {
               handleChangeResultsPerPage={handleChange}
               currentPage={1}
               resultsPerPage={undefined}
+              viewMode={SiteDetailsMode.ViewOnlyMode}
               handleTableSortChange={handleChange}
             />
           </ApproveReject>

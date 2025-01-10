@@ -1,12 +1,20 @@
 import { RequestStatus } from '../../../helpers/requests/status';
+import { ParcelDescriptionType } from './parcelDescriptionsConfig';
 
 export interface IParcelDescriptionDto {
-  id: number;
-  descriptionType: string;
+  id: string;
+  descriptionType: ParcelDescriptionType;
   idPinNumber: string;
   dateNoted: string;
   landDescription: string;
+  srAction: string;
+  userAction: string;
 }
+
+export interface IParcelDescriptionSaveDto extends IParcelDescriptionDto {
+  apiAction: string;
+}
+
 export interface IParcelDescriptionResponseDto {
   page: number;
   pageSize: number;

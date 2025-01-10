@@ -1172,6 +1172,7 @@ describe('SiteService', () => {
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         limit: jest.fn().mockImplementation(() => mockQueryBuilder),
         orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        addOrderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
         getManyAndCount: jest.fn().mockReturnValue([]),
       };
 

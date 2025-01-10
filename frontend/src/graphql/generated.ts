@@ -603,7 +603,7 @@ export type ParcelDescriptionDto = {
   __typename?: 'ParcelDescriptionDto';
   dateNoted: Scalars['DateTime']['output'];
   descriptionType: Scalars['String']['output'];
-  id: Scalars['Float']['output'];
+  id: Scalars['String']['output'];
   idPinNumber: Scalars['String']['output'];
   landDescription: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
@@ -717,7 +717,8 @@ export type QueryFindSiteBySiteIdLoggedInUserArgs = {
 
 
 export type QueryFindSitesAndPlacesArgs = {
-  searchParam?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  searchParam: Scalars['String']['input'];
 };
 
 

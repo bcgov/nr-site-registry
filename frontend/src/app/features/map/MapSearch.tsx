@@ -22,7 +22,10 @@ import { RadiusSearchButton } from './search/RadiusSearchButton';
 import { MapSearchQueryParamsContext } from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
 import { RadiusSearch } from './search/RadiusSearch';
 import { PolygonSearch } from './search/PolygonSearch';
-import { useMapSearch_FindSitesAndPlacesQuery } from '../../../graphql/generated';
+import {
+  MapSearch_FindSitesAndPlacesQuery,
+  useMapSearch_FindSitesAndPlacesQuery,
+} from '../../../graphql/generated';
 import useDebouncedValue from '../../helpers/useDebouncedValue';
 import { getZoom, MAP_FLY_OPTIONS } from './mapOptions';
 import {
@@ -68,6 +71,32 @@ const componentProps = {
     ],
   },
 };
+
+function formatDataForAutocomplete(
+  data: MapSearch_FindSitesAndPlacesQuery | undefined,
+) {
+  if (!data) return [];
+  return [
+    ...data.findSitesAndPlaces.data.sites.map(
+      ({ id, commonName: label, latdeg, longdeg, __typename }) => ({
+        id,
+        label,
+        latdeg,
+        longdeg,
+        type: __typename,
+      }),
+    ),
+    ...data.findSitesAndPlaces.data.places.map(
+      ({ id, name: label, latdeg, longdeg, __typename }) => ({
+        id,
+        label,
+        latdeg,
+        longdeg,
+        type: __typename,
+      }),
+    ),
+  ];
+}
 
 interface MapSearchProps {
   mapRef: RefObject<Map | null>;
@@ -161,28 +190,7 @@ export function MapSearch({
     }
   };
 
-  const autocompleteOptions = data
-    ? [
-        ...data.findSitesAndPlaces.sites.map(
-          ({ id, commonName: label, latdeg, longdeg, __typename }) => ({
-            id,
-            label,
-            latdeg,
-            longdeg,
-            type: __typename,
-          }),
-        ),
-        ...data.findSitesAndPlaces.places.map(
-          ({ id, name: label, latdeg, longdeg, __typename }) => ({
-            id,
-            label,
-            latdeg,
-            longdeg,
-            type: __typename,
-          }),
-        ),
-      ]
-    : [];
+  const autocompleteOptions = formatDataForAutocomplete(data);
 
   return (
     <Box component="div" sx={styles} className="map-search">

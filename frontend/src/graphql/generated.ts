@@ -288,12 +288,21 @@ export type FetchSiteResponse = {
   timestamp?: Maybe<Scalars['String']['output']>;
 };
 
-export type FindSitesAndPlacesResponse = {
-  __typename?: 'FindSitesAndPlacesResponse';
+export type FindSitesAndPlaces = {
+  __typename?: 'FindSitesAndPlaces';
   httpStatusCode?: Maybe<Scalars['Int']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   places: Array<Place>;
   sites: Array<Sites>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
+export type FindSitesAndPlacesResponse = {
+  __typename?: 'FindSitesAndPlacesResponse';
+  data: FindSitesAndPlaces;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
   timestamp?: Maybe<Scalars['String']['output']>;
 };
@@ -1407,7 +1416,7 @@ export type MapSearch_FindSitesAndPlacesQueryVariables = Exact<{
 }>;
 
 
-export type MapSearch_FindSitesAndPlacesQuery = { __typename?: 'Query', findSitesAndPlaces: { __typename?: 'FindSitesAndPlacesResponse', sites: Array<{ __typename?: 'Sites', id: string, commonName: string, latdeg?: number | null, longdeg?: number | null }>, places: Array<{ __typename?: 'Place', id: string, name: string, latdeg: number, longdeg: number }> } };
+export type MapSearch_FindSitesAndPlacesQuery = { __typename?: 'Query', findSitesAndPlaces: { __typename?: 'FindSitesAndPlacesResponse', data: { __typename?: 'FindSitesAndPlaces', sites: Array<{ __typename?: 'Sites', id: string, commonName: string, latdeg?: number | null, longdeg?: number | null }>, places: Array<{ __typename?: 'Place', id: string, name: string, latdeg: number, longdeg: number }> } } };
 
 
 export const Folio_GetFolioItemsForUserDocument = gql`
@@ -1702,17 +1711,19 @@ export type MapSearch_AddCartItemMutationOptions = Apollo.BaseMutationOptions<Ma
 export const MapSearch_FindSitesAndPlacesDocument = gql`
     query MapSearch_findSitesAndPlaces($searchParam: String!) {
   findSitesAndPlaces(searchParam: $searchParam) {
-    sites {
-      id
-      commonName
-      latdeg
-      longdeg
-    }
-    places {
-      id
-      name
-      latdeg
-      longdeg
+    data {
+      sites {
+        id
+        commonName
+        latdeg
+        longdeg
+      }
+      places {
+        id
+        name
+        latdeg
+        longdeg
+      }
     }
   }
 }

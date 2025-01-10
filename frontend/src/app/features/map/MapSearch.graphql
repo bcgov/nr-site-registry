@@ -81,17 +81,19 @@ mutation MapSearch_addCartItem($siteId: String!) {
 
 query MapSearch_findSitesAndPlaces($searchParam: String!) {
   findSitesAndPlaces(searchParam: $searchParam) {
-    sites {
-      id
-      commonName
-      latdeg
-      longdeg
-    }
-    places {
-      id
-      name
-      latdeg
-      longdeg
+    data {
+      sites {
+        id
+        commonName
+        latdeg
+        longdeg
+      }
+      places {
+        id
+        name
+        latdeg
+        longdeg
+      }
     }
   }
 }

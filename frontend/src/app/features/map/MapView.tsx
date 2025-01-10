@@ -1,12 +1,10 @@
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { LatLngBounds, LatLngTuple, Map } from 'leaflet';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import clsx from 'clsx';
 
-//import { env } from '@/env'
-//import MapSearch from './MapSearch'
 import { MyLocationMarker } from './MyLocationMarker'; // Import the MyLocationMarker component
 
 import 'leaflet/dist/leaflet.css';
@@ -21,6 +19,8 @@ import {
   MapSearchQueryProvider,
 } from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
 import { MapSearchDrawer } from './siteDrawer/MapSearchDrawer';
+import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../constants/Constant';
+import { RadiusSearchLayer } from './layers/RadiusSearchLayer';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -44,6 +44,7 @@ function MapView() {
     },
     onCompleted: ({ mapSearch: { data } }) => {
       flyToSiteBounds(data);
+      setSites(data);
     },
   });
 
@@ -64,6 +65,16 @@ function MapView() {
 
   const mapRef = useRef<Map>(null);
   const [isLocationVisible, setLocationVisible] = useState(false);
+  const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
+  const [activeTool, setActiveTool] = useState<ActiveToolEnum | null>(null);
+  const [sites, setSites] = useState<Site[]>([]);
+  const clearSites = () => setSites([]);
+
+  useEffect(() => {
+    if (activeTool === null) {
+      setSites(data?.mapSearch.data || []);
+    }
+  }, [activeTool]);
 
   return (
     <div
@@ -87,11 +98,20 @@ function MapView() {
           setLocationVisible={setLocationVisible}
         />
         {<MyLocationMarker isLocationVisible={isLocationVisible} />}
-        <SiteMarkers sites={data?.mapSearch.data || []} />
+        <SiteMarkers sites={sites} />
+        <RadiusSearchLayer
+          activeTool={activeTool}
+          radius={radius}
+          onCrossHairClick={clearSites}
+        />
       </MapContainer>
       <MapSearch
         isLocationVisible={isLocationVisible}
         setLocationVisible={setLocationVisible}
+        activeTool={activeTool}
+        setActiveTool={setActiveTool}
+        radius={radius}
+        setRadius={setRadius}
       />
 
       <MapSearchDrawer

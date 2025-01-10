@@ -18,7 +18,7 @@ export interface SaveSiteDetails {
   notationData: any;
   siteParticipantData: any;
   siteAssociationsData: any;
-  subDivisionsData: any;
+  parcelDescriptionsData: any;
   landHistoriesData: any;
   documentsData: any;
   profilesData: any;

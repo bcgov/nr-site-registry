@@ -43,7 +43,7 @@ describe('SiteService', () => {
   let landHistoriesRepo: Repository<LandHistories>;
   let siteSubDivisionsRepo: Repository<SiteSubdivisions>;
   let siteProfilesRepo: Repository<SiteProfiles>;
-  let placersRepo: Repository<Place>;
+  let placesRepo: Repository<Place>;
   let entityManager: EntityManager;
   let historyLogRepository: Repository<HistoryLog>;
   let loggerService: LoggerService;
@@ -384,7 +384,7 @@ describe('SiteService', () => {
     historyLogRepository = module.get<Repository<HistoryLog>>(
       getRepositoryToken(HistoryLog),
     );
-    placersRepo = module.get<Repository<Place>>(getRepositoryToken(Place));
+    placesRepo = module.get<Repository<Place>>(getRepositoryToken(Place));
     entityManager = module.get<EntityManager>(EntityManager);
     loggerService = module.get<LoggerService>(LoggerService);
     parcelDescriptionService = module.get<ParcelDescriptionsService>(

@@ -11,7 +11,7 @@
     "@bcgov/design-tokens": "^2.0.1",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@mui/material": "^5.10.8",
+    "@mui/material": "6.3.0",
     "@reduxjs/toolkit": "^1.8.5",
     "axios": "^0.27.2",
     "bootstrap": "^5.2.2",
@@ -43,7 +43,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "concurrently \"PORT=4000 react-scripts start\" \"graphql-codegen --watch\"",
+    "start": "concurrently \"react-scripts start\" \"graphql-codegen --watch\"",
     "build": "react-scripts build",
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!@react-parcelmap-bc)/\"  ",
     "eject": "react-scripts eject",

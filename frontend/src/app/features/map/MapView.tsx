@@ -90,6 +90,7 @@ function MapView() {
         <SiteMarkers sites={data?.mapSearch.data || []} />
       </MapContainer>
       <MapSearch
+        mapRef={mapRef}
         isLocationVisible={isLocationVisible}
         setLocationVisible={setLocationVisible}
       />

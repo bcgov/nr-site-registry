@@ -1,0 +1,44 @@
+.autocomplete-item {
+  height: 66px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  padding: 8px 16px;
+}
+
+.autocomplete-item:hover {
+  background-color: var(--surface-color-brand-gray-20);
+}
+
+.autocomplete-icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  color: var(--typography-color-primary);
+}
+
+.autocomplete-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: flex-start;
+  gap: 4px;
+  overflow: hidden;
+}
+
+div.autocomplete-label {
+  font-size: 14px;
+  line-height: 21px;
+}
+
+div.autocomplete-value {
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 27px;
+  width: 100%;
+  overflow: hidden;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+}

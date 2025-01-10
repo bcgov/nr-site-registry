@@ -56,12 +56,15 @@ export const MapSearchDrawer: FC<MapSearchDrawerProps> = ({
           loading={sitesLoading}
         />
       )}
-      {activeTool === ActiveToolEnum.radiusSearch && radius > 500 && (
-        <SearchResultsDrawerContent
-          siteIds={sites.map((site) => site.id)}
-          loading={sitesLoading}
-        />
-      )}
+      {!searchTerm &&
+        !selectedSiteId &&
+        activeTool === ActiveToolEnum.radiusSearch &&
+        radius > 500 && (
+          <SearchResultsDrawerContent
+            siteIds={sites.map((site) => site.id)}
+            loading={sitesLoading}
+          />
+        )}
       {selectedSiteId && <SiteDetailsDrawerContent mapRef={mapRef} />}
     </Drawer>
   );

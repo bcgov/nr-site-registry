@@ -8,23 +8,27 @@ import { formatDistance } from '../../../helpers/utility';
 import { useState } from 'react';
 import { Button } from '../../../components/button/Button';
 
-interface Props {
+interface RadiusSearchProps {
+  radius: number;
+  setRadius: React.Dispatch<React.SetStateAction<number>>;
   isSmall?: boolean;
   className?: string;
   setActiveTool?: React.Dispatch<React.SetStateAction<ActiveToolEnum | null>>;
 }
 
 export function RadiusSearch({
+  radius = MIN_CIRCLE_RADIUS,
+  setRadius,
   isSmall = false,
   className,
   setActiveTool,
-}: Readonly<Props>) {
-  const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
-
+}: Readonly<RadiusSearchProps>) {
   const [isVisible, setIsVisible] = useState(true);
+
   const onCancel = () => {
     setIsVisible(false);
     setActiveTool && setActiveTool(null);
+    setRadius(MIN_CIRCLE_RADIUS);
   };
 
   const onRadiusChange = (_ev: any, value: number | number[]) => {

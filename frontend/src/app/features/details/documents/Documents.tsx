@@ -562,7 +562,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
       viewMode === SiteDetailsMode.SRMode &&
       (value === 'checked' || value === 'unchecked')
     ) {
-      console.log({ [graphQLPropertyName]: value, id });
       updatedDocuments = updateDocuments(
         id,
         formData,

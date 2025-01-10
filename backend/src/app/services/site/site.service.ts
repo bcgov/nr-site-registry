@@ -347,14 +347,22 @@ export class SiteService {
     }
 
     sitesQuery
-      .where('CAST(sites.id AS TEXT) LIKE :searchTerm', {
-        searchTerm: `%${searchTermClean}%`,
+      .where('CAST(sites.id AS TEXT) = :searchTermId', {
+        searchTermId: searchTermClean,
       })
-      .orWhere('LOWER(sites.common_name) LIKE LOWER(:searchTerm)', {
-        searchTerm: `%${searchTermClean}%`,
+      .orWhere('LOWER(sites.common_name) LIKE LOWER(:searchTermName)', {
+        searchTermName: `%${searchTermClean}%`,
       })
       .limit(limit)
-      .orderBy('sites.id', 'ASC');
+      // This makes sure that sites found by ID match appear first on the list, sites found by common_name match follow
+      .orderBy(
+        `CASE 
+          WHEN CAST(sites.id AS TEXT) LIKE :searchTermId THEN 0 
+          ELSE 1 
+        END`,
+        'ASC',
+      )
+      .addOrderBy('sites.id', 'ASC');
     placesQuery
       .where('LOWER(places.name) LIKE LOWER(:searchTerm)', {
         searchTerm: `%${searchTermClean}%`,

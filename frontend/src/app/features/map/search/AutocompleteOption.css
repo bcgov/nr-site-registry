@@ -12,9 +12,8 @@
 }
 
 .autocomplete-icon {
-  width: 24px;
+  width: 18px;
   height: 24px;
-  flex: 0 0 24px;
   color: var(--typography-color-primary);
 }
 

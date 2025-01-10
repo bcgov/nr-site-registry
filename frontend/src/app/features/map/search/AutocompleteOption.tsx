@@ -2,6 +2,9 @@ import { FC } from 'react';
 import clsx from 'clsx';
 import './AutocompleteOption.css';
 
+import memoIcon from './assets/memo.png';
+import markerIcon from './assets/marker.png';
+
 export interface AutocompleteOption {
   id: string;
   label: string;
@@ -28,7 +31,11 @@ export const AutocompleteItem: FC<AutocompleteItemProps> = ({
     );
   return (
     <li className={clsx('autocomplete-item', className)} {...rest}>
-      {/* TODO: place icon here */}
+      <img
+        src={type === 'Sites' ? memoIcon : markerIcon}
+        alt=""
+        className="autocomplete-icon"
+      />
       <div className="autocomplete-column">
         <div className="autocomplete-label">{optionTypeLabel}</div>
         <div className="autocomplete-value">{label}</div>

@@ -27,6 +27,7 @@ import {
   SRApproveRejectResponse,
 } from '../../dto/sitesPendingReview.dto';
 import {
+  FindSitesAndPlaces,
   FindSitesAndPlacesResponse,
   MapSearchResponse,
 } from '../../dto/mapSearch.dto';
@@ -48,7 +49,7 @@ export class SiteResolver {
     private readonly mapSearchGenericResponseProvider: GenericResponseProvider<
       Sites[]
     >,
-    private readonly sitesAndPlacesResponseProvider: GenericResponseProvider<FindSitesAndPlacesResponse>,
+    private readonly sitesAndPlacesResponseProvider: GenericResponseProvider<FindSitesAndPlaces>,
   ) {}
 
   /**
@@ -275,14 +276,12 @@ export class SiteResolver {
         limit,
       );
 
-      return data;
-      // TODO: this is not working right
-      // return this.sitesAndPlacesResponseProvider.createResponse(
-      //   'Successfully fetched sites and places for map autocomplete',
-      //   HttpStatus.OK,
-      //   true,
-      //   data
-      // );
+      return this.sitesAndPlacesResponseProvider.createResponse(
+        'Successfully fetched sites and places for map autocomplete',
+        HttpStatus.OK,
+        true,
+        data,
+      );
     } catch (e) {
       this.sitesLogger.log(
         `SiteResolver.findSitesAndPlaces() failed, ${JSON.stringify(e)}`,

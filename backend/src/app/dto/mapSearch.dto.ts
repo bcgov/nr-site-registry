@@ -10,10 +10,16 @@ export class MapSearchResponse extends ResponseDto {
 }
 
 @ObjectType()
-export class FindSitesAndPlacesResponse extends ResponseDto {
+export class FindSitesAndPlaces extends ResponseDto {
   @Field(() => [Sites])
   sites: Sites[];
 
   @Field(() => [Place])
   places: Place[];
+}
+
+@ObjectType()
+export class FindSitesAndPlacesResponse extends ResponseDto {
+  @Field(() => FindSitesAndPlaces)
+  data: FindSitesAndPlaces;
 }

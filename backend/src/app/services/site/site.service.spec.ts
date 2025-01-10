@@ -335,7 +335,9 @@ describe('SiteService', () => {
         },
         {
           provide: getRepositoryToken(Place),
-          useValue: {},
+          useValue: {
+            createQueryBuilder: jest.fn().mockReturnThis(),
+          },
         },
         {
           provide: LoggerService,
@@ -1160,6 +1162,59 @@ describe('SiteService', () => {
       expect(mockQueryBuilder.orWhere).toHaveBeenCalledWith(expect.anything(), {
         searchTerm: '%test%',
       });
+    });
+  });
+
+  describe('findSitesAndPlaces', () => {
+    it('should apply search term and limit if provided', async () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        limit: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      jest
+        .spyOn(placesRepo, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      await siteService.findSitesAndPlaces('test', 20);
+
+      expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalledTimes(2);
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(expect.anything(), {
+        searchTerm: '%test%',
+      });
+      expect(mockQueryBuilder.limit).toHaveBeenCalledWith(20);
+    });
+
+    it('should bypass DB calls if no search term provided', async () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        limit: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      jest
+        .spyOn(placesRepo, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      expect(await siteService.findSitesAndPlaces()).toMatchObject({
+        sites: [],
+        places: [],
+      });
+
+      expect(mockQueryBuilder.getManyAndCount).not.toHaveBeenCalled();
     });
   });
 });

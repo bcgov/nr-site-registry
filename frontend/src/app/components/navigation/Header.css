@@ -1,6 +1,6 @@
 header {
   /* background-color: #053662; */
-  border-bottom: 2px solid var(--surface-border-light);
+  border-bottom: 1px solid var(--surface-color-border-light);
   /* padding: 0 65px 0 65px; */
   padding: 10px var(--layout-padding-xlarge) 11px var(--layout-padding-xlarge) !important;
   color: var(--typography-color-link);

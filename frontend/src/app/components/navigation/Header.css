@@ -22,7 +22,7 @@ header h1 {
   margin: 5px 5px 0 18px;
   visibility: hidden;
   font-size: 24px;
-  border-left: 1px solid var(--surface-color-border-medium);
+  border-left: 1px solid var(--surface-color-border-light);
   padding-left: 24px;
 }
 

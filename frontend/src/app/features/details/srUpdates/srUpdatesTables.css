@@ -1,0 +1,21 @@
+.not-public-btn {
+  background-color: var(--support-surface-color-danger, #f4e1e2) !important;
+  border: 1px solid var(--support-border-color-danger, #ce3e39) !important;
+}
+
+.approve-btn {
+  background-color: var(--support-surface-color-success, #f6fff8) !important;
+  border: 1px solid var(--support-border-color-success, #42814a) !important;
+}
+
+.approve-reject-btn {
+  padding: var(--layout-padding-small) var(--layout-padding-medium)
+    var(--layout-padding-small) var(--layout-padding-medium);
+  gap: var(--layout-margin-small);
+  border-radius: var(--layout-border-radius-medium);
+  border: 1px 0px 0px 0px;
+  display: flex;
+  background-color: var(--surface-secondary-disabled);
+  border: 1px solid var(--surface-secondary-disabled);
+  align-items: center;
+}

@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux';
 import { fetchInternalUserNameForDropdown } from '../dropdowns/DropdownSlice';
 import SRUpdatesTableConfiguration from './srUpdatesTableConfiguration';
 import { Button } from '../../../components/button/Button';
+import './srUpdatesTableFilter.css';
 
 interface ISRUpdatesTableFilter {
   closeSection: () => void;
@@ -96,7 +97,7 @@ const SRUpdatesTableFilter: React.FC<ISRUpdatesTableFilter> = ({
             Reset Filters
           </Button>
         </div>
-        <div>
+        <div className="filter-action-buttons">
           <Button type="submit">Submit</Button>
           <Button
             variant="tertiary"

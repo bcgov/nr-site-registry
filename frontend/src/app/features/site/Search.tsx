@@ -267,7 +267,7 @@ const Search = () => {
             <div className="custom-text-search">
               {!noUserAction ? null : (
                 <div className="custom-text-search-start">
-                  <MagnifyingGlassIcon></MagnifyingGlassIcon>
+                  <MagnifyingGlassIcon className="customSearchIcon"></MagnifyingGlassIcon>
                 </div>
               )}
 

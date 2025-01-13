@@ -7,7 +7,7 @@ const Intro = () => {
     <div data-testid="intro" className="intro">
       <div className="intro-heading">
         <span className="gold-bar">&nbsp;</span>
-        <span className="text">Introducing the New Site Registry</span>
+        <span className="text">Introducing the new Site Registry</span>
       </div>
       <div className="row">
         <div className="col-12 col-sm-12 col-md-4 mt-3">

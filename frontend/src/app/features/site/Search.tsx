@@ -275,7 +275,7 @@ const Search = () => {
                 <input
                   tabIndex={13}
                   aria-label="Search input"
-                  placeholder="Search"
+                  placeholder="Search for site address or name"
                   onChange={handleTextChange}
                   value={searchText}
                   type="text"

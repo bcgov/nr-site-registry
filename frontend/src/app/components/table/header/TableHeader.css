@@ -15,8 +15,8 @@
   color: var(--typography-color-secondary);
   border-right: 1px solid #d8d8d8;
   border-left: 1px solid #d8d8d8;
-
   background: var(--surface-brand-gray-20) !important;
+  vertical-align: baseline;
 }
 
 .checkbox-column {

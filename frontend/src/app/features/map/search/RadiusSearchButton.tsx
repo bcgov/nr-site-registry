@@ -7,7 +7,10 @@ interface Props {
   onClick: () => void;
 }
 
-export function RadiusSearchButton({ isActive, onClick }: Readonly<Props>) {
+export function RadiusSearchButton({
+  isActive,
+  onClick,
+}: Readonly<Props>) {
   return (
     <Button
       variant="contained"

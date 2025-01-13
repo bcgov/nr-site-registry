@@ -7,6 +7,7 @@ import {
   MAP_CONTROLS_RIGHT_LG,
   MAP_CONTROLS_RIGHT_SM,
   MAP_CONTROLS_RIGHT_XL,
+  MIN_CIRCLE_RADIUS,
 } from '../../constants/Constant';
 
 import { TextSearchButton } from './search/TextSearchButton';
@@ -62,11 +63,19 @@ const componentProps = {
 };
 
 interface MapSearchProps {
+  activeTool?: ActiveToolEnum | null;
+  setActiveTool?: React.Dispatch<React.SetStateAction<ActiveToolEnum | null>>;
+  radius: number;
+  setRadius: React.Dispatch<React.SetStateAction<number>>;
   isLocationVisible: boolean;
   setLocationVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function MapSearch({
+  activeTool,
+  setActiveTool,
+  radius,
+  setRadius,
   isLocationVisible,
   setLocationVisible,
 }: MapSearchProps) {
@@ -93,25 +102,29 @@ export function MapSearch({
     setQuery({ search: searchValue }, 'replace');
   };
 
-  const [activeTool, setActiveTool] = useState<ActiveToolEnum | null>(null);
   const isPolygonTool = activeTool === ActiveToolEnum.polygonSearch;
   const isRadiusTool = activeTool === ActiveToolEnum.radiusSearch;
 
   const handlePolygonToolClick = () => {
-    setActiveTool((prevTool) =>
-      prevTool === ActiveToolEnum.polygonSearch
-        ? null
-        : ActiveToolEnum.polygonSearch,
-    );
+    if (setActiveTool) {
+      setActiveTool((prevTool) =>
+        prevTool === ActiveToolEnum.polygonSearch
+          ? null
+          : ActiveToolEnum.polygonSearch,
+      );
+    }
   };
 
   const handleRadiusToolClick = () => {
     console.log('Radius tool clicked');
-    setActiveTool((prevTool) =>
-      prevTool === ActiveToolEnum.radiusSearch
-        ? null
-        : ActiveToolEnum.radiusSearch,
-    );
+    if (setActiveTool) {
+      setActiveTool((prevTool) =>
+        prevTool === ActiveToolEnum.radiusSearch
+          ? null
+          : ActiveToolEnum.radiusSearch,
+      );
+      setRadius(MIN_CIRCLE_RADIUS);
+    }
   };
 
   return (
@@ -155,6 +168,7 @@ export function MapSearch({
           onClick={handlePolygonToolClick}
         />
         <RadiusSearchButton
+          //mapRef={mapRef}
           isActive={isRadiusTool}
           onClick={handleRadiusToolClick}
         />
@@ -165,7 +179,11 @@ export function MapSearch({
             {isPolygonTool ? (
               <PolygonSearch />
             ) : (
-              <RadiusSearch setActiveTool={setActiveTool} />
+              <RadiusSearch
+                radius={radius}
+                setRadius={setRadius}
+                setActiveTool={setActiveTool}
+              />
             )}
           </div>
         </div>

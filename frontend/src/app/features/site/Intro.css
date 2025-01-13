@@ -56,3 +56,15 @@
     var(--layout-padding-small);
   gap: var(--layout-margin-xlarge);
 }
+
+@media (max-width: 576px) {
+  .intro-section-parent {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .intro-section-parent {
+    flex-direction: column;
+  }
+}

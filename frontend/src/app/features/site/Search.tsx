@@ -260,7 +260,7 @@ const Search = () => {
 
   return (
     <PageContainer role="Search">
-      <div className="row search-container">
+      <div className="search-container">
         <h1 className="search-text-label">Search Site Registry</h1>
         <div className="">
           <div className="d-flex align-items-center">

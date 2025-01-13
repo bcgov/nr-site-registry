@@ -6,17 +6,19 @@
   border-radius: var(--layout-margin-xsmall) !important;
   border: 1px solid !important;
   border-color: var(--support-support-border-color-info) !important;
+  background: white;
 }
 
 .custom-text-search-start {
-  width: 5%;
-  justify-content: center;
+  width: 3%;
+  justify-content: flex-end;
   display: flex;
   color: grey;
 }
 
 .custom-text-search-middle {
-  width: 95%;
+  width: 97%;
+  padding-left: 2px;
 }
 
 @media (max-width: 576px) {
@@ -56,6 +58,11 @@
   letter-spacing: 0em !important;
   text-align: left !important;
   width: 100%;
+}
+
+input.textSearch::-webkit-input-placeholder {
+  font-size: 18px !important;
+  line-height: 32px;
 }
 
 .addBorder {
@@ -222,4 +229,11 @@ div.search-parent {
   text-align: left;
   color: var(--surface-primary-default);
   text-decoration: none;
+}
+
+.customSearchIcon {
+  vertical-align: middle;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 900;
 }

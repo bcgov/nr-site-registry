@@ -12,7 +12,7 @@ header {
 }
 
 .logo {
-  height: 41px;
+  height: 54px;
 }
 
 header h1 {
@@ -91,6 +91,12 @@ header .other {
     font-size: 24px;
     visibility: visible;
     display: flex;
+    padding-left: 12px;
+    margin: 0px;
+  }
+
+  .logo {
+    height: 44px;
   }
 }
 
@@ -164,4 +170,9 @@ header .other {
 .custom-toggler {
   border: 1px solid var(--surface-border-dark);
   border-radius: 0px;
+}
+
+.no-link-style {
+  text-decoration: none !important;
+  color: var(--typography-color-link);
 }

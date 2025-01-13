@@ -2,13 +2,14 @@ header {
   /* background-color: #053662; */
   border-bottom: 1px solid var(--surface-color-border-light);
   /* padding: 0 65px 0 65px; */
-  padding: 10px var(--layout-padding-xlarge) 11px var(--layout-padding-xlarge) !important;
+  padding: 0px var(--layout-padding-xlarge) 0px var(--layout-padding-xlarge) !important;
   color: var(--typography-color-link);
   display: flex;
   height: 65px;
   top: 0px;
   width: 100%;
   z-index: 99999 !important;
+  background-color: #ffffff;
 }
 
 .logo {

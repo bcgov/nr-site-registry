@@ -260,7 +260,7 @@ const Search = () => {
 
   return (
     <PageContainer role="Search">
-      <div className="row search-container">
+      <div className="search-container">
         <h1 className="search-text-label">Search Site Registry</h1>
         <div className="">
           <div className="d-flex align-items-center">
@@ -275,7 +275,7 @@ const Search = () => {
                 <input
                   tabIndex={13}
                   aria-label="Search input"
-                  placeholder="Search"
+                  placeholder="Search for site address or name"
                   onChange={handleTextChange}
                   value={searchText}
                   type="text"

@@ -175,5 +175,5 @@ header .other {
 
 .no-link-style {
   text-decoration: none !important;
-  color: var(--typography-color-link);
+  color: var(--typography-color-link) !important;
 }

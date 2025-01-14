@@ -1,4 +1,4 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   AuthenticatedUser,
   Resource,
@@ -27,7 +27,11 @@ import {
   SearchParams,
   SRApproveRejectResponse,
 } from '../../dto/sitesPendingReview.dto';
-import { MapSearchResponse } from '../../dto/mapSearch.dto';
+import {
+  FindSitesAndPlaces,
+  FindSitesAndPlacesResponse,
+  MapSearchResponse,
+} from '../../dto/mapSearch.dto';
 
 /**
  * Resolver for Region
@@ -46,6 +50,7 @@ export class SiteResolver {
     private readonly mapSearchGenericResponseProvider: GenericResponseProvider<
       Sites[]
     >,
+    private readonly sitesAndPlacesResponseProvider: GenericResponseProvider<FindSitesAndPlaces>,
   ) {}
 
   /**
@@ -246,6 +251,47 @@ export class SiteResolver {
         HttpStatus.INTERNAL_SERVER_ERROR,
         false,
         [],
+      );
+    }
+  }
+
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => FindSitesAndPlacesResponse, { name: 'findSitesAndPlaces' })
+  async findSitesAndPlaces(
+    @Args('searchParam', { type: () => String })
+    searchParam: string,
+    @Args('limit', { type: () => Int, nullable: true })
+    limit: number,
+  ) {
+    this.sitesLogger.log('SiteResolver.findSitesAndPlaces() start ');
+    try {
+      const data = await this.siteService.findSitesAndPlaces(
+        searchParam,
+        limit,
+      );
+
+      return this.sitesAndPlacesResponseProvider.createResponse(
+        'Successfully fetched sites and places for map autocomplete',
+        HttpStatus.OK,
+        true,
+        data,
+      );
+    } catch (e) {
+      this.sitesLogger.log(
+        `SiteResolver.findSitesAndPlaces() failed, ${JSON.stringify(e)}`,
+      );
+      return this.sitesAndPlacesResponseProvider.createResponse(
+        'Error fetching sites and places for map autocomplete',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        false,
+        { sites: [], places: [] },
       );
     }
   }

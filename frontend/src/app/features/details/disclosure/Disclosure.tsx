@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import {
@@ -23,9 +23,12 @@ import {
 } from '../../../components/common/IChangeType';
 import {
   flattenFormRows,
+  getAxiosInstance,
   getUser,
+  resultCache,
   serializeDate,
   sortArray,
+  updateFields,
 } from '../../../helpers/utility';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import {
@@ -45,6 +48,11 @@ import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';
 import { v4 } from 'uuid';
+import { GRAPHQL } from '../../../helpers/endpoints';
+import { print } from 'graphql';
+import { graphQLPeopleOrgsCd } from '../../site/graphql/Dropdowns';
+import infoIcon from '../../../images/info-icon.png';
+import { FormFieldType } from '../../../components/input-controls/IFormField';
 
 const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -82,55 +90,57 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Commenting the below method because I am not sure which dropdown type
   // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
 
-  //  const fetchInternalContact = useCallback(async (searchParam: string) => {
-  //   if (searchParam.trim()) {
-  //     try {
-  //       // Check cache first
-  //       if (resultCache[searchParam]) {
-  //         return resultCache[searchParam];
-  //       }
+  const fetchInternalContact = useCallback(async (searchParam: string) => {
+    if (searchParam.trim()) {
+      try {
+        // Check cache first
+        if (resultCache[searchParam]) {
+          return resultCache[searchParam];
+        }
 
-  //       const response = await getAxiosInstance().post(GRAPHQL, {
-  //         query: print(graphQLPeopleOrgsCd()),
-  //         variables: { searchParam,  entityType:'EMP' },
-  //       });
+        const response = await getAxiosInstance().post(GRAPHQL, {
+          query: print(graphQLPeopleOrgsCd()),
+          variables: { searchParam, entityType: 'EMP' },
+        });
 
-  //       // Store result in cache if successful
-  //       if (response?.data?.data?.getPeopleOrgsCd?.success) {
-  //         resultCache[searchParam] = response.data.data.getPeopleOrgsCd.data;
-  //         return response.data.data.getPeopleOrgsCd;
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching notation participant:', error);
-  //       return [];
-  //     }
-  //   }
-  //   return [];
-  // }, []);
+        // Store result in cache if successful
+        if (response?.data?.data?.getPeopleOrgsCd?.success) {
+          resultCache[searchParam] = response.data.data.getPeopleOrgsCd.data;
+          return response.data.data.getPeopleOrgsCd;
+        }
+      } catch (error) {
+        console.error('Error fetching notation participant:', error);
+        return [];
+      }
+    }
+    return [];
+  }, []);
 
   // Handle search action
   // Commenting the below method because I am not sure which dropdown type
   // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
 
-  // const handleSearch = useCallback(
-  //   (value: any) => {
-  //     setSearchInternalContact(value.trim());
-  //     setInternalRow((prev) =>
-  //       updateFields(prev, {
-  //         indexToUpdate: prev.findIndex((row) =>
-  //           row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-  //         ),
-  //         updates: {
-  //           isLoading: RequestStatus.loading,
-  //           filteredOptions: [],
-  //           handleSearch,
-  //           customInfoMessage: <></>,
-  //         },
-  //       }),
-  //     );
-  //   },
-  //   [options],
-  // );
+  const handleSearch = useCallback(
+    (value: any) => {
+      setSearchInternalContact(value.trim());
+      setInternalRow((prev) =>
+        updateFields(prev, {
+          indexToUpdate: prev.findIndex((row) =>
+            row.some(
+              (field) => field.graphQLPropertyName === 'siteRegParticId',
+            ),
+          ),
+          updates: {
+            isLoading: RequestStatus.loading,
+            filteredOptions: [],
+            handleSearch,
+            customInfoMessage: <></>,
+          },
+        }),
+      );
+    },
+    [options],
+  );
 
   // Handle user type based on username
 
@@ -153,50 +163,51 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Commenting the below method because I am not sure which dropdown type
   // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
 
-  // useEffect(() => {
-  //   if (searchInternalContact) {
-  //     const timeoutId = setTimeout(async () => {
-  //       const res = await fetchInternalContact(searchInternalContact);
-  //       const indexToUpdate = internalRow.findIndex((row) =>
-  //         row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-  //       );
-  //       const infoMsg = !res.success ? (
-  //         <div className="px-2">
-  //           <img
-  //             src={infoIcon}
-  //             alt="info"
-  //             aria-hidden="true"
-  //             role="img"
-  //             aria-label="User image"
-  //           />
-  //           <span
-  //             aria-label={'info-message'}
-  //             className="text-wrap px-2 custom-not-found"
-  //           >
-  //             No results found.
-  //           </span>
-  //         </div>
-  //       ) : (
-  //         <></>
-  //       );
+  useEffect(() => {
+    if (searchInternalContact) {
+      const timeoutId = setTimeout(async () => {
+        const res = await fetchInternalContact(searchInternalContact);
+        const indexToUpdate = internalRow.findIndex((row) =>
+          row.some((field) => field.graphQLPropertyName === 'siteRegParticId'),
+        );
+        const infoMsg = !res.success ? (
+          <div className="px-2">
+            <img
+              src={infoIcon}
+              alt="info"
+              aria-hidden="true"
+              role="img"
+              aria-label="User image"
+            />
+            <span
+              aria-label={'info-message'}
+              className="text-wrap px-2 custom-not-found"
+            >
+              No results found.
+            </span>
+          </div>
+        ) : (
+          <></>
+        );
 
-  //       setInternalRow((prev) =>
-  //         updateFields(prev, {
-  //           indexToUpdate,
-  //           updates: {
-  //             isLoading: RequestStatus.success,
-  //             options,
-  //             filteredOptions: res.data ?? resultCache[searchInternalContact] ?? [],
-  //             customInfoMessage: infoMsg,
-  //             handleSearch,
-  //           },
-  //         }),
-  //       );
-  //     }, 300);
+        setInternalRow((prev) =>
+          updateFields(prev, {
+            indexToUpdate,
+            updates: {
+              isLoading: RequestStatus.success,
+              options,
+              filteredOptions:
+                res.data ?? resultCache[searchInternalContact] ?? [],
+              customInfoMessage: infoMsg,
+              handleSearch,
+            },
+          }),
+        );
+      }, 300);
 
-  //     return () => clearTimeout(timeoutId);
-  //   }
-  // }, [searchInternalContact, options]);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchInternalContact, options]);
 
   // Update form data when notations change
 
@@ -205,31 +216,35 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       // Commenting the below method because I am not sure which dropdown type
       // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
 
-      // const uniquePsnOrgs: any = Array.from(
-      //   new Map(
-      //     [disclosureData].map((item: any) => [
-      //       item.psnorgId,
-      //       { key: item.psnorgId, value: item.displayName },
-      //     ]),
-      //   ).values(),
-      // );
-      // setOptions(uniquePsnOrgs);
-      // setInternalRow((prev) =>
-      //   updateFields(prev, {
-      //     indexToUpdate: prev.findIndex((row) =>
-      //       row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-      //     ),
-      //     updates: {
-      //       isLoading: RequestStatus.loading,
-      //       options: uniquePsnOrgs,
-      //       filteredOptions: [],
-      //       handleSearch,
-      //       customInfoMessage: <></>,
-      //     },
-      //   }),
-      // );
+      const uniquePsnOrgs: any = Array.from(
+        new Map(
+          [disclosureData].map((item: any) => [
+            item.siteRegParticId,
+            { key: item.siteRegParticId, value: item.displayName },
+          ]),
+        ).values(),
+      );
+      if (JSON.stringify(uniquePsnOrgs) !== JSON.stringify(options)) {
+        setOptions(uniquePsnOrgs);
+        setInternalRow((prev) =>
+          updateFields(prev, {
+            indexToUpdate: prev.findIndex((row) =>
+              row.some(
+                (field) => field.graphQLPropertyName === 'siteRegParticId',
+              ),
+            ),
+            updates: {
+              isLoading: RequestStatus.loading,
+              options: uniquePsnOrgs,
+              filteredOptions: [],
+              handleSearch,
+              customInfoMessage: <></>,
+            },
+          }),
+        );
 
-      setFormData(disclosureData);
+        setFormData(disclosureData);
+      }
     }
 
     // Commenting the below method because I am not sure which dropdown type
@@ -240,7 +255,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     //   setInternalRow((prev) =>
     //     updateFields(prev, {
     //       indexToUpdate: prev.findIndex((row) =>
-    //         row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+    //         row.some((field) => field.graphQLPropertyName === 'siteRegParticId'),
     //       ),
     //       updates: {
     //         isLoading: RequestStatus.loading,
@@ -257,10 +272,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
   // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
   useEffect(() => {
-    if (
-      resetDetails ||
-      saveSiteDetailsRequestStatus === RequestStatus.success
-    ) {
+    if (resetDetails) {
       dispatch(
         fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending }),
       );
@@ -270,15 +282,38 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const handleInputChange = (
     id: number,
     graphQLPropertyName: any,
-    value: String | [Date, Date],
+    value: any,
   ) => {
     if (viewMode === SiteDetailsMode.SRMode) {
       console.log({ [graphQLPropertyName]: value, id });
     } else {
       const updatedDisclosure = (disclosure: any) => {
+        const isPsnorgId =
+          typeof value === 'object' &&
+          value !== null &&
+          graphQLPropertyName === 'siteRegParticId';
+        if (isPsnorgId) {
+          setInternalRow((prev) =>
+            updateFields(prev, {
+              indexToUpdate: prev.findIndex((row) =>
+                row.some(
+                  (field) => field.graphQLPropertyName === 'siteRegParticId',
+                ),
+              ),
+              updates: {
+                isLoading: RequestStatus.loading,
+                options,
+                filteredOptions: [],
+                handleSearch,
+                customInfoMessage: <></>,
+              },
+            }),
+          );
+        }
         return {
           ...disclosure,
-          [graphQLPropertyName]: value,
+          [graphQLPropertyName]: isPsnorgId ? value.key : value,
+          displayName: isPsnorgId ? value.value : disclosure.displayName,
           id: disclosure.id ?? '',
           siteId: disclosure.siteId ?? siteId,
           apiAction:
@@ -546,6 +581,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   return (
     <>
       <DisclosureComponent
+        index={0}
         viewMode={viewMode}
         userType={userType}
         handleWidgetCheckBox={handleWidgetCheckBox}

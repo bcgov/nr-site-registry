@@ -819,6 +819,7 @@ const SRUpdates = () => {
       {disclosureData && (
         <ApproveReject name="Disclosure" link="?disclosure">
           <DisclosureComponent
+            index={0}
             viewMode={SiteDetailsMode.ViewOnlyMode}
             userType={UserType.Internal}
             handleWidgetCheckBox={handleChange}

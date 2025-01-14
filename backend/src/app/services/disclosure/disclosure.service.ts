@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { LoggerService } from '../../logger/logger.service';
 import { UserActionEnum } from '../../common/userActionEnum';
@@ -8,12 +8,16 @@ import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { plainToInstance } from 'class-transformer';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { UserTypeEum } from '../../common/userType';
+import { PeopleOrgs } from 'src/app/entities/peopleOrgs.entity';
+import { SiteProfilesDTO } from 'src/app/dto/disclosure.dto';
 
 @Injectable()
 export class DisclosureService {
   constructor(
     @InjectRepository(SiteProfiles)
     private readonly disclosureRepository: Repository<SiteProfiles>,
+    @InjectRepository(PeopleOrgs)
+    private readonly peopleOrgRepository: Repository<PeopleOrgs>,
     private readonly sitesLogger: LoggerService,
     private snapshotService: SnapshotsService,
   ) {}
@@ -29,7 +33,7 @@ export class DisclosureService {
     siteId: string,
     showPending: boolean,
     user: any,
-  ): Promise<SiteProfiles[]> {
+  ): Promise<SiteProfilesDTO[]> {
     try {
       this.sitesLogger.log(
         'DisclosureService.getSiteDisclosureBySiteId() start',
@@ -67,9 +71,23 @@ export class DisclosureService {
       if (!result?.length) {
         return [];
       } else {
-        const res = result?.map((res) => {
+        // Step 1: Fetch all PeopleOrgs in one query for the required ids
+        const siteRegParticIds = result.map((res) => res.siteRegParticId);
+        const peopleOrgs = await this.peopleOrgRepository.find({
+          where: { id: In(siteRegParticIds) },
+        });
+
+        // Step 2: Create a lookup map for displayName by siteRegParticId
+        const displayNameMap = peopleOrgs.reduce((map, org) => {
+          map[org.id] = org.displayName;
+          return map;
+        }, {});
+
+        // Step 3: Map over result and resolve displayName using the lookup map
+        const res = result.map((res) => {
           return {
             ...res,
+            displayName: displayNameMap[res.siteRegParticId] || '',
             srAction:
               res.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
           };
@@ -78,7 +96,7 @@ export class DisclosureService {
           'DisclosureService.getSiteDisclosureBySiteId() end',
         );
         // Convert the transformed objects into DTOs
-        const disclosure = plainToInstance(SiteProfiles, res);
+        const disclosure = plainToInstance(SiteProfilesDTO, res);
         return disclosure;
       }
     } catch (error) {

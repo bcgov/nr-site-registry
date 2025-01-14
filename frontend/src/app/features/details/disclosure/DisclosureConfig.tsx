@@ -82,29 +82,28 @@ export const disclosureStatementConfig: IFormField[][] = [
       customEditInputTextCss:
         'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
     },
-
-    // Commenting the below method because I am not sure which dropdown type
-    // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
-
-    // {
-    //   type: FormFieldType.DropDownWithSearch,
-    //   label: 'Internal Contact',
-    //   isLabel: false,
-    //   graphQLPropertyName: 'psnorgId',
-    //   placeholder: 'Select Internal Contact.',
-    //   isLoading: RequestStatus.idle,
-    //   value: '',
-    //   options: [],
-    //   filteredOptions: [],
-    //   colSize: 'col-xxl-2 col-xl-3 col-lg-4 col-md-5 col-sm-12',
-    //   customLabelCss: 'custom-disclosure-lbl-text',
-    //   customInputTextCss: 'custom-disclosure-input-text',
-    //   customEditLabelCss: 'custom-disclosure-edit-label',
-    //   customEditInputTextCss: 'custom-disclosure-edit-input',
-    //   customPlaceholderCss: 'custom-disclosure-search-placeholder',
-    //   customMenuMessage: <span>Please select site participant name:</span>,
-    //   handleSearch: () => {},
-    // },
+    {
+      type: FormFieldType.DropDownWithSearch,
+      label: 'Internal Contact',
+      isLabel: false,
+      graphQLPropertyName: 'siteRegParticId',
+      placeholder: 'Select Internal Contact.',
+      isLoading: RequestStatus.idle,
+      value: '',
+      options: [],
+      filteredOptions: [],
+      colSize: 'col-xxl-2 col-xl-3 col-lg-4 col-md-5 col-sm-12',
+      customLabelCss: 'custom-disclosure-lbl-text',
+      customInputTextCss: 'custom-disclosure-input-text',
+      customEditLabelCss: 'custom-disclosure-edit-label',
+      customEditInputTextCss: 'custom-disclosure-edit-input',
+      customMenuMessage: <span>Please select site internal contact:</span>,
+      handleSearch: () => {},
+      validation: {
+        required: true,
+        customMessage: 'Internal Contact is required.',
+      },
+    },
   ],
 ];
 

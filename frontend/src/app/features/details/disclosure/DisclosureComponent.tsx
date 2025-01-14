@@ -13,6 +13,7 @@ import { Button } from '../../../components/button/Button';
 import { v4 } from 'uuid';
 
 interface IDisclosureComponent {
+  index: number;
   viewMode: SiteDetailsMode;
   userType: UserType;
   handleWidgetCheckBox: (event: any) => void;
@@ -37,6 +38,7 @@ interface IDisclosureComponent {
 }
 
 const DisclosureComponent: React.FC<IDisclosureComponent> = ({
+  index,
   viewMode,
   userType,
   handleWidgetCheckBox,
@@ -60,15 +62,16 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
   showApproveRejectSection = showApproveRejectSection ?? false;
 
   approveRejectHandler = approveRejectHandler ?? (() => {});
-
   return (
     <div
       className="row"
       id="disclosure-component"
       data-testid="disclosure-component"
+      key={index}
     >
       <div
         className={`mb-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-5' : 'px-3'}`}
+        key={index}
       >
         <Widget
           title={'Site Disclosure Statement (Sec. III and IV)'}
@@ -88,7 +91,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
         >
           <div
             className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : ''}`}
-            key={v4()}
+            key={index}
           >
             {formData && (
               <Form

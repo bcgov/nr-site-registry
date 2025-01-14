@@ -341,10 +341,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
     setFormData(sorted);
   };
 
-  const handleWidgetCheckBox = (event: any) => {
-    alert(event);
-  };
-
   const handleParentChekBoxChange = (id: any, value: any) => {
     alert(`${value}, ${id}`);
   };

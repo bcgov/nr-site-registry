@@ -33,8 +33,12 @@
   text-overflow: ellipsis;
 }
 
+input.rs-date-range-input::placeholder {
+  font-size: 16px !important;
+}
+
 .custom-input::placeholder {
-  font-size: 16px;
+  font-size: 16px !important;
   font-weight: 400;
   line-height: 24px;
   text-align: left;

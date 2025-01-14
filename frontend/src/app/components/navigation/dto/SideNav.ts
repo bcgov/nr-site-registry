@@ -104,7 +104,7 @@ const roleBasedSideBarList: Record<string, SideNav[]> = {
       createSideNav('Map Search', false, icons.mapLocation, '/map'),
     ]),
     createSideNav('SR', true, null, '/', [
-      createSideNav('Reference', false, icons.srReference, '/review'),
+      createSideNav('SR Approvals', false, icons.srReference, '/review'),
     ]),
   ],
   public: [

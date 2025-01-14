@@ -22,11 +22,10 @@ function App() {
     <div className="container-fluid p-0">
       <Header />
       <div className="row m-0 p-0">
-        <div className="col-md-1 p-0 display-from-medium">
+        <div className="col-auto p-0 display-from-medium sidebar-container">
           <SideBar />
         </div>
-        <div className="col-md-11  p-0">
-          {/* */}
+        <div className="col p-0">
           <Outlet />
         </div>
       </div>

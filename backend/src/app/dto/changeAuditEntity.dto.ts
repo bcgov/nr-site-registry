@@ -9,6 +9,9 @@ export class ChangeAuditEntityDTO {
 
   @Field()
   srAction: string;
+
+  @Field(() => Boolean, { nullable: true })
+  srValue: boolean;
 }
 
 @ObjectType()
@@ -18,4 +21,7 @@ export class ChangeAuditObjectTypeDTO {
 
   @Field()
   srAction: string;
+
+  @Field()
+  srValue: boolean;
 }

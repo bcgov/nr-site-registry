@@ -30,14 +30,6 @@ export const MapSearchDrawer: FC<MapSearchDrawerProps> = ({
   if (selectedSiteId) drawerTitle = 'Selected Site';
   if (activeTool === ActiveToolEnum.radiusSearch && radius > 500)
     drawerTitle = 'Radius Search';
-  console.log(
-    'nupur - activeTool: ',
-    activeTool,
-    ' sites: ',
-    sites,
-    ' radius: ',
-    radius,
-  );
   return (
     <Drawer
       isOpen={

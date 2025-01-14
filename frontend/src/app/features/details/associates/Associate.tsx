@@ -433,12 +433,27 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
               setIsRecordExist({});
               setCurrentRecordId('');
             }
-            return {
-              ...assoc,
-              [event.property]: event.value,
-              apiAction: assoc?.apiAction ?? UserActionEnum.updated,
-              srAction: SRApprovalStatusEnum.Pending,
-            };
+
+            if (
+              viewMode === SiteDetailsMode.SRMode &&
+              event.property === 'srValue'
+            ) {
+              return {
+                ...assoc,
+                [event.property]: event.value,
+                apiAction: assoc?.apiAction ?? UserActionEnum.updated,
+                srAction: event.value
+                  ? SRApprovalStatusEnum.Public
+                  : SRApprovalStatusEnum.Pending,
+              };
+            } else {
+              return {
+                ...assoc,
+                [event.property]: event.value,
+                apiAction: assoc?.apiAction ?? UserActionEnum.updated,
+                srAction: SRApprovalStatusEnum.Pending,
+              };
+            }
           }
           return assoc;
         });
@@ -456,14 +471,25 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
       const currLabel = associateColumnInternal.find(
         (row) => row.graphQLPropertyName === event.property,
       );
-      dispatch(
-        trackChanges(
-          new ChangeTracker(
-            IChangeType.Modified,
-            'Associated Sites: ' + currLabel?.displayName,
-          ).toPlainObject(),
-        ),
-      );
+      if (viewMode === SiteDetailsMode.SRMode && event.property === 'srValue') {
+        dispatch(
+          trackChanges(
+            new ChangeTracker(
+              IChangeType.Modified,
+              'Associated Sites: SR Status',
+            ).toPlainObject(),
+          ),
+        );
+      } else {
+        dispatch(
+          trackChanges(
+            new ChangeTracker(
+              IChangeType.Modified,
+              'Associated Sites: ' + currLabel?.displayName,
+            ).toPlainObject(),
+          ),
+        );
+      }
     }
   };
 

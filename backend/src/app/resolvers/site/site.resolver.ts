@@ -9,6 +9,7 @@ import {
   FetchSiteDetail,
   FetchSiteResponse,
   SaveSiteDetailsResponse,
+  SearchSiteResponse,
 } from '../../dto/response/genericResponse';
 import { Sites } from '../../entities/sites.entity';
 import { SiteService } from '../../services/site/site.service';

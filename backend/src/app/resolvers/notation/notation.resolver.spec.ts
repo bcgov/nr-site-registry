@@ -76,6 +76,7 @@ describe('NotationResolver', () => {
         requirementReceivedDate: new Date('2024-07-10'),
         srAction: 'pending',
         userAction: 'pending',
+        srValue: false,
         notationParticipant: [
           {
             eventParticId: 'GUID001',
@@ -85,6 +86,7 @@ describe('NotationResolver', () => {
             srAction: 'pending',
             userAction: 'pending',
             eventId: '',
+            srValue: false,
           },
           {
             eventParticId: 'GUID002',
@@ -94,6 +96,7 @@ describe('NotationResolver', () => {
             srAction: 'pending',
             userAction: 'pending',
             eventId: '',
+            srValue: false,
           },
         ],
       },

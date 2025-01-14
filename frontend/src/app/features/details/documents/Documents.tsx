@@ -510,66 +510,130 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
     }
   };
 
+  const updateDocuments = (
+    documentId: number,
+    documents: any,
+    value: any,
+    graphQLPropertyName: any,
+    srMode?: boolean,
+    srActionValue?: SRApprovalStatusEnum,
+  ) => {
+    return documents.map((document: any) => {
+      if (document.id === documentId) {
+        const isPsnorgId =
+          typeof value === 'object' &&
+          value !== null &&
+          graphQLPropertyName === 'psnorgId';
+        if (isPsnorgId) {
+          let params: UpdateDisplayTypeParams = {
+            indexToUpdate: documentFormRows.findIndex((row) =>
+              row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+            ),
+            updates: {
+              isLoading: RequestStatus.success,
+              options,
+              filteredOptions: [],
+              handleSearch,
+              customInfoMessage: <></>,
+            },
+          };
+          setInternalRow(updateFields(internalRow, params));
+        }
+        let updatedDocument = null;
+        if (srMode) {
+          updatedDocument = {
+            ...document,
+            displayName: isPsnorgId ? value.value : document.displayName,
+            apiAction: document?.apiAction ?? UserActionEnum.updated,
+            srAction: srActionValue,
+          };
+        } else {
+          updatedDocument = {
+            ...document,
+            [graphQLPropertyName]: isPsnorgId ? value.key : value,
+            displayName: isPsnorgId ? value.value : document.displayName,
+            organizationName: isPsnorgId ? value?.metaData : '',
+            apiAction: document?.apiAction ?? UserActionEnum.updated,
+            srAction: srActionValue,
+          };
+        }
+        return updatedDocument;
+      }
+      return document;
+    });
+  };
+
   const handleInputChange = (
     id: number,
     graphQLPropertyName: any,
     value: any,
   ) => {
-    if (viewMode === SiteDetailsMode.SRMode) {
-      console.log({ [graphQLPropertyName]: value, id });
+    let updatedDocuments = null;
+    let updatedTrackDocuments = null;
+    if (
+      viewMode === SiteDetailsMode.SRMode &&
+      (value === 'checked' || value === 'unchecked')
+    ) {
+      updatedDocuments = updateDocuments(
+        id,
+        formData,
+        value,
+        graphQLPropertyName,
+        true,
+        value === 'checked'
+          ? SRApprovalStatusEnum.Public
+          : SRApprovalStatusEnum.Private,
+      );
+      updatedTrackDocuments = updateDocuments(
+        id,
+        trackDocuments ?? formData,
+        value,
+        graphQLPropertyName,
+        true,
+        value === 'checked'
+          ? SRApprovalStatusEnum.Public
+          : SRApprovalStatusEnum.Private,
+      );
     } else {
-      const updateDocuments = (documents: any) => {
-        return documents.map((document: any) => {
-          if (document.id === id) {
-            const isPsnorgId =
-              typeof value === 'object' &&
-              value !== null &&
-              graphQLPropertyName === 'psnorgId';
-            if (isPsnorgId) {
-              let params: UpdateDisplayTypeParams = {
-                indexToUpdate: documentFormRows.findIndex((row) =>
-                  row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-                ),
-                updates: {
-                  isLoading: RequestStatus.success,
-                  options,
-                  filteredOptions: [],
-                  handleSearch,
-                  customInfoMessage: <></>,
-                },
-              };
-              setInternalRow(updateFields(internalRow, params));
-            }
-            let updatedDocument = {
-              ...document,
-              [graphQLPropertyName]: isPsnorgId ? value.key : value,
-              displayName: isPsnorgId ? value.value : document.displayName,
-              organizationName: isPsnorgId ? value?.metaData : '',
-              apiAction: document?.apiAction ?? UserActionEnum.updated,
-              srAction: SRApprovalStatusEnum.Pending,
-            };
-            return updatedDocument;
-          }
-          return document;
-        });
-      };
-
       // Update both formData and trackNotation
-      const updatedDocuments = updateDocuments(formData);
-      const updatedTrackDocuments = updateDocuments(trackDocuments ?? formData);
-      setFormData(updatedDocuments);
-      dispatch(updateSiteDocument(updatedDocuments));
-      dispatch(setupDocumentsDataForSaving(updatedTrackDocuments));
+      updatedDocuments = updateDocuments(
+        id,
+        formData,
+        value,
+        graphQLPropertyName,
+      );
+      updatedTrackDocuments = updateDocuments(
+        id,
+        trackDocuments ?? formData,
+        value,
+        graphQLPropertyName,
+      );
     }
+
+    setFormData(updatedDocuments);
+    dispatch(updateSiteDocument(updatedDocuments));
+    dispatch(setupDocumentsDataForSaving(updatedTrackDocuments));
+
     const flattedArr = flattenFormRows(documentFormRows);
     const currLabel =
       flattedArr &&
       flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
-    const tracker = new ChangeTracker(
-      IChangeType.Modified,
-      'Document: ' + currLabel?.label,
-    );
-    dispatch(trackChanges(tracker.toPlainObject()));
+    if (
+      viewMode === SiteDetailsMode.SRMode &&
+      (value === 'checked' || value === 'unchecked')
+    ) {
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Document: SR Status',
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    } else {
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Document: ' + currLabel?.label,
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    }
   };
 
   return (
@@ -643,8 +707,16 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                     type={FormFieldType.Checkbox}
                     label={''}
                     isLabel={false}
+                    isChecked={
+                      document.srAction === 'true' ||
+                      document.srAction === SRApprovalStatusEnum.Public
+                    }
                     onChange={(value) =>
-                      handleParentChekBoxChange(document.id, value)
+                      handleInputChange(
+                        document.id,
+                        '',
+                        value ? 'checked' : 'unchecked',
+                      )
                     }
                     srMode={viewMode === SiteDetailsMode.SRMode}
                   />

@@ -35,11 +35,12 @@ import {
   SiteRecordsForSRAction,
 } from '../../dto/sitesPendingReview.dto';
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
-import { SiteFilters } from 'src/app/resolvers/site/sitePublic.resolver';
+import { SiteFilters } from '../../resolvers/site/sitePublic.resolver';
 import { SnapshotResponse } from '../../dto/snapshot.dto';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { Place } from '../../entities/placeEntity';
+import { UserTypeEum } from '../../common/userType';
 
 /**
  * Nestjs Service For Region Entity
@@ -107,6 +108,7 @@ export class SiteService {
    * @returns sites where id or address matches the search param
    */
   async searchSites(
+    userInfo: any,
     searchParam: string,
     page: number,
     pageSize: number,
@@ -172,6 +174,11 @@ export class SiteService {
           });
       }),
     );
+
+    if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR)
+      query.andWhere('sites.srAction != :srAction', {
+        srAction: SRApprovalStatusEnum.PRIVATE,
+      });
 
     if (id) {
       query.andWhere('sites.id = :id', { id: id });
@@ -866,6 +873,7 @@ export class SiteService {
               apiAction,
               particRoleId,
               srAction,
+              srValue,
               ...siteParticsData
             } = participant;
 
@@ -1059,8 +1067,13 @@ export class SiteService {
           participants: any[],
         ) => {
           const participantPromises = participants.map(async (partic) => {
-            const { eventParticId, displayName, apiAction, ...particData } =
-              partic;
+            const {
+              eventParticId,
+              displayName,
+              apiAction,
+              srValue,
+              ...particData
+            } = partic;
             switch (apiAction) {
               case UserActionEnum.ADDED:
                 return {
@@ -1255,7 +1268,7 @@ export class SiteService {
         const deleteSiteAssociates: { id: string }[] = [];
 
         const siteAssociatePromises = siteAccociated.map(async (asscos) => {
-          const { id, apiAction, ...siteAssocsData } = asscos;
+          const { id, apiAction, srValue, ...siteAssocsData } = asscos;
           const siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
           switch (apiAction) {
             case UserActionEnum.ADDED:

@@ -1,0 +1,4 @@
+.filter-action-buttons {
+  display: flex;
+  gap: 16px;
+}

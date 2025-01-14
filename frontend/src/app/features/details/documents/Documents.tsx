@@ -79,7 +79,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [isReplace, setIsReplace] = useState(false);
   const [currentDocument, setCurrentDocument] = useState({});
   const [currentFile, setCurrentFile] = useState({});
-  const [key, setKey] = useState(Date.now()); // Key for input type="file" element
+  const [uniqueId, setUniqueId] = useState(Date.now()); // Key for input type="file" element
 
   const [internalRow, setInternalRow] = useState(documentFormRows);
   const [externalRow, setExternalRow] = useState(
@@ -99,7 +99,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
 
         const response = await getAxiosInstance().post(GRAPHQL, {
           query: print(graphQLPeopleOrgsCd()),
-          variables: { searchParam },
+          variables: { searchParam, entity: 'ORG' },
         });
 
         // Store result in cache if successful
@@ -178,6 +178,10 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
             },
           }),
         );
+      }
+
+      // Always update formData if different
+      if (JSON.stringify(formData) !== JSON.stringify(siteDocuments)) {
         setFormData(siteDocuments);
       }
     }
@@ -248,7 +252,10 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
   // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
   useEffect(() => {
-    if (resetDetails) {
+    if (
+      resetDetails ||
+      saveSiteDetailsRequestStatus === RequestStatus.success
+    ) {
       dispatch(fetchDocuments({ siteId: id ?? '', showPending: showPending }));
     }
   }, [resetDetails, saveSiteDetailsRequestStatus]);
@@ -339,10 +346,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
         break;
     }
     setFormData(sorted);
-  };
-
-  const handleWidgetCheckBox = (event: any) => {
-    alert(event);
   };
 
   const handleParentChekBoxChange = (id: any, value: any) => {
@@ -461,7 +464,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
       setIsReplace(true);
 
       // Reset input type="file" element by changing key prop
-      setKey(Date.now()); // Force input type="file" to reset
+      setUniqueId(Date.now()); // Force input type="file" to reset
     }
   };
 
@@ -541,6 +544,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
               ...document,
               [graphQLPropertyName]: isPsnorgId ? value.key : value,
               displayName: isPsnorgId ? value.value : document.displayName,
+              organizationName: isPsnorgId ? value?.metaData : '',
               apiAction: document?.apiAction ?? UserActionEnum.updated,
               srAction: SRApprovalStatusEnum.Pending,
             };
@@ -588,6 +592,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                 </label>
 
                 <input
+                  key={uniqueId}
                   aria-label="input-file"
                   type="file"
                   id="input-file"
@@ -627,8 +632,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
       </div>
       <div
         data-testid="document-rows"
-        className={`col-lg-12 overflow-auto p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`}
-        style={{ maxHeight: '800px' }}
+        className={`col-lg-12 p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`}
       >
         {formData &&
           formData.map((document, index) => (
@@ -646,7 +650,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                   />
                 )}
               <Document
-                index={index}
                 userType={userType}
                 mode={mode}
                 documentFirstChildFormRows={documentFirstChildFormRows}
@@ -659,7 +662,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                 handleDownload={handleDownload}
                 handleFileReplace={handleFileReplace}
                 handleFileDelete={handleFileDelete}
-                key={key}
+                uniqueId={uniqueId}
                 internalRow={internalRow}
               />
             </div>

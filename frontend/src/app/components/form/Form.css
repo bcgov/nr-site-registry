@@ -14,6 +14,14 @@
   border-radius: var(--layout-margin-xsmall) !important;
 }
 
+.custom-input:disabled {
+  cursor: not-allowed;
+  opacity: 1;
+  background-color: var(--surface-secondary-disabled) !important;
+  border-color: var(--surface-secondary-disabled);
+  color: var(--typography-color-disabled);
+}
+
 .custom-input-text {
   font-size: 16px !important;
   font-weight: 400 !important;
@@ -58,6 +66,10 @@ input.rs-date-range-input::placeholder {
   line-height: 24px;
   text-align: left;
   color: var(--typography-color-disabled);
+}
+
+.rs-input:read-only {
+  cursor: not-allowed;
 }
 
 .custom-select {

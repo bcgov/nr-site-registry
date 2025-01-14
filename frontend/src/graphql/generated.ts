@@ -152,6 +152,7 @@ export type DocumentDto = {
   documentDate?: Maybe<Scalars['String']['output']>;
   filePath?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
+  organizationName?: Maybe<Scalars['String']['output']>;
   psnorgId?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
@@ -167,6 +168,7 @@ export type DocumentInputDto = {
   documentDate?: InputMaybe<Scalars['String']['input']>;
   filePath?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
+  organizationName?: InputMaybe<Scalars['String']['input']>;
   psnorgId: Scalars['String']['input'];
   siteId: Scalars['String']['input'];
   srAction: Scalars['String']['input'];
@@ -187,6 +189,7 @@ export type DocumentResponse = {
 export type DropdownDto = {
   __typename?: 'DropdownDto';
   key: Scalars['String']['output'];
+  metaData: Scalars['String']['output'];
   value: Scalars['String']['output'];
 };
 

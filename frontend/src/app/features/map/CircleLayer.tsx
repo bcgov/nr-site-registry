@@ -24,26 +24,27 @@ export function CircleLayer({
   const map = useMap();
   useMapCrosshairsCursor(map);
 
-  const previousSitesRef = useRef<Site[]>([]);
+  const initialSitesRef = useRef<Site[]>([]);
+
+  useEffect(() => {
+    if (sites.length > 0 && initialSitesRef.current.length === 0) {
+      initialSitesRef.current = sites;
+    }
+  }, [sites]);
 
   useMapEvents({
     click: (ev: LeafletMouseEvent) => {
       const newCenter: LatLngTuple = [ev.latlng.lat, ev.latlng.lng];
       setCenter(newCenter);
-      previousSitesRef.current = sites;
       onCrossHairClick();
     },
   });
 
   const calculateBoundingBox = (center: LatLngTuple, radius: number) => {
-    console.log('nupur: center is : ', center);
     const [centerLat, centerLon] = center;
-    console.log('nupur: centerLat is : ', centerLat);
-    console.log('nupur: centerLon is : ', centerLon);
     const earthRadius = 6371e3; // Earth's radius in meters
 
-    /*latDelta: The change in latitude (latDelta) is calculated by dividing the radius by the Earth's radius.
-     * This gives the angular distance in radians.
+    /* latDelta: The change in latitude (latDelta) is calculated by dividing the radius by the Earth's radius.This gives the angular distance in radians.
      * lonDelta: The change in longitude (lonDelta) is calculated similarly but adjusted by the cosine of the latitude to account for the Earth's curvature.
      * The angular distances are converted from radians to degrees by multiplying by 180 and dividing by π.
      * Bounding Box Calculation: The minimum and maximum latitudes and longitudes are calculated by subtracting and adding the deltas to the center coordinates.
@@ -57,34 +58,23 @@ export function CircleLayer({
     const maxLat = centerLat + (latDelta * 180) / Math.PI;
     const minLon = centerLon - (lonDelta * 180) / Math.PI;
     const maxLon = centerLon + (lonDelta * 180) / Math.PI;
-    console.log(
-      'nupur: minLat is : ',
-      minLat,
-      ' , maxLat is : ',
-      maxLat,
-      ' , minLon is : ',
-      minLon,
-      ' , maxLon is : ',
-      maxLon,
-    );
     return { minLat, maxLat, minLon, maxLon };
   };
 
   const findSitesWithinCircle = (
     center: LatLngTuple,
     radius: number,
-    prevSites: Site[],
+    initialSites: Site[],
   ) => {
     if (!center) return [];
     const [centerLat, centerLon] = center;
-    console.log('nupur: sites(previousSiteRef.current) are is : ', sites);
     const { minLat, maxLat, minLon, maxLon } = calculateBoundingBox(
       center,
       radius,
     );
 
     // Filter sites within the bounding box
-    const sitesWithinBoundingBox = prevSites.filter((site) => {
+    const sitesWithinBoundingBox = initialSites.filter((site) => {
       return (
         site.latdeg !== null &&
         site.latdeg !== undefined &&
@@ -96,10 +86,6 @@ export function CircleLayer({
         site.longdeg <= maxLon
       );
     });
-    console.log(
-      'nupur: sitesWithinBoundingBox is : ',
-      sitesWithinBoundingBox.length,
-    );
 
     const sitesWithinCircle = sitesWithinBoundingBox.filter((site) => {
       const distance =
@@ -114,7 +100,6 @@ export function CircleLayer({
           : 0;
       return distance <= radius;
     });
-    console.log('nupur: sitesWithinCircle is : ', sitesWithinCircle.length);
     return sitesWithinCircle;
   };
 
@@ -123,9 +108,8 @@ export function CircleLayer({
       const filteredSites = findSitesWithinCircle(
         center,
         radius,
-        previousSitesRef.current,
+        initialSitesRef.current,
       );
-      console.log('nupur: filteredSites is : ', filteredSites.length);
       if (setSites) {
         setSites(filteredSites);
       }

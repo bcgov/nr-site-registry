@@ -55,7 +55,9 @@ describe('Search Component', () => {
         </ApolloProvider>
       </Provider>,
     );
-    const searchInput = screen.getByPlaceholderText('Search');
+    const searchInput = screen.getByPlaceholderText(
+      'Search for site address or name',
+    );
     expect(searchInput).toBeInTheDocument();
   });
 });

@@ -52,7 +52,7 @@ function SideBar() {
     const isCurrentPath = location.pathname === item.linkTo;
     const hasIcon = item.icon;
     const isCartLink = item.linkTo.includes('cart');
-    const displayCount = userCartItems.length > 0 ? userCartItems.length : '';
+    const displayCount = userCartItems.length > 0 ? userCartItems.length : '0';
 
     const linkContent = isCartLink ? displayCount : item.displayText;
     const isParentGroup: boolean = item.displayText && !item.icon;
@@ -62,7 +62,7 @@ function SideBar() {
         aria-label={item.displayText}
         aria-roledescription="menu"
         role={isParentGroup ? 'group' : 'menuitem'}
-        className={`sideBar-NavItem ${isCurrentPath && hasIcon ? 'currentPath' : ''}`}
+        className={`sideBar-NavItem ${isCurrentPath && hasIcon ? 'currentPath' : ''} ${isParentGroup === false ? 'sideBar-menu-item-hover' : ''}`}
         key={item.id} // Use a unique key based on the item id
       >
         <div className="d-flex align-items-center">
@@ -105,7 +105,7 @@ function SideBar() {
         {navList
           .filter((item: any) => !item.lowerSection)
           .map((item: any, index: number) => (
-            <React.Fragment key={item.id}>
+            <div className="sidebar-menu-group" key={item.id}>
               {' '}
               {/* Use item.id for a unique key */}
               {renderMenuOption(item, index + 1)}
@@ -117,7 +117,7 @@ function SideBar() {
                     {renderMenuOption(child, index + 1)}
                   </React.Fragment>
                 ))}
-            </React.Fragment>
+            </div>
           ))}
       </div>
 
@@ -125,7 +125,7 @@ function SideBar() {
         {navList
           .filter((item: any) => item.lowerSection)
           .map((item: any, index: number) => (
-            <React.Fragment key={item.id}>
+            <div className="sidebar-menu-group" key={item.id}>
               {' '}
               {/* Use item.id for a unique key */}
               {renderMenuOption(item, index + 1)}
@@ -137,7 +137,7 @@ function SideBar() {
                     {renderMenuOption(child, index + 1)}
                   </React.Fragment>
                 ))}
-            </React.Fragment>
+            </div>
           ))}
       </div>
     </div>

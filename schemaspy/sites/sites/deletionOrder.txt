@@ -4,6 +4,7 @@ site_registry_module
 site_registry
 site_profile_owners
 plan_table
+places
 migrations
 lto_prev_download
 lto_download

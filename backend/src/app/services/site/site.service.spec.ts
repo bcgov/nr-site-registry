@@ -29,6 +29,7 @@ import { ParcelDescriptionInputDTO } from 'src/app/dto/parcelDescriptionInput.dt
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SnapshotsService } from '../snapshot/snapshot.service';
+import { Place } from '../../entities/placeEntity';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -42,6 +43,7 @@ describe('SiteService', () => {
   let landHistoriesRepo: Repository<LandHistories>;
   let siteSubDivisionsRepo: Repository<SiteSubdivisions>;
   let siteProfilesRepo: Repository<SiteProfiles>;
+  let placesRepo: Repository<Place>;
   let entityManager: EntityManager;
   let historyLogRepository: Repository<HistoryLog>;
   let loggerService: LoggerService;
@@ -332,6 +334,12 @@ describe('SiteService', () => {
           },
         },
         {
+          provide: getRepositoryToken(Place),
+          useValue: {
+            createQueryBuilder: jest.fn().mockReturnThis(),
+          },
+        },
+        {
           provide: LoggerService,
           useValue: {
             log: jest.fn(),
@@ -378,6 +386,7 @@ describe('SiteService', () => {
     historyLogRepository = module.get<Repository<HistoryLog>>(
       getRepositoryToken(HistoryLog),
     );
+    placesRepo = module.get<Repository<Place>>(getRepositoryToken(Place));
     entityManager = module.get<EntityManager>(EntityManager);
     loggerService = module.get<LoggerService>(LoggerService);
     parcelDescriptionService = module.get<ParcelDescriptionsService>(
@@ -1153,6 +1162,60 @@ describe('SiteService', () => {
       expect(mockQueryBuilder.orWhere).toHaveBeenCalledWith(expect.anything(), {
         searchTerm: '%test%',
       });
+    });
+  });
+
+  describe('findSitesAndPlaces', () => {
+    it('should apply search term and limit if provided', async () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        limit: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        addOrderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      jest
+        .spyOn(placesRepo, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      await siteService.findSitesAndPlaces('test', 20);
+
+      expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalledTimes(2);
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(expect.anything(), {
+        searchTerm: '%test%',
+      });
+      expect(mockQueryBuilder.limit).toHaveBeenCalledWith(20);
+    });
+
+    it('should bypass DB calls if no search term provided', async () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        limit: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      jest
+        .spyOn(placesRepo, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      expect(await siteService.findSitesAndPlaces()).toMatchObject({
+        sites: [],
+        places: [],
+      });
+
+      expect(mockQueryBuilder.getManyAndCount).not.toHaveBeenCalled();
     });
   });
 });

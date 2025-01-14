@@ -288,6 +288,16 @@ export type FetchSiteResponse = {
   timestamp?: Maybe<Scalars['String']['output']>;
 };
 
+export type FindSitesAndPlacesResponse = {
+  __typename?: 'FindSitesAndPlacesResponse';
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  places: Array<Place>;
+  sites: Array<Sites>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
 export type Folio = {
   __typename?: 'Folio';
   description: Scalars['String']['output'];
@@ -593,7 +603,7 @@ export type ParcelDescriptionDto = {
   __typename?: 'ParcelDescriptionDto';
   dateNoted: Scalars['DateTime']['output'];
   descriptionType: Scalars['String']['output'];
-  id: Scalars['Float']['output'];
+  id: Scalars['String']['output'];
   idPinNumber: Scalars['String']['output'];
   landDescription: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
@@ -649,11 +659,20 @@ export type PeopleOrgs = {
   whoUpdated: Scalars['String']['output'];
 };
 
+export type Place = {
+  __typename?: 'Place';
+  id: Scalars['String']['output'];
+  latdeg: Scalars['Float']['output'];
+  longdeg: Scalars['Float']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   _service: _Service;
   findSiteBySiteId: FetchSiteDetail;
   findSiteBySiteIdLoggedInUser: FetchSiteDetail;
+  findSitesAndPlaces: FindSitesAndPlacesResponse;
   getAssociatedSitesBySiteId: AssociatedSiteResponse;
   getBannerType: BannerTypeResponse;
   getCartItemsForUser: CartResponse;
@@ -694,6 +713,12 @@ export type QueryFindSiteBySiteIdArgs = {
 export type QueryFindSiteBySiteIdLoggedInUserArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
+};
+
+
+export type QueryFindSitesAndPlacesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  searchParam: Scalars['String']['input'];
 };
 
 

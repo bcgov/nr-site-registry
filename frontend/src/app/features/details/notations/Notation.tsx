@@ -113,6 +113,7 @@ const Notation: React.FC<INotationProps> = ({
             aria-label="Sort Notation Form"
           />
           <Widget
+            isRequired={true}
             changeHandler={(event) => handleTableChange(notation.id, event)}
             handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
             title={'Notation Participants'}
@@ -136,10 +137,8 @@ const Notation: React.FC<INotationProps> = ({
               viewMode === SiteDetailsMode.EditMode &&
               userType === UserType.Internal
             }
-            srMode={
-              viewMode === SiteDetailsMode.SRMode &&
-              userType === UserType.Internal
-            }
+            srMode={viewMode === SiteDetailsMode.SRMode}
+            hideWidgetCheckbox={true}
             primaryKeycolumnName="eventParticId"
             sortHandler={(row, ascDir) => {
               handleTableSort(row, ascDir, notation.id);

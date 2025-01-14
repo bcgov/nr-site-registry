@@ -51,12 +51,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
 }) => {
   showApproveRejectSection = showApproveRejectSection ?? false;
 
-  approveRejectHandler =
-    approveRejectHandler ??
-    ((value) => {
-      console.log('Approve/Reject Handler not provided');
-    });
-
+  approveRejectHandler = approveRejectHandler ?? (() => {});
   hideLabelForWidget = hideLabelForWidget ?? false;
   return (
     <React.Fragment>
@@ -85,9 +80,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
           viewMode === SiteDetailsMode.EditMode &&
           userType === UserType.Internal
         }
-        srMode={
-          viewMode === SiteDetailsMode.SRMode && userType === UserType.Internal
-        }
+        srMode={false}
         primaryKeycolumnName="id"
         sortHandler={(row: any, ascDir: any) => {
           handleTableSort(row, ascDir);

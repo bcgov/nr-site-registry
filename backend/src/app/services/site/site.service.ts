@@ -35,10 +35,12 @@ import {
   SiteRecordsForSRAction,
 } from '../../dto/sitesPendingReview.dto';
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
-import { SiteFilters } from 'src/app/resolvers/site/sitePublic.resolver';
+import { SiteFilters } from '../../resolvers/site/sitePublic.resolver';
 import { SnapshotResponse } from '../../dto/snapshot.dto';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Snapshots } from '../../entities/snapshots.entity';
+import { Place } from '../../entities/placeEntity';
+import { UserTypeEum } from '../../common/userType';
 
 /**
  * Nestjs Service For Region Entity
@@ -72,6 +74,8 @@ export class SiteService {
     private readonly entityManager: EntityManager,
     @InjectRepository(HistoryLog)
     private historyLogRepository: Repository<HistoryLog>,
+    @InjectRepository(Place)
+    private placeRepository: Repository<Place>,
 
     private readonly landHistoryService: LandHistoryService,
     private readonly parcelDescriptionService: ParcelDescriptionsService,
@@ -104,6 +108,7 @@ export class SiteService {
    * @returns sites where id or address matches the search param
    */
   async searchSites(
+    userInfo: any,
     searchParam: string,
     page: number,
     pageSize: number,
@@ -169,6 +174,11 @@ export class SiteService {
           });
       }),
     );
+
+    if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR)
+      query.andWhere('sites.srAction != :srAction', {
+        srAction: SRApprovalStatusEnum.PRIVATE,
+      });
 
     if (id) {
       query.andWhere('sites.id = :id', { id: id });
@@ -327,6 +337,52 @@ export class SiteService {
 
     this.sitesLogger.log('SiteService.mapSearch() end');
     return result;
+  }
+
+  async findSitesAndPlaces(searchTerm = '', limit = 3) {
+    this.sitesLogger.log('SiteService.findSitesAndPlaces() start');
+
+    const searchTermClean = searchTerm.toLowerCase().trim();
+    const sitesQuery = this.siteRepository.createQueryBuilder('sites');
+    const placesQuery = this.placeRepository.createQueryBuilder('places');
+
+    if (searchTermClean.length === 0) {
+      return {
+        sites: [],
+        places: [],
+      };
+    }
+
+    sitesQuery
+      .where('CAST(sites.id AS TEXT) = :searchTermId', {
+        searchTermId: searchTermClean,
+      })
+      .orWhere('LOWER(sites.common_name) LIKE LOWER(:searchTermName)', {
+        searchTermName: `%${searchTermClean}%`,
+      })
+      .limit(limit)
+      // This makes sure that sites found by ID match appear first on the list, sites found by common_name match follow
+      .orderBy(
+        `CASE 
+          WHEN CAST(sites.id AS TEXT) LIKE :searchTermId THEN 0 
+          ELSE 1 
+        END`,
+        'ASC',
+      )
+      .addOrderBy('sites.id', 'ASC');
+    placesQuery
+      .where('LOWER(places.name) LIKE LOWER(:searchTerm)', {
+        searchTerm: `%${searchTermClean}%`,
+      })
+      .limit(limit);
+
+    const [[sites], [places]] = await Promise.all([
+      sitesQuery.getManyAndCount(),
+      placesQuery.getManyAndCount(),
+    ]);
+
+    this.sitesLogger.log('SiteService.findSitesAndPlaces() end');
+    return { sites, places };
   }
 
   /**
@@ -606,7 +662,7 @@ export class SiteService {
           const {
             displayName,
             psnorgId,
-            // dprCode,
+            organizationName,
             docParticId,
             apiAction,
             srAction,
@@ -817,6 +873,7 @@ export class SiteService {
               apiAction,
               particRoleId,
               srAction,
+              srValue,
               ...siteParticsData
             } = participant;
 
@@ -1010,8 +1067,13 @@ export class SiteService {
           participants: any[],
         ) => {
           const participantPromises = participants.map(async (partic) => {
-            const { eventParticId, displayName, apiAction, ...particData } =
-              partic;
+            const {
+              eventParticId,
+              displayName,
+              apiAction,
+              srValue,
+              ...particData
+            } = partic;
             switch (apiAction) {
               case UserActionEnum.ADDED:
                 return {
@@ -1206,7 +1268,7 @@ export class SiteService {
         const deleteSiteAssociates: { id: string }[] = [];
 
         const siteAssociatePromises = siteAccociated.map(async (asscos) => {
-          const { id, apiAction, ...siteAssocsData } = asscos;
+          const { id, apiAction, srValue, ...siteAssocsData } = asscos;
           const siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
           switch (apiAction) {
             case UserActionEnum.ADDED:

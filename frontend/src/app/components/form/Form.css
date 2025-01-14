@@ -14,6 +14,14 @@
   border-radius: var(--layout-margin-xsmall) !important;
 }
 
+.custom-input:disabled {
+  cursor: not-allowed;
+  opacity: 1;
+  background-color: var(--surface-secondary-disabled) !important;
+  border-color: var(--surface-secondary-disabled);
+  color: var(--typography-color-disabled);
+}
+
 .custom-input-text {
   font-size: 16px !important;
   font-weight: 400 !important;
@@ -25,8 +33,12 @@
   text-overflow: ellipsis;
 }
 
+input.rs-date-range-input::placeholder {
+  font-size: 16px !important;
+}
+
 .custom-input::placeholder {
-  font-size: 16px;
+  font-size: 16px !important;
   font-weight: 400;
   line-height: 24px;
   text-align: left;
@@ -54,6 +66,10 @@
   line-height: 24px;
   text-align: left;
   color: var(--typography-color-disabled);
+}
+
+.rs-input:read-only {
+  cursor: not-allowed;
 }
 
 .custom-select {

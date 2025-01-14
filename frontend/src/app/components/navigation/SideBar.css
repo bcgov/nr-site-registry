@@ -21,11 +21,13 @@
   border-right: 1px solid var(--surface-border-light, #d8d8d8);
   min-width: 84px;
   z-index: 9999;
+  max-width: 128px;
 }
 
 .side-bar:hover {
   width: 240px;
   position: sticky;
+  max-width: 240px;
 }
 
 .side-bar:hover .sideBar-Nav {

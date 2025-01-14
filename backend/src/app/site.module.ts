@@ -85,6 +85,7 @@ import { ParcelDescriptionsService } from './services/parcelDescriptions/parcelD
 import { TransactionManagerService } from './services/transactionManager/transactionManager.service';
 import { LoggerService } from './logger/logger.service';
 import { SitePublicResolver } from './resolvers/site/sitePublic.resolver';
+import { Place } from './entities/placeEntity';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -146,6 +147,7 @@ import { SitePublicResolver } from './resolvers/site/sitePublic.resolver';
       FolioContents,
       User,
       HistoryLog,
+      Place,
     ]),
   ],
   providers: [

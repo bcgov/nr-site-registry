@@ -11,6 +11,7 @@ import { DropdownItem } from '../../../components/action/IActions';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
 import { Button } from '../../../components/button/Button';
 import { v4 } from 'uuid';
+import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 
 interface IDisclosureComponent {
   index: number;
@@ -85,7 +86,17 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
             viewMode === SiteDetailsMode.SRMode &&
             userType === UserType.Internal
           }
-          handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
+          widgetIschecked={
+            formData?.srAction === 'true' ||
+            formData?.srAction === SRApprovalStatusEnum.Public
+          }
+          handleCheckBoxChange={(event) => {
+            handleInputChange(
+              formData?.id,
+              'srCheckbox',
+              event === true ? 'checked' : 'unchecked',
+            );
+          }}
           customLabelCss="custom-disclosure-widget-lbl"
           aria-label="Disclosure Widget"
         >
@@ -143,10 +154,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                 viewMode === SiteDetailsMode.EditMode &&
                 userType === UserType.Internal
               }
-              srMode={
-                viewMode === SiteDetailsMode.SRMode &&
-                userType === UserType.Internal
-              }
+              srMode={false}
               primaryKeycolumnName="scheduleId"
               sortHandler={(row, ascDir) => {
                 handleTableSort(row, ascDir, formData.id);
@@ -205,10 +213,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                 viewMode === SiteDetailsMode.EditMode &&
                 userType === UserType.Internal
               }
-              srMode={
-                viewMode === SiteDetailsMode.SRMode &&
-                userType === UserType.Internal
-              }
+              srMode={false}
               handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
               aria-label="Disclosure Widget"
             >

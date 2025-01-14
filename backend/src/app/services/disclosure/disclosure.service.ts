@@ -88,8 +88,7 @@ export class DisclosureService {
           return {
             ...res,
             displayName: displayNameMap[res.siteRegParticId] || '',
-            srAction:
-              res.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
+            srAction: res.srAction === SRApprovalStatusEnum.PUBLIC,
           };
         });
         this.sitesLogger.log(

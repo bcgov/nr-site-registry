@@ -20,6 +20,7 @@ export const graphQLSiteParticipantsBySiteId = () => {
           prCode
           description
           srAction
+          srValue
         }
       }
     }

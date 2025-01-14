@@ -284,10 +284,28 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     graphQLPropertyName: any,
     value: any,
   ) => {
-    if (viewMode === SiteDetailsMode.SRMode) {
-      console.log({ [graphQLPropertyName]: value, id });
+    let updatedDisclosure = null;
+    if (
+      viewMode === SiteDetailsMode.SRMode &&
+      graphQLPropertyName === 'srCheckbox'
+    ) {
+      updatedDisclosure = (disclosure: any) => {
+        return {
+          ...disclosure,
+          id: disclosure.id ?? '',
+          siteId: disclosure.siteId ?? siteId,
+          apiAction:
+            disclosure.id === '' || disclosure.id === undefined
+              ? UserActionEnum.added
+              : UserActionEnum.updated,
+          srAction:
+            value === 'checked'
+              ? SRApprovalStatusEnum.Public
+              : SRApprovalStatusEnum.Private,
+        };
+      };
     } else {
-      const updatedDisclosure = (disclosure: any) => {
+      updatedDisclosure = (disclosure: any) => {
         const isPsnorgId =
           typeof value === 'object' &&
           value !== null &&
@@ -323,14 +341,16 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
           srAction: SRApprovalStatusEnum.Pending,
         };
       };
-      const updatedFormData = updatedDisclosure(formData);
-      const updatedTrackDisclosure = updatedDisclosure(
-        trackSiteDisclosure ?? formData,
-      );
-      setFormData(updatedFormData);
-      dispatch(updateSiteDisclosure(serializeDate(updatedFormData)));
-      dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
     }
+
+    const updatedFormData = updatedDisclosure(formData);
+    const updatedTrackDisclosure = updatedDisclosure(
+      trackSiteDisclosure ?? formData,
+    );
+    setFormData(updatedFormData);
+    dispatch(updateSiteDisclosure(serializeDate(updatedFormData)));
+    dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
+
     const flattedArr = flattenFormRows([
       ...disclosureStatementConfig,
       ...disclosureCommentsConfig,
@@ -338,11 +358,23 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     const currLabel =
       flattedArr &&
       flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
-    const tracker = new ChangeTracker(
-      IChangeType.Modified,
-      'Site Disclosure: ' + currLabel?.label,
-    );
-    dispatch(trackChanges(tracker.toPlainObject()));
+
+    if (
+      viewMode === SiteDetailsMode.SRMode &&
+      graphQLPropertyName === 'srCheckbox'
+    ) {
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Site Disclosure: SR Status',
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    } else {
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Site Disclosure: ' + currLabel?.label,
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    }
   };
 
   /// not working yet as the actual source of table data is unknown.

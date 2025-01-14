@@ -28,6 +28,7 @@ export const graphQLPeopleOrgsCd = () => {
         data {
           key
           value
+          metaData
         }
       }
     }

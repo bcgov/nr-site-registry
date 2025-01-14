@@ -27,6 +27,7 @@ export const graphQLSiteNotationBySiteId = () => {
             psnorgId
             displayName
             srAction
+            srValue
           }
         }
       }

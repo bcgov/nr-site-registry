@@ -1,5 +1,5 @@
 import { Args, Field, InputType, Int, Query, Resolver } from '@nestjs/graphql';
-import { Unprotected } from 'nest-keycloak-connect';
+import { AuthenticatedUser, Unprotected } from 'nest-keycloak-connect';
 import {
   FetchSiteDetail,
   SaveSiteDetailsResponse,
@@ -79,7 +79,7 @@ export class SiteFilters {
  * Resolver for Region
  */
 @Resolver(() => Sites)
-@Unprotected()
+@Unprotected(false)
 export class SitePublicResolver {
   constructor(
     private readonly siteService: SiteService,
@@ -100,6 +100,7 @@ export class SitePublicResolver {
    */
   @Query(() => SearchSiteResponse, { name: 'searchSites' })
   async searchSites(
+    @AuthenticatedUser() userInfo,
     @Args('searchParam', { type: () => String }) searchParam: string,
     @Args('page', { type: () => Int }) page: number,
     @Args('pageSize', { type: () => Int }) pageSize: number,
@@ -109,6 +110,7 @@ export class SitePublicResolver {
     this.sitesLogger.log('SiteResolver.searchSites() start ');
 
     return await this.siteService.searchSites(
+      userInfo,
       searchParam,
       page,
       pageSize,

@@ -39,6 +39,7 @@ import { SiteFilters } from 'src/app/resolvers/site/sitePublic.resolver';
 import { SnapshotResponse } from '../../dto/snapshot.dto';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Snapshots } from '../../entities/snapshots.entity';
+import { Place } from '../../entities/placeEntity';
 
 /**
  * Nestjs Service For Region Entity
@@ -72,6 +73,8 @@ export class SiteService {
     private readonly entityManager: EntityManager,
     @InjectRepository(HistoryLog)
     private historyLogRepository: Repository<HistoryLog>,
+    @InjectRepository(Place)
+    private placeRepository: Repository<Place>,
 
     private readonly landHistoryService: LandHistoryService,
     private readonly parcelDescriptionService: ParcelDescriptionsService,
@@ -327,6 +330,52 @@ export class SiteService {
 
     this.sitesLogger.log('SiteService.mapSearch() end');
     return result;
+  }
+
+  async findSitesAndPlaces(searchTerm = '', limit = 3) {
+    this.sitesLogger.log('SiteService.findSitesAndPlaces() start');
+
+    const searchTermClean = searchTerm.toLowerCase().trim();
+    const sitesQuery = this.siteRepository.createQueryBuilder('sites');
+    const placesQuery = this.placeRepository.createQueryBuilder('places');
+
+    if (searchTermClean.length === 0) {
+      return {
+        sites: [],
+        places: [],
+      };
+    }
+
+    sitesQuery
+      .where('CAST(sites.id AS TEXT) = :searchTermId', {
+        searchTermId: searchTermClean,
+      })
+      .orWhere('LOWER(sites.common_name) LIKE LOWER(:searchTermName)', {
+        searchTermName: `%${searchTermClean}%`,
+      })
+      .limit(limit)
+      // This makes sure that sites found by ID match appear first on the list, sites found by common_name match follow
+      .orderBy(
+        `CASE 
+          WHEN CAST(sites.id AS TEXT) LIKE :searchTermId THEN 0 
+          ELSE 1 
+        END`,
+        'ASC',
+      )
+      .addOrderBy('sites.id', 'ASC');
+    placesQuery
+      .where('LOWER(places.name) LIKE LOWER(:searchTerm)', {
+        searchTerm: `%${searchTermClean}%`,
+      })
+      .limit(limit);
+
+    const [[sites], [places]] = await Promise.all([
+      sitesQuery.getManyAndCount(),
+      placesQuery.getManyAndCount(),
+    ]);
+
+    this.sitesLogger.log('SiteService.findSitesAndPlaces() end');
+    return { sites, places };
   }
 
   /**

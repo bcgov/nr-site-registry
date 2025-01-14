@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import {
@@ -159,6 +159,47 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     setViewMode(mode);
   }, [mode]);
 
+  // Track whether the effect has already run
+  const hasRun = useRef(false);
+  useEffect(() => {
+    // Check if the effect has already been run
+    if (hasRun.current) return;
+
+    if (loggedInUser?.profile.preferred_username?.includes('idir')) {
+      const internalContact = {
+        type: FormFieldType.DropDownWithSearch,
+        label: 'Internal Contact',
+        isLabel: false,
+        graphQLPropertyName: 'siteRegParticId',
+        placeholder: 'Select Internal Contact.',
+        isLoading: RequestStatus.idle,
+        value: '',
+        options: [],
+        filteredOptions: [],
+        colSize: 'col-xxl-2 col-xl-3 col-lg-4 col-md-5 col-sm-12',
+        customLabelCss: 'custom-disclosure-lbl-text',
+        customInputTextCss: 'custom-disclosure-input-text',
+        customEditLabelCss: 'custom-disclosure-edit-label',
+        customEditInputTextCss: 'custom-disclosure-edit-input',
+        customMenuMessage: <span>Please select site internal contact:</span>,
+        handleSearch: () => {},
+        validation: {
+          required: true,
+          customMessage: 'Internal Contact is required.',
+        },
+      };
+
+      setInternalRow((prev) => {
+        // Add internalContact to the first row (index 0)
+        const updatedRow = [...prev[0], internalContact];
+        // Return the updated state with the new field added
+        return [updatedRow];
+      });
+    }
+
+    // Set the flag to true so that the effect does not run again
+    hasRun.current = true;
+  }, []); // Empty dependency array ensures this runs only once
   // Search internal contact effect with debounce
   // Commenting the below method because I am not sure which dropdown type
   // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.

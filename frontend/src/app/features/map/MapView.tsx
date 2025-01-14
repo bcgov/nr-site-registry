@@ -114,8 +114,6 @@ function MapView() {
         setActiveTool={setActiveTool}
         radius={radius}
         setRadius={setRadius}
-        sites={sites}
-        setSites={setSites}
       />
 
       <MapSearchDrawer

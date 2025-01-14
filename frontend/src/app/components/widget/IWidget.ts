@@ -11,6 +11,7 @@ export interface IWidget {
   hideTable?: boolean;
   hideTitle?: boolean;
   editMode?: boolean;
+  isRequired?: boolean;
   srMode?: boolean;
   currentPage?: number;
   primaryKeycolumnName?: string;

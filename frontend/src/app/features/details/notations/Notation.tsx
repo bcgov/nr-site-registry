@@ -113,6 +113,7 @@ const Notation: React.FC<INotationProps> = ({
             aria-label="Sort Notation Form"
           />
           <Widget
+            isRequired={true}
             changeHandler={(event) => handleTableChange(notation.id, event)}
             handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
             title={'Notation Participants'}

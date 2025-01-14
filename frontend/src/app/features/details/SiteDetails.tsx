@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-
 import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
 import {
@@ -36,35 +35,25 @@ import './SiteDetails.css'; // Ensure this import is correct
 import { SiteActionBtn, SiteDetailsMode } from './dto/SiteDetailsMode';
 import { UserType } from '../../helpers/requests/userType';
 import Actions from '../../components/action/Actions';
+import { getActionItems } from '../../components/action/ActionsConfig';
 import {
-  ActionItems,
-  getActionItems,
-} from '../../components/action/ActionsConfig';
-import {
+  deepFilterByUserAction,
   formatDate,
   formatDateWithNoTimzoneName,
   getUser,
   isUserOfType,
+  removeProperty,
   showNotification,
   UserRoleType,
   validateForm,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
-import {
-  fetchSiteParticipants,
-  siteParticipants,
-} from './participants/ParticipantSlice';
-import {
-  fetchSiteDisclosure,
-  siteDisclosure,
-} from './disclosure/DisclosureSlice';
+import { fetchSiteParticipants } from './participants/ParticipantSlice';
+import { fetchSiteDisclosure } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
-import {
-  fetchNotationParticipants,
-  notationParticipants,
-} from './notations/NotationSlice';
-import { fetchDocuments } from './documents/DocumentsSlice';
+import { fetchNotationParticipants } from './notations/NotationSlice';
+import { documents, fetchDocuments } from './documents/DocumentsSlice';
 import {
   fetchSnapshots,
   snapshots,
@@ -79,21 +68,27 @@ import {
   fetchNotationParticipantRoleCd,
   fetchNotationTypeCd,
   fetchParticipantRoleCd,
-  fetchPeopleOrgsCd,
 } from './dropdowns/DropdownSlice';
 import BannerDetails from '../../components/banners/BannerDetails';
 import {
+  getSiteAssociated,
+  getSiteDisclosure,
+  getSiteDocuments,
+  getSiteNoatations,
+  getSiteParticipants,
   resetSaveSiteDetails,
   resetSaveSiteDetailsRequestStatus,
   saveRequestStatus,
   saveSiteDetails,
+  setupDocumentsDataForSaving,
+  setupNotationDataForSaving,
+  setupSiteAssociationDataForSaving,
+  setupSiteDisclosureDataForSaving,
   setupSiteIdForSaving,
+  setupSiteParticipantDataForSaving,
   setupSiteSummaryForSaving,
 } from './SaveSiteDetailsSlice';
-import {
-  associatedSites,
-  fetchAssociatedSites,
-} from './associates/AssociateSlice';
+import { fetchAssociatedSites } from './associates/AssociateSlice';
 import AddToFolio from '../folios/AddToFolio';
 import {
   fetchParcelDescriptionsForApproval,
@@ -110,7 +105,6 @@ import {
 import { fetchLandUseCodes } from './landUses/LandUsesSlice';
 import { IFetchParcelDescriptionsParams } from './parcelDescriptions/parcelDescriptionsInterfaces';
 import {
-  bulkAproveRejectChanges,
   bulkUpdateApproveRejectStatus,
   resetBulkUpdateStatus,
 } from './srUpdates/state/srUpdatesTableSlice';
@@ -120,6 +114,7 @@ import { GetNotationConfig } from './notations/NotationsConfig';
 import { disclosureStatementConfig } from './disclosure/DisclosureConfig';
 import GetConfig from './participants/ParticipantConfig';
 import { GetAssociateConfig } from './associates/AssociateConfig';
+import { GetDocumentsConfig } from './documents/DocumentsConfig';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
@@ -163,14 +158,17 @@ const SiteDetails = () => {
   const [hasError, setHasError] = useState(false);
   const [errorList, setErrorList] = useState<any[]>([]);
   const savedChanges = useSelector(trackedChanges);
-  const siteNotation = useSelector(notationParticipants);
-  const disclosure = useSelector(siteDisclosure);
-  const sitePartics = useSelector(siteParticipants);
-  const siteAssocs = useSelector(associatedSites);
+  const siteNotation = useSelector(getSiteNoatations);
+  const disclosure = useSelector(getSiteDisclosure);
+  const sitePartics = useSelector(getSiteParticipants);
+  const siteAssocs = useSelector(getSiteAssociated);
+  const siteDocuments = useSelector(getSiteDocuments);
+  const userActions = [UserActionEnum.added, UserActionEnum.updated];
   const { notationFormRowEditMode, notationColumnInternal } =
     GetNotationConfig();
   const { participantColumnInternal } = GetConfig();
   const { associateColumnInternal } = GetAssociateConfig();
+  const { documentFormRows } = GetDocumentsConfig();
   const [userType, setUserType] = useState<UserType | null>(null);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
@@ -497,25 +495,27 @@ const SiteDetails = () => {
     try {
       // Run all validation functions in parallel using Promise.all
       const [
-        notationErrors,
-        siteDisclosureErrors,
+        siteNotationErrors,
         siteParticErrors,
+        siteDocErrors,
         siteAssocErrors,
+        siteDisclosureErrors,
       ] = await Promise.all([
         validateNotationsForm(),
         validateSiteParticipantForm(),
+        validateSiteDocumentsForm(),
         validateAssociatedSitesForm(),
         validateSiteDisclosureForm(),
       ]);
 
       // Combine all errors into one list
       const errors = [
-        ...notationErrors,
+        ...siteNotationErrors,
         ...siteParticErrors,
+        ...siteDocErrors,
         ...siteAssocErrors,
         ...siteDisclosureErrors,
       ];
-
       // You can now use `allErrors` for further processing
       return errors;
     } catch (error) {
@@ -523,126 +523,249 @@ const SiteDetails = () => {
     }
   };
 
-  const validateAssociatedSitesForm = async () => {
-    const associatedSiteTable: IFormField[][] = [
-      associateColumnInternal
-        .map((column) => column.displayType)
-        .filter(
-          (displayType): displayType is IFormField => displayType !== undefined,
-        ),
-    ];
+  const validateSiteDocumentsForm = async () => {
+    try {
+      if (siteDocuments?.length > 0) {
+        let updatedSiteDocs = deepFilterByUserAction(
+          siteDocuments,
+          userActions,
+        );
+        const errors = validateForm(
+          documentFormRows,
+          updatedSiteDocs,
+          'Documents',
+        );
+        if (errors?.length > 0) {
+          return errors;
+        } else {
+          updatedSiteDocs = removeProperty(updatedSiteDocs, 'position');
+          dispatch(setupDocumentsDataForSaving(updatedSiteDocs));
+          return [];
+        }
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
 
-    return validateForm(
-      associatedSiteTable,
-      siteAssocs?.siteAssociate,
-      'Associated Sites',
-    );
+  const validateAssociatedSitesForm = async () => {
+    try {
+      if (siteAssocs?.length > 0) {
+        const associatedSiteTable: IFormField[][] = [
+          associateColumnInternal
+            .map((column) => column.displayType)
+            .filter(
+              (displayType): displayType is IFormField =>
+                displayType !== undefined,
+            ),
+        ];
+        let updatedSiteAssocs = deepFilterByUserAction(siteAssocs, userActions);
+        const errors = validateForm(
+          associatedSiteTable,
+          updatedSiteAssocs,
+          'Associated Sites',
+        );
+        if (errors?.length > 0) {
+          return errors;
+        } else {
+          updatedSiteAssocs = removeProperty(updatedSiteAssocs, 'position');
+          dispatch(setupSiteAssociationDataForSaving(updatedSiteAssocs));
+          return [];
+        }
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
   };
 
   const validateSiteParticipantForm = async () => {
-    const siteParticipantTable: IFormField[][] = [
-      participantColumnInternal
-        .map((column) => column.displayType)
-        .filter(
-          (displayType): displayType is IFormField => displayType !== undefined,
-        ),
-    ];
-
-    return validateForm(
-      siteParticipantTable,
-      sitePartics?.siteParticipants,
-      'Site Participant',
-    );
+    try {
+      if (sitePartics?.length) {
+        const siteParticipantTable: IFormField[][] = [
+          participantColumnInternal
+            .map((column) => column.displayType)
+            .filter(
+              (displayType): displayType is IFormField =>
+                displayType !== undefined,
+            ),
+        ];
+        let updatedSitePartics = deepFilterByUserAction(
+          sitePartics,
+          userActions,
+        );
+        const errors = validateForm(
+          siteParticipantTable,
+          updatedSitePartics,
+          'Site Participant',
+        );
+        if (errors?.length > 0) {
+          return errors;
+        } else {
+          updatedSitePartics = removeProperty(updatedSitePartics, 'position');
+          dispatch(setupSiteParticipantDataForSaving(updatedSitePartics));
+          return [];
+        }
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
   };
 
   const validateSiteDisclosureForm = async () => {
-    const siteDisclosureErrors: any[] = [];
-    siteDisclosureErrors.push(
-      ...validateForm(
-        disclosureStatementConfig,
-        disclosure?.siteDisclosure,
-        'Site Disclosure',
-      ),
-    );
-
-    const { siteRegDateRecd, dateCompleted } = disclosure?.siteDisclosure;
-    if (!!siteRegDateRecd && !!dateCompleted) {
+    try {
       if (
-        new Date(disclosure?.siteDisclosure?.dateCompleted) <
-        new Date(disclosure?.siteDisclosure?.siteRegDateRecd)
+        disclosure &&
+        typeof disclosure === 'object' &&
+        Object.keys(disclosure).length > 0
       ) {
-        siteDisclosureErrors.push({
-          label: 'Site Disclosure',
-          errorMessage: `Site Disclosure Date Completed is always equal or greater than Date Received.`,
-        });
+        const siteDisclosureErrors: any[] = [];
+        let updatedSiteDisclosure = deepFilterByUserAction(
+          disclosure,
+          userActions,
+        );
+        const errors = validateForm(
+          disclosureStatementConfig,
+          updatedSiteDisclosure,
+          'Site Disclosure',
+        );
+        if (errors?.length > 0) {
+          siteDisclosureErrors.push(...errors);
+        }
+        const { siteRegDateRecd, dateCompleted } = disclosure;
+        if (!!siteRegDateRecd && !!dateCompleted) {
+          if (
+            new Date(disclosure?.dateCompleted) <
+            new Date(disclosure?.siteRegDateRecd)
+          ) {
+            siteDisclosureErrors.push({
+              label: 'Site Disclosure',
+              errorMessage: `Site Disclosure Date Completed is always equal or greater than Date Received.`,
+            });
+          }
+        }
+
+        if (siteDisclosureErrors?.length > 0) {
+          return siteDisclosureErrors;
+        } else {
+          updatedSiteDisclosure = removeProperty(
+            updatedSiteDisclosure,
+            'position',
+          );
+          dispatch(setupSiteDisclosureDataForSaving(updatedSiteDisclosure));
+          return [];
+        }
+      } else {
+        return [];
       }
+    } catch (error) {
+      console.error(error);
+      return [];
     }
-    return siteDisclosureErrors;
   };
 
   const validateNotationsForm = async () => {
     try {
       // Run both validations in parallel and wait for them to finish
-      const [notationErrors, notationParticipantErrors] = await Promise.all([
-        validateNotations(), // Async function handling Notation validation
-        validateNotationParticipants(), // Async function handling Notation Participant validation
-      ]);
-
-      // Combine and return the errors from both functions
-      return [...notationErrors, ...notationParticipantErrors];
-    } catch (error) {
-      return []; // Return empty array in case of error to avoid breaking further logic
-    }
-  };
-
-  const validateNotations = async () => {
-    // Directly return the result of validateForm if it's not async
-    return validateForm(
-      notationFormRowEditMode,
-      siteNotation?.siteNotation,
-      'Notation',
-    );
-  };
-
-  const validateNotationParticipants = async () => {
-    const notationParticipantTable: IFormField[][] = [
-      notationColumnInternal
-        .map((column) => column.displayType)
-        .filter(
-          (displayType): displayType is IFormField => displayType !== undefined,
-        ),
-    ];
-
-    const notationParticipantErrors: any[] = [];
-
-    // Loop through siteNotation and their notationParticipants
-    for (const [index, notation] of siteNotation?.siteNotation.entries()) {
-      if (
-        notation?.notationParticipant &&
-        notation?.notationParticipant?.length > 0
-      ) {
-        for (const [
-          participantIndex,
-          notationParticipant,
-        ] of notation.notationParticipant.entries()) {
-          // Validate and accumulate errors for each notation participant
-          const errors = await validateForm(
-            notationParticipantTable,
-            notationParticipant,
-            `Notation [${index + 1}] Notation Participant [${participantIndex + 1}]`,
+      if (siteNotation?.length > 0) {
+        let updatedSiteNotations = deepFilterByUserAction(
+          siteNotation,
+          userActions,
+        );
+        const [notationErrors, notationParticipantErrors] = await Promise.all([
+          validateNotations(updatedSiteNotations), // Async function handling Notation validation
+          validateNotationParticipants(updatedSiteNotations), // Async function handling Notation Participant validation
+        ]);
+        // Combine and return the errors from both functions
+        const siteNotationErrors = [
+          ...notationErrors,
+          ...notationParticipantErrors,
+        ];
+        if (siteNotationErrors.length > 0) {
+          return siteNotationErrors;
+        } else {
+          updatedSiteNotations = removeProperty(
+            updatedSiteNotations,
+            'position',
           );
-          notationParticipantErrors.push(...errors);
+          dispatch(setupNotationDataForSaving(updatedSiteNotations));
+          return [];
         }
       } else {
-        notationParticipantErrors.push({
-          label: 'Notation Participants',
-          errorMessage: `Notation [${index + 1}] Atleast one  Notation Participant is required.`,
-        });
+        return [];
       }
+    } catch (error) {
+      console.error(error);
+      return [];
     }
+  };
 
-    // Return the accumulated errors
-    return notationParticipantErrors;
+  const validateNotations = async (updatedSiteNotations: any) => {
+    try {
+      // Directly return the result of validateForm if it's not async
+      return validateForm(
+        notationFormRowEditMode,
+        updatedSiteNotations,
+        'Notation',
+      );
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+
+  const validateNotationParticipants = async (updatedSiteNotations: any) => {
+    try {
+      const notationParticipantTable: IFormField[][] = [
+        notationColumnInternal
+          .map((column) => column.displayType)
+          .filter(
+            (displayType): displayType is IFormField =>
+              displayType !== undefined,
+          ),
+      ];
+
+      const notationParticipantErrors: any[] = [];
+      // Loop through siteNotation and their notationParticipants
+      for (const [index, notation] of updatedSiteNotations?.entries()) {
+        if (
+          notation?.notationParticipant &&
+          notation?.notationParticipant?.length > 0
+        ) {
+          for (const [
+            participantIndex,
+            notationParticipant,
+          ] of notation.notationParticipant.entries()) {
+            // Validate and accumulate errors for each notation participant
+            const errors = validateForm(
+              notationParticipantTable,
+              notationParticipant,
+              `Notation [${notation?.position + 1}] Notation Participant [${notationParticipant?.position + 1}]`,
+            );
+            notationParticipantErrors.push(...errors);
+          }
+        } else {
+          notationParticipantErrors.push({
+            label: 'Notation Participants',
+            errorMessage: `Notation [${notation?.position + 1}] Atleast one  Notation Participant is required.`,
+          });
+        }
+      }
+
+      // Return the accumulated errors
+      return notationParticipantErrors;
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
   };
 
   const handleCancelButton = () => {

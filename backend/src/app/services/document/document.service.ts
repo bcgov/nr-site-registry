@@ -106,6 +106,7 @@ export class DocumentService {
             docParticId: sdp.id,
             psnorgId: sdp.psnorgId,
             displayName: sdp.psnorg.displayName,
+            organizationName: sdp.psnorg.organizationName,
           }));
         }
 

@@ -717,7 +717,6 @@ const SRUpdates = () => {
               link="?documents"
             >
               <Document
-                index={index}
                 userType={UserType.Internal}
                 mode={SiteDetailsMode.ViewOnlyMode}
                 documentFirstChildFormRows={documentFirstChildFormRows}
@@ -730,7 +729,7 @@ const SRUpdates = () => {
                 handleDownload={() => {}}
                 handleFileReplace={handleChange}
                 handleFileDelete={handleChange}
-                key={Date.now()}
+                uniqueId={Date.now()}
                 internalRow={documentFormRows}
                 showApproveRejectSection={true}
                 approveRejectHandler={(value) =>

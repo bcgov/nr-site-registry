@@ -929,11 +929,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
           {!tableMode && (
             <label
               htmlFor={textAreaId}
-              className={`${
-                !isEditing
-                  ? (customLabelCss ?? '')
-                  : `form-label ${customEditLabelCss ?? 'custom-label'}`
-              }`}
+              className={`${!isEditing ? (customLabelCss ?? '') : `form-label ${customEditLabelCss ?? 'custom-label'}`} ${validation?.required ? 'required-field' : ''}`}
             >
               {label}
             </label>
@@ -946,7 +942,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
           data-testid={textAreaId}
           className={`form-control custom-textarea  ${customPlaceholderCss ?? ''} ${
             customEditInputTextCss ?? 'custom-input-text'
-          }`}
+          } ${error && 'error'}`}
           placeholder={placeholder}
           value={value ?? ''}
           onChange={handleTextAreaChange}

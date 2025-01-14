@@ -553,7 +553,6 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   };
 
   const handleTableSort = (row: any, ascDir: any) => {
-    debugger;
     let property = row['graphQLPropertyName'];
     setFormData((prevData) => {
       // Create a shallow copy of the previous data

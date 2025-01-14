@@ -288,12 +288,21 @@ export type FetchSiteResponse = {
   timestamp?: Maybe<Scalars['String']['output']>;
 };
 
-export type FindSitesAndPlacesResponse = {
-  __typename?: 'FindSitesAndPlacesResponse';
+export type FindSitesAndPlaces = {
+  __typename?: 'FindSitesAndPlaces';
   httpStatusCode?: Maybe<Scalars['Int']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   places: Array<Place>;
   sites: Array<Sites>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
+export type FindSitesAndPlacesResponse = {
+  __typename?: 'FindSitesAndPlacesResponse';
+  data: FindSitesAndPlaces;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
   timestamp?: Maybe<Scalars['String']['output']>;
 };

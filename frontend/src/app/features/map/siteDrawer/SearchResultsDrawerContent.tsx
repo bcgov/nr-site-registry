@@ -61,6 +61,9 @@ export const SearchResultsDrawerContent: FC<
     });
 
   const searchSitesWithFilters = useCallback(() => {
+    if (siteIds.length === 0) {
+      return;
+    }
     searchSitesQuery({
       variables: {
         ...pagination,

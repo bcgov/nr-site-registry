@@ -31,6 +31,10 @@ export class DocumentDto extends ChangeAuditObjectTypeDTO {
   @IsString()
   displayName: string;
 
+  @Field({ nullable: true })
+  @IsString()
+  organizationName?: string;
+
   @Field()
   @IsString()
   siteId: string;
@@ -68,6 +72,10 @@ export class DocumentInputDTO extends ChangeAuditEntityDTO {
   @Field({ nullable: true })
   @IsString()
   displayName: string;
+
+  @Field({ nullable: true })
+  @IsString()
+  organizationName?: string;
 
   @Field()
   @IsString()

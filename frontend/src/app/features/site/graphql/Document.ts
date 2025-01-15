@@ -17,6 +17,7 @@ export const graphQLSiteDocumentsBySiteId = () => {
           documentDate
           title
           displayName
+          organizationName
           filePath
           srAction
         }

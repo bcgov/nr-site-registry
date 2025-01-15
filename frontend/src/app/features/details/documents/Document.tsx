@@ -14,7 +14,6 @@ import { ApproveRejectButtons } from '../../../components/approve/ApproveReject'
 import { Button } from '../../../components/button/Button';
 
 interface IDocumentProps {
-  index: number;
   userType: UserType;
   mode: any;
   documentFirstChildFormRows: IFormField[][];
@@ -29,14 +28,13 @@ interface IDocumentProps {
   handleDownload: () => void;
   handleFileReplace: (event: any, doc: any, docIsReplace?: boolean) => void;
   handleFileDelete: (document: any, docIsDelete?: boolean) => void;
-  key: number;
+  uniqueId: number;
   internalRow: IFormField[][];
   approveRejectHandler?: (value: boolean) => void;
   showApproveRejectSection?: boolean;
 }
 
 const Document: React.FC<IDocumentProps> = ({
-  index,
   userType,
   mode,
   documentFirstChildFormRows,
@@ -49,23 +47,19 @@ const Document: React.FC<IDocumentProps> = ({
   handleDownload,
   handleFileReplace,
   handleFileDelete,
-  key,
+  uniqueId,
   internalRow,
   approveRejectHandler,
   showApproveRejectSection,
 }) => {
   showApproveRejectSection = showApproveRejectSection ?? false;
 
-  approveRejectHandler =
-    approveRejectHandler ??
-    ((value) => {
-      console.log('Approve/Reject Handler not provided');
-    });
+  approveRejectHandler = approveRejectHandler ?? (() => {});
 
   return (
     <PanelWithUpDown
       firstChild={
-        <div className="w-100" key={index}>
+        <div className="w-100" key={document?.id}>
           <Form
             formRows={
               userType === UserType.Internal
@@ -88,10 +82,10 @@ const Document: React.FC<IDocumentProps> = ({
         </div>
       }
       secondChild={
-        <div className="w-100 custom-second-child" key={index}>
+        <div className="w-100 custom-second-child" key={document?.id}>
           <div
             className="d-flex py-2 mb-3 gap-2 flex-wrap flex-column flex-sm-row"
-            key={index}
+            key={document?.id}
           >
             <Button onClick={handleViewOnline}>
               <ViewOnlyIcon />
@@ -110,7 +104,7 @@ const Document: React.FC<IDocumentProps> = ({
                 <>
                   <Button variant="secondary" data-testid="replace-file">
                     <label
-                      htmlFor={`replace-file_${index}`}
+                      htmlFor={`replace-file_${document?.id}`}
                       className="d-flex align-items-center gap-2 cursor-pointer"
                     >
                       <ReplaceIcon className="btn-document-icon" />
@@ -118,11 +112,11 @@ const Document: React.FC<IDocumentProps> = ({
                     </label>
                     <input
                       type="file"
-                      id={`replace-file_${index}`}
+                      id={`replace-file_${document?.id}`}
                       accept=".pdf"
                       style={{ display: 'none' }}
                       onChange={(e) => handleFileReplace(e, document)}
-                      key={key}
+                      key={uniqueId}
                     />
                   </Button>
                   <Button

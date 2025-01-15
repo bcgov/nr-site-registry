@@ -36,6 +36,7 @@ export type AssociatedSiteDto = {
   siteId: Scalars['String']['output'];
   siteIdAssociatedWith: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
 
@@ -152,9 +153,11 @@ export type DocumentDto = {
   documentDate?: Maybe<Scalars['String']['output']>;
   filePath?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
+  organizationName?: Maybe<Scalars['String']['output']>;
   psnorgId?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
   submissionDate: Scalars['String']['output'];
   title: Scalars['String']['output'];
   userAction: Scalars['String']['output'];
@@ -167,9 +170,11 @@ export type DocumentInputDto = {
   documentDate?: InputMaybe<Scalars['String']['input']>;
   filePath?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
+  organizationName?: InputMaybe<Scalars['String']['input']>;
   psnorgId: Scalars['String']['input'];
   siteId: Scalars['String']['input'];
   srAction: Scalars['String']['input'];
+  srValue?: InputMaybe<Scalars['Boolean']['input']>;
   submissionDate: Scalars['String']['input'];
   title: Scalars['String']['input'];
   userAction?: InputMaybe<Scalars['String']['input']>;
@@ -187,6 +192,7 @@ export type DocumentResponse = {
 export type DropdownDto = {
   __typename?: 'DropdownDto';
   key: Scalars['String']['output'];
+  metaData: Scalars['String']['output'];
   value: Scalars['String']['output'];
 };
 
@@ -389,6 +395,27 @@ export type LandHistories = {
   whoUpdated?: Maybe<Scalars['String']['output']>;
 };
 
+export type LandHistoriesDto = {
+  __typename?: 'LandHistoriesDTO';
+  guid: Scalars['String']['output'];
+  landUse: LandUseCd;
+  lutCode: Scalars['String']['output'];
+  note?: Maybe<Scalars['String']['output']>;
+  profileDateReceived?: Maybe<Scalars['DateTime']['output']>;
+  rwmFlag: Scalars['Float']['output'];
+  rwmNoteFlag: Scalars['Float']['output'];
+  site: Sites;
+  siteId: Scalars['String']['output'];
+  siteProfile?: Maybe<Scalars['String']['output']>;
+  srAction: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
+  userAction: Scalars['String']['output'];
+  whenCreated: Scalars['DateTime']['output'];
+  whenUpdated?: Maybe<Scalars['DateTime']['output']>;
+  whoCreated: Scalars['String']['output'];
+  whoUpdated?: Maybe<Scalars['String']['output']>;
+};
+
 export type LandHistoriesInputDto = {
   apiAction?: InputMaybe<Scalars['String']['input']>;
   landUseCode?: InputMaybe<Scalars['String']['input']>;
@@ -396,12 +423,13 @@ export type LandHistoriesInputDto = {
   originalLandUseCode?: InputMaybe<Scalars['String']['input']>;
   shouldDelete?: Scalars['Boolean']['input'];
   srAction: Scalars['String']['input'];
+  srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type LandHistoryResponse = {
   __typename?: 'LandHistoryResponse';
-  data: Array<LandHistories>;
+  data: Array<LandHistoriesDto>;
   httpStatusCode?: Maybe<Scalars['Int']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
@@ -557,6 +585,7 @@ export type NotationDto = {
   requirementReceivedDate?: Maybe<Scalars['DateTime']['output']>;
   siteId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
 
@@ -574,6 +603,7 @@ export type NotationIputDto = {
   requirementReceivedDate?: InputMaybe<Scalars['DateTime']['input']>;
   siteId: Scalars['String']['input'];
   srAction: Scalars['String']['input'];
+  srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -585,6 +615,7 @@ export type NotationParticipantDto = {
   eventParticId: Scalars['String']['output'];
   psnorgId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
 
@@ -596,6 +627,7 @@ export type NotationParticipantInputDto = {
   eventParticId: Scalars['String']['input'];
   psnorgId: Scalars['String']['input'];
   srAction: Scalars['String']['input'];
+  srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -627,6 +659,7 @@ export type ParcelDescriptionInputDto = {
   idPinNumber: Scalars['String']['input'];
   landDescription: Scalars['String']['input'];
   srAction: Scalars['String']['input'];
+  srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -942,6 +975,7 @@ export type SiteAssociationsInputDto = {
   siteId: Scalars['String']['input'];
   siteIdAssociatedWith: Scalars['String']['input'];
   srAction: Scalars['String']['input'];
+  srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1082,6 +1116,7 @@ export type SiteParticsDto = {
   psnorgId: Scalars['String']['output'];
   siteId: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
 
@@ -1098,6 +1133,7 @@ export type SiteParticsInputDto = {
   psnorgId: Scalars['String']['input'];
   siteId: Scalars['String']['input'];
   srAction: Scalars['String']['input'];
+  srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1197,6 +1233,7 @@ export type SiteProfilesInputDto = {
   siteRegDateEntered?: InputMaybe<Scalars['DateTime']['input']>;
   siteRegDateRecd?: InputMaybe<Scalars['DateTime']['input']>;
   srAction: Scalars['String']['input'];
+  srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1269,6 +1306,7 @@ export type SiteSummaryDto = {
   siteRiskCode?: InputMaybe<Scalars['String']['input']>;
   srAction: Scalars['String']['input'];
   srStatus?: InputMaybe<Scalars['String']['input']>;
+  srValue?: InputMaybe<Scalars['Boolean']['input']>;
   sstCode?: InputMaybe<Scalars['String']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
   victoriaFileNo?: InputMaybe<Scalars['String']['input']>;

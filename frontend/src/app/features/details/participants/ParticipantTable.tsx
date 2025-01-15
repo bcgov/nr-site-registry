@@ -82,9 +82,8 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
           viewMode === SiteDetailsMode.EditMode &&
           userType === UserType.Internal
         }
-        srMode={
-          viewMode === SiteDetailsMode.SRMode && userType === UserType.Internal
-        }
+        srMode={viewMode === SiteDetailsMode.SRMode}
+        hideWidgetCheckbox={true}
         primaryKeycolumnName="particRoleId"
         sortHandler={(row, ascDir) => {
           handleTableSort(row, ascDir);

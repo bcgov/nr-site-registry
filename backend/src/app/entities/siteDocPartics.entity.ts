@@ -8,11 +8,11 @@ import { ChangeAuditEntity } from './changeAuditEntity';
 
 @ObjectType()
 @Index('sdp_classified_by_frgn', ['dprCode'], {})
-@Index(
-  'site_doc_partics_sdoc_id_psnorg_id_dpr_code_key',
-  ['dprCode', 'psnorgId', 'sdocId'],
-  { unique: true },
-)
+// @Index(
+//   'site_doc_partics_sdoc_id_psnorg_id_dpr_code_key',
+//   ['dprCode', 'psnorgId', 'sdocId'],
+//   { unique: true },
+// )
 @Index('site_doc_partics_pkey', ['id'], { unique: true })
 @Index('sdp_psnorg_frgn', ['psnorgId'], {})
 @Index('sdp_rwm_flag', ['rwmFlag'], {})

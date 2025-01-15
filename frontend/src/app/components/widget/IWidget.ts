@@ -19,4 +19,6 @@ export interface IWidget {
   handleCheckBoxChange?: (event: any) => void;
   sortHandler?: (row: any, ascSort: boolean) => void;
   showPageOptions?: boolean;
+  widgetIschecked?: boolean;
+  hideWidgetCheckbox?: boolean;
 }

@@ -518,6 +518,7 @@ describe('SiteService', () => {
               userAction: 'pending',
               apiAction: 'pending',
               srAction: 'pending',
+              srValue: true,
               notationParticipant: [
                 {
                   apiAction: UserActionEnum.ADDED,
@@ -528,6 +529,7 @@ describe('SiteService', () => {
                   displayName: 'SAGER, J.',
                   srAction: 'false',
                   userAction: 'pending',
+                  srValue: true
                 },
               ],
             },

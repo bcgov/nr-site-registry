@@ -47,5 +47,19 @@ export const getLandUseColumns = (
       tableMode: true,
     },
   };
-  return [landUseCodeColumns, noteColumn];
+
+  const srColumn = {
+    id: 3,
+    displayName: 'SR',
+    active: true,
+    graphQLPropertyName: 'srValue',
+    displayType: {
+      type: FormFieldType.Checkbox,
+      label: 'SR',
+      graphQLPropertyName: 'srValue',
+      tableMode: true,
+    },
+  };
+
+  return [landUseCodeColumns, noteColumn, srColumn];
 };

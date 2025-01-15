@@ -70,8 +70,7 @@ export class DisclosureService {
         const res = result?.map((res) => {
           return {
             ...res,
-            srAction:
-              res.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
+            srAction: res.srAction === SRApprovalStatusEnum.PUBLIC,
           };
         });
         this.sitesLogger.log(

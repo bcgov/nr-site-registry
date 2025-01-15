@@ -193,6 +193,13 @@ const LandUses: FC = () => {
         event.value,
     };
 
+    const srActionValue =
+      viewMode === SiteDetailsMode.SRMode && event.property === 'srValue'
+        ? event.value
+          ? SRApprovalStatusEnum.Public
+          : SRApprovalStatusEnum.Private
+        : SRApprovalStatusEnum.Pending;
+
     setEditLandUsesData((prev) => {
       const data = new Map(prev);
 
@@ -200,7 +207,7 @@ const LandUses: FC = () => {
         ...(data.get(editedRowId) ?? {}),
         ...landUseUpdateInput,
         userAction: UserActionEnum.updated,
-        srAction: SRApprovalStatusEnum.Pending,
+        srAction: srActionValue,
       });
       return data;
     });
@@ -209,10 +216,13 @@ const LandUses: FC = () => {
       (column) => column.graphQLPropertyName === event.property,
     );
     const propertyLabel = tableColumn?.displayName || '';
-    const tracker = new ChangeTracker(
-      IChangeType.Modified,
-      'Suspect Land Uses: ' + propertyLabel,
-    );
+
+    const description =
+      viewMode === SiteDetailsMode.SRMode && event.property === 'srValue'
+        ? 'Suspect Land Uses: SR Status'
+        : 'Suspect Land Uses: ' + propertyLabel;
+
+    const tracker = new ChangeTracker(IChangeType.Modified, description);
     dispatch(trackChanges(tracker.toPlainObject()));
 
     setTableData(updatedLandUses);

@@ -11,7 +11,7 @@
     "@bcgov/design-tokens": "^2.0.1",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@mui/material": "^5.10.8",
+    "@mui/material": "6.3.0",
     "@reduxjs/toolkit": "^1.8.5",
     "axios": "^0.27.2",
     "bootstrap": "^5.2.2",

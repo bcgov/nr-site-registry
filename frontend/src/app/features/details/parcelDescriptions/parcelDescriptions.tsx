@@ -17,6 +17,7 @@ import {
   updateSortByInputValue,
 } from './parcelDescriptionsSlice';
 import {
+  getAddDeleteParcelDescriptionTableColumns,
   getParcelDescriptionsTableColumns,
   ParcelDescriptionType,
 } from './parcelDescriptionsConfig';
@@ -44,9 +45,17 @@ import {
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
+import { Button } from '../../../components/button/Button';
+import { UserMinus, UserPlus } from '../../../components/common/icon';
 
 type ParcelDescriptionsChangeEvent = {
-  property: 'descriptionType' | 'idPinNumber' | 'dateNoted';
+  property:
+    | 'descriptionType'
+    | 'idPinNumber'
+    | 'dateNoted'
+    | 'select_all'
+    | 'select_row'
+    | 'deleteIcon';
   value:
     | string
     | boolean
@@ -114,6 +123,15 @@ const ParcelDescriptions = () => {
   const [mergedRows, setMergedRows] = React.useState<IParcelDescriptionDto[]>(
     [],
   );
+  const [selectedRows, setSelectedRows] = React.useState<
+    IParcelDescriptionDto[]
+  >([]);
+  const [addedRows, setAddedRows] = React.useState<IParcelDescriptionSaveDto[]>(
+    [],
+  );
+  const [deletedRows, setDeletedRows] = React.useState<
+    IParcelDescriptionSaveDto[]
+  >([]);
 
   const handleSelectPage = (newPage: number) => {
     if (newPage !== currentPage) {
@@ -246,6 +264,53 @@ const ParcelDescriptions = () => {
     );
   };
 
+  const handleAddedRowUpdate = (newRow: IParcelDescriptionDto) => {
+    const newAddedRows: IParcelDescriptionSaveDto[] = addedRows.map(
+      (originalRow) => {
+        if (newRow.id === originalRow.id) {
+          return {
+            ...newRow,
+            apiAction: UserActionEnum.added,
+            srAction: SRApprovalStatusEnum.Pending,
+          } as IParcelDescriptionSaveDto;
+        } else {
+          return originalRow;
+        }
+      },
+    );
+    setAddedRows(newAddedRows);
+    dispatch(
+      trackChanges(
+        new ChangeTracker(
+          IChangeType.Added,
+          `Parcel Descriptions: Added New Parcel Description(s)`,
+        ).toPlainObject(),
+      ),
+    );
+  };
+
+  const handleAddedRowRemoval = (event: ParcelDescriptionsChangeEvent) => {
+    const newAddedRows = addedRows.filter((addedRow) => {
+      if (event.row !== undefined) {
+        return addedRow.id !== event.row.id;
+      }
+      return true;
+    });
+    setAddedRows(newAddedRows);
+    // TODO: There needs to be a way to remove the change tracker entry.
+  };
+
+  const handleDeletedRowRemoval = (event: ParcelDescriptionsChangeEvent) => {
+    const newDeletedRows = deletedRows.filter((deletedRow) => {
+      if (event.row !== undefined) {
+        return deletedRow.id !== event.row.id;
+      }
+      return true;
+    });
+    setDeletedRows(newDeletedRows);
+    // TODO: There needs to be a way to remove the change tracker entry.
+  };
+
   const idPinNumberIsValid = (
     newIdPinNumber: string,
     descriptionType: ParcelDescriptionType,
@@ -259,23 +324,138 @@ const ParcelDescriptions = () => {
     }
   };
 
-  const handleTableChange = (event: ParcelDescriptionsChangeEvent) => {
+  const handleSelectAll = (
+    newRows: IParcelDescriptionDto[],
+    selected: boolean,
+  ) => {
+    // Select All only selects all for the current page.
+    const rowIds = selectedRows.map((row) => {
+      return row.id;
+    });
+
+    let newSelectedRows: IParcelDescriptionDto[];
+    if (selected) {
+      // Filter out any existing rows and then re-add them. This addresses an
+      // edge case where a user selects all, deselects one, then selects all
+      // again, resulting in there being duplicate selected rows.
+      newSelectedRows = selectedRows
+        .filter((row) => {
+          return !rowIds.includes(row.id);
+        })
+        .concat(newRows);
+    } else {
+      newSelectedRows = selectedRows.filter((row) => {
+        return !rowIds.includes(row.id);
+      });
+    }
+
+    setSelectedRows(newSelectedRows);
+  };
+
+  const handleSelectRow = (
+    newRow: IParcelDescriptionDto,
+    selected: boolean,
+  ) => {
+    let newSelectedRows: IParcelDescriptionDto[];
+
+    if (selected) {
+      newSelectedRows = selectedRows.concat([newRow]);
+    } else {
+      newSelectedRows = selectedRows.filter((row) => {
+        return row.id !== newRow.id;
+      });
+    }
+
+    setSelectedRows(newSelectedRows);
+  };
+
+  const handleAddRow = () => {
+    // We need to assign an id to the new row in order to handle merging updates
+    // to the row and handling deletions. This id is temporary until it is saved
+    // to the database and will always be negative.
+    let nextId: Number;
+    if (addedRows.length > 0) {
+      nextId = Math.min(...addedRows.map((row) => Number(row.id))) - 1;
+    } else {
+      nextId = -1;
+    }
+    const newRow: IParcelDescriptionSaveDto = {
+      id: nextId.toString(),
+      descriptionType: ParcelDescriptionType.ParcelID,
+      idPinNumber: '',
+      dateNoted: '',
+      landDescription: '',
+      apiAction: UserActionEnum.added,
+      srAction: SRApprovalStatusEnum.Pending,
+      userAction: '',
+    };
+    setAddedRows([...addedRows, newRow]);
+  };
+
+  const handleDeleteRows = () => {
+    const newDeletedRows: IParcelDescriptionSaveDto[] = deletedRows.concat(
+      selectedRows.map((row) => {
+        return {
+          ...row,
+          apiAction: UserActionEnum.deleted,
+        } as IParcelDescriptionSaveDto;
+      }),
+    );
+    setDeletedRows(newDeletedRows);
+    newDeletedRows.forEach((deletedRow) => {
+      dispatch(
+        trackChanges(
+          new ChangeTracker(
+            IChangeType.Deleted,
+            `Parcel Descriptions: ${deletedRow.id}`,
+          ).toPlainObject(),
+        ),
+      );
+    });
+  };
+
+  const handleEditTableChange = (event: ParcelDescriptionsChangeEvent) => {
+    handleTableChange(event, false);
+  };
+
+  const handleAddTableChange = (event: ParcelDescriptionsChangeEvent) => {
+    handleTableChange(event, true);
+  };
+
+  const handleTableChange = (
+    event: ParcelDescriptionsChangeEvent,
+    added: boolean,
+  ) => {
+    if (event.property === 'select_all' && event.selected !== undefined) {
+      // When selecting all, the event's value will be an array of rows, and the
+      // "selected" boolean property will be present. Row is missing.
+      handleSelectAll(event.value as IParcelDescriptionDto[], event.selected);
+      return;
+    }
     if (event.row !== undefined) {
       let newRow: IParcelDescriptionDto;
       switch (event.property) {
+        case 'select_row':
+          handleSelectRow(event.row, event.value as boolean);
+          break;
         case 'descriptionType':
           // There is an edge case where the user enters a 9 digit idPinNumber
           // then changes the description type to Crown Land File Number, which
           // only allows an input length of 7. Truncate the value.
           const value = event.value as ParcelDescriptionType;
-          if (value === ParcelDescriptionType.CrownLandFileNumber) {
-            event.row.idPinNumber = event.row.idPinNumber.slice(0, 7);
+          let cleanedIdPinNumber = event.row.idPinNumber;
+          if (
+            value === ParcelDescriptionType.CrownLandFileNumber &&
+            event.row.idPinNumber?.length > 7
+          ) {
+            cleanedIdPinNumber = event.row.idPinNumber.slice(0, 7);
           }
           newRow = {
             ...event.row,
+            idPinNumber: cleanedIdPinNumber,
             descriptionType: value,
           };
-          handleRowUpdate(newRow);
+          added ? handleAddedRowUpdate(newRow) : handleRowUpdate(newRow);
           break;
         case 'idPinNumber':
           if (
@@ -288,7 +468,7 @@ const ParcelDescriptions = () => {
               ...event.row,
               idPinNumber: event.value as string,
             };
-            handleRowUpdate(newRow);
+            added ? handleAddedRowUpdate(newRow) : handleRowUpdate(newRow);
           }
           break;
         case 'dateNoted':
@@ -304,7 +484,7 @@ const ParcelDescriptions = () => {
             ...event.row,
             dateNoted: newDateString,
           };
-          handleRowUpdate(newRow);
+          added ? handleAddedRowUpdate(newRow) : handleRowUpdate(newRow);
           break;
       }
     }
@@ -336,8 +516,14 @@ const ParcelDescriptions = () => {
   };
 
   React.useEffect(() => {
-    dispatch(setupParcelDescriptionsDataForSaving([...updatedRows]));
-  }, [updatedRows]);
+    dispatch(
+      setupParcelDescriptionsDataForSaving([
+        ...updatedRows,
+        ...addedRows,
+        ...deletedRows,
+      ]),
+    );
+  }, [updatedRows, addedRows, deletedRows]);
 
   React.useEffect(() => {
     if (viewMode == SiteDetailsMode.EditMode) {
@@ -378,45 +564,149 @@ const ParcelDescriptions = () => {
     setTotalResults(reduxState.totalResults);
   }, [reduxState]);
 
+  const addRemoveButtons = () => {
+    if (viewMode === SiteDetailsMode.EditMode) {
+      return (
+        <div className="row">
+          <div className="d-flex gap-2 flex-wrap">
+            <Button variant="secondary" onClick={() => handleAddRow()}>
+              <UserPlus />
+              Add Parcel Description
+            </Button>
+            <Button
+              variant="secondary"
+              disabled={selectedRows.length === 0}
+              onClick={() => handleDeleteRows()}
+            >
+              <UserMinus />
+              Remove Parcel Description
+            </Button>
+          </div>
+        </div>
+      );
+    }
+  };
+
+  const addedParcelDescriptions = () => {
+    if (addedRows.length > 0 && viewMode === SiteDetailsMode.EditMode) {
+      return (
+        <div
+          id="parcel-descriptions-component-added"
+          data-testid="parcel-descriptions-component-added"
+        >
+          <div className="row">
+            <h3>Parcel Descriptions to Create</h3>
+            <hr />
+          </div>
+          <div className="row">
+            <ParcelDescriptionTable
+              showPageOptions={false}
+              requestStatus={requestStatus}
+              columns={getAddDeleteParcelDescriptionTableColumns()}
+              data={addedRows}
+              totalResults={addedRows.length}
+              handleSelectPage={() => {}}
+              handleChangeResultsPerPage={() => {}}
+              currentPage={1}
+              resultsPerPage={addedRows.length}
+              handleTableSortChange={() => {}}
+              viewMode={viewMode}
+              tableChangeHandler={handleAddTableChange}
+              deleteHandler={handleAddedRowRemoval}
+              allowRowsSelect={false}
+            />
+          </div>
+        </div>
+      );
+    }
+  };
+
+  const deletedParcelDescriptions = () => {
+    if (deletedRows.length > 0 && viewMode === SiteDetailsMode.EditMode) {
+      return (
+        <div
+          id="parcel-descriptions-component-deleted"
+          data-testid="parcel-descriptions-component-deleted"
+        >
+          <div className="row">
+            <h3>Parcel Descriptions to Delete</h3>
+            <hr />
+          </div>
+          <div className="row">
+            <ParcelDescriptionTable
+              showPageOptions={false}
+              requestStatus={requestStatus}
+              columns={getAddDeleteParcelDescriptionTableColumns()}
+              data={deletedRows}
+              totalResults={deletedRows.length}
+              handleSelectPage={() => {}}
+              handleChangeResultsPerPage={() => {}}
+              currentPage={1}
+              resultsPerPage={deletedRows.length}
+              handleTableSortChange={() => {}}
+              viewMode={SiteDetailsMode.ViewOnlyMode}
+              tableChangeHandler={() => {}}
+              deleteHandler={handleDeletedRowRemoval}
+              allowRowsSelect={false}
+            />
+          </div>
+        </div>
+      );
+    }
+  };
+
   return (
     <div
       id="parcel-descriptions-component"
       data-testid="parcel-descriptions-component"
     >
-      <div className="row justify-content-between p-0">
-        <div className="col-9">
-          <SearchInput
-            label={'Search'}
-            searchTerm={searchParam}
-            clearSearch={handleSearchClear}
-            handleSearchChange={handleSearchChange}
+      <div id="parcel-descriptions-component-existing">
+        <div id="parcel-descriptions-component-search-controls" className="row">
+          <div className="col-9">
+            <SearchInput
+              label={'Search'}
+              searchTerm={searchParam}
+              clearSearch={handleSearchClear}
+              handleSearchChange={handleSearchChange}
+            />
+          </div>
+          <div className="col-3">
+            <Sort
+              formData={sortByInputValue}
+              editMode={true}
+              handleSortChange={handleSortInputChange}
+            />
+          </div>
+        </div>
+        <div className="row">
+          <h2>Parcel Description</h2>
+          <hr />
+        </div>
+        {addRemoveButtons()}
+        <div
+          id="parcel-descriptions-component-existing-table"
+          data-testid="parcel-descriptions-component-existing-table"
+          className="row py-3"
+        >
+          <ParcelDescriptionTable
+            showPageOptions={true}
+            requestStatus={requestStatus}
+            columns={getParcelDescriptionsTableColumns(viewMode)}
+            data={mergedRows}
+            totalResults={totalResults}
+            handleSelectPage={handleSelectPage}
+            handleChangeResultsPerPage={handleChangeResultsPerPage}
+            currentPage={currentPage}
+            resultsPerPage={resultsPerPage}
+            handleTableSortChange={handleTableSortChange}
+            viewMode={viewMode}
+            tableChangeHandler={handleEditTableChange}
+            deleteHandler={() => {}}
+            allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
           />
         </div>
-        <div className="col-3">
-          <Sort
-            formData={sortByInputValue}
-            editMode={true}
-            handleSortChange={handleSortInputChange}
-          />
-        </div>
-      </div>
-      <div className="row">
-        <h2>Parcel Description</h2>
-        <hr />
-        <ParcelDescriptionTable
-          showPageOptions={true}
-          requestStatus={requestStatus}
-          columns={getParcelDescriptionsTableColumns(viewMode)}
-          data={mergedRows}
-          totalResults={totalResults}
-          handleSelectPage={handleSelectPage}
-          handleChangeResultsPerPage={handleChangeResultsPerPage}
-          currentPage={currentPage}
-          resultsPerPage={resultsPerPage}
-          handleTableSortChange={handleTableSortChange}
-          viewMode={viewMode}
-          tableChangeHandler={handleTableChange}
-        />
+        {addedParcelDescriptions()}
+        {deletedParcelDescriptions()}
       </div>
     </div>
   );

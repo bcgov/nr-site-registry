@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { HttpException } from '@nestjs/common';
+import { Brackets, EntityManager, Repository } from 'typeorm';
 import { SiteService } from './site.service';
 import { Sites } from '../../entities/sites.entity';
 import { FetchSiteDetail } from '../../dto/response/genericResponse';
@@ -404,57 +405,73 @@ describe('SiteService', () => {
     expect(sites.data.length).toBe(3);
   });
 
-  /*describe('searchSites', () => {
-    it('site search matches a search parameter', async () => {
-      // Arrange
+  describe('searchSites', () => {
+    it('returns sites that match matches a search parameter', async () => {
       const searchParam = 'v';
+      const page = 1;
+      const pageSize = 20;
       const expectedResult = [
         { id: '123', commonName: 'victoria' },
-        { id: '222', commonName: 'vancouver' }]; // Example result
-      const whereMock = jest.fn().mockReturnThis();
-      const orWhereMock = jest.fn().mockReturnThis();
-      const getManyMock = jest.fn().mockResolvedValue(expectedResult);
-      const siteRepositoryFindSpy = jest.spyOn(siteRepository, 'createQueryBuilder').mockReturnValue({
-        where: whereMock,
-        orWhere: orWhereMock,
-        getMany: getManyMock,
-      } as unknown as SelectQueryBuilder<Sites>);
+        { id: '222', commonName: 'vancouver' },
+      ];
 
-      // Act
-      const result = await siteService.searchSites(searchParam);
+      jest.mock('typeorm', () => {
+        const originalModule = jest.requireActual('typeorm');
+        return {
+          ...originalModule,
+          Brackets: jest.fn().mockImplementation((whereFactory) => {
+            const mockBrackets = {
+              '@instanceof': Symbol('Brackets'),
+              whereFactory,
+            };
+            whereFactory(mockBrackets);
+            return mockBrackets;
+          }),
+        };
+      });
 
-      // Assert
-      expect(siteRepositoryFindSpy).toHaveBeenCalledWith('sites');
-      expect(whereMock).toHaveBeenCalledWith(expect.any(String), { searchParam: `%${searchParam}%` });
-      expect(orWhereMock).toHaveBeenCalledTimes(7); // Number of orWhere calls
-      expect(getManyMock).toHaveBeenCalled();
-      expect(result).toEqual(expectedResult);
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        skip: jest.fn().mockImplementation(() => mockQueryBuilder),
+        take: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest
+          .fn()
+          .mockReturnValue([expectedResult, expectedResult.length]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      const result = await siteService.searchSites(
+        {},
+        searchParam,
+        page,
+        pageSize,
+        {},
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenNthCalledWith(
+        1,
+        expect.any(Brackets),
+      );
+
+      expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
+      expect(result).toEqual({
+        sites: expectedResult,
+        count: 2,
+        page,
+        pageSize,
+      });
     });
 
-    it('site search has no matches with the search parameter', async () => {
-      // Arrange
-      const searchParam = 'xyz';
-      const expectedResult = []; // Example result
-      const whereMock = jest.fn().mockReturnThis();
-      const orWhereMock = jest.fn().mockReturnThis();
-      const getManyMock = jest.fn().mockResolvedValue(expectedResult);
-      const siteRepositoryFindSpy = jest.spyOn(siteRepository, 'createQueryBuilder').mockReturnValue({
-        where: whereMock,
-        orWhere: orWhereMock,
-        getMany: getManyMock,
-      } as unknown as SelectQueryBuilder<Sites>);
-
-      // Act
-      const result = await siteService.searchSites(searchParam);
-
-      // Assert
-      expect(siteRepositoryFindSpy).toHaveBeenCalledWith('sites');
-      expect(whereMock).toHaveBeenCalledWith(expect.any(String), { searchParam: `%${searchParam}%` });
-      expect(orWhereMock).toHaveBeenCalledTimes(7); // Number of orWhere calls
-      expect(getManyMock).toHaveBeenCalled();
-      expect(result).toEqual(expectedResult);
+    it('throws an input error when filters.siteIds is an empty array', async () => {
+      expect(async () => {
+        await siteService.searchSites({}, 'searchParam', 1, 1, { siteIds: [] });
+      }).rejects.toThrow(HttpException);
     });
-  });*/
+  });
 
   describe.skip('findSiteBySiteId', () => {
     it('should call findOneOrFail method of the repository with the provided siteId', async () => {
@@ -529,7 +546,7 @@ describe('SiteService', () => {
                   displayName: 'SAGER, J.',
                   srAction: 'false',
                   userAction: 'pending',
-                  srValue: true
+                  srValue: true,
                 },
               ],
             },

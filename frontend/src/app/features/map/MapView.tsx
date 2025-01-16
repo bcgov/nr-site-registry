@@ -108,6 +108,7 @@ function MapView() {
         />
       </MapContainer>
       <MapSearch
+        mapRef={mapRef}
         isLocationVisible={isLocationVisible}
         setLocationVisible={setLocationVisible}
         activeTool={activeTool}

@@ -1,39 +1,48 @@
 query mapSearch($searchParam: String) {
-    mapSearch(searchParam: $searchParam) {
-        data {
-            id
-            addrLine_1
-            latdeg
-            longdeg
-        }
+  mapSearch(searchParam: $searchParam) {
+    data {
+      id
+      addrLine_1
+      latdeg
+      longdeg
     }
+  }
 }
 
 query MapSearch_findSiteBySiteId($siteId: String!) {
-    findSiteBySiteId(siteId: $siteId) {
-        data {
-            id
-            addrLine_1
-            addrLine_2
-            addrLine_3
-            addrLine_4
-            city
-            latdeg
-            longdeg
-            latDegrees
-            latMinutes
-            latSeconds
-            longDegrees
-            longMinutes
-            longSeconds
-            generalDescription
-            siteRiskCode
-        }
+  findSiteBySiteId(siteId: $siteId) {
+    data {
+      id
+      addrLine_1
+      addrLine_2
+      addrLine_3
+      addrLine_4
+      city
+      latdeg
+      longdeg
+      latDegrees
+      latMinutes
+      latSeconds
+      longDegrees
+      longMinutes
+      longSeconds
+      generalDescription
+      siteRiskCode
     }
+  }
 }
 
-query MapSearch_filterSearchResults($page: Int!, $pageSize: Int!, $filters: SiteFilters!) {
-  searchSites(searchParam: "", page: $page, pageSize: $pageSize, filters: $filters) {
+query MapSearch_filterSearchResults(
+  $page: Int!
+  $pageSize: Int!
+  $filters: SiteFilters!
+) {
+  searchSites(
+    searchParam: ""
+    page: $page
+    pageSize: $pageSize
+    filters: $filters
+  ) {
     sites {
       id
       addrLine_1
@@ -65,10 +74,26 @@ query MapSearch_filterSearchResults($page: Int!, $pageSize: Int!, $filters: Site
 }
 
 mutation MapSearch_addCartItem($siteId: String!) {
-    addCartItem(cartDTO:  {
-       siteId: $siteId,
-       price: 0
-    }) {
-        success
+  addCartItem(cartDTO: { siteId: $siteId, price: 0 }) {
+    success
+  }
+}
+
+query MapSearch_findSitesAndPlaces($searchParam: String!) {
+  findSitesAndPlaces(searchParam: $searchParam) {
+    data {
+      sites {
+        id
+        commonName
+        latdeg
+        longdeg
+      }
+      places {
+        id
+        name
+        latdeg
+        longdeg
+      }
     }
+  }
 }

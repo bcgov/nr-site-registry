@@ -17,6 +17,8 @@ interface IParcelDescriptionTable {
   showPageOptions: boolean;
   viewMode: SiteDetailsMode;
   tableChangeHandler: (event: any) => void;
+  deleteHandler: (event: any) => void;
+  allowRowsSelect: boolean;
 }
 
 const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
@@ -32,6 +34,8 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
   showPageOptions,
   viewMode,
   tableChangeHandler,
+  deleteHandler,
+  allowRowsSelect,
 }) => {
   return (
     <Table
@@ -45,11 +49,12 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
       changeResultsPerPage={handleChangeResultsPerPage}
       currentPage={currentPage}
       resultsPerPage={resultsPerPage}
-      allowRowsSelect={viewMode == SiteDetailsMode.EditMode}
+      allowRowsSelect={allowRowsSelect}
       changeHandler={tableChangeHandler}
       editMode={viewMode === SiteDetailsMode.EditMode}
       idColumnName="id"
       sortHandler={handleTableSortChange}
+      deleteHandler={deleteHandler}
     ></Table>
   );
 };

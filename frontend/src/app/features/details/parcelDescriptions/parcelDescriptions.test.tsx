@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore, {
   MockStoreCreator,
@@ -136,7 +136,7 @@ describe('Parcel Descriptions Component', () => {
       );
 
       const parcelDescriptionsComponent = screen.getByTestId(
-        /^parcel-descriptions-component.*/,
+        'parcel-descriptions-component',
       );
       expect(parcelDescriptionsComponent).toBeInTheDocument();
     });
@@ -886,6 +886,241 @@ describe('Parcel Descriptions Component', () => {
             ]),
           );
         });
+      });
+    });
+  });
+
+  describe('when adding a new parcel description', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      testState.sites.siteDetailsMode = SiteDetailsMode.EditMode;
+      store = mockStore(testState);
+    });
+
+    afterEach(() => {
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+    });
+
+    it('renders the added row in a new table', async () => {
+      await act(async () => {
+        render(
+          <Provider store={store}>
+            <ParcelDescriptions />
+          </Provider>,
+        );
+      });
+
+      let addButton = screen.getByText('Add Parcel Description');
+      await act(async () => {
+        fireEvent.click(addButton);
+      });
+      jest.runAllTimers();
+
+      expect(
+        await screen.findByTestId('parcel-descriptions-component-added'),
+      ).toBeInTheDocument();
+    });
+
+    describe('when editing the added row', () => {
+      it('sets up the parcel description for saving, and tracks the action', async () => {
+        await act(async () => {
+          render(
+            <Provider store={store}>
+              <ParcelDescriptions />
+            </Provider>,
+          );
+        });
+
+        const addButton = screen.getByText('Add Parcel Description');
+        await act(async () => {
+          fireEvent.click(addButton);
+        });
+        const addedParcelDescriptionsTable = screen.getByTestId(
+          'parcel-descriptions-component-added',
+        );
+        const idPinNumberInput = within(
+          addedParcelDescriptionsTable,
+        ).getByLabelText('ID/PIN/Number');
+
+        fireEvent.change(idPinNumberInput, {
+          target: { value: '192837465' },
+        });
+
+        jest.runAllTimers();
+
+        let actions = store.getActions();
+        expect(actions).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              type: 'siteDetails/setupParcelDescriptionsDataForSaving',
+              payload: expect.arrayContaining([
+                expect.objectContaining({
+                  id: '-1',
+                  apiAction: 'added',
+                }),
+              ]),
+            }),
+            expect.objectContaining({
+              type: 'sites/trackChanges',
+              payload: expect.objectContaining({
+                changeType: IChangeType.Added,
+                label: expect.stringMatching(
+                  /^Parcel Descriptions: Added New Parcel Description\(s\)$/,
+                ),
+              }),
+            }),
+          ]),
+        );
+      });
+    });
+
+    describe('when removing the added row', () => {
+      it('removes the unused table.', async () => {
+        await act(async () => {
+          render(
+            <Provider store={store}>
+              <ParcelDescriptions />
+            </Provider>,
+          );
+        });
+
+        const addButton = screen.getByText('Add Parcel Description');
+        await act(async () => {
+          fireEvent.click(addButton);
+        });
+        const addedParcelDescriptionsTable = screen.getByTestId(
+          'parcel-descriptions-component-added',
+        );
+        const removeButton = within(
+          addedParcelDescriptionsTable,
+        ).getByLabelText('Delete');
+
+        await act(async () => {
+          fireEvent.click(removeButton);
+        });
+
+        jest.runAllTimers();
+
+        expect(
+          screen.queryByTestId('parcel-descriptions-component-added'),
+        ).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('when deleting a parcel description', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      testState.sites.siteDetailsMode = SiteDetailsMode.EditMode;
+      store = mockStore(testState);
+    });
+
+    afterEach(() => {
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+    });
+
+    it('renders the row in a new table', async () => {
+      await act(async () => {
+        render(
+          <Provider store={store}>
+            <ParcelDescriptions />
+          </Provider>,
+        );
+      });
+
+      let selectBox = screen.getAllByLabelText('Select Row')[0];
+      await act(async () => {
+        fireEvent.click(selectBox);
+      });
+      let deleteButton = screen.getByText('Remove Parcel Description');
+      await act(async () => {
+        fireEvent.click(deleteButton);
+      });
+      jest.runAllTimers();
+
+      expect(
+        await screen.findByTestId('parcel-descriptions-component-deleted'),
+      ).toBeInTheDocument();
+    });
+
+    it('sets up the parcel description for saving, and tracks the action', async () => {
+      await act(async () => {
+        render(
+          <Provider store={store}>
+            <ParcelDescriptions />
+          </Provider>,
+        );
+      });
+
+      let selectBox = screen.getAllByLabelText('Select Row')[0];
+      await act(async () => {
+        fireEvent.click(selectBox);
+      });
+      let deleteButton = screen.getByText('Remove Parcel Description');
+      await act(async () => {
+        fireEvent.click(deleteButton);
+      });
+      jest.runAllTimers();
+
+      let actions = store.getActions();
+      expect(actions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: 'siteDetails/setupParcelDescriptionsDataForSaving',
+            payload: expect.arrayContaining([
+              expect.objectContaining({
+                id: '11',
+                apiAction: 'deleted',
+              }),
+            ]),
+          }),
+          expect.objectContaining({
+            type: 'sites/trackChanges',
+            payload: expect.objectContaining({
+              changeType: IChangeType.Deleted,
+              label: expect.stringMatching(/^Parcel Descriptions: 11$/),
+            }),
+          }),
+        ]),
+      );
+    });
+
+    describe('when removing the deleted row', () => {
+      it('removes the unused table.', async () => {
+        await act(async () => {
+          render(
+            <Provider store={store}>
+              <ParcelDescriptions />
+            </Provider>,
+          );
+        });
+
+        let selectBox = screen.getAllByLabelText('Select Row')[0];
+        await act(async () => {
+          fireEvent.click(selectBox);
+        });
+        let deleteButton = screen.getByText('Remove Parcel Description');
+        await act(async () => {
+          fireEvent.click(deleteButton);
+        });
+        const deletedParcelDescriptionsTable = screen.getByTestId(
+          'parcel-descriptions-component-deleted',
+        );
+        const removeButton = within(
+          deletedParcelDescriptionsTable,
+        ).getByLabelText('Delete');
+
+        await act(async () => {
+          fireEvent.click(removeButton);
+        });
+
+        jest.runAllTimers();
+
+        expect(
+          screen.queryByTestId('parcel-descriptions-component-deleted'),
+        ).not.toBeInTheDocument();
       });
     });
   });

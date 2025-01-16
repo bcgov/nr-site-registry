@@ -153,7 +153,7 @@ export class SiteService {
 
     let pid;
     // pid/pin are 9 in length and 11 in case its hyphenated
-    if (searchParam?.length == 11 || searchParam?.length == 9) {
+    if (searchParam?.length === 11 || searchParam?.length === 9) {
       pid = searchParam.replace(/-/g, ''); // Replaces all '-' with an empty string
     }
 

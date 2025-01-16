@@ -143,7 +143,10 @@ export class SiteService {
     const query = this.siteRepository.createQueryBuilder('sites');
 
     if (siteIds && siteIds.length === 0) {
-      throw new Error('If provided, siteIds filter array must not be empty');
+      throw new HttpException(
+        `If provided, siteIds filter array must not be empty`,
+        HttpStatus.BAD_REQUEST,
+      );
     } else if (siteIds && siteIds.length > 0) {
       query.whereInIds(siteIds);
     }

@@ -552,7 +552,7 @@ describe('ParcelDescriptionsService', () => {
         srAction: 'approved',
         userAction: 'approved',
         apiAction: 'updated',
-        srValue: false
+        srValue: false,
       };
       parcelDescriptionToAdd = {
         id: idForAddedParcelDescription,
@@ -563,7 +563,7 @@ describe('ParcelDescriptionsService', () => {
         srAction: 'pending',
         userAction: 'pending',
         apiAction: 'added',
-        srValue: false
+        srValue: false,
       };
       parcelDescriptionToDelete = {
         id: idForDeletedParcelDescription,
@@ -574,7 +574,7 @@ describe('ParcelDescriptionsService', () => {
         srAction: 'pending',
         userAction: 'pending',
         apiAction: 'deleted',
-        srValue: false
+        srValue: false,
       };
 
       siteId = '100';
@@ -784,7 +784,7 @@ describe('ParcelDescriptionsService', () => {
           srAction: 'pending',
           userAction: 'pending',
           apiAction: 'added',
-          srValue: false
+          srValue: false,
         },
       ];
       userInfo = { givenName: 'test' };
@@ -1016,7 +1016,7 @@ describe('ParcelDescriptionsService', () => {
           srAction: 'approved',
           userAction: 'approved',
           apiAction: 'updated',
-          srValue: true
+          srValue: true,
         },
       ];
       userInfo = { givenName: 'test' };
@@ -1312,7 +1312,7 @@ describe('ParcelDescriptionsService', () => {
           srAction: 'approved',
           userAction: 'approved',
           apiAction: 'deleted',
-          srValue: true
+          srValue: true,
         },
       ];
 

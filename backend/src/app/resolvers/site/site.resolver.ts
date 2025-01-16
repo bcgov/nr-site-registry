@@ -311,6 +311,32 @@ export class SiteResolver {
     ],
     mode: RoleMatchingMode.ANY,
   })
+  @Query(() => FetchSiteResponse, { name: 'fetchSitesByRadius' })
+  async fetchSitesByRadius(
+    @Args('lat', { type: () => Number }) lat: number,
+    @Args('lon', { type: () => Number }) lon: number,
+    @Args('radius', { type: () => Number }) radius: number,
+  ) {
+    this.sitesLogger.log(
+      'SiteResolver.fetchSitesByRadius() start lat:' +
+        ' ' +
+        lat +
+        ' lon ' +
+        lon +
+        ' radius ' +
+        radius,
+    );
+    return this.siteService.fetchSitesByRadius(lat, lon, radius);
+  }
+
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => FetchSiteDetail, { name: 'findSiteBySiteIdLoggedInUser' })
   findSiteBySiteIdLoggedInUser(
     @Args('siteId', { type: () => String }) siteId: string,

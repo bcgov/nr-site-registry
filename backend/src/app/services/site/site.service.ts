@@ -151,6 +151,19 @@ export class SiteService {
       query.whereInIds(siteIds);
     }
 
+    let pid;
+    // pid/pin are 9 in length and 11 in case its hyphenated
+    if (searchParam?.length === 11 || searchParam?.length === 9) {
+      pid = searchParam.replace(/-/g, ''); // Replaces all '-' with an empty string
+    }
+
+    // Add joins to the query
+    if (pid) {
+      query
+        .innerJoin('sites.siteSubdivisions', 'siteSubdivisions') // Join the siteSubdivisions table
+        .innerJoin('siteSubdivisions.subdivision', 'subdivision'); // Join the subdivisions table
+    }
+
     query.andWhere(
       new Brackets((qb) => {
         qb.where('CAST(sites.id AS TEXT) LIKE :searchParam', {
@@ -177,6 +190,14 @@ export class SiteService {
           .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchParam)', {
             searchParam: `%${searchParam.toLowerCase()}%`,
           });
+        if (pid) {
+          qb.orWhere('subdivision.pid = :pid', {
+            pid: pid,
+          });
+          qb.orWhere('subdivision.pin = :pin', {
+            pin: pid,
+          });
+        }
       }),
     );
 

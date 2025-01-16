@@ -531,6 +531,54 @@ export class SiteService {
     }
   }
 
+  async fetchSitesByRadius(lat: number, lon: number, radius: number) {
+    this.sitesLogger.log('SiteService.fetchSitesByRadius() start');
+    this.sitesLogger.debug('SiteService.fetchSitesByRadius() start');
+    try {
+      const query = this.siteRepository.createQueryBuilder('sites');
+      // const result = await query
+      //   .select('sites.id')
+      //   .addSelect(
+      //     `ST_Distance(ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326), ST_SetSRID(ST_MakePoint(sites.longdeg, sites.latdeg), 4326))`,
+      //     'distance',
+      //   )
+      //   .where(
+      //     `ST_DWithin(ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326), ST_SetSRID(ST_MakePoint(sites.longdeg, sites.latdeg), 4326), ${radius})`,
+      //   )
+      //   .getMany();
+      const result = await query
+        .select('sites.id')
+        .addSelect(
+          `ST_Distance(sites.geom, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326))`,
+          'distance',
+        )
+        .where(
+          `ST_DWithin(sites.geom, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326), :radius)`,
+        )
+        .setParameters({ lon, lat, radius })
+        .getMany();
+
+      if (result) {
+        this.sitesLogger.log('SiteService.fetchSitesByRadius() end');
+        this.sitesLogger.debug('SiteService.fetchSitesByRadius() end');
+        return result.map((obj: any) => obj.id);
+      } else {
+        this.sitesLogger.log('SiteService.fetchSitesByRadius() end');
+        this.sitesLogger.debug('SiteService.fetchSitesByRadius() end');
+        return []; // Return an empty array if no results
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in SiteService.fetchSitesByRadius() end',
+        JSON.stringify(error),
+      );
+      throw new HttpException(
+        `Failed to retrieve site ids.`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
   async saveSiteDetails(
     inputDTO: SaveSiteDetailsDTO,
     userInfo: any,

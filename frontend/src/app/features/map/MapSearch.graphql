@@ -97,3 +97,15 @@ query MapSearch_findSitesAndPlaces($searchParam: String!) {
     }
   }
 }
+
+query MapSearch_fetchSitesByRadius($latitude: Float!, $longitude: Float!, $radius: Float!) {
+  fetchSitesByRadius(lat: $latitude, lon: $longitude, radius: $radius) {
+    data {
+      sites {
+        id
+        latdeg
+        longdeg
+      }
+    }
+  }
+}

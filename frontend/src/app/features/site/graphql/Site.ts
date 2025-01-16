@@ -146,6 +146,8 @@ export const graphqlSiteDetailsQueryForLoggedIn = () => {
           latDegrees
           latMinutes
           latSeconds
+          latdeg
+          longdeg
           city
           generalDescription
           siteRiskCode

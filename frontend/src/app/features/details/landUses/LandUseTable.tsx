@@ -41,13 +41,14 @@ const LandUseTable: React.FC<ILandUseTable> = ({
       changeHandler={onTableChange}
       title={'Suspect Land Uses'}
       tableColumns={tableColumns}
-      tableData={dataWithTextSearchApplied}
+      tableData={dataWithTextSearchApplied ?? []}
       allowRowsSelect={editModeEnabled}
       tableIsLoading={tableLoading}
       editMode={editModeEnabled}
       srMode={viewMode === SiteDetailsMode.SRMode}
       primaryKeycolumnName="guid"
       sortHandler={handleTableSort}
+      hideWidgetCheckbox={true}
     >
       {editModeEnabled && (
         <div className="d-flex gap-2 flex-wrap ">

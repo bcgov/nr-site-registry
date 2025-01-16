@@ -45,6 +45,7 @@ import {
   FaListCheck,
   FaDrawPolygon,
   FaMapPin,
+  FaCircleExclamation,
 } from 'react-icons/fa6';
 
 import {
@@ -108,3 +109,4 @@ export const FindMe = FaLocationCrosshairs;
 export const ListCheckIcon = FaListCheck;
 export const DrawPolygon = FaDrawPolygon;
 export const MapPin = FaMapPin;
+export const CircleExclamationIconFa = FaCircleExclamation;

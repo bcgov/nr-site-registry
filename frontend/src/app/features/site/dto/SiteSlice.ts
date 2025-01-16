@@ -5,6 +5,7 @@ import {
   graphQlSiteQuery,
   graphqlSiteDetailsQuery,
   graphqlSiteDetailsQueryForLoggedIn,
+  graphQlSiteQueryForAuthenticatedUsers,
 } from '../graphql/Site';
 import { SiteState } from './SiteState';
 import { RequestStatus } from '../../../helpers/requests/status';

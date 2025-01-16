@@ -15,6 +15,7 @@ export const graphQLAssociatedSitesBySiteId = () => {
           effectiveDate
           note
           srAction
+          srValue
         }
       }
     }

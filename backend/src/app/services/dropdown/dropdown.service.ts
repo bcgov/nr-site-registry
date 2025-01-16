@@ -109,6 +109,7 @@ export class DropdownService {
         result.map((obj: PeopleOrgs) => ({
           key: obj.id,
           value: obj.displayName,
+          metaData: obj.organizationName,
         })) || []
       );
     } catch (error) {

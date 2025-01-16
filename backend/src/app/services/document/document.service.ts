@@ -90,7 +90,7 @@ export class DocumentService {
           siteId: res.siteId,
           title: res.title,
           submissionDate: formattedSubmissionDate,
-          srAction: res.srAction === SRApprovalStatusEnum.PUBLIC ? true : false,
+          srAction: res.srAction === SRApprovalStatusEnum.PUBLIC,
           documentDate: formattedDocumentDate,
         };
 
@@ -106,6 +106,7 @@ export class DocumentService {
             docParticId: sdp.id,
             psnorgId: sdp.psnorgId,
             displayName: sdp.psnorg.displayName,
+            organizationName: sdp.psnorg.organizationName,
           }));
         }
 

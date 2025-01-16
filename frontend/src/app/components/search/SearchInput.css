@@ -5,12 +5,18 @@
   line-height: 16px;
   text-align: left;
 }
+
 .custom-search {
   border: 1px solid var(--surface-color-border-light, #d8d8d8) !important;
   background-color: var(--surface-background-white, #ffffff) !important;
   padding: var(--layout-padding-small) var(--layout-padding-medium)
     var(--layout-padding-small) var(--layout-padding-medium) !important;
   border-radius: var(--layout-margin-xsmall) !important;
+}
+
+input.custom-search::placeholder {
+  font-size: 16px !important;
+  line-height: 24px;
 }
 
 .custom-search::placeholder {

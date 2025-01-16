@@ -68,6 +68,7 @@ describe('ParticipantResolver', () => {
           siteId: '1',
           srAction: 'pending',
           userAction: 'pending',
+          srValue: false,
         },
       ];
       (

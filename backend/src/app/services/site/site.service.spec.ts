@@ -471,6 +471,79 @@ describe('SiteService', () => {
         await siteService.searchSites({}, 'searchParam', 1, 1, { siteIds: [] });
       }).rejects.toThrow(HttpException);
     });
+
+    it('should generate a query with joins and conditions when pid is provided', async () => {
+      jest.mock('typeorm', () => {
+        const originalModule = jest.requireActual('typeorm');
+        return {
+          ...originalModule,
+          Brackets: jest.fn().mockImplementation((whereFactory) => {
+            const mockBrackets = {
+              '@instanceof': Symbol('Brackets'),
+              whereFactory,
+            };
+            whereFactory(mockBrackets);
+            return mockBrackets;
+          }),
+        };
+      });
+
+      const mockQueryBuilder = {
+        whereInIds: jest.fn().mockReturnThis(),
+        innerJoin: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([[], 0]), // Mock empty results and count
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder as any);
+
+      //const siteIds = [1, 2, 3];
+      const searchParam = '123-456-789'; // Example pid with hyphen
+      await siteService.searchSites({}, searchParam, 1, 1, {});
+
+      //expect(mockQueryBuilder.whereInIds).toHaveBeenCalledWith(siteIds);
+      expect(mockQueryBuilder.innerJoin).toHaveBeenCalledWith(
+        'sites.siteSubdivisions',
+        'siteSubdivisions',
+      );
+      expect(mockQueryBuilder.innerJoin).toHaveBeenCalledWith(
+        'siteSubdivisions.subdivision',
+        'subdivision',
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenNthCalledWith(
+        1,
+        expect.any(Brackets),
+      );
+      expect(mockQueryBuilder.skip).toHaveBeenCalledWith(expect.any(Number));
+      expect(mockQueryBuilder.take).toHaveBeenCalledWith(expect.any(Number));
+      expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
+    });
+
+    it('should not add joins if pid is not provided', async () => {
+      const mockQueryBuilder = {
+        whereInIds: jest.fn().mockReturnThis(),
+        innerJoin: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([[], 0]), // Mock empty results and count
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder as any);
+
+      const searchParam = '123';
+      await siteService.searchSites({}, searchParam, 1, 1, {});
+
+      expect(mockQueryBuilder.innerJoin).not.toHaveBeenCalled(); // No joins without pid
+    });
   });
 
   describe.skip('findSiteBySiteId', () => {

@@ -529,7 +529,7 @@ describe('SiteService', () => {
                   displayName: 'SAGER, J.',
                   srAction: 'false',
                   userAction: 'pending',
-                  srValue: true
+                  srValue: true,
                 },
               ],
             },

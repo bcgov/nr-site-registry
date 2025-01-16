@@ -152,6 +152,7 @@ export class SiteService {
     }
 
     let pid;
+    // pid/pin are 9 in length and 11 in case its hyphenated
     if (searchParam?.length == 11 || searchParam?.length == 9) {
       pid = searchParam.replace(/-/g, ''); // Replaces all '-' with an empty string
     }
@@ -317,8 +318,6 @@ export class SiteService {
       .skip((page - 1) * pageSize)
       .take(pageSize)
       .getManyAndCount();
-
-    console.log(query.getSql());
 
     response.sites = result[0] ? result[0] : [];
     response.count = result[1] ? result[1] : 0;

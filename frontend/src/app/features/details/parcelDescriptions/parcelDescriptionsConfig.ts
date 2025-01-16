@@ -97,6 +97,25 @@ const SRColumn: TableColumn = {
   },
 };
 
+const DeleteColumn: TableColumn = {
+  id: 5,
+  displayName: 'Remove',
+  active: true,
+  graphQLPropertyName: 'deleteIcon',
+  columnSize: ColumnSize.Default,
+  displayType: {
+    type: FormFieldType.DeleteIcon,
+    label: 'Delete',
+    graphQLPropertyName: 'deleteIcon',
+    value: '',
+    tableMode: true,
+  },
+};
+
+export const getAddDeleteParcelDescriptionTableColumns = () => {
+  return [...columns, DeleteColumn];
+};
+
 export const getParcelDescriptionsTableColumns = (
   viewMode: SiteDetailsMode,
 ): TableColumn[] => {

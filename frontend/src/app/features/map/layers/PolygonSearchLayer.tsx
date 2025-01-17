@@ -35,7 +35,7 @@ export function PolygonSearch() {
   } = useMapSearchContext();
 
   const map = useMap();
-  useMapCrosshairsCursor(map);
+  useMapCrosshairsCursor(map, isDrawingPolygon);
 
   const dottedLineRef = useRef<LeafletPolyline>(null);
   const mousePositionRef = useRef<LatLng>(map.getCenter());
@@ -58,7 +58,7 @@ export function PolygonSearch() {
     },
   });
 
-  const showCrosshairs = drawShapeVertices.length === 0;
+  const showCrosshairs = isDrawingPolygon && drawShapeVertices.length === 0;
   const drawLine = isDrawingPolygon && drawShapeVertices.length >= 2;
   const drawDottedLine = isDrawingPolygon && drawShapeVertices.length > 0;
   let dottedLinePositions: LatLngExpression[] = [];

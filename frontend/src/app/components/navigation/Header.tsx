@@ -50,7 +50,11 @@ const Header = () => {
         }`}
         onClick={() => toggleNavbar()}
       >
-        <MobileNavMenu toggleOpen={toggleNavbar} mobileView={isOpen} />
+        <MobileNavMenu
+          toggleOpen={toggleNavbar}
+          mobileView={isOpen}
+          user={user}
+        />
       </div>
     </header>
   );

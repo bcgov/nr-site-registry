@@ -73,9 +73,11 @@ const MobileNavMenu = (props: any) => {
             );
           })}
         </div>
-        <div className="mobile-nav-user-section">
-          <UserAccount mobileView={props.mobileView} />
-        </div>
+        {props.user !== null && (
+          <div className="mobile-nav-user-section">
+            <UserAccount mobileView={props.mobileView} />
+          </div>
+        )}
       </div>
     </div>
   );

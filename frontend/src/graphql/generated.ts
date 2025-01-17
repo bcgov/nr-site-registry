@@ -133,7 +133,7 @@ export type CreateSnapshotDto = {
 
 export type DisclosureResponse = {
   __typename?: 'DisclosureResponse';
-  data?: Maybe<Array<SiteProfiles>>;
+  data?: Maybe<Array<SiteProfilesDto>>;
   httpStatusCode?: Maybe<Scalars['Int']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
@@ -294,12 +294,21 @@ export type FetchSiteResponse = {
   timestamp?: Maybe<Scalars['String']['output']>;
 };
 
-export type FindSitesAndPlacesResponse = {
-  __typename?: 'FindSitesAndPlacesResponse';
+export type FindSitesAndPlaces = {
+  __typename?: 'FindSitesAndPlaces';
   httpStatusCode?: Maybe<Scalars['Int']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   places: Array<Place>;
   sites: Array<Sites>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
+export type FindSitesAndPlacesResponse = {
+  __typename?: 'FindSitesAndPlacesResponse';
+  data: FindSitesAndPlaces;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
   timestamp?: Maybe<Scalars['String']['output']>;
 };
@@ -1207,9 +1216,33 @@ export type SiteProfiles = {
   whoUpdated?: Maybe<Scalars['String']['output']>;
 };
 
+export type SiteProfilesDto = {
+  __typename?: 'SiteProfilesDTO';
+  dateCompleted: Scalars['DateTime']['output'];
+  displayName?: Maybe<Scalars['String']['output']>;
+  govDocumentsComment?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  localAuthDateForwarded?: Maybe<Scalars['DateTime']['output']>;
+  localAuthDateRecd?: Maybe<Scalars['DateTime']['output']>;
+  localAuthDateSubmitted?: Maybe<Scalars['DateTime']['output']>;
+  plannedActivityComment?: Maybe<Scalars['String']['output']>;
+  rwmDateDecision?: Maybe<Scalars['DateTime']['output']>;
+  rwmDateReceived?: Maybe<Scalars['DateTime']['output']>;
+  rwmParticId?: Maybe<Scalars['String']['output']>;
+  siteDisclosureComment?: Maybe<Scalars['String']['output']>;
+  siteId: Scalars['String']['output'];
+  siteRegDateEntered?: Maybe<Scalars['DateTime']['output']>;
+  siteRegDateRecd?: Maybe<Scalars['DateTime']['output']>;
+  siteRegParticId?: Maybe<Scalars['String']['output']>;
+  srAction: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
+  userAction: Scalars['String']['output'];
+};
+
 export type SiteProfilesInputDto = {
   apiAction?: InputMaybe<Scalars['String']['input']>;
   dateCompleted: Scalars['DateTime']['input'];
+  displayName?: InputMaybe<Scalars['String']['input']>;
   govDocumentsComment?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
   localAuthDateForwarded?: InputMaybe<Scalars['DateTime']['input']>;
@@ -1223,6 +1256,7 @@ export type SiteProfilesInputDto = {
   siteId: Scalars['String']['input'];
   siteRegDateEntered?: InputMaybe<Scalars['DateTime']['input']>;
   siteRegDateRecd?: InputMaybe<Scalars['DateTime']['input']>;
+  siteRegParticId?: InputMaybe<Scalars['String']['input']>;
   srAction: Scalars['String']['input'];
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;

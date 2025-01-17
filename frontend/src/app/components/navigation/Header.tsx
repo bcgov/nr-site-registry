@@ -1,21 +1,11 @@
 import logo from '../../../app/images/logos/logo-banner.png';
-import logoVertical from '../../../app/images/logos/logo-vertical.png';
-import { useDispatch } from 'react-redux';
-
 import './Header.css';
-import moon from '../../images/moon.png';
-import { BarsIcon } from '../common/icon';
 import { useState } from 'react';
 import MobileNavMenu from './MobileNavMenu';
-import { ArrowDownIcon } from '../common/icon';
-import LanguageSwitcher from '../language/LanguageSwitcher';
 import UserAccount from '../account/UserAccount';
-import Actions from '../action/Actions';
-import { UserType } from '../../helpers/requests/userType';
-import { updateUserType } from '../../features/site/dto/SiteSlice';
-import { AppDispatch } from '../../Store';
 import { LoginDropdown } from '../login/LoginDropdown';
 import { getUser } from '../../helpers/utility';
+import Hamburger from '../hamburger/Hamburger';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,21 +14,6 @@ const Header = () => {
 
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
-  };
-
-  const dispatch = useDispatch<AppDispatch>();
-
-  const handleUserClick = (value: string) => {
-    switch (value) {
-      case UserType.External:
-        dispatch(updateUserType(UserType.External));
-        break;
-      case UserType.Internal:
-        dispatch(updateUserType(UserType.Internal));
-        break;
-      default:
-        break;
-    }
   };
 
   return (
@@ -53,18 +28,14 @@ const Header = () => {
       </div>
       <div className="header-right-corner-section d-flex align-items-center">
         {/* <LanguageSwitcher /> */}
-
-        <button
-          className="navbar-toggler display-upto-medium no-bg-br-outline custom-toggler"
-          type="button"
-          onClick={toggleNavbar}
-          aria-label="menu for mobile/smaller devices"
-          aria-expanded={isOpen ? 'true' : 'false'}
-          aria-controls="navbarMenu"
-          aria-haspopup="true"
-        >
-          <BarsIcon className="bars-button" />
-        </button>
+        <Hamburger
+          isOpen={isOpen}
+          toggleNavbar={toggleNavbar}
+          ariaLabel="menu for mobile/smaller devices"
+          ariaExpanded={isOpen}
+          ariaControls="navbarMenu"
+          ariaHasPopup="true"
+        />
 
         {/* <div className="d-sm-none d-md-flex d-none">       
           <img src={moon} alt="Moon image for theme." />

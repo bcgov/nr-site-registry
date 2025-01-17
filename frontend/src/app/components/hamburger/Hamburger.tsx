@@ -25,9 +25,9 @@ const Hamburger: React.FC<HamburgerProps> = ({
         onClick={toggleNavbar}
         aria-label={ariaLabel}
       >
-        <div className={`${customHumburgerLinesCss ?? 'line'}`}></div>
-        <div className={`${customHumburgerLinesCss ?? 'line'}`}></div>
-        <div className={`${customHumburgerLinesCss ?? 'line'}`}></div>
+        <span className={`${customHumburgerLinesCss ?? 'line'}`}></span>
+        <span className={`${customHumburgerLinesCss ?? 'line'}`}></span>
+        <span className={`${customHumburgerLinesCss ?? 'line'}`}></span>
       </div>
     </div>
   );

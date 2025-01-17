@@ -11,7 +11,7 @@
 /* Style for the hamburger icon */
 .hamburger {
   width: 20px;
-  height: 12px;
+  height: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -20,7 +20,7 @@
 }
 
 .hamburger .line {
-  height: 2px;
+  height: 3px;
   background-color: #2d2d2d;
   border-radius: 10px;
   transition: all 0.3s ease;
@@ -33,7 +33,7 @@
   -o-transform: rotate(-45deg);
   transform: rotate(45deg);
   position: relative;
-  top: 6px;
+  top: 10px;
   height: 3px !important;
 }
 

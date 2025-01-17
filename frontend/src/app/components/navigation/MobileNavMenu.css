@@ -1,11 +1,15 @@
+.mobile-nav-container {
+  overflow-y: scroll;
+  height: 100vh;
+  max-height: 251px;
+}
+
 .mobile-nav {
-  padding: var(--layout-padding-medium) var(--layout-padding-large)
-    var(--layout-padding-medium) var(--layout-padding-large);
   gap: 32px;
-  border-radius: 0px 0px var(--layout-border-radius-medium)
-    var(--layout-border-radius-medium);
   display: flex;
   flex-direction: column;
+  padding: var(--layout-padding-medium) var(--layout-padding-large)
+    var(--layout-padding-medium) var(--layout-padding-large);
 }
 
 .mobile-nav-top {
@@ -17,6 +21,14 @@
 .mobile-nav-menu-item {
   gap: 8px;
   display: flex;
+}
+
+.mobile-nav-menu-item-active {
+  background-color: var(--surface-color-primary-default, #053662);
+}
+.mobile-nav-menu-item-active .sideBar-Icon,
+.mobile-nav-menu-item-active .sideBarText {
+  color: white !important;
 }
 
 .mobile-nav-menu-item a {
@@ -52,9 +64,4 @@
   gap: 16px;
   border: 1px 0px 0px 0px;
   border-top: 1px solid var(--surface-border-light);
-}
-
-.displayLink {
-  display: flex;
-  gap: 4px;
 }

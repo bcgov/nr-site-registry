@@ -1,0 +1,62 @@
+/* Style for the container of the hamburger */
+.hamburger-container {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px;
+  gap: var(--layout-margin-small);
+}
+
+/* Style for the hamburger icon */
+.hamburger {
+  width: 20px;
+  height: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  z-index: 100;
+}
+
+.hamburger .line {
+  height: 2px;
+  background-color: #2d2d2d;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+/* Transform hamburger into cross */
+.hamburger.open .line:nth-child(1) {
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  transform: rotate(45deg);
+  position: relative;
+  top: 6px;
+  height: 3px !important;
+}
+
+.hamburger.open .line:nth-child(2) {
+  opacity: 0; /* Hide the middle line */
+}
+
+.hamburger.open .line:nth-child(3) {
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  position: relative;
+  top: -3px;
+  height: 3px !important;
+}
+@media screen and (min-width: 768px) {
+  .display-upto-medium {
+    display: none !important;
+  }
+}
+
+.custom-toggler {
+  border: 1px solid var(--surface-border-dark);
+  border-radius: var(--layout-margin-xsmall);
+}

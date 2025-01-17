@@ -32,8 +32,8 @@ import {
   FindSitesAndPlacesResponse,
   MapSearchResponse,
 } from '../../dto/mapSearch.dto';
-import { LatLngTuple } from 'src/app/utils/geometry';
-import { LatLngTupleScalar } from 'src/app/scalars/latLngTuple';
+import { LatLngTuple } from '../../utils/geometry';
+import { LatLngTupleScalar } from '../../scalars/latLngTuple';
 
 /**
  * Resolver for Region

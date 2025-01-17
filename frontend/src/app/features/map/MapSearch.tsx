@@ -20,7 +20,7 @@ import { FindMeButton } from './FindMeButton';
 import { HorizontalScroller } from './controls/HorizontalScroller';
 import { PolygonSearchButton } from './search/PolygonSearchButton';
 import { RadiusSearchButton } from './search/RadiusSearchButton';
-import { useMapSearchContext } from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { useMapSearchContext } from './mapSearchContext/MapSearchContext';
 import { RadiusSearch } from './search/RadiusSearch';
 import { PolygonSearchControls } from './search/PolygonSearchControls';
 import {

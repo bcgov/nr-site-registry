@@ -11,7 +11,7 @@ import { useMapCrosshairsCursor } from '../../../hooks/useMapCrossHairCursor';
 import { CrosshairsTooltipMarker } from '../CrossHairToolTipMarker';
 import { IconMarker } from '../IconMarker';
 import { ActiveToolEnum } from '../../../constants/Constant';
-import { useMapSearchContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 
 const PolygonVertexIcon = L.divIcon({
   html: `<div />`,

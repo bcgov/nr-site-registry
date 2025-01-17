@@ -4,7 +4,7 @@ import { SiteMarker } from './SiteMarker';
 import { useMap } from 'react-leaflet';
 import { getZoom, MAP_FLY_OPTIONS } from '../mapOptions';
 import { Site } from '../MapView';
-import { useMapSearchContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 
 interface SiteMarkersProps {
   sites: Site[];

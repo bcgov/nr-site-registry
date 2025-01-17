@@ -16,7 +16,7 @@ import './MapSearchDrawer.css';
 import { Button } from '../../../components/button/Button';
 import AddToFolio from '../../folios/AddToFolio';
 import { getZoom, MAP_FLY_OPTIONS } from '../mapOptions';
-import { useMapSearchContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 import { AppDispatch } from '../../../Store';
 import { fetchCartItems } from '../../cart/CartSlice';
 import { notifyError, notifySuccess } from '../../../components/alert/Alert';

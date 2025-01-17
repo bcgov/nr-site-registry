@@ -2,7 +2,7 @@ import { Map } from 'leaflet';
 import { Drawer } from '../../../components/drawer/Drawer';
 import { Site } from '../MapView';
 import { FC, RefObject } from 'react';
-import { useMapSearchContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 import { SearchResultsDrawerContent } from './SearchResultsDrawerContent';
 import { SiteDetailsDrawerContent } from './SiteDetailsDrawerContent';
 import { ActiveToolEnum } from '../../../constants/Constant';

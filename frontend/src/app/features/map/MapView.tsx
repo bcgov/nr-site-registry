@@ -17,7 +17,7 @@ import { MAP_FLY_OPTIONS } from './mapOptions';
 import {
   MapSearchQueryProvider,
   useMapSearchContext,
-} from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+} from './mapSearchContext/MapSearchContext';
 import { MapSearchDrawer } from './siteDrawer/MapSearchDrawer';
 import { MIN_CIRCLE_RADIUS } from '../../constants/Constant';
 import { RadiusSearchLayer } from './layers/RadiusSearchLayer';

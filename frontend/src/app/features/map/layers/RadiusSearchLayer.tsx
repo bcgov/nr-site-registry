@@ -1,7 +1,7 @@
 import { ActiveToolEnum } from '../../../constants/Constant';
 import { CircleLayer } from '../CircleLayer';
 import { Site } from '../MapView';
-import { useMapSearchContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 
 interface RadiusSearchLayerProps {
   radius: number;

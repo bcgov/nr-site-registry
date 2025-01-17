@@ -8,7 +8,7 @@ import { formatDistance } from '../../../helpers/utility';
 import { useState } from 'react';
 import { Button } from '../../../components/button/Button';
 import { Site } from '../MapView';
-import { useMapSearchContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 
 interface RadiusSearchProps {
   radius: number;

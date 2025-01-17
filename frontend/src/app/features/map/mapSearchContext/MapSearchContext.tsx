@@ -20,7 +20,7 @@ const acceptedParams = {
   search: StringParam,
   polygon: JsonParam,
 };
-interface MapSearchQueryParamsContextType {
+interface MapSearchContextType {
   selectedSiteId: string | null;
   searchTerm: string | null;
   setQuery: (
@@ -39,22 +39,21 @@ interface MapSearchQueryParamsContextType {
   setActiveTool: (tool: ActiveToolEnum | null) => void;
 }
 
-export const MapSearchQueryParamsContext =
-  createContext<MapSearchQueryParamsContextType>({
-    selectedSiteId: null,
-    searchTerm: null,
-    setQuery: () => {},
-    clearQuery: () => {},
-    isDrawingPolygon: false,
-    drawShapeVertices: [],
-    polygonVertices: [],
-    addDrawShapeVertex: () => {},
-    deleteLastDrawShapeVertex: () => {},
-    finishPolygonDraw: () => {},
-    deletePolygon: () => {},
-    activeTool: null,
-    setActiveTool: () => {},
-  });
+export const MapSearchContext = createContext<MapSearchContextType>({
+  selectedSiteId: null,
+  searchTerm: null,
+  setQuery: () => {},
+  clearQuery: () => {},
+  isDrawingPolygon: false,
+  drawShapeVertices: [],
+  polygonVertices: [],
+  addDrawShapeVertex: () => {},
+  deleteLastDrawShapeVertex: () => {},
+  finishPolygonDraw: () => {},
+  deletePolygon: () => {},
+  activeTool: null,
+  setActiveTool: () => {},
+});
 
 export const MapSearchQueryProvider = ({
   children,
@@ -117,7 +116,7 @@ export const MapSearchQueryProvider = ({
   const clearQuery = () => setQuery({}, 'replace');
 
   return (
-    <MapSearchQueryParamsContext.Provider
+    <MapSearchContext.Provider
       value={{
         selectedSiteId: query.site || null,
         searchTerm: query.search || null,
@@ -135,9 +134,8 @@ export const MapSearchQueryProvider = ({
       }}
     >
       {children}
-    </MapSearchQueryParamsContext.Provider>
+    </MapSearchContext.Provider>
   );
 };
 
-export const useMapSearchContext = () =>
-  useContext(MapSearchQueryParamsContext);
+export const useMapSearchContext = () => useContext(MapSearchContext);

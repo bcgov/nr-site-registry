@@ -4,7 +4,7 @@ import {
   TrashCanIcon,
   XmarkIcon,
 } from '../../../components/common/icon';
-import { useMapSearchContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 
 export const PolygonSearchControls = () => {
   const {

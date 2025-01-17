@@ -37,11 +37,12 @@ function MapView() {
   // Feature flag for turning OpenStreetMap tiles gray
   const osmGrayscale = false;
 
-  const { searchTerm, activeTool } = useMapSearchContext();
+  const { searchTerm, activeTool, polygonVertices } = useMapSearchContext();
 
   const { data, loading: sitesLoading } = useMapSearchQuery({
     variables: {
       searchParam: searchTerm || '',
+      ...(polygonVertices.length > 0 && { polygon: polygonVertices }),
     },
     onCompleted: ({ mapSearch: { data } }) => {
       flyToSiteBounds(data);
@@ -118,7 +119,7 @@ function MapView() {
 
       <MapSearchDrawer
         mapRef={mapRef}
-        sites={sites}
+        sites={data?.mapSearch.data || []}
         sitesLoading={sitesLoading}
         activeTool={activeTool}
         radius={radius}

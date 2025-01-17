@@ -1225,7 +1225,7 @@ describe('SiteService', () => {
         .spyOn(siteRepository, 'createQueryBuilder')
         .mockImplementation(() => mockQueryBuilder);
 
-      siteService.mapSearch();
+      siteService.mapSearch({});
 
       expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
       expect(mockQueryBuilder.where).not.toHaveBeenCalled();
@@ -1243,7 +1243,7 @@ describe('SiteService', () => {
         .mockImplementation(() => mockQueryBuilder);
 
       // Padding spaces are intentional here, do not remove
-      siteService.mapSearch('   TeSt   ');
+      siteService.mapSearch({ searchTerm: '   TeSt   ' });
 
       expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
       expect(mockQueryBuilder.where).toHaveBeenCalledTimes(1);
@@ -1254,6 +1254,36 @@ describe('SiteService', () => {
       expect(mockQueryBuilder.orWhere).toHaveBeenCalledWith(expect.anything(), {
         searchTerm: '%test%',
       });
+    });
+
+    it('should throw an input error when polygon array contains less than three vertices', () => {
+      expect(async () =>
+        siteService.mapSearch({ polygon: [[0, 0]] }),
+      ).rejects.toThrow(HttpException);
+    });
+
+    it('should format array of LatLong tuples for the DB query and enclose the polygon if start and end point do not match', () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      siteService.mapSearch({
+        polygon: [
+          [1, 2],
+          [10, 20],
+          [100, 200],
+        ],
+      });
+      expect(mockQueryBuilder.where).toHaveBeenCalledTimes(1);
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+        expect.stringContaining('POLYGON((2 1, 20 10, 200 100, 2 1))'),
+      );
     });
   });
 

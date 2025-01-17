@@ -21,18 +21,24 @@ export const MapSearchDrawer: FC<MapSearchDrawerProps> = ({
   activeTool,
   radius,
 }) => {
-  const { selectedSiteId, searchTerm, clearQuery } = useMapSearchContext();
+  const { selectedSiteId, searchTerm, clearQuery, polygonVertices } =
+    useMapSearchContext();
+
+  const isPolygonValid = polygonVertices.length > 2;
 
   let drawerTitle = '';
   if (searchTerm) drawerTitle = 'Search Results';
   if (selectedSiteId) drawerTitle = 'Selected Site';
   if (activeTool === ActiveToolEnum.radiusSearch && radius > 500)
     drawerTitle = 'Radius Search';
+  if (activeTool === ActiveToolEnum.polygonSearch)
+    drawerTitle = 'Search Results';
   return (
     <Drawer
       isOpen={
         !!selectedSiteId ||
         !!searchTerm ||
+        isPolygonValid ||
         (activeTool === ActiveToolEnum.radiusSearch &&
           sites.length > 0 &&
           radius > 500)
@@ -40,7 +46,7 @@ export const MapSearchDrawer: FC<MapSearchDrawerProps> = ({
       onClose={clearQuery}
       title={drawerTitle}
     >
-      {searchTerm && !selectedSiteId && (
+      {(searchTerm || isPolygonValid) && !selectedSiteId && (
         <SearchResultsDrawerContent
           siteIds={sites.map((site) => site.id)}
           loading={sitesLoading}

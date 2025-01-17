@@ -32,6 +32,8 @@ import {
   FindSitesAndPlacesResponse,
   MapSearchResponse,
 } from '../../dto/mapSearch.dto';
+import { LatLngTuple } from 'src/app/utils/geometry';
+import { LatLngTupleScalar } from 'src/app/scalars/latLngTuple';
 
 /**
  * Resolver for Region
@@ -232,10 +234,15 @@ export class SiteResolver {
   async mapSearch(
     @Args('searchParam', { type: () => String, nullable: true })
     searchParam: string,
+    @Args('polygon', { type: () => [LatLngTupleScalar], nullable: true })
+    polygon?: LatLngTuple[],
   ) {
     this.sitesLogger.log('SiteResolver.mapSearch() start ');
     try {
-      const data = await this.siteService.mapSearch(searchParam);
+      const data = await this.siteService.mapSearch({
+        searchTerm: searchParam,
+        polygon,
+      });
       return this.mapSearchGenericResponseProvider.createResponse(
         'Successfully fetched sites for map',
         HttpStatus.OK,

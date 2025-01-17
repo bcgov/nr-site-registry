@@ -1423,6 +1423,7 @@ export type Folio_AddSiteToFolioMutation = { __typename?: 'Mutation', addSiteToF
 
 export type MapSearchQueryVariables = Exact<{
   searchParam?: InputMaybe<Scalars['String']['input']>;
+  polygon?: InputMaybe<Array<Scalars['LatLngTuple']['input']> | Scalars['LatLngTuple']['input']>;
 }>;
 
 
@@ -1541,8 +1542,8 @@ export type Folio_AddSiteToFolioMutationHookResult = ReturnType<typeof useFolio_
 export type Folio_AddSiteToFolioMutationResult = Apollo.MutationResult<Folio_AddSiteToFolioMutation>;
 export type Folio_AddSiteToFolioMutationOptions = Apollo.BaseMutationOptions<Folio_AddSiteToFolioMutation, Folio_AddSiteToFolioMutationVariables>;
 export const MapSearchDocument = gql`
-    query mapSearch($searchParam: String) {
-  mapSearch(searchParam: $searchParam) {
+    query mapSearch($searchParam: String, $polygon: [LatLngTuple!]) {
+  mapSearch(searchParam: $searchParam, polygon: $polygon) {
     data {
       id
       addrLine_1
@@ -1566,6 +1567,7 @@ export const MapSearchDocument = gql`
  * const { data, loading, error } = useMapSearchQuery({
  *   variables: {
  *      searchParam: // value for 'searchParam'
+ *      polygon: // value for 'polygon'
  *   },
  * });
  */

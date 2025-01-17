@@ -1,5 +1,5 @@
-query mapSearch($searchParam: String) {
-  mapSearch(searchParam: $searchParam) {
+query mapSearch($searchParam: String, , $polygon: [LatLngTuple!]) {
+  mapSearch(searchParam: $searchParam, polygon: $polygon) {
     data {
       id
       addrLine_1

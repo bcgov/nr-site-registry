@@ -1,4 +1,4 @@
-import { FC, RefObject, useContext } from 'react';
+import { FC, RefObject } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Map } from 'leaflet';
@@ -16,7 +16,7 @@ import './MapSearchDrawer.css';
 import { Button } from '../../../components/button/Button';
 import AddToFolio from '../../folios/AddToFolio';
 import { getZoom, MAP_FLY_OPTIONS } from '../mapOptions';
-import { MapSearchQueryParamsContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { useMapSearchContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
 import { AppDispatch } from '../../../Store';
 import { fetchCartItems } from '../../cart/CartSlice';
 import { notifyError, notifySuccess } from '../../../components/alert/Alert';
@@ -62,7 +62,7 @@ interface SiteDetailsDrawerContentProps {
 export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
   mapRef,
 }) => {
-  const { selectedSiteId } = useContext(MapSearchQueryParamsContext);
+  const { selectedSiteId } = useMapSearchContext();
 
   const dispatch = useDispatch<AppDispatch>();
 

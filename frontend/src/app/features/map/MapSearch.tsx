@@ -15,14 +15,14 @@ import { TextSearchButton } from './search/TextSearchButton';
 
 import './MapSearch.css';
 import { SearchInput } from './search/SearchInput';
-import React, { RefObject, useContext, useState } from 'react';
+import React, { RefObject, useState } from 'react';
 import { FindMeButton } from './FindMeButton';
 import { HorizontalScroller } from './controls/HorizontalScroller';
 import { PolygonSearchButton } from './search/PolygonSearchButton';
 import { RadiusSearchButton } from './search/RadiusSearchButton';
-import { MapSearchQueryParamsContext } from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { useMapSearchContext } from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
 import { RadiusSearch } from './search/RadiusSearch';
-import { PolygonSearch } from './search/PolygonSearch';
+import { PolygonSearchControls } from './search/PolygonSearchControls';
 import {
   MapSearch_FindSitesAndPlacesQuery,
   useMapSearch_FindSitesAndPlacesQuery,
@@ -101,8 +101,6 @@ function formatDataForAutocomplete(
 
 interface MapSearchProps {
   mapRef: RefObject<Map | null>;
-  activeTool?: ActiveToolEnum | null;
-  setActiveTool?: React.Dispatch<React.SetStateAction<ActiveToolEnum | null>>;
   radius: number;
   setRadius: React.Dispatch<React.SetStateAction<number>>;
   isLocationVisible: boolean;
@@ -110,17 +108,14 @@ interface MapSearchProps {
 }
 
 export function MapSearch({
-  activeTool,
-  setActiveTool,
   radius,
   setRadius,
   isLocationVisible,
   setLocationVisible,
   mapRef,
 }: MapSearchProps) {
-  const { searchTerm, setQuery, clearQuery } = useContext(
-    MapSearchQueryParamsContext,
-  );
+  const { searchTerm, setQuery, clearQuery, activeTool, setActiveTool } =
+    useMapSearchContext();
 
   const [searchValue, setSearchValue] = useState(searchTerm);
   const searchValueDebounced = useDebouncedValue(searchValue);
@@ -158,25 +153,12 @@ export function MapSearch({
   const isRadiusTool = activeTool === ActiveToolEnum.radiusSearch;
 
   const handlePolygonToolClick = () => {
-    if (setActiveTool) {
-      setActiveTool((prevTool) =>
-        prevTool === ActiveToolEnum.polygonSearch
-          ? null
-          : ActiveToolEnum.polygonSearch,
-      );
-    }
+    setActiveTool(ActiveToolEnum.polygonSearch);
   };
 
   const handleRadiusToolClick = () => {
-    console.log('Radius tool clicked');
-    if (setActiveTool) {
-      setActiveTool((prevTool) =>
-        prevTool === ActiveToolEnum.radiusSearch
-          ? null
-          : ActiveToolEnum.radiusSearch,
-      );
-      setRadius(MIN_CIRCLE_RADIUS);
-    }
+    setActiveTool(ActiveToolEnum.radiusSearch);
+    setRadius(MIN_CIRCLE_RADIUS);
   };
 
   const onOptionSelect = (option: AutocompleteOption) => {
@@ -270,13 +252,9 @@ export function MapSearch({
         <div className="map-search-tool-row">
           <div className="map-search-tool-box">
             {isPolygonTool ? (
-              <PolygonSearch />
+              <PolygonSearchControls />
             ) : (
-              <RadiusSearch
-                radius={radius}
-                setRadius={setRadius}
-                setActiveTool={setActiveTool}
-              />
+              <RadiusSearch radius={radius} setRadius={setRadius} />
             )}
           </div>
         </div>

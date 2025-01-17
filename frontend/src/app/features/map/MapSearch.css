@@ -232,6 +232,11 @@ div.search-autocomplete.MuiAutocomplete-hasClearIcon .MuiInputBase-root {
   background-color: var(--surface-color-primary-default) !important;
 }
 
+.polygon-vertex {
+  background-color: var(--surface-primary-default);
+  border: 1px solid var(--surface-color-border-light);
+}
+
 :root {
   --layout-margin-xsmall: 4px;
   --layout-margin-small: 8px;

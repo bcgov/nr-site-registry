@@ -8,13 +8,13 @@ import { formatDistance } from '../../../helpers/utility';
 import { useState } from 'react';
 import { Button } from '../../../components/button/Button';
 import { Site } from '../MapView';
+import { useMapSearchContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
 
 interface RadiusSearchProps {
   radius: number;
   setRadius: React.Dispatch<React.SetStateAction<number>>;
   isSmall?: boolean;
   className?: string;
-  setActiveTool?: React.Dispatch<React.SetStateAction<ActiveToolEnum | null>>;
 }
 
 export function RadiusSearch({
@@ -22,13 +22,13 @@ export function RadiusSearch({
   setRadius,
   isSmall = false,
   className,
-  setActiveTool,
 }: Readonly<RadiusSearchProps>) {
+  const { setActiveTool } = useMapSearchContext();
   const [isVisible, setIsVisible] = useState(true);
 
   const onCancel = () => {
     setIsVisible(false);
-    setActiveTool && setActiveTool(null);
+    setActiveTool(null);
     setRadius(MIN_CIRCLE_RADIUS);
   };
 

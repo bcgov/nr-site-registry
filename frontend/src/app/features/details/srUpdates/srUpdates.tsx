@@ -811,6 +811,8 @@ const SRUpdates = () => {
               resultsPerPage={undefined}
               viewMode={SiteDetailsMode.ViewOnlyMode}
               handleTableSortChange={handleChange}
+              deleteHandler={() => {}}
+              allowRowsSelect={false}
             />
           </ApproveReject>
         )}

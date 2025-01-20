@@ -41,6 +41,7 @@ import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { Place } from '../../entities/placeEntity';
 import { UserTypeEum } from '../../common/userType';
+import { BC_ALBERS, LatLngTuple, WGS_84 } from '../../utils/geometry';
 
 /**
  * Nestjs Service For Region Entity
@@ -328,10 +329,23 @@ export class SiteService {
     return response;
   }
 
-  async mapSearch(searchTerm = '') {
+  async mapSearch({
+    searchTerm,
+    polygon,
+  }: {
+    searchTerm?: string;
+    polygon?: LatLngTuple[];
+  }) {
     this.sitesLogger.log('SiteService.mapSearch() start');
 
-    const searchTermClean = searchTerm.toLowerCase().trim();
+    if (polygon && polygon.length < 3) {
+      throw new HttpException(
+        'Polygon must have at least 3 vertices',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const searchTermClean = (searchTerm ?? '').toLowerCase().trim();
     const query = this.siteRepository.createQueryBuilder('sites');
 
     if (searchTermClean.length) {
@@ -357,6 +371,26 @@ export class SiteService {
         .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchTerm)', {
           searchTerm: `%${searchTermClean}%`,
         });
+    }
+
+    if (polygon) {
+      const polygonVertices = [...polygon];
+
+      // This makes sure that the provided shape is enclosed
+      if (polygonVertices[0] !== polygonVertices[polygonVertices.length - 1]) {
+        polygonVertices.push(polygonVertices[0]);
+      }
+
+      const polygonString = polygonVertices
+        .map(([lat, long]) => `${long} ${lat}`)
+        .join(', ');
+
+      query.where(
+        `ST_Within(
+          ST_Transform(sites.geometry, ${BC_ALBERS}), 
+          ST_Transform(ST_GeomFromText('POLYGON((${polygonString}))', ${WGS_84}), ${BC_ALBERS})
+        )`,
+      );
     }
 
     const [result] = await query.getManyAndCount();

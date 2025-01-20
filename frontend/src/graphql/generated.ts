@@ -17,7 +17,6 @@ export type Scalars = {
   Float: { input: number; output: number; }
   DateTime: { input: any; output: any; }
   JSON: { input: any; output: any; }
-  LatLngTuple: { input: any; output: any; }
   _Any: { input: any; output: any; }
   federation__FieldSet: { input: any; output: any; }
   link__Import: { input: any; output: any; }
@@ -36,7 +35,7 @@ export type AssociatedSiteDto = {
   note?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
   siteIdAssociatedWith: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
@@ -157,7 +156,7 @@ export type DocumentDto = {
   organizationName?: Maybe<Scalars['String']['output']>;
   psnorgId?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   submissionDate: Scalars['String']['output'];
   title: Scalars['String']['output'];
@@ -408,7 +407,7 @@ export type LandHistoriesDto = {
   site: Sites;
   siteId: Scalars['String']['output'];
   siteProfile?: Maybe<Scalars['String']['output']>;
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
   whenCreated: Scalars['DateTime']['output'];
@@ -585,7 +584,7 @@ export type NotationDto = {
   requirementDueDate?: Maybe<Scalars['DateTime']['output']>;
   requirementReceivedDate?: Maybe<Scalars['DateTime']['output']>;
   siteId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
@@ -615,7 +614,7 @@ export type NotationParticipantDto = {
   eventId: Scalars['String']['output'];
   eventParticId: Scalars['String']['output'];
   psnorgId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
@@ -858,7 +857,6 @@ export type QueryGetSnapshotsByUserIdArgs = {
 
 
 export type QueryMapSearchArgs = {
-  polygon?: InputMaybe<Array<Scalars['LatLngTuple']['input']>>;
   searchParam?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1117,7 +1115,7 @@ export type SiteParticsDto = {
   prCode: Scalars['String']['output'];
   psnorgId: Scalars['String']['output'];
   siteId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };

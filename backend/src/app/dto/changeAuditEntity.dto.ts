@@ -19,7 +19,7 @@ export class ChangeAuditObjectTypeDTO {
   @Field()
   userAction: string;
 
-  @Field()
+  @Field({ nullable: true })
   srAction: string;
 
   @Field()

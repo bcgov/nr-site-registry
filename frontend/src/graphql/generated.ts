@@ -36,7 +36,7 @@ export type AssociatedSiteDto = {
   note?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
   siteIdAssociatedWith: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
@@ -157,7 +157,7 @@ export type DocumentDto = {
   organizationName?: Maybe<Scalars['String']['output']>;
   psnorgId?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   submissionDate: Scalars['String']['output'];
   title: Scalars['String']['output'];
@@ -408,7 +408,7 @@ export type LandHistoriesDto = {
   site: Sites;
   siteId: Scalars['String']['output'];
   siteProfile?: Maybe<Scalars['String']['output']>;
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
   whenCreated: Scalars['DateTime']['output'];
@@ -585,7 +585,7 @@ export type NotationDto = {
   requirementDueDate?: Maybe<Scalars['DateTime']['output']>;
   requirementReceivedDate?: Maybe<Scalars['DateTime']['output']>;
   siteId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
@@ -615,7 +615,7 @@ export type NotationParticipantDto = {
   eventId: Scalars['String']['output'];
   eventParticId: Scalars['String']['output'];
   psnorgId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
@@ -1117,7 +1117,7 @@ export type SiteParticsDto = {
   prCode: Scalars['String']['output'];
   psnorgId: Scalars['String']['output'];
   siteId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };

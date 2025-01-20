@@ -125,7 +125,7 @@ const Notation: React.FC<INotationProps> = ({
             }
             tableData={notation.notationParticipant}
             tableIsLoading={
-              notation.notationParticipant.length > 0
+              notation.notationParticipant?.length > 0
                 ? loading
                 : RequestStatus.idle
             }

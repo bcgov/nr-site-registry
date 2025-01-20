@@ -6,9 +6,11 @@
   --current-path-background-color: var(--surface-primary-default);
   --side-bar-text-color: var(--surface-primary-default);
   --side-bar-text-hover-color: #ffffff;
+  --sidebar-default-width: 128px;
 }
 
 .side-bar {
+  position: absolute;
   display: flex;
   flex-direction: column;
   background: var(--side-bar-background-color);
@@ -19,14 +21,12 @@
   justify-content: space-between;
   min-height: calc(100vh - 65px) !important;
   border-right: 1px solid var(--surface-border-light, #d8d8d8);
-  min-width: 84px;
   z-index: 9999;
-  max-width: 128px;
+  width: var(--sidebar-default-width);
 }
 
 .side-bar:hover {
   width: 240px;
-  position: sticky;
   max-width: 240px;
 }
 

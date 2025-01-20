@@ -17,6 +17,7 @@ import {
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CustomExceptionFilter } from './app/filters/customExceptionFilters';
+import { LatLngTupleScalar } from './app/scalars/latLngTuple';
 
 /**
  * Application Module Wrapping All Functionality For User Micro Service
@@ -69,6 +70,7 @@ import { CustomExceptionFilter } from './app/filters/customExceptionFilters';
   controllers: [AppController],
   providers: [
     AppService,
+    LatLngTupleScalar,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

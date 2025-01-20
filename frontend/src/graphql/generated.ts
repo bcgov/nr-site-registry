@@ -17,6 +17,7 @@ export type Scalars = {
   Float: { input: number; output: number; }
   DateTime: { input: any; output: any; }
   JSON: { input: any; output: any; }
+  LatLngTuple: { input: any; output: any; }
   _Any: { input: any; output: any; }
   federation__FieldSet: { input: any; output: any; }
   link__Import: { input: any; output: any; }
@@ -857,6 +858,7 @@ export type QueryGetSnapshotsByUserIdArgs = {
 
 
 export type QueryMapSearchArgs = {
+  polygon?: InputMaybe<Array<Scalars['LatLngTuple']['input']>>;
   searchParam?: InputMaybe<Scalars['String']['input']>;
 };
 

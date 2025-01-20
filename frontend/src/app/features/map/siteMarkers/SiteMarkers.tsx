@@ -1,10 +1,10 @@
-import { FC, useCallback, useContext, useMemo } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { SiteMarker } from './SiteMarker';
 import { useMap } from 'react-leaflet';
 import { getZoom, MAP_FLY_OPTIONS } from '../mapOptions';
 import { Site } from '../MapView';
-import { MapSearchQueryParamsContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 
 interface SiteMarkersProps {
   sites: Site[];
@@ -13,7 +13,7 @@ interface SiteMarkersProps {
 export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
   const map = useMap();
 
-  const { selectedSiteId, setQuery } = useContext(MapSearchQueryParamsContext);
+  const { selectedSiteId, setQuery } = useMapSearchContext();
 
   const moveToSiteLocation = useCallback(
     (site: Site) => {

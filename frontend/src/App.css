@@ -51,3 +51,7 @@
     display: none !important;
   }
 }
+
+.sidebar-container {
+  width: var(--sidebar-default-width);
+}

@@ -1,8 +1,8 @@
 import { Map } from 'leaflet';
 import { Drawer } from '../../../components/drawer/Drawer';
 import { Site } from '../MapView';
-import { FC, RefObject, useContext } from 'react';
-import { MapSearchQueryParamsContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { FC, RefObject } from 'react';
+import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 import { SearchResultsDrawerContent } from './SearchResultsDrawerContent';
 import { SiteDetailsDrawerContent } from './SiteDetailsDrawerContent';
 import { ActiveToolEnum } from '../../../constants/Constant';
@@ -21,9 +21,7 @@ export const MapSearchDrawer: FC<MapSearchDrawerProps> = ({
   activeTool,
   radius,
 }) => {
-  const { selectedSiteId, searchTerm, clearQuery } = useContext(
-    MapSearchQueryParamsContext,
-  );
+  const { selectedSiteId, searchTerm, clearQuery } = useMapSearchContext();
 
   let drawerTitle = '';
   if (searchTerm) drawerTitle = 'Search Results';

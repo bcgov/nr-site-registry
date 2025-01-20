@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LatLngBounds, LatLngTuple, Map } from 'leaflet';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
@@ -15,12 +15,13 @@ import { SiteMarkers } from './siteMarkers/SiteMarkers';
 import { MapControls } from './MapControls';
 import { MAP_FLY_OPTIONS } from './mapOptions';
 import {
-  MapSearchQueryParamsContext,
   MapSearchQueryProvider,
-} from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+  useMapSearchContext,
+} from './mapSearchContext/MapSearchContext';
 import { MapSearchDrawer } from './siteDrawer/MapSearchDrawer';
-import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../constants/Constant';
+import { MIN_CIRCLE_RADIUS } from '../../constants/Constant';
 import { RadiusSearchLayer } from './layers/RadiusSearchLayer';
+import { PolygonSearchLayer } from './layers/PolygonSearchLayer';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -36,7 +37,7 @@ function MapView() {
   // Feature flag for turning OpenStreetMap tiles gray
   const osmGrayscale = false;
 
-  const { searchTerm } = useContext(MapSearchQueryParamsContext);
+  const { searchTerm, activeTool } = useMapSearchContext();
 
   const { data, loading: sitesLoading } = useMapSearchQuery({
     variables: {
@@ -66,7 +67,6 @@ function MapView() {
   const mapRef = useRef<Map>(null);
   const [isLocationVisible, setLocationVisible] = useState(false);
   const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
-  const [activeTool, setActiveTool] = useState<ActiveToolEnum | null>(null);
   const [sites, setSites] = useState<Site[]>([]);
   const clearSites = () => setSites([]);
 
@@ -100,19 +100,18 @@ function MapView() {
         {<MyLocationMarker isLocationVisible={isLocationVisible} />}
         <SiteMarkers sites={sites} />
         <RadiusSearchLayer
-          activeTool={activeTool}
           radius={radius}
           onCrossHairClick={clearSites}
           sites={sites}
           setSites={setSites}
         />
+
+        <PolygonSearchLayer />
       </MapContainer>
       <MapSearch
         mapRef={mapRef}
         isLocationVisible={isLocationVisible}
         setLocationVisible={setLocationVisible}
-        activeTool={activeTool}
-        setActiveTool={setActiveTool}
         radius={radius}
         setRadius={setRadius}
       />

@@ -5,6 +5,7 @@ import {
   disclosureCommentsConfig,
   disclosureScheduleExternalConfig,
   disclosureScheduleInternalConfig,
+  disclosureStatementConfigEditMode,
   disclosureStatementConfig,
   srVisibilityConfig,
 } from './DisclosureConfig';
@@ -74,7 +75,9 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const [searchInternalContact, setSearchInternalContact] = useState('');
   const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
-  const [internalRow, setInternalRow] = useState(disclosureStatementConfig);
+  const [internalRow, setInternalRow] = useState(
+    disclosureStatementConfigEditMode,
+  );
   const [isDelete, setIsDelete] = useState(false);
   const [currentDisclosure, setCurrenDisclosure] = useState({});
 
@@ -582,7 +585,11 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
         userType={userType}
         handleWidgetCheckBox={handleWidgetCheckBox}
         formData={formData}
-        disclosureStatementConfig={internalRow}
+        disclosureStatementConfig={
+          viewMode === SiteDetailsMode.EditMode
+            ? internalRow
+            : disclosureStatementConfig
+        }
         handleInputChange={handleInputChange}
         handleTableChange={handleTableChange}
         disclosureScheduleInternalConfig={disclosureScheduleInternalConfig}

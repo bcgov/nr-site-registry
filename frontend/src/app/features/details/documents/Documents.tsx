@@ -56,6 +56,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
     documentFirstChildFormRowsForExternal,
     documentFirstChildFormRows,
     documentFormRows,
+    documentFormRowsEditMode,
   } = GetDocumentsConfig();
   const loggedInUser = getUser();
   const { id } = useParams();
@@ -81,7 +82,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [currentFile, setCurrentFile] = useState({});
   const [uniqueId, setUniqueId] = useState(Date.now()); // Key for input type="file" element
 
-  const [internalRow, setInternalRow] = useState(documentFormRows);
+  const [internalRow, setInternalRow] = useState(documentFormRowsEditMode);
   const [externalRow, setExternalRow] = useState(
     documentFirstChildFormRowsForExternal,
   );
@@ -735,7 +736,11 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                 handleFileReplace={handleFileReplace}
                 handleFileDelete={handleFileDelete}
                 uniqueId={uniqueId}
-                internalRow={internalRow}
+                internalRow={
+                  viewMode === SiteDetailsMode.EditMode
+                    ? internalRow
+                    : documentFormRows
+                }
               />
             </div>
           ))}

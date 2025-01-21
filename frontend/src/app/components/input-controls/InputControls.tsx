@@ -187,11 +187,11 @@ export const TextInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: string) => {
     if (validation) {
       if (validation?.pattern && !validation.pattern?.test(inputValue)) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || '');
         return false;
       }
       if (validation.required && !inputValue.trim()) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
         return false;
       }
     }
@@ -303,7 +303,7 @@ export const DropdownInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: string) => {
     if (validation) {
       if (validation?.required && !inputValue.trim()) {
-        setError(validation?.customMessage || 'Invalid input');
+        setError(validation?.customMessage || ' ');
         return false;
       }
     }
@@ -457,11 +457,11 @@ export const GroupInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: string, child: InputProps) => {
     if (child?.validation) {
       if (child?.validation && !child?.validation.pattern?.test(inputValue)) {
-        setError(child?.validation?.customMessage || 'Invalid input');
+        setError(child?.validation?.customMessage || ' ');
         return false;
       }
       if (child?.validation?.required && !inputValue.trim()) {
-        setError(child?.validation?.customMessage || 'Invalid input');
+        setError(child?.validation?.customMessage || ' ');
         return false;
       }
     }
@@ -600,7 +600,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: any) => {
     if (validation) {
       if (validation.required && !inputValue) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
         return false;
       }
     }
@@ -715,7 +715,7 @@ export const DateInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: Date | null) => {
     if (validation) {
       if (validation.required && !inputValue) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
         return false;
       }
     }
@@ -893,11 +893,11 @@ export const TextAreaInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: string) => {
     if (validation) {
       if (validation?.pattern && !validation.pattern?.test(inputValue)) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
         return false;
       }
       if (validation.required && !inputValue.trim()) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
         return false;
       }
     }
@@ -1012,7 +1012,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: string) => {
     if (validation) {
       if (validation?.required && !inputValue) {
-        setError(validation?.customMessage || 'Invalid input');
+        setError(validation?.customMessage || ' ');
         return false;
       }
     }
@@ -1221,15 +1221,15 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: any) => {
     if (validation) {
       if (inputValue === null || inputValue === undefined) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
         return false;
       }
       if (validation.pattern && !validation.pattern.test(inputValue)) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
         return false;
       }
       if (!inputValue.trim()) {
-        setError(validation?.customMessage || 'Invalid input');
+        setError(validation?.customMessage || ' ');
         return false;
       }
     }

@@ -4,7 +4,9 @@
       <sequence increment="1" name="historylog_id_seq" startValue="1"/>
       <sequence increment="1" name="migrations_id_seq" startValue="1"/>
       <sequence increment="1" name="recent_views_id_seq" startValue="1"/>
+      <sequence increment="1" name="site_subdivision_site_subdiv_id_seq" startValue="1"/>
       <sequence increment="1" name="snapshots_id_seq" startValue="1"/>
+      <sequence increment="1" name="subdivision_id_seq" startValue="1"/>
       <sequence increment="1" name="user_id_seq" startValue="1"/>
    </sequences>
    <tables>
@@ -1264,7 +1266,7 @@
          <column autoUpdated="false" defaultValue="null" digits="6" id="6" name="when_created" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="7" name="when_updated" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="8" name="sprof_date_completed" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="site_subdiv_id" nullable="false" remarks="" size="19" type="int8" typeCode="-5"/>
+         <column autoUpdated="true" defaultValue="nextval('sites.site_subdivision_site_subdiv_id_seq'::regclass)" digits="0" id="9" name="site_subdiv_id" nullable="false" remarks="" size="19" type="bigserial" typeCode="-5"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="send_to_sr" nullable="false" remarks="" size="1" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="user_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="sr_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
@@ -1432,7 +1434,7 @@
          </index>
       </table>
       <table name="subdivisions" remarks="" schema="sites" type="TABLE">
-         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="id" nullable="false" remarks="" size="19" type="int8" typeCode="-5">
+         <column autoUpdated="true" defaultValue="nextval('sites.subdivision_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="19" type="bigserial" typeCode="-5">
             <child column="subdiv_id" foreignKey="FK_658bd2d307dc4205b529993cddd" implied="false" onDeleteCascade="true" schema="sites" table="site_subdivisions"/>
          </column>
          <column autoUpdated="false" defaultValue="null" digits="6" id="1" name="date_noted" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>

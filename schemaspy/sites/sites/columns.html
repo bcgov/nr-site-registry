@@ -495,11 +495,11 @@
         "keyClass": "primaryKey",
         "keyTitle": "Primary Key",
         "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>site_subdiv_id",
-        "type": "int8",
+        "type": "bigserial",
         "length": 19,
         "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
+        "autoUpdated": "√",
+        "defaultValue": "nextval('sites.site_subdivision_site_subdiv_id_seq'::regclass)",
         "comments": ""
     },
     {
@@ -6571,11 +6571,11 @@
         "keyClass": "primaryKey",
         "keyTitle": "Primary Key",
         "name": "<i class='icon ion-key iconkey' style='padding-left: 5px;'><\/i>id",
-        "type": "int8",
+        "type": "bigserial",
         "length": 19,
         "nullable": "",
-        "autoUpdated": "",
-        "defaultValue": "null",
+        "autoUpdated": "√",
+        "defaultValue": "nextval('sites.subdivision_id_seq'::regclass)",
         "comments": ""
     },
     {

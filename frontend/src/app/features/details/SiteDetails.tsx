@@ -111,7 +111,7 @@ import {
 import { Button } from '../../components/button/Button';
 import { IFormField } from '../../components/input-controls/IFormField';
 import { GetNotationConfig } from './notations/NotationsConfig';
-import { disclosureStatementConfig } from './disclosure/DisclosureConfig';
+import { disclosureStatementConfigEditMode } from './disclosure/DisclosureConfig';
 import GetConfig from './participants/ParticipantConfig';
 import { GetAssociateConfig } from './associates/AssociateConfig';
 import { GetDocumentsConfig } from './documents/DocumentsConfig';
@@ -168,7 +168,7 @@ const SiteDetails = () => {
     GetNotationConfig();
   const { participantColumnInternal } = GetConfig();
   const { associateColumnInternal } = GetAssociateConfig();
-  const { documentFormRows } = GetDocumentsConfig();
+  const { documentFormRowsEditMode } = GetDocumentsConfig();
   const [userType, setUserType] = useState<UserType | null>(null);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
@@ -531,7 +531,7 @@ const SiteDetails = () => {
           userActions,
         );
         const errors = validateForm(
-          documentFormRows,
+          documentFormRowsEditMode,
           updatedSiteDocs,
           'Documents',
         );
@@ -633,7 +633,7 @@ const SiteDetails = () => {
           userActions,
         );
         const errors = validateForm(
-          disclosureStatementConfig,
+          disclosureStatementConfigEditMode,
           updatedSiteDisclosure,
           'Site Disclosure',
         );

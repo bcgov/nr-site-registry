@@ -119,7 +119,9 @@ function MapView() {
 
       <MapSearchDrawer
         mapRef={mapRef}
-        sites={data?.mapSearch.data || []}
+        // TODO: replace this with the query results (`data?.mapSearch.data || []`)
+        // and remove `sites` state variable once radius search is fixed
+        sites={sites}
         sitesLoading={sitesLoading}
         activeTool={activeTool}
         radius={radius}

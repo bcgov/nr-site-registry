@@ -37,13 +37,22 @@ function MapView() {
   // Feature flag for turning OpenStreetMap tiles gray
   const osmGrayscale = false;
 
-  const { searchTerm, activeTool, polygonVertices } = useMapSearchContext();
+  const { searchTerm, activeTool, polygonVertices, center, radius } =
+    useMapSearchContext();
+
+  const [latitude, longitude] = center || [];
+
+  const variables: any = {
+    searchParam: searchTerm || '',
+    ...(polygonVertices.length > 0 && { polygon: polygonVertices }),
+  };
+
+  if (latitude && longitude && radius > 500) {
+    variables.circle = { latitude, longitude, radius };
+  }
 
   const { data, loading: sitesLoading } = useMapSearchQuery({
-    variables: {
-      searchParam: searchTerm || '',
-      ...(polygonVertices.length > 0 && { polygon: polygonVertices }),
-    },
+    variables,
     onCompleted: ({ mapSearch: { data } }) => {
       flyToSiteBounds(data);
       setSites(data);
@@ -67,7 +76,7 @@ function MapView() {
 
   const mapRef = useRef<Map>(null);
   const [isLocationVisible, setLocationVisible] = useState(false);
-  const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
+  //const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
   const [sites, setSites] = useState<Site[]>([]);
   const clearSites = () => setSites([]);
 
@@ -101,7 +110,7 @@ function MapView() {
         {<MyLocationMarker isLocationVisible={isLocationVisible} />}
         <SiteMarkers sites={sites} />
         <RadiusSearchLayer
-          radius={radius}
+          //radius={radius}
           onCrossHairClick={clearSites}
           sites={sites}
           setSites={setSites}
@@ -113,8 +122,8 @@ function MapView() {
         mapRef={mapRef}
         isLocationVisible={isLocationVisible}
         setLocationVisible={setLocationVisible}
-        radius={radius}
-        setRadius={setRadius}
+        //radius={radius}
+        //setRadius={setRadius}
       />
 
       <MapSearchDrawer
@@ -124,7 +133,7 @@ function MapView() {
         sites={sites}
         sitesLoading={sitesLoading}
         activeTool={activeTool}
-        radius={radius}
+        // radius={radius}
       />
     </div>
   );

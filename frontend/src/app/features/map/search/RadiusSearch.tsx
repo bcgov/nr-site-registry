@@ -11,34 +11,35 @@ import { Site } from '../MapView';
 import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 
 interface RadiusSearchProps {
-  radius: number;
-  setRadius: React.Dispatch<React.SetStateAction<number>>;
+  // radius: number;
+  // setRadius: React.Dispatch<React.SetStateAction<number>>;
   isSmall?: boolean;
   className?: string;
 }
 
 export function RadiusSearch({
-  radius = MIN_CIRCLE_RADIUS,
-  setRadius,
+  //radius = MIN_CIRCLE_RADIUS,
+  //setRadius,
   isSmall = false,
   className,
 }: Readonly<RadiusSearchProps>) {
-  const { setActiveTool } = useMapSearchContext();
-  const [isVisible, setIsVisible] = useState(true);
+  const { radius, onRadiusChange, onCancelRadiusSearch } =
+    useMapSearchContext();
+  //const [isVisible, setIsVisible] = useState(true);
 
-  const onCancel = () => {
-    setIsVisible(false);
-    setActiveTool(null);
-    setRadius(MIN_CIRCLE_RADIUS);
-  };
+  // const onCancel = () => {
+  //   setIsVisible(false);
+  //   setActiveTool(null);
+  //   setRadius(MIN_CIRCLE_RADIUS);
+  // };
 
-  const onRadiusChange = (_ev: any, value: number | number[]) => {
-    const newRadius = Math.max(
-      Array.isArray(value) ? value[0] : value,
-      MIN_CIRCLE_RADIUS,
-    );
-    setRadius(newRadius);
-  };
+  // const onRadiusChange = (_ev: any, value: number | number[]) => {
+  //   const newRadius = Math.max(
+  //     Array.isArray(value) ? value[0] : value,
+  //     MIN_CIRCLE_RADIUS,
+  //   );
+  //   setRadius(newRadius);
+  // };
 
   const sliderBox = (
     <div className="point-search-slider-content">
@@ -72,21 +73,21 @@ export function RadiusSearch({
     sliderBox
   ) : (
     <div className={clsx('point-search', className)}>
-      {isVisible && (
-        <>
-          <Button size="medium" onClick={onCancel}>
-            <XmarkIcon />
-            Cancel
-          </Button>
-          <DropdownButton
-            id="pointSearchSetRadiusButton"
-            menuClassName="point-search-menu"
-            dropdownContent={sliderBox}
-          >
-            Set Radius
-          </DropdownButton>
-        </>
-      )}
+      {/* {isVisible && ( */}
+      <>
+        <Button size="medium" onClick={onCancelRadiusSearch}>
+          <XmarkIcon />
+          Cancel
+        </Button>
+        <DropdownButton
+          id="pointSearchSetRadiusButton"
+          menuClassName="point-search-menu"
+          dropdownContent={sliderBox}
+        >
+          Set Radius
+        </DropdownButton>
+      </>
+      {/* )} */}
     </div>
   );
 }

@@ -13,12 +13,13 @@ import {
   JsonParam,
   useQueryParams,
 } from 'use-query-params';
-import { ActiveToolEnum } from '../../../constants/Constant';
+import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../../constants/Constant';
 
 const acceptedParams = {
   site: StringParam,
   search: StringParam,
   polygon: JsonParam,
+  circle: JsonParam,
 };
 interface MapSearchContextType {
   selectedSiteId: string | null;
@@ -37,6 +38,12 @@ interface MapSearchContextType {
   deletePolygon: () => void;
   activeTool: ActiveToolEnum | null;
   setActiveTool: (tool: ActiveToolEnum | null) => void;
+  radius: number;
+  center: LatLngTuple | null;
+  onRadiusCrossHairClick: (newCenter: LatLngTuple) => void;
+  onRadiusChange: (_ev: any, value: number | number[]) => void;
+  onCancelRadiusSearch: () => void;
+  handleRadiusToolClick: () => void;
 }
 
 export const MapSearchContext = createContext<MapSearchContextType>({
@@ -53,6 +60,12 @@ export const MapSearchContext = createContext<MapSearchContextType>({
   deletePolygon: () => {},
   activeTool: null,
   setActiveTool: () => {},
+  radius: MIN_CIRCLE_RADIUS,
+  center: null,
+  onRadiusCrossHairClick: () => {},
+  onRadiusChange: () => {},
+  onCancelRadiusSearch: () => {},
+  handleRadiusToolClick: () => {},
 });
 
 export const MapSearchQueryProvider = ({
@@ -68,10 +81,17 @@ export const MapSearchQueryProvider = ({
   const [isDrawingPolygon, setIsDrawingPolygon] = useState(false);
   const [drawShapeVertices, setDrawShapeVertices] = useState<LatLngTuple[]>([]);
 
+  const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
+  const [center, setCenter] = useState<LatLngTuple | null>(null);
+
   useEffect(() => {
-    const { polygon } = query;
+    const { polygon, circle } = query;
     if (polygon && Array.isArray(polygon) && polygon.length > 2) {
       setActiveToolState(ActiveToolEnum.polygonSearch);
+    }
+
+    if (circle) {
+      setActiveToolState(ActiveToolEnum.radiusSearch);
     }
     // This should only run on the initial load to read the query params
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -98,6 +118,13 @@ export const MapSearchQueryProvider = ({
     }
   };
 
+  // const finishRadiusSearchSetup = () => {
+  //   if (center && radius > MIN_CIRCLE_RADIUS) {
+  //     const [latitude, longitude] = center;
+  //     setQuery({ circle: {latitude, longitude, radius} }, 'replace');
+  //   }
+  // }
+
   const setActiveTool = (tool: ActiveToolEnum | null) => {
     const nextTool = activeTool === tool ? null : tool;
     setActiveToolState(nextTool);
@@ -115,6 +142,41 @@ export const MapSearchQueryProvider = ({
 
   const clearQuery = () => setQuery({}, 'replace');
 
+  const onRadiusCrossHairClick = (newCenter: LatLngTuple) => {
+    setCenter(newCenter);
+  };
+
+  const onRadiusChange = (_ev: any, value: number | number[]) => {
+    const newRadius = Math.max(
+      Array.isArray(value) ? value[0] : value,
+      MIN_CIRCLE_RADIUS,
+    );
+    setRadius(newRadius);
+    if (center && newRadius > MIN_CIRCLE_RADIUS) {
+      const [latitude, longitude] = center;
+      console.log(
+        'nupur - params for setQuery are : latitude',
+        latitude,
+        'longitude',
+        longitude,
+        'radius',
+        newRadius,
+      );
+      setQuery({ circle: { latitude, longitude, radius } }, 'replace');
+    }
+  };
+
+  const onCancelRadiusSearch = () => {
+    // setIsVisible(false);
+    setActiveTool(null);
+    setRadius(MIN_CIRCLE_RADIUS);
+  };
+
+  const handleRadiusToolClick = () => {
+    setActiveTool(ActiveToolEnum.radiusSearch);
+    setRadius(MIN_CIRCLE_RADIUS);
+  };
+
   return (
     <MapSearchContext.Provider
       value={{
@@ -131,6 +193,12 @@ export const MapSearchQueryProvider = ({
         deletePolygon,
         activeTool,
         setActiveTool,
+        radius,
+        center,
+        onRadiusCrossHairClick,
+        onRadiusChange,
+        onCancelRadiusSearch,
+        handleRadiusToolClick,
       }}
     >
       {children}

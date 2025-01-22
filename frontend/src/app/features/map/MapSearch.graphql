@@ -1,5 +1,5 @@
-query mapSearch($searchParam: String, , $polygon: [LatLngTuple!]) {
-  mapSearch(searchParam: $searchParam, polygon: $polygon) {
+query mapSearch($searchParam: String, $polygon: [LatLngTuple!], $circle: RadiusSearchParams) {
+  mapSearch(searchParam: $searchParam, polygon: $polygon, circle: $circle) {
     data {
       id
       addrLine_1
@@ -91,18 +91,6 @@ query MapSearch_findSitesAndPlaces($searchParam: String!) {
       places {
         id
         name
-        latdeg
-        longdeg
-      }
-    }
-  }
-}
-
-query MapSearch_fetchSitesByRadius($latitude: Float!, $longitude: Float!, $radius: Float!) {
-  fetchSitesByRadius(lat: $latitude, lon: $longitude, radius: $radius) {
-    data {
-      sites {
-        id
         latdeg
         longdeg
       }

@@ -1,12 +1,10 @@
-import { useContext, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LatLngBounds, LatLngTuple, Map } from 'leaflet';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import clsx from 'clsx';
 
-//import { env } from '@/env'
-//import MapSearch from './MapSearch'
 import { MyLocationMarker } from './MyLocationMarker'; // Import the MyLocationMarker component
 
 import 'leaflet/dist/leaflet.css';
@@ -17,10 +15,13 @@ import { SiteMarkers } from './siteMarkers/SiteMarkers';
 import { MapControls } from './MapControls';
 import { MAP_FLY_OPTIONS } from './mapOptions';
 import {
-  MapSearchQueryParamsContext,
   MapSearchQueryProvider,
-} from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+  useMapSearchContext,
+} from './mapSearchContext/MapSearchContext';
 import { MapSearchDrawer } from './siteDrawer/MapSearchDrawer';
+import { MIN_CIRCLE_RADIUS } from '../../constants/Constant';
+import { RadiusSearchLayer } from './layers/RadiusSearchLayer';
+import { PolygonSearchLayer } from './layers/PolygonSearchLayer';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -36,14 +37,16 @@ function MapView() {
   // Feature flag for turning OpenStreetMap tiles gray
   const osmGrayscale = false;
 
-  const { searchTerm } = useContext(MapSearchQueryParamsContext);
+  const { searchTerm, activeTool, polygonVertices } = useMapSearchContext();
 
   const { data, loading: sitesLoading } = useMapSearchQuery({
     variables: {
       searchParam: searchTerm || '',
+      ...(polygonVertices.length > 0 && { polygon: polygonVertices }),
     },
     onCompleted: ({ mapSearch: { data } }) => {
       flyToSiteBounds(data);
+      setSites(data);
     },
   });
 
@@ -64,6 +67,15 @@ function MapView() {
 
   const mapRef = useRef<Map>(null);
   const [isLocationVisible, setLocationVisible] = useState(false);
+  const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
+  const [sites, setSites] = useState<Site[]>([]);
+  const clearSites = () => setSites([]);
+
+  useEffect(() => {
+    if (activeTool === null) {
+      setSites(data?.mapSearch.data || []);
+    }
+  }, [activeTool]);
 
   return (
     <div
@@ -87,17 +99,32 @@ function MapView() {
           setLocationVisible={setLocationVisible}
         />
         {<MyLocationMarker isLocationVisible={isLocationVisible} />}
-        <SiteMarkers sites={data?.mapSearch.data || []} />
+        <SiteMarkers sites={sites} />
+        <RadiusSearchLayer
+          radius={radius}
+          onCrossHairClick={clearSites}
+          sites={sites}
+          setSites={setSites}
+        />
+
+        <PolygonSearchLayer />
       </MapContainer>
       <MapSearch
+        mapRef={mapRef}
         isLocationVisible={isLocationVisible}
         setLocationVisible={setLocationVisible}
+        radius={radius}
+        setRadius={setRadius}
       />
 
       <MapSearchDrawer
         mapRef={mapRef}
-        sites={data?.mapSearch.data || []}
+        // TODO: replace this with the query results (`data?.mapSearch.data || []`)
+        // and remove `sites` state variable once radius search is fixed
+        sites={sites}
         sitesLoading={sitesLoading}
+        activeTool={activeTool}
+        radius={radius}
       />
     </div>
   );

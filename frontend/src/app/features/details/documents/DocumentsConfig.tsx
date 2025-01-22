@@ -1,9 +1,7 @@
-import { useSelector } from 'react-redux';
 import {
   FormFieldType,
   IFormField,
 } from '../../../components/input-controls/IFormField';
-import { participantNameDrpdown } from '../dropdowns/DropdownSlice';
 import { RequestStatus } from '../../../helpers/requests/status';
 
 export const GetDocumentsConfig = () => {
@@ -21,6 +19,10 @@ export const GetDocumentsConfig = () => {
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
         customEditInputTextCss: 'custom-document-edit-input-text ',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
       {
         type: FormFieldType.Date,
@@ -35,6 +37,10 @@ export const GetDocumentsConfig = () => {
         customInputTextCss: 'custom-document-input-text',
         customEditInputTextCss:
           'custom-document-edit-input-text .rs-input .rs-input-group-addon',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
     ],
   ];
@@ -53,6 +59,10 @@ export const GetDocumentsConfig = () => {
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
         customEditInputTextCss: 'custom-document-edit-input-text',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
       {
         type: FormFieldType.DropDownWithSearch,
@@ -68,6 +78,10 @@ export const GetDocumentsConfig = () => {
         customInputTextCss: 'custom-document-input-text',
         customEditInputTextCss: 'custom-document-edit-input-text',
         customPlaceholderCss: 'custom-document-search-placeholder',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
       {
         type: FormFieldType.Date,
@@ -82,6 +96,10 @@ export const GetDocumentsConfig = () => {
         customInputTextCss: 'custom-document-input-text',
         customEditInputTextCss:
           'custom-document-edit-input-text .rs-input .rs-input-group-addon',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
     ],
   ];
@@ -100,6 +118,10 @@ export const GetDocumentsConfig = () => {
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
         customEditInputTextCss: 'custom-document-edit-input-text',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
     ],
     [
@@ -111,7 +133,7 @@ export const GetDocumentsConfig = () => {
         value: '',
         options: [],
         filteredOptions: [],
-        colSize: 'col-lg-6 col-md-12 col-sm-12',
+        colSize: 'col-lg-6 col-md-6 col-sm-12',
         customLabelCss: 'custom-docuemnt-lbl-text',
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
@@ -120,19 +142,42 @@ export const GetDocumentsConfig = () => {
         customMenuMessage: <span>Please select site participant name:</span>,
         handleSearch: () => {},
         isLoading: RequestStatus.idle,
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
+      {
+        type: FormFieldType.Text,
+        label: 'Organization',
+        placeholder: 'Organization',
+        graphQLPropertyName: 'organizationName',
+        value: '',
+        colSize: 'col-lg-6 col-md-6 col-sm-12',
+        customLabelCss: 'custom-docuemnt-lbl-text',
+        customEditLabelCss: 'custom-docuemnt-lbl-text',
+        customInputTextCss: 'custom-document-input-text',
+        customEditInputTextCss: 'custom-document-edit-input-text ',
+        isDisabled: true,
+      },
+    ],
+    [
       {
         type: FormFieldType.Date,
         label: 'Document Date',
         placeholder: 'MM/DD/YY',
         graphQLPropertyName: 'documentDate',
         value: '',
-        colSize: 'col-lg-3 col-md-6 col-sm-12',
+        colSize: 'col-lg-6 col-md-6 col-sm-12',
         customLabelCss: 'custom-docuemnt-lbl-text',
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
         customEditInputTextCss:
           'custom-document-edit-input-text .rs-input .rs-input-group-addon',
+        validation: {
+          required: true,
+          customMessage: '',
+        },
       },
       {
         type: FormFieldType.Date,
@@ -141,7 +186,99 @@ export const GetDocumentsConfig = () => {
         graphQLPropertyName: 'submissionDate',
         value: '',
         isDisabled: true,
-        colSize: 'col-lg-3 col-md-6 col-sm-12',
+        colSize: 'col-lg-6 col-md-6 col-sm-12',
+        customLabelCss: 'custom-docuemnt-lbl-text',
+        customEditLabelCss: 'custom-docuemnt-lbl-text',
+        customInputTextCss: 'custom-document-input-text',
+        customEditInputTextCss:
+          'custom-document-edit-input-text .rs-input .rs-input-group-addon',
+      },
+    ],
+  ];
+
+  const documentFormRowsEditMode: IFormField[][] = [
+    [
+      {
+        type: FormFieldType.TextArea,
+        label: 'Document Title',
+        placeholder: 'Document title...',
+        graphQLPropertyName: 'title',
+        value: '',
+        textAreaRow: 1,
+        colSize: 'col-lg-12 col-md-12 col-sm-12',
+        customLabelCss: 'custom-docuemnt-lbl-text',
+        customEditLabelCss: 'custom-docuemnt-lbl-text',
+        customInputTextCss: 'custom-document-input-text',
+        customEditInputTextCss: 'custom-document-edit-input-text',
+        validation: {
+          required: true,
+          customMessage: 'Document Title is required.',
+        },
+      },
+    ],
+    [
+      {
+        type: FormFieldType.DropDownWithSearch,
+        label: 'Author',
+        placeholder: 'Author....',
+        graphQLPropertyName: 'psnorgId',
+        value: '',
+        options: [],
+        filteredOptions: [],
+        colSize: 'col-lg-6 col-md-6 col-sm-12',
+        customLabelCss: 'custom-docuemnt-lbl-text',
+        customEditLabelCss: 'custom-docuemnt-lbl-text',
+        customInputTextCss: 'custom-document-input-text',
+        customEditInputTextCss: 'custom-document-edit-input-text ',
+        customPlaceholderCss: 'custom-document-search-placeholder',
+        customMenuMessage: <span>Please select site participant name:</span>,
+        handleSearch: () => {},
+        isLoading: RequestStatus.idle,
+        validation: {
+          required: true,
+          customMessage: 'Author is required.',
+        },
+      },
+      {
+        type: FormFieldType.Text,
+        label: 'Organization',
+        placeholder: 'Organization',
+        graphQLPropertyName: 'organizationName',
+        value: '',
+        colSize: 'col-lg-6 col-md-6 col-sm-12',
+        customLabelCss: 'custom-docuemnt-lbl-text',
+        customEditLabelCss: 'custom-docuemnt-lbl-text',
+        customInputTextCss: 'custom-document-input-text',
+        customEditInputTextCss: 'custom-document-edit-input-text ',
+        isDisabled: true,
+      },
+    ],
+    [
+      {
+        type: FormFieldType.Date,
+        label: 'Document Date',
+        placeholder: 'MM/DD/YY',
+        graphQLPropertyName: 'documentDate',
+        value: '',
+        colSize: 'col-lg-6 col-md-6 col-sm-12',
+        customLabelCss: 'custom-docuemnt-lbl-text',
+        customEditLabelCss: 'custom-docuemnt-lbl-text',
+        customInputTextCss: 'custom-document-input-text',
+        customEditInputTextCss:
+          'custom-document-edit-input-text .rs-input .rs-input-group-addon',
+        validation: {
+          required: true,
+          customMessage: 'Document Date is required.',
+        },
+      },
+      {
+        type: FormFieldType.Date,
+        label: 'Received Date',
+        placeholder: 'MM/DD/YY',
+        graphQLPropertyName: 'submissionDate',
+        value: '',
+        isDisabled: true,
+        colSize: 'col-lg-6 col-md-6 col-sm-12',
         customLabelCss: 'custom-docuemnt-lbl-text',
         customEditLabelCss: 'custom-docuemnt-lbl-text',
         customInputTextCss: 'custom-document-input-text',
@@ -154,6 +291,7 @@ export const GetDocumentsConfig = () => {
   return {
     documentFirstChildFormRowsForExternal,
     documentFirstChildFormRows,
+    documentFormRowsEditMode,
     documentFormRows,
   };
 };

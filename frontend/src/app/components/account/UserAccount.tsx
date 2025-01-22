@@ -62,7 +62,7 @@ const UserAccount = (props: any) => {
               {/* Profile image */}
               <Avatar firstName={user.firstname} lastName={user.lastName} />
               {/* User name */}
-              <div id="user-name" className="p-3">
+              <div id="user-name" className="user-name">
                 {user.firstname}
               </div>
               <div

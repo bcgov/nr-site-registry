@@ -2,6 +2,7 @@ import React from 'react';
 import Table from '../../../components/table/Table';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { TableColumn } from '../../../components/table/TableColumn';
+import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 
 interface IParcelDescriptionTable {
   requestStatus: RequestStatus;
@@ -14,7 +15,10 @@ interface IParcelDescriptionTable {
   resultsPerPage: number | undefined;
   handleTableSortChange: (column: TableColumn, descending: boolean) => void;
   showPageOptions: boolean;
+  viewMode: SiteDetailsMode;
   tableChangeHandler: (event: any) => void;
+  deleteHandler: (event: any) => void;
+  allowRowsSelect: boolean;
 }
 
 const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
@@ -28,7 +32,10 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
   resultsPerPage,
   handleTableSortChange,
   showPageOptions,
+  viewMode,
   tableChangeHandler,
+  deleteHandler,
+  allowRowsSelect,
 }) => {
   return (
     <Table
@@ -42,11 +49,12 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
       changeResultsPerPage={handleChangeResultsPerPage}
       currentPage={currentPage}
       resultsPerPage={resultsPerPage}
-      allowRowsSelect={false}
+      allowRowsSelect={allowRowsSelect}
       changeHandler={tableChangeHandler}
-      editMode={false}
+      editMode={viewMode === SiteDetailsMode.EditMode}
       idColumnName="id"
       sortHandler={handleTableSortChange}
+      deleteHandler={deleteHandler}
     ></Table>
   );
 };

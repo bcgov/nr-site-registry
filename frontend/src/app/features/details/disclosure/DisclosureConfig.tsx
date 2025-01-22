@@ -23,6 +23,107 @@ export const disclosureStatementConfig: IFormField[][] = [
         'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
       validation: {
         required: true,
+        customMessage: '',
+      },
+    },
+    {
+      type: FormFieldType.Date,
+      label: 'Date Completed',
+      placeholder: 'MM/DD/YY',
+      graphQLPropertyName: 'dateCompleted',
+      value: '',
+      colSize: 'col-xxl-2 col-xl-3 col-lg-4 col-md-5 col-sm-12',
+      customLabelCss: 'custom-disclosure-lbl-text',
+      customInputTextCss: 'custom-disclosure-input-text',
+      customEditLabelCss: 'custom-disclosure-edit-label',
+      customEditInputTextCss:
+        'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
+      validation: {
+        required: true,
+        customMessage: '',
+      },
+    },
+    {
+      type: FormFieldType.Date,
+      label: 'Local Authority Received',
+      placeholder: 'MM/DD/YY',
+      graphQLPropertyName: 'localAuthDateRecd',
+      value: '',
+      colSize: 'col-xxl-2 col-xl-3 col-lg-4 col-md-5 col-sm-12',
+      customLabelCss: 'custom-disclosure-lbl-text',
+      customInputTextCss: 'custom-disclosure-input-text',
+      customEditLabelCss: 'custom-disclosure-edit-label',
+      customEditInputTextCss:
+        'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
+    },
+    {
+      type: FormFieldType.Date,
+      label: 'Date Registrar',
+      placeholder: 'MM/DD/YY',
+      graphQLPropertyName: 'rwmDateDecision',
+      value: '',
+      colSize: 'col-xxl-2 col-xl-3 col-lg-4 col-md-5 col-sm-12',
+      customLabelCss: 'custom-disclosure-lbl-text',
+      customInputTextCss: 'custom-disclosure-input-text',
+      customEditLabelCss: 'custom-disclosure-edit-label',
+      customEditInputTextCss:
+        'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
+    },
+    {
+      type: FormFieldType.Date,
+      label: 'Date Entered',
+      placeholder: 'MM/DD/YY',
+      graphQLPropertyName: 'siteRegDateEntered',
+      value: '',
+      colSize: 'col-xxl-2 col-xl-3 col-lg-4 col-md-5 col-sm-12',
+      customLabelCss: 'custom-disclosure-lbl-text',
+      customInputTextCss: 'custom-disclosure-input-text',
+      customEditLabelCss: 'custom-disclosure-edit-label',
+      customEditInputTextCss:
+        'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
+    },
+
+    // Commenting the below method because I am not sure which dropdown type
+    // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
+
+    // {
+    //   type: FormFieldType.DropDownWithSearch,
+    //   label: 'Internal Contact',
+    //   isLabel: false,
+    //   graphQLPropertyName: 'psnorgId',
+    //   placeholder: 'Select Internal Contact.',
+    //   isLoading: RequestStatus.idle,
+    //   value: '',
+    //   options: [],
+    //   filteredOptions: [],
+    //   colSize: 'col-xxl-2 col-xl-3 col-lg-4 col-md-5 col-sm-12',
+    //   customLabelCss: 'custom-disclosure-lbl-text',
+    //   customInputTextCss: 'custom-disclosure-input-text',
+    //   customEditLabelCss: 'custom-disclosure-edit-label',
+    //   customEditInputTextCss: 'custom-disclosure-edit-input',
+    //   customPlaceholderCss: 'custom-disclosure-search-placeholder',
+    //   customMenuMessage: <span>Please select site participant name:</span>,
+    //   handleSearch: () => {},
+    // },
+  ],
+];
+
+export const disclosureStatementConfigEditMode: IFormField[][] = [
+  [
+    {
+      type: FormFieldType.Date,
+      label: 'Date Received',
+      placeholder: 'MM/DD/YY',
+      graphQLPropertyName: 'siteRegDateRecd',
+      value: '',
+      colSize: 'col-xxl-2 col-xl-3 col-lg-4 col-md-5 col-sm-12',
+      customLabelCss: 'custom-disclosure-lbl-text',
+      customInputTextCss: 'custom-disclosure-input-text',
+      customEditLabelCss: 'custom-disclosure-edit-label',
+      customEditInputTextCss:
+        'custom-disclosure-edit-input .rs-input .rs-input-group-addon',
+      validation: {
+        required: true,
         customMessage: 'Date Received is required.',
       },
     },

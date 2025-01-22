@@ -35,9 +35,13 @@ import {
   SiteRecordsForSRAction,
 } from '../../dto/sitesPendingReview.dto';
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
+import { SiteFilters } from '../../resolvers/site/sitePublic.resolver';
 import { SnapshotResponse } from '../../dto/snapshot.dto';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Snapshots } from '../../entities/snapshots.entity';
+import { Place } from '../../entities/placeEntity';
+import { UserTypeEum } from '../../common/userType';
+import { BC_ALBERS, LatLngTuple, WGS_84 } from '../../utils/geometry';
 
 /**
  * Nestjs Service For Region Entity
@@ -71,6 +75,8 @@ export class SiteService {
     private readonly entityManager: EntityManager,
     @InjectRepository(HistoryLog)
     private historyLogRepository: Repository<HistoryLog>,
+    @InjectRepository(Place)
+    private placeRepository: Repository<Place>,
 
     private readonly landHistoryService: LandHistoryService,
     private readonly parcelDescriptionService: ParcelDescriptionsService,
@@ -103,34 +109,63 @@ export class SiteService {
    * @returns sites where id or address matches the search param
    */
   async searchSites(
+    userInfo: any,
     searchParam: string,
     page: number,
     pageSize: number,
-    id?: string,
-    srStatus?: string,
-    siteRiskCode?: string,
-    commonName?: string,
-    addrLine_1?: string,
-    city?: string,
-    whoCreated?: string,
-    latlongReliabilityFlag?: string,
-    latdeg?: number,
-    latDegrees?: number,
-    latMinutes?: number,
-    latSeconds?: string,
-    longdeg?: number,
-    longDegrees?: number,
-    longMinutes?: number,
-    longSeconds?: string,
-    whenCreated?: Date,
-    whenUpdated?: Date,
+    filters: SiteFilters,
   ) {
+    const {
+      siteIds,
+      id,
+      srStatus,
+      siteRiskCode,
+      commonName,
+      addrLine_1,
+      city,
+      whoCreated,
+      latlongReliabilityFlag,
+      latdeg,
+      latDegrees,
+      latMinutes,
+      latSeconds,
+      longdeg,
+      longDegrees,
+      longMinutes,
+      longSeconds,
+      whenCreated,
+      whenUpdated,
+    } = filters;
     this.sitesLogger.log('SiteService.searchSites() start');
     this.sitesLogger.debug('SiteService.searchSites() start');
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
 
-    const query = this.siteRepository.createQueryBuilder('sites').where(
+    const query = this.siteRepository.createQueryBuilder('sites');
+
+    if (siteIds && siteIds.length === 0) {
+      throw new HttpException(
+        `If provided, siteIds filter array must not be empty`,
+        HttpStatus.BAD_REQUEST,
+      );
+    } else if (siteIds && siteIds.length > 0) {
+      query.whereInIds(siteIds);
+    }
+
+    let pid;
+    // pid/pin are 9 in length and 11 in case its hyphenated
+    if (searchParam?.length === 11 || searchParam?.length === 9) {
+      pid = searchParam.replace(/-/g, ''); // Replaces all '-' with an empty string
+    }
+
+    // Add joins to the query
+    if (pid) {
+      query
+        .innerJoin('sites.siteSubdivisions', 'siteSubdivisions') // Join the siteSubdivisions table
+        .innerJoin('siteSubdivisions.subdivision', 'subdivision'); // Join the subdivisions table
+    }
+
+    query.andWhere(
       new Brackets((qb) => {
         qb.where('CAST(sites.id AS TEXT) LIKE :searchParam', {
           searchParam: `%${searchParam}%`,
@@ -156,8 +191,21 @@ export class SiteService {
           .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchParam)', {
             searchParam: `%${searchParam.toLowerCase()}%`,
           });
+        if (pid) {
+          qb.orWhere('subdivision.pid = :pid', {
+            pid: pid,
+          });
+          qb.orWhere('subdivision.pin = :pin', {
+            pin: pid,
+          });
+        }
       }),
     );
+
+    if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR)
+      query.andWhere('sites.srAction != :srAction', {
+        srAction: SRApprovalStatusEnum.PRIVATE,
+      });
 
     if (id) {
       query.andWhere('sites.id = :id', { id: id });
@@ -246,15 +294,25 @@ export class SiteService {
       });
     }
 
-    if (whenCreated) {
-      query.andWhere('sites.whenCreated = :whenCreated', {
-        whenCreated: whenCreated,
+    if (
+      whenCreated &&
+      whenCreated.length === 2 &&
+      whenCreated.every((date) => date instanceof Date)
+    ) {
+      query.andWhere('sites.whenCreated BETWEEN :start AND :end', {
+        start: whenCreated[0],
+        end: whenCreated[1],
       });
     }
 
-    if (whenUpdated) {
-      query.andWhere('sites.whenUpdated = :whenUpdated', {
-        whenUpdated: whenUpdated,
+    if (
+      whenUpdated &&
+      whenUpdated.length === 2 &&
+      whenUpdated.every((date) => date instanceof Date)
+    ) {
+      query.andWhere('sites.whenUpdated BETWEEN :start AND :end', {
+        start: whenUpdated[0],
+        end: whenUpdated[1],
       });
     }
     const result = await query
@@ -271,10 +329,23 @@ export class SiteService {
     return response;
   }
 
-  async mapSearch(searchTerm = '') {
+  async mapSearch({
+    searchTerm,
+    polygon,
+  }: {
+    searchTerm?: string;
+    polygon?: LatLngTuple[];
+  }) {
     this.sitesLogger.log('SiteService.mapSearch() start');
 
-    const searchTermClean = searchTerm.toLowerCase().trim();
+    if (polygon && polygon.length < 3) {
+      throw new HttpException(
+        'Polygon must have at least 3 vertices',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const searchTermClean = (searchTerm ?? '').toLowerCase().trim();
     const query = this.siteRepository.createQueryBuilder('sites');
 
     if (searchTermClean.length) {
@@ -302,10 +373,76 @@ export class SiteService {
         });
     }
 
+    if (polygon) {
+      const polygonVertices = [...polygon];
+
+      // This makes sure that the provided shape is enclosed
+      if (polygonVertices[0] !== polygonVertices[polygonVertices.length - 1]) {
+        polygonVertices.push(polygonVertices[0]);
+      }
+
+      const polygonString = polygonVertices
+        .map(([lat, long]) => `${long} ${lat}`)
+        .join(', ');
+
+      query.where(
+        `ST_Within(
+          ST_Transform(sites.geometry, ${BC_ALBERS}), 
+          ST_Transform(ST_GeomFromText('POLYGON((${polygonString}))', ${WGS_84}), ${BC_ALBERS})
+        )`,
+      );
+    }
+
     const [result] = await query.getManyAndCount();
 
     this.sitesLogger.log('SiteService.mapSearch() end');
     return result;
+  }
+
+  async findSitesAndPlaces(searchTerm = '', limit = 3) {
+    this.sitesLogger.log('SiteService.findSitesAndPlaces() start');
+
+    const searchTermClean = searchTerm.toLowerCase().trim();
+    const sitesQuery = this.siteRepository.createQueryBuilder('sites');
+    const placesQuery = this.placeRepository.createQueryBuilder('places');
+
+    if (searchTermClean.length === 0) {
+      return {
+        sites: [],
+        places: [],
+      };
+    }
+
+    sitesQuery
+      .where('CAST(sites.id AS TEXT) = :searchTermId', {
+        searchTermId: searchTermClean,
+      })
+      .orWhere('LOWER(sites.common_name) LIKE LOWER(:searchTermName)', {
+        searchTermName: `%${searchTermClean}%`,
+      })
+      .limit(limit)
+      // This makes sure that sites found by ID match appear first on the list, sites found by common_name match follow
+      .orderBy(
+        `CASE 
+          WHEN CAST(sites.id AS TEXT) LIKE :searchTermId THEN 0 
+          ELSE 1 
+        END`,
+        'ASC',
+      )
+      .addOrderBy('sites.id', 'ASC');
+    placesQuery
+      .where('LOWER(places.name) LIKE LOWER(:searchTerm)', {
+        searchTerm: `%${searchTermClean}%`,
+      })
+      .limit(limit);
+
+    const [[sites], [places]] = await Promise.all([
+      sitesQuery.getManyAndCount(),
+      placesQuery.getManyAndCount(),
+    ]);
+
+    this.sitesLogger.log('SiteService.findSitesAndPlaces() end');
+    return { sites, places };
   }
 
   /**
@@ -585,7 +722,7 @@ export class SiteService {
           const {
             displayName,
             psnorgId,
-            // dprCode,
+            organizationName,
             docParticId,
             apiAction,
             srAction,
@@ -796,6 +933,7 @@ export class SiteService {
               apiAction,
               particRoleId,
               srAction,
+              srValue,
               ...siteParticsData
             } = participant;
 
@@ -989,8 +1127,13 @@ export class SiteService {
           participants: any[],
         ) => {
           const participantPromises = participants.map(async (partic) => {
-            const { eventParticId, displayName, apiAction, ...particData } =
-              partic;
+            const {
+              eventParticId,
+              displayName,
+              apiAction,
+              srValue,
+              ...particData
+            } = partic;
             switch (apiAction) {
               case UserActionEnum.ADDED:
                 return {
@@ -1185,7 +1328,7 @@ export class SiteService {
         const deleteSiteAssociates: { id: string }[] = [];
 
         const siteAssociatePromises = siteAccociated.map(async (asscos) => {
-          const { id, apiAction, ...siteAssocsData } = asscos;
+          const { id, apiAction, srValue, ...siteAssocsData } = asscos;
           const siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
           switch (apiAction) {
             case UserActionEnum.ADDED:

@@ -717,7 +717,6 @@ const SRUpdates = () => {
               link="?documents"
             >
               <Document
-                index={index}
                 userType={UserType.Internal}
                 mode={SiteDetailsMode.ViewOnlyMode}
                 documentFirstChildFormRows={documentFirstChildFormRows}
@@ -730,7 +729,7 @@ const SRUpdates = () => {
                 handleDownload={() => {}}
                 handleFileReplace={handleChange}
                 handleFileDelete={handleChange}
-                key={Date.now()}
+                uniqueId={Date.now()}
                 internalRow={documentFormRows}
                 showApproveRejectSection={true}
                 approveRejectHandler={(value) =>
@@ -810,7 +809,10 @@ const SRUpdates = () => {
               handleChangeResultsPerPage={handleChange}
               currentPage={1}
               resultsPerPage={undefined}
+              viewMode={SiteDetailsMode.ViewOnlyMode}
               handleTableSortChange={handleChange}
+              deleteHandler={() => {}}
+              allowRowsSelect={false}
             />
           </ApproveReject>
         )}
@@ -849,12 +851,15 @@ const SRUpdates = () => {
         </ApproveReject>
       )}
       {!disclosureData &&
-        (!parcelDescriptionData || parcelDescriptionData.data.length === 0) &&
-        (!landUsesData || landUsesData.length === 0) &&
-        (!associatedSitesData || associatedSitesData.length === 0) &&
-        (!documentsData || documentsData.length === 0) &&
-        (!siteParticipantData || siteParticipantData.length === 0) &&
-        (!notationData || notationData.length === 0) &&
+        (!parcelDescriptionData ||
+          (parcelDescriptionData && parcelDescriptionData.data.length === 0)) &&
+        (!landUsesData || (landUsesData && landUsesData.length === 0)) &&
+        (!associatedSitesData ||
+          (associatedSitesData && associatedSitesData.length === 0)) &&
+        (!documentsData || (documentsData && documentsData.length === 0)) &&
+        (!siteParticipantData ||
+          (siteParticipantData && siteParticipantData.length === 0)) &&
+        (!notationData || (notationData && notationData.length === 0)) &&
         !siteSummaryData && (
           <div>
             <span> No updates to review</span>

@@ -59,11 +59,7 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
   showApproveRejectSection = showApproveRejectSection ?? false;
   hideLabelForWidget = hideLabelForWidget ?? false;
 
-  approveRejectHandler =
-    approveRejectHandler ??
-    ((value) => {
-      console.log('Approve/Reject Handler not provided');
-    });
+  approveRejectHandler = approveRejectHandler ?? (() => {});
 
   return (
     <div>
@@ -86,9 +82,8 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
           viewMode === SiteDetailsMode.EditMode &&
           userType === UserType.Internal
         }
-        srMode={
-          viewMode === SiteDetailsMode.SRMode && userType === UserType.Internal
-        }
+        srMode={viewMode === SiteDetailsMode.SRMode}
+        hideWidgetCheckbox={true}
         primaryKeycolumnName="particRoleId"
         sortHandler={(row, ascDir) => {
           handleTableSort(row, ascDir);

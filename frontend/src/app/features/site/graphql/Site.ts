@@ -1,6 +1,52 @@
 import gql from 'graphql-tag';
 
-export const graphQlSiteQuery = (filter: {}) => {
+export const graphQlSiteQuery = () => {
+  return gql`
+    query searchSites(
+      $searchParam: String!
+      $page: Int!
+      $pageSize: Int!
+      $filters: SiteFilters!
+    ) {
+      searchSites(
+        searchParam: $searchParam
+        page: $page
+        pageSize: $pageSize
+        filters: $filters
+      ) {
+        sites {
+          id
+          addrLine_1
+          addrLine_2
+          addrLine_3
+          city
+          srStatus
+          siteRiskCode
+          generalDescription
+          commonName
+          latdeg
+          latDegrees
+          latMinutes
+          latSeconds
+          longdeg
+          longDegrees
+          longMinutes
+          longSeconds
+          latlongReliabilityFlag
+          whoCreated
+          whenCreated
+          whenCreated
+          consultantSubmitted
+        }
+        count
+        page
+        pageSize
+      }
+    }
+  `;
+};
+
+export const graphQlSiteQueryForAuthenticatedUsers = (filter: {}) => {
   const filterConditions = filter && Object.keys(filter);
   let fieldsString = '';
   let fieldsArgString = '';
@@ -17,8 +63,8 @@ export const graphQlSiteQuery = (filter: {}) => {
   }
 
   return gql`
-query searchSites($searchParam: String!,  $page: String!, $pageSize: String!, ${fieldsArgString}){ 
-    searchSites(searchParam: $searchParam, , page: $page, pageSize: $pageSize, ${fieldsString}) {
+query searchSitesForAuthenticatedUsers($searchParam: String!,  $page: Int!, $pageSize: Int!, ${fieldsArgString}){ 
+    searchSitesForAuthenticatedUsers(searchParam: $searchParam, , page: $page, pageSize: $pageSize, ${fieldsString}) {
        sites
        {
         id
@@ -75,6 +121,7 @@ export const graphqlSiteDetailsQuery = () => {
           generalDescription
           siteRiskCode
           whenUpdated
+          srAction
         }
         httpStatusCode
       }
@@ -99,6 +146,8 @@ export const graphqlSiteDetailsQueryForLoggedIn = () => {
           latDegrees
           latMinutes
           latSeconds
+          latdeg
+          longdeg
           city
           generalDescription
           siteRiskCode

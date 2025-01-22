@@ -187,11 +187,11 @@ export const TextInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: string) => {
     if (validation) {
       if (validation?.pattern && !validation.pattern?.test(inputValue)) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || '');
         return false;
       }
       if (validation.required && !inputValue.trim()) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
         return false;
       }
     }
@@ -208,7 +208,7 @@ export const TextInput: React.FC<InputProps> = ({
 
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
-        onChange(inputValue); // Update parent component state only if validation passes
+        onChange(parseFloat(inputValue)); // Update parent component state only if validation passes
       }
     } else {
       onChange(inputValue);
@@ -227,15 +227,6 @@ export const TextInput: React.FC<InputProps> = ({
     >
       {!tableMode && (
         <>
-          {srMode && (
-            <CheckBoxInput
-              type={FormFieldType.Checkbox}
-              label={inputTxtId}
-              isLabel={false}
-              onChange={handleCheckBoxChange}
-              srMode={srMode}
-            />
-          )}
           {!tableMode && (
             <label
               htmlFor={inputTxtId}
@@ -312,7 +303,7 @@ export const DropdownInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: string) => {
     if (validation) {
       if (validation?.required && !inputValue.trim()) {
-        setError(validation?.customMessage || 'Invalid input');
+        setError(validation?.customMessage || ' ');
         return false;
       }
     }
@@ -338,15 +329,6 @@ export const DropdownInput: React.FC<InputProps> = ({
     <ContainerElement
       className={tableMode ? 'table-border-light align-content-center' : 'mb-3'}
     >
-      {srMode && (
-        <CheckBoxInput
-          type={FormFieldType.Checkbox}
-          label={drdownId}
-          isLabel={false}
-          onChange={handleCheckBoxChange}
-          srMode={srMode}
-        />
-      )}
       {/* Create a label for the dropdown using the form-label class */}
 
       {!tableMode && (
@@ -475,11 +457,11 @@ export const GroupInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: string, child: InputProps) => {
     if (child?.validation) {
       if (child?.validation && !child?.validation.pattern?.test(inputValue)) {
-        setError(child?.validation?.customMessage || 'Invalid input');
+        setError(child?.validation?.customMessage || ' ');
         return false;
       }
       if (child?.validation?.required && !inputValue.trim()) {
-        setError(child?.validation?.customMessage || 'Invalid input');
+        setError(child?.validation?.customMessage || ' ');
         return false;
       }
     }
@@ -498,7 +480,7 @@ export const GroupInput: React.FC<InputProps> = ({
     }
     if (child.allowNumbersOnly) {
       if (validateInput(inputValue, child)) {
-        child.onChange(inputValue); // Update parent component state only if validation passes
+        child.onChange(parseFloat(inputValue)); // Update parent component state only if validation passes
       }
     } else {
       child.onChange(inputValue);
@@ -513,15 +495,6 @@ export const GroupInput: React.FC<InputProps> = ({
     <div className="mb-3">
       {' '}
       {/* Container for the group input */}
-      {srMode && (
-        <CheckBoxInput
-          type={FormFieldType.Checkbox}
-          label={''}
-          isLabel={false}
-          onChange={handleCheckBoxChange}
-          srMode={srMode}
-        />
-      )}
       {/* Label for the group input */}
       <label
         htmlFor={groupId}
@@ -627,7 +600,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: any) => {
     if (validation) {
       if (validation.required && !inputValue) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
         return false;
       }
     }
@@ -653,15 +626,6 @@ export const DateRangeInput: React.FC<InputProps> = ({
     <ContainerElement
       className={tableMode ? 'table-border-light align-content-center' : 'mb-3'}
     >
-      {srMode && (
-        <CheckBoxInput
-          type={FormFieldType.Checkbox}
-          label={dateRangeId}
-          isLabel={false}
-          onChange={handleCheckBoxChange}
-          srMode={srMode}
-        />
-      )}
       {!tableMode && (
         <label
           htmlFor={dateRangeId}
@@ -689,6 +653,7 @@ export const DateRangeInput: React.FC<InputProps> = ({
           value={value ?? []}
           onChange={(value) => handleDateRange(value)}
           editable={true}
+          menuStyle={{ zIndex: 1500 }}
         />
       ) : (
         <span
@@ -750,7 +715,7 @@ export const DateInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: Date | null) => {
     if (validation) {
       if (validation.required && !inputValue) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
         return false;
       }
     }
@@ -779,15 +744,6 @@ export const DateInput: React.FC<InputProps> = ({
     <ContainerElement
       className={tableMode ? 'table-border-light align-content-center' : 'mb-3'}
     >
-      {srMode && (
-        <CheckBoxInput
-          type={FormFieldType.Checkbox}
-          label={dateRangeId}
-          isLabel={false}
-          onChange={handleCheckBoxChange}
-          srMode={srMode}
-        />
-      )}
       {!tableMode && (
         <label
           htmlFor={dateRangeId}
@@ -937,11 +893,11 @@ export const TextAreaInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: string) => {
     if (validation) {
       if (validation?.pattern && !validation.pattern?.test(inputValue)) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
         return false;
       }
       if (validation.required && !inputValue.trim()) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
         return false;
       }
     }
@@ -970,23 +926,10 @@ export const TextAreaInput: React.FC<InputProps> = ({
     >
       {!tableMode && (
         <>
-          {srMode && (
-            <CheckBoxInput
-              type={FormFieldType.Checkbox}
-              label={textAreaId}
-              isLabel={false}
-              onChange={(isChecked) => onChange(isChecked)}
-              srMode={srMode}
-            />
-          )}
           {!tableMode && (
             <label
               htmlFor={textAreaId}
-              className={`${
-                !isEditing
-                  ? (customLabelCss ?? '')
-                  : `form-label ${customEditLabelCss ?? 'custom-label'}`
-              }`}
+              className={`${!isEditing ? (customLabelCss ?? '') : `form-label ${customEditLabelCss ?? 'custom-label'}`} ${validation?.required ? 'required-field' : ''}`}
             >
               {label}
             </label>
@@ -999,7 +942,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
           data-testid={textAreaId}
           className={`form-control custom-textarea  ${customPlaceholderCss ?? ''} ${
             customEditInputTextCss ?? 'custom-input-text'
-          }`}
+          } ${error && 'error'}`}
           placeholder={placeholder}
           value={value ?? ''}
           onChange={handleTextAreaChange}
@@ -1069,7 +1012,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: string) => {
     if (validation) {
       if (validation?.required && !inputValue) {
-        setError(validation?.customMessage || 'Invalid input');
+        setError(validation?.customMessage || ' ');
         return false;
       }
     }
@@ -1130,15 +1073,6 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
     <ContainerElement
       className={`${tableMode ? 'table-border-light align-content-center' : 'mb-3'} ${tableMode && stickyCol ? 'position-sticky' : ''} `}
     >
-      {srMode && (
-        <CheckBoxInput
-          type={FormFieldType.Checkbox}
-          label={label}
-          isLabel={false}
-          onChange={(isChecked) => onChange(isChecked)}
-          srMode={srMode}
-        />
-      )}
       {!tableMode && (
         <label
           htmlFor={drdownId}
@@ -1278,25 +1212,24 @@ export const SearchCustomInput: React.FC<InputProps> = ({
     }
   }, [isOpen]);
 
-  // useEffect(() => {
-  //   if (resetDetails) {
-  //     setError(null);
-  //   }
-  // }, [resetDetails]);
-
   useEffect(() => {
     if (validation?.required) {
-      validateInput(value);
+      validateInput(value.trim());
     }
   }, []);
 
   const validateInput = (inputValue: any) => {
     if (validation) {
       if (inputValue === null || inputValue === undefined) {
+        setError(validation.customMessage || ' ');
         return false;
       }
       if (validation.pattern && !validation.pattern.test(inputValue)) {
-        setError(validation.customMessage || 'Invalid input');
+        setError(validation.customMessage || ' ');
+        return false;
+      }
+      if (!inputValue.trim()) {
+        setError(validation?.customMessage || ' ');
         return false;
       }
     }
@@ -1306,11 +1239,12 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   };
 
   const handleTextInputChange = (value: any) => {
-    const inputValue = value;
-    if (validation?.required) {
-      validateInput(inputValue);
-    }
     setHasInfoMsg(null);
+    const inputValue = value;
+    let isValid = true;
+    if (validation?.required) {
+      isValid = validateInput(inputValue);
+    }
     if (allowNumbersOnly) {
       if (validateInput(inputValue)) {
         if (inputValue.trim().toString() === '') {
@@ -1327,7 +1261,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
       }
     } else {
       setHasInfoMsg(null);
-      setIsOpen(true);
+      setIsOpen(isValid);
       onChange(inputValue);
     }
   };
@@ -1335,7 +1269,7 @@ export const SearchCustomInput: React.FC<InputProps> = ({
   const handleSelectInputChange = (selectedValue: any) => {
     setHasInfoMsg(customInfoMessage);
     const { value } = selectedValue;
-    handleTextInputChange(value);
+    handleTextInputChange(value.trim());
   };
 
   const closeSearch = useCallback(() => {

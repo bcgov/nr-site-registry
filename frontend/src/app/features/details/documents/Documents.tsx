@@ -56,6 +56,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
     documentFirstChildFormRowsForExternal,
     documentFirstChildFormRows,
     documentFormRows,
+    documentFormRowsEditMode,
   } = GetDocumentsConfig();
   const loggedInUser = getUser();
   const { id } = useParams();
@@ -79,9 +80,9 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [isReplace, setIsReplace] = useState(false);
   const [currentDocument, setCurrentDocument] = useState({});
   const [currentFile, setCurrentFile] = useState({});
-  const [key, setKey] = useState(Date.now()); // Key for input type="file" element
+  const [uniqueId, setUniqueId] = useState(Date.now()); // Key for input type="file" element
 
-  const [internalRow, setInternalRow] = useState(documentFormRows);
+  const [internalRow, setInternalRow] = useState(documentFormRowsEditMode);
   const [externalRow, setExternalRow] = useState(
     documentFirstChildFormRowsForExternal,
   );
@@ -99,7 +100,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
 
         const response = await getAxiosInstance().post(GRAPHQL, {
           query: print(graphQLPeopleOrgsCd()),
-          variables: { searchParam },
+          variables: { searchParam, entity: 'ORG' },
         });
 
         // Store result in cache if successful
@@ -178,6 +179,10 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
             },
           }),
         );
+      }
+
+      // Always update formData if different
+      if (JSON.stringify(formData) !== JSON.stringify(siteDocuments)) {
         setFormData(siteDocuments);
       }
     }
@@ -248,7 +253,10 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   // THIS MAY CHANGE IN FUTURE. NEED TO DISCUSS AS API NEEDS TO BE CALLED AGAIN
   // IF SAVED OR CANCEL BUTTON ON TOP IS CLICKED
   useEffect(() => {
-    if (resetDetails) {
+    if (
+      resetDetails ||
+      saveSiteDetailsRequestStatus === RequestStatus.success
+    ) {
       dispatch(fetchDocuments({ siteId: id ?? '', showPending: showPending }));
     }
   }, [resetDetails, saveSiteDetailsRequestStatus]);
@@ -339,10 +347,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
         break;
     }
     setFormData(sorted);
-  };
-
-  const handleWidgetCheckBox = (event: any) => {
-    alert(event);
   };
 
   const handleParentChekBoxChange = (id: any, value: any) => {
@@ -461,7 +465,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
       setIsReplace(true);
 
       // Reset input type="file" element by changing key prop
-      setKey(Date.now()); // Force input type="file" to reset
+      setUniqueId(Date.now()); // Force input type="file" to reset
     }
   };
 
@@ -507,65 +511,130 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
     }
   };
 
+  const updateDocuments = (
+    documentId: number,
+    documents: any,
+    value: any,
+    graphQLPropertyName: any,
+    srMode?: boolean,
+    srActionValue?: SRApprovalStatusEnum,
+  ) => {
+    return documents.map((document: any) => {
+      if (document.id === documentId) {
+        const isPsnorgId =
+          typeof value === 'object' &&
+          value !== null &&
+          graphQLPropertyName === 'psnorgId';
+        if (isPsnorgId) {
+          let params: UpdateDisplayTypeParams = {
+            indexToUpdate: documentFormRows.findIndex((row) =>
+              row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+            ),
+            updates: {
+              isLoading: RequestStatus.success,
+              options,
+              filteredOptions: [],
+              handleSearch,
+              customInfoMessage: <></>,
+            },
+          };
+          setInternalRow(updateFields(internalRow, params));
+        }
+        let updatedDocument = null;
+        if (srMode) {
+          updatedDocument = {
+            ...document,
+            displayName: isPsnorgId ? value.value : document.displayName,
+            apiAction: document?.apiAction ?? UserActionEnum.updated,
+            srAction: srActionValue,
+          };
+        } else {
+          updatedDocument = {
+            ...document,
+            [graphQLPropertyName]: isPsnorgId ? value.key : value,
+            displayName: isPsnorgId ? value.value : document.displayName,
+            organizationName: isPsnorgId ? value?.metaData : '',
+            apiAction: document?.apiAction ?? UserActionEnum.updated,
+            srAction: srActionValue,
+          };
+        }
+        return updatedDocument;
+      }
+      return document;
+    });
+  };
+
   const handleInputChange = (
     id: number,
     graphQLPropertyName: any,
     value: any,
   ) => {
-    if (viewMode === SiteDetailsMode.SRMode) {
-      console.log({ [graphQLPropertyName]: value, id });
+    let updatedDocuments = null;
+    let updatedTrackDocuments = null;
+    if (
+      viewMode === SiteDetailsMode.SRMode &&
+      (value === 'checked' || value === 'unchecked')
+    ) {
+      updatedDocuments = updateDocuments(
+        id,
+        formData,
+        value,
+        graphQLPropertyName,
+        true,
+        value === 'checked'
+          ? SRApprovalStatusEnum.Public
+          : SRApprovalStatusEnum.Private,
+      );
+      updatedTrackDocuments = updateDocuments(
+        id,
+        trackDocuments ?? formData,
+        value,
+        graphQLPropertyName,
+        true,
+        value === 'checked'
+          ? SRApprovalStatusEnum.Public
+          : SRApprovalStatusEnum.Private,
+      );
     } else {
-      const updateDocuments = (documents: any) => {
-        return documents.map((document: any) => {
-          if (document.id === id) {
-            const isPsnorgId =
-              typeof value === 'object' &&
-              value !== null &&
-              graphQLPropertyName === 'psnorgId';
-            if (isPsnorgId) {
-              let params: UpdateDisplayTypeParams = {
-                indexToUpdate: documentFormRows.findIndex((row) =>
-                  row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-                ),
-                updates: {
-                  isLoading: RequestStatus.success,
-                  options,
-                  filteredOptions: [],
-                  handleSearch,
-                  customInfoMessage: <></>,
-                },
-              };
-              setInternalRow(updateFields(internalRow, params));
-            }
-            let updatedDocument = {
-              ...document,
-              [graphQLPropertyName]: isPsnorgId ? value.key : value,
-              displayName: isPsnorgId ? value.value : document.displayName,
-              apiAction: document?.apiAction ?? UserActionEnum.updated,
-              srAction: SRApprovalStatusEnum.Pending,
-            };
-            return updatedDocument;
-          }
-          return document;
-        });
-      };
-
       // Update both formData and trackNotation
-      const updatedDocuments = updateDocuments(formData);
-      const updatedTrackDocuments = updateDocuments(trackDocuments ?? formData);
-      setFormData(updatedDocuments);
-      dispatch(updateSiteDocument(updatedDocuments));
-      dispatch(setupDocumentsDataForSaving(updatedTrackDocuments));
+      updatedDocuments = updateDocuments(
+        id,
+        formData,
+        value,
+        graphQLPropertyName,
+      );
+      updatedTrackDocuments = updateDocuments(
+        id,
+        trackDocuments ?? formData,
+        value,
+        graphQLPropertyName,
+      );
     }
+
+    setFormData(updatedDocuments);
+    dispatch(updateSiteDocument(updatedDocuments));
+    dispatch(setupDocumentsDataForSaving(updatedTrackDocuments));
+
     const flattedArr = flattenFormRows(documentFormRows);
     const currLabel =
       flattedArr &&
       flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
-    const tracker = new ChangeTracker(
-      IChangeType.Modified,
-      'Document: ' + currLabel?.label,
-    );
-    dispatch(trackChanges(tracker.toPlainObject()));
+    if (
+      viewMode === SiteDetailsMode.SRMode &&
+      (value === 'checked' || value === 'unchecked')
+    ) {
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Document: SR Status',
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    } else {
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Document: ' + currLabel?.label,
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    }
   };
 
   return (
@@ -588,6 +657,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                 </label>
 
                 <input
+                  key={uniqueId}
                   aria-label="input-file"
                   type="file"
                   id="input-file"
@@ -627,8 +697,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
       </div>
       <div
         data-testid="document-rows"
-        className={`col-lg-12 overflow-auto p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`}
-        style={{ maxHeight: '800px' }}
+        className={`col-lg-12 p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`}
       >
         {formData &&
           formData.map((document, index) => (
@@ -639,14 +708,21 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                     type={FormFieldType.Checkbox}
                     label={''}
                     isLabel={false}
+                    isChecked={
+                      document.srAction === 'true' ||
+                      document.srAction === SRApprovalStatusEnum.Public
+                    }
                     onChange={(value) =>
-                      handleParentChekBoxChange(document.id, value)
+                      handleInputChange(
+                        document.id,
+                        '',
+                        value ? 'checked' : 'unchecked',
+                      )
                     }
                     srMode={viewMode === SiteDetailsMode.SRMode}
                   />
                 )}
               <Document
-                index={index}
                 userType={userType}
                 mode={mode}
                 documentFirstChildFormRows={documentFirstChildFormRows}
@@ -659,8 +735,12 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                 handleDownload={handleDownload}
                 handleFileReplace={handleFileReplace}
                 handleFileDelete={handleFileDelete}
-                key={key}
-                internalRow={internalRow}
+                uniqueId={uniqueId}
+                internalRow={
+                  viewMode === SiteDetailsMode.EditMode
+                    ? internalRow
+                    : documentFormRows
+                }
               />
             </div>
           ))}

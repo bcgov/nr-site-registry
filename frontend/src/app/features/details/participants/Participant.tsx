@@ -14,9 +14,6 @@ import {
   IChangeType,
 } from '../../../components/common/IChangeType';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
-import Widget from '../../../components/widget/Widget';
-import { UserMinus, UserPlus } from '../../../components/common/icon';
-import Actions from '../../../components/action/Actions';
 import './Participant.css';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
@@ -428,15 +425,32 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
               setInternalRow(updateTableColumn(internalRow, params));
             }
 
-            return {
-              ...participant,
-              [event.property]: isPsnorgId ? event.value.key : event.value,
-              displayName: isPsnorgId
-                ? event.value.value
-                : participant.displayName,
-              apiAction: participant?.apiAction ?? UserActionEnum.updated,
-              srAction: SRApprovalStatusEnum.Pending,
-            };
+            if (
+              viewMode === SiteDetailsMode.SRMode &&
+              event.property === 'srValue'
+            ) {
+              return {
+                ...participant,
+                [event.property]: isPsnorgId ? event.value.key : event.value,
+                displayName: isPsnorgId
+                  ? event.value.value
+                  : participant.displayName,
+                apiAction: participant?.apiAction ?? UserActionEnum.updated,
+                srAction: event.value
+                  ? SRApprovalStatusEnum.Public
+                  : SRApprovalStatusEnum.Private,
+              };
+            } else {
+              return {
+                ...participant,
+                [event.property]: isPsnorgId ? event.value.key : event.value,
+                displayName: isPsnorgId
+                  ? event.value.value
+                  : participant.displayName,
+                apiAction: participant?.apiAction ?? UserActionEnum.updated,
+                srAction: SRApprovalStatusEnum.Pending,
+              };
+            }
           }
           return participant;
         });
@@ -457,11 +471,19 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
         participantColumnInternal.find(
           (row) => row.graphQLPropertyName === event.property,
         );
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Site Participant: ' + currLabel?.displayName,
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      if (viewMode === SiteDetailsMode.SRMode && event.property === 'srValue') {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          'Site Participant: SR Status',
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      } else {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          'Site Participant: ' + currLabel?.displayName,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     }
   };
 
@@ -531,7 +553,6 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   };
 
   const handleTableSort = (row: any, ascDir: any) => {
-    debugger;
     let property = row['graphQLPropertyName'];
     setFormData((prevData) => {
       // Create a shallow copy of the previous data

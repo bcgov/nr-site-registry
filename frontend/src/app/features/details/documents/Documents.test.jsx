@@ -224,6 +224,71 @@ jest.mock('./DocumentsConfig', () => ({
         },
       ],
     ],
+    documentFormRowsEditMode: [
+      [
+        {
+          type: 'textarea',
+          label: 'Document Title',
+          placeholder: 'Document title...',
+          graphQLPropertyName: 'title',
+          value: '',
+          textAreaRow: 1,
+          colSize: 'col-lg-12 col-md-12 col-sm-12',
+          customLabelCss: 'custom-docuemnt-lbl-text',
+          customEditLabelCss: 'custom-docuemnt-lbl-text',
+          customInputTextCss: 'custom-document-input-text',
+          customEditInputTextCss: 'custom-document-edit-input-text',
+        },
+      ],
+      [
+        {
+          type: 'dropdownWithSearch',
+          label: 'Author',
+          placeholder: 'Author....',
+          graphQLPropertyName: 'psnorgId',
+          options:
+            [
+              {
+                dropdownDto: [
+                  { label: 'Author 1', value: '1' },
+                  { label: 'Author 2', value: '2' },
+                ],
+              },
+            ].flatMap((item) => item.dropdownDto) ?? [],
+          value: '',
+          colSize: 'col-lg-6 col-md-12 col-sm-12',
+          customLabelCss: 'custom-docuemnt-lbl-text',
+          customEditLabelCss: 'custom-docuemnt-lbl-text',
+          customInputTextCss: 'custom-document-input-text',
+          customEditInputTextCss: 'custom-document-edit-input-text',
+        },
+        {
+          type: 'date',
+          label: 'Document Date',
+          placeholder: 'MM/DD/YY',
+          graphQLPropertyName: 'documentDate',
+          value: '',
+          colSize: 'col-lg-3 col-md-6 col-sm-12',
+          customLabelCss: 'custom-docuemnt-lbl-text',
+          customEditLabelCss: 'custom-docuemnt-lbl-text',
+          customInputTextCss: 'custom-document-input-text',
+          customEditInputTextCss: 'custom-document-edit-input-text',
+        },
+        {
+          type: 'date',
+          label: 'Received Date',
+          placeholder: 'MM/DD/YY',
+          graphQLPropertyName: 'submissionDate',
+          value: '',
+          isDisabled: true,
+          colSize: 'col-lg-3 col-md-6 col-sm-12',
+          customLabelCss: 'custom-docuemnt-lbl-text',
+          customEditLabelCss: 'custom-docuemnt-lbl-text',
+          customInputTextCss: 'custom-document-input-text',
+          customEditInputTextCss: 'custom-document-edit-input-text',
+        },
+      ],
+    ],
   })),
 }));
 
@@ -333,6 +398,71 @@ describe('Documents component', () => {
         ],
       ],
       documentFormRows: [
+        [
+          {
+            type: 'textarea',
+            label: 'Document Title',
+            placeholder: 'Document title...',
+            graphQLPropertyName: 'title',
+            value: '',
+            textAreaRow: 1,
+            colSize: 'col-lg-12 col-md-12 col-sm-12',
+            customLabelCss: 'custom-docuemnt-lbl-text',
+            customEditLabelCss: 'custom-docuemnt-lbl-text',
+            customInputTextCss: 'custom-document-input-text',
+            customEditInputTextCss: 'custom-document-edit-input-text',
+          },
+        ],
+        [
+          {
+            type: 'dropdownWithSearch',
+            label: 'Author',
+            placeholder: 'Author....',
+            graphQLPropertyName: 'psnorgId',
+            options:
+              [
+                {
+                  dropdownDto: [
+                    { label: 'Author 1', value: '1' },
+                    { label: 'Author 2', value: '2' },
+                  ],
+                },
+              ].flatMap((item) => item.dropdownDto) ?? [],
+            value: '',
+            colSize: 'col-lg-6 col-md-12 col-sm-12',
+            customLabelCss: 'custom-docuemnt-lbl-text',
+            customEditLabelCss: 'custom-docuemnt-lbl-text',
+            customInputTextCss: 'custom-document-input-text',
+            customEditInputTextCss: 'custom-document-edit-input-text',
+          },
+          {
+            type: 'date',
+            label: 'Document Date',
+            placeholder: 'MM/DD/YY',
+            graphQLPropertyName: 'documentDate',
+            value: '',
+            colSize: 'col-lg-3 col-md-6 col-sm-12',
+            customLabelCss: 'custom-docuemnt-lbl-text',
+            customEditLabelCss: 'custom-docuemnt-lbl-text',
+            customInputTextCss: 'custom-document-input-text',
+            customEditInputTextCss: 'custom-document-edit-input-text',
+          },
+          {
+            type: 'date',
+            label: 'Received Date',
+            placeholder: 'MM/DD/YY',
+            graphQLPropertyName: 'submissionDate',
+            value: '',
+            isDisabled: true,
+            colSize: 'col-lg-3 col-md-6 col-sm-12',
+            customLabelCss: 'custom-docuemnt-lbl-text',
+            customEditLabelCss: 'custom-docuemnt-lbl-text',
+            customInputTextCss: 'custom-document-input-text',
+            customEditInputTextCss: 'custom-document-edit-input-text',
+          },
+        ],
+      ],
+      documentFormRowsEditMode: [
         [
           {
             type: 'textarea',

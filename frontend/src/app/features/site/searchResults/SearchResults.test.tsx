@@ -4,14 +4,14 @@ import userEvent from '@testing-library/user-event';
 import SearchResults from './SearchResults';
 import { Provider } from 'react-redux';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import configureStore from 'redux-mock-store';
-import { RequestStatus } from '../../helpers/requests/status';
-import { getSiteSearchResultsColumns } from './dto/Columns';
+import configureStore, { MockStoreEnhanced } from 'redux-mock-store';
+import { RequestStatus } from '../../../helpers/requests/status';
+import { getSiteSearchResultsColumns } from '../dto/Columns';
 
 const mockStore = configureStore([]);
 
 describe('SearchResults Component', () => {
-  let store;
+  let store: MockStoreEnhanced<unknown, {}>;
 
   beforeEach(() => {
     store = mockStore({
@@ -25,10 +25,16 @@ describe('SearchResults Component', () => {
   });
 
   test('renders no results found when data is empty', () => {
-    const emptyData = [];
+    const emptyData: any[] = [];
     const { container } = render(
       <Provider store={store}>
-        <SearchResults data={emptyData} pageChange={() => {}} />
+        <SearchResults
+          data={emptyData}
+          pageChange={() => {}}
+          columns={[]}
+          totalRecords={0}
+          changeHandler={jest.fn}
+        />
       </Provider>,
     );
     const noResultsText = screen.getByText('No Results Found');
@@ -54,6 +60,8 @@ describe('SearchResults Component', () => {
             data={mockData}
             pageChange={(currentPage, resultsPerPage) => {}}
             columns={getSiteSearchResultsColumns()}
+            totalRecords={0}
+            changeHandler={jest.fn}
           />
         ),
         path: '/',
@@ -86,8 +94,9 @@ describe('SearchResults Component', () => {
           <SearchResults
             data={mockData}
             columns={getSiteSearchResultsColumns()}
-            changeHandler={() => {}}
-            pageChange={() => {}}
+            pageChange={jest.fn}
+            totalRecords={0}
+            changeHandler={jest.fn}
           />
         ),
         path: '/',
@@ -125,7 +134,9 @@ describe('SearchResults Component', () => {
           <SearchResults
             data={mockData}
             columns={columns}
-            pageChange={() => {}}
+            pageChange={jest.fn}
+            totalRecords={0}
+            changeHandler={jest.fn}
           />
         ),
         path: '/',

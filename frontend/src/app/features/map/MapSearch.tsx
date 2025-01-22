@@ -1,23 +1,38 @@
 import { Autocomplete, Box, Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { Map } from 'leaflet';
 
 import {
+  ActiveToolEnum,
   MAP_CONTROLS_RIGHT_LG,
   MAP_CONTROLS_RIGHT_SM,
   MAP_CONTROLS_RIGHT_XL,
+  MIN_CIRCLE_RADIUS,
 } from '../../constants/Constant';
 
 import { TextSearchButton } from './search/TextSearchButton';
 
 import './MapSearch.css';
 import { SearchInput } from './search/SearchInput';
-import React, { useContext, useState } from 'react';
+import React, { RefObject, useState } from 'react';
 import { FindMeButton } from './FindMeButton';
 import { HorizontalScroller } from './controls/HorizontalScroller';
 import { PolygonSearchButton } from './search/PolygonSearchButton';
 import { RadiusSearchButton } from './search/RadiusSearchButton';
-import { MapSearchQueryParamsContext } from './mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { useMapSearchContext } from './mapSearchContext/MapSearchContext';
+import { RadiusSearch } from './search/RadiusSearch';
+import { PolygonSearchControls } from './search/PolygonSearchControls';
+import {
+  MapSearch_FindSitesAndPlacesQuery,
+  useMapSearch_FindSitesAndPlacesQuery,
+} from '../../../graphql/generated';
+import useDebouncedValue from '../../helpers/useDebouncedValue';
+import { getZoom, MAP_FLY_OPTIONS } from './mapOptions';
+import {
+  AutocompleteItem,
+  AutocompleteOption,
+} from './search/AutocompleteOption';
 
 const styles = {
   marginTop: {
@@ -58,23 +73,63 @@ const componentProps = {
   },
 };
 
+function formatDataForAutocomplete(
+  data: MapSearch_FindSitesAndPlacesQuery | undefined,
+) {
+  if (!data) return [];
+  return [
+    ...data.findSitesAndPlaces.data.sites.map(
+      ({ id, commonName: label, latdeg, longdeg, __typename }) => ({
+        id,
+        label,
+        latdeg,
+        longdeg,
+        type: __typename,
+      }),
+    ),
+    ...data.findSitesAndPlaces.data.places.map(
+      ({ id, name: label, latdeg, longdeg, __typename }) => ({
+        id,
+        label,
+        latdeg,
+        longdeg,
+        type: __typename,
+      }),
+    ),
+  ];
+}
+
 interface MapSearchProps {
+  mapRef: RefObject<Map | null>;
+  radius: number;
+  setRadius: React.Dispatch<React.SetStateAction<number>>;
   isLocationVisible: boolean;
   setLocationVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function MapSearch({
+  radius,
+  setRadius,
   isLocationVisible,
   setLocationVisible,
+  mapRef,
 }: MapSearchProps) {
-  const { searchTerm, setQuery, clearQuery } = useContext(
-    MapSearchQueryParamsContext,
-  );
+  const { searchTerm, setQuery, clearQuery, activeTool, setActiveTool } =
+    useMapSearchContext();
 
   const [searchValue, setSearchValue] = useState(searchTerm);
+  const searchValueDebounced = useDebouncedValue(searchValue);
+
   const theme = useTheme();
   const isLarge = useMediaQuery(theme.breakpoints.up('lg'));
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
+
+  const { data } = useMapSearch_FindSitesAndPlacesQuery({
+    variables: {
+      searchParam: searchValueDebounced || '',
+    },
+    skip: (searchValueDebounced?.length ?? 0) < 3,
+  });
 
   const clearSearch = () => {
     setSearchValue('');
@@ -85,10 +140,52 @@ export function MapSearch({
     setSearchValue(event.target.value);
   };
 
-  const submitSearchOnEnterPress = (e: React.KeyboardEvent) => {
-    if (e.key !== 'Enter' || searchValue === null) return;
-    setQuery({ search: searchValue }, 'replace');
+  const submitSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (searchValue) {
+      setQuery({ search: searchValue }, 'replace');
+      return;
+    }
   };
+
+  const isPolygonTool = activeTool === ActiveToolEnum.polygonSearch;
+  const isRadiusTool = activeTool === ActiveToolEnum.radiusSearch;
+
+  const handlePolygonToolClick = () => {
+    setActiveTool(ActiveToolEnum.polygonSearch);
+  };
+
+  const handleRadiusToolClick = () => {
+    setActiveTool(ActiveToolEnum.radiusSearch);
+    setRadius(MIN_CIRCLE_RADIUS);
+  };
+
+  const onOptionSelect = (option: AutocompleteOption) => {
+    if (
+      !mapRef.current ||
+      !option.id ||
+      !option.latdeg ||
+      !option.longdeg ||
+      !option.type
+    )
+      return;
+
+    const lat = option.latdeg;
+    const lng = option.longdeg;
+
+    mapRef.current.flyTo(
+      { lat, lng },
+      getZoom(mapRef.current),
+      MAP_FLY_OPTIONS,
+    );
+
+    if (option?.type === 'Sites') {
+      setQuery({ site: option.id }, 'replace');
+    }
+  };
+
+  const autocompleteOptions = formatDataForAutocomplete(data);
 
   return (
     <Box component="div" sx={styles} className="map-search">
@@ -99,25 +196,40 @@ export function MapSearch({
       >
         {isLarge ? (
           <Stack direction="row" className="map-search-row">
-            <Autocomplete
-              options={[]}
-              value={searchValue}
-              onKeyDown={submitSearchOnEnterPress}
-              freeSolo
-              renderInput={(params) => {
-                return (
-                  <SearchInput
-                    {...params}
-                    onChange={handleSearchChange}
-                    value={searchValue}
-                    sx={searchInputStyles}
-                    onClear={clearSearch}
-                  />
-                );
-              }}
-              className="search-autocomplete"
-              componentsProps={componentProps}
-            />
+            <form onSubmit={submitSearch}>
+              <Autocomplete
+                options={autocompleteOptions}
+                value={searchValue}
+                freeSolo
+                onChange={(_, option) => {
+                  if (typeof option === 'string' || option === null) return;
+                  onOptionSelect(option);
+                }}
+                renderInput={(params) => {
+                  return (
+                    <SearchInput
+                      {...params}
+                      onChange={handleSearchChange}
+                      value={searchValue}
+                      sx={searchInputStyles}
+                      onClear={clearSearch}
+                    />
+                  );
+                }}
+                className="search-autocomplete"
+                slotProps={componentProps}
+                renderOption={(props, option) => {
+                  const { key, ...optionProps } = props;
+                  return (
+                    <AutocompleteItem
+                      key={key}
+                      option={option}
+                      {...optionProps}
+                    />
+                  );
+                }}
+              />
+            </form>
             <FindMeButton
               isLocationVisible={isLocationVisible}
               setLocationVisible={setLocationVisible}
@@ -126,9 +238,27 @@ export function MapSearch({
         ) : (
           <TextSearchButton />
         )}
-        <PolygonSearchButton />
-        <RadiusSearchButton />
+        <PolygonSearchButton
+          isActive={isPolygonTool}
+          onClick={handlePolygonToolClick}
+        />
+        <RadiusSearchButton
+          //mapRef={mapRef}
+          isActive={isRadiusTool}
+          onClick={handleRadiusToolClick}
+        />
       </HorizontalScroller>
+      {isLarge && (isPolygonTool || isRadiusTool) && (
+        <div className="map-search-tool-row">
+          <div className="map-search-tool-box">
+            {isPolygonTool ? (
+              <PolygonSearchControls />
+            ) : (
+              <RadiusSearch radius={radius} setRadius={setRadius} />
+            )}
+          </div>
+        </div>
+      )}
     </Box>
   );
 }

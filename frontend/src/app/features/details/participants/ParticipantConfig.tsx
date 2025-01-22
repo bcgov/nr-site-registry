@@ -3,9 +3,6 @@ import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import { RequestStatus } from '../../../helpers/requests/status';
-import { siteParticipants } from './ParticipantSlice';
-import { useEffect } from 'react';
-import { TickIcon, XmarkIcon } from '../../../components/common/icon';
 
 export const GetConfig = () => {
   const participantColumnInternal: TableColumn[] = [
@@ -34,6 +31,10 @@ export const GetConfig = () => {
         customMenuMessage: <span>Please select site participant name:</span>,
         tableMode: true,
         handleSearch: () => {},
+        validation: {
+          required: true,
+          customMessage: 'Participant Name is required.',
+        },
       },
     },
     {
@@ -56,6 +57,10 @@ export const GetConfig = () => {
         customEditInputTextCss: 'custom-participant-edit-input',
         tableMode: true,
         customInfoMessage: null,
+        validation: {
+          required: true,
+          customMessage: 'Role(s) is required.',
+        },
       },
     },
     {
@@ -77,6 +82,10 @@ export const GetConfig = () => {
         customEditInputTextCss:
           'custom-participant-edit-input .rs.input .rs-input-group-addon',
         tableMode: true,
+        validation: {
+          required: true,
+          customMessage: 'Start Date is required.',
+        },
       },
     },
     {
@@ -124,18 +133,17 @@ export const GetConfig = () => {
       id: 6,
       displayName: 'SR',
       active: true,
-      graphQLPropertyName: 'srAction',
+      graphQLPropertyName: 'srValue',
       displayType: {
         type: FormFieldType.Checkbox,
         label: 'SR',
         placeholder: '',
-        graphQLPropertyName: 'srAction',
+        graphQLPropertyName: 'srValue',
         value: false,
         tableMode: true,
         stickyCol: true,
       },
       columnSize: ColumnSize.XtraSmall,
-      // dynamicColumn: true,
       stickyCol: true,
     },
   ];
@@ -165,9 +173,10 @@ export const GetConfig = () => {
         customPlaceholderCss: 'custom-participant-search-placeholder',
         customMenuMessage: <span>Please select site participant name:</span>,
         tableMode: true,
-        // handleSearch: () => {
-        //   console.log('handleSearch click');
-        // },
+        validation: {
+          required: true,
+          customMessage: 'Participant Name is required.',
+        },
       },
     },
     {
@@ -190,6 +199,10 @@ export const GetConfig = () => {
         customEditInputTextCss: 'custom-participant-edit-input',
         tableMode: true,
         customInfoMessage: null,
+        validation: {
+          required: true,
+          customMessage: 'Role(s) is required.',
+        },
       },
     },
     {
@@ -211,6 +224,10 @@ export const GetConfig = () => {
         customEditInputTextCss:
           'custom-participant-edit-input .rs.input .rs-input-group-addon',
         tableMode: true,
+        validation: {
+          required: true,
+          customMessage: 'Start Date is required.',
+        },
       },
     },
     {

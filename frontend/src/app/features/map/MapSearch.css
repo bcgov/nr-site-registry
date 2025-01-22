@@ -11,6 +11,11 @@
   align-items: flex-start;
   flex-wrap: nowrap;
   gap: 16px 8px;
+  pointer-events: none;
+}
+
+.map-search button {
+  pointer-events: auto;
 }
 
 .map-pos-absolute {
@@ -93,22 +98,22 @@ button.map-button--active:hover {
 }
 
 .data-layers-icon,
-.find-me-icon {
+.find-me-icon,
+.polygon-search-icon,
+.radius-search-icon {
   color: var(--typography-color-link);
 }
 
-.find-me-icon--active {
+.find-me-icon--active,
+.radius-search-icon--active,
+.polygon-search-icon--active {
   color: var(--typography-color-primary-invert);
 }
 
-.map-button:hover .find-me-icon {
+.map-button:hover .find-me-icon,
+.map-button:hover .radius-search-icon,
+.map-button:hover .polygon-search-icon {
   color: var(--typography-color-primary-invert);
-}
-
-.polygon-search-icon,
-.point-search-icon,
-.radius-search-icon {
-  color: var(--typography-color-primary);
 }
 
 .dropdown-button-menu.data-layers-button-menu .MuiPaper-root {
@@ -201,6 +206,7 @@ p.point-search-slider-text {
 
 .point-search-menu .MuiPaper-root {
   overflow: visible;
+  width: 400px;
 }
 
 .search-autocomplete .search-input {
@@ -216,6 +222,19 @@ div.search-autocomplete.MuiAutocomplete-hasClearIcon .MuiInputBase-root {
 .search-autocomplete .search-input-clear-button > .search-input-icon {
   width: 16px;
   height: 16px;
+}
+
+.radius-search-cancel-button {
+  background-color: var(--surface-color-primary-default) !important;
+}
+
+.radius-search-set-radius {
+  background-color: var(--surface-color-primary-default) !important;
+}
+
+.polygon-vertex {
+  background-color: var(--surface-primary-default);
+  border: 1px solid var(--surface-color-border-light);
 }
 
 :root {

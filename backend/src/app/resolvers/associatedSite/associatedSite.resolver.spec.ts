@@ -66,6 +66,7 @@ describe('AssociatedSiteResolver', () => {
           note: 'Note 1',
           srAction: 'pending',
           userAction: 'pending',
+          srValue: false,
         },
       ];
 

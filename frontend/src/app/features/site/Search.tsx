@@ -17,39 +17,22 @@ import {
   currentPageSelection,
   currentPageSize,
 } from './dto/SiteSlice';
-import SearchResults from './SearchResults';
+import SearchResults from './searchResults/SearchResults';
 import {
-  ShoppingCartIcon,
-  FileExportIcon,
-  TableColumnsIcon,
-  FilterIcon,
   CircleXMarkIcon,
   MagnifyingGlassIcon,
-  BarsIcon,
 } from '../../components/common/icon';
 import Intro from './Intro';
-import Column from './columns/Column';
 import { TableColumn } from '../../components/table/TableColumn';
 import { getSiteSearchResultsColumns } from './dto/Columns';
-import SiteFilterForm from './filters/SiteFilterForm';
 import PageContainer from '../../components/simple/PageContainer';
-import {
-  flattenFormRows,
-  formatDateRange,
-  getUser,
-  isUserOfType,
-  UserRoleType,
-} from '../../helpers/utility';
-import { useAuth } from 'react-oidc-context';
-import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
-import AddToFolio from '../folios/AddToFolio';
-import { downloadCSV } from '../../helpers/csvExport/csvExport';
+import { flattenFormRows, formatDateRange } from '../../helpers/utility';
 import FilterPills from './filters/FilterPills';
 import { formRows } from './dto/SiteFilterConfig';
-import { Button } from '../../components/button/Button';
+import { SearchResultsFilters } from './searchResults/SearchResultsFilters';
+import { SearchResultsActions } from './searchResults/SearchResultsActions';
 
 const Search = () => {
-  const auth = useAuth();
   const [searchText, setSearchText] = useState('');
   const dispatch = useDispatch<AppDispatch>();
   const sites = useSelector(selectAllSites);
@@ -58,14 +41,11 @@ const Search = () => {
   const currentPageSizeInState = useSelector(currentPageSize);
   const totalRecords = useSelector(resultsCount);
   const [noUserAction, setUserAction] = useState(true);
-  const [displayColumn, SetDisplayColumns] = useState(false);
-  const [displayFilters, SetDisplayFilters] = useState(false);
 
   const columns = getSiteSearchResultsColumns();
   const [columnsToDisplay, setColumnsToDisplay] = useState<TableColumn[]>([
     ...columns,
   ]);
-  const [showMobileTableMenu, SetShowMobileTableMenu] = useState(false);
   const [selectedRows, SetSelectedRows] = useState<any[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<
     { key: string; value: string; label: string }[]
@@ -103,26 +83,9 @@ const Search = () => {
     }
   }, [currentPageSizeInState]);
 
-  const hideColumns = () => {
-    SetDisplayColumns(false);
-  };
-
   const resetDefaultColums = () => {
     setColumnsToDisplay(columns);
   };
-
-  const cancelSearchFilter = () => {
-    SetDisplayFilters(false);
-  };
-
-  const search = (value: any) => {
-    return sites;
-  };
-
-  const dynamicSearchIconStyle = (left: any) => ({
-    position: `absoulte`,
-    left: `${left}px`,
-  });
 
   const pageChange = (pageRequested: number, resultsCount: number) => {
     dispatch(
@@ -177,35 +140,6 @@ const Search = () => {
     }
   };
 
-  const customStyle: React.CSSProperties = {
-    left:
-      document
-        .getElementsByClassName('form-control textSearch')[0]
-        ?.getBoundingClientRect().x +
-      2 +
-      'px',
-    position: 'absolute',
-    color: 'grey',
-    margin: '4px',
-  };
-
-  const handleAddToShoppingCart = () => {
-    const loggedInUser = getUser();
-    if (loggedInUser === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
-    } else {
-      const cartItems = selectedRows.map((row) => {
-        return {
-          siteId: row.id,
-          price: 200.11,
-        };
-      });
-
-      dispatch(resetCartItemAddedStatus(null));
-      dispatch(addCartItem(cartItems)).unwrap();
-    }
-  };
-
   const changeHandler = (event: any) => {
     if (event && event.property === 'select_row') {
       if (event.value) {
@@ -243,12 +177,6 @@ const Search = () => {
           return prevArray.filter((obj) => !idsToRemove.has(obj.id));
         });
       }
-    }
-  };
-
-  const handleExport = () => {
-    if (selectedRows.length > 0) {
-      downloadCSV(selectedRows);
     }
   };
 
@@ -332,14 +260,14 @@ const Search = () => {
 
   return (
     <PageContainer role="Search">
-      <div className="row search-container">
+      <div className="search-container">
         <h1 className="search-text-label">Search Site Registry</h1>
         <div className="">
           <div className="d-flex align-items-center">
             <div className="custom-text-search">
               {!noUserAction ? null : (
                 <div className="custom-text-search-start">
-                  <MagnifyingGlassIcon></MagnifyingGlassIcon>
+                  <MagnifyingGlassIcon className="customSearchIcon"></MagnifyingGlassIcon>
                 </div>
               )}
 
@@ -347,7 +275,7 @@ const Search = () => {
                 <input
                   tabIndex={13}
                   aria-label="Search input"
-                  placeholder="Search"
+                  placeholder="Search for site address or name"
                   onChange={handleTextChange}
                   value={searchText}
                   type="text"
@@ -366,25 +294,6 @@ const Search = () => {
                 </div>
               )}
             </div>
-            {/* {!noUserAction ? null : (
-              <MagnifyingGlassIcon className="search-icon " style={customStyle}>
-              </MagnifyingGlassIcon>
-            )}
-            <input
-              type="text"
-              onChange={handleTextChange}
-              className="form-control textSearch"
-              placeholder="Search"
-              aria-label="Search input"
-              value={searchText}
-              tabIndex={13}
-            />
-            {noUserAction ? null : (
-              <CircleXMarkIcon
-                className="clear-button"
-                
-              ></CircleXMarkIcon>
-            )} */}
           </div>
         </div>
       </div>
@@ -398,128 +307,16 @@ const Search = () => {
             className="row search-container results"
             aria-label="search-results-section-title"
           >
-            <div className="search-results-section-header-top">
-              <div>
-                <h2 className="search-results-section-title">Results</h2>
-              </div>
-              <div className="table-actions hide-custom">
-                <div
-                  className={`table-actions-items ${
-                    displayColumn ? 'active' : ''
-                  } `}
-                  onClick={() => {
-                    SetDisplayColumns(!displayColumn);
-                    SetDisplayFilters(false);
-                  }}
-                >
-                  <TableColumnsIcon />
-                  Columns
-                </div>
-                <div
-                  className={`table-actions-items ${
-                    displayFilters ? 'active' : ''
-                  }`}
-                  onClick={() => {
-                    SetDisplayFilters(!displayFilters);
-                    SetDisplayColumns(false);
-                  }}
-                >
-                  <FilterIcon />
-                  Filters
-                </div>
-              </div>
-              <button
-                className="display-upto-medium"
-                type="button"
-                onClick={() => {
-                  SetShowMobileTableMenu(!showMobileTableMenu);
-                }}
-                aria-label="menu for table columns /filter options"
-                aria-controls="navbarMenu"
-                aria-haspopup="true"
-              >
-                <BarsIcon className="bars-button-table-options" />
-                <div
-                  className={`${
-                    showMobileTableMenu ? 'mobileTableColumnOptions' : 'd-none'
-                  }`}
-                >
-                  <div>
-                    <div
-                      className={`table-actions-items`}
-                      onClick={() => {
-                        SetDisplayColumns(!displayColumn);
-                        SetDisplayFilters(false);
-                      }}
-                    >
-                      <TableColumnsIcon />
-                      <span className="table-options-text-color">Columns</span>
-                    </div>
-                    <div
-                      className={`table-actions-items ${
-                        displayFilters ? 'active' : ''
-                      }`}
-                      onClick={() => {
-                        SetDisplayFilters(!displayFilters);
-                        SetDisplayColumns(false);
-                      }}
-                    >
-                      <FilterIcon />
-                      <span className="table-options-text-color">Filters</span>
-                    </div>
-                  </div>
-                </div>
-              </button>
-            </div>
-            {displayFilters && (
-              <SiteFilterForm
-                formData={formData}
-                onInputChange={handleInputChange}
-                onSubmit={handleFormSubmit}
-                onReset={handleReset}
-                cancelSearchFilter={cancelSearchFilter}
-              />
-            )}
-            {displayColumn ? (
-              <div>
-                {' '}
-                <Column
-                  toggleColumnSelectionForDisplay={
-                    toggleColumnSelectionForDisplay
-                  }
-                  columns={columnsToDisplay}
-                  reset={resetDefaultColums}
-                  close={hideColumns}
-                />
-              </div>
-            ) : null}
-            <div className="search-result-actions">
-              {!isUserOfType(UserRoleType.INTERNAL) && (
-                <Button
-                  onClick={handleAddToShoppingCart}
-                  disabled={selectedRows.length === 0}
-                >
-                  <ShoppingCartIcon />
-                  Add Selected To Cart
-                </Button>
-              )}
-              {!isUserOfType(UserRoleType.INTERNAL) && (
-                <AddToFolio
-                  label="Add Selected To Folio"
-                  disabled={selectedRows.length === 0}
-                  selectedSiteIds={selectedRows.map((row) => row.id)}
-                />
-              )}
-
-              <Button
-                variant="secondary"
-                onClick={handleExport}
-                disabled={selectedRows.length === 0}
-              >
-                <FileExportIcon />
-                Export Results As File
-              </Button>
-            </div>
+            <SearchResultsFilters
+              columns={columnsToDisplay}
+              onColumnSelectionChange={toggleColumnSelectionForDisplay}
+              resetColumns={resetDefaultColums}
+              filtersFormData={formData}
+              onFiltersChange={handleInputChange}
+              onFiltersSubmit={handleFormSubmit}
+              onFiltersReset={handleReset}
+            />
+            <SearchResultsActions selectedRows={selectedRows} />
           </div>
           <FilterPills
             filters={selectedFilters}
@@ -531,7 +328,7 @@ const Search = () => {
             <div className="" aria-label="Search results">
               <SearchResults
                 pageChange={pageChange}
-                data={search(searchText)}
+                data={sites}
                 columns={columnsToDisplay.filter((x) => x.isChecked === true)}
                 totalRecords={totalRecords}
                 changeHandler={changeHandler}

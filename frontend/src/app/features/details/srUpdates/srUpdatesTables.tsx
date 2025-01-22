@@ -26,6 +26,7 @@ import {
   fetchInternalUserNameForDropdown,
   getInternalUserNameForDropdown,
 } from '../dropdowns/DropdownSlice';
+import './srUpdatesTables.css';
 
 const SRUpdatesTables = () => {
   const [displayFilters, SetDisplayFilters] = useState(false);
@@ -225,7 +226,7 @@ const SRUpdatesTables = () => {
       )}
       <div className="search-result-actions">
         <div
-          className="search-result-actions-btn"
+          className={`approve-reject-btn ${selectedRows.length > 0 ? 'approve-btn ' : ''}`}
           onClick={() => {
             handleApprove();
           }}
@@ -235,7 +236,7 @@ const SRUpdatesTables = () => {
           <span>Approve</span>
         </div>
         <div
-          className="search-result-actions-btn"
+          className={`approve-reject-btn ${selectedRows.length > 0 ? 'not-public-btn' : ''}`}
           onClick={() => {
             rejectHandler();
           }}

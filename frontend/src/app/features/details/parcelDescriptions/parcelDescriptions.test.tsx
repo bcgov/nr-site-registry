@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore, {
   MockStoreCreator,
@@ -9,13 +9,21 @@ import { RequestStatus } from '../../../helpers/requests/status';
 import { IParcelDescriptionsState } from './parcelDescriptionsInterfaces';
 import thunk from 'redux-thunk';
 import { initialParcelDescriptionsState } from './parcelDescriptionsSlice';
+import { SiteDetailsMode } from '../dto/SiteDetailsMode';
+import { ParcelDescriptionType } from './parcelDescriptionsConfig';
+import { IChangeType } from '../../../components/common/IChangeType';
+import { act } from '@testing-library/react';
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({ id: '1' }),
 }));
 
-type TestState = { parcelDescriptions: IParcelDescriptionsState };
+type TestState = {
+  sites: { siteDetailsMode: string };
+  siteDetails: { saveRequestStatus: RequestStatus };
+  parcelDescriptions: IParcelDescriptionsState;
+};
 
 describe('Parcel Descriptions Component', () => {
   let mockStore: MockStoreCreator<unknown, {}>;
@@ -47,43 +55,59 @@ describe('Parcel Descriptions Component', () => {
     resultsPerPage = 5;
     totalResults = 10;
     testState = {
+      sites: {
+        siteDetailsMode: SiteDetailsMode.ViewOnlyMode,
+      },
+      siteDetails: {
+        saveRequestStatus: RequestStatus.idle,
+      },
       parcelDescriptions: {
         siteId: siteId,
         data: [
           {
-            id: 11,
-            descriptionType: 'Parcel ID',
-            idPinNumber: '123456',
-            dateNoted: '2023-06-15T00:00:00Z',
+            id: '11',
+            descriptionType: ParcelDescriptionType.CrownLandPIN,
+            idPinNumber: '123456789',
+            dateNoted: '2023-06-15T00:00:00',
             landDescription: 'first land description',
+            srAction: '',
+            userAction: '',
           },
           {
-            id: 12,
-            descriptionType: 'Crown Land PIN',
-            idPinNumber: '654321',
-            dateNoted: '2023-06-16T00:00:00Z',
+            id: '12',
+            descriptionType: ParcelDescriptionType.CrownLandPIN,
+            idPinNumber: '987654321',
+            dateNoted: '2023-06-16T00:00:00',
             landDescription: 'second land description',
+            srAction: '',
+            userAction: '',
           },
           {
-            id: 13,
-            descriptionType: 'Crown Land File Number',
-            idPinNumber: 'ax213456',
-            dateNoted: '2023-06-17T00:00:00Z',
+            id: '13',
+            descriptionType: ParcelDescriptionType.CrownLandFileNumber,
+            idPinNumber: 'ax12345',
+            dateNoted: '2023-06-17T00:00:00',
             landDescription: 'third land description',
+            srAction: '',
+            userAction: '',
           },
           {
-            id: 14,
-            descriptionType: 'Parcel ID',
-            idPinNumber: '789012',
-            dateNoted: '2023-06-18T00:00:00Z',
+            id: '14',
+            descriptionType: ParcelDescriptionType.ParcelID,
+            idPinNumber: '789012345',
+            dateNoted: '2023-06-18T00:00:00',
             landDescription: 'fourth land description',
+            srAction: '',
+            userAction: '',
           },
           {
-            id: 15,
-            descriptionType: 'Crown Land PIN',
-            idPinNumber: '210987',
-            dateNoted: '2023-06-19T00:00:00Z',
+            id: '15',
+            descriptionType: ParcelDescriptionType.CrownLandPIN,
+            idPinNumber: '4321098765',
+            dateNoted: '2023-06-19T00:00:00',
             landDescription: 'fifth land description',
+            srAction: '',
+            userAction: '',
           },
         ],
         requestStatus: RequestStatus.idle,
@@ -112,7 +136,7 @@ describe('Parcel Descriptions Component', () => {
       );
 
       const parcelDescriptionsComponent = screen.getByTestId(
-        /^parcel-descriptions-component.*/,
+        'parcel-descriptions-component',
       );
       expect(parcelDescriptionsComponent).toBeInTheDocument();
     });
@@ -580,6 +604,524 @@ describe('Parcel Descriptions Component', () => {
           }),
         ]),
       );
+    });
+  });
+
+  describe('when editing', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      testState.sites.siteDetailsMode = SiteDetailsMode.EditMode;
+      store = mockStore(testState);
+    });
+
+    afterEach(() => {
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+    });
+
+    describe('when editing the description type', () => {
+      it('sets up the parcel description for saving, and tracks the action', async () => {
+        render(
+          <Provider store={store}>
+            <ParcelDescriptions />
+          </Provider>,
+        );
+
+        // The first row on the table.
+        const descriptionTypeInputs =
+          await screen.findAllByDisplayValue('Crown Land PIN');
+
+        fireEvent.change(descriptionTypeInputs[0], {
+          target: { value: 'Crown Land File Number' },
+        });
+
+        jest.runAllTimers();
+
+        let actions = store.getActions();
+        expect(actions).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              type: 'siteDetails/setupParcelDescriptionsDataForSaving',
+              payload: expect.arrayContaining([
+                expect.objectContaining({
+                  descriptionType: 'Crown Land File Number',
+                  apiAction: 'updated',
+                }),
+              ]),
+            }),
+            expect.objectContaining({
+              type: 'sites/trackChanges',
+              payload: expect.objectContaining({
+                changeType: IChangeType.Modified,
+                label: 'Parcel Descriptions: 11',
+              }),
+            }),
+          ]),
+        );
+      });
+
+      describe('when selecting Crown Land File Number', () => {
+        it('truncates the value in id/pin/number', async () => {
+          render(
+            <Provider store={store}>
+              <ParcelDescriptions />
+            </Provider>,
+          );
+
+          const descriptionTypeInputs =
+            await screen.findAllByDisplayValue('Crown Land PIN');
+
+          fireEvent.change(descriptionTypeInputs[0], {
+            target: { value: 'Crown Land File Number' },
+          });
+
+          // the first id/pin/number should have been truncated from 123456789 to 1234567.
+          expect(
+            await screen.findByDisplayValue('1234567'),
+          ).toBeInTheDocument();
+          expect(
+            screen.queryByDisplayValue('123456789'),
+          ).not.toBeInTheDocument();
+        });
+      });
+    });
+
+    describe('when editing the id/pin/number', () => {
+      it('sets up the parcel description for saving, and tracks the action', () => {
+        render(
+          <Provider store={store}>
+            <ParcelDescriptions />
+          </Provider>,
+        );
+
+        const descriptionTypeInput = screen.getByDisplayValue('123456789');
+
+        fireEvent.change(descriptionTypeInput, {
+          target: { value: '192837465' },
+        });
+
+        jest.runAllTimers();
+
+        let actions = store.getActions();
+        expect(actions).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              type: 'siteDetails/setupParcelDescriptionsDataForSaving',
+              payload: expect.arrayContaining([
+                expect.objectContaining({
+                  idPinNumber: '192837465',
+                  apiAction: 'updated',
+                }),
+              ]),
+            }),
+            expect.objectContaining({
+              type: 'sites/trackChanges',
+              payload: expect.objectContaining({
+                changeType: IChangeType.Modified,
+                label: 'Parcel Descriptions: 11',
+              }),
+            }),
+          ]),
+        );
+      });
+
+      describe('when entering an id/pin/number that is too long', () => {
+        describe('and the row is a crown land PIN or parcel ID', () => {
+          it('does not update the input value', async () => {
+            render(
+              <Provider store={store}>
+                <ParcelDescriptions />
+              </Provider>,
+            );
+
+            // The first row is a crown land PIN
+            const idPinNumberInput = screen.getByDisplayValue('123456789');
+
+            fireEvent.change(idPinNumberInput, {
+              target: { value: '1234567890' },
+            });
+
+            // This is a crown land PIN, so the tenth digit should be disregarded.
+            expect(
+              await screen.findByDisplayValue('123456789'),
+            ).toBeInTheDocument();
+            expect(
+              screen.queryByDisplayValue('1234567890'),
+            ).not.toBeInTheDocument();
+          });
+        });
+
+        describe('and the row is a crown land File Number', () => {
+          it('does not update the input value', async () => {
+            render(
+              <Provider store={store}>
+                <ParcelDescriptions />
+              </Provider>,
+            );
+
+            // The third row is a crown land file number.
+            const idPinNumberInput = screen.getByDisplayValue('ax12345');
+
+            fireEvent.change(idPinNumberInput, {
+              target: { value: 'ax123456' },
+            });
+
+            // This is a crown land PIN, so the tenth digit should be disregarded.
+            expect(
+              await screen.findByDisplayValue('ax12345'),
+            ).toBeInTheDocument();
+            expect(
+              screen.queryByDisplayValue('ax123456'),
+            ).not.toBeInTheDocument();
+          });
+        });
+      });
+    });
+
+    describe('when editing the date noted', () => {
+      const originalConsoleError = console.error;
+
+      beforeAll(() => {
+        console.error = (msg: any) => {
+          // Suppress react printing an error about wrapping updates in act(...)
+          // this is an issue caused by rsuite's date picker component
+          // performing updates asynchronously. I have thoroughly tested that
+          // everything works as expected during these tests.
+          if (
+            !msg.toString().includes('inside a test was not wrapped in act')
+          ) {
+            originalConsoleError(msg);
+          }
+        };
+      });
+
+      afterAll(() => {
+        console.error = originalConsoleError;
+      });
+
+      describe('when inputting a new date', () => {
+        it('sets up the parcel description for saving, and tracks the action', async () => {
+          await act(async () => {
+            render(
+              <Provider store={store}>
+                <ParcelDescriptions />
+              </Provider>,
+            );
+          });
+
+          // Get the first date picker input (Jun 15, 2023).
+          let dateNotedInput = screen.getByDisplayValue('Jun 15, 2023');
+          await act(async () => {
+            fireEvent.click(dateNotedInput);
+          });
+          let targetDate = screen.getByText('11');
+          await act(async () => {
+            // Click on Jun 11, 2023
+            fireEvent.click(targetDate);
+          });
+
+          let actions = store.getActions();
+          expect(actions).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                type: 'siteDetails/setupParcelDescriptionsDataForSaving',
+                payload: expect.arrayContaining([
+                  expect.objectContaining({
+                    // Match only the date without the timezone. This is necessary
+                    // because the timezone will necessarily be in the test
+                    // environment's timezone which will be different in our
+                    // development and CI environments.
+                    dateNoted: expect.stringMatching(/^2023-06-11.*$/),
+                    apiAction: 'updated',
+                  }),
+                ]),
+              }),
+              expect.objectContaining({
+                type: 'sites/trackChanges',
+                payload: expect.objectContaining({
+                  changeType: IChangeType.Modified,
+                  label: expect.stringMatching(/^Parcel Descriptions: 11$/),
+                }),
+              }),
+            ]),
+          );
+        });
+      });
+
+      describe('when clearing the date', () => {
+        it('sets up the parcel description for saving, and tracks the action', async () => {
+          await act(async () => {
+            render(
+              <Provider store={store}>
+                <ParcelDescriptions />
+              </Provider>,
+            );
+          });
+
+          // Get the first (Parcel Description 11) date clear button.
+          let clearButton = screen.getAllByLabelText('Clear')[0];
+          await act(async () => {
+            fireEvent.click(clearButton);
+          });
+
+          let actions = store.getActions();
+          expect(actions).toEqual(
+            expect.arrayContaining([
+              expect.objectContaining({
+                type: 'siteDetails/setupParcelDescriptionsDataForSaving',
+                payload: expect.arrayContaining([
+                  expect.objectContaining({
+                    dateNoted: expect.stringMatching(/^$/),
+                    apiAction: 'updated',
+                  }),
+                ]),
+              }),
+              expect.objectContaining({
+                type: 'sites/trackChanges',
+                payload: expect.objectContaining({
+                  changeType: IChangeType.Modified,
+                  label: expect.stringMatching(/^Parcel Descriptions: 11$/),
+                }),
+              }),
+            ]),
+          );
+        });
+      });
+    });
+  });
+
+  describe('when adding a new parcel description', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      testState.sites.siteDetailsMode = SiteDetailsMode.EditMode;
+      store = mockStore(testState);
+    });
+
+    afterEach(() => {
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+    });
+
+    it('renders the added row in a new table', async () => {
+      await act(async () => {
+        render(
+          <Provider store={store}>
+            <ParcelDescriptions />
+          </Provider>,
+        );
+      });
+
+      let addButton = screen.getByText('Add Parcel Description');
+      await act(async () => {
+        fireEvent.click(addButton);
+      });
+      jest.runAllTimers();
+
+      expect(
+        await screen.findByTestId('parcel-descriptions-component-added'),
+      ).toBeInTheDocument();
+    });
+
+    describe('when editing the added row', () => {
+      it('sets up the parcel description for saving, and tracks the action', async () => {
+        await act(async () => {
+          render(
+            <Provider store={store}>
+              <ParcelDescriptions />
+            </Provider>,
+          );
+        });
+
+        const addButton = screen.getByText('Add Parcel Description');
+        await act(async () => {
+          fireEvent.click(addButton);
+        });
+        const addedParcelDescriptionsTable = screen.getByTestId(
+          'parcel-descriptions-component-added',
+        );
+        const idPinNumberInput = within(
+          addedParcelDescriptionsTable,
+        ).getByLabelText('ID/PIN/Number');
+
+        fireEvent.change(idPinNumberInput, {
+          target: { value: '192837465' },
+        });
+
+        jest.runAllTimers();
+
+        let actions = store.getActions();
+        expect(actions).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              type: 'siteDetails/setupParcelDescriptionsDataForSaving',
+              payload: expect.arrayContaining([
+                expect.objectContaining({
+                  id: '-1',
+                  apiAction: 'added',
+                }),
+              ]),
+            }),
+            expect.objectContaining({
+              type: 'sites/trackChanges',
+              payload: expect.objectContaining({
+                changeType: IChangeType.Added,
+                label: expect.stringMatching(
+                  /^Parcel Descriptions: Added New Parcel Description\(s\)$/,
+                ),
+              }),
+            }),
+          ]),
+        );
+      });
+    });
+
+    describe('when removing the added row', () => {
+      it('removes the unused table.', async () => {
+        await act(async () => {
+          render(
+            <Provider store={store}>
+              <ParcelDescriptions />
+            </Provider>,
+          );
+        });
+
+        const addButton = screen.getByText('Add Parcel Description');
+        await act(async () => {
+          fireEvent.click(addButton);
+        });
+        const addedParcelDescriptionsTable = screen.getByTestId(
+          'parcel-descriptions-component-added',
+        );
+        const removeButton = within(
+          addedParcelDescriptionsTable,
+        ).getByLabelText('Delete');
+
+        await act(async () => {
+          fireEvent.click(removeButton);
+        });
+
+        jest.runAllTimers();
+
+        expect(
+          screen.queryByTestId('parcel-descriptions-component-added'),
+        ).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('when deleting a parcel description', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      testState.sites.siteDetailsMode = SiteDetailsMode.EditMode;
+      store = mockStore(testState);
+    });
+
+    afterEach(() => {
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+    });
+
+    it('renders the row in a new table', async () => {
+      await act(async () => {
+        render(
+          <Provider store={store}>
+            <ParcelDescriptions />
+          </Provider>,
+        );
+      });
+
+      let selectBox = screen.getAllByLabelText('Select Row')[0];
+      await act(async () => {
+        fireEvent.click(selectBox);
+      });
+      let deleteButton = screen.getByText('Remove Parcel Description');
+      await act(async () => {
+        fireEvent.click(deleteButton);
+      });
+      jest.runAllTimers();
+
+      expect(
+        await screen.findByTestId('parcel-descriptions-component-deleted'),
+      ).toBeInTheDocument();
+    });
+
+    it('sets up the parcel description for saving, and tracks the action', async () => {
+      await act(async () => {
+        render(
+          <Provider store={store}>
+            <ParcelDescriptions />
+          </Provider>,
+        );
+      });
+
+      let selectBox = screen.getAllByLabelText('Select Row')[0];
+      await act(async () => {
+        fireEvent.click(selectBox);
+      });
+      let deleteButton = screen.getByText('Remove Parcel Description');
+      await act(async () => {
+        fireEvent.click(deleteButton);
+      });
+      jest.runAllTimers();
+
+      let actions = store.getActions();
+      expect(actions).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: 'siteDetails/setupParcelDescriptionsDataForSaving',
+            payload: expect.arrayContaining([
+              expect.objectContaining({
+                id: '11',
+                apiAction: 'deleted',
+              }),
+            ]),
+          }),
+          expect.objectContaining({
+            type: 'sites/trackChanges',
+            payload: expect.objectContaining({
+              changeType: IChangeType.Deleted,
+              label: expect.stringMatching(/^Parcel Descriptions: 11$/),
+            }),
+          }),
+        ]),
+      );
+    });
+
+    describe('when removing the deleted row', () => {
+      it('removes the unused table.', async () => {
+        await act(async () => {
+          render(
+            <Provider store={store}>
+              <ParcelDescriptions />
+            </Provider>,
+          );
+        });
+
+        let selectBox = screen.getAllByLabelText('Select Row')[0];
+        await act(async () => {
+          fireEvent.click(selectBox);
+        });
+        let deleteButton = screen.getByText('Remove Parcel Description');
+        await act(async () => {
+          fireEvent.click(deleteButton);
+        });
+        const deletedParcelDescriptionsTable = screen.getByTestId(
+          'parcel-descriptions-component-deleted',
+        );
+        const removeButton = within(
+          deletedParcelDescriptionsTable,
+        ).getByLabelText('Delete');
+
+        await act(async () => {
+          fireEvent.click(removeButton);
+        });
+
+        jest.runAllTimers();
+
+        expect(
+          screen.queryByTestId('parcel-descriptions-component-deleted'),
+        ).not.toBeInTheDocument();
+      });
     });
   });
 });

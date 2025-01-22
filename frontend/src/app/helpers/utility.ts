@@ -130,7 +130,7 @@ export const getAxiosInstance = () => {
     baseURL: API,
     // timeout: 2000,
     headers: {
-      Authorization: 'Bearer ' + user?.access_token,
+      Authorization: `Bearer ${user?.access_token || ''}`,
       requestID: generateRequestId(),
       'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json',
@@ -315,46 +315,61 @@ type UserAction = UserActionEnum;
 
 export const deepFilterByUserAction = (
   data: any,
-  actions: UserAction[],
+  actions: UserAction[], // actions is an array of user actions to filter by
 ): any[] => {
-  const filterRecursive = (item: any): any => {
-    // Check if the input is an array
+  const filterRecursive = (item: any, position: number): any => {
+    // If the item is an array, apply recursive filtering to each element
     if (Array.isArray(item)) {
-      const filteredArray = item.map(filterRecursive).filter(Boolean); // Remove undefined values
+      const filteredArray = item
+        .map((element, idx) => filterRecursive(element, idx)) // Pass index to each element
+        .filter(Boolean); // Remove undefined values
 
-      // If the array contains any valid items, return the filtered array
+      // Return the filtered array if it contains any valid elements, otherwise undefined
       return filteredArray.length > 0 ? filteredArray : undefined;
     }
 
-    // Check if the input is an object
+    // If the item is an object, recursively filter its properties
     else if (item && typeof item === 'object') {
       // Recursively filter nested objects and arrays
       const filteredObject = Object.keys(item).reduce(
         (acc: any, key: string) => {
-          const filteredValue = filterRecursive(item[key]);
+          const filteredValue = filterRecursive(item[key], position); // Pass index to recursive calls
           if (filteredValue !== undefined) {
-            acc[key] = filteredValue;
+            acc[key] = filteredValue; // Add the filtered value to the accumulator if it's valid
           }
           return acc;
         },
-        {},
+        {}, // Start with an empty object for accumulating filtered values
       );
 
-      // Check if the current object has a apiAction that matches
+      // Check if the current object has a `apiAction` property and whether it matches one of the user actions
       const hasUserAction = item.apiAction && actions.includes(item.apiAction);
 
-      // If current object has a userAction that matches, include it
-      // Include the filteredObject only if it has at least one valid property or it has a matching userAction
+      // Include index information in the object if it has valid properties or matching user action
       return Object.keys(filteredObject).length > 0 || hasUserAction
-        ? { ...item, ...filteredObject }
-        : undefined;
+        ? { ...item, position, ...filteredObject }
+        : undefined; // Add the original index to the object
     }
 
     // If the data is neither an object nor an array, return undefined
     return undefined;
   };
 
-  return filterRecursive(data) || [];
+  // If data is an array, map over it
+  if (Array.isArray(data)) {
+    return data
+      .map((item: any, idx: number) => filterRecursive(item, idx)) // Pass index here to filter each element
+      .filter(Boolean); // Remove undefined values (empty results)
+  }
+
+  // If data is an object, directly filter it
+  else if (data && typeof data === 'object') {
+    const result = filterRecursive(data, 0); // Apply filterRecursive directly to the object
+    return result ? [result] : []; // If the object passes filtering, return it as an array, else return an empty array
+  }
+
+  // If data is neither an object nor an array, return an empty array
+  return [];
 };
 
 const DEFAULT_POSITION_OPTIONS: PositionOptions = {
@@ -452,6 +467,17 @@ export function sortArray<T>(
   });
 }
 
+export function formatDistance(meters: number, kmDigits = 2): string {
+  if (isNaN(meters)) {
+    return '';
+  }
+  if (meters <= 1000) {
+    return `${Math.round(meters)} m`;
+  }
+  const kms = Number((meters / 1000).toFixed(kmDigits));
+  return `${kms} km`;
+}
+
 export const validateForm = (
   formRows: IFormField[][],
   formData: any,
@@ -476,7 +502,7 @@ export const validateForm = (
           if (row.validation?.required && !fieldValue) {
             // Building the error label with index
             const errorLabel = parentIndex
-              ? `${parentLabel} [${parentIndex}] ${row?.validation.customMessage}`
+              ? `${parentLabel} [${parseInt(parentIndex, 10) + 1}] ${row?.validation.customMessage}`
               : `${parentLabel} ${row?.validation.customMessage}`;
 
             errors.push({
@@ -493,7 +519,7 @@ export const validateForm = (
                 row.children as any,
                 child,
                 `${parentLabel} [${parentIndex}] ${row.label}`,
-                `${++index}`,
+                `${index + 1}`,
               );
             });
           }
@@ -505,11 +531,39 @@ export const validateForm = (
   // Handle both arrays and single objects
   if (Array.isArray(formData)) {
     formData.forEach((item, index) =>
-      traverse(formRows, item, source, `${++index}`),
+      traverse(formRows, item, source, `${item.position}`),
     );
   } else {
     traverse(formRows, formData, source);
   }
 
   return errors;
+};
+
+export const removeProperty = (obj: any, propertyName: string): any => {
+  // If obj is a Date object, return it as is (without modification)
+  if (obj instanceof Date) {
+    return obj;
+  }
+
+  // If obj is an array, recursively process each element
+  if (Array.isArray(obj)) {
+    return obj.map((item) => removeProperty(item, propertyName));
+  }
+
+  // If obj is an object, create a new object excluding the specified property
+  if (obj && typeof obj === 'object') {
+    const { [propertyName]: _, ...rest } = obj; // Destructure and exclude the specified property
+    // Recursively process all the values in the object
+    return Object.keys(rest).reduce(
+      (acc, key) => {
+        acc[key] = removeProperty(rest[key], propertyName);
+        return acc;
+      },
+      {} as Record<string, any>,
+    ); // Explicitly typing the return object
+  }
+
+  // Return the value if it's neither an array nor an object (i.e., a primitive)
+  return obj;
 };

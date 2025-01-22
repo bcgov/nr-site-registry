@@ -1,10 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RequestStatus } from '../../helpers/requests/status';
 
-import {
-  deepFilterByUserAction,
-  getAxiosInstance,
-} from '../../helpers/utility';
+import { getAxiosInstance } from '../../helpers/utility';
 import { GRAPHQL } from '../../helpers/endpoints';
 
 import { print } from 'graphql';
@@ -18,7 +15,7 @@ const initialState: SaveSiteDetails = {
   siteParticipantData: null,
   documentsData: null,
   landHistoriesData: null,
-  subDivisionsData: null,
+  parcelDescriptionsData: null,
   profilesData: null,
   siteAssociationsData: null,
   siteId: '',
@@ -52,7 +49,7 @@ const siteDetailsSlice = createSlice({
       newState.siteParticipantData = null;
       newState.documentsData = null;
       newState.landHistoriesData = null;
-      newState.subDivisionsData = null;
+      newState.parcelDescriptionsData = null;
       newState.profilesData = null;
       newState.siteAssociationsData = null;
       newState.siteId = '';
@@ -109,11 +106,11 @@ const siteDetailsSlice = createSlice({
       newState.landHistoriesData = action.payload;
       return newState;
     },
-    setupSubDivisionsDataForSaving: (state, action) => {
+    setupParcelDescriptionsDataForSaving: (state, action) => {
       const newState = {
         ...state,
       };
-      newState.subDivisionsData = action.payload;
+      newState.parcelDescriptionsData = action.payload;
       return newState;
     },
     setupSiteAssociationDataForSaving: (state, action) => {
@@ -146,47 +143,13 @@ const siteDetailsSlice = createSlice({
 
 export const getSiteDetailsToBeSaved = (state: any) => {
   return {
-    events:
-      state.siteDetails.notationData &&
-      state.siteDetails.notationData.length > 0 &&
-      deepFilterByUserAction(state.siteDetails.notationData, [
-        UserActionEnum.added,
-        UserActionEnum.updated,
-        UserActionEnum.deleted,
-      ]),
-    siteParticipants:
-      state.siteDetails.siteParticipantData &&
-      state.siteDetails.siteParticipantData.length > 0 &&
-      deepFilterByUserAction(state.siteDetails.siteParticipantData, [
-        UserActionEnum.added,
-        UserActionEnum.updated,
-        UserActionEnum.deleted,
-      ]),
-    documents:
-      state.siteDetails.documentsData &&
-      state.siteDetails.documentsData.length > 0 &&
-      deepFilterByUserAction(state.siteDetails.documentsData, [
-        UserActionEnum.added,
-        UserActionEnum.updated,
-        UserActionEnum.deleted,
-      ]),
-    siteAssociations:
-      state.siteDetails.siteAssociationsData &&
-      state.siteDetails.siteAssociationsData.length > 0 &&
-      deepFilterByUserAction(state.siteDetails.siteAssociationsData, [
-        UserActionEnum.added,
-        UserActionEnum.updated,
-        UserActionEnum.deleted,
-      ]),
-    subDivisions: state.siteDetails.subDivisions,
+    events: state.siteDetails?.notationData,
+    siteParticipants: state.siteDetails?.siteParticipantData,
+    documents: state.siteDetails?.documentsData,
+    siteAssociations: state.siteDetails?.siteAssociationsData,
+    parcelDescriptions: state.siteDetails.parcelDescriptionsData,
     landHistories: state.siteDetails.landHistoriesData,
-    profiles:
-      state.siteDetails.profilesData &&
-      deepFilterByUserAction(state.siteDetails.profilesData, [
-        UserActionEnum.added,
-        UserActionEnum.updated,
-        UserActionEnum.deleted,
-      ]),
+    profiles: state.siteDetails?.profilesData,
     siteId: state.siteDetails.siteId,
     sitesSummary: state.siteDetails.sitesSummary,
   };
@@ -214,7 +177,7 @@ export const {
   setupLandHistoriesDataForSaving,
   setupSiteAssociationDataForSaving,
   setupSiteParticipantDataForSaving,
-  setupSubDivisionsDataForSaving,
+  setupParcelDescriptionsDataForSaving,
   setupSiteSummaryForSaving,
   setupSiteDisclosureDataForSaving,
 } = siteDetailsSlice.actions;

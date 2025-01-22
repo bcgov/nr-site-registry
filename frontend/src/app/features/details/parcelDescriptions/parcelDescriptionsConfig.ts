@@ -1,5 +1,12 @@
 import { FormFieldType } from '../../../components/input-controls/IFormField';
-import { TableColumn } from '../../../components/table/TableColumn';
+import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
+import { SiteDetailsMode } from '../dto/SiteDetailsMode';
+
+export enum ParcelDescriptionType {
+  ParcelID = 'Parcel ID',
+  CrownLandPIN = 'Crown Land PIN',
+  CrownLandFileNumber = 'Crown Land File Number',
+}
 
 export const columns: TableColumn[] = [
   {
@@ -7,87 +14,114 @@ export const columns: TableColumn[] = [
     displayName: 'Description Type',
     active: true,
     graphQLPropertyName: 'descriptionType',
-    groupId: 1,
-    disabled: true,
-    isDefault: true,
-    sortOrder: 1,
-    isChecked: true,
+    columnSize: ColumnSize.Default,
     displayType: {
-      type: FormFieldType.Label,
+      type: FormFieldType.DropDown,
       label: 'DescriptionType',
       graphQLPropertyName: 'descriptionType',
-      value: '',
-      customLabelCss: 'custom-lbl-text',
-      customInputTextCss: 'custom-input-text',
+      options: [
+        {
+          key: ParcelDescriptionType.ParcelID,
+          value: ParcelDescriptionType.ParcelID,
+        },
+        {
+          key: ParcelDescriptionType.CrownLandPIN,
+          value: ParcelDescriptionType.CrownLandPIN,
+        },
+        {
+          key: ParcelDescriptionType.CrownLandFileNumber,
+          value: ParcelDescriptionType.CrownLandFileNumber,
+        },
+      ],
       tableMode: true,
-      stickyCol: false,
     },
-    stickyCol: true,
   },
   {
     id: 2,
     displayName: 'ID/PIN/Number',
     active: true,
     graphQLPropertyName: 'idPinNumber',
-    groupId: 1,
-    disabled: true,
-    isDefault: true,
-    sortOrder: 1,
-    isChecked: true,
+    columnSize: ColumnSize.Default,
     displayType: {
-      type: FormFieldType.Label,
+      type: FormFieldType.Text,
       label: 'ID/PIN/Number',
       graphQLPropertyName: 'idPinNumber',
       value: '',
-      customLabelCss: 'custom-lbl-text',
-      customInputTextCss: 'custom-input-text',
       tableMode: true,
-      stickyCol: false,
     },
-    stickyCol: true,
   },
   {
     id: 3,
     displayName: 'Date Noted',
     active: true,
     graphQLPropertyName: 'dateNoted',
-    groupId: 1,
-    disabled: true,
-    isDefault: true,
-    sortOrder: 1,
-    isChecked: true,
+    columnSize: ColumnSize.Default,
     displayType: {
-      type: FormFieldType.Label,
+      type: FormFieldType.Date,
       label: 'Date Noted',
       graphQLPropertyName: 'dateNoted',
       value: '',
-      customLabelCss: 'custom-lbl-text',
-      customInputTextCss: 'custom-input-text',
       tableMode: true,
-      stickyCol: false,
     },
-    stickyCol: true,
   },
   {
     id: 4,
     displayName: 'Land Description',
     active: true,
     graphQLPropertyName: 'landDescription',
-    groupId: 1,
-    disabled: true,
-    isDefault: true,
-    sortOrder: 1,
-    isChecked: true,
+    columnSize: ColumnSize.Triple,
     displayType: {
-      type: FormFieldType.Label,
+      type: FormFieldType.Text,
       label: 'Land Description',
       graphQLPropertyName: 'landDescription',
       value: '',
-      customLabelCss: 'custom-lbl-text',
-      customInputTextCss: 'custom-input-text',
       tableMode: true,
-      stickyCol: false,
+      isDisabled: true,
     },
-    stickyCol: true,
   },
 ];
+
+const SRColumn: TableColumn = {
+  id: 4,
+  displayName: 'SR',
+  active: true,
+  graphQLPropertyName: 'srAction',
+  columnSize: ColumnSize.Default,
+  displayType: {
+    type: FormFieldType.Checkbox,
+    label: 'SR',
+    placeholder: '',
+    graphQLPropertyName: 'srAction',
+    value: false,
+    tableMode: true,
+  },
+};
+
+const DeleteColumn: TableColumn = {
+  id: 5,
+  displayName: 'Remove',
+  active: true,
+  graphQLPropertyName: 'deleteIcon',
+  columnSize: ColumnSize.Default,
+  displayType: {
+    type: FormFieldType.DeleteIcon,
+    label: 'Delete',
+    graphQLPropertyName: 'deleteIcon',
+    value: '',
+    tableMode: true,
+  },
+};
+
+export const getAddDeleteParcelDescriptionTableColumns = () => {
+  return [...columns, DeleteColumn];
+};
+
+export const getParcelDescriptionsTableColumns = (
+  viewMode: SiteDetailsMode,
+): TableColumn[] => {
+  if (viewMode === SiteDetailsMode.SRMode) {
+    return [...columns, SRColumn];
+  } else {
+    return columns;
+  }
+};

@@ -1,37 +1,66 @@
 import { Map } from 'leaflet';
 import { Drawer } from '../../../components/drawer/Drawer';
 import { Site } from '../MapView';
-import { FC, RefObject, useContext } from 'react';
-import { MapSearchQueryParamsContext } from '../mapSearchQueryParamsContext/MapSearchQueryParamsContext';
+import { FC, RefObject } from 'react';
+import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 import { SearchResultsDrawerContent } from './SearchResultsDrawerContent';
 import { SiteDetailsDrawerContent } from './SiteDetailsDrawerContent';
+import { ActiveToolEnum } from '../../../constants/Constant';
 
 interface MapSearchDrawerProps {
   mapRef: RefObject<Map | null>;
   sites: Site[];
   sitesLoading: boolean;
+  activeTool: ActiveToolEnum | null;
+  radius: number;
 }
 export const MapSearchDrawer: FC<MapSearchDrawerProps> = ({
   mapRef,
   sites,
   sitesLoading,
+  activeTool,
+  radius,
 }) => {
-  const { selectedSiteId, searchTerm, clearQuery } = useContext(
-    MapSearchQueryParamsContext,
-  );
+  const { selectedSiteId, searchTerm, clearQuery, polygonVertices } =
+    useMapSearchContext();
+
+  const isPolygonValid = polygonVertices.length > 2;
 
   let drawerTitle = '';
   if (searchTerm) drawerTitle = 'Search Results';
   if (selectedSiteId) drawerTitle = 'Selected Site';
+  if (activeTool === ActiveToolEnum.radiusSearch && radius > 500)
+    drawerTitle = 'Radius Search';
+  if (activeTool === ActiveToolEnum.polygonSearch)
+    drawerTitle = 'Search Results';
   return (
     <Drawer
-      isOpen={!!selectedSiteId || !!searchTerm}
+      isOpen={
+        !!selectedSiteId ||
+        !!searchTerm ||
+        isPolygonValid ||
+        (activeTool === ActiveToolEnum.radiusSearch &&
+          sites.length > 0 &&
+          radius > 500)
+      }
       onClose={clearQuery}
       title={drawerTitle}
     >
-      {searchTerm && !selectedSiteId && (
-        <SearchResultsDrawerContent sites={sites} loading={sitesLoading} />
+      {(searchTerm || isPolygonValid) && !selectedSiteId && (
+        <SearchResultsDrawerContent
+          siteIds={sites.map((site) => site.id)}
+          loading={sitesLoading}
+        />
       )}
+      {!searchTerm &&
+        !selectedSiteId &&
+        activeTool === ActiveToolEnum.radiusSearch &&
+        radius > 500 && (
+          <SearchResultsDrawerContent
+            siteIds={sites.map((site) => site.id)}
+            loading={sitesLoading}
+          />
+        )}
       {selectedSiteId && <SiteDetailsDrawerContent mapRef={mapRef} />}
     </Drawer>
   );

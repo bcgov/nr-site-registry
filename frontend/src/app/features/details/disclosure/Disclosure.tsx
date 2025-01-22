@@ -5,6 +5,7 @@ import {
   disclosureCommentsConfig,
   disclosureScheduleExternalConfig,
   disclosureScheduleInternalConfig,
+  disclosureStatementConfigEditMode,
   disclosureStatementConfig,
   srVisibilityConfig,
 } from './DisclosureConfig';
@@ -74,7 +75,9 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const [searchInternalContact, setSearchInternalContact] = useState('');
   const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
-  const [internalRow, setInternalRow] = useState(disclosureStatementConfig);
+  const [internalRow, setInternalRow] = useState(
+    disclosureStatementConfigEditMode,
+  );
   const [isDelete, setIsDelete] = useState(false);
   const [currentDisclosure, setCurrenDisclosure] = useState({});
 
@@ -272,10 +275,28 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     graphQLPropertyName: any,
     value: String | [Date, Date],
   ) => {
-    if (viewMode === SiteDetailsMode.SRMode) {
-      console.log({ [graphQLPropertyName]: value, id });
+    let updatedDisclosure = null;
+    if (
+      viewMode === SiteDetailsMode.SRMode &&
+      graphQLPropertyName === 'srCheckbox'
+    ) {
+      updatedDisclosure = (disclosure: any) => {
+        return {
+          ...disclosure,
+          id: disclosure.id ?? '',
+          siteId: disclosure.siteId ?? siteId,
+          apiAction:
+            disclosure.id === '' || disclosure.id === undefined
+              ? UserActionEnum.added
+              : UserActionEnum.updated,
+          srAction:
+            value === 'checked'
+              ? SRApprovalStatusEnum.Public
+              : SRApprovalStatusEnum.Private,
+        };
+      };
     } else {
-      const updatedDisclosure = (disclosure: any) => {
+      updatedDisclosure = (disclosure: any) => {
         return {
           ...disclosure,
           [graphQLPropertyName]: value,
@@ -288,14 +309,16 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
           srAction: SRApprovalStatusEnum.Pending,
         };
       };
-      const updatedFormData = updatedDisclosure(formData);
-      const updatedTrackDisclosure = updatedDisclosure(
-        trackSiteDisclosure ?? formData,
-      );
-      setFormData(updatedFormData);
-      dispatch(updateSiteDisclosure(serializeDate(updatedFormData)));
-      dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
     }
+
+    const updatedFormData = updatedDisclosure(formData);
+    const updatedTrackDisclosure = updatedDisclosure(
+      trackSiteDisclosure ?? formData,
+    );
+    setFormData(updatedFormData);
+    dispatch(updateSiteDisclosure(serializeDate(updatedFormData)));
+    dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
+
     const flattedArr = flattenFormRows([
       ...disclosureStatementConfig,
       ...disclosureCommentsConfig,
@@ -303,11 +326,23 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     const currLabel =
       flattedArr &&
       flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
-    const tracker = new ChangeTracker(
-      IChangeType.Modified,
-      'Site Disclosure: ' + currLabel?.label,
-    );
-    dispatch(trackChanges(tracker.toPlainObject()));
+
+    if (
+      viewMode === SiteDetailsMode.SRMode &&
+      graphQLPropertyName === 'srCheckbox'
+    ) {
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Site Disclosure: SR Status',
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    } else {
+      const tracker = new ChangeTracker(
+        IChangeType.Modified,
+        'Site Disclosure: ' + currLabel?.label,
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+    }
   };
 
   /// not working yet as the actual source of table data is unknown.
@@ -550,7 +585,11 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
         userType={userType}
         handleWidgetCheckBox={handleWidgetCheckBox}
         formData={formData}
-        disclosureStatementConfig={internalRow}
+        disclosureStatementConfig={
+          viewMode === SiteDetailsMode.EditMode
+            ? internalRow
+            : disclosureStatementConfig
+        }
         handleInputChange={handleInputChange}
         handleTableChange={handleTableChange}
         disclosureScheduleInternalConfig={disclosureScheduleInternalConfig}

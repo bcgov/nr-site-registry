@@ -1,4 +1,13 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Field,
+  Float,
+  InputType,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+} from '@nestjs/graphql';
 import {
   AuthenticatedUser,
   Resource,
@@ -35,6 +44,17 @@ import {
 import { LatLngTuple } from '../../utils/geometry';
 import { LatLngTupleScalar } from '../../scalars/latLngTuple';
 
+@InputType()
+export class RadiusSearchParams {
+  @Field(() => Float)
+  latitude: number;
+
+  @Field(() => Float)
+  longitude: number;
+
+  @Field(() => Float)
+  radius: number;
+}
 /**
  * Resolver for Region
  */
@@ -236,13 +256,17 @@ export class SiteResolver {
     searchParam: string,
     @Args('polygon', { type: () => [LatLngTupleScalar], nullable: true })
     polygon?: LatLngTuple[],
+    @Args('circle', { type: () => RadiusSearchParams, nullable: true })
+    circle?: RadiusSearchParams,
   ) {
     this.sitesLogger.log('SiteResolver.mapSearch() start ');
     try {
       const data = await this.siteService.mapSearch({
         searchTerm: searchParam,
         polygon,
+        circle,
       });
+      console.log('nupur - data', data.length);
       return this.mapSearchGenericResponseProvider.createResponse(
         'Successfully fetched sites for map',
         HttpStatus.OK,

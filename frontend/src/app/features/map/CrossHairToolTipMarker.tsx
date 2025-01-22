@@ -1,8 +1,9 @@
 import { ReactNode, useRef } from 'react';
 import {
-  LatLngExpression,
+  //LatLngExpression,
   LeafletMouseEvent,
   Marker as LeafletMarker,
+  LatLngTuple,
 } from 'leaflet';
 import { Tooltip, useMap, useMapEvent } from 'react-leaflet';
 import { IconMarker } from './IconMarker';
@@ -10,7 +11,7 @@ import { crosshairsIcon, emptyIcon } from './siteMarkers/icons';
 
 interface Props {
   children: ReactNode;
-  center?: LatLngExpression;
+  center?: LatLngTuple | null;
 }
 
 export function CrosshairsTooltipMarker({ children, center }: Readonly<Props>) {

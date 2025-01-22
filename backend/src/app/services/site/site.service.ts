@@ -42,6 +42,7 @@ import { Snapshots } from '../../entities/snapshots.entity';
 import { Place } from '../../entities/placeEntity';
 import { UserTypeEum } from '../../common/userType';
 import { BC_ALBERS, LatLngTuple, WGS_84 } from '../../utils/geometry';
+import { RadiusSearchParams } from 'src/app/dto/radiusSearch.dto';
 
 /**
  * Nestjs Service For Region Entity
@@ -332,9 +333,11 @@ export class SiteService {
   async mapSearch({
     searchTerm,
     polygon,
+    circle,
   }: {
     searchTerm?: string;
     polygon?: LatLngTuple[];
+    circle?: RadiusSearchParams;
   }) {
     this.sitesLogger.log('SiteService.mapSearch() start');
 
@@ -393,7 +396,30 @@ export class SiteService {
       );
     }
 
+    console.log('nupur - circle', circle);
+    if (circle) {
+      const { latitude, longitude, radius } = circle;
+      console.log(
+        'nupur - latitude: ',
+        latitude,
+        'longitude: ',
+        longitude,
+        'radius: ',
+        radius,
+      );
+      query.where(
+        `ST_DWithin(
+          ST_Transform(sites.geometry, ${BC_ALBERS}),
+          ST_Transform(ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}),${WGS_84}), ${BC_ALBERS}),
+          ${radius}
+          )`,
+      );
+    }
+
+    console.log('nupur - query: ', query);
+
     const [result] = await query.getManyAndCount();
+    console.log('nupur - data(result): ', result.length);
 
     this.sitesLogger.log('SiteService.mapSearch() end');
     return result;
@@ -536,17 +562,7 @@ export class SiteService {
     this.sitesLogger.debug('SiteService.fetchSitesByRadius() start');
     try {
       const query = this.siteRepository.createQueryBuilder('sites');
-      // const result = await query
-      //   .select('sites.id')
-      //   .addSelect(
-      //     `ST_Distance(ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326), ST_SetSRID(ST_MakePoint(sites.longdeg, sites.latdeg), 4326))`,
-      //     'distance',
-      //   )
-      //   .where(
-      //     `ST_DWithin(ST_SetSRID(ST_MakePoint(${lon}, ${lat}), 4326), ST_SetSRID(ST_MakePoint(sites.longdeg, sites.latdeg), 4326), ${radius})`,
-      //   )
-      //   .getMany();
-      const result = await query
+      const [result] = await query
         .select('sites.id')
         .addSelect(
           `ST_Distance(sites.geom, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326))`,
@@ -561,7 +577,7 @@ export class SiteService {
       if (result) {
         this.sitesLogger.log('SiteService.fetchSitesByRadius() end');
         this.sitesLogger.debug('SiteService.fetchSitesByRadius() end');
-        return result.map((obj: any) => obj.id);
+        return result;
       } else {
         this.sitesLogger.log('SiteService.fetchSitesByRadius() end');
         this.sitesLogger.debug('SiteService.fetchSitesByRadius() end');

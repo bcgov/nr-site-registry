@@ -4,13 +4,13 @@ import { Site } from '../MapView';
 import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 
 interface RadiusSearchLayerProps {
-  radius: number;
+  //radius: number;
   onCrossHairClick: () => void;
   sites: Site[];
   setSites: React.Dispatch<React.SetStateAction<Site[]>> | null;
 }
 export function RadiusSearchLayer({
-  radius,
+  //radius,
   onCrossHairClick,
   sites,
   setSites,
@@ -19,7 +19,7 @@ export function RadiusSearchLayer({
   if (activeTool === ActiveToolEnum.radiusSearch) {
     return (
       <CircleLayer
-        radius={radius}
+        //radius={radius}
         onCrossHairClick={onCrossHairClick}
         sites={sites}
         setSites={setSites}

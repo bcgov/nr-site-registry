@@ -33,7 +33,7 @@ test('Renders Intro', () => {
 });
 
 describe('Access token refresh', () => {
-  it('should call refresh token methods if access token is expired', async () => {
+  it('should call refresh token methods if access token is expired and sings the user out if refresh fails', async () => {
     const userMock = { expired: true };
     const addAccessTokenExpiringMock = jest.fn();
     const signinSilentMock = jest.fn(() => Promise.resolve(null));
@@ -62,6 +62,31 @@ describe('Access token refresh', () => {
 
     await expect(signinSilentMock).toHaveBeenCalled();
     expect(signoutSilentMock).toHaveBeenCalled();
+  });
+
+  it('should call refresh token methods if access token is expired does not sign out the user if refresh is successful', async () => {
+    const userMock = { expired: true };
+    const addAccessTokenExpiringMock = jest.fn();
+    const signinSilentMock = jest.fn(() =>
+      Promise.resolve({ someResolvedValue: 'that is not null' }),
+    );
+    const signoutSilentMock = jest.fn();
+
+    (useAuth as jest.Mock).mockReturnValue({
+      signinSilent: signinSilentMock,
+      signoutSilent: signoutSilentMock,
+      events: { addAccessTokenExpiring: addAccessTokenExpiringMock },
+      user: userMock,
+    });
+
+    render(
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>,
+    );
+
+    await expect(signinSilentMock).toHaveBeenCalled();
+    expect(signoutSilentMock).not.toHaveBeenCalled();
   });
 
   it('should not call refresh token methods if access token valid', async () => {

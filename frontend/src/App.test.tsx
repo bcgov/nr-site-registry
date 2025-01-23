@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { useAuth } from 'react-oidc-context';
 import { store } from './app/Store';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 jest.mock('react-oidc-context', () => ({
   useAuth: jest.fn(),
@@ -17,7 +18,12 @@ const router = createBrowserRouter([
 ]);
 
 test('Renders Intro', () => {
-  (useAuth as jest.Mock).mockReturnValue({ isAuthenticated: false });
+  (useAuth as jest.Mock).mockReturnValue({
+    isAuthenticated: false,
+    events: {
+      addAccessTokenExpiring: () => {},
+    },
+  });
   render(
     <Provider store={store}>
       <RouterProvider router={router} />
@@ -25,4 +31,56 @@ test('Renders Intro', () => {
   );
   const siteName = screen.getByText(/SITE/i);
   expect(siteName).toBeInTheDocument();
+});
+
+describe('Access token refresh', () => {
+  it('should call refresh token methods if access token is expired', async () => {
+    const userMock = { expired: true };
+    const addAccessTokenExpiringMock = jest.fn();
+    const signinSilentMock = jest.fn(() => Promise.resolve(null));
+    const signoutSilentMock = jest.fn();
+
+    (useAuth as jest.Mock).mockReturnValue({
+      signinSilent: signinSilentMock,
+      signoutSilent: signoutSilentMock,
+      events: { addAccessTokenExpiring: addAccessTokenExpiringMock },
+      user: userMock,
+    });
+
+    render(
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>,
+    );
+
+    expect(addAccessTokenExpiringMock).toHaveBeenCalled();
+    await expect(signinSilentMock).toHaveBeenCalled();
+    expect(signoutSilentMock).toHaveBeenCalled();
+  });
+
+  it('should not call refresh token methods if access token valid', async () => {
+    const userMock = { expired: false };
+    const addAccessTokenExpiringMock = jest.fn();
+    const signinSilentMock = jest.fn(() => Promise.resolve(null));
+    const signoutSilentMock = jest.fn();
+
+    (useAuth as jest.Mock).mockReturnValue({
+      isAuthenticated: false,
+      signinSilent: signinSilentMock,
+      signoutSilent: signoutSilentMock,
+      events: { addAccessTokenExpiring: addAccessTokenExpiringMock },
+      user: userMock,
+    });
+
+    render(
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>,
+    );
+
+    expect(addAccessTokenExpiringMock).toHaveBeenCalled();
+
+    await expect(signinSilentMock).not.toHaveBeenCalled();
+    expect(signoutSilentMock).not.toHaveBeenCalled();
+  });
 });

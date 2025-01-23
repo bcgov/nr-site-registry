@@ -33,7 +33,7 @@ test('Renders Intro', () => {
 });
 
 describe('Access token refresh', () => {
-  it('should call refresh token methods if access token is expired and sings the user out if refresh fails', async () => {
+  it('should call refresh token methods if access token is expired and signs the user out if refresh fails', async () => {
     const userMock = { expired: true };
     const addAccessTokenExpiringMock = jest.fn();
     const signinSilentMock = jest.fn(() => Promise.resolve(null));

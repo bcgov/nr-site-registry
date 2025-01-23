@@ -162,7 +162,7 @@ export const MapSearchQueryProvider = ({
         'longitude',
         longitude,
         'radius',
-        newRadius,
+        radius,
       );
       setQuery({ circle: { center, radius: newRadius } }, 'replace');
     }
@@ -196,8 +196,8 @@ export const MapSearchQueryProvider = ({
         deletePolygon,
         activeTool,
         setActiveTool,
-        radius,
-        center,
+        radius: (query.circle && query.circle.radius) || MIN_CIRCLE_RADIUS,
+        center: (query.circle && query.circle.center) || null,
         onRadiusCrossHairClick,
         onRadiusChange,
         onCancelRadiusSearch,

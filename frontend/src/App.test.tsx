@@ -4,7 +4,6 @@ import { Provider } from 'react-redux';
 import { useAuth } from 'react-oidc-context';
 import { store } from './app/Store';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
 
 jest.mock('react-oidc-context', () => ({
   useAuth: jest.fn(),

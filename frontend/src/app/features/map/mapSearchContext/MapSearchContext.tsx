@@ -14,6 +14,7 @@ import {
   useQueryParams,
 } from 'use-query-params';
 import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../../constants/Constant';
+import { clear } from 'console';
 
 const acceptedParams = {
   site: StringParam,
@@ -168,7 +169,8 @@ export const MapSearchQueryProvider = ({
 
   const onCancelRadiusSearch = () => {
     // setIsVisible(false);
-    setActiveTool(null);
+    clearQuery();
+    setActiveToolState(null);
     setRadius(MIN_CIRCLE_RADIUS);
   };
 

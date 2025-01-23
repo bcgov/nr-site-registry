@@ -2,6 +2,7 @@ import { Button } from '@mui/material';
 import clsx from 'clsx';
 import { MapPin } from '../../../components/common/icon';
 import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
+import { on } from 'events';
 
 interface Props {
   isActive: boolean;
@@ -20,7 +21,7 @@ export function RadiusSearchButton({ isActive, onClick }: Readonly<Props>) {
         'map-button--medium',
         isActive && 'map-button--active',
       )}
-      onClick={handleRadiusToolClick}
+      onClick={onClick}
       startIcon={
         <MapPin
           title="Radius search icon"

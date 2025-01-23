@@ -25,21 +25,6 @@ export function RadiusSearch({
 }: Readonly<RadiusSearchProps>) {
   const { radius, onRadiusChange, onCancelRadiusSearch } =
     useMapSearchContext();
-  //const [isVisible, setIsVisible] = useState(true);
-
-  // const onCancel = () => {
-  //   setIsVisible(false);
-  //   setActiveTool(null);
-  //   setRadius(MIN_CIRCLE_RADIUS);
-  // };
-
-  // const onRadiusChange = (_ev: any, value: number | number[]) => {
-  //   const newRadius = Math.max(
-  //     Array.isArray(value) ? value[0] : value,
-  //     MIN_CIRCLE_RADIUS,
-  //   );
-  //   setRadius(newRadius);
-  // };
 
   const sliderBox = (
     <div className="point-search-slider-content">

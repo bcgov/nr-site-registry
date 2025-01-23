@@ -904,8 +904,7 @@ export type QueryResultForPendingSitesResponse = {
 };
 
 export type RadiusSearchParams = {
-  latitude: Scalars['Float']['input'];
-  longitude: Scalars['Float']['input'];
+  center: Scalars['LatLngTuple']['input'];
   radius: Scalars['Float']['input'];
 };
 

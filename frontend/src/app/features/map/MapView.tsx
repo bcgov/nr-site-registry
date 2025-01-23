@@ -47,8 +47,8 @@ function MapView() {
     ...(polygonVertices.length > 0 && { polygon: polygonVertices }),
   };
 
-  if (latitude && longitude && radius > 500) {
-    variables.circle = { latitude, longitude, radius };
+  if (center && radius > 500) {
+    variables.circle = { center, radius };
   }
 
   const { data, loading: sitesLoading } = useMapSearchQuery({

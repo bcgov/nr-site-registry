@@ -46,11 +46,14 @@ import { LatLngTupleScalar } from '../../scalars/latLngTuple';
 
 @InputType()
 export class RadiusSearchParams {
-  @Field(() => Float)
-  latitude: number;
+  // @Field(() => Float)
+  // latitude: number;
 
-  @Field(() => Float)
-  longitude: number;
+  // @Field(() => Float)
+  // longitude: number;
+
+  @Field(() => LatLngTupleScalar)
+  center: LatLngTuple;
 
   @Field(() => Float)
   radius: number;

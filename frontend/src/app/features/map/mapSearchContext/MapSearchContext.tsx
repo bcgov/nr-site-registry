@@ -153,6 +153,7 @@ export const MapSearchQueryProvider = ({
       MIN_CIRCLE_RADIUS,
     );
     setRadius(newRadius);
+    console.log('nupur - newRadius', newRadius);
     if (center && newRadius > MIN_CIRCLE_RADIUS) {
       const [latitude, longitude] = center;
       console.log(
@@ -163,7 +164,7 @@ export const MapSearchQueryProvider = ({
         'radius',
         newRadius,
       );
-      setQuery({ circle: { latitude, longitude, radius } }, 'replace');
+      setQuery({ circle: { center, radius: newRadius } }, 'replace');
     }
   };
 

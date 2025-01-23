@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import App from './App';
 import { Provider } from 'react-redux';
 import { useAuth } from 'react-oidc-context';
@@ -53,6 +53,13 @@ describe('Access token refresh', () => {
     );
 
     expect(addAccessTokenExpiringMock).toHaveBeenCalled();
+
+    // Simulate the token expiring event
+    const callback = addAccessTokenExpiringMock.mock.calls[0][0];
+    await act(async () => {
+      callback();
+    });
+
     await expect(signinSilentMock).toHaveBeenCalled();
     expect(signoutSilentMock).toHaveBeenCalled();
   });

@@ -21,7 +21,6 @@
   justify-content: space-between;
   min-height: calc(100vh - 65px) !important;
   border-right: 1px solid var(--surface-border-light, #d8d8d8);
-  z-index: 9999;
   width: var(--sidebar-default-width);
 }
 

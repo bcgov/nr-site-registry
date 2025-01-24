@@ -37,10 +37,10 @@ function App() {
     <div className="container-fluid p-0">
       <Header />
       <div className="row m-0 p-0">
-        <div className="col-auto p-0 display-from-medium sidebar-container">
+        <div className="d-none d-md-block p-0 position-fixed sidebar-container">
           <SideBar />
         </div>
-        <div className="col p-0">
+        <div className="col p-0 content-container">
           <Outlet />
         </div>
       </div>

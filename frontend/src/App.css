@@ -46,12 +46,20 @@
   font-family: 'BCSans' !important;
 }
 
-@media screen and (max-width: 768px) {
-  .display-from-medium {
-    display: none !important;
-  }
-}
-
 .sidebar-container {
   width: var(--sidebar-default-width);
+  z-index: 100;
+}
+
+.content-container {
+  margin-left: var(--sidebar-default-width);
+  width: calc(100% - var(--sidebar-default-width));
+}
+
+/* 768px is bootstrap's medium breakpoint */
+@media (max-width: 768px) {
+  .content-container {
+    margin-left: 0;
+    width: 100%;
+  }
 }

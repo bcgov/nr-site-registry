@@ -8,29 +8,35 @@ import { useEffect, useState } from 'react';
 import { Button } from '../../../components/button/Button';
 import { Site } from '../MapView';
 import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
-import { on } from 'events';
 
 interface RadiusSearchProps {
-  // radius: number;
-  // setRadius: React.Dispatch<React.SetStateAction<number>>;
   isSmall?: boolean;
   className?: string;
 }
 
 export function RadiusSearch({
-  //radius = MIN_CIRCLE_RADIUS,
-  //setRadius,
   isSmall = false,
   className,
 }: Readonly<RadiusSearchProps>) {
   const { center, radius, onRadiusChange, onCancelRadiusSearch } =
     useMapSearchContext();
 
-  console.log('nupur - RadiusSearch.tsx: center:', center);
-  const isCenterValid = center !== null;
-  console.log('nupur - RadiusSearch.tsx: center valid:', isCenterValid);
+  const [localRadius, setLocalRadius] = useState(radius);
 
-  console.log('nupur - RadiusSearch.tsx: radius:', radius);
+  const isCenterValid = center !== null;
+
+  const handleChange = (_ev: any, newValue: number | number[]) => {
+    if (typeof newValue === 'number') {
+      setLocalRadius(newValue);
+    } else if (Array.isArray(newValue) && newValue.length > 0) {
+      setLocalRadius(newValue[0]);
+    }
+  };
+
+  const handleChangeCommitted = (_ev: any, newValue: number | number[]) => {
+    onRadiusChange(_ev, newValue);
+  };
+
   const sliderBox = (
     <div className="point-search-slider-content">
       {isSmall && (
@@ -49,10 +55,10 @@ export function RadiusSearch({
         // 500 km is roughly half the size of BC
         max={500000}
         step={MIN_CIRCLE_RADIUS}
-        //defaultValue={MIN_CIRCLE_RADIUS}
-        value={radius}
-        onChangeCommitted={onRadiusChange}
-        //onChange={onRadiusChange}
+        defaultValue={MIN_CIRCLE_RADIUS}
+        value={localRadius}
+        onChangeCommitted={handleChangeCommitted} //Make fetch request on change commit
+        onChange={handleChange} //This is kept to keep the slider move smoothly without making fetch requests
       />
       <Typography className="point-search-slider-text">
         {formatDistance(radius, 1)}
@@ -64,7 +70,6 @@ export function RadiusSearch({
     sliderBox
   ) : (
     <div className={clsx('point-search', className)}>
-      {/* {isVisible && ( */}
       <>
         <Button size="medium" onClick={onCancelRadiusSearch}>
           <XmarkIcon />
@@ -79,7 +84,6 @@ export function RadiusSearch({
           Set Radius
         </DropdownButton>
       </>
-      {/* )} */}
     </div>
   );
 }

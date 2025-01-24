@@ -14,7 +14,6 @@ import {
   useQueryParams,
 } from 'use-query-params';
 import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../../constants/Constant';
-import { clear } from 'console';
 
 const acceptedParams = {
   site: StringParam,
@@ -95,7 +94,9 @@ export const MapSearchQueryProvider = ({
       setActiveToolState(ActiveToolEnum.radiusSearch);
     }
 
+    // This is to make sure the center picks the value from the query params on page reload
     setCenter(query.circle?.center || null);
+
     // This should only run on the initial load to read the query params
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -121,13 +122,6 @@ export const MapSearchQueryProvider = ({
     }
   };
 
-  // const finishRadiusSearchSetup = () => {
-  //   if (center && radius > MIN_CIRCLE_RADIUS) {
-  //     const [latitude, longitude] = center;
-  //     setQuery({ circle: {latitude, longitude, radius} }, 'replace');
-  //   }
-  // }
-
   const setActiveTool = (tool: ActiveToolEnum | null) => {
     const nextTool = activeTool === tool ? null : tool;
     setActiveToolState(nextTool);
@@ -151,7 +145,6 @@ export const MapSearchQueryProvider = ({
       { circle: { center: newCenter, radius: radius || MIN_CIRCLE_RADIUS } },
       'replace',
     );
-    console.log('nupur - newCenter in Context ', newCenter);
   };
 
   const onRadiusChange = (_ev: any, value: number | number[]) => {
@@ -159,43 +152,18 @@ export const MapSearchQueryProvider = ({
       Array.isArray(value) ? value[0] : value,
       MIN_CIRCLE_RADIUS,
     );
-    console.log('nupur - newRadius', newRadius);
+
     setRadius(newRadius);
-    console.log('nupur - center in contex is', center);
-    console.log('nupur - center in query is', query.circle.center);
-    console.log(
-      'nupur - radius in onRadiusChange',
-      newRadius,
-      'and center is: ',
-      center,
-    );
 
-    if (center && radius > MIN_CIRCLE_RADIUS) {
-      // const [latitude, longitude] = center;
-      // console.log(
-      //   'nupur - params for setQuery are : latitude',
-      //   latitude,
-      //   'longitude',
-      //   longitude,
-      //   'radius',
-      //   newRadius,
-      // );
-
+    if (center && newRadius > MIN_CIRCLE_RADIUS) {
       setQuery(
         { circle: { center, radius: newRadius || MIN_CIRCLE_RADIUS } },
         'replace',
-      );
-      console.log(
-        'nupur - after setQuery radius is: ',
-        query.circle.radius,
-        'and center: ',
-        query.circle.center,
       );
     }
   };
 
   const onCancelRadiusSearch = () => {
-    // setIsVisible(false);
     clearQuery();
     setActiveToolState(null);
     setRadius(MIN_CIRCLE_RADIUS);
@@ -223,7 +191,7 @@ export const MapSearchQueryProvider = ({
         activeTool,
         setActiveTool,
         radius: (query.circle && query.circle.radius) || MIN_CIRCLE_RADIUS,
-        center: center || (query.circle && query.circle.center) || null,
+        center: (query.circle && query.circle.center) || null,
         onRadiusCrossHairClick,
         onRadiusChange,
         onCancelRadiusSearch,

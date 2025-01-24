@@ -8,7 +8,6 @@ import { LatLngTuple, LeafletMouseEvent } from 'leaflet';
 import { CrosshairsTooltipMarker } from '../CrossHairToolTipMarker';
 
 interface RadiusSearchLayerProps {
-  //radius: number;
   onCrossHairClick: () => void;
   sites: Site[];
   setSites: React.Dispatch<React.SetStateAction<Site[]>> | null;
@@ -19,14 +18,12 @@ export function RadiusSearchLayer({
   const { center, radius, onRadiusCrossHairClick, activeTool } =
     useMapSearchContext();
   const map = useMap();
-  //const { center, radius, onRadiusCrossHairClick } = useMapSearchContext();
 
   useMapCrosshairsCursor(map);
 
   useMapEvents({
     click: (ev: LeafletMouseEvent) => {
       const newCenter: LatLngTuple = [ev.latlng.lat, ev.latlng.lng];
-      //setCenter(newCenter);
       onRadiusCrossHairClick(newCenter);
       onCrossHairClick();
     },
@@ -35,13 +32,6 @@ export function RadiusSearchLayer({
 
   if (activeTool === ActiveToolEnum.radiusSearch) {
     return (
-      // <CircleLayer
-      //   //radius={radius}
-      //   onCrossHairClick={onCrossHairClick}
-      //   sites={sites}
-      //   setSites={setSites}
-      // />
-
       <>
         <CrosshairsTooltipMarker center={center}>
           Click to place center point

@@ -43,7 +43,6 @@ import { Place } from '../../entities/placeEntity';
 import { UserTypeEum } from '../../common/userType';
 import { BC_ALBERS, LatLngTuple, WGS_84 } from '../../utils/geometry';
 import { RadiusSearchParams } from 'src/app/resolvers/site/site.resolver';
-//import { RadiusSearchParams } from 'src/app/dto/radiusSearch.dto';
 
 /**
  * Nestjs Service For Region Entity
@@ -341,9 +340,7 @@ export class SiteService {
     circle?: RadiusSearchParams;
   }) {
     this.sitesLogger.log('SiteService.mapSearch() start');
-    // const searchParams = [searchTerm, polygon, circle].filter(Boolean);
-    // console.log('nupur - searchParams: ', searchParams);
-    // console.log('nupur - search is : ', searchTerm, "or ", polygon, "or ", circle);
+
     if (polygon && polygon.length < 3) {
       throw new HttpException(
         'Polygon must have at least 3 vertices',
@@ -399,20 +396,10 @@ export class SiteService {
       );
     }
 
-    console.log('nupur - circle', circle);
     if (circle) {
       const { center, radius } = circle;
       const [latitude, longitude] = center;
-      console.log(
-        'nupur - center is',
-        center,
-        ' latitude is:',
-        latitude,
-        'longitude: ',
-        longitude,
-        'radius: ',
-        radius,
-      );
+
       query.where(
         `ST_DWithin(
           ST_Transform(sites.geometry, ${BC_ALBERS}),
@@ -422,11 +409,7 @@ export class SiteService {
       );
     }
 
-    console.log('nupur - query: ', query);
-
     const [result] = await query.getManyAndCount();
-    console.log('nupur - data(result): ', result.length);
-
     this.sitesLogger.log('SiteService.mapSearch() end');
     return result;
   }

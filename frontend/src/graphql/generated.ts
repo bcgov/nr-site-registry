@@ -713,7 +713,6 @@ export type Place = {
 export type Query = {
   __typename?: 'Query';
   _service: _Service;
-  fetchSitesByRadius: FetchSiteResponse;
   findSiteBySiteId: FetchSiteDetail;
   findSiteBySiteIdLoggedInUser: FetchSiteDetail;
   findSitesAndPlaces: FindSitesAndPlacesResponse;
@@ -745,13 +744,6 @@ export type Query = {
   searchSiteIds: DropdownResponse;
   searchSites: SearchSiteResponse;
   sites: FetchSiteResponse;
-};
-
-
-export type QueryFetchSitesByRadiusArgs = {
-  lat: Scalars['Float']['input'];
-  lon: Scalars['Float']['input'];
-  radius: Scalars['Float']['input'];
 };
 
 

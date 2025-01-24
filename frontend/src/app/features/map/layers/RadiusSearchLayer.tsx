@@ -1,7 +1,6 @@
 import { Circle, useMap, useMapEvents } from 'react-leaflet';
 import { ActiveToolEnum } from '../../../constants/Constant';
 import { useMapCrosshairsCursor } from '../../../hooks/useMapCrossHairCursor';
-import { CircleLayer } from '../CircleLayer';
 import { Site } from '../MapView';
 import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 import { LatLngTuple, LeafletMouseEvent } from 'leaflet';

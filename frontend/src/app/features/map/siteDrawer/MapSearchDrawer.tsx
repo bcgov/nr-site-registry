@@ -12,14 +12,12 @@ interface MapSearchDrawerProps {
   sites: Site[];
   sitesLoading: boolean;
   activeTool: ActiveToolEnum | null;
-  //radius: number;
 }
 export const MapSearchDrawer: FC<MapSearchDrawerProps> = ({
   mapRef,
   sites,
   sitesLoading,
   activeTool,
-  //radius,
 }) => {
   const { selectedSiteId, searchTerm, clearQuery, polygonVertices, radius } =
     useMapSearchContext();

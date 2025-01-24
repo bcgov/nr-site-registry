@@ -19,7 +19,6 @@ import {
   useMapSearchContext,
 } from './mapSearchContext/MapSearchContext';
 import { MapSearchDrawer } from './siteDrawer/MapSearchDrawer';
-import { MIN_CIRCLE_RADIUS } from '../../constants/Constant';
 import { RadiusSearchLayer } from './layers/RadiusSearchLayer';
 import { PolygonSearchLayer } from './layers/PolygonSearchLayer';
 
@@ -39,8 +38,6 @@ function MapView() {
 
   const { searchTerm, activeTool, polygonVertices, center, radius } =
     useMapSearchContext();
-
-  const [latitude, longitude] = center || [];
 
   const variables: any = {
     searchParam: searchTerm || '',
@@ -76,7 +73,6 @@ function MapView() {
 
   const mapRef = useRef<Map>(null);
   const [isLocationVisible, setLocationVisible] = useState(false);
-  //const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
   const [sites, setSites] = useState<Site[]>([]);
   const clearSites = () => setSites([]);
 
@@ -110,7 +106,6 @@ function MapView() {
         {<MyLocationMarker isLocationVisible={isLocationVisible} />}
         <SiteMarkers sites={sites} />
         <RadiusSearchLayer
-          //radius={radius}
           onCrossHairClick={clearSites}
           sites={sites}
           setSites={setSites}
@@ -122,8 +117,6 @@ function MapView() {
         mapRef={mapRef}
         isLocationVisible={isLocationVisible}
         setLocationVisible={setLocationVisible}
-        //radius={radius}
-        //setRadius={setRadius}
       />
 
       <MapSearchDrawer
@@ -133,7 +126,6 @@ function MapView() {
         sites={sites}
         sitesLoading={sitesLoading}
         activeTool={activeTool}
-        // radius={radius}
       />
     </div>
   );

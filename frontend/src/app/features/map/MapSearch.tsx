@@ -8,7 +8,6 @@ import {
   MAP_CONTROLS_RIGHT_LG,
   MAP_CONTROLS_RIGHT_SM,
   MAP_CONTROLS_RIGHT_XL,
-  MIN_CIRCLE_RADIUS,
 } from '../../constants/Constant';
 
 import { TextSearchButton } from './search/TextSearchButton';
@@ -101,15 +100,11 @@ function formatDataForAutocomplete(
 
 interface MapSearchProps {
   mapRef: RefObject<Map | null>;
-  //radius: number;
-  //setRadius: React.Dispatch<React.SetStateAction<number>>;
   isLocationVisible: boolean;
   setLocationVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function MapSearch({
-  //radius,
-  //setRadius,
   isLocationVisible,
   setLocationVisible,
   mapRef,

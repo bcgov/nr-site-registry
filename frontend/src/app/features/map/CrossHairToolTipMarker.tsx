@@ -1,6 +1,5 @@
 import { ReactNode, useRef } from 'react';
 import {
-  //LatLngExpression,
   LeafletMouseEvent,
   Marker as LeafletMarker,
   LatLngTuple,

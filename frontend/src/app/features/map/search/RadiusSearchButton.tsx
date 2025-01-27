@@ -9,7 +9,6 @@ interface Props {
 }
 
 export function RadiusSearchButton({ isActive, onClick }: Readonly<Props>) {
-  const { handleRadiusToolClick } = useMapSearchContext();
   return (
     <Button
       variant="contained"

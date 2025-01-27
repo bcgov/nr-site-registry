@@ -40,9 +40,9 @@ interface MapSearchContextType {
   setActiveTool: (tool: ActiveToolEnum | null) => void;
   radius: number;
   center: LatLngTuple | null;
-  onRadiusCrossHairClick: (newCenter: LatLngTuple) => void;
-  onRadiusChange: (_ev: any, value: number | number[]) => void;
-  onCancelRadiusSearch: () => void;
+  setCenterOnCrossHairClick: (newCenter: LatLngTuple) => void;
+  handleRadiusChange: (_ev: any, value: number | number[]) => void;
+  clearRadiusSearch: () => void;
   handleRadiusToolClick: () => void;
 }
 
@@ -62,9 +62,9 @@ export const MapSearchContext = createContext<MapSearchContextType>({
   setActiveTool: () => {},
   radius: MIN_CIRCLE_RADIUS,
   center: null,
-  onRadiusCrossHairClick: () => {},
-  onRadiusChange: () => {},
-  onCancelRadiusSearch: () => {},
+  setCenterOnCrossHairClick: () => {},
+  handleRadiusChange: () => {},
+  clearRadiusSearch: () => {},
   handleRadiusToolClick: () => {},
 });
 
@@ -96,6 +96,9 @@ export const MapSearchQueryProvider = ({
 
     // This is to make sure the center picks the value from the query params on page reload
     setCenter(query.circle?.center || null);
+
+    // This is to make sure the radius picks the value from the query params on page reload
+    setRadius(query.circle?.radius || MIN_CIRCLE_RADIUS);
 
     // This should only run on the initial load to read the query params
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -139,7 +142,7 @@ export const MapSearchQueryProvider = ({
 
   const clearQuery = () => setQuery({}, 'replace');
 
-  const onRadiusCrossHairClick = (newCenter: LatLngTuple) => {
+  const setCenterOnCrossHairClick = (newCenter: LatLngTuple) => {
     setCenter(newCenter);
     setQuery(
       { circle: { center: newCenter, radius: radius || MIN_CIRCLE_RADIUS } },
@@ -147,7 +150,7 @@ export const MapSearchQueryProvider = ({
     );
   };
 
-  const onRadiusChange = (_ev: any, value: number | number[]) => {
+  const handleRadiusChange = (_ev: any, value: number | number[]) => {
     const newRadius = Math.max(
       Array.isArray(value) ? value[0] : value,
       MIN_CIRCLE_RADIUS,
@@ -163,7 +166,7 @@ export const MapSearchQueryProvider = ({
     }
   };
 
-  const onCancelRadiusSearch = () => {
+  const clearRadiusSearch = () => {
     clearQuery();
     setActiveToolState(null);
     setRadius(MIN_CIRCLE_RADIUS);
@@ -192,9 +195,9 @@ export const MapSearchQueryProvider = ({
         setActiveTool,
         radius: (query.circle && query.circle.radius) || MIN_CIRCLE_RADIUS,
         center: (query.circle && query.circle.center) || null,
-        onRadiusCrossHairClick,
-        onRadiusChange,
-        onCancelRadiusSearch,
+        setCenterOnCrossHairClick,
+        handleRadiusChange,
+        clearRadiusSearch,
         handleRadiusToolClick,
       }}
     >

@@ -1,6 +1,10 @@
 import { Slider, Typography } from '@mui/material';
 import clsx from 'clsx';
-import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../../constants/Constant';
+import {
+  ActiveToolEnum,
+  MAX_CIRCLE_RADIUS,
+  MIN_CIRCLE_RADIUS,
+} from '../../../constants/Constant';
 import { XmarkIcon } from '../../../components/common/icon';
 import DropdownButton from '../DropDownButton';
 import { formatDistance } from '../../../helpers/utility';
@@ -18,7 +22,7 @@ export function RadiusSearch({
   isSmall = false,
   className,
 }: Readonly<RadiusSearchProps>) {
-  const { center, radius, onRadiusChange, onCancelRadiusSearch } =
+  const { center, radius, handleRadiusChange, clearRadiusSearch } =
     useMapSearchContext();
 
   const [localRadius, setLocalRadius] = useState(radius);
@@ -34,7 +38,7 @@ export function RadiusSearch({
   };
 
   const handleChangeCommitted = (_ev: any, newValue: number | number[]) => {
-    onRadiusChange(_ev, newValue);
+    handleRadiusChange(_ev, newValue);
   };
 
   const sliderBox = (
@@ -53,7 +57,7 @@ export function RadiusSearch({
         valueLabelDisplay="off"
         min={MIN_CIRCLE_RADIUS}
         // 500 km is roughly half the size of BC
-        max={500000}
+        max={MAX_CIRCLE_RADIUS}
         step={MIN_CIRCLE_RADIUS}
         defaultValue={MIN_CIRCLE_RADIUS}
         value={localRadius}
@@ -61,7 +65,7 @@ export function RadiusSearch({
         onChange={handleChange} //This is kept to keep the slider move smoothly without making fetch requests
       />
       <Typography className="point-search-slider-text">
-        {formatDistance(radius, 1)}
+        {formatDistance(localRadius, 1)}
       </Typography>
     </div>
   );
@@ -71,7 +75,7 @@ export function RadiusSearch({
   ) : (
     <div className={clsx('point-search', className)}>
       <>
-        <Button size="medium" onClick={onCancelRadiusSearch}>
+        <Button size="medium" onClick={clearRadiusSearch}>
           <XmarkIcon />
           Cancel
         </Button>

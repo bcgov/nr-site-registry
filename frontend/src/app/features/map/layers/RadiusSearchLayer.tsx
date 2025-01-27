@@ -1,5 +1,5 @@
 import { Circle, useMap, useMapEvents } from 'react-leaflet';
-import { ActiveToolEnum } from '../../../constants/Constant';
+import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../../constants/Constant';
 import { useMapCrosshairsCursor } from '../../../hooks/useMapCrossHairCursor';
 import { Site } from '../MapView';
 import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
@@ -14,20 +14,20 @@ interface RadiusSearchLayerProps {
 export function RadiusSearchLayer({
   onCrossHairClick,
 }: Readonly<RadiusSearchLayerProps>) {
-  const { center, radius, onRadiusCrossHairClick, activeTool } =
+  const { center, radius, setCenterOnCrossHairClick, activeTool } =
     useMapSearchContext();
   const map = useMap();
 
-  useMapCrosshairsCursor(map);
+  useMapCrosshairsCursor(map, activeTool === ActiveToolEnum.radiusSearch);
 
   useMapEvents({
     click: (ev: LeafletMouseEvent) => {
       const newCenter: LatLngTuple = [ev.latlng.lat, ev.latlng.lng];
-      onRadiusCrossHairClick(newCenter);
+      setCenterOnCrossHairClick(newCenter);
       onCrossHairClick();
     },
   });
-  const drawCircle = center && radius > 500;
+  const drawCircle = center && radius > MIN_CIRCLE_RADIUS;
 
   if (activeTool === ActiveToolEnum.radiusSearch) {
     return (

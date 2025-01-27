@@ -10,7 +10,11 @@ import { MyLocationMarker } from './MyLocationMarker'; // Import the MyLocationM
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 import { MapSearch } from './MapSearch';
-import { MapSearchQuery, useMapSearchQuery } from '../../../graphql/generated';
+import {
+  MapSearchQuery,
+  MapSearchQueryVariables,
+  useMapSearchQuery,
+} from '../../../graphql/generated';
 import { SiteMarkers } from './siteMarkers/SiteMarkers';
 import { MapControls } from './MapControls';
 import { MAP_FLY_OPTIONS } from './mapOptions';
@@ -39,7 +43,7 @@ function MapView() {
   const { searchTerm, activeTool, polygonVertices, center, radius } =
     useMapSearchContext();
 
-  const variables: any = {
+  const variables: MapSearchQueryVariables = {
     searchParam: searchTerm || '',
     ...(polygonVertices.length > 0 && { polygon: polygonVertices }),
   };

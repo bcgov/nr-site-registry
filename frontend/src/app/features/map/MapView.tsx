@@ -25,6 +25,7 @@ import {
 import { MapSearchDrawer } from './siteDrawer/MapSearchDrawer';
 import { RadiusSearchLayer } from './layers/RadiusSearchLayer';
 import { PolygonSearchLayer } from './layers/PolygonSearchLayer';
+import { MIN_CIRCLE_RADIUS } from '../../constants/Constant';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -48,7 +49,7 @@ function MapView() {
     ...(polygonVertices.length > 0 && { polygon: polygonVertices }),
   };
 
-  if (center && radius > 500) {
+  if (center && radius > MIN_CIRCLE_RADIUS) {
     variables.circle = { center, radius };
   }
 

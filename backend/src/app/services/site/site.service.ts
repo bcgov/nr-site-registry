@@ -43,6 +43,7 @@ import { Place } from '../../entities/placeEntity';
 import { UserTypeEum } from '../../common/userType';
 import { BC_ALBERS, LatLngTuple, WGS_84 } from '../../utils/geometry';
 import { RadiusSearchParams } from 'src/app/resolvers/site/site.resolver';
+import { MAX_CIRCLE_RADIUS, MIN_CIRCLE_RADIUS } from '../../utils/constants';
 
 /**
  * Nestjs Service For Region Entity
@@ -394,6 +395,35 @@ export class SiteService {
           ST_Transform(ST_GeomFromText('POLYGON((${polygonString}))', ${WGS_84}), ${BC_ALBERS})
         )`,
       );
+    }
+
+    if (circle && circle.radius < MIN_CIRCLE_RADIUS) {
+      throw new HttpException(
+        'Circle radius must be at least 500 meters',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (circle && circle.radius > MAX_CIRCLE_RADIUS) {
+      throw new HttpException(
+        'Circle radius cannot exceed 500 km',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (circle && circle.center) {
+      const [latitude, longitude] = circle.center;
+      if (
+        latitude === 0 ||
+        latitude === undefined ||
+        longitude === 0 ||
+        longitude === undefined
+      ) {
+        throw new HttpException(
+          'Latitude and longitude cannot be 0 or undefined',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
 
     if (circle) {

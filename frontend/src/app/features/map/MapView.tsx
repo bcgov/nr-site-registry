@@ -49,7 +49,7 @@ function MapView() {
     ...(polygonVertices.length > 0 && { polygon: polygonVertices }),
   };
 
-  if (center && radius > MIN_CIRCLE_RADIUS) {
+  if (center && radius >= MIN_CIRCLE_RADIUS) {
     variables.circle = { center, radius };
   }
 

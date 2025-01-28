@@ -41,7 +41,7 @@ interface MapSearchContextType {
   radius: number;
   center: LatLngTuple | null;
   setCenterOnCrossHairClick: (newCenter: LatLngTuple) => void;
-  handleRadiusChange: (_ev: any, value: number | number[]) => void;
+  handleRadiusChange: (value: number | number[]) => void;
   clearRadiusSearch: () => void;
   handleRadiusToolClick: () => void;
 }
@@ -150,7 +150,7 @@ export const MapSearchQueryProvider = ({
     );
   };
 
-  const handleRadiusChange = (_ev: any, value: number | number[]) => {
+  const handleRadiusChange = (value: number | number[]) => {
     const newRadius = Math.max(
       Array.isArray(value) ? value[0] : value,
       MIN_CIRCLE_RADIUS,

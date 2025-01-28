@@ -5,6 +5,7 @@ import { Site } from '../MapView';
 import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 import { LatLngTuple, LeafletMouseEvent } from 'leaflet';
 import { CrosshairsTooltipMarker } from '../CrossHairToolTipMarker';
+import { useEffect } from 'react';
 
 interface RadiusSearchLayerProps {
   onCrossHairClick: () => void;
@@ -27,7 +28,12 @@ export function RadiusSearchLayer({
       onCrossHairClick();
     },
   });
-  const drawCircle = center && radius > MIN_CIRCLE_RADIUS;
+
+  //displayRadius is only set to circle with MIN_CIRCLE_RADIUS so that it is visible on the map with a clear dot/circle
+  const displayRadius =
+    radius === MIN_CIRCLE_RADIUS ? radius * map.getZoom() : radius;
+
+  const drawCircle = center && radius >= MIN_CIRCLE_RADIUS;
 
   if (activeTool === ActiveToolEnum.radiusSearch) {
     return (

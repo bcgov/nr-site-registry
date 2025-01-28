@@ -38,7 +38,11 @@ export function RadiusSearch({
   };
 
   const handleChangeCommitted = (_ev: any, newValue: number | number[]) => {
-    handleRadiusChange(_ev, newValue);
+    if (typeof newValue === 'number') {
+      handleRadiusChange(newValue);
+    } else if (Array.isArray(newValue) && newValue.length > 0) {
+      handleRadiusChange(newValue[0]);
+    }
   };
 
   const sliderBox = (

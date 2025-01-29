@@ -29,10 +29,6 @@ export function RadiusSearchLayer({
     },
   });
 
-  //displayRadius is only set to circle with MIN_CIRCLE_RADIUS so that it is visible on the map with a clear dot/circle
-  const displayRadius =
-    radius === MIN_CIRCLE_RADIUS ? radius * map.getZoom() : radius;
-
   const drawCircle = center && radius >= MIN_CIRCLE_RADIUS;
 
   if (activeTool === ActiveToolEnum.radiusSearch) {

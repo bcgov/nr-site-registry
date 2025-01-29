@@ -414,13 +414,13 @@ export class SiteService {
     if (circle && circle.center) {
       const [latitude, longitude] = circle.center;
       if (
-        latitude === 0 ||
+        latitude === null ||
         latitude === undefined ||
-        longitude === 0 ||
+        longitude === null ||
         longitude === undefined
       ) {
         throw new HttpException(
-          'Latitude and longitude cannot be 0 or undefined',
+          'Latitude and longitude cannot be null or undefined',
           HttpStatus.BAD_REQUEST,
         );
       }

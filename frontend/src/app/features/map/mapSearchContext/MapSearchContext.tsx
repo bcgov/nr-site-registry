@@ -158,7 +158,7 @@ export const MapSearchQueryProvider = ({
 
     setRadius(newRadius);
 
-    if (center && newRadius > MIN_CIRCLE_RADIUS) {
+    if (center && newRadius >= MIN_CIRCLE_RADIUS) {
       setQuery(
         { circle: { center, radius: newRadius || MIN_CIRCLE_RADIUS } },
         'replace',

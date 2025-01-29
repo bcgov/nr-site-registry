@@ -1287,29 +1287,29 @@ describe('SiteService', () => {
       );
     });
 
-    it('should throw an error if the circle has latitude with value 0', () => {
+    it('should throw an error if the circle has latitude with value null', () => {
       const circle: RadiusSearchParams = {
-        center: [0, -123.1207],
+        center: [null, -123.1207],
         radius: 1000,
       };
 
       expect(async () => siteService.mapSearch({ circle })).rejects.toThrow(
         new HttpException(
-          'Latitude and longitude cannot be 0 or undefined',
+          'Latitude and longitude cannot be null or undefined',
           HttpStatus.BAD_REQUEST,
         ),
       );
     });
 
-    it('should throw an error if circle has longitude with value 0', () => {
+    it('should throw an error if circle has longitude with value null', () => {
       const circle: RadiusSearchParams = {
-        center: [50, 0],
+        center: [50, null],
         radius: 1000,
       };
 
       expect(async () => siteService.mapSearch({ circle })).rejects.toThrow(
         new HttpException(
-          'Latitude and longitude cannot be 0 or undefined',
+          'Latitude and longitude cannot be null or undefined',
           HttpStatus.BAD_REQUEST,
         ),
       );
@@ -1323,7 +1323,7 @@ describe('SiteService', () => {
 
       expect(async () => siteService.mapSearch({ circle })).rejects.toThrow(
         new HttpException(
-          'Latitude and longitude cannot be 0 or undefined',
+          'Latitude and longitude cannot be null or undefined',
           HttpStatus.BAD_REQUEST,
         ),
       );
@@ -1337,7 +1337,7 @@ describe('SiteService', () => {
 
       expect(async () => siteService.mapSearch({ circle })).rejects.toThrow(
         new HttpException(
-          'Latitude and longitude cannot be 0 or undefined',
+          'Latitude and longitude cannot be null or undefined',
           HttpStatus.BAD_REQUEST,
         ),
       );

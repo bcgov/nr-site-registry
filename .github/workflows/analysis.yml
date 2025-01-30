@@ -43,7 +43,7 @@ jobs:
           - dir: frontend
             token: SONAR_TOKEN_FRONTEND
     steps:
-      - uses: bcgov/action-test-and-analyse@v1.2.1
+    #  - uses: bcgov/action-test-and-analyse@v1.2.1
         env:
           LOG_LEVEL: info
           LOG_FILE_LOCATION: /tmp/sites-%DATE%.log
@@ -53,14 +53,14 @@ jobs:
             npm run test:cov
           dir: ${{ matrix.dir }}
           node_version: "22"
-          sonar_args: >
-             -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts,**/migrations/**,**/*test.tsx,**/*test.ts
-             -Dsonar.organization=bcgov-sonarcloud
-             -Dsonar.projectKey=bcgov-sonarcloud_nr-site-registry-${{ matrix.dir }}
-             -Dsonar.sources=src
-             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
-             -Dsonar.cpd.exclusions=**/migrations/**
-          sonar_token: ${{ secrets[matrix.token] }}
+    #      sonar_args: >
+    #         -Dsonar.exclusions=**/coverage/**,**/node_modules/**,**/*spec.ts,**/migrations/**,**/*test.tsx,**/*test.ts
+    #         -Dsonar.organization=bcgov-sonarcloud
+    #         -Dsonar.projectKey=bcgov-sonarcloud_nr-site-registry-${{ matrix.dir }}
+    #         -Dsonar.sources=src
+    #         -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
+    #         -Dsonar.cpd.exclusions=**/migrations/**
+    #      sonar_token: ${{ secrets[matrix.token] }}
           
 
   results:

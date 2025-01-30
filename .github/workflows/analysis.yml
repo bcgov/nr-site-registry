@@ -6,7 +6,7 @@ on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review, converted_to_draft]
   schedule:
-    - cron: "0 11 * * 0" # 3 AM PST = 12 PM UDT, runs sundays
+    - cron: "0 11 * * 0" # Runs every Sunday at 3 AM PST (11 AM UTC)
   workflow_dispatch:
 
 concurrency:
@@ -14,14 +14,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  #TODO add the Unit TEST with sonar, sample https://github.com/bcgov/quickstart-openshift/blob/main/.github/workflows/analysis.yml#L17-L58
+  # TODO: Add unit tests with Sonar. Example: 
+  # https://github.com/bcgov/quickstart-openshift/blob/main/.github/workflows/analysis.yml#L17-L58
 
   tests:
     name: Unit Tests
-    # TODO - Re-enable below before submitting PR, jsut have it disabled while I work via draft.
-    # if: ${{ ! github.event.pull_request.draft }}
-    runs-on: ubuntu-24.04
+    # TODO: Re-enable before submitting PR; temporarily disabled for draft work.
+    # if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
     timeout-minutes: 5
+
     services:
       postgres:
         image: postgres
@@ -34,6 +36,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+
     strategy:
       matrix:
         dir: [backend, frontend]
@@ -42,24 +45,25 @@ jobs:
             token: SONAR_TOKEN_BACKEND
           - dir: frontend
             token: SONAR_TOKEN_FRONTEND
+
     steps:
       - uses: bcgov/action-test-and-analyse@v1.2.1
         env:
           LOG_LEVEL: info
-          LOG_FILE_LOCATION: /tmp/sites-%DATE%.log
+          LOG_FILE_LOCATION: /tmp/sites-${{ github.run_id }}.log
         with:
           commands: |
             npm ci
             npm run test:cov
           dir: ${{ matrix.dir }}
           node_version: "22"
-          
 
   results:
     name: Analysis Results
     needs: [tests]
     if: always()
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+
     steps:
       - if: contains(needs.*.result, 'failure')
         run: echo "At least one job has failed." && exit 1

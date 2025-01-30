@@ -52,7 +52,7 @@ const siteDetailsSlice = createSlice({
       newState.parcelDescriptionsData = null;
       newState.profilesData = null;
       newState.siteAssociationsData = null;
-      newState.siteId = '';
+      newState.siteId = state.siteId;
       newState.sitesSummary = null;
       return newState;
     },

@@ -858,6 +858,7 @@ export type QueryGetSnapshotsByUserIdArgs = {
 
 
 export type QueryMapSearchArgs = {
+  circle?: InputMaybe<RadiusSearchParams>;
   polygon?: InputMaybe<Array<Scalars['LatLngTuple']['input']>>;
   searchParam?: InputMaybe<Scalars['String']['input']>;
 };
@@ -892,6 +893,11 @@ export type QueryResultForPendingSitesResponse = {
   message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
   timestamp?: Maybe<Scalars['String']['output']>;
+};
+
+export type RadiusSearchParams = {
+  center: Scalars['LatLngTuple']['input'];
+  radius: Scalars['Float']['input'];
 };
 
 export type RecentViewDto = {

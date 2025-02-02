@@ -46,6 +46,7 @@ import {
   FaDrawPolygon,
   FaMapPin,
   FaCircleExclamation,
+  FaLayerGroup,
 } from 'react-icons/fa6';
 
 import {
@@ -110,3 +111,4 @@ export const ListCheckIcon = FaListCheck;
 export const DrawPolygon = FaDrawPolygon;
 export const MapPin = FaMapPin;
 export const CircleExclamationIconFa = FaCircleExclamation;
+export const LayersIcon = FaLayerGroup;

@@ -14,6 +14,7 @@ import {
   useQueryParams,
 } from 'use-query-params';
 import { ActiveToolEnum } from '../../../constants/Constant';
+import { LayerKey } from '../dataLayers/Layers';
 
 const acceptedParams = {
   site: StringParam,
@@ -37,6 +38,9 @@ interface MapSearchContextType {
   deletePolygon: () => void;
   activeTool: ActiveToolEnum | null;
   setActiveTool: (tool: ActiveToolEnum | null) => void;
+  selectedDataLayers: Set<LayerKey>;
+  toggleDataLayerSelection: (layer: LayerKey) => void;
+  resetDataLayers: () => void;
 }
 
 export const MapSearchContext = createContext<MapSearchContextType>({
@@ -53,6 +57,9 @@ export const MapSearchContext = createContext<MapSearchContextType>({
   deletePolygon: () => {},
   activeTool: null,
   setActiveTool: () => {},
+  selectedDataLayers: new Set(),
+  toggleDataLayerSelection: () => {},
+  resetDataLayers: () => {},
 });
 
 export const MapSearchQueryProvider = ({
@@ -67,6 +74,9 @@ export const MapSearchQueryProvider = ({
 
   const [isDrawingPolygon, setIsDrawingPolygon] = useState(false);
   const [drawShapeVertices, setDrawShapeVertices] = useState<LatLngTuple[]>([]);
+  const [selectedDataLayers, setSelectedDataLayers] = useState(
+    new Set<LayerKey>(),
+  );
 
   useEffect(() => {
     const { polygon } = query;
@@ -115,6 +125,22 @@ export const MapSearchQueryProvider = ({
 
   const clearQuery = () => setQuery({}, 'replace');
 
+  const toggleDataLayerSelection = (layer: LayerKey) => {
+    setSelectedDataLayers((prevSelectedLayers) => {
+      const newSelectedLayers = new Set(prevSelectedLayers);
+      if (newSelectedLayers.has(layer)) {
+        newSelectedLayers.delete(layer);
+      } else {
+        newSelectedLayers.add(layer);
+      }
+      return newSelectedLayers;
+    });
+  };
+
+  const resetDataLayers = () => {
+    setSelectedDataLayers(new Set());
+  };
+
   return (
     <MapSearchContext.Provider
       value={{
@@ -131,6 +157,9 @@ export const MapSearchQueryProvider = ({
         deletePolygon,
         activeTool,
         setActiveTool,
+        selectedDataLayers,
+        toggleDataLayerSelection,
+        resetDataLayers,
       }}
     >
       {children}

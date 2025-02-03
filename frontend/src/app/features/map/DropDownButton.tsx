@@ -24,6 +24,7 @@ interface ButtonDropdownProps extends ButtonProps {
   openClassName?: string;
   menuClassName?: string;
   menuProps?: Partial<MenuProps>;
+  disabled?: boolean;
   horizontalAlign?: 'left' | 'right';
   [key: string]: any;
 }
@@ -38,6 +39,7 @@ export function DropdownButton({
   openClassName,
   menuClassName,
   menuProps,
+  disabled,
   horizontalAlign = 'left',
   ...rest
 }: Readonly<ButtonDropdownProps>) {
@@ -59,7 +61,7 @@ export function DropdownButton({
 
   return (
     <div>
-      <Button onClick={handleClick} size="medium">
+      <Button onClick={handleClick} size="medium" disabled={disabled}>
         {children}
         <ArrowDownIcon title="Down arrow" />
       </Button>

@@ -1,5 +1,5 @@
-query mapSearch($searchParam: String, , $polygon: [LatLngTuple!]) {
-  mapSearch(searchParam: $searchParam, polygon: $polygon) {
+query mapSearch($searchParam: String, $polygon: [LatLngTuple!], $circle: RadiusSearchParams) {
+  mapSearch(searchParam: $searchParam, polygon: $polygon, circle: $circle) {
     data {
       id
       addrLine_1

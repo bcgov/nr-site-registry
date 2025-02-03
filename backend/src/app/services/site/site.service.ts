@@ -42,6 +42,8 @@ import { Snapshots } from '../../entities/snapshots.entity';
 import { Place } from '../../entities/placeEntity';
 import { UserTypeEum } from '../../common/userType';
 import { BC_ALBERS, LatLngTuple, WGS_84 } from '../../utils/geometry';
+import { RadiusSearchParams } from 'src/app/resolvers/site/site.resolver';
+import { MAX_CIRCLE_RADIUS, MIN_CIRCLE_RADIUS } from '../../utils/constants';
 
 /**
  * Nestjs Service For Region Entity
@@ -332,9 +334,11 @@ export class SiteService {
   async mapSearch({
     searchTerm,
     polygon,
+    circle,
   }: {
     searchTerm?: string;
     polygon?: LatLngTuple[];
+    circle?: RadiusSearchParams;
   }) {
     this.sitesLogger.log('SiteService.mapSearch() start');
 
@@ -393,8 +397,49 @@ export class SiteService {
       );
     }
 
-    const [result] = await query.getManyAndCount();
+    if (circle && circle.radius < MIN_CIRCLE_RADIUS) {
+      throw new HttpException(
+        'Circle radius must be at least 500 meters',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
+    if (circle && circle.radius > MAX_CIRCLE_RADIUS) {
+      throw new HttpException(
+        'Circle radius cannot exceed 500 km',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (circle && circle.center) {
+      const [latitude, longitude] = circle.center;
+      if (
+        latitude === null ||
+        latitude === undefined ||
+        longitude === null ||
+        longitude === undefined
+      ) {
+        throw new HttpException(
+          'Latitude and longitude cannot be null or undefined',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+    if (circle) {
+      const { center, radius } = circle;
+      const [latitude, longitude] = center;
+
+      query.where(
+        `ST_DWithin(
+          ST_Transform(sites.geometry, ${BC_ALBERS}),
+          ST_Transform(ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}),${WGS_84}), ${BC_ALBERS}),
+          ${radius}
+          )`,
+      );
+    }
+
+    const [result] = await query.getManyAndCount();
     this.sitesLogger.log('SiteService.mapSearch() end');
     return result;
   }

@@ -12,7 +12,6 @@ export const DataLayersMenu = () => {
 
   return (
     <OverlayTrigger
-      show
       trigger="click"
       placement={'bottom-end'}
       rootClose

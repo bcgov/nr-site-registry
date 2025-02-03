@@ -8,7 +8,6 @@ import {
   MAP_CONTROLS_RIGHT_LG,
   MAP_CONTROLS_RIGHT_SM,
   MAP_CONTROLS_RIGHT_XL,
-  MIN_CIRCLE_RADIUS,
 } from '../../constants/Constant';
 
 import { TextSearchButton } from './search/TextSearchButton';
@@ -101,21 +100,23 @@ function formatDataForAutocomplete(
 
 interface MapSearchProps {
   mapRef: RefObject<Map | null>;
-  radius: number;
-  setRadius: React.Dispatch<React.SetStateAction<number>>;
   isLocationVisible: boolean;
   setLocationVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function MapSearch({
-  radius,
-  setRadius,
   isLocationVisible,
   setLocationVisible,
   mapRef,
 }: MapSearchProps) {
-  const { searchTerm, setQuery, clearQuery, activeTool, setActiveTool } =
-    useMapSearchContext();
+  const {
+    searchTerm,
+    setQuery,
+    clearQuery,
+    activeTool,
+    setActiveTool,
+    handleRadiusToolClick,
+  } = useMapSearchContext();
 
   const [searchValue, setSearchValue] = useState(searchTerm);
   const searchValueDebounced = useDebouncedValue(searchValue);
@@ -154,11 +155,6 @@ export function MapSearch({
 
   const handlePolygonToolClick = () => {
     setActiveTool(ActiveToolEnum.polygonSearch);
-  };
-
-  const handleRadiusToolClick = () => {
-    setActiveTool(ActiveToolEnum.radiusSearch);
-    setRadius(MIN_CIRCLE_RADIUS);
   };
 
   const onOptionSelect = (option: AutocompleteOption) => {
@@ -251,11 +247,7 @@ export function MapSearch({
       {isLarge && (isPolygonTool || isRadiusTool) && (
         <div className="map-search-tool-row">
           <div className="map-search-tool-box">
-            {isPolygonTool ? (
-              <PolygonSearchControls />
-            ) : (
-              <RadiusSearch radius={radius} setRadius={setRadius} />
-            )}
+            {isPolygonTool ? <PolygonSearchControls /> : <RadiusSearch />}
           </div>
         </div>
       )}

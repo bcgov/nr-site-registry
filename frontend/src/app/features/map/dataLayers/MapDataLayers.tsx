@@ -9,17 +9,21 @@ export function MapDataLayers() {
     return null;
   }
 
-  return Array.from(selectedDataLayers).map((selectedLayer) => {
-    const { name, url, layers } = DATA_LAYERS[selectedLayer];
+  return (
+    <>
+      {Array.from(selectedDataLayers).map((selectedLayer) => {
+        const { name, url, layers } = DATA_LAYERS[selectedLayer];
 
-    return (
-      <WMSTileLayer
-        key={`DataLayer-${name}`}
-        url={url}
-        layers={layers}
-        format="image/png"
-        transparent
-      />
-    );
-  });
+        return (
+          <WMSTileLayer
+            key={`DataLayer-${name}`}
+            url={url}
+            layers={layers}
+            format="image/png"
+            transparent
+          />
+        );
+      })}
+    </>
+  );
 }

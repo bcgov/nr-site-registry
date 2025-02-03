@@ -13,13 +13,14 @@ import {
   JsonParam,
   useQueryParams,
 } from 'use-query-params';
-import { ActiveToolEnum } from '../../../constants/Constant';
+import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../../constants/Constant';
 import { LayerKey } from '../dataLayers/Layers';
 
 const acceptedParams = {
   site: StringParam,
   search: StringParam,
   polygon: JsonParam,
+  circle: JsonParam,
 };
 interface MapSearchContextType {
   selectedSiteId: string | null;
@@ -38,9 +39,15 @@ interface MapSearchContextType {
   deletePolygon: () => void;
   activeTool: ActiveToolEnum | null;
   setActiveTool: (tool: ActiveToolEnum | null) => void;
+  center: LatLngTuple | null;
+  setCenterOnCrossHairClick: (newCenter: LatLngTuple) => void;
+  handleRadiusChange: (value: number | number[]) => void;
+  clearRadiusSearch: () => void;
+  handleRadiusToolClick: () => void;
   selectedDataLayers: Set<LayerKey>;
   toggleDataLayerSelection: (layer: LayerKey) => void;
   resetDataLayers: () => void;
+  radius: number;
 }
 
 export const MapSearchContext = createContext<MapSearchContextType>({
@@ -57,6 +64,12 @@ export const MapSearchContext = createContext<MapSearchContextType>({
   deletePolygon: () => {},
   activeTool: null,
   setActiveTool: () => {},
+  radius: MIN_CIRCLE_RADIUS,
+  center: null,
+  setCenterOnCrossHairClick: () => {},
+  handleRadiusChange: () => {},
+  clearRadiusSearch: () => {},
+  handleRadiusToolClick: () => {},
   selectedDataLayers: new Set(),
   toggleDataLayerSelection: () => {},
   resetDataLayers: () => {},
@@ -78,11 +91,25 @@ export const MapSearchQueryProvider = ({
     new Set<LayerKey>(),
   );
 
+  const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
+  const [center, setCenter] = useState<LatLngTuple | null>(null);
+
   useEffect(() => {
-    const { polygon } = query;
+    const { polygon, circle } = query;
     if (polygon && Array.isArray(polygon) && polygon.length > 2) {
       setActiveToolState(ActiveToolEnum.polygonSearch);
     }
+
+    if (circle) {
+      setActiveToolState(ActiveToolEnum.radiusSearch);
+    }
+
+    // This is to make sure the center picks the value from the query params on page reload
+    setCenter(query.circle?.center || null);
+
+    // This is to make sure the radius picks the value from the query params on page reload
+    setRadius(query.circle?.radius || MIN_CIRCLE_RADIUS);
+
     // This should only run on the initial load to read the query params
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -141,6 +168,41 @@ export const MapSearchQueryProvider = ({
     setSelectedDataLayers(new Set());
   };
 
+  const setCenterOnCrossHairClick = (newCenter: LatLngTuple) => {
+    setCenter(newCenter);
+    setQuery(
+      { circle: { center: newCenter, radius: radius || MIN_CIRCLE_RADIUS } },
+      'replace',
+    );
+  };
+
+  const handleRadiusChange = (value: number | number[]) => {
+    const newRadius = Math.max(
+      Array.isArray(value) ? value[0] : value,
+      MIN_CIRCLE_RADIUS,
+    );
+
+    setRadius(newRadius);
+
+    if (center && newRadius >= MIN_CIRCLE_RADIUS) {
+      setQuery(
+        { circle: { center, radius: newRadius || MIN_CIRCLE_RADIUS } },
+        'replace',
+      );
+    }
+  };
+
+  const clearRadiusSearch = () => {
+    clearQuery();
+    setActiveToolState(null);
+    setRadius(MIN_CIRCLE_RADIUS);
+  };
+
+  const handleRadiusToolClick = () => {
+    setActiveTool(ActiveToolEnum.radiusSearch);
+    setRadius(MIN_CIRCLE_RADIUS);
+  };
+
   return (
     <MapSearchContext.Provider
       value={{
@@ -160,6 +222,12 @@ export const MapSearchQueryProvider = ({
         selectedDataLayers,
         toggleDataLayerSelection,
         resetDataLayers,
+        radius: (query.circle && query.circle.radius) || MIN_CIRCLE_RADIUS,
+        center: (query.circle && query.circle.center) || null,
+        setCenterOnCrossHairClick,
+        handleRadiusChange,
+        clearRadiusSearch,
+        handleRadiusToolClick,
       }}
     >
       {children}

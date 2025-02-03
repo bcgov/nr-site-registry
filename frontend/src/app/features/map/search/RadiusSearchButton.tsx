@@ -1,6 +1,7 @@
 import { Button } from '@mui/material';
 import clsx from 'clsx';
 import { MapPin } from '../../../components/common/icon';
+import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 
 interface Props {
   isActive: boolean;

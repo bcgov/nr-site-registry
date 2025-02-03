@@ -152,6 +152,7 @@ export const graphqlSiteDetailsQueryForLoggedIn = () => {
           generalDescription
           siteRiskCode
           whenUpdated
+          srAction
         }
         httpStatusCode
       }

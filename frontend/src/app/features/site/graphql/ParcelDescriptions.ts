@@ -34,6 +34,7 @@ export const graphQLParcelDescriptionBySiteId = () => {
           landDescription
           srAction
           userAction
+          srValue
         }
       }
     }

@@ -9,6 +9,7 @@ export interface IParcelDescriptionDto {
   landDescription: string;
   srAction: string;
   userAction: string;
+  srValue: boolean;
 }
 
 export interface IParcelDescriptionSaveDto extends IParcelDescriptionDto {

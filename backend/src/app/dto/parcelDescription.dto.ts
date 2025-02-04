@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { IsInt, IsDate, IsString } from 'class-validator';
+import { IsInt, IsDate, IsString, IsBoolean } from 'class-validator';
 import { PagedResponseDto } from './response/response.dto';
+import { SRApprovalStatusEnum } from '../common/srApprovalStatusEnum';
 
 @ObjectType()
 export class ParcelDescriptionsResponse extends PagedResponseDto {
@@ -41,6 +42,7 @@ export class ParcelDescriptionDto {
     this.landDescription = landDescription ? landDescription : '';
     this.userAction = userAction ? userAction : '';
     this.srAction = srAction ? srAction : '';
+    this.srValue = srAction === SRApprovalStatusEnum.PUBLIC ? true : false;
   }
   @Field()
   @IsInt()
@@ -69,4 +71,8 @@ export class ParcelDescriptionDto {
   @Field()
   @IsString()
   srAction: string;
+
+  @Field()
+  @IsBoolean()
+  srValue: boolean;
 }

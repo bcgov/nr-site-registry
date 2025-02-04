@@ -72,6 +72,7 @@ describe('Parcel Descriptions Component', () => {
             landDescription: 'first land description',
             srAction: '',
             userAction: '',
+            srValue: false,
           },
           {
             id: '12',
@@ -81,6 +82,7 @@ describe('Parcel Descriptions Component', () => {
             landDescription: 'second land description',
             srAction: '',
             userAction: '',
+            srValue: false,
           },
           {
             id: '13',
@@ -90,6 +92,7 @@ describe('Parcel Descriptions Component', () => {
             landDescription: 'third land description',
             srAction: '',
             userAction: '',
+            srValue: false,
           },
           {
             id: '14',
@@ -99,6 +102,7 @@ describe('Parcel Descriptions Component', () => {
             landDescription: 'fourth land description',
             srAction: '',
             userAction: '',
+            srValue: false,
           },
           {
             id: '15',
@@ -108,6 +112,7 @@ describe('Parcel Descriptions Component', () => {
             landDescription: 'fifth land description',
             srAction: '',
             userAction: '',
+            srValue: false,
           },
         ],
         requestStatus: RequestStatus.idle,

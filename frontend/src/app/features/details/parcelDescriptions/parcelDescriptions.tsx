@@ -55,7 +55,8 @@ type ParcelDescriptionsChangeEvent = {
     | 'dateNoted'
     | 'select_all'
     | 'select_row'
-    | 'deleteIcon';
+    | 'deleteIcon'
+    | 'srValue';
   value:
     | string
     | boolean
@@ -388,6 +389,7 @@ const ParcelDescriptions = () => {
       apiAction: UserActionEnum.added,
       srAction: SRApprovalStatusEnum.Pending,
       userAction: '',
+      srValue: false,
     };
     setAddedRows([...addedRows, newRow]);
   };
@@ -486,6 +488,24 @@ const ParcelDescriptions = () => {
           };
           added ? handleAddedRowUpdate(newRow) : handleRowUpdate(newRow);
           break;
+        case 'srValue':
+          let updatedNewRow = null;
+          if (event.value === 'true' || event.value === true) {
+            updatedNewRow = {
+              ...event.row,
+              srValue: true,
+              srAction: SRApprovalStatusEnum.Public,
+            };
+          } else {
+            updatedNewRow = {
+              ...event.row,
+              srValue: false,
+              srAction: SRApprovalStatusEnum.Private,
+            };
+          }
+
+          handleRowUpdate(updatedNewRow);
+          break;
       }
     }
   };
@@ -526,7 +546,10 @@ const ParcelDescriptions = () => {
   }, [updatedRows, addedRows, deletedRows]);
 
   React.useEffect(() => {
-    if (viewMode == SiteDetailsMode.EditMode) {
+    if (
+      viewMode === SiteDetailsMode.EditMode ||
+      viewMode === SiteDetailsMode.SRMode
+    ) {
       // Merge rows from DB with user edited rows upon the update of either.
       const newMergedRows = dbRows.map((dbRow) => {
         const match = updatedRows.find((updatedRow) => {

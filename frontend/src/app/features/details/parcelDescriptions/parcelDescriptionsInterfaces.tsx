@@ -43,4 +43,8 @@ export interface IParcelDescriptionsState {
   sortBy: string;
   sortByDir: string;
   sortByInputValue: { [key: string]: any };
+  updatedRows: IParcelDescriptionSaveDto[];
+  mergedRows: IParcelDescriptionDto[];
+  addedRows: IParcelDescriptionSaveDto[];
+  deletedRows: IParcelDescriptionSaveDto[];
 }

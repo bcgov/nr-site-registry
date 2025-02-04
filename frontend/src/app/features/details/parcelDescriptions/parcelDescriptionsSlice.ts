@@ -21,6 +21,10 @@ export const initialParcelDescriptionsState: IParcelDescriptionsState = {
   sortBy: 'id',
   sortByDir: 'ASC',
   sortByInputValue: {},
+  updatedRows: [],
+  mergedRows: [],
+  addedRows: [],
+  deletedRows: [],
 };
 
 export const fetchParcelDescriptions = createAsyncThunk(
@@ -70,6 +74,18 @@ export const parcelDescriptionsSlice = createSlice({
     updateSortByInputValue: (state, action) => {
       state.sortByInputValue = action.payload;
     },
+    updateUpdatedRows: (state, action) => {
+      state.updatedRows = action.payload;
+    },
+    updateMergedRows: (state, action) => {
+      state.mergedRows = action.payload;
+    },
+    updateAddedRows: (state, action) => {
+      state.addedRows = action.payload;
+    },
+    updateDeletedRows: (state, action) => {
+      state.deletedRows = action.payload;
+    },
     resetAllDataForSite: (state, action) => {
       state.siteId = action.payload;
       state.currentPage = initialParcelDescriptionsState.currentPage;
@@ -81,6 +97,10 @@ export const parcelDescriptionsSlice = createSlice({
       state.sortByDir = initialParcelDescriptionsState.sortByDir;
       state.sortByInputValue = initialParcelDescriptionsState.sortByInputValue;
       state.totalResults = initialParcelDescriptionsState.totalResults;
+      state.updatedRows = initialParcelDescriptionsState.updatedRows;
+      state.mergedRows = initialParcelDescriptionsState.mergedRows;
+      state.addedRows = initialParcelDescriptionsState.addedRows;
+      state.deletedRows = initialParcelDescriptionsState.deletedRows;
     },
   },
   extraReducers: (builder) => {
@@ -117,6 +137,10 @@ export const {
   updateSortBy,
   updateSortByDir,
   updateSortByInputValue,
+  updateUpdatedRows,
+  updateMergedRows,
+  updateAddedRows,
+  updateDeletedRows,
   resetAllDataForSite,
 } = parcelDescriptionsSlice.actions;
 

@@ -9,12 +9,16 @@ import {
   initialParcelDescriptionsState,
   parcelDescriptions,
   resetAllDataForSite,
+  updateAddedRows,
   updateCurrentPage,
+  updateDeletedRows,
+  updateMergedRows,
   updateResultsPerPage,
   updateSearchParam,
   updateSortBy,
   updateSortByDir,
   updateSortByInputValue,
+  updateUpdatedRows,
 } from './parcelDescriptionsSlice';
 import {
   getAddDeleteParcelDescriptionTableColumns,
@@ -120,19 +124,19 @@ const ParcelDescriptions = () => {
   );
   const [updatedRows, setUpdatedRows] = React.useState<
     IParcelDescriptionSaveDto[]
-  >([]);
+  >(reduxState.updatedRows);
   const [mergedRows, setMergedRows] = React.useState<IParcelDescriptionDto[]>(
-    [],
+    reduxState.mergedRows,
   );
   const [selectedRows, setSelectedRows] = React.useState<
     IParcelDescriptionDto[]
   >([]);
   const [addedRows, setAddedRows] = React.useState<IParcelDescriptionSaveDto[]>(
-    [],
+    reduxState.addedRows,
   );
   const [deletedRows, setDeletedRows] = React.useState<
     IParcelDescriptionSaveDto[]
-  >([]);
+  >(reduxState.deletedRows);
 
   const handleSelectPage = (newPage: number) => {
     if (newPage !== currentPage) {
@@ -254,7 +258,7 @@ const ParcelDescriptions = () => {
       } as IParcelDescriptionSaveDto);
     }
 
-    setUpdatedRows(newUpdatedRows);
+    dispatch(updateUpdatedRows(newUpdatedRows));
     dispatch(
       trackChanges(
         new ChangeTracker(
@@ -279,7 +283,7 @@ const ParcelDescriptions = () => {
         }
       },
     );
-    setAddedRows(newAddedRows);
+    dispatch(updateAddedRows(newAddedRows));
     dispatch(
       trackChanges(
         new ChangeTracker(
@@ -297,7 +301,7 @@ const ParcelDescriptions = () => {
       }
       return true;
     });
-    setAddedRows(newAddedRows);
+    dispatch(updateAddedRows(newAddedRows));
     // TODO: There needs to be a way to remove the change tracker entry.
   };
 
@@ -308,7 +312,7 @@ const ParcelDescriptions = () => {
       }
       return true;
     });
-    setDeletedRows(newDeletedRows);
+    dispatch(updateDeletedRows(newDeletedRows));
     // TODO: There needs to be a way to remove the change tracker entry.
   };
 
@@ -391,7 +395,7 @@ const ParcelDescriptions = () => {
       userAction: '',
       srValue: false,
     };
-    setAddedRows([...addedRows, newRow]);
+    dispatch(updateAddedRows([...addedRows, newRow]));
   };
 
   const handleDeleteRows = () => {
@@ -403,7 +407,7 @@ const ParcelDescriptions = () => {
         } as IParcelDescriptionSaveDto;
       }),
     );
-    setDeletedRows(newDeletedRows);
+    dispatch(updateDeletedRows(newDeletedRows));
     newDeletedRows.forEach((deletedRow) => {
       dispatch(
         trackChanges(
@@ -561,16 +565,16 @@ const ParcelDescriptions = () => {
           return dbRow;
         }
       });
-      setMergedRows(newMergedRows);
+      dispatch(updateMergedRows(newMergedRows));
     } else {
-      setMergedRows(dbRows);
+      dispatch(updateMergedRows(dbRows));
     }
   }, [dbRows, updatedRows, viewMode]);
 
   React.useEffect(() => {
     if (resetDetails) {
       fetchNewParcelDescriptions({});
-      setUpdatedRows([]);
+      dispatch(updateUpdatedRows([]));
     }
   }, [resetDetails, saveSiteDetailsRequestStatus]);
 
@@ -585,6 +589,10 @@ const ParcelDescriptions = () => {
     setSortByDir(reduxState.sortByDir);
     setSortByInputValue(reduxState.sortByInputValue);
     setTotalResults(reduxState.totalResults);
+    setUpdatedRows(reduxState.updatedRows);
+    setMergedRows(reduxState.mergedRows);
+    setAddedRows(reduxState.addedRows);
+    setDeletedRows(reduxState.deletedRows);
   }, [reduxState]);
 
   const addRemoveButtons = () => {

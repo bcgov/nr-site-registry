@@ -1,43 +1,48 @@
 import { Slider, Typography } from '@mui/material';
-
 import clsx from 'clsx';
-import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../../constants/Constant';
+import {
+  ActiveToolEnum,
+  MAX_CIRCLE_RADIUS,
+  MIN_CIRCLE_RADIUS,
+} from '../../../constants/Constant';
 import { XmarkIcon } from '../../../components/common/icon';
 import DropdownButton from '../DropDownButton';
 import { formatDistance } from '../../../helpers/utility';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../../../components/button/Button';
 import { Site } from '../MapView';
 import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 
 interface RadiusSearchProps {
-  radius: number;
-  setRadius: React.Dispatch<React.SetStateAction<number>>;
   isSmall?: boolean;
   className?: string;
 }
 
 export function RadiusSearch({
-  radius = MIN_CIRCLE_RADIUS,
-  setRadius,
   isSmall = false,
   className,
 }: Readonly<RadiusSearchProps>) {
-  const { setActiveTool } = useMapSearchContext();
-  const [isVisible, setIsVisible] = useState(true);
+  const { center, radius, handleRadiusChange, clearRadiusSearch } =
+    useMapSearchContext();
 
-  const onCancel = () => {
-    setIsVisible(false);
-    setActiveTool(null);
-    setRadius(MIN_CIRCLE_RADIUS);
+  const [localRadius, setLocalRadius] = useState(radius);
+
+  const isCenterValid = center !== null;
+
+  const handleChange = (_ev: any, newValue: number | number[]) => {
+    if (typeof newValue === 'number') {
+      setLocalRadius(newValue);
+    } else if (Array.isArray(newValue) && newValue.length > 0) {
+      setLocalRadius(newValue[0]);
+    }
   };
 
-  const onRadiusChange = (_ev: any, value: number | number[]) => {
-    const newRadius = Math.max(
-      Array.isArray(value) ? value[0] : value,
-      MIN_CIRCLE_RADIUS,
-    );
-    setRadius(newRadius);
+  const handleChangeCommitted = (_ev: any, newValue: number | number[]) => {
+    if (typeof newValue === 'number') {
+      handleRadiusChange(newValue);
+    } else if (Array.isArray(newValue) && newValue.length > 0) {
+      handleRadiusChange(newValue[0]);
+    }
   };
 
   const sliderBox = (
@@ -56,14 +61,15 @@ export function RadiusSearch({
         valueLabelDisplay="off"
         min={MIN_CIRCLE_RADIUS}
         // 500 km is roughly half the size of BC
-        max={500000}
+        max={MAX_CIRCLE_RADIUS}
         step={MIN_CIRCLE_RADIUS}
         defaultValue={MIN_CIRCLE_RADIUS}
-        value={radius}
-        onChange={onRadiusChange}
+        value={localRadius}
+        onChangeCommitted={handleChangeCommitted} //Make fetch request on change commit
+        onChange={handleChange} //This is kept to keep the slider move smoothly without making fetch requests
       />
       <Typography className="point-search-slider-text">
-        {formatDistance(radius, 1)}
+        {formatDistance(localRadius, 1)}
       </Typography>
     </div>
   );
@@ -72,21 +78,20 @@ export function RadiusSearch({
     sliderBox
   ) : (
     <div className={clsx('point-search', className)}>
-      {isVisible && (
-        <>
-          <Button size="medium" onClick={onCancel}>
-            <XmarkIcon />
-            Cancel
-          </Button>
-          <DropdownButton
-            id="pointSearchSetRadiusButton"
-            menuClassName="point-search-menu"
-            dropdownContent={sliderBox}
-          >
-            Set Radius
-          </DropdownButton>
-        </>
-      )}
+      <>
+        <Button size="medium" onClick={clearRadiusSearch}>
+          <XmarkIcon />
+          Cancel
+        </Button>
+        <DropdownButton
+          id="pointSearchSetRadiusButton"
+          menuClassName="point-search-menu"
+          dropdownContent={sliderBox}
+          disabled={!isCenterValid}
+        >
+          Set Radius
+        </DropdownButton>
+      </>
     </div>
   );
 }

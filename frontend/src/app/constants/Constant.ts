@@ -17,6 +17,8 @@ export const MAP_CONTROLS_BOTTOM_SM = 24;
  */
 export const MIN_CIRCLE_RADIUS = 500;
 
+export const MAX_CIRCLE_RADIUS = 500000;
+
 export enum ActiveToolEnum {
   dataLayers = 'dataLayers',
   radiusSearch = 'radiusSearch',

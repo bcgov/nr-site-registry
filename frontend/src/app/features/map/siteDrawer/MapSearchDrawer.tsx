@@ -5,23 +5,21 @@ import { FC, RefObject } from 'react';
 import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 import { SearchResultsDrawerContent } from './SearchResultsDrawerContent';
 import { SiteDetailsDrawerContent } from './SiteDetailsDrawerContent';
-import { ActiveToolEnum } from '../../../constants/Constant';
+import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../../constants/Constant';
 
 interface MapSearchDrawerProps {
   mapRef: RefObject<Map | null>;
   sites: Site[];
   sitesLoading: boolean;
   activeTool: ActiveToolEnum | null;
-  radius: number;
 }
 export const MapSearchDrawer: FC<MapSearchDrawerProps> = ({
   mapRef,
   sites,
   sitesLoading,
   activeTool,
-  radius,
 }) => {
-  const { selectedSiteId, searchTerm, clearQuery, polygonVertices } =
+  const { selectedSiteId, searchTerm, clearQuery, polygonVertices, radius } =
     useMapSearchContext();
 
   const isPolygonValid = polygonVertices.length > 2;
@@ -41,7 +39,7 @@ export const MapSearchDrawer: FC<MapSearchDrawerProps> = ({
         isPolygonValid ||
         (activeTool === ActiveToolEnum.radiusSearch &&
           sites.length > 0 &&
-          radius > 500)
+          radius > MIN_CIRCLE_RADIUS)
       }
       onClose={clearQuery}
       title={drawerTitle}
@@ -55,7 +53,7 @@ export const MapSearchDrawer: FC<MapSearchDrawerProps> = ({
       {!searchTerm &&
         !selectedSiteId &&
         activeTool === ActiveToolEnum.radiusSearch &&
-        radius > 500 && (
+        radius >= MIN_CIRCLE_RADIUS && (
           <SearchResultsDrawerContent
             siteIds={sites.map((site) => site.id)}
             loading={sitesLoading}

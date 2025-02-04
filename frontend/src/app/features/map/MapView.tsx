@@ -10,7 +10,11 @@ import { MyLocationMarker } from './MyLocationMarker'; // Import the MyLocationM
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 import { MapSearch } from './MapSearch';
-import { MapSearchQuery, useMapSearchQuery } from '../../../graphql/generated';
+import {
+  MapSearchQuery,
+  MapSearchQueryVariables,
+  useMapSearchQuery,
+} from '../../../graphql/generated';
 import { SiteMarkers } from './siteMarkers/SiteMarkers';
 import { MapControls } from './MapControls';
 import { MAP_FLY_OPTIONS } from './mapOptions';
@@ -19,9 +23,9 @@ import {
   useMapSearchContext,
 } from './mapSearchContext/MapSearchContext';
 import { MapSearchDrawer } from './siteDrawer/MapSearchDrawer';
-import { MIN_CIRCLE_RADIUS } from '../../constants/Constant';
 import { RadiusSearchLayer } from './layers/RadiusSearchLayer';
 import { PolygonSearchLayer } from './layers/PolygonSearchLayer';
+import { MIN_CIRCLE_RADIUS } from '../../constants/Constant';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -37,13 +41,20 @@ function MapView() {
   // Feature flag for turning OpenStreetMap tiles gray
   const osmGrayscale = false;
 
-  const { searchTerm, activeTool, polygonVertices } = useMapSearchContext();
+  const { searchTerm, activeTool, polygonVertices, center, radius } =
+    useMapSearchContext();
+
+  const variables: MapSearchQueryVariables = {
+    searchParam: searchTerm || '',
+    ...(polygonVertices.length > 0 && { polygon: polygonVertices }),
+  };
+
+  if (center && radius >= MIN_CIRCLE_RADIUS) {
+    variables.circle = { center, radius };
+  }
 
   const { data, loading: sitesLoading } = useMapSearchQuery({
-    variables: {
-      searchParam: searchTerm || '',
-      ...(polygonVertices.length > 0 && { polygon: polygonVertices }),
-    },
+    variables,
     onCompleted: ({ mapSearch: { data } }) => {
       flyToSiteBounds(data);
       setSites(data);
@@ -67,7 +78,6 @@ function MapView() {
 
   const mapRef = useRef<Map>(null);
   const [isLocationVisible, setLocationVisible] = useState(false);
-  const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
   const [sites, setSites] = useState<Site[]>([]);
   const clearSites = () => setSites([]);
 
@@ -101,7 +111,6 @@ function MapView() {
         {<MyLocationMarker isLocationVisible={isLocationVisible} />}
         <SiteMarkers sites={sites} />
         <RadiusSearchLayer
-          radius={radius}
           onCrossHairClick={clearSites}
           sites={sites}
           setSites={setSites}
@@ -113,8 +122,6 @@ function MapView() {
         mapRef={mapRef}
         isLocationVisible={isLocationVisible}
         setLocationVisible={setLocationVisible}
-        radius={radius}
-        setRadius={setRadius}
       />
 
       <MapSearchDrawer
@@ -124,7 +131,6 @@ function MapView() {
         sites={sites}
         sitesLoading={sitesLoading}
         activeTool={activeTool}
-        radius={radius}
       />
     </div>
   );

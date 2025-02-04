@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { HttpException } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { Brackets, EntityManager, Repository } from 'typeorm';
 import { SiteService } from './site.service';
 import { Sites } from '../../entities/sites.entity';
@@ -31,6 +31,7 @@ import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescripti
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Place } from '../../entities/placeEntity';
+import { RadiusSearchParams } from 'src/app/resolvers/site/site.resolver';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -1283,6 +1284,114 @@ describe('SiteService', () => {
       expect(mockQueryBuilder.where).toHaveBeenCalledTimes(1);
       expect(mockQueryBuilder.where).toHaveBeenCalledWith(
         expect.stringContaining('POLYGON((2 1, 20 10, 200 100, 2 1))'),
+      );
+    });
+
+    it('should throw an error if the circle has latitude with value null', () => {
+      const circle: RadiusSearchParams = {
+        center: [null, -123.1207],
+        radius: 1000,
+      };
+
+      expect(async () => siteService.mapSearch({ circle })).rejects.toThrow(
+        new HttpException(
+          'Latitude and longitude cannot be null or undefined',
+          HttpStatus.BAD_REQUEST,
+        ),
+      );
+    });
+
+    it('should throw an error if circle has longitude with value null', () => {
+      const circle: RadiusSearchParams = {
+        center: [50, null],
+        radius: 1000,
+      };
+
+      expect(async () => siteService.mapSearch({ circle })).rejects.toThrow(
+        new HttpException(
+          'Latitude and longitude cannot be null or undefined',
+          HttpStatus.BAD_REQUEST,
+        ),
+      );
+    });
+
+    it('should throw an error if circle has undefined latitude', () => {
+      const circle: RadiusSearchParams = {
+        center: [undefined, -123.1207],
+        radius: 1000,
+      };
+
+      expect(async () => siteService.mapSearch({ circle })).rejects.toThrow(
+        new HttpException(
+          'Latitude and longitude cannot be null or undefined',
+          HttpStatus.BAD_REQUEST,
+        ),
+      );
+    });
+
+    it('should throw an error if circle has undefined longitude', () => {
+      const circle: RadiusSearchParams = {
+        center: [50, undefined],
+        radius: 1000,
+      };
+
+      expect(async () => siteService.mapSearch({ circle })).rejects.toThrow(
+        new HttpException(
+          'Latitude and longitude cannot be null or undefined',
+          HttpStatus.BAD_REQUEST,
+        ),
+      );
+    });
+
+    it('should throw an error if circle has radius less than 500m', () => {
+      const circle: RadiusSearchParams = {
+        center: [120, -123.1207],
+        radius: 200,
+      };
+
+      expect(async () => siteService.mapSearch({ circle })).rejects.toThrow(
+        new HttpException(
+          'Circle radius must be at least 500 meters',
+          HttpStatus.BAD_REQUEST,
+        ),
+      );
+    });
+
+    it('should throw an error if circle has radius more than 500km', () => {
+      const circle: RadiusSearchParams = {
+        center: [120, -123.1207],
+        radius: 600000,
+      };
+
+      expect(async () => siteService.mapSearch({ circle })).rejects.toThrow(
+        new HttpException(
+          'Circle radius cannot exceed 500 km',
+          HttpStatus.BAD_REQUEST,
+        ),
+      );
+    });
+
+    it('should call ST_MakePoint with correct longitude and latitude', () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      const circle: RadiusSearchParams = {
+        center: [49.2827, -123.1207],
+        radius: 1000,
+      };
+
+      siteService.mapSearch({ circle });
+
+      expect(mockQueryBuilder.where).toHaveBeenCalledTimes(1);
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+        expect.stringContaining(`ST_MakePoint(-123.1207, 49.2827)`),
       );
     });
   });

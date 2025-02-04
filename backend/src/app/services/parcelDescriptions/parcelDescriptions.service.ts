@@ -16,6 +16,7 @@ import { ParcelDescriptionInputDTO } from '../../dto/parcelDescriptionInput.dto'
 import { UserActionEnum } from '../../common/userActionEnum';
 import { Subdivisions } from '../../entities/subdivisions.entity';
 import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 @Injectable()
 export class ParcelDescriptionsService {
@@ -437,7 +438,11 @@ export class ParcelDescriptionsService {
       // description. This data comes from LTSA.
 
       siteSubdivision.dateNoted = parcelDescription.dateNoted;
-      siteSubdivision.userAction = parcelDescription.userAction;
+      siteSubdivision.userAction =
+        parcelDescription.srAction === SRApprovalStatusEnum.PUBLIC ||
+        parcelDescription.srAction === SRApprovalStatusEnum.PRIVATE
+          ? UserActionEnum.DEFAULT
+          : UserActionEnum.UPDATED;
       siteSubdivision.srAction = parcelDescription.srAction;
       siteSubdivision.whoUpdated = userInfo?.givenName;
       siteSubdivision.whenUpdated = now;

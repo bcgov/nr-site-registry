@@ -26,6 +26,7 @@ import { MapSearchDrawer } from './siteDrawer/MapSearchDrawer';
 import { RadiusSearchLayer } from './layers/RadiusSearchLayer';
 import { PolygonSearchLayer } from './layers/PolygonSearchLayer';
 import { MIN_CIRCLE_RADIUS } from '../../constants/Constant';
+import { MapDataLayers } from './dataLayers/MapDataLayers';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -117,6 +118,7 @@ function MapView() {
         />
 
         <PolygonSearchLayer />
+        <MapDataLayers />
       </MapContainer>
       <MapSearch
         mapRef={mapRef}

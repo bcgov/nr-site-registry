@@ -14,6 +14,7 @@ import {
   useQueryParams,
 } from 'use-query-params';
 import { ActiveToolEnum, MIN_CIRCLE_RADIUS } from '../../../constants/Constant';
+import { LayerKey } from '../dataLayers/Layers';
 
 const acceptedParams = {
   site: StringParam,
@@ -38,12 +39,15 @@ interface MapSearchContextType {
   deletePolygon: () => void;
   activeTool: ActiveToolEnum | null;
   setActiveTool: (tool: ActiveToolEnum | null) => void;
-  radius: number;
   center: LatLngTuple | null;
   setCenterOnCrossHairClick: (newCenter: LatLngTuple) => void;
   handleRadiusChange: (value: number | number[]) => void;
   clearRadiusSearch: () => void;
   handleRadiusToolClick: () => void;
+  selectedDataLayers: Set<LayerKey>;
+  toggleDataLayerSelection: (layer: LayerKey) => void;
+  resetDataLayers: () => void;
+  radius: number;
 }
 
 export const MapSearchContext = createContext<MapSearchContextType>({
@@ -66,6 +70,9 @@ export const MapSearchContext = createContext<MapSearchContextType>({
   handleRadiusChange: () => {},
   clearRadiusSearch: () => {},
   handleRadiusToolClick: () => {},
+  selectedDataLayers: new Set(),
+  toggleDataLayerSelection: () => {},
+  resetDataLayers: () => {},
 });
 
 export const MapSearchQueryProvider = ({
@@ -80,6 +87,9 @@ export const MapSearchQueryProvider = ({
 
   const [isDrawingPolygon, setIsDrawingPolygon] = useState(false);
   const [drawShapeVertices, setDrawShapeVertices] = useState<LatLngTuple[]>([]);
+  const [selectedDataLayers, setSelectedDataLayers] = useState(
+    new Set<LayerKey>(),
+  );
 
   const [radius, setRadius] = useState(MIN_CIRCLE_RADIUS);
   const [center, setCenter] = useState<LatLngTuple | null>(null);
@@ -142,6 +152,22 @@ export const MapSearchQueryProvider = ({
 
   const clearQuery = () => setQuery({}, 'replace');
 
+  const toggleDataLayerSelection = (layer: LayerKey) => {
+    setSelectedDataLayers((prevSelectedLayers) => {
+      const newSelectedLayers = new Set(prevSelectedLayers);
+      if (newSelectedLayers.has(layer)) {
+        newSelectedLayers.delete(layer);
+      } else {
+        newSelectedLayers.add(layer);
+      }
+      return newSelectedLayers;
+    });
+  };
+
+  const resetDataLayers = () => {
+    setSelectedDataLayers(new Set());
+  };
+
   const setCenterOnCrossHairClick = (newCenter: LatLngTuple) => {
     setCenter(newCenter);
     setQuery(
@@ -193,6 +219,9 @@ export const MapSearchQueryProvider = ({
         deletePolygon,
         activeTool,
         setActiveTool,
+        selectedDataLayers,
+        toggleDataLayerSelection,
+        resetDataLayers,
         radius: (query.circle && query.circle.radius) || MIN_CIRCLE_RADIUS,
         center: (query.circle && query.circle.center) || null,
         setCenterOnCrossHairClick,

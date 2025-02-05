@@ -32,6 +32,7 @@ import {
   AutocompleteItem,
   AutocompleteOption,
 } from './search/AutocompleteOption';
+import { DataLayersMenu } from './dataLayers/DataLayersMenu';
 
 const styles = {
   marginTop: {
@@ -230,6 +231,9 @@ export function MapSearch({
               isLocationVisible={isLocationVisible}
               setLocationVisible={setLocationVisible}
             />
+            <div className="flex-grow-1" /*  spacer element */ />
+
+            <DataLayersMenu />
           </Stack>
         ) : (
           <TextSearchButton />

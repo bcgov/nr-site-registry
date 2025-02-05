@@ -13,6 +13,8 @@ import { Subdivisions } from '../../entities/subdivisions.entity';
 import { SiteSubdivisions } from '../../entities/siteSubdivisions.entity';
 import { ParcelDescriptionType } from '../../dto/parcelDescription.dto';
 import { BadRequestException } from '@nestjs/common';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { UserActionEnum } from '../../common/userActionEnum';
 
 jest.useFakeTimers();
 jest.mock('./parcelDescriptions.queryBuilder');
@@ -1013,8 +1015,8 @@ describe('ParcelDescriptionsService', () => {
           idPinNumber: '654321',
           dateNoted: today,
           landDescription: 'should be ignored',
-          srAction: 'approved',
-          userAction: 'approved',
+          srAction: SRApprovalStatusEnum.PUBLIC,
+          userAction: UserActionEnum.DEFAULT,
           apiAction: 'updated',
           srValue: true,
         },
@@ -1070,8 +1072,8 @@ describe('ParcelDescriptionsService', () => {
       // The whenUpdated is tested separately because there isn't a good jest
       // matcher to test a date property.
       updatedSubdivision = {
-        srAction: 'approved',
-        userAction: 'approved',
+        srAction: SRApprovalStatusEnum.PUBLIC,
+        userAction: UserActionEnum.DEFAULT,
         id: '1',
         dateNoted: today,
         pin: '654321',
@@ -1093,8 +1095,8 @@ describe('ParcelDescriptionsService', () => {
         validPid: null,
       };
       updatedSiteSubdivision = {
-        srAction: 'approved',
-        userAction: 'approved',
+        srAction: SRApprovalStatusEnum.PUBLIC,
+        userAction: UserActionEnum.DEFAULT,
         siteId: '10',
         subdivId: '1',
         dateNoted: today,

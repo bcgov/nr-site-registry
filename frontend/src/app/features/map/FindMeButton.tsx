@@ -1,8 +1,6 @@
-import { Button } from '@mui/material';
-import clsx from 'clsx';
-
 import { FindMe } from '../../components/common/icon';
 import { useGeolocationPermission } from '../../../hooks/useMyLocation';
+import { Button } from '../../components/button/Button';
 
 interface FindMeButtonProps {
   isLocationVisible: boolean;
@@ -24,26 +22,8 @@ export function FindMeButton({
   };
 
   return (
-    <Button
-      variant="contained"
-      size="large"
-      color="secondary"
-      className={clsx(
-        'map-button',
-        'map-button--large',
-        isLocationVisible && 'map-button--active',
-      )}
-      startIcon={
-        <FindMe
-          title="Find me icon"
-          className={clsx(
-            'find-me-icon',
-            isLocationVisible && 'find-me-icon--active',
-          )}
-        />
-      }
-      onClick={onClick}
-    >
+    <Button variant="secondary" className="map-button" onClick={onClick}>
+      <FindMe title="Find me icon" />
       Find Me
     </Button>
   );

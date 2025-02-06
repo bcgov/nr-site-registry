@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import './Button.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'icon';
-export type ButtonSize = 'small' | 'medium';
+export type ButtonSize = 'small' | 'medium' | 'large';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: ButtonSize;

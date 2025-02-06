@@ -30,6 +30,10 @@
   min-height: 40px;
 }
 
+.SITE-Button.large {
+  min-height: 64px;
+}
+
 /* Variant - Primary */
 .SITE-Button.primary {
   background: var(--surface-primary-default);

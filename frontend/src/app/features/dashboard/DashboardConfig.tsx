@@ -91,10 +91,9 @@ export const recentViewedColumns: TableColumn[] = [
       customLinkValue: 'View',
       customInputTextCss: 'custom-dashboard-link',
       tableMode: true,
-      href: 'site/map/',
+      href: '/map?site=',
       customIcon: <FillPinMapFill />,
     },
-    linkRedirectionURL: 'site/map/',
   },
   {
     id: 7,

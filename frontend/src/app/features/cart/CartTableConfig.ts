@@ -46,7 +46,7 @@ export const CartTableColumns: TableColumn[] = [
     displayName: 'Site ID',
     active: true,
     graphQLPropertyName: 'siteId',
-    displayType: getLinkColumnType('', 'id', '', 'site/details/'),
+    displayType: getLinkColumnType('', 'id', '', '/site/details/'),
   },
   {
     id: 2,
@@ -75,7 +75,7 @@ export const CartTableColumns: TableColumn[] = [
   },
   new TableColumn(
     17,
-    'View',
+    'Map',
     true,
     'siteId',
     4,
@@ -83,8 +83,8 @@ export const CartTableColumns: TableColumn[] = [
     true,
     1,
     true,
-    getLinkColumnType('Map', 'id', '', 'site/map/', 'View'),
-    'site/map/',
+    getLinkColumnType('Map', 'id', '', '/map?site=', 'Map'),
+    '/map?site=',
     true,
   ),
   new TableColumn(
@@ -97,8 +97,8 @@ export const CartTableColumns: TableColumn[] = [
     true,
     1,
     true,
-    getLinkColumnType('Details', 'id', '', 'site/details/', 'View'),
-    'site/details/',
+    getLinkColumnType('Details', 'id', '', '/site/details/', 'View'),
+    '/site/details/',
     true,
   ),
   new TableColumn(

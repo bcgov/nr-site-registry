@@ -110,8 +110,8 @@ export const FolioContentTableColumns: TableColumn[] = [
     true,
     1,
     true,
-    getLinkColumnType('Map', 'siteId', '', 'site/map/', 'View'),
-    'site/map/',
+    getLinkColumnType('Map', 'siteId', '', '/map?site=', 'View'),
+    '/map?site=',
     true,
   ),
   new TableColumn(

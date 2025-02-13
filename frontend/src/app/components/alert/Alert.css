@@ -20,7 +20,7 @@
 }
 
 .custom-border {
-  border-bottom: 1px solid var(--support-support-border-color-danger, #ce3e39);
+  border-bottom: 1px solid var(--support-border-color-danger, #ce3e39);
 }
 
 .error-heading {

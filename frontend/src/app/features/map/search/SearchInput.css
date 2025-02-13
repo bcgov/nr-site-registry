@@ -2,14 +2,23 @@
   display: flex;
 }
 
+div.MuiInputBase-root {
+  --map-button-height-large: 64px;
+  --map-button-height-medium: 40px;
+  --map-button-padding-large: 16px 24px;
+  --map-button-padding-medium: 8px 16px;
+  --map-button-font-size-large: 18px;
+  --map-button-font-size-medium: 16px;
+}
+
 div.search-input > div.MuiInputBase-root {
   background-color: var(--surface-color-background-white);
   box-sizing: border-box;
   border-radius: var(--layout-border-radius-medium);
-  border: 1px solid var(--surface-color-border-light);
+  border: 1px solid var(--surface-color-border-default);
   outline: 2px solid transparent;
   transition: all ease-in-out 0.2s;
-  box-shadow: var(--box-shadow-small);
+  box-shadow: var(--surface-shadow-small);
   height: var(--map-button-height-large);
   padding: var(--map-button-padding-large);
 }
@@ -22,8 +31,8 @@ div.search-input--small > div.MuiInputBase-root {
 }
 
 div.search-input > .MuiInputBase-root.Mui-focused {
-  border-color: var(--surface-color-primary-active-border);
-  outline-color: var(--surface-color-primary-active-border);
+  border-color: var(--surface-color-border-active);
+  outline-color: var(--surface-color-border-active);
 }
 
 div.search-input input {
@@ -59,5 +68,5 @@ input:-webkit-autofill:active {
 
 .search-input-icon--active,
 .Mui-focused .search-input-icon--active {
-  color: var(--surface-color-primary-active-border);
+  color: var(--surface-color-border-active);
 }

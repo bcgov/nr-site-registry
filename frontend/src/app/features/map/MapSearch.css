@@ -23,7 +23,7 @@
   z-index: 2;
   top: 45px;
   left: 20px;
-  background: var(--surface-background-white, #ffffff);
+  background: var(--surface-color-background-white, #ffffff);
   gap: 8px;
   border: 0px;
   display: flex;
@@ -71,9 +71,9 @@
   gap: 8px;
   padding: 16px;
   background: var(--surface-color-background-white);
-  border: 1px solid var(--surface-color-border-light);
+  border: 1px solid var(--surface-color-border-default);
   border-radius: 4px;
-  box-shadow: var(--box-shadow-small);
+  box-shadow: var(--surface-shadow-small);
 }
 
 .polygon-search,
@@ -111,7 +111,7 @@
   width: 23px;
   height: 23px;
   background-color: var(--surface-color-primary-default);
-  border: 1px solid var(--surface-color-primary-active-border);
+  border: 1px solid var(--surface-color-border-active);
 }
 
 .point-search-slider .MuiSlider-valueLabel {
@@ -155,6 +155,6 @@ div.search-autocomplete.MuiAutocomplete-hasClearIcon .MuiInputBase-root {
 }
 
 .polygon-vertex {
-  background-color: var(--surface-primary-default);
-  border: 1px solid var(--surface-color-border-light);
+  background-color: var(--surface-color-primary-default);
+  border: 1px solid var(--surface-color-border-default);
 }

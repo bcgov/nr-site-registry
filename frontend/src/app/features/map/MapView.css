@@ -42,21 +42,21 @@
   pointer-events: none;
   width: 18px;
   height: 18px;
-  background-color: var(--surface-color-brand-blue-100);
-  border: 1px solid var(--surface-color-border-light);
-  box-shadow: var(--box-shadow-small);
+  background-color: var(--theme-blue-100);
+  border: 1px solid var(--surface-color-border-default);
+  box-shadow: var(--surface-shadow-small);
 }
 
 .point-search-circle,
 .polygon-search-polygon {
-  stroke: var(--surface-color-brand-blue-100);
+  stroke: var(--theme-blue-100);
   stroke-width: 8;
   fill: #3470b1;
   fill-opacity: 0.5;
 }
 
 .polygon-search-line {
-  stroke: var(--surface-color-brand-blue-70);
+  stroke: var(--theme-blue-70);
   stroke-width: 8;
 }
 

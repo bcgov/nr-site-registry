@@ -21,7 +21,7 @@
   background: var(--surface-color-background-white);
   color: var(--surface-color-primary-hover);
   border: 1px var(--surface-color-primary-hover) solid;
-  box-shadow: var(--box-shadow-small);
+  box-shadow: var(--surface-shadow-small);
   transition: all ease-in-out 0.3s;
 }
 

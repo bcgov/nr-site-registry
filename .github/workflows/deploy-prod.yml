@@ -33,14 +33,11 @@ jobs:
     needs: [deploy_db_prod]
     with:
       environment: prod
-      # TODO - verify below, make sure it gets prod values.
       values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
+      ## Since we don't have PR tags for prod, we just use commit sha.
+      ## Ref_name should always be dev/main branch, but hey, helps provide clarity.
+      tag: ${{ github.ref_name }}-${{ github.sha }}
 
-
-      # TODO - Is there a 'tag' we can add here? We're not doing PR based deployments to prod. Maybe git hash, or some other unique identifier?
-      # tag:  '${{ needs.get-pr-info.outputs.pr }}'
-      # values: 'values.yaml' # TEST env specific values file
-      # TODO - get prod values.yaml here.
 
 
   # schemaspy:

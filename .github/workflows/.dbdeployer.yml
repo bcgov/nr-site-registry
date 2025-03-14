@@ -116,6 +116,9 @@ jobs:
             helm upgrade --install --wait --values ${{ inputs.values }} postgres .
           fi
 
+
+      # QUESTION: Do we want this for prod? If just for dev (and not even test), how do we bypass?
+      # I guess test/prod skip "if: github.event_name == 'pull_request'"
       - name: Add PR specific user to Crunchy DB # only for PRs
         shell: bash
         if: github.event_name == 'pull_request'

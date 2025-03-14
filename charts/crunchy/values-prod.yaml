@@ -9,13 +9,16 @@ crunchy:
         requests:
           storage: 600Mi
       storageClassName: netapp-block-standard
-    walVolumeClaimSpec:  # Move WAL config here
+    walVolumeClaimSpec:
       accessModes:
         - ReadWriteOnce
       resources:
         requests:
           storage: 350Mi
       storageClassName: netapp-block-standard
+  # Explicitly disable shorthand to avoid conflicts
+  dataVolumeClaimSpec.storage: null  # Prevent fallback to values.yaml shorthand
+  dataVolumeClaimSpec.walStorage: null  # Prevent fallback to 450Mi
   pgBackRest:
     backupPath: /backups/prod/cluster/version
     s3:

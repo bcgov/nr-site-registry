@@ -81,6 +81,9 @@ jobs:
   ## Prod Deploy
   ## Curently trigering on merge to dev, we can change if desired
   ## So now, test and prod are identical from a code/commit perspective (differ in envs, db params, etc)
+
+  # 2/4 of the db pods are failing, 2/4 are fine. why?
+
   deploy_db_prod:
     name: Deploys Database
     uses: ./.github/workflows/.dbdeployer.yml
@@ -89,31 +92,18 @@ jobs:
       environment: prod
       values: 'values-prod.yaml'
       app_values: 'values.yaml' # PROD env specific values file for the APP
-  deploys_prod:
-    name: Deploys to PROD
-    uses: ./.github/workflows/.deployer.yml
-    secrets: inherit
-    needs: [deploy_db_prod]
-    with:
-      environment: prod
-      values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
-      # tag:  '${{ needs.get-pr-info.outputs.pr }}'
-      # tag: "${{ github.ref_name }}"-"${{ github.sha }}" | sed 's|/|-|g' | cut -c1-50
-      # tag: "${{ needs.generate_tag.outputs.safe_tag }}" # not working? validate
-      # Tag is hardcoded for now, but 
-
-      # TODO: Replace hardcoded tag with '${{ needs.get-pr-info.outputs.pr }}'
-      tag: '286'
-      # tag:  '${{ needs.get-pr-info.outputs.pr }}'
-
-      ## Since we don't have PR tags for prod, we just use commit sha.
-      ## Ref_name should always be dev/main branch, but hey, helps provide clarity.
-    #   tag: ${{ github.ref_name }}-${{ github.sha }}
-    #   tag: tag: ${{ github.ref_name }}
-    # | sed 's|/|-|g'   # Replace '/' with '-'
-    # | sed 's|[^a-zA-Z0-9._-]||g'   # Remove any other invalid characters
-    # | cut -c1-30    # Limit to 30 characters (adjustable)
-
+  # Temporarily commented out to verify db deploys working
+  # deploys_prod:
+  #   name: Deploys to PROD
+  #   uses: ./.github/workflows/.deployer.yml
+  #   secrets: inherit
+  #   needs: [deploy_db_prod]
+  #   with:
+  #     environment: prod
+  #     values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
+  #     # TODO: Replace hardcoded tag with '${{ needs.get-pr-info.outputs.pr }}'
+  #     tag: '286'
+  #     # tag:  '${{ needs.get-pr-info.outputs.pr }}'
 
 
 

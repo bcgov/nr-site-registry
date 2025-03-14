@@ -13,32 +13,68 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+
+  # PROBLEM - the .deployer.yaml is looking for image with tags that don't exist
+  # The prod file isn't building, just deploying. So we get imagepullerrors, as our generate safe tag is totally new and not existing
+  # Ideally, we want to reference existing images deployed to dev. Or do we want to re-build it? 
+  # But even if we do build it, what tag / ghcr do we use?
+
+  # So how can we get it to to pull the existing images?
+  # builds:
+  #   name: Builds
+  #   runs-on: ubuntu-24.04
+  #   strategy:
+  #     matrix:
+  #       package: [backend, frontend, backend-migration]
+  #       include:
+  #         - package: backend
+  #           build_file: ./backend/Dockerfile
+  #           build_context: backend
+  #         - package: backend-migration
+  #           build_file: ./backend/Dockerfile.migrations
+  #           build_context: backend
+  #         - package: frontend
+  #           build_file: ./frontend/Dockerfile
+  #           build_context: frontend
+  #   timeout-minutes: 10
+  #   steps:
+  #     - uses: bcgov-nr/action-builder-ghcr@v2.2.0
+  #       with:
+  #         package: ${{ matrix.package }}
+  #         tag: ${{ github.event.number }}
+  #         tag_fallback: latest
+  #         triggers: ('${{ matrix.package }}/')
+  #         build_file: ${{ matrix.build_file }}
+  #         build_context: ${{ matrix.build_context }}
+
   # Since we don't use PRs for prod, this helps generate a tag
   # Since we use the tag in Kubernetes, we are limited by characters and length
   # so feat/whatever-12481748147184781374817418471 becomes feat-whatever-1234 (or appropriate length)
   # basically: branch-name-sha
-  generate_tag:
-    name: Generate Safe Tag
-    runs-on: ubuntu-latest
-    outputs:
-      safe_tag: ${{ steps.sanitize_tag.outputs.tag }}
-    steps:
-      - name: Sanitize tag
-        id: sanitize_tag
-        run: |
-          SAFE_TAG=$(echo "${GITHUB_REF_NAME}-${GITHUB_SHA}" | tr '/' '-' | cut -c1-50)
-          echo "tag=$SAFE_TAG" >> $GITHUB_OUTPUT
-  # We don't need PR info for prod? We don't even have it.
-  # get-pr-info:
-  #   runs-on: ubuntu-24.04
+  # generate_tag:
+  #   name: Generate Safe Tag
+  #   runs-on: ubuntu-latest
   #   outputs:
-  #     pr: ${{ steps.vars.outputs.pr }}
+  #     safe_tag: ${{ steps.sanitize_tag.outputs.tag }}
   #   steps:
-  #     - id: vars
-  #       uses: bcgov-nr/action-get-pr@v0.0.1
-  #     - name: Echo PR number
+  #     - name: Sanitize tag
+  #       id: sanitize_tag
   #       run: |
-  #         echo "PR: ${{ steps.vars.outputs.pr }}"
+  #         SAFE_TAG=$(echo "${GITHUB_REF_NAME}-${GITHUB_SHA}" | tr '/' '-' | cut -c1-50)
+  #         echo "tag=$SAFE_TAG" >> $GITHUB_OUTPUT
+  # We don't need PR info for prod? We don't even have it.
+  get-pr-info:
+    # Only run if the branch is 'dev'. If it's a feature branch like feat/ocp-prod, you MUST hardcode the tag below
+    if: github.ref_name == 'dev'  
+    runs-on: ubuntu-24.04
+    outputs:
+      pr: ${{ steps.vars.outputs.pr }}
+    steps:
+      - id: vars
+        uses: bcgov-nr/action-get-pr@v0.0.1
+      - name: Echo PR number
+        run: |
+          echo "PR: ${{ steps.vars.outputs.pr }}"
 
 
 
@@ -64,7 +100,12 @@ jobs:
       values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
       # tag:  '${{ needs.get-pr-info.outputs.pr }}'
       # tag: "${{ github.ref_name }}"-"${{ github.sha }}" | sed 's|/|-|g' | cut -c1-50
-      tag: "${{ needs.generate_tag.outputs.safe_tag }}" # not working? validate
+      # tag: "${{ needs.generate_tag.outputs.safe_tag }}" # not working? validate
+      # Tag is hardcoded for now, but 
+
+      # TODO: Replace hardcoded tag with '${{ needs.get-pr-info.outputs.pr }}'
+      tag: '286'
+      # tag:  '${{ needs.get-pr-info.outputs.pr }}'
 
       ## Since we don't have PR tags for prod, we just use commit sha.
       ## Ref_name should always be dev/main branch, but hey, helps provide clarity.

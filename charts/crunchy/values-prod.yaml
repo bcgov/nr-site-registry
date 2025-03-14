@@ -13,7 +13,6 @@ crunchy:
       enabled: false
     path: ~ 
   pgBackRest:
-    # clusterCounter: 4 # for some reason 1, did not work, putting it to 2 worked, so updating it in pipelines.
     backupPath: /backups/prod/cluster/version # change it for PROD, create values-prod.yaml
     s3:
       enabled: true

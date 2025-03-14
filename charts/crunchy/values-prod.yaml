@@ -1,19 +1,21 @@
 crunchy:
   instances:
-    name: db  # Ensure consistency with base values.yaml
-    replicas: 2 
-    # Attempting to explicitly handle dataVolumeClaimSpec to handle missing pvcs in prod.
-    # unsure why this would be necessary, it's not in dev/test. Is there a glitch with the operator? mistake in my code?
+    name: db
+    replicas: 2
     dataVolumeClaimSpec:
       accessModes:
-        - ReadWriteOnce  # Explicitly define access mode
+        - ReadWriteOnce
       resources:
         requests:
-          storage: 600Mi  # Matches your current setting
-      storageClassName: netapp-block-standard  # Matches your current setting
-      walStorage:
-        storage: 350Mi  # Matches your current setting
-        storageClassName: netapp-block-standard  # Ensure WAL uses the same storage class
+          storage: 600Mi
+      storageClassName: netapp-block-standard
+    walVolumeClaimSpec:  # Move WAL config here
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 350Mi
+      storageClassName: netapp-block-standard
   pgBackRest:
     backupPath: /backups/prod/cluster/version
     s3:

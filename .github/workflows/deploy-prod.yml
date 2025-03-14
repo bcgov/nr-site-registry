@@ -1,5 +1,7 @@
 name: Deploy to PROD
 
+## TODO TODO: Need to replace hardcoded 'tag' with pr tag number. 
+## Can only verify this after we merge into dev which has PRs in it.
 
 on:
   push:
@@ -14,55 +16,9 @@ concurrency:
 
 jobs:
 
-  # PROBLEM - the .deployer.yaml is looking for image with tags that don't exist
-  # The prod file isn't building, just deploying. So we get imagepullerrors, as our generate safe tag is totally new and not existing
-  # Ideally, we want to reference existing images deployed to dev. Or do we want to re-build it? 
-  # But even if we do build it, what tag / ghcr do we use?
 
-  # So how can we get it to to pull the existing images?
-  # builds:
-  #   name: Builds
-  #   runs-on: ubuntu-24.04
-  #   strategy:
-  #     matrix:
-  #       package: [backend, frontend, backend-migration]
-  #       include:
-  #         - package: backend
-  #           build_file: ./backend/Dockerfile
-  #           build_context: backend
-  #         - package: backend-migration
-  #           build_file: ./backend/Dockerfile.migrations
-  #           build_context: backend
-  #         - package: frontend
-  #           build_file: ./frontend/Dockerfile
-  #           build_context: frontend
-  #   timeout-minutes: 10
-  #   steps:
-  #     - uses: bcgov-nr/action-builder-ghcr@v2.2.0
-  #       with:
-  #         package: ${{ matrix.package }}
-  #         tag: ${{ github.event.number }}
-  #         tag_fallback: latest
-  #         triggers: ('${{ matrix.package }}/')
-  #         build_file: ${{ matrix.build_file }}
-  #         build_context: ${{ matrix.build_context }}
-
-  # Since we don't use PRs for prod, this helps generate a tag
-  # Since we use the tag in Kubernetes, we are limited by characters and length
-  # so feat/whatever-12481748147184781374817418471 becomes feat-whatever-1234 (or appropriate length)
-  # basically: branch-name-sha
-  # generate_tag:
-  #   name: Generate Safe Tag
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     safe_tag: ${{ steps.sanitize_tag.outputs.tag }}
-  #   steps:
-  #     - name: Sanitize tag
-  #       id: sanitize_tag
-  #       run: |
-  #         SAFE_TAG=$(echo "${GITHUB_REF_NAME}-${GITHUB_SHA}" | tr '/' '-' | cut -c1-50)
-  #         echo "tag=$SAFE_TAG" >> $GITHUB_OUTPUT
-  # We don't need PR info for prod? We don't even have it.
+  # TODO - After switching to dev brand, verify this works in dev.
+  # Currently can't test it in feat/ocp-prod branch, as no PRs there.
   get-pr-info:
     # Only run if the branch is 'dev'. If it's a feature branch like feat/ocp-prod, you MUST hardcode the tag below
     if: github.ref_name == 'dev'  
@@ -81,9 +37,6 @@ jobs:
   ## Prod Deploy
   ## Curently trigering on merge to dev, we can change if desired
   ## So now, test and prod are identical from a code/commit perspective (differ in envs, db params, etc)
-
-  # 2/4 of the db pods are failing, 2/4 are fine. why?
-
   deploy_db_prod:
     name: Deploys Database
     uses: ./.github/workflows/.dbdeployer.yml
@@ -92,18 +45,17 @@ jobs:
       environment: prod
       values: 'values-prod.yaml'
       app_values: 'values.yaml' # PROD env specific values file for the APP
-  # Temporarily commented out to verify db deploys working
-  # deploys_prod:
-  #   name: Deploys to PROD
-  #   uses: ./.github/workflows/.deployer.yml
-  #   secrets: inherit
-  #   needs: [deploy_db_prod]
-  #   with:
-  #     environment: prod
-  #     values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
-  #     # TODO: Replace hardcoded tag with '${{ needs.get-pr-info.outputs.pr }}'
-  #     tag: '286'
-  #     # tag:  '${{ needs.get-pr-info.outputs.pr }}'
+  deploys_prod:
+    name: Deploys to PROD
+    uses: ./.github/workflows/.deployer.yml
+    secrets: inherit
+    needs: [deploy_db_prod]
+    with:
+      environment: prod
+      values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
+      # TODO: Replace hardcoded tag with '${{ needs.get-pr-info.outputs.pr }}'
+      tag: '286'
+      # tag:  '${{ needs.get-pr-info.outputs.pr }}'
 
 
 

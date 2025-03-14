@@ -9,7 +9,7 @@ on:
 
 concurrency:
   # Cancel in progress for PR open and close
-  group: test
+  group: prod
   cancel-in-progress: false
 
 jobs:
@@ -26,16 +26,21 @@ jobs:
       environment: prod
       values: 'values-prod.yaml'
       app_values: 'values.yaml' # PROD env specific values file for the APP
-  # deploys_prod:
-  #   name: Deploys to PROD
-  #   uses: ./.github/workflows/.deployer.yml
-  #   secrets: inherit
-  #   needs: [get-pr-info, deploy_db]
-  #   with:
-  #     environment: prod
-  #     tag:  '${{ needs.get-pr-info.outputs.pr }}'
-  #     # values: 'values.yaml' # TEST env specific values file
-  #     # TODO - get prod values.yaml here.
+  deploys_prod:
+    name: Deploys to PROD
+    uses: ./.github/workflows/.deployer.yml
+    secrets: inherit
+    needs: [deploy_db_prod]
+    with:
+      environment: prod
+      # TODO - verify below, make sure it gets prod values.
+      values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
+
+
+      # TODO - Is there a 'tag' we can add here? We're not doing PR based deployments to prod. Maybe git hash, or some other unique identifier?
+      # tag:  '${{ needs.get-pr-info.outputs.pr }}'
+      # values: 'values.yaml' # TEST env specific values file
+      # TODO - get prod values.yaml here.
 
 
   # schemaspy:
@@ -44,4 +49,4 @@ jobs:
   #   secrets: inherit
   #   needs: [deploys]
   #   with:
-  #     tag: test
+  #     tag: prod

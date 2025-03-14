@@ -57,7 +57,8 @@ jobs:
     name: Deploys to PROD
     uses: ./.github/workflows/.deployer.yml
     secrets: inherit
-    needs: [deploy_db_prod, generate_tag]
+    # needs: [deploy_db_prod, generate_tag]
+    needs: [deploy_db_prod, get-pr-info]
     with:
       environment: prod
       values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml

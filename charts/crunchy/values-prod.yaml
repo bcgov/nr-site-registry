@@ -1,40 +1,4 @@
-# crunchy:
-#   instances:
-#     - name: db
-#       replicas: 2
-#       dataVolumeClaimSpec:
-#         accessModes:
-#           - ReadWriteOnce
-#         resources:
-#           requests:
-#             storage: 600Mi
-#         storageClassName: netapp-block-standard
-#       walVolumeClaimSpec:
-#         accessModes:
-#           - ReadWriteOnce
-#         resources:
-#           requests:
-#             storage: 350Mi
-#         storageClassName: netapp-block-standard
-#       resources:
-#         requests:
-#           cpu: 50m
-#           memory: 128Mi
-#   pgBackRest:
-#     backupPath: /backups/prod/cluster/version
-#     s3:
-#       enabled: true
-#       retention: 7
-#       bucket: nrsiteprd
-#       endpoint: nrs.objectstore.gov.bc.ca
-#       fullBackupSchedule: 0 0/4 * * *
-#       incrementalBackupSchedule: 0 1,6,11,17,23 * * *
-#     pvc:
-#       enabled: false
-#   pgmonitor:
-#     enabled: true
-# Only ovverride values-test.yaml if the environment is TEST with the following values as a delta:
-crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single postgres
+crunchy:
   instances:
     dataVolumeClaimSpec:
       # TODO, want to increase to 1Gi, but low on space now, that was the issue.
@@ -42,14 +6,14 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       storageClassName: netapp-block-standard
       walStorage: 100Mi
   clone:
-    enabled: false # enable it when the cluster needs to be cloned.
+    enabled: false 
     s3:
       enabled: false
     pvc:
       enabled: false
-    path: ~ #provide the proper path to source the cluster. ex: /backups/test/cluster/version/1
+    path: ~ 
   pgBackRest:
-    clusterCounter: 4 # for some reason 1, did not work, putting it to 2 worked, so updating it in pipelines.
+    # clusterCounter: 4 # for some reason 1, did not work, putting it to 2 worked, so updating it in pipelines.
     backupPath: /backups/prod/cluster/version # change it for PROD, create values-prod.yaml
     s3:
       enabled: true

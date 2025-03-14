@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev
-      # - feat/ocp-prod # Remove this before accepting PR! We desire this only to happen when merging to dev.
 
 concurrency:
   # Cancel in progress for PR open and close

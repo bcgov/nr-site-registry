@@ -70,10 +70,10 @@ jobs:
   #     # TODO - get prod values.yaml here.
 
 
-  schemaspy:
-    name: Schemaspy
-    uses: ./.github/workflows/.schema-spy.yml
-    secrets: inherit
-    needs: [deploys]
-    with:
-      tag: test
+  # schemaspy:
+  #   name: Schemaspy
+  #   uses: ./.github/workflows/.schema-spy.yml
+  #   secrets: inherit
+  #   needs: [deploys]
+  #   with:
+  #     tag: test

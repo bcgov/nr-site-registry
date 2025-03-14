@@ -13,40 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  get-pr-info:
-    runs-on: ubuntu-24.04
-    outputs:
-      pr: ${{ steps.vars.outputs.pr }}
-    steps:
-      - id: vars
-        uses: bcgov-nr/action-get-pr@v0.0.1
-      - name: Echo PR number
-        run: |
-          echo "PR: ${{ steps.vars.outputs.pr }}"
-
-  # TODO - Re-enable this after finishing up work. For now, bypassing test and only caring about prod.
-
-  # Test Deploy
-
-  # deploy_db:
-  #   name: Deploys Database
-  #   uses: ./.github/workflows/.dbdeployer.yml
-  #   secrets: inherit
-  #   with:
-  #     environment: test
-  #     values: 'values-test.yaml'
-  #     app_values: 'values.yaml' # TEST env specific values file for the APP
-  # deploys:
-  #   name: Deploys to TEST
-  #   uses: ./.github/workflows/.deployer.yml
-  #   secrets: inherit
-  #   needs: [get-pr-info, deploy_db]
-  #   with:
-  #     environment: test
-  #     tag:  '${{ needs.get-pr-info.outputs.pr }}'
-  #     values: 'values.yaml' # TEST env specific values file
-
-
+  # We don't need PR info for prod.
 
   ## Prod Deploy
   ## Curently trigering on merge to dev, we can change if desired

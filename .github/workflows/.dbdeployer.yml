@@ -107,7 +107,7 @@ jobs:
         shell: bash
         run: |
           echo 'Deploying crunchy helm chart'
-          echo 'Targetting: ${{ inputs.oc_server }}'
+          echo 'Targetting: ${{ inputs.oc_server }} in namespace: ${{ inputs.oc_namespace }}'
           # if [ ${{ inputs.s3_enabled }} == true ]; then
           #   helm upgrade --install --wait --set crunchy.pgBackRest.s3.enabled=true \
           #    --set-string crunchy.pgBackRest.s3.accessKey=${{ secrets.s3_access_key }} \

@@ -13,6 +13,21 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Since we don't use PRs for prod, this helps generate a tag
+  # Since we use the tag in Kubernetes, we are limited by characters and length
+  # so feat/whatever-12481748147184781374817418471 becomes feat-whatever-1234 (or appropriate length)
+  # basically: branch-name-sha
+  generate_tag:
+    name: Generate Safe Tag
+    runs-on: ubuntu-latest
+    outputs:
+      safe_tag: ${{ steps.sanitize_tag.outputs.tag }}
+    steps:
+      - name: Sanitize tag
+        id: sanitize_tag
+        run: |
+          SAFE_TAG=$(echo "${GITHUB_REF_NAME}-${GITHUB_SHA}" | tr '/' '-' | cut -c1-50)
+          echo "tag=$SAFE_TAG" >> $GITHUB_OUTPUT
   # We don't need PR info for prod.
 
   ## Prod Deploy
@@ -34,9 +49,18 @@ jobs:
     with:
       environment: prod
       values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
+      # tag: "${{ github.ref_name }}"-"${{ github.sha }}" | sed 's|/|-|g' | cut -c1-50
+      tag: "${{ needs.generate_tag.outputs.safe_tag }}"
+
       ## Since we don't have PR tags for prod, we just use commit sha.
       ## Ref_name should always be dev/main branch, but hey, helps provide clarity.
-      tag: ${{ github.ref_name }}-${{ github.sha }}
+    #   tag: ${{ github.ref_name }}-${{ github.sha }}
+    #   tag: tag: ${{ github.ref_name }}
+    # | sed 's|/|-|g'   # Replace '/' with '-'
+    # | sed 's|[^a-zA-Z0-9._-]||g'   # Remove any other invalid characters
+    # | cut -c1-30    # Limit to 30 characters (adjustable)
+
+
 
 
 

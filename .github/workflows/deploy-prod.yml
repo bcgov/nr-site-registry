@@ -17,28 +17,28 @@ jobs:
   # Since we use the tag in Kubernetes, we are limited by characters and length
   # so feat/whatever-12481748147184781374817418471 becomes feat-whatever-1234 (or appropriate length)
   # basically: branch-name-sha
-  # generate_tag:
-  #   name: Generate Safe Tag
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     safe_tag: ${{ steps.sanitize_tag.outputs.tag }}
-  #   steps:
-  #     - name: Sanitize tag
-  #       id: sanitize_tag
-  #       run: |
-  #         SAFE_TAG=$(echo "${GITHUB_REF_NAME}-${GITHUB_SHA}" | tr '/' '-' | cut -c1-50)
-  #         echo "tag=$SAFE_TAG" >> $GITHUB_OUTPUT
-  # # We don't need PR info for prod.
-  get-pr-info:
-    runs-on: ubuntu-24.04
+  generate_tag:
+    name: Generate Safe Tag
+    runs-on: ubuntu-latest
     outputs:
-      pr: ${{ steps.vars.outputs.pr }}
+      safe_tag: ${{ steps.sanitize_tag.outputs.tag }}
     steps:
-      - id: vars
-        uses: bcgov-nr/action-get-pr@v0.0.1
-      - name: Echo PR number
+      - name: Sanitize tag
+        id: sanitize_tag
         run: |
-          echo "PR: ${{ steps.vars.outputs.pr }}"
+          SAFE_TAG=$(echo "${GITHUB_REF_NAME}-${GITHUB_SHA}" | tr '/' '-' | cut -c1-50)
+          echo "tag=$SAFE_TAG" >> $GITHUB_OUTPUT
+  # We don't need PR info for prod? We don't even have it.
+  # get-pr-info:
+  #   runs-on: ubuntu-24.04
+  #   outputs:
+  #     pr: ${{ steps.vars.outputs.pr }}
+  #   steps:
+  #     - id: vars
+  #       uses: bcgov-nr/action-get-pr@v0.0.1
+  #     - name: Echo PR number
+  #       run: |
+  #         echo "PR: ${{ steps.vars.outputs.pr }}"
 
 
 
@@ -57,14 +57,14 @@ jobs:
     name: Deploys to PROD
     uses: ./.github/workflows/.deployer.yml
     secrets: inherit
-    # needs: [deploy_db_prod, generate_tag]
-    needs: [deploy_db_prod, get-pr-info]
+    needs: [deploy_db_prod, generate_tag]
+    # needs: [deploy_db_prod, get-pr-info]
     with:
       environment: prod
       values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
-      tag:  '${{ needs.get-pr-info.outputs.pr }}'
+      # tag:  '${{ needs.get-pr-info.outputs.pr }}'
       # tag: "${{ github.ref_name }}"-"${{ github.sha }}" | sed 's|/|-|g' | cut -c1-50
-      # tag: "${{ needs.generate_tag.outputs.safe_tag }}" # not working? validate
+      tag: "${{ needs.generate_tag.outputs.safe_tag }}" # not working? validate
 
       ## Since we don't have PR tags for prod, we just use commit sha.
       ## Ref_name should always be dev/main branch, but hey, helps provide clarity.

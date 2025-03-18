@@ -15,6 +15,7 @@ describe('siteDetailsSlice', () => {
         siteAssociationsData: ['siteAssociationsData'],
         siteId: '123',
         sitesSummary: ['sitesSummary'],
+        parentBucket: ['parentBucket'],
       };
 
       const result = reducer(initialState, resetSaveSiteDetails(null));
@@ -28,6 +29,7 @@ describe('siteDetailsSlice', () => {
           profilesData: null,
           siteAssociationsData: null,
           sitesSummary: null,
+          parentBucket: null,
         }),
       );
     });
@@ -44,6 +46,7 @@ describe('siteDetailsSlice', () => {
         siteAssociationsData: ['siteAssociationsData'],
         siteId: '123',
         sitesSummary: ['sitesSummary'],
+        parentBucket: ['parentBucket'],
       };
 
       const result = reducer(initialState, resetSaveSiteDetails(null));
@@ -62,6 +65,7 @@ describe('siteDetailsSlice', () => {
         siteAssociationsData: ['siteAssociationsData'],
         siteId: '123',
         sitesSummary: ['sitesSummary'],
+        parentBucket: ['parentBucket'],
       };
 
       const result = reducer(initialState, resetSaveSiteDetails(null));

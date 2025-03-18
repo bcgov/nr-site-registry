@@ -127,7 +127,7 @@ export const GetDocumentsConfig = () => {
     [
       {
         type: FormFieldType.DropDownWithSearch,
-        label: 'Author',
+        label: 'Authors',
         placeholder: 'Author....',
         graphQLPropertyName: 'psnorgId',
         value: '',

@@ -88,7 +88,10 @@ describe('DocumentService', () => {
           rwmNoteFlag: null,
           userAction: 'pending',
           srAction: 'pending',
-          filePath: '',
+          bucketId: '1',
+          objectId: '1',
+          whenDeleted: new Date(),
+          whoDeleted: 'User',
           siteDocPartics: [
             {
               id: '1',
@@ -106,6 +109,8 @@ describe('DocumentService', () => {
               sdoc: null, // Assigning SiteDocs entity
               userAction: 'pending',
               srAction: 'pending',
+              whenDeleted: new Date(),
+              whoDeleted: 'User',
             },
           ],
           site: sampleSites[0],
@@ -214,7 +219,10 @@ describe('DocumentService', () => {
         rwmNoteFlag: null,
         userAction: 'pending',
         srAction: 'pending',
-        filePath: '',
+        bucketId: '1',
+        objectId: '1',
+        whenDeleted: new Date(),
+        whoDeleted: 'User',
         siteDocPartics: [
           {
             id: '1',
@@ -232,6 +240,8 @@ describe('DocumentService', () => {
             sdoc: null, // Assigning SiteDocs entity
             srAction: 'pending',
             userAction: 'pending',
+            whenDeleted: new Date(),
+            whoDeleted: 'User',
           },
         ],
         site: sampleSites[0],

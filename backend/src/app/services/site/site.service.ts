@@ -948,7 +948,6 @@ export class SiteService {
 
         // Delete existing site documents and site document participants in bulk
         if (deleteDocuments?.length > 0) {
-          // here i need to delete or call api to s3 object to soft delete the file
           await Promise.all(
             deleteDocuments.map(({ id, changes }) =>
               transactionalEntityManager.update(SiteDocs, { id }, changes),

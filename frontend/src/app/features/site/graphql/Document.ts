@@ -18,8 +18,11 @@ export const graphQLSiteDocumentsBySiteId = () => {
           title
           displayName
           organizationName
-          filePath
+          bucketId
+          objectId
           srAction
+          whenCreated
+          whenUpdated
         }
       }
     }

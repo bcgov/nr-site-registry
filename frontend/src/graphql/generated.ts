@@ -149,11 +149,12 @@ export type DocParticRoleCd = {
 
 export type DocumentDto = {
   __typename?: 'DocumentDto';
+  bucketId?: Maybe<Scalars['String']['output']>;
   displayName?: Maybe<Scalars['String']['output']>;
   docParticId?: Maybe<Scalars['String']['output']>;
   documentDate?: Maybe<Scalars['String']['output']>;
-  filePath?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
+  objectId?: Maybe<Scalars['String']['output']>;
   organizationName?: Maybe<Scalars['String']['output']>;
   psnorgId?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
@@ -162,15 +163,18 @@ export type DocumentDto = {
   submissionDate: Scalars['String']['output'];
   title: Scalars['String']['output'];
   userAction: Scalars['String']['output'];
+  whenCreated: Scalars['DateTime']['output'];
+  whenUpdated?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type DocumentInputDto = {
   apiAction?: InputMaybe<Scalars['String']['input']>;
+  bucketId: Scalars['String']['input'];
   displayName?: InputMaybe<Scalars['String']['input']>;
   docParticId?: InputMaybe<Scalars['String']['input']>;
   documentDate?: InputMaybe<Scalars['String']['input']>;
-  filePath?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
+  objectId: Scalars['String']['input'];
   organizationName?: InputMaybe<Scalars['String']['input']>;
   psnorgId: Scalars['String']['input'];
   siteId: Scalars['String']['input'];
@@ -223,8 +227,8 @@ export type EventPartics = {
   psnorgId: Scalars['String']['output'];
   rwmFlag?: Maybe<Scalars['Float']['output']>;
   spId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
-  userAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated: Scalars['DateTime']['output'];
   whoCreated: Scalars['String']['output'];
@@ -269,8 +273,8 @@ export type Events = {
   site: Sites;
   siteId: Scalars['String']['output'];
   spId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
-  userAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
@@ -388,8 +392,8 @@ export type LandHistories = {
   rwmNoteFlag: Scalars['Float']['output'];
   siteId: Scalars['String']['output'];
   siteProfile?: Maybe<Scalars['String']['output']>;
-  srAction: Scalars['String']['output'];
-  userAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
@@ -649,6 +653,7 @@ export type ParcelDescriptionDto = {
   idPinNumber: Scalars['String']['output'];
   landDescription: Scalars['String']['output'];
   srAction: Scalars['String']['output'];
+  srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
 };
 
@@ -996,8 +1001,8 @@ export type SiteAssocs = {
   rwmNoteFlag?: Maybe<Scalars['Float']['output']>;
   siteId: Scalars['String']['output'];
   siteIdAssociatedWith: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
-  userAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated: Scalars['DateTime']['output'];
   whoCreated: Scalars['String']['output'];
@@ -1026,31 +1031,36 @@ export type SiteDocPartics = {
   rwmFlag?: Maybe<Scalars['Float']['output']>;
   sdocId: Scalars['String']['output'];
   spId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
-  userAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
+  whenDeleted?: Maybe<Scalars['DateTime']['output']>;
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
+  whoDeleted?: Maybe<Scalars['String']['output']>;
   whoUpdated?: Maybe<Scalars['String']['output']>;
 };
 
 export type SiteDocs = {
   __typename?: 'SiteDocs';
+  bucketId: Scalars['String']['output'];
   documentDate?: Maybe<Scalars['DateTime']['output']>;
-  filePath?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
   note?: Maybe<Scalars['String']['output']>;
+  objectId: Scalars['String']['output'];
   rwmFlag?: Maybe<Scalars['Float']['output']>;
   rwmNoteFlag?: Maybe<Scalars['Float']['output']>;
   siteDocPartics: Array<SiteDocPartics>;
   siteId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   submissionDate: Scalars['DateTime']['output'];
   title: Scalars['String']['output'];
-  userAction: Scalars['String']['output'];
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
+  whenDeleted?: Maybe<Scalars['DateTime']['output']>;
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
+  whoDeleted?: Maybe<Scalars['String']['output']>;
   whoUpdated?: Maybe<Scalars['String']['output']>;
 };
 
@@ -1083,8 +1093,8 @@ export type SiteParticRoles = {
   prCode2: ParticRoleCd;
   rwmFlag?: Maybe<Scalars['Float']['output']>;
   spId: Scalars['String']['output'];
-  srAction: Scalars['String']['output'];
-  userAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
@@ -1103,8 +1113,8 @@ export type SitePartics = {
   rwmNoteFlag?: Maybe<Scalars['Float']['output']>;
   siteId: Scalars['String']['output'];
   siteParticRoles: Array<SiteParticRoles>;
-  srAction: Scalars['String']['output'];
-  userAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
@@ -1216,8 +1226,8 @@ export type SiteProfiles = {
   siteRegDateEntered?: Maybe<Scalars['DateTime']['output']>;
   siteRegDateRecd?: Maybe<Scalars['DateTime']['output']>;
   siteRegParticId?: Maybe<Scalars['String']['output']>;
-  srAction: Scalars['String']['output'];
-  userAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
@@ -1274,9 +1284,9 @@ export type SiteSubdivisions = {
   siteId: Scalars['String']['output'];
   siteSubdivId: Scalars['String']['output'];
   sprofDateCompleted: Scalars['DateTime']['output'];
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   subdivId: Scalars['String']['output'];
-  userAction: Scalars['String']['output'];
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated: Scalars['DateTime']['output'];
   whoCreated: Scalars['String']['output'];
@@ -1370,11 +1380,11 @@ export type Sites = {
   siteRiskCode: Scalars['String']['output'];
   siteRiskCode2: SiteRiskCd;
   siteSubdivisions: SiteSubdivisions;
-  srAction: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
   srStatus: Scalars['String']['output'];
   sstCode: Scalars['String']['output'];
   sstCode2: SiteStatusCd;
-  userAction: Scalars['String']['output'];
+  userAction?: Maybe<Scalars['String']['output']>;
   victoriaFileNo?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;

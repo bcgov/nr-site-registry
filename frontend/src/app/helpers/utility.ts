@@ -123,12 +123,11 @@ export const generateRequestId = () => {
   return nanoid();
 };
 
-export const getAxiosInstance = () => {
+export const getAxiosInstance = (URL?: string) => {
   const user = getUser();
 
   const instance = axios.create({
-    baseURL: API,
-    // timeout: 2000,
+    baseURL: URL ?? API,
     headers: {
       Authorization: `Bearer ${user?.access_token || ''}`,
       requestID: generateRequestId(),
@@ -542,10 +541,9 @@ export const validateForm = (
 
 export const removeProperty = (obj: any, propertyName: string): any => {
   // If obj is a Date object, return it as is (without modification)
-  if (obj instanceof Date) {
+  if (obj instanceof Date || obj instanceof File) {
     return obj;
   }
-
   // If obj is an array, recursively process each element
   if (Array.isArray(obj)) {
     return obj.map((item) => removeProperty(item, propertyName));
@@ -566,4 +564,14 @@ export const removeProperty = (obj: any, propertyName: string): any => {
 
   // Return the value if it's neither an array nor an object (i.e., a primitive)
   return obj;
+};
+
+export const dateFormatSR = (date: Date) => {
+  const formatDate = new Date(date);
+  const formattedDate = formatDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  return formattedDate;
 };

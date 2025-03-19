@@ -158,7 +158,10 @@ describe('SnapshotService', () => {
       rwmNoteFlag: null,
       userAction: 'pending',
       srAction: 'public',
-      filePath: '',
+      bucketId: '1',
+      objectId: '1',
+      whenDeleted: new Date(),
+      whoDeleted: 'User',
       siteDocPartics: [
         {
           id: '1',
@@ -176,6 +179,8 @@ describe('SnapshotService', () => {
           sdoc: null, // Assigning SiteDocs entity
           userAction: 'pending',
           srAction: 'pending',
+          whenDeleted: new Date(),
+          whoDeleted: 'Tester',
         },
       ],
       site: sampleSites[0],

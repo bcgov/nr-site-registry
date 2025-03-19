@@ -1,26 +1,19 @@
-import { Button } from '@mui/material';
-import clsx from 'clsx';
 import { DrawPolygon } from '../../../components/common/icon';
+import { Button } from '../../../components/button/Button';
 
 interface Props {
   isActive: boolean;
   onClick: () => void;
 }
-export function PolygonSearchButton({ isActive, onClick }: Readonly<Props>) {
+export function PolygonSearchButton({ onClick }: Readonly<Props>) {
   return (
     <Button
       color="secondary"
-      size="medium"
-      variant="contained"
-      className={clsx('map-button map-button--medium')}
-      startIcon={
-        <DrawPolygon
-          title="Polygon search icon"
-          className="polygon-search-icon"
-        />
-      }
+      variant="secondary"
+      className="map-button"
       onClick={onClick}
     >
+      <DrawPolygon title="Polygon search icon" />
       Polygon Search
     </Button>
   );

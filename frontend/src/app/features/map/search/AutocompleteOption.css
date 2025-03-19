@@ -8,7 +8,7 @@
 }
 
 .autocomplete-item:hover {
-  background-color: var(--surface-color-brand-gray-20);
+  background-color: var(--theme-gray-20);
 }
 
 .autocomplete-icon {

@@ -21,7 +21,7 @@
   /* margin: auto;  */
   position: relative;
   border-radius: var(--layout-border-width-medium);
-  background: var(--surface-background-white);
+  background: var(--surface-color-background-white);
 }
 
 .custom-modal-header {

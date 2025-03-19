@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSnapshotDto } from '../../dto/snapshot.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { Sites } from '../../entities/sites.entity';
 import { EventPartics } from '../../entities/eventPartics.entity';
 import { SitePartics } from '../../entities/sitePartics.entity';
@@ -261,8 +261,12 @@ export class SnapshotsService {
         where: {
           siteId, // Filter for main table
           srAction: SRApprovalStatusEnum.PUBLIC, // Filter for main table
+          whoDeleted: IsNull(),
+          whenDeleted: IsNull(),
           siteDocPartics: {
             srAction: SRApprovalStatusEnum.PUBLIC, // Filter for related siteDocPartics
+            whoDeleted: IsNull(),
+            whenDeleted: IsNull(),
           },
         },
       });

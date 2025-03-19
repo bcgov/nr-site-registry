@@ -807,13 +807,16 @@ export class SiteService {
               // Only fetch the MAX(id) when adding new documents
               currentDocMaxId += 1;
               documentId = currentDocMaxId.toString();
+              const currentDate = new Date();
               newDocuments.push({
                 ...siteDocument,
                 id: documentId,
                 userAction: UserActionEnum.ADDED,
                 srAction: SRApprovalStatusEnum.PENDING,
-                whenCreated: new Date(),
+                whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
+                whenUpdated: currentDate,
+                whoUpdated: userInfo ? userInfo.givenName : '',
               });
 
               currentDocParticsMaxId += 1;
@@ -825,8 +828,10 @@ export class SiteService {
                 dprCode: 'ATH', // dprCode is always ATH. We don't have a UI for this value and keeping this column allows us to maintain historical data.
                 userAction: UserActionEnum.ADDED,
                 srAction: SRApprovalStatusEnum.PENDING,
-                whenCreated: new Date(),
+                whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
+                whenUpdated: currentDate,
+                whoUpdated: userInfo ? userInfo.givenName : '',
               });
 
               break;
@@ -1040,21 +1045,25 @@ export class SiteService {
                 // Get the ID of the newly created participant
                 currentSiteParticMaxId += 1;
                 participantId = currentSiteParticMaxId.toString();
-
+                const currentDate = new Date();
                 newSitePartics.push({
                   ...sitePartic,
                   id: participantId,
                   userAction: UserActionEnum.ADDED,
-                  whenCreated: new Date(),
+                  whenCreated: currentDate,
                   whoCreated: userInfo ? userInfo.givenName : '',
+                  whenUpdated: currentDate,
+                  whoUpdated: userInfo ? userInfo.givenName : '',
                 });
 
                 newSiteParticRoles.push({
                   ...siteParticRole,
                   spId: participantId,
                   userAction: UserActionEnum.ADDED,
-                  whenCreated: new Date(),
+                  whenCreated: currentDate,
                   whoCreated: userInfo ? userInfo.givenName : '',
+                  whenUpdated: currentDate,
+                  whoUpdated: userInfo ? userInfo.givenName : '',
                 });
                 break;
 
@@ -1213,12 +1222,15 @@ export class SiteService {
             } = partic;
             switch (apiAction) {
               case UserActionEnum.ADDED:
+                const currentDate = new Date();
                 return {
                   ...particData,
                   eventId,
                   userAction: UserActionEnum.ADDED,
-                  whenCreated: new Date(),
+                  whenCreated: currentDate,
                   whoCreated: userInfo ? userInfo.givenName : '',
+                  whenUpdated: currentDate,
+                  whoUpdated: userInfo ? userInfo.givenName : '',
                 };
               case UserActionEnum.UPDATED:
                 const existingPartic =
@@ -1283,14 +1295,16 @@ export class SiteService {
               // Get the ID of the newly created event
               currentNotationMaxId += 1;
               notationId = currentNotationMaxId.toString();
-
+              const currentDate = new Date();
               newEvents.push({
                 ...event,
                 id: notationId,
                 eventDate: new Date(),
                 userAction: UserActionEnum.ADDED,
-                whenCreated: new Date(),
+                whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
+                whenUpdated: currentDate,
+                whoUpdated: userInfo ? userInfo.givenName : '',
               });
               break;
 
@@ -1409,13 +1423,16 @@ export class SiteService {
           const siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
           switch (apiAction) {
             case UserActionEnum.ADDED:
+              const currentDate = new Date();
               newSiteAssociates.push({
                 ...siteAssoc,
                 // Need to know common pid relation as it is non-nullable field in DB and we don't have visibility in our design for same.
                 commonPid: 'N',
                 userAction: UserActionEnum.ADDED,
-                whenCreated: new Date(),
+                whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
+                whenUpdated: currentDate,
+                whoUpdated: userInfo ? userInfo.givenName : '',
               });
               break;
             case UserActionEnum.UPDATED:
@@ -1500,11 +1517,14 @@ export class SiteService {
           };
           switch (apiAction) {
             case UserActionEnum.ADDED:
+              const currentDate = new Date();
               profile = {
                 ...profile,
                 userAction: UserActionEnum.ADDED,
-                whenCreated: new Date(),
+                whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
+                whenUpdated: currentDate,
+                whoUpdated: userInfo ? userInfo.givenName : '',
               };
               break;
             case UserActionEnum.UPDATED:

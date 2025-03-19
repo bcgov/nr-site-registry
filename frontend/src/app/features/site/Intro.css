@@ -1,7 +1,7 @@
 .intro {
   padding: var(--layout-padding-xlarge);
   gap: var(--layout-margin-xxlarge);
-  border-radius: var(--surface-border-radius-medium);
+  border-radius: var(--layout-border-radius-medium);
   border: 1px;
   box-shadow: 0px 3.2px 7.2px 0px #00000021;
   display: flex;
@@ -13,7 +13,7 @@
   width: 36px;
   height: 4px;
   gap: 0px;
-  background-color: var(--surface-brand-gold-60);
+  background-color: var(--theme-gold-60);
 }
 
 .intro-heading {

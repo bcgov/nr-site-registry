@@ -48,7 +48,7 @@
 
 .sidebar-container {
   width: var(--sidebar-default-width);
-  z-index: 100;
+  z-index: 1300;
 }
 
 .content-container {

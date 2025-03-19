@@ -25,7 +25,7 @@
   display: flex;
   flex-direction: column;
   background: var(--surface-brand-blue-10);
-  border: 1px solid var(--surface-border-medium, #898785);
+  border: 1px solid var(--surface-color-border-medium, #898785);
 }
 
 .external-purchase-info {

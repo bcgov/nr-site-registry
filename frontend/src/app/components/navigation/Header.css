@@ -1,6 +1,6 @@
 header {
   /* background-color: #053662; */
-  border-bottom: 1px solid var(--surface-color-border-light);
+  border-bottom: 1px solid var(--surface-color-border-default);
   /* padding: 0 65px 0 65px; */
   padding: 0px var(--layout-padding-xlarge) 0px var(--layout-padding-xlarge) !important;
   color: var(--typography-color-link);
@@ -22,7 +22,7 @@ header h1 {
   margin: 5px 5px 0 18px;
   visibility: hidden;
   font-size: 24px;
-  border-left: 1px solid var(--surface-color-border-light);
+  border-left: 1px solid var(--surface-color-border-default);
   padding-left: 24px;
 }
 
@@ -111,8 +111,8 @@ header .other {
 .mobile-menu {
   margin-bottom: var(--layout-margin-xxxlarge);
   z-index: 1000;
-  border-bottom-left-radius: var(--surface-border-radius-medium);
-  border-bottom-right-radius: var(--surface-border-radius-medium);
+  border-bottom-left-radius: var(--layout-border-radius-medium);
+  border-bottom-right-radius: var(--layout-border-radius-medium);
   box-shadow: 0px 3.2px 7.2px 0px #00000021;
 }
 

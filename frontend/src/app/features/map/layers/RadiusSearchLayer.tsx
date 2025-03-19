@@ -5,7 +5,6 @@ import { Site } from '../MapView';
 import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 import { LatLngTuple, LeafletMouseEvent } from 'leaflet';
 import { CrosshairsTooltipMarker } from '../CrossHairToolTipMarker';
-import { useEffect } from 'react';
 
 interface RadiusSearchLayerProps {
   onCrossHairClick: () => void;
@@ -19,10 +18,13 @@ export function RadiusSearchLayer({
     useMapSearchContext();
   const map = useMap();
 
-  useMapCrosshairsCursor(map, activeTool === ActiveToolEnum.radiusSearch);
+  const radiusSearchEnabled = activeTool === ActiveToolEnum.radiusSearch;
+
+  useMapCrosshairsCursor(map, radiusSearchEnabled);
 
   useMapEvents({
     click: (ev: LeafletMouseEvent) => {
+      if (!radiusSearchEnabled) return;
       const newCenter: LatLngTuple = [ev.latlng.lat, ev.latlng.lng];
       setCenterOnCrossHairClick(newCenter);
       onCrossHairClick();
@@ -31,7 +33,7 @@ export function RadiusSearchLayer({
 
   const drawCircle = center && radius >= MIN_CIRCLE_RADIUS;
 
-  if (activeTool === ActiveToolEnum.radiusSearch) {
+  if (radiusSearchEnabled) {
     return (
       <>
         <CrosshairsTooltipMarker center={center}>

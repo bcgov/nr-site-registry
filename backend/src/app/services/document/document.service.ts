@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SiteDocs } from '../../entities/siteDocs.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { DocumentDto } from '../../dto/document.dto';
 import { UserActionEnum } from '../../common/userActionEnum';
@@ -39,12 +39,17 @@ export class DocumentService {
       if (user?.identity_provider === UserTypeEum.IDIR) {
         if (showPending) {
           result = await this.siteDocsRepository.find({
-            where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
+            where: {
+              siteId,
+              srAction: SRApprovalStatusEnum.PENDING,
+              whoDeleted: IsNull(),
+              whenDeleted: IsNull(),
+            },
             relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
           });
         } else {
           result = await this.siteDocsRepository.find({
-            where: { siteId },
+            where: { siteId, whoDeleted: IsNull(), whenDeleted: IsNull() },
             relations: ['siteDocPartics', 'siteDocPartics.psnorg'],
           });
         }
@@ -92,6 +97,10 @@ export class DocumentService {
           submissionDate: formattedSubmissionDate,
           srAction: res.srAction === SRApprovalStatusEnum.PUBLIC,
           documentDate: formattedDocumentDate,
+          bucketId: res.bucketId,
+          objectId: res.objectId,
+          whenCreated: res.whenCreated,
+          whenUpdated: res.whenUpdated,
         };
 
         // If there are associated siteDocPartics, map them

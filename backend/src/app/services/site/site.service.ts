@@ -756,12 +756,26 @@ export class SiteService {
         const newDocuments: SiteDocs[] = [];
         const updateDocuments: { id: string; changes: Partial<SiteDocs> }[] =
           [];
-        const deleteDocuments: { id: string }[] = [];
+        const deleteDocuments: { id: string; changes: Partial<SiteDocs> }[] =
+          [];
+        const deleteDocumentParticipants: {
+          id: string;
+          changes: Partial<SiteDocPartics>;
+        }[] = [];
         const newDocumentParticipants: SiteDocPartics[] = [];
         const updateDocumentParticipants: {
           id: string;
           changes: Partial<SiteDocPartics>;
         }[] = [];
+
+        // Use the utility function to get the current max ID for the documents table
+        let currentDocMaxId = await this.getMaxId(this.siteDocumentsRepo, 'id');
+
+        // Use the utility function to get the current max ID for the document participants table
+        let currentDocParticsMaxId = await this.getMaxId(
+          this.siteDocumentParticsRepo,
+          'id',
+        );
 
         const siteDocuments = documents.map(async (document) => {
           const {
@@ -790,15 +804,9 @@ export class SiteService {
 
           switch (apiAction) {
             case UserActionEnum.ADDED:
-              //Generate new id for new document
-              const newDocId = await this.siteDocumentsRepo
-                .createQueryBuilder()
-                .select('Max(id)', 'maxid')
-                .getRawOne()
-                .then((result) => (Number(result.maxid) || 0) + 1);
-
-              //Get the Id of newly created document
-              documentId = newDocId.toString();
+              // Only fetch the MAX(id) when adding new documents
+              currentDocMaxId += 1;
+              documentId = currentDocMaxId.toString();
               newDocuments.push({
                 ...siteDocument,
                 id: documentId,
@@ -808,16 +816,11 @@ export class SiteService {
                 whoCreated: userInfo ? userInfo.givenName : '',
               });
 
-              //Generate new id for new document participant.
-              const newDocParticId = await this.siteDocumentParticsRepo
-                .createQueryBuilder()
-                .select('Max(id)', 'maxid')
-                .getRawOne()
-                .then((result) => (Number(result.maxid) || 0) + 1);
-
+              currentDocParticsMaxId += 1;
+              let newDocParticId = currentDocParticsMaxId.toString();
               newDocumentParticipants.push({
                 ...siteDocumentParticipant,
-                id: newDocParticId.toString(),
+                id: newDocParticId,
                 sdocId: documentId,
                 dprCode: 'ATH', // dprCode is always ATH. We don't have a UI for this value and keeping this column allows us to maintain historical data.
                 userAction: UserActionEnum.ADDED,
@@ -880,7 +883,26 @@ export class SiteService {
               }
               break;
             case UserActionEnum.DELETED:
-              deleteDocuments.push({ id: documentId });
+              this.sitesLogger.log(
+                `SiteService.processDocuments(): Document deletion process start();`,
+              );
+              deleteDocuments.push({
+                id: documentId,
+                changes: {
+                  whenDeleted: new Date(),
+                  whoDeleted: userInfo ? userInfo.givenName : '',
+                },
+              });
+              deleteDocumentParticipants.push({
+                id: docParticId,
+                changes: {
+                  whenDeleted: new Date(),
+                  whoDeleted: userInfo ? userInfo.givenName : '',
+                },
+              });
+              this.sitesLogger.log(
+                `SiteService.processDocuments(): Document deletion process end();`,
+              );
               break;
             default:
               this.sitesLogger.warn(
@@ -927,8 +949,20 @@ export class SiteService {
         // Delete existing site documents and site document participants in bulk
         if (deleteDocuments?.length > 0) {
           await Promise.all(
-            deleteDocuments.map(({ id }) =>
-              transactionalEntityManager.delete(SiteDocs, { id }),
+            deleteDocuments.map(({ id, changes }) =>
+              transactionalEntityManager.update(SiteDocs, { id }, changes),
+            ),
+          );
+        }
+
+        if (deleteDocumentParticipants?.length > 0) {
+          await Promise.all(
+            deleteDocumentParticipants.map(({ id, changes }) =>
+              transactionalEntityManager.update(
+                SiteDocPartics,
+                { id },
+                changes,
+              ),
             ),
           );
         }
@@ -967,6 +1001,10 @@ export class SiteService {
           changes: Partial<SiteParticRoles>;
         }[] = [];
         const deleteSiteParticRoles: { id: string }[] = [];
+        let currentSiteParticMaxId = await this.getMaxId(
+          this.siteParticipantsRepo,
+          'id',
+        );
 
         // Main processing loop for site participants
         const siteParticsPromises = siteParticipants.map(
@@ -999,15 +1037,9 @@ export class SiteService {
 
             switch (apiAction) {
               case UserActionEnum.ADDED:
-                // Generate new ID for the new participant
-                const newId = await this.siteParticipantsRepo
-                  .createQueryBuilder()
-                  .select('MAX(id)', 'maxid')
-                  .getRawOne()
-                  .then((result) => (Number(result.maxid) || 0) + 1);
-
                 // Get the ID of the newly created participant
-                participantId = newId.toString();
+                currentSiteParticMaxId += 1;
+                participantId = currentSiteParticMaxId.toString();
 
                 newSitePartics.push({
                   ...sitePartic,
@@ -1232,6 +1264,12 @@ export class SiteService {
           });
         };
 
+        // Use the utility function to get the current max ID for the documents table
+        let currentNotationMaxId = await this.getMaxId(
+          this.eventsRepositoryRepo,
+          'id',
+        );
+
         // Main processing loop for events
         const eventPromises = events.map(async (notation) => {
           const { notationParticipant, apiAction, ...eventData } = notation;
@@ -1242,15 +1280,9 @@ export class SiteService {
           };
           switch (apiAction) {
             case UserActionEnum.ADDED:
-              // Generate new ID for the new event
-              const newId = await this.eventsRepositoryRepo
-                .createQueryBuilder()
-                .select('MAX(id)', 'maxid')
-                .getRawOne()
-                .then((result) => (Number(result.maxid) || 0) + 1);
-
               // Get the ID of the newly created event
-              notationId = newId.toString();
+              currentNotationMaxId += 1;
+              notationId = currentNotationMaxId.toString();
 
               newEvents.push({
                 ...event,
@@ -2142,4 +2174,22 @@ export class SiteService {
     entity.whenUpdated = new Date();
     entity.whoUpdated = userInfo?.givenName;
   };
+
+  // Generic function to fetch the max id from any table and column
+  async getMaxId(repository: any, column: string): Promise<number> {
+    try {
+      const result = await repository
+        .createQueryBuilder()
+        .select(`MAX(${column})`, 'maxid')
+        .getRawOne();
+
+      return result?.maxid ? Number(result.maxid) : 0; // Return 0 if no result found
+    } catch (error) {
+      this.sitesLogger.error(
+        `Error fetching max ID from ${repository.metadata.tableName}:`,
+        error,
+      );
+      return 0; // Return 0 on error
+    }
+  }
 }

@@ -35,24 +35,28 @@ echo "schema created"
 # run type orm migrations
 npm run typeorm:run-migrations
 
+echo "Migrations completed."
 
-echo "migrations completed"
+# Disable constraints before seeding, if file exists
+if [ -f "/mnt/sql/disable_constraint.sql" ]; then
+    echo "Disabling constraints..."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/disable_constraint.sql"
+fi
 
 # Check for existence of SEED_DATA_PATH
-# In OpenShift, $SEED_DATA_PATH should point to a PVC that contains storage
-# See ora2pg/openshift/readme.md in this repo for setup of that.
 if [ -n "$SEED_DATA_PATH" ]; then
-    # TODO TODO: DO NOT ACCEPT WITHOUT
-    # Need a safety to only run seed file if db is empty or something? Experiment with restarting it, try adding records, etc.
-    # TODO:  Move this to separate initContainer, just left here to verify it works as we're close.
-
-    # Run the seed data SQL file
     echo "Seed data set, attempting to load."
     PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "$SEED_DATA_PATH"
-    # psql: error: connection to server at "nr-site-registry-143-bitnami-pg" (10.98.70.107), port 5432 failed: fe_sendauth: no password supplied
     echo "Seed data successfully loaded."
 else
     echo "SEED_DATA_PATH is not set. Skipping seed data loading."
 fi
 
+# Enable constraints after seeding, if file exists
+if [ -f "/mnt/sql/enable_constraint.sql" ]; then
+    echo "Enabling constraints..."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/enable_constraint.sql"
+fi
+
+echo "Migration process complete."
 exit 0

@@ -1,10 +1,9 @@
 crunchy:
   instances:
     dataVolumeClaimSpec:
-      # TODO, want to increase to 1Gi, but low on space now, that was the issue.
-      storage: 250Mi
+      storage: 1Gi
       storageClassName: netapp-block-standard
-      walStorage: 100Mi
+      walStorage: 500Mi
   clone:
     enabled: false 
     s3:

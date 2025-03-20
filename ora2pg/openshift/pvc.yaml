@@ -8,4 +8,4 @@ spec:
   resources:
     requests:
     # Prod needs like 900Mi or more, test just 200Mi.
-      storage: 900Mi
+      storage: 1Gi

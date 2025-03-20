@@ -52,7 +52,16 @@ export class DocumentDto extends ChangeAuditObjectTypeDTO {
   title: string;
 
   @Field({ nullable: true })
-  filePath: string | null;
+  bucketId: string | null;
+
+  @Field({ nullable: true })
+  objectId: string | null;
+
+  @Field()
+  whenCreated: Date;
+
+  @Field({ nullable: true })
+  whenUpdated: Date | null;
 }
 
 @InputType()
@@ -93,6 +102,9 @@ export class DocumentInputDTO extends ChangeAuditEntityDTO {
   @IsString()
   title: string;
 
-  @Field({ nullable: true })
-  filePath: string | null;
+  @Field()
+  bucketId: string;
+
+  @Field()
+  objectId: string;
 }

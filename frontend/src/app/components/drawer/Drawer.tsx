@@ -9,6 +9,7 @@ import {
   ChevronUp,
   XmarkIcon2,
 } from '../common/icon';
+import { Button } from '../button/Button';
 
 enum ExpansionState {
   Default,
@@ -188,18 +189,18 @@ export const Drawer: FC<DrawerProps> = ({
       <div className="drawer-header">
         <div className="resize-handle" onMouseDown={enterResizeMode}></div>
 
-        <button
-          className="border-0 bg-transparent"
+        <Button
+          variant="tertiary"
           onClick={() => {
             setExpansion(getNextExpansionStateFromCurrentState(expansion));
           }}
         >
           {getExpandIcon(expansion)}
-        </button>
+        </Button>
         <span>{title}</span>
-        <button className="border-0 bg-transparent" onClick={handleDrawerClose}>
+        <Button variant="tertiary" onClick={handleDrawerClose}>
           <XmarkIcon2 size={20} />
-        </button>
+        </Button>
       </div>
 
       <div className="drawer-body">{children}</div>

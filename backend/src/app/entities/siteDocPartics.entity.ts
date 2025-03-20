@@ -73,6 +73,21 @@ export class SiteDocPartics extends ChangeAuditEntity {
   })
   whenUpdated: Date | null;
 
+  @Field({ nullable: true })
+  @Column('character varying', {
+    name: 'who_deleted',
+    nullable: true,
+    length: 30,
+  })
+  whoDeleted: string | null;
+
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'when_deleted',
+    nullable: true,
+  })
+  whenDeleted: Date | null;
+
   //Make this nullable because we are not using it anymore and keeing it for
   //historical data
   @Field({ nullable: true })

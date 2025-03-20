@@ -623,7 +623,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
       {isDelete && (
         <ModalDialog
           key={v4()}
-          label={`Are you sure to ${isDelete ? 'delete' : 'replace'} associated site ?`}
+          label={`Are you sure to ${isDelete ? 'delete' : 'replace'} site participant(s) ?`}
           closeHandler={(response) => {
             if (response) {
               if (isDelete) {

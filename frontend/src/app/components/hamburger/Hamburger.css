@@ -57,6 +57,6 @@
 }
 
 .custom-toggler {
-  border: 1px solid var(--surface-border-dark);
+  border: 1px solid var(--surface-color-border-dark);
   border-radius: var(--layout-margin-xsmall);
 }

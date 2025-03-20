@@ -1,13 +1,13 @@
 .data-layers-menu-trigger.secondary {
-  border: 1px solid var(--surface-primary-default);
+  border: 1px solid var(--surface-color-primary-default);
   color: var(--typography-color-link);
 }
 
 .data-layers-checkbox {
   transform: scale(1.15);
-  border: 1px solid var(--surface-icons-secondary);
+  border: 1px solid var(--icons-color-secondary);
 }
 
 .data-layers-checkbox:checked {
-  background-color: var(--surface-icons-secondary);
+  background-color: var(--icons-color-secondary);
 }

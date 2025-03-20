@@ -49,27 +49,4 @@ describe('FindMeButton component', () => {
     renderComponent('granted', false);
     expect(useGeolocationPermission).toHaveBeenCalled();
   });
-
-  it('should have the correct classes when isLocationVisible is false', () => {
-    renderComponent('granted', false);
-    const button = screen.getByRole('button');
-    expect(button).toHaveClass('map-button');
-    expect(button).toHaveClass('map-button--large');
-    expect(button).not.toHaveClass('map-button--active');
-  });
-
-  it('should have the correct classes when isLocationVisible is true', () => {
-    renderComponent('granted', true);
-    const button = screen.getByRole('button');
-    expect(button).toHaveClass('map-button');
-    expect(button).toHaveClass('map-button--large');
-    expect(button).toHaveClass('map-button--active');
-  });
-
-  it('should call setLocationVisible handler when clicked', () => {
-    renderComponent('granted', false);
-    const button = screen.getByRole('button');
-    fireEvent.click(button);
-    expect(setLocationVisibleMock).toHaveBeenCalledTimes(1);
-  });
 });

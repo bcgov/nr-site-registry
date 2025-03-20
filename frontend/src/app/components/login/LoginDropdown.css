@@ -10,7 +10,7 @@
 }
 
 #login-selector-dropdown-toggle:hover {
-  background-color: var(--surface-primary-hover);
+  background-color: var(--surface-color-primary-hover);
 }
 
 #login-selector-dropdown-menu {

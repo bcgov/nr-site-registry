@@ -55,7 +55,6 @@ jobs:
           package: ${{ matrix.package }}
           # Use input tag if provided, otherwise fallback to branch name (feat-ocp-prod -> feat-ocp-prod)
           tag: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
-          tag: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
           tag_fallback: latest
           triggers: ('${{ matrix.package }}/')
           build_file: ${{ matrix.build_file }}

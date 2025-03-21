@@ -8,7 +8,18 @@ backend:
   pdb:
     enabled: true
     # Trying to force replicaCount to 1 during deployment so we only run the seed data scripts once.
+
+  # Temporarily going for 1 pod max, so that we only run the SEED_DATA import scripts once, instead of twice concurrently.
   replicaCount: 1
+  autoscaling:
+    #-- enable or disable autoscaling.
+    enabled: true
+    #-- the minimum number of replicas.
+    minReplicas: 1
+    #-- the maximum number of replicas.
+    maxReplicas: 1
+    #-- the target cpu utilization percentage, is from request cpu and NOT LIMIT CPU.
+    targetCPUUtilizationPercentage: 80
 
 frontend:
   pdb:

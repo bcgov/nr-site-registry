@@ -40,6 +40,8 @@ echo "Migrations completed."
 
 
 # Check for existence of SEED_DATA_PATH
+# Do we need to move this into configmap's seed.sh? Unsure which is running.
+echo "Before SEED_DATA_PATH check."
 if [ -n "$SEED_DATA_PATH" ]; then
     echo "SEED_DATA_PATH set."
     # Disable constraints before seeding, if file exists
@@ -48,6 +50,7 @@ if [ -n "$SEED_DATA_PATH" ]; then
         PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/disable_constraint.sql"
     fi
 
+    # below line appears, but not above?
     echo "Seed data set, attempting to load."
     PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "$SEED_DATA_PATH"
     echo "Seed data successfully loaded."

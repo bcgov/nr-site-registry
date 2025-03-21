@@ -44,9 +44,27 @@ data:
       exit 0
     fi
 
+    echo "Seed data set, seed is enabled, and db is blank, disabling constraints."
+    # Disable constraints before seeding, if file exists
+    if [ -f "/mnt/sql/disable_constraint.sql" ]; then
+    echo "Disabling constraints..."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/disable_constraint.sql"
+    fi
+
+
+
     echo "Seed data set, seed is enabled, and db is blank, loading data."
     PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "$SEED_DATA_PATH"
     echo "Seed data successfully loaded."
     exit 0
+
+
+    # Enable constraints after seeding, if file exists
+    if [ -f "/mnt/sql/enable_constraint.sql" ]; then
+    echo "Enabling constraints..."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/enable_constraint.sql"
+    fi
+
+
 
 {{- end }}

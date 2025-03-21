@@ -1,4 +1,9 @@
 # PROD specific overrides
+global:
+  config:
+    seed:
+      enabled: true
+
 backend:
   pdb:
     enabled: true

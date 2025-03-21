@@ -85,7 +85,7 @@ jobs:
     name: Deploys to PROD
     uses: ./.github/workflows/.deployer.yml
     secrets: inherit
-    needs: [deploy_db_prod, builds]
+    needs: [deploy_db_prod]
     with:
       environment: prod
       values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
@@ -94,7 +94,7 @@ jobs:
       # tag: '288'
       # same as the build tag above.
       # tag: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
-      tag: prod-experimental
+      tag: prod
       # tag:  '${{ needs.get-pr-info.outputs.pr }}'
 
 

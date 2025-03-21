@@ -6,7 +6,9 @@ set -e  # Exit immediately if a command exits with a non-zero status
 TEMP_POD="temp-pod"
 PVC_FILE="pvc.yaml"
 POD_FILE="temp-pod.yaml"
-SQL_FILE="data_migration.sql"
+NAMESPACE="c6a6e5-prod"
+# SQL_FILE="data_migration.sql"
+SQL_FILE="output-prod-17march.sql"
 # Contstraints files only exist in prod, not everywhere.
 ENABLE_CONSTRAINT_FILE="enable_constraint.sql"
 DISABLE_CONSTRAINT_FILE="disable_constraint.sql"
@@ -18,11 +20,13 @@ oc apply -f "$PVC_FILE"
 oc apply -f "$POD_FILE"
 
 # Wait for pod to be ready
+echo "Targetting namespace: $NAMESPACE"
 echo "Waiting for pod to be ready..."
 oc wait --for=condition=Ready pod/$TEMP_POD --timeout=60s
 
 # Copy main SQL file
 if [[ -f "$SQL_FILE" ]]; then
+    echo "Starting upload of $SQL_FILE to $TEMP_POD:/mnt/sql/$SQL_FILE"
     oc cp "$SQL_FILE" "$TEMP_POD:/mnt/sql/$SQL_FILE"
     echo "Uploaded $SQL_FILE"
 else
@@ -32,6 +36,7 @@ fi
 
 # Copy optional constraint files (only in production)
 if [[ "$ENV" == "prod" ]]; then
+    echo "Prod enabled, uploading constraint files..."
     if [[ -f "$ENABLE_CONSTRAINT_FILE" ]]; then
         oc cp "$ENABLE_CONSTRAINT_FILE" "$TEMP_POD:/mnt/sql/$ENABLE_CONSTRAINT_FILE"
         echo "Uploaded $ENABLE_CONSTRAINT_FILE"

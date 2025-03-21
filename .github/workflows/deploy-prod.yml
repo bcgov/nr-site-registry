@@ -46,18 +46,18 @@ jobs:
       environment: prod
       values: 'values-prod.yaml'
       app_values: 'values.yaml' # PROD env specific values file for the APP
-  # deploys_prod:
-  #   name: Deploys to PROD
-  #   uses: ./.github/workflows/.deployer.yml
-  #   secrets: inherit
-  #   needs: [deploy_db_prod]
-  #   with:
-  #     environment: prod
-  #     values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
-  #     # TODO: Replace hardcoded tag with '${{ needs.get-pr-info.outputs.pr }}'
-  #     # tag: '286'
-  #     tag: '288'
-      # tag:  '${{ needs.get-pr-info.outputs.pr }}'
+  deploys_prod:
+    name: Deploys to PROD
+    uses: ./.github/workflows/.deployer.yml
+    secrets: inherit
+    needs: [deploy_db_prod]
+    with:
+      environment: prod
+      values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
+      # TODO: Replace hardcoded tag with '${{ needs.get-pr-info.outputs.pr }}'
+      # tag: '286'
+      tag: '288'
+      tag:  '${{ needs.get-pr-info.outputs.pr }}'
 
 
 

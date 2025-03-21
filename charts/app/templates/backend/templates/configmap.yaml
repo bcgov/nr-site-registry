@@ -46,7 +46,7 @@ data:
 
     echo "Seed data set, seed is enabled, and db is blank, disabling constraints."
     # Disable constraints before seeding, if file exists
-    if [ -f "/mnt/sql/disable_constraint.sql" ]; then
+    if [ -f "/mnt/sql/disable_constraints.sql" ]; then
     echo "Disabling constraints..."
     PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/disable_constraint.sql"
     fi
@@ -61,7 +61,7 @@ data:
 
 
     # Enable constraints after seeding, if file exists
-    if [ -f "/mnt/sql/enable_constraint.sql" ]; then
+    if [ -f "/mnt/sql/enable_constraints.sql" ]; then
     echo "Enabling constraints..."
     PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/enable_constraint.sql"
     fi

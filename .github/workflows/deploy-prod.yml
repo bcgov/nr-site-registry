@@ -57,7 +57,7 @@ jobs:
       # TODO: Replace hardcoded tag with '${{ needs.get-pr-info.outputs.pr }}'
       # tag: '286'
       tag: '288'
-      tag:  '${{ needs.get-pr-info.outputs.pr }}'
+      # tag:  '${{ needs.get-pr-info.outputs.pr }}'
 
 
 

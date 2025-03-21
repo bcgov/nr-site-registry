@@ -7,6 +7,8 @@ global:
 backend:
   pdb:
     enabled: true
+    # Trying to force replicaCount to 1 during deployment so we only run the seed data scripts once.
+  replicaCount: 1
 
 frontend:
   pdb:

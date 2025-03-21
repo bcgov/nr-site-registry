@@ -57,7 +57,6 @@ data:
     echo "TEMPORARILY DISABLED LOADING SEED DATA JUST TO VERIFY DEPLOYMENTS - $SEED_DATA_PATH"
     # PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "$SEED_DATA_PATH"
     # echo "Seed data successfully loaded."
-    # exit 0
 
 
     # Enable constraints after seeding, if file exists
@@ -65,6 +64,10 @@ data:
     echo "Enabling constraints..."
     PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/enable_constraint.sql"
     fi
+
+
+    echo "Finish seed.sh script, exiting."
+    exit 0
 
 
 

@@ -26,8 +26,8 @@ oc wait --for=condition=Ready pod/$TEMP_POD --timeout=60s
 
 # Copy main SQL file
 if [[ -f "$SQL_FILE" ]]; then
-    echo "Starting upload of $SQL_FILE to $TEMP_POD:/mnt/sql/$SQL_FILE"
-    oc cp "$SQL_FILE" "$TEMP_POD:/mnt/sql/$SQL_FILE"
+    echo "Starting upload of $SQL_FILE to $TEMP_POD:/mnt/sql/data_migration.sql"
+    oc cp "$SQL_FILE" "$TEMP_POD:/mnt/sql/data_migration.sql"
     echo "Uploaded $SQL_FILE"
 else
     echo "Error: $SQL_FILE not found!"

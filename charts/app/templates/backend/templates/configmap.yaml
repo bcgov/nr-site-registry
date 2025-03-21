@@ -59,10 +59,11 @@ data:
     # echo "Seed data successfully loaded."
 
 
+    # Trying -c "SET synchronous_commit = off;" in the import, this should reduce file pressure for WAL logs.
     # Enable constraints after seeding, if file exists
     if [ -f "/mnt/sql/enable_constraints.sql" ]; then
     echo "Enabling constraints..."
-    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/enable_constraints.sql"
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -c "SET synchronous_commit = off;" -f "/mnt/sql/enable_constraints.sql"
     fi
 
 

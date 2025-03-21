@@ -67,11 +67,6 @@ spec:
                 secretKeyRef:
                   key: user
                   name: postgres-crunchy-pguser-postgres
-          #   - name: SEED_DATA_PATH
-          #     value: "/mnt/sql/data_migration.sql"
-          # volumeMounts:
-          #   - mountPath: /mnt/sql
-          #     name: seed-data-mount
           resources: # this is optional
             requests:
               cpu: {{ .Values.backend.resources.requests.cpu }}

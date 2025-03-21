@@ -2,16 +2,19 @@ This guide describes how to upload a SQL file to a PersistentVolume (PV) and mak
 
 Purpose: We upload the starter yaml (from ora2pg). This makes it readable by all pods, and should work in PR deployments.
 
-## Steps (NEW) using SQL
+## Steps (NEW, using script)
 
 ```bash
 
-
+## Prod only, pass in ENV var, so it uploads constraints too
 ENV=prod ./upload_sql.sh
+
+## If it fails, make sure to delete temp pod
+oc delete temp-pod.
 
 ```
 
-## Steps
+## Steps (Old, manual way)
 
 1. Create a Temporary Pod:
 
@@ -41,18 +44,5 @@ Your SQL file is now available for read access by any pod that mounts the associ
 
 4. Ensure migrations are updated
 
-initDB.sh shou
+initDB.sh / migrations.sh
 
-
-### Debugging Notes
-
-Error, after over 30k lines of `INSERT 0 1`
-
-INSERT 0 1
-psql:/mnt/sql/data_migration.sql:37791: server closed the connection unexpectedly
-This probably means the server terminated abnormally
-before or while processing the request.
-psql:/mnt/sql/data_migration.sql:37791: error: connection to server was lost
-Seed data successfully loaded.
-
-^ for above, the pvc only has 10mb left. Likely out of memory. Increasing space.

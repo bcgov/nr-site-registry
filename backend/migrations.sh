@@ -37,26 +37,31 @@ npm run typeorm:run-migrations
 
 echo "Migrations completed."
 
-# Disable constraints before seeding, if file exists
-if [ -f "/mnt/sql/disable_constraint.sql" ]; then
-    echo "Disabling constraints..."
-    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/disable_constraint.sql"
-fi
+
 
 # Check for existence of SEED_DATA_PATH
 if [ -n "$SEED_DATA_PATH" ]; then
+    echo "SEED_DATA_PATH set."
+    # Disable constraints before seeding, if file exists
+    if [ -f "/mnt/sql/disable_constraint.sql" ]; then
+        echo "Disabling constraints..."
+        PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/disable_constraint.sql"
+    fi
+
     echo "Seed data set, attempting to load."
     PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "$SEED_DATA_PATH"
     echo "Seed data successfully loaded."
+
+    # Enable constraints after seeding, if file exists
+    if [ -f "/mnt/sql/enable_constraint.sql" ]; then
+        echo "Enabling constraints..."
+        PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/enable_constraint.sql"
+    fi
 else
     echo "SEED_DATA_PATH is not set. Skipping seed data loading."
 fi
 
-# Enable constraints after seeding, if file exists
-if [ -f "/mnt/sql/enable_constraint.sql" ]; then
-    echo "Enabling constraints..."
-    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/enable_constraint.sql"
-fi
+
 
 echo "Migration process complete."
 exit 0

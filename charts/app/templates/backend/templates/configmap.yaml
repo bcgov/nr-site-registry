@@ -55,8 +55,8 @@ data:
 
     echo "Seed data set, seed is enabled, and db is blank, loading data."
     echo "TEMPORARILY DISABLED LOADING SEED DATA JUST TO VERIFY DEPLOYMENTS - $SEED_DATA_PATH"
-    # PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "$SEED_DATA_PATH"
-    # echo "Seed data successfully loaded."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "$SEED_DATA_PATH"
+    echo "Seed data successfully loaded."
 
 
     # Trying -c "SET synchronous_commit = off;" in the import, this should reduce file pressure for WAL logs.

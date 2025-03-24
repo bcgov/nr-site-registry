@@ -34,6 +34,7 @@ import { Place } from '../../entities/placeEntity';
 import { RadiusSearchParams } from '../../resolvers/site/site.resolver';
 import { SiteRegistry } from '../../entities/siteRegistry.entity';
 import { find } from 'rxjs';
+import { userInfo } from 'os';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -624,9 +625,15 @@ describe('SiteService', () => {
       entityManager.save = jest.fn();
     });
 
+    let userInfo: any = { givenName: 'test' };
+
     it('should throw an error if siteId is missing', async () => {
       await expect(
-        siteService.updateSiteRegistryLastApprovedDate(entityManager, ''),
+        siteService.updateSiteRegistryLastApprovedDate(
+          entityManager,
+          '',
+          userInfo,
+        ),
       ).rejects.toThrow(
         new HttpException(
           'Failed to update site registry last approved date as Site Id is missing.',
@@ -639,6 +646,7 @@ describe('SiteService', () => {
       await siteService.updateSiteRegistryLastApprovedDate(
         entityManager,
         '123',
+        userInfo,
       );
 
       expect(entityManager.findOne).toHaveBeenCalledWith(SiteRegistry, {
@@ -651,6 +659,7 @@ describe('SiteService', () => {
       await siteService.updateSiteRegistryLastApprovedDate(
         entityManager,
         '1234',
+        userInfo,
       );
 
       expect(entityManager.findOne).toHaveBeenCalled();
@@ -663,7 +672,11 @@ describe('SiteService', () => {
       );
 
       await expect(
-        siteService.updateSiteRegistryLastApprovedDate(entityManager, '123'),
+        siteService.updateSiteRegistryLastApprovedDate(
+          entityManager,
+          '123',
+          userInfo,
+        ),
       ).rejects.toThrow('DB error');
 
       expect(loggerService.log).toHaveBeenCalledWith(

@@ -774,6 +774,7 @@ export class SiteService {
       await this.updateSiteRegistryLastApprovedDate(
         transactionalEntityManager,
         siteId,
+        userInfo,
       );
     }
 
@@ -2158,6 +2159,7 @@ export class SiteService {
         await this.updateSiteRegistryLastApprovedDate(
           transactionalEntityManager,
           site.siteId,
+          userInfo,
         );
       }
 
@@ -2178,6 +2180,7 @@ export class SiteService {
   updateSiteRegistryLastApprovedDate = async (
     transactionalEntityManager: EntityManager,
     siteId: string,
+    userInfo?: any,
   ) => {
     try {
       if (!siteId)
@@ -2194,6 +2197,9 @@ export class SiteService {
       );
       if (siteRegistryRecord !== null) {
         siteRegistryRecord.lastApprovalDate = new Date();
+        siteRegistryRecord.regUserid = userInfo?.givenName
+          ? userInfo?.givenName
+          : '';
         await transactionalEntityManager.save(siteRegistryRecord);
       }
       this.sitesLogger.log(

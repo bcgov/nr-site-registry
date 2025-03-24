@@ -35,6 +35,7 @@ import { Place } from '../../entities/placeEntity';
 import { RadiusSearchParams } from '../../resolvers/site/site.resolver';
 import { SiteRegistry } from '../../entities/siteRegistry.entity';
 import { find } from 'rxjs';
+import { userInfo } from 'os';
 
 describe('SiteService', () => {
   let siteService: SiteService;

@@ -111,6 +111,7 @@ jobs:
             helm upgrade --install --wait --set crunchy.pgBackRest.s3.enabled=true \
              --set-string crunchy.pgBackRest.s3.accessKey=${{ secrets.s3_access_key }} \
               --set-string crunchy.pgBackRest.s3.secretKey=${{ secrets.s3_secret_key }} \
+              --set-string crunchy.pgBackRest.s3.bucket=${{ secrets.s3_bucket }} \
               --values ${{ inputs.values }} postgres  .
           else
             helm upgrade --install --wait --values ${{ inputs.values }} postgres .

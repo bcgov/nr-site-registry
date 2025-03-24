@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Brackets, EntityManager, FindOneOptions, Repository } from 'typeorm';
+import { Brackets, EntityManager, FindOneOptions, Repository } from 'typeorm';
 import { SiteService } from './site.service';
 import { Sites } from '../../entities/sites.entity';
 import { FetchSiteDetail } from '../../dto/response/genericResponse';
@@ -34,7 +35,6 @@ import { Place } from '../../entities/placeEntity';
 import { RadiusSearchParams } from '../../resolvers/site/site.resolver';
 import { SiteRegistry } from '../../entities/siteRegistry.entity';
 import { find } from 'rxjs';
-import { userInfo } from 'os';
 
 describe('SiteService', () => {
   let siteService: SiteService;

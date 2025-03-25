@@ -32,7 +32,36 @@ jobs:
         run: |
           echo "PR: ${{ steps.vars.outputs.pr }}"
 
-
+# Typically, we do not build and deploy in the prod branch, we just re-use tags from other branches.
+# But during development, it's nice to be able to build changes, eg migration changes as we work through prod data import.
+  # builds:
+  #   name: Builds
+  #   runs-on: ubuntu-24.04
+  #   strategy:
+  #     matrix:
+  #       package: [backend, frontend, backend-migration]
+  #       include:
+  #         - package: backend
+  #           build_file: ./backend/Dockerfile
+  #           build_context: backend
+  #         - package: backend-migration
+  #           build_file: ./backend/Dockerfile.migrations
+  #           build_context: backend
+  #         - package: frontend
+  #           build_file: ./frontend/Dockerfile
+  #           build_context: frontend
+  #   timeout-minutes: 10
+  #   steps:
+  #     - uses: bcgov-nr/action-builder-ghcr@v2.2.0
+  #       with:
+  #         package: ${{ matrix.package }}
+  #         # Use input tag if provided, otherwise fallback to branch name (feat-ocp-prod -> feat-ocp-prod)
+  #         # tag: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
+  #         tag: prod-experimental
+  #         tag_fallback: latest
+  #         triggers: ('${{ matrix.package }}/')
+  #         build_file: ${{ matrix.build_file }}
+  #         build_context: ${{ matrix.build_context }}
 
   ## Prod Deploy
   ## Curently trigering on merge to dev, we can change if desired
@@ -49,6 +78,9 @@ jobs:
       environment: prod
       values: 'values-prod.yaml'
       app_values: 'values.yaml' # PROD env specific values file for the APP
+
+      # Problem - if we need latest migration, we also need to change tag stuff.
+      # this is using an old build, it's just deploying it.
   deploys_prod:
     name: Deploys to PROD
     uses: ./.github/workflows/.deployer.yml
@@ -59,7 +91,10 @@ jobs:
       values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
       # TODO: Replace hardcoded tag with '${{ needs.get-pr-info.outputs.pr }}'
       # tag: '286'
-      tag: '288'
+      # tag: '288'
+      # same as the build tag above.
+      # tag: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
+      tag: prod
       # tag:  '${{ needs.get-pr-info.outputs.pr }}'
 
 

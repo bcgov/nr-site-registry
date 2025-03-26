@@ -14,6 +14,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import {
+  dateFormatSR,
   flattenFormRows,
   getAxiosInstance,
   getUser,
@@ -43,13 +44,16 @@ import { IComponentProps } from '../navigation/NavigationPillsConfig';
 import Document from './Document';
 import { GetDocumentsConfig } from './DocumentsConfig';
 import {
+  getParentBucket,
   getSiteDocuments,
   saveRequestStatus,
   setupDocumentsDataForSaving,
+  updateParentBucket,
 } from '../SaveSiteDetailsSlice';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { Button } from '../../../components/button/Button';
+import { createBucket, getObject } from './DocumentEndpoints';
 
 const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   const {
@@ -65,15 +69,13 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   const resetDetails = useSelector(resetSiteDetails);
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
   const trackDocuments = useSelector(getSiteDocuments);
+  const parentBucket = useSelector(getParentBucket);
   const dispatch = useDispatch<AppDispatch>();
 
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [formData, setFormData] =
-    useState<{ [key: string]: any | [Date, Date] }[]>(siteDocuments);
-  const [srTimeStamp, setSRTimeStamp] = useState(
-    'Sent to SR on June 2nd, 2013',
-  );
+    useState<{ [key: string]: any | File | [Date, Date] }[]>(siteDocuments);
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [isDelete, setIsDelete] = useState(false);
@@ -83,6 +85,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [uniqueId, setUniqueId] = useState(Date.now()); // Key for input type="file" element
 
   const [internalRow, setInternalRow] = useState(documentFormRowsEditMode);
+  const [internalDocRow, setInternalDocRow] = useState(documentFormRows);
   const [externalRow, setExternalRow] = useState(
     documentFirstChildFormRowsForExternal,
   );
@@ -165,6 +168,20 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
             },
           }),
         );
+        setInternalDocRow((prev) =>
+          updateFields(prev, {
+            indexToUpdate: prev.findIndex((row) =>
+              row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+            ),
+            updates: {
+              isLoading: RequestStatus.success,
+              options: uniquePsnOrgs,
+              filteredOptions: [],
+              handleSearch,
+              customInfoMessage: <></>,
+            },
+          }),
+        );
         setExternalRow((prev) =>
           updateFields(prev, {
             indexToUpdate: prev.findIndex((row) =>
@@ -181,10 +198,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
         );
       }
 
-      // Always update formData if different
-      if (JSON.stringify(formData) !== JSON.stringify(siteDocuments)) {
-        setFormData(siteDocuments);
-      }
+      setFormData(siteDocuments);
     }
   }, [siteDocuments, status]);
 
@@ -349,62 +363,92 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
     setFormData(sorted);
   };
 
-  const handleParentChekBoxChange = (id: any, value: any) => {
-    alert(`${value}, ${id}`);
-  };
-
-  const handleOnUploadDocument = (event: any) => {
+  const handleOnUploadDocument = async (event: any) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0] ?? null;
-      if (file && file.type === 'application/pdf') {
-        // You can perform additional actions here with the selected file
-        // For example, upload it to a server or process it further
+      if (file) {
+        if (file && file.type === 'application/pdf') {
+          let parentBucketId: string = '';
+          if (parentBucket?.bucketId?.trim().length > 0) {
+            parentBucketId = parentBucket?.bucketId;
+          } else {
+            const bucketName = `sites/${id}`;
+            const bucketKey = `sites/${id}`;
+            const parentBucketRes = await createBucket(bucketName, bucketKey);
+            if (parentBucketRes) {
+              dispatch(
+                updateParentBucket({ bucketId: parentBucketRes?.bucketId }),
+              );
+              parentBucketId = parentBucketRes?.bucketId;
+            }
+          }
 
-        const newDocument = {
-          id: v4(), // Generate a unique ID for the new document
-          docParticId: v4(),
-          siteId: id,
-          psnorgId: '',
-          submissionDate: new Date(),
-          documentDate: new Date(file.lastModified),
-          title: file.name.split('.pdf')[0].trim(),
-          displayName: '',
+          if (parentBucketId.trim().length > 0) {
+            const newDocument = {
+              id: v4(), // Generate a unique ID for the new document
+              docParticId: v4(),
+              siteId: id,
+              psnorgId: '',
+              submissionDate: new Date(),
+              documentDate: new Date(file.lastModified),
+              title: file.name.split('.')[0].trim(),
+              displayName: '',
+              file: file,
+              apiAction: UserActionEnum.added,
+              srAction: SRApprovalStatusEnum.Pending,
+            };
 
-          //this need to be filled once file is uploaded in BC Box
-          filePath: 'Need to give uploaded file path.',
+            const updatedDocuments = [newDocument, ...(formData || [])];
+            setFormData(updatedDocuments);
+            dispatch(updateSiteDocument(updatedDocuments));
+            dispatch(
+              setupDocumentsDataForSaving([
+                newDocument,
+                ...(trackDocuments ?? (formData || [])),
+              ]),
+            );
 
-          apiAction: UserActionEnum.added,
-          srAction: SRApprovalStatusEnum.Pending,
-        };
-        const updatedDocuments = [newDocument, ...(formData || [])];
-        setFormData(updatedDocuments);
-        dispatch(updateSiteDocument(updatedDocuments));
-        dispatch(
-          setupDocumentsDataForSaving([
-            newDocument,
-            ...(trackDocuments ?? (formData || [])),
-          ]),
-        );
-        const tracker = new ChangeTracker(
-          IChangeType.Added,
-          'New Site Document',
-        );
-        dispatch(trackChanges(tracker.toPlainObject()));
-      } else {
-        alert('Please select a valid PDF file.');
+            const tracker = new ChangeTracker(
+              IChangeType.Added,
+              'New Site Document',
+            );
+            dispatch(trackChanges(tracker.toPlainObject()));
+          }
+        } else {
+          alert('Please select a valid PDF file.');
+        }
       }
     }
   };
 
-  const handleViewOnline = () => {
-    alert('View online click');
+  const handleViewOnline = async (document: any) => {
+    if (document?.objectId !== null) {
+      const response = await getObject(document?.objectId);
+      window.open(response, '_blank');
+    }
   };
 
-  const handleDownload = () => {
-    alert('Download click');
+  const handleDownload = async (doc: any) => {
+    if (doc?.objectId !== null) {
+      const response = await getObject(doc?.objectId, 'proxy');
+
+      // Create an object URL for the Blob
+      const objectURL = URL.createObjectURL(response);
+
+      // Create an anchor element to trigger the download
+      const downloadLink = document.createElement('a');
+      downloadLink.href = objectURL; // Set the href to the Blob URL
+      downloadLink.download = doc?.title; // Provide a filename for the download
+
+      // Trigger the download
+      downloadLink.click();
+
+      // Optionally, revoke the object URL after the download
+      URL.revokeObjectURL(objectURL);
+    }
   };
 
-  const handleFileReplace = (
+  const handleFileReplace = async (
     event: any,
     doc: any,
     docIsReplace: boolean = false,
@@ -413,9 +457,6 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
       if (event.target.files && event.target.files.length > 0) {
         const file = event.target.files[0] ?? null;
         if (file && file.type === 'application/pdf') {
-          // You can perform additional actions here with the selected file
-          // For example, upload it to a server or process it further
-
           const updateDocuments = (documents: any) => {
             return documents.map((document: any) => {
               if (document.id === doc.id) {
@@ -423,11 +464,8 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                   ...doc,
                   submissionDate: new Date(),
                   documentDate: new Date(file.lastModified),
-                  title: file.name.split('.pdf')[0].trim(),
-
-                  //this need to be filled once file is uploaded in BC Box
-                  filePath: 'Need to give uploaded file path.',
-
+                  title: file.name.split('.')[0].trim(),
+                  file: file,
                   apiAction: UserActionEnum.updated,
                   srAction: SRApprovalStatusEnum.Pending,
                 };
@@ -476,7 +514,9 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
           if (doc.id === document.id) {
             return {
               ...document,
-              apiAction: UserActionEnum.deleted, // Mark as deleted
+              apiAction: document?.file
+                ? UserActionEnum.default
+                : UserActionEnum.deleted, // Mark as deleted
               srAction: SRApprovalStatusEnum.Pending,
             };
           }
@@ -525,6 +565,11 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
           typeof value === 'object' &&
           value !== null &&
           graphQLPropertyName === 'psnorgId';
+        const isTitle =
+          typeof value === 'string' &&
+          value !== null &&
+          document?.file &&
+          graphQLPropertyName === 'title';
         if (isPsnorgId) {
           let params: UpdateDisplayTypeParams = {
             indexToUpdate: documentFormRows.findIndex((row) =>
@@ -549,14 +594,30 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
             srAction: srActionValue,
           };
         } else {
+          let fileExtension: any;
           updatedDocument = {
             ...document,
             [graphQLPropertyName]: isPsnorgId ? value.key : value,
             displayName: isPsnorgId ? value.value : document.displayName,
             organizationName: isPsnorgId ? value?.metaData : '',
             apiAction: document?.apiAction ?? UserActionEnum.updated,
-            srAction: srActionValue,
+            srAction: srActionValue ?? document.srAction,
           };
+
+          if (isTitle) {
+            const fileName = document?.file?.name;
+            fileExtension = fileName.slice(fileName.lastIndexOf('.'));
+            const updatedFile = new File(
+              [document?.file],
+              `${value}${fileExtension}`,
+              {
+                type: document.file.type, // Keep the original file's type (e.g., application/pdf)
+                lastModified: document.file.lastModified, // Keep the original file's lastModified date
+              },
+            );
+
+            updatedDocument = { ...updatedDocument, file: updatedFile };
+          }
         }
         return updatedDocument;
       }
@@ -730,16 +791,20 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                 viewMode={viewMode}
                 handleInputChange={handleInputChange}
                 document={document}
-                srTimeStamp={srTimeStamp}
-                handleViewOnline={handleViewOnline}
-                handleDownload={handleDownload}
+                srTimeStamp={`Send to SR on ${dateFormatSR(document?.whenUpdated ?? document?.whenCreated ?? new Date())}`}
+                handleViewOnline={() => {
+                  handleViewOnline(document);
+                }}
+                handleDownload={() => {
+                  handleDownload(document);
+                }}
                 handleFileReplace={handleFileReplace}
                 handleFileDelete={handleFileDelete}
                 uniqueId={uniqueId}
                 internalRow={
                   viewMode === SiteDetailsMode.EditMode
                     ? internalRow
-                    : documentFormRows
+                    : internalDocRow
                 }
               />
             </div>

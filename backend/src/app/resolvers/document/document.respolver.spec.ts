@@ -72,10 +72,13 @@ describe('DocumentResolver', () => {
         displayName: 'Display Name',
         submissionDate: new Date('2024-07-17').toISOString(),
         documentDate: new Date('2024-07-17').toISOString(),
-        filePath: '',
         srAction: 'pending',
         userAction: 'pending',
         srValue: false,
+        bucketId: '1',
+        objectId: '1',
+        whenCreated: new Date(),
+        whenUpdated: new Date(),
       },
     ];
     const expectedResult: DocumentResponse = {

@@ -71,6 +71,7 @@ import {
 } from './dropdowns/DropdownSlice';
 import BannerDetails from '../../components/banners/BannerDetails';
 import {
+  getParentBucket,
   getSiteAssociated,
   getSiteDisclosure,
   getSiteDocuments,
@@ -117,6 +118,13 @@ import { GetAssociateConfig } from './associates/AssociateConfig';
 import { GetDocumentsConfig } from './documents/DocumentsConfig';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import {
+  createObject,
+  deleteObject,
+  setFilePublic,
+  updateObject,
+} from './documents/DocumentEndpoints';
+import { HttpStatusCode } from '../../common/httpStatusCode';
 
 const SiteDetails = () => {
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
@@ -163,6 +171,7 @@ const SiteDetails = () => {
   const sitePartics = useSelector(getSiteParticipants);
   const siteAssocs = useSelector(getSiteAssociated);
   const siteDocuments = useSelector(getSiteDocuments);
+  const parentBucket = useSelector(getParentBucket);
   const userActions = [UserActionEnum.added, UserActionEnum.updated];
   const { notationFormRowEditMode, notationColumnInternal } =
     GetNotationConfig();
@@ -526,10 +535,10 @@ const SiteDetails = () => {
   const validateSiteDocumentsForm = async () => {
     try {
       if (siteDocuments?.length > 0) {
-        let updatedSiteDocs = deepFilterByUserAction(
-          siteDocuments,
-          userActions,
-        );
+        let updatedSiteDocs = deepFilterByUserAction(siteDocuments, [
+          ...userActions,
+          UserActionEnum.deleted,
+        ]);
         const errors = validateForm(
           documentFormRowsEditMode,
           updatedSiteDocs,
@@ -771,6 +780,7 @@ const SiteDetails = () => {
   const handleCancelButton = () => {
     dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
     dispatch(clearTrackChanges({}));
+    dispatch(resetSaveSiteDetails(null));
     setSave(false);
     setHasError(false);
     setEdit(false);
@@ -901,6 +911,101 @@ const SiteDetails = () => {
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
+  const saveSiteDocumentData = async () => {
+    try {
+      if (siteDocuments?.length > 0) {
+        // Create an array of promises that will resolve when the deletion and object creation is done
+        const updatedDocumentsPromises = siteDocuments.map(
+          async (document: any) => {
+            if (document?.apiAction === UserActionEnum.added) {
+              const objRes = await createObject(
+                parentBucket?.bucketId,
+                document?.file,
+              );
+              if (objRes?.status === HttpStatusCode.CONFLICT) {
+                setHasError(true);
+                errorList.push({
+                  errorMessage: `${document?.title} is already exists. Same file name is deleted by someone in past. Please change the name of file.`,
+                });
+                return document;
+              } else {
+                // Create the updated document object
+                const updatedSiteDocument = {
+                  ...document,
+                  bucketId: parentBucket?.bucketId,
+                  objectId: objRes?.id,
+                };
+
+                // Delete the file from the document object
+                delete updatedSiteDocument.file;
+
+                // Return the updated document
+                return updatedSiteDocument;
+              }
+            } else if (document?.apiAction === UserActionEnum.updated) {
+              // Create the updated document object
+              const updatedSiteDocument = { ...document };
+              if (document?.file) {
+                const objRes = await updateObject(
+                  document?.objectId,
+                  document?.file,
+                );
+                if (objRes) {
+                  // Delete the file from the document object
+                  delete updatedSiteDocument.file;
+                }
+              }
+              if (document?.srAction === SRApprovalStatusEnum.Public) {
+                // Make file public
+                await setFilePublic(document?.objectId);
+              }
+
+              // Return the updated document
+              delete updatedSiteDocument?.whenCreated;
+              delete updatedSiteDocument?.whenUpdated;
+              return updatedSiteDocument;
+            } else if (document?.apiAction === UserActionEnum.deleted) {
+              const response = await deleteObject(document?.objectId);
+              if (response?.DeleteMarker) {
+                const updatedSiteDocument = { ...document };
+                delete updatedSiteDocument?.whenCreated;
+                delete updatedSiteDocument?.whenUpdated;
+                return updatedSiteDocument;
+              }
+            }
+            return document;
+          },
+        );
+
+        // Wait for all the promises to resolve
+        const updatedDocuments = await Promise.all(updatedDocumentsPromises);
+        if (errorList.length === 0) {
+          // Dispatch the updated documents for saving
+          dispatch(setupDocumentsDataForSaving(updatedDocuments));
+        }
+      }
+    } catch (error) {
+      console.error(`Error: Saving Document: ${error}`);
+      errorList.push('Error in saving or updating document(s)');
+      throw error;
+    }
+  };
+
+  const saveSiteDetailsHandler = async () => {
+    try {
+      // Wait for saveSiteData to complete
+      if (siteDocuments?.length > 0) {
+        await saveSiteDocumentData();
+      }
+      if (errorList.length === 0) {
+        await dispatch(saveSiteDetails()).unwrap();
+      }
+    } catch (error) {
+      console.error('Error while saving site details:', error);
+      throw error;
+    }
+  };
+
   return (
     <>
       {isVisible && (
@@ -1001,80 +1106,16 @@ const SiteDetails = () => {
               }}
             />
           )}
-        {/* {save && !error && errors?.length === 0 && (
-          <ModalDialog
-            closeHandler={(response) => {
-              setSave(false);
-              if (response) {
-                dispatch(saveSiteDetails()).unwrap();
-              }
-            }}
-          >
-            {savedChanges.length > 0 ? (
-              <React.Fragment>
-                <div>
-                  <span className="custom-modal-data-text">
-                    The following fields will be updated:
-                  </span>
-                </div>
-                <div>
-                  <ul className="custom-modal-data-text">
-                    {savedChanges.map((item: any) => (
-                      <li key={item.label}>
-                        {IChangeType[item.changeType]} {item.label}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                <div>
-                  <span className="custom-modal-data-text">
-                    No changes to save
-                  </span>
-                </div>
-              </React.Fragment>
-            )}
-          </ModalDialog>
-        )}
-
-        {save && error && errors?.length > 0 && (
-          <ModalDialog
-            closeHandler={(response) => {
-              setError(false);
-              if (response) {
-                // dispatch(saveSiteDetails()).unwrap();
-              }
-            }}>
-              <React.Fragment>
-                <div>
-                  <span className="custom-modal-data-text text-danger">
-                    The following fields have errors:
-                  </span>
-                </div>
-                <div>
-                  <ul className="custom-modal-data-text text-danger">
-                    {errors.map((item: any) => (
-                      <li key={item.label}>
-                        {IChangeType[item.changeType]} {item.label}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </React.Fragment>
-          </ModalDialog>
-        )} */}
         {(save || hasError) && (
           <ModalDialog
             errorOption={hasError}
             customHeaderCss={hasError ? 'custom-modal-error-header-text' : ''}
             headerLabel={hasError ? 'Please fix the errors' : ''}
-            closeHandler={(response) => {
+            closeHandler={async (response) => {
               setSave(false);
               if (response && errorList?.length === 0) {
                 // Proceed with saving if there are no errors
-                dispatch(saveSiteDetails()).unwrap();
+                await saveSiteDetailsHandler();
               } else {
                 // If there are errors, you can handle accordingly (perhaps reset or keep showing the errors)
                 setHasError(false);
@@ -1099,7 +1140,7 @@ const SiteDetails = () => {
                     {errorList.map((item: any, index) => (
                       <li key={index}>
                         {/* Assuming item has changeType and label */}
-                        {IChangeType[item.changeType]} {item.errorMessage}
+                        {IChangeType[item?.changeType]} {item.errorMessage}
                       </li>
                     ))}
                   </ul>

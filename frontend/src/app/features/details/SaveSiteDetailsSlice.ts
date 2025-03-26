@@ -11,6 +11,7 @@ import { UserActionEnum } from '../../common/userActionEnum';
 
 const initialState: SaveSiteDetails = {
   saveRequestStatus: RequestStatus.idle,
+  parentBucket: null,
   notationData: null,
   siteParticipantData: null,
   documentsData: null,
@@ -54,6 +55,7 @@ const siteDetailsSlice = createSlice({
       newState.siteAssociationsData = null;
       newState.siteId = state.siteId;
       newState.sitesSummary = null;
+      newState.parentBucket = null;
       return newState;
     },
     resetSaveSiteDetailsRequestStatus: (state, action) => {
@@ -127,6 +129,13 @@ const siteDetailsSlice = createSlice({
       newState.profilesData = action.payload;
       return newState;
     },
+    updateParentBucket: (state, action) => {
+      const newState = {
+        ...state,
+      };
+      newState.parentBucket = action.payload;
+      return newState;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -168,6 +177,8 @@ export const getSiteParticipants = (state: any) =>
   state.siteDetails.siteParticipantData;
 export const getSiteAssociated = (state: any) =>
   state.siteDetails.siteAssociationsData;
+export const getParentBucket = (state: any) => state.siteDetails.parentBucket;
+
 export const {
   resetSaveSiteDetailsRequestStatus,
   resetSaveSiteDetails,
@@ -180,6 +191,7 @@ export const {
   setupParcelDescriptionsDataForSaving,
   setupSiteSummaryForSaving,
   setupSiteDisclosureDataForSaving,
+  updateParentBucket,
 } = siteDetailsSlice.actions;
 
 export default siteDetailsSlice.reducer;

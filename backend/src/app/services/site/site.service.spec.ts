@@ -1093,6 +1093,8 @@ describe('SiteService', () => {
       const documents = [
         {
           id: '1',
+          docParticId: '1',
+          displayName: 'Updated Document',
           apiAction: UserActionEnum.DELETED,
         },
       ];
@@ -1100,7 +1102,12 @@ describe('SiteService', () => {
 
       await siteService.processDocuments(documents, userInfo, entityManager);
 
-      expect(entityManager.delete).toHaveBeenCalledWith(SiteDocs, { id: '1' });
+      expect(entityManager.update).toHaveBeenCalledTimes(2); // For SiteDocs and SiteDocPartics
+      expect(entityManager.update).toHaveBeenCalledWith(
+        SiteDocs,
+        { id: '1' },
+        expect.any(Object),
+      );
     });
   });
 

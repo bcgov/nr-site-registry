@@ -15,6 +15,7 @@ export enum SiteActionBtn {
 
 export interface SaveSiteDetails {
   saveRequestStatus: RequestStatus;
+  parentBucket: any;
   notationData: any;
   siteParticipantData: any;
   siteAssociationsData: any;

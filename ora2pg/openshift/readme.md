@@ -6,6 +6,9 @@ Purpose: We upload the starter yaml (from ora2pg). This makes it readable by all
 
 ```bash
 
+## For dev and test, where we don't need constraints, just upload
+./upload_sql.sh
+
 ## Prod only, pass in ENV var, so it uploads constraints too
 ENV=prod ./upload_sql.sh
 

@@ -86,6 +86,7 @@ import { TransactionManagerService } from './services/transactionManager/transac
 import { LoggerService } from './logger/logger.service';
 import { SitePublicResolver } from './resolvers/site/sitePublic.resolver';
 import { Place } from './entities/placeEntity';
+import { SiteRegistry } from './entities/siteRegistry.entity';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -148,6 +149,7 @@ import { Place } from './entities/placeEntity';
       User,
       HistoryLog,
       Place,
+      SiteRegistry,
     ]),
   ],
   providers: [

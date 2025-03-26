@@ -744,6 +744,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         IChangeType.Modified,
         'Notation Participant: ' + currLabel?.displayName,
       );
+      dispatch(trackChanges(tracker.toPlainObject()));
     }
   };
 

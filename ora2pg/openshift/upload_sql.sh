@@ -6,9 +6,10 @@ set -e  # Exit immediately if a command exits with a non-zero status
 TEMP_POD="temp-pod"
 PVC_FILE="pvc.yaml"
 POD_FILE="temp-pod.yaml"
-NAMESPACE="c6a6e5-prod"
+NAMESPACE="SET THIS" # Intentionally wrong so you must set it.
 # SQL_FILE="data_migration.sql"
-SQL_FILE="output-prod-17march.sql"
+# SQL_FILE="output-prod-17march.sql"
+SQL_FILE="output-prod-25march.sql"
 # Contstraints files only exist in prod, not everywhere.
 ENABLE_CONSTRAINT_FILE="enable_constraints.sql"
 DISABLE_CONSTRAINT_FILE="disable_constraints.sql"

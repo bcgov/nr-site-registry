@@ -601,7 +601,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
             displayName: isPsnorgId ? value.value : document.displayName,
             organizationName: isPsnorgId ? value?.metaData : '',
             apiAction: document?.apiAction ?? UserActionEnum.updated,
-            srAction: srActionValue ?? document.srAction,
+            srAction: SRApprovalStatusEnum.Pending,
           };
 
           if (isTitle) {

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { Brackets, EntityManager, Repository } from 'typeorm';
+import { Brackets, EntityManager, FindOneOptions, Repository } from 'typeorm';
 import { SiteService } from './site.service';
 import { Sites } from '../../entities/sites.entity';
 import { FetchSiteDetail } from '../../dto/response/genericResponse';
@@ -31,7 +31,10 @@ import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescripti
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Place } from '../../entities/placeEntity';
-import { RadiusSearchParams } from 'src/app/resolvers/site/site.resolver';
+import { RadiusSearchParams } from '../../resolvers/site/site.resolver';
+import { SiteRegistry } from '../../entities/siteRegistry.entity';
+import { find } from 'rxjs';
+import { userInfo } from 'os';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -45,6 +48,7 @@ describe('SiteService', () => {
   let landHistoriesRepo: Repository<LandHistories>;
   let siteSubDivisionsRepo: Repository<SiteSubdivisions>;
   let siteProfilesRepo: Repository<SiteProfiles>;
+  let siteRegistryRepo: Repository<SiteRegistry>;
   let placesRepo: Repository<Place>;
   let entityManager: EntityManager;
   let historyLogRepository: Repository<HistoryLog>;
@@ -301,6 +305,21 @@ describe('SiteService', () => {
           },
         },
         {
+          provide: getRepositoryToken(SiteRegistry),
+          useValue: {
+            findOne: jest.fn(() => {
+              return {
+                id: '123',
+                siteId: '456',
+                lastApprovalDate: new Date(),
+                initApprovalDate: new Date(),
+                tombstoneDate: new Date(),
+              };
+            }),
+            save: jest.fn(),
+          },
+        },
+        {
           provide: EntityManager,
           useValue: {
             transaction: jest.fn(async () => {
@@ -316,6 +335,20 @@ describe('SiteService', () => {
             // save: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
+            findOne: jest.fn(
+              async <T>(entityClass: T, options: FindOneOptions<T>) =>
+                entityClass === SiteRegistry &&
+                (options as any).where?.siteId === '123'
+                  ? ({
+                      siteId: '456',
+                      lastApprovalDate: new Date(),
+                      initApprovalDate: new Date(),
+                      tombstoneDate: new Date(),
+                      regFlag: 1,
+                      regUserid: '123',
+                    } as unknown as T)
+                  : null,
+            ) as typeof entityManager.findOne,
           },
         },
         {
@@ -395,6 +428,10 @@ describe('SiteService', () => {
       ParcelDescriptionsService,
     );
     snapShotService = module.get<SnapshotsService>(SnapshotsService);
+
+    siteRegistryRepo = module.get<Repository<SiteRegistry>>(
+      getRepositoryToken(SiteRegistry),
+    );
   });
 
   afterEach(() => {
@@ -580,6 +617,71 @@ describe('SiteService', () => {
       await expect(
         siteService.findSiteBySiteId(siteId, false, null),
       ).rejects.toThrowError(error);
+    });
+  });
+
+  describe('updateSiteRegistryRecord', () => {
+    beforeEach(() => {
+      entityManager.save = jest.fn();
+    });
+
+    let userInfo: any = { givenName: 'test' };
+
+    it('should throw an error if siteId is missing', async () => {
+      await expect(
+        siteService.updateSiteRegistryLastApprovedDate(
+          entityManager,
+          '',
+          userInfo,
+        ),
+      ).rejects.toThrow(
+        new HttpException(
+          'Failed to update site registry last approved date as Site Id is missing.',
+          HttpStatus.BAD_REQUEST,
+        ),
+      );
+    });
+
+    it('should update lastApprovalDate if site record exists', async () => {
+      await siteService.updateSiteRegistryLastApprovedDate(
+        entityManager,
+        '123',
+        userInfo,
+      );
+
+      expect(entityManager.findOne).toHaveBeenCalledWith(SiteRegistry, {
+        where: { siteId: '123' },
+      });
+      expect(entityManager.save).toHaveBeenCalled();
+    });
+
+    it('should not update anything if no site record is found', async () => {
+      await siteService.updateSiteRegistryLastApprovedDate(
+        entityManager,
+        '1234',
+        userInfo,
+      );
+
+      expect(entityManager.findOne).toHaveBeenCalled();
+      expect(entityManager.save).not.toHaveBeenCalled();
+    });
+
+    it('should log and rethrow errors', async () => {
+      (entityManager.findOne as jest.Mock).mockRejectedValue(
+        new Error('DB error'),
+      );
+
+      await expect(
+        siteService.updateSiteRegistryLastApprovedDate(
+          entityManager,
+          '123',
+          userInfo,
+        ),
+      ).rejects.toThrow('DB error');
+
+      expect(loggerService.log).toHaveBeenCalledWith(
+        'SiteService.updateSiteRegistryLastApprovedDate() error',
+      );
     });
   });
 

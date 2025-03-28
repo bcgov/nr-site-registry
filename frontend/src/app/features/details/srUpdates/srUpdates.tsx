@@ -41,6 +41,7 @@ import {
   participantRoleDrpdown,
 } from '../dropdowns/DropdownSlice';
 import {
+  dateFormatSR,
   showNotification,
   UpdateDisplayTypeParams,
   updateFields,
@@ -89,11 +90,8 @@ const SRUpdates = () => {
   const { associateColumnInternalSRandViewMode, srVisibilityAssocConfig } =
     GetAssociateConfig();
 
-  const {
-    documentFirstChildFormRowsForExternal,
-    documentFirstChildFormRows,
-    documentFormRows,
-  } = GetDocumentsConfig() || {};
+  const { documentFirstChildFormRowsForExternal, documentFormRows } =
+    GetDocumentsConfig() || {};
 
   const {
     notationFormRowsInternal,
@@ -154,7 +152,10 @@ const SRUpdates = () => {
       parcelDescriptions: null,
     };
   };
-
+  const [internalDocRow, setInternalDocRow] = useState(documentFormRows);
+  const [internalDocChildRow, setInternalDocChildRow] = useState(
+    documentFirstChildFormRowsForExternal,
+  );
   const siteSummaryData = useSelector(selectSiteSummary);
   const notationData = useSelector(selectNotationData);
   const siteParticipantData = useSelector(selectSiteParticipants);
@@ -280,6 +281,41 @@ const SRUpdates = () => {
       );
     }
   }, [notationData]);
+
+  useEffect(() => {
+    if (documentsData) {
+      const uniquePsnOrgs: any = Array.from(
+        new Map(
+          documentsData.map((item: any) => [
+            item.psnorgId,
+            { key: item.psnorgId, value: item.displayName },
+          ]),
+        ).values(),
+      );
+      setInternalDocRow((prev) =>
+        updateFields(prev, {
+          indexToUpdate: prev.findIndex((row) =>
+            row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+          ),
+          updates: {
+            isLoading: RequestStatus.success,
+            options: uniquePsnOrgs,
+          },
+        }),
+      );
+      setInternalDocChildRow((prev) =>
+        updateFields(prev, {
+          indexToUpdate: prev.findIndex((row) =>
+            row.some((field) => field.graphQLPropertyName === 'psnorgId'),
+          ),
+          updates: {
+            isLoading: RequestStatus.success,
+            options: uniquePsnOrgs,
+          },
+        }),
+      );
+    }
+  }, [documentsData]);
 
   useEffect(() => {
     if (siteParticipantData) {
@@ -597,6 +633,8 @@ const SRUpdates = () => {
       isApproved,
     );
 
+    delete updatedDocument?.whenCreated;
+    delete updatedDocument?.whenUpdated;
     let saveDTO = {
       ...getDefaultObjectForSaving(),
       documents: updatedDocument,
@@ -719,18 +757,18 @@ const SRUpdates = () => {
               <Document
                 userType={UserType.Internal}
                 mode={SiteDetailsMode.ViewOnlyMode}
-                documentFirstChildFormRows={documentFirstChildFormRows}
-                externalRow={documentFirstChildFormRowsForExternal}
+                documentFirstChildFormRows={[]}
+                externalRow={internalDocChildRow}
                 viewMode={SiteDetailsMode.ViewOnlyMode}
                 handleInputChange={handleChange}
                 document={document}
-                srTimeStamp={'Sent to SR on June 2nd, 2013'}
+                srTimeStamp={`Send to SR on ${dateFormatSR(document?.whenUpdated ?? document?.whenCreated ?? new Date())}`}
                 handleViewOnline={() => {}}
                 handleDownload={() => {}}
                 handleFileReplace={handleChange}
                 handleFileDelete={handleChange}
                 uniqueId={Date.now()}
-                internalRow={documentFormRows}
+                internalRow={internalDocRow}
                 showApproveRejectSection={true}
                 approveRejectHandler={(value) =>
                   handleDocumentsApproveRejectHandler(document, value)

@@ -44,6 +44,7 @@ import { UserTypeEum } from '../../common/userType';
 import { BC_ALBERS, LatLngTuple, WGS_84 } from '../../utils/geometry';
 import { RadiusSearchParams } from 'src/app/resolvers/site/site.resolver';
 import { MAX_CIRCLE_RADIUS, MIN_CIRCLE_RADIUS } from '../../utils/constants';
+import { SiteRegistry } from '../../entities/siteRegistry.entity';
 
 /**
  * Nestjs Service For Region Entity
@@ -79,6 +80,8 @@ export class SiteService {
     private historyLogRepository: Repository<HistoryLog>,
     @InjectRepository(Place)
     private placeRepository: Repository<Place>,
+    @InjectRepository(SiteRegistry)
+    private siteRegistryRepository: Repository<SiteRegistry>,
 
     private readonly landHistoryService: LandHistoryService,
     private readonly parcelDescriptionService: ParcelDescriptionsService,
@@ -737,6 +740,44 @@ export class SiteService {
 
     await transactionalEntityManager.save(HistoryLog, historyLog);
 
+    const hasPublicSrAction =
+      sitesSummary?.srAction === SRApprovalStatusEnum.PUBLIC ||
+      events?.some(
+        (event) =>
+          event.srAction === SRApprovalStatusEnum.PUBLIC ||
+          event.notationParticipant?.some(
+            (participant) =>
+              participant.srAction === SRApprovalStatusEnum.PUBLIC,
+          ),
+      ) ||
+      eventsParticipants?.some(
+        (participant) => participant.srAction === SRApprovalStatusEnum.PUBLIC,
+      ) ||
+      siteParticipants?.some(
+        (participant) => participant.srAction === SRApprovalStatusEnum.PUBLIC,
+      ) ||
+      documents?.some((doc) => doc.srAction === SRApprovalStatusEnum.PUBLIC) ||
+      siteAssociations?.some(
+        (assoc) => assoc.srAction === SRApprovalStatusEnum.PUBLIC,
+      ) ||
+      parcelDescriptions?.some(
+        (parcel) => parcel.srAction === SRApprovalStatusEnum.PUBLIC,
+      ) ||
+      landHistories?.some(
+        (history) => history.srAction === SRApprovalStatusEnum.PUBLIC,
+      ) ||
+      profiles?.some(
+        (profile) => profile.srAction === SRApprovalStatusEnum.PUBLIC,
+      );
+
+    if (hasPublicSrAction) {
+      await this.updateSiteRegistryLastApprovedDate(
+        transactionalEntityManager,
+        siteId,
+        userInfo,
+      );
+    }
+
     return true;
   }
 
@@ -807,13 +848,16 @@ export class SiteService {
               // Only fetch the MAX(id) when adding new documents
               currentDocMaxId += 1;
               documentId = currentDocMaxId.toString();
+              const currentDate = new Date();
               newDocuments.push({
                 ...siteDocument,
                 id: documentId,
                 userAction: UserActionEnum.ADDED,
                 srAction: SRApprovalStatusEnum.PENDING,
-                whenCreated: new Date(),
+                whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
+                whenUpdated: currentDate,
+                whoUpdated: userInfo ? userInfo.givenName : '',
               });
 
               currentDocParticsMaxId += 1;
@@ -825,8 +869,10 @@ export class SiteService {
                 dprCode: 'ATH', // dprCode is always ATH. We don't have a UI for this value and keeping this column allows us to maintain historical data.
                 userAction: UserActionEnum.ADDED,
                 srAction: SRApprovalStatusEnum.PENDING,
-                whenCreated: new Date(),
+                whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
+                whenUpdated: currentDate,
+                whoUpdated: userInfo ? userInfo.givenName : '',
               });
 
               break;
@@ -1040,21 +1086,25 @@ export class SiteService {
                 // Get the ID of the newly created participant
                 currentSiteParticMaxId += 1;
                 participantId = currentSiteParticMaxId.toString();
-
+                const currentDate = new Date();
                 newSitePartics.push({
                   ...sitePartic,
                   id: participantId,
                   userAction: UserActionEnum.ADDED,
-                  whenCreated: new Date(),
+                  whenCreated: currentDate,
                   whoCreated: userInfo ? userInfo.givenName : '',
+                  whenUpdated: currentDate,
+                  whoUpdated: userInfo ? userInfo.givenName : '',
                 });
 
                 newSiteParticRoles.push({
                   ...siteParticRole,
                   spId: participantId,
                   userAction: UserActionEnum.ADDED,
-                  whenCreated: new Date(),
+                  whenCreated: currentDate,
                   whoCreated: userInfo ? userInfo.givenName : '',
+                  whenUpdated: currentDate,
+                  whoUpdated: userInfo ? userInfo.givenName : '',
                 });
                 break;
 
@@ -1213,12 +1263,15 @@ export class SiteService {
             } = partic;
             switch (apiAction) {
               case UserActionEnum.ADDED:
+                const currentDate = new Date();
                 return {
                   ...particData,
                   eventId,
                   userAction: UserActionEnum.ADDED,
-                  whenCreated: new Date(),
+                  whenCreated: currentDate,
                   whoCreated: userInfo ? userInfo.givenName : '',
+                  whenUpdated: currentDate,
+                  whoUpdated: userInfo ? userInfo.givenName : '',
                 };
               case UserActionEnum.UPDATED:
                 const existingPartic =
@@ -1283,14 +1336,16 @@ export class SiteService {
               // Get the ID of the newly created event
               currentNotationMaxId += 1;
               notationId = currentNotationMaxId.toString();
-
+              const currentDate = new Date();
               newEvents.push({
                 ...event,
                 id: notationId,
                 eventDate: new Date(),
                 userAction: UserActionEnum.ADDED,
-                whenCreated: new Date(),
+                whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
+                whenUpdated: currentDate,
+                whoUpdated: userInfo ? userInfo.givenName : '',
               });
               break;
 
@@ -1409,13 +1464,16 @@ export class SiteService {
           const siteAssoc = { ...new SiteAssocs(), ...siteAssocsData };
           switch (apiAction) {
             case UserActionEnum.ADDED:
+              const currentDate = new Date();
               newSiteAssociates.push({
                 ...siteAssoc,
                 // Need to know common pid relation as it is non-nullable field in DB and we don't have visibility in our design for same.
                 commonPid: 'N',
                 userAction: UserActionEnum.ADDED,
-                whenCreated: new Date(),
+                whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
+                whenUpdated: currentDate,
+                whoUpdated: userInfo ? userInfo.givenName : '',
               });
               break;
             case UserActionEnum.UPDATED:
@@ -1500,11 +1558,14 @@ export class SiteService {
           };
           switch (apiAction) {
             case UserActionEnum.ADDED:
+              const currentDate = new Date();
               profile = {
                 ...profile,
                 userAction: UserActionEnum.ADDED,
-                whenCreated: new Date(),
+                whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
+                whenUpdated: currentDate,
+                whoUpdated: userInfo ? userInfo.givenName : '',
               };
               break;
             case UserActionEnum.UPDATED:
@@ -2146,6 +2207,14 @@ export class SiteService {
 
       await transactionalEntityManager.save(HistoryLog, historyLog);
 
+      if (isApproved) {
+        await this.updateSiteRegistryLastApprovedDate(
+          transactionalEntityManager,
+          site.siteId,
+          userInfo,
+        );
+      }
+
       this.sitesLogger.log('SiteService.processSRBulkUpdates() end');
 
       return true;
@@ -2159,6 +2228,42 @@ export class SiteService {
       );
     }
   }
+
+  updateSiteRegistryLastApprovedDate = async (
+    transactionalEntityManager: EntityManager,
+    siteId: string,
+    userInfo?: any,
+  ) => {
+    try {
+      if (!siteId)
+        throw new HttpException(
+          'Failed to update site registry last approved date as Site Id is missing.',
+          HttpStatus.BAD_REQUEST,
+        );
+      this.sitesLogger.log('SiteService.updateSiteRegistryLastApprovedDate()');
+      const siteRegistryRecord = await transactionalEntityManager.findOne(
+        SiteRegistry,
+        {
+          where: { siteId: siteId },
+        },
+      );
+      if (siteRegistryRecord !== null) {
+        siteRegistryRecord.lastApprovalDate = new Date();
+        siteRegistryRecord.regUserid = userInfo?.givenName
+          ? userInfo?.givenName
+          : '';
+        await transactionalEntityManager.save(siteRegistryRecord);
+      }
+      this.sitesLogger.log(
+        'SiteService.updateSiteRegistryLastApprovedDate() end',
+      );
+    } catch (error) {
+      this.sitesLogger.log(
+        'SiteService.updateSiteRegistryLastApprovedDate() error',
+      );
+      throw error;
+    }
+  };
 
   /**
    * SET Updated Status

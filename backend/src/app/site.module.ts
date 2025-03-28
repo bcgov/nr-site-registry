@@ -86,6 +86,8 @@ import { TransactionManagerService } from './services/transactionManager/transac
 import { LoggerService } from './logger/logger.service';
 import { SitePublicResolver } from './resolvers/site/sitePublic.resolver';
 import { Place } from './entities/placeEntity';
+import { CsvController } from './controller/csv.controller';
+import { CsvService } from './services/csv/csv.service';
 import { SiteRegistry } from './entities/siteRegistry.entity';
 
 /**
@@ -153,6 +155,7 @@ import { SiteRegistry } from './entities/siteRegistry.entity';
     ]),
   ],
   providers: [
+    CsvService,
     SitePublicResolver,
     SiteResolver,
     SiteService,
@@ -189,7 +192,7 @@ import { SiteRegistry } from './entities/siteRegistry.entity';
     TransactionManagerService,
     LoggerService,
   ],
-  controllers: [],
+  controllers: [CsvController],
 })
 export class SiteModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

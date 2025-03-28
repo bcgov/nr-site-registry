@@ -1,21 +1,10 @@
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { TableColumn, ColumnSize } from '../../../components/table/TableColumn';
 
-const getSiteSearchResultsColumns = () => {
+const getSiteSearchResultsColumns = (
+  hiddenColumns: Set<string> = new Set(),
+) => {
   const columns: TableColumn[] = [
-    // new TableColumn(
-    //   1,
-    //   "Site ID",
-    //   true,
-    //   "id",
-    //   1,
-    //   true,
-    //   true,
-    //   1,
-    //   true,
-    //   getColumnType("Site ID","id",""),
-
-    // ),
     {
       id: 1,
       displayName: 'Site ID',
@@ -216,35 +205,23 @@ const getSiteSearchResultsColumns = () => {
       false,
       getColumnType('Consultant Submitted', 'consultantSubmitted', ''),
     ),
-    // new TableColumn(
-    //   17,
-    //   "View",
-    //   true,
-    //   "id",
-    //   4,
-    //   true,
-    //   true,
-    //   1,
-    //   true,
-    //   getLinkColumnType("Map","id","","site/map/") ,
-    //   "site/map/",
-    //   true
-    // ),
-    {
-      id: 17,
-      displayName: 'View',
-      active: true,
-      graphQLPropertyName: 'id',
-      groupId: 4,
-      disabled: true,
-      isDefault: true,
-      sortOrder: 1,
-      isChecked: true,
-      displayType: getLinkColumnType('Map', 'id', '', 'site/map/', 'Map'),
-      linkRedirectionURL: 'site/map/',
-      dynamicColumn: true,
-      stickyCol: true,
-    },
+    hiddenColumns.has('map')
+      ? null
+      : {
+          id: 17,
+          displayName: 'View',
+          active: true,
+          graphQLPropertyName: 'id',
+          groupId: 4,
+          disabled: true,
+          isDefault: true,
+          sortOrder: 1,
+          isChecked: true,
+          displayType: getLinkColumnType('Map', 'id', '', '/map?site=', 'Map'),
+          linkRedirectionURL: '/map?site=',
+          dynamicColumn: true,
+          stickyCol: true,
+        },
     {
       id: 18,
       displayName: 'Details',
@@ -266,7 +243,7 @@ const getSiteSearchResultsColumns = () => {
       dynamicColumn: true,
       stickyCol: true,
     },
-  ];
+  ].filter((column): column is TableColumn => column !== null);
 
   return columns;
 };

@@ -17,7 +17,7 @@ import { formRowsMap } from '../../site/dto/SiteFilterConfig';
 import { formatDateRange } from '../../../helpers/utility';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 
-const defaultColumns = getSiteSearchResultsColumns();
+const defaultColumns = getSiteSearchResultsColumns(new Set(['map']));
 
 type Pagination = {
   page: number;

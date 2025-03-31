@@ -45,7 +45,6 @@ import { BC_ALBERS, LatLngTuple, WGS_84 } from '../../utils/geometry';
 import { RadiusSearchParams } from 'src/app/resolvers/site/site.resolver';
 import { MAX_CIRCLE_RADIUS, MIN_CIRCLE_RADIUS } from '../../utils/constants';
 import { SiteRegistry } from '../../entities/siteRegistry.entity';
-import { SiteRegistry } from '../../entities/siteRegistry.entity';
 
 /**
  * Nestjs Service For Region Entity

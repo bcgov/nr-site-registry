@@ -13,4 +13,6 @@
   text-align: left;
   height: 40px;
   color: var(--typography-color-secondary);
+  overflow: auto;
+  text-wrap: wrap;
 }

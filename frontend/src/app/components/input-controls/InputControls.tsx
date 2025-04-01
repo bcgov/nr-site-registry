@@ -37,7 +37,7 @@ const renderTableCell = (
 ) => {
   return (
     <td
-      className={`"table-border-light align-content-center" ${stickyCol ? 'positionSticky' : ''}`}
+      className={`table-border-light align-content-center ${stickyCol ? 'positionSticky' : ''}`}
     >
       {content}
     </td>

@@ -169,15 +169,15 @@ const SummaryForm: FC<SummaryFormProps> = ({
         customLabelCss: 'custom-summary-lbl-text',
         customInputTextCss: 'custom-summary-input-text',
       },
-      {
-        type: FormFieldType.Text,
-        label: 'Region',
-        placeholder: 'Region',
-        graphQLPropertyName: 'region',
-        value: '',
-        customLabelCss: 'custom-summary-lbl-text',
-        customInputTextCss: 'custom-summary-input-text',
-      },
+      // {
+      //   type: FormFieldType.Text,
+      //   label: 'Region',
+      //   placeholder: 'Region',
+      //   graphQLPropertyName: 'region',
+      //   value: '',
+      //   customLabelCss: 'custom-summary-lbl-text',
+      //   customInputTextCss: 'custom-summary-input-text',
+      // },
     ],
     [
       {

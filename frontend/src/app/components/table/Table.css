@@ -83,14 +83,14 @@
 
   .table td:first-child {
     /* position: sticky; */
-    left: 0;
+    left: 0px;
     background-color: var(--surface-color-background-white) !important;
     /* z-index: 1; */
   }
 
   .table th:first-child {
     /* position: sticky; */
-    left: 0;
+    left: 0px;
     /* z-index: 1; */
   }
 
@@ -113,14 +113,14 @@
 
   .table td:last-child {
     /* position: sticky; */
-    right: 1;
+    right: 1px;
     background-color: var(--surface-color-background-white) !important;
     /* z-index: 1; */
   }
 
   .table th:last-child {
     /* position: sticky; */
-    right: 1;
+    right: 1px;
     /* z-index: 1; */
   }
 

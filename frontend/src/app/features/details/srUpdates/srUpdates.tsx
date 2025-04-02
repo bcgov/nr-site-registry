@@ -808,7 +808,7 @@ const SRUpdates = () => {
         </ApproveReject>
       )}
 
-      {landUsesData && (
+      {landUsesData && landUsesData.length > 0 && (
         <ApproveReject
           name="LandUses"
           testId="srupdates-landuses-component"

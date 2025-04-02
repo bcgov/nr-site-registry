@@ -1121,7 +1121,11 @@ export class SiteService {
                       ...new SitePartics(),
                       ...existingSitePartic,
                       ...sitePartic,
-                      userAction: UserActionEnum.UPDATED,
+                      userAction:
+                        sitePartic.srAction === SRApprovalStatusEnum.PUBLIC ||
+                        sitePartic.srAction === SRApprovalStatusEnum.PRIVATE
+                          ? UserActionEnum.DEFAULT
+                          : UserActionEnum.UPDATED,
                       whenUpdated: new Date(),
                       whoUpdated: userInfo ? userInfo.givenName : '',
                     },
@@ -1487,7 +1491,11 @@ export class SiteService {
                   changes: {
                     ...existingSiteAssoc,
                     ...siteAssoc,
-                    userAction: UserActionEnum.UPDATED,
+                    userAction:
+                      asscos.srAction === SRApprovalStatusEnum.PUBLIC ||
+                      asscos.srAction === SRApprovalStatusEnum.PRIVATE
+                        ? UserActionEnum.DEFAULT
+                        : UserActionEnum.UPDATED,
                     whenUpdated: new Date(),
                     whoUpdated: userInfo ? userInfo.givenName : '',
                   },
@@ -1578,7 +1586,11 @@ export class SiteService {
                 profile = {
                   ...isExist,
                   ...profile,
-                  userAction: UserActionEnum.UPDATED,
+                  userAction:
+                    disclosure.srAction === SRApprovalStatusEnum.PUBLIC ||
+                    disclosure.srAction === SRApprovalStatusEnum.PRIVATE
+                      ? UserActionEnum.DEFAULT
+                      : UserActionEnum.UPDATED,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 };
@@ -1624,56 +1636,56 @@ export class SiteService {
           FROM (
               SELECT id AS site_id, when_Updated ,who_updated 
               FROM sites.sites
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated , who_updated 
               FROM sites.events
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT e.site_id, e.when_Updated, e.who_updated 
               FROM sites.event_partics ep
               INNER JOIN sites.events e ON ep.event_id = e.id
-              WHERE e.sr_action = 'pending'
+              WHERE e.sr_action = 'pending' or e.user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated, who_updated 
               FROM sites.site_partics
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated, who_updated 
               FROM sites.site_docs
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated,who_updated 
               FROM sites.site_assocs
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated,who_updated 
               FROM sites.land_histories
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated,who_updated 
               FROM sites.site_subdivisions
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated ,who_updated 
               FROM sites.site_profiles
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
           ) AS updates
           GROUP BY site_id, who_updated
       )
@@ -1685,56 +1697,56 @@ export class SiteService {
       FROM (
           SELECT id AS site_id, 'summary' AS Change, when_Updated, who_updated ,addr_line_1,addr_line_2,addr_line_3 
           FROM sites.sites
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'notation', when_Updated, who_updated , '' , '', '' 
           FROM sites.events
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT e.site_id, 'notation participants' AS Change, e.when_Updated, e.who_updated , '' , '', '' 
           FROM sites.event_partics ep
           INNER JOIN sites.events e ON ep.event_id = e.id
-          WHERE e.sr_action = 'pending'
+          WHERE e.sr_action = 'pending' or e.user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'site participants' AS Change, when_Updated, who_updated ,  '' , '', '' 
           FROM sites.site_partics
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'documents' AS Change, when_Updated, who_updated,  '' , '', '' 
           FROM sites.site_docs
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'associated sites' AS Change, when_Updated, who_updated,  '' , '', '' 
           FROM sites.site_assocs
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'land histories' AS Change, when_Updated, who_updated,  '' , '', '' 
           FROM sites.land_histories
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'parcel description' AS Change, when_Updated, who_updated,  '' , '', '' 
           FROM sites.site_subdivisions
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'site profiles' AS Change, when_Updated, who_updated ,  '' , '', '' 
           FROM sites.site_profiles
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
       ) AS c
       GROUP BY c.site_id,c.who_updated) Final
       JOIN LatestUpdates lu ON Final.site_id = lu.site_id and Final.who_updated = lu.who ) ResultInFo

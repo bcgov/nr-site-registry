@@ -9,7 +9,7 @@ import {
   CartDTO,
 } from '../../dto/cart.dto';
 import { LoggerService } from '../../logger/logger.service';
-import { SRApprovalStatusEnum } from 'src/app/common/srApprovalStatusEnum';
+import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 
 @Injectable()
 export class CartService {

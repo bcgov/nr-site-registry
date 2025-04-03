@@ -51,13 +51,17 @@ data:
     PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/disable_constraints.sql"
     fi
 
+    # Disable WAL-related settings temporarily during the import
+    echo "Disabling WAL-related settings for import..."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -c "SET synchronous_commit = OFF;" -c "SET fsync = OFF;" -c "SET full_page_writes = OFF;"
 
-
-    # Trying -c "SET synchronous_commit = off;" in the import, this should reduce file pressure for WAL logs.
     echo "Seed data set, seed is enabled, and db is blank, loading data."
-    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME"  -c "SET synchronous_commit = off;" -f "$SEED_DATA_PATH"
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "$SEED_DATA_PATH"
     echo "Seed data successfully loaded."
 
+    # Re-enable WAL-related settings after the import
+    echo "Re-enabling WAL-related settings..."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -c "SET fsync = ON;" -c "SET full_page_writes = ON;" -c "SET synchronous_commit = ON;"
 
     # Enable constraints after seeding, if file exists
     if [ -f "/mnt/sql/enable_constraints.sql" ]; then

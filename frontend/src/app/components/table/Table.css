@@ -9,6 +9,7 @@
   border: 1px solid;
   border-color: var(--surface-color-border-default);
   background-color: var(--surface-color-background-white) !important;
+  outline: 1px solid var(--surface-color-border-default);
 }
 
 .fa-spin {
@@ -112,14 +113,14 @@
 
   .table td:last-child {
     /* position: sticky; */
-    right: 0;
+    right: 1;
     background-color: var(--surface-color-background-white) !important;
     /* z-index: 1; */
   }
 
   .table th:last-child {
     /* position: sticky; */
-    right: 0;
+    right: 1;
     /* z-index: 1; */
   }
 

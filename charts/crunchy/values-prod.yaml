@@ -1,9 +1,9 @@
 crunchy:
   instances:
     dataVolumeClaimSpec:
-      storage: 1500Mi
+      storage: 2Gi
       storageClassName: netapp-block-standard
-      walStorage: 1Gi
+      walStorage: 500Mi
   clone:
     enabled: false 
     s3:

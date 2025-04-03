@@ -81,20 +81,20 @@ jobs:
 
       # Problem - if we need latest migration, we also need to change tag stuff.
       # this is using an old build, it's just deploying it.
-  deploys_prod:
-    name: Deploys to PROD
-    uses: ./.github/workflows/.deployer.yml
-    secrets: inherit
-    needs: [deploy_db_prod]
-    with:
-      environment: prod
-      values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
-      # TODO: Replace hardcoded tag with '${{ needs.get-pr-info.outputs.pr }}'
-      # tag: '286'
-      # tag: '288'
-      # same as the build tag above.
-      # tag: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
-      tag: prod-experimental
+  # deploys_prod:
+  #   name: Deploys to PROD
+  #   uses: ./.github/workflows/.deployer.yml
+  #   secrets: inherit
+  #   needs: [deploy_db_prod]
+  #   with:
+  #     environment: prod
+  #     values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
+  #     # TODO: Replace hardcoded tag with '${{ needs.get-pr-info.outputs.pr }}'
+  #     # tag: '286'
+  #     # tag: '288'
+  #     # same as the build tag above.
+  #     # tag: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
+  #     tag: prod-experimental
       # tag:  '${{ needs.get-pr-info.outputs.pr }}'
 
 

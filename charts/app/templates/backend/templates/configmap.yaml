@@ -51,17 +51,31 @@ data:
     PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/disable_constraints.sql"
     fi
 
-    # Disable WAL-related settings temporarily during the import
-    echo "Disabling WAL-related settings for import..."
-    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -c "SET synchronous_commit = OFF;" -c "SET fsync = OFF;" -c "SET full_page_writes = OFF;"
+    # Create the UNLOGGED table for fast import
+    echo "Creating UNLOGGED table for fast import..."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -c "
+    CREATE UNLOGGED TABLE sites.sites_unlogged (LIKE sites.sites INCLUDING ALL);
+    "
 
-    echo "Seed data set, seed is enabled, and db is blank, loading data."
+    # Insert data into the UNLOGGED table (faster due to no WAL)
+    echo "Inserting data into the UNLOGGED table..."
     PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "$SEED_DATA_PATH"
-    echo "Seed data successfully loaded."
 
-    # Re-enable WAL-related settings after the import
-    echo "Re-enabling WAL-related settings..."
-    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -c "SET fsync = ON;" -c "SET full_page_writes = ON;" -c "SET synchronous_commit = ON;"
+    echo "Data inserted into the UNLOGGED table successfully."
+
+    # Transfer data from the UNLOGGED table to the final table
+    echo "Transferring data from UNLOGGED table to final table..."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -c "
+    INSERT INTO sites.sites SELECT * FROM sites.sites_unlogged;
+    "
+
+    echo "Data transferred to the final table successfully."
+
+    # Drop the UNLOGGED table as it is no longer needed
+    echo "Dropping the UNLOGGED table..."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -c "
+    DROP TABLE IF EXISTS sites.sites_unlogged;
+    "
 
     # Enable constraints after seeding, if file exists
     if [ -f "/mnt/sql/enable_constraints.sql" ]; then

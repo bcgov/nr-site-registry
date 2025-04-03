@@ -57,6 +57,14 @@ const Cart = () => {
         'Successfully created snapshot',
       );
       dispatch(resetCreateSnapshotForSitesStatus(null));
+    } else {
+      showNotification(
+        createSnapshotRequestStatus,
+        '',
+        'Unable to create snapshot at this time.',
+        'Request Failed',
+      );
+      dispatch(resetCreateSnapshotForSitesStatus(null));
     }
   }, [createSnapshotRequestStatus]);
 

@@ -9,6 +9,7 @@ import {
   CartDTO,
 } from '../../dto/cart.dto';
 import { LoggerService } from '../../logger/logger.service';
+import { SRApprovalStatusEnum } from 'src/app/common/srApprovalStatusEnum';
 
 @Injectable()
 export class CartService {
@@ -22,10 +23,13 @@ export class CartService {
     this.sitesLogger.log('CartService.getCartItemsForUser() start');
     this.sitesLogger.debug('CartService.getCartItemsForUser() start');
     try {
-      const cartItems = await this.cartRepository.find({
+      let cartItems = await this.cartRepository.find({
         relations: { site: true },
         where: { userId },
       });
+      cartItems = cartItems.filter(
+        (item) => item.site.srAction === SRApprovalStatusEnum.PUBLIC,
+      );
       this.sitesLogger.log('CartService.getCartItemsForUser() end');
       this.sitesLogger.debug('CartService.getCartItemsForUser() end');
       return cartItems;

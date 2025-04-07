@@ -1,0 +1,52 @@
+---
+data_management_roles:
+  data_custodian: Karen Li
+  data_steward: Haley Sawyer
+  product_owner: Haley Sawyer
+product_external_dependencies:
+  common_components:
+    - BC-Address-Geocoder
+    - Design-System
+  identity_authorization:
+    - IDIR
+    - BceId
+    - Business-BceId
+    - BC-Services-Card
+    - BCGov-SSO-Keycloak
+  notification_standard:
+  other_dependencies:
+product_information:
+  api_specifications: []
+  business_capabilities_standard:
+    - Site Remediation
+  ministry:
+    - Environment and Parks
+  product_acronym: SITE
+  product_description: The public platform for the Site Remediation Services program. This platform provides a single point of access to information about contaminated sites in BC, including site status, remediation activities, and related services.
+  product_name: Site Remediation Services Public Platform
+  product_status: maturing
+  product_urls: []
+  program_area: Digital Services
+product_technology_information:
+  backend_frameworks:
+    - name: NestJS
+      version: 10.4.4
+  backend_languages_version:
+    - name: TypeScript
+      version: 5.4.5
+  ci_cd_tools:
+    - GitHub-Actions
+  data_storage_platforms:
+    - Postgresql
+  frontend_frameworks:
+    - name: React
+      version: 18.2.0
+  frontend_languages:
+    - name: TypeScript
+      version: 4.8.4
+  hosting_platforms:
+    - Private-Cloud-Openshift
+  other_tools:
+  spatial_mapping_technologies:
+    - Leaflet
+version: 1

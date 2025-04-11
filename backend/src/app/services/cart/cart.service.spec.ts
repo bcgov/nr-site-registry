@@ -68,13 +68,15 @@ describe('CartSerive', () => {
         id: '1',
         whoUpdated: '',
         whenCreated: new Date(),
-        site: sampleSites[0],
+        site: {
+          ...sampleSites[1],
+          cart: null,
+        },
+        srAction: 'public',
       },
     ];
 
-    jest
-      .spyOn(cartRepository, 'find')
-      .mockResolvedValueOnce(expectedCartItems as Cart[]);
+    jest.spyOn(cartRepository, 'find').mockResolvedValueOnce(expectedCartItems);
 
     const cartItems = await cartService.getCartItemsForUser(userId);
 

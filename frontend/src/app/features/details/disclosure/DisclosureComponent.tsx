@@ -12,6 +12,7 @@ import { ApproveRejectButtons } from '../../../components/approve/ApproveReject'
 import { Button } from '../../../components/button/Button';
 import { v4 } from 'uuid';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
+import { dateFormatSR } from '../../../helpers/utility';
 
 interface IDisclosureComponent {
   viewMode: SiteDetailsMode;
@@ -234,7 +235,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
       </div>
       {userType === UserType.Internal && (
         <p className="sr-time-stamp">
-          {formData?.srTimeStamp ?? 'SR value hard coded'}
+          {`Send to SR on ${dateFormatSR(formData?.whenUpdated ?? formData?.whenCreated ?? new Date())}`}
         </p>
       )}
       {showApproveRejectSection && (

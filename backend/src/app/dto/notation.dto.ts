@@ -47,6 +47,12 @@ export class NotationDto extends ChangeAuditObjectTypeDTO {
   @Field({ nullable: true })
   requirementReceivedDate: Date | null;
 
+  @Field()
+  whenCreated: Date;
+
+  @Field({ nullable: true })
+  whenUpdated: Date | null;
+
   @Field(() => [NotationParticipantDto], { nullable: true })
   notationParticipant: NotationParticipantDto[] | null;
 }
@@ -86,6 +92,12 @@ export class NotationIputDTO extends ChangeAuditEntityDTO {
   @Field({ nullable: true })
   requirementReceivedDate: Date | null;
 
+  @Field({ nullable: true })
+  whenCreated: Date | null;
+
+  @Field({ nullable: true })
+  whenUpdated: Date | null;
+
   @Field(() => [NotationParticipantInputDTO], { nullable: true })
   notationParticipant: NotationParticipantInputDTO[] | null;
 }
@@ -107,6 +119,12 @@ export class NotationParticipantDto extends ChangeAuditObjectTypeDTO {
   @Field()
   @IsString()
   displayName: string;
+
+  @Field()
+  whenCreated: Date;
+
+  @Field({ nullable: true })
+  whenUpdated: Date | null;
 }
 
 @InputType()
@@ -126,4 +144,10 @@ export class NotationParticipantInputDTO extends ChangeAuditEntityDTO {
   @Field()
   @IsString()
   displayName: string;
+
+  @Field({ nullable: true })
+  whenCreated: Date | null;
+
+  @Field({ nullable: true })
+  whenUpdated: Date | null;
 }

@@ -94,7 +94,7 @@ const Notation: React.FC<INotationProps> = ({
   };
 
   const srTimeStamp =
-    'Send to SR on ' +
+    'Sent to SR on ' +
     calculateLatestTimestamp(
       notation,
       notation.notationParticipant,

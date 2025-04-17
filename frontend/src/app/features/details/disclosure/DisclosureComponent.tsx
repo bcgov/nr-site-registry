@@ -235,7 +235,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
       </div>
       {userType === UserType.Internal && (
         <p className="sr-time-stamp">
-          {`Send to SR on ${dateFormatSR(formData?.whenUpdated ?? formData?.whenCreated ?? new Date())}`}
+          {`Sent to SR on ${dateFormatSR(formData?.whenUpdated ?? formData?.whenCreated ?? new Date())}`}
         </p>
       )}
       {showApproveRejectSection && (

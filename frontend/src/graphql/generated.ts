@@ -612,6 +612,8 @@ export type NotationIputDto = {
   srAction: Scalars['String']['input'];
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
+  whenCreated?: InputMaybe<Scalars['DateTime']['input']>;
+  whenUpdated?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type NotationParticipantDto = {
@@ -638,6 +640,8 @@ export type NotationParticipantInputDto = {
   srAction: Scalars['String']['input'];
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
+  whenCreated?: InputMaybe<Scalars['DateTime']['input']>;
+  whenUpdated?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type NotationResponse = {
@@ -1257,7 +1261,7 @@ export type SiteProfilesInputDto = {
   srAction: Scalars['String']['input'];
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
-  whenCreated: Scalars['DateTime']['input'];
+  whenCreated?: InputMaybe<Scalars['DateTime']['input']>;
   whenUpdated?: InputMaybe<Scalars['DateTime']['input']>;
 };
 

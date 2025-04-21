@@ -20,6 +20,8 @@ export const graphQLSiteDisclosureBySiteId = () => {
           siteDisclosureComment
           plannedActivityComment
           srAction
+          whenCreated
+          whenUpdated
         }
       }
     }

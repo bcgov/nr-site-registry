@@ -93,11 +93,6 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     useState<{ [key: string]: any | [Date, Date] }[]>(notations);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 
-  // NEED TO ADD COLUMN FOR THIS IN DATABASE
-  const [srTimeStamp, setSRTimeStamp] = useState(
-    'Sent to SR on June 2nd, 2013',
-  );
-
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [isDelete, setIsDelete] = useState(false);

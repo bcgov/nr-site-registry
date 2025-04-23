@@ -77,6 +77,8 @@ describe('NotationResolver', () => {
         srAction: 'pending',
         userAction: 'pending',
         srValue: false,
+        whenCreated: new Date('2024-07-17'),
+        whenUpdated: new Date('2024-07-17'),
         notationParticipant: [
           {
             eventParticId: 'GUID001',
@@ -87,6 +89,8 @@ describe('NotationResolver', () => {
             userAction: 'pending',
             eventId: '',
             srValue: false,
+            whenCreated: new Date('2024-07-17'),
+            whenUpdated: new Date('2024-07-17'),
           },
           {
             eventParticId: 'GUID002',
@@ -97,6 +101,8 @@ describe('NotationResolver', () => {
             userAction: 'pending',
             eventId: '',
             srValue: false,
+            whenCreated: new Date('2024-07-17'),
+            whenUpdated: new Date('2024-07-17'),
           },
         ],
       },

@@ -11,6 +11,7 @@ import { RequestStatus } from '../../../helpers/requests/status';
 import { DropdownItem } from '../../../components/action/IActions';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
 import { Button } from '../../../components/button/Button';
+import { dateFormatSR } from '../../../helpers/utility';
 
 interface INotationProps {
   index?: number;
@@ -73,6 +74,33 @@ const Notation: React.FC<INotationProps> = ({
 
   approveRejectHandler = approveRejectHandler ?? (() => {});
 
+  const calculateLatestTimestamp = (
+    event: any,
+    eventParticsForEvent: any,
+    dateFormatSR: (date: Date) => string,
+  ) => {
+    let latestTimestamp = new Date(event.whenUpdated || event.whenCreated);
+
+    eventParticsForEvent?.forEach((partic: any) => {
+      const particTimestamp = new Date(
+        partic.whenUpdated || partic.whenCreated,
+      );
+      if (particTimestamp > latestTimestamp) {
+        latestTimestamp = particTimestamp;
+      }
+    });
+
+    return dateFormatSR(latestTimestamp);
+  };
+
+  const srTimeStamp =
+    'Sent to SR on ' +
+    calculateLatestTimestamp(
+      notation,
+      notation.notationParticipant,
+      dateFormatSR,
+    );
+
   return (
     <PanelWithUpDown
       firstChild={
@@ -87,8 +115,8 @@ const Notation: React.FC<INotationProps> = ({
             }
             aria-label="Sort Notation Form"
           />
-          {userType === UserType.Internal && (
-            <span className="sr-time-stamp">{notation.srTimeStamp}</span>
+          {userType === UserType.Internal && srTimeStamp && (
+            <span className="sr-time-stamp">{srTimeStamp}</span>
           )}
         </div>
       }
@@ -178,10 +206,8 @@ const Notation: React.FC<INotationProps> = ({
                 />
               )}
           </Widget>
-          {userType === UserType.Internal && (
-            <p className="sr-time-stamp">
-              {notation.srTimeStamp ?? 'SR value hard coded'}
-            </p>
+          {userType === UserType.Internal && srTimeStamp && (
+            <p className="sr-time-stamp">{srTimeStamp}</p>
           )}
           {showApproveRejectSection && (
             <ApproveRejectButtons approveRejectHandler={approveRejectHandler} />

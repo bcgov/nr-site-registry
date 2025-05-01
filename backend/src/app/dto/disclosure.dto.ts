@@ -52,4 +52,10 @@ export class SiteProfilesInputDTO extends ChangeAuditEntityDTO {
 
   @Field({ nullable: true })
   govDocumentsComment: string | null;
+
+  @Field({ nullable: true })
+  whenCreated: Date | null;
+
+  @Field({ nullable: true })
+  whenUpdated: Date | null;
 }

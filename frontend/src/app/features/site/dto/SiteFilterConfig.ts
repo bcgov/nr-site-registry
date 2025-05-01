@@ -226,8 +226,6 @@ export const formRows: IFormField[][] = [
     formRowsMap['commonName'],
     formRowsMap['siteRiskCode'],
     formRowsMap['addrLine_1'],
-    formRowsMap['city'],
-    formRowsMap['whoCreated'],
     formRowsMap['latlongReliabilityFlag'],
     formRowsMap['latdeg'],
     {
@@ -241,6 +239,7 @@ export const formRows: IFormField[][] = [
         formRowsMap['latSeconds'],
       ],
     },
+    formRowsMap['whenCreated'],
     formRowsMap['longdeg'],
     {
       type: FormFieldType.Group,
@@ -253,7 +252,7 @@ export const formRows: IFormField[][] = [
         formRowsMap['longSeconds'],
       ],
     },
-    formRowsMap['whenCreated'],
+
     formRowsMap['whenUpdated'],
   ],
 ];

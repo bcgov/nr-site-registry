@@ -712,6 +712,8 @@ describe('SiteService', () => {
               apiAction: 'pending',
               srAction: 'pending',
               srValue: true,
+              whenCreated: new Date(),
+              whenUpdated: new Date(),
               notationParticipant: [
                 {
                   apiAction: UserActionEnum.ADDED,
@@ -723,6 +725,8 @@ describe('SiteService', () => {
                   srAction: 'false',
                   userAction: 'pending',
                   srValue: true,
+                  whenCreated: new Date(),
+                  whenUpdated: new Date(),
                 },
               ],
             },

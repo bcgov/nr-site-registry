@@ -62,14 +62,10 @@ jobs:
           triggers: ('${{ matrix.package }}/')
           build_file: ${{ matrix.build_file }}
           build_context: ${{ matrix.build_context }}
-
   ## Prod Deploy
   ## Curently trigering on merge to dev, we can change if desired
   ## So now, test and prod are identical from a code/commit perspective (differ in envs, db params, etc)
 
-## the db_prod job finishes before it's actually done
-## as the helm install finishes fast, but then it waits a while for the operator to actually setup the stateful sets.
-## so sometimes we comment out deploys_prod to JUST make sure db is deployed.
   deploy_db_prod:
     name: Deploys Database
     uses: ./.github/workflows/.dbdeployer.yml

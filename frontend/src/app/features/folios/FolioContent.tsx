@@ -83,8 +83,6 @@ const FolioContents = () => {
     SetSelectedFolio(folioDetails);
   }, [folioItemsArr]);
 
-  useEffect(() => {}, [sitesInFolioArr]);
-
   const navigate = useNavigate();
   const onClickBackButton = () => {
     navigate(-1);

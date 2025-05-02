@@ -38,8 +38,6 @@ const FolioContents = () => {
   const { id } = useParams();
   const auth = useAuth();
 
-  console.log(id);
-
   const user = getUser();
 
   useEffect(() => {
@@ -82,13 +80,10 @@ const FolioContents = () => {
     let folioDetails = folioItemsArr.find(
       (x: any) => x.id === parseInt(id ?? ''),
     );
-    console.log('folioItemsArr', folioDetails);
     SetSelectedFolio(folioDetails);
   }, [folioItemsArr]);
 
-  useEffect(() => {
-    console.log(sitesInFolioArr);
-  }, [sitesInFolioArr]);
+  useEffect(() => {}, [sitesInFolioArr]);
 
   const navigate = useNavigate();
   const onClickBackButton = () => {
@@ -96,7 +91,6 @@ const FolioContents = () => {
   };
 
   const handleChangeEventFromTable = (event: any) => {
-    console.log(event);
     if (event && event.property === 'select_row') {
       const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
       if (index > -1 && !event.value) {
@@ -109,7 +103,6 @@ const FolioContents = () => {
 
   const handleAddToShoppingCart = () => {
     const loggedInUser = getUser();
-    console.log(selectedRows);
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
@@ -127,7 +120,6 @@ const FolioContents = () => {
 
   const handleDeleteFromFolio = () => {
     const loggedInUser = getUser();
-    console.log(selectedRows);
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
@@ -147,7 +139,6 @@ const FolioContents = () => {
 
   const handleDeleteFromShoppingCart = () => {
     const loggedInUser = getUser();
-    console.log(selectedRows);
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
@@ -233,7 +224,6 @@ const FolioContents = () => {
         <ModalDialog
           label="Are you sure to delete the selected sites from folio?"
           closeHandler={(response) => {
-            console.log('response', response);
             if (response) {
               handleDeleteFromFolio();
             }

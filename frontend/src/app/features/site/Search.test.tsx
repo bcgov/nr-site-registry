@@ -36,14 +36,16 @@ describe('Search Component', () => {
 
   beforeEach(() => {
     store = mockStore({
-      sites: {
+      siteSearch: {
         sites: [],
+        error: '',
+        page: 1,
+        count: 0,
+        pageSize: 5,
+        status: RequestStatus.idle,
+        searchParam: '',
+        filter: {},
       },
-      error: '',
-      fetchStatus: RequestStatus.idle,
-      deleteStatus: RequestStatus.idle,
-      addedStatus: RequestStatus.idle,
-      updateStatus: RequestStatus.idle,
     });
   });
 

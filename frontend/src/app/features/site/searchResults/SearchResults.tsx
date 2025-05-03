@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
 import { SpinnerIcon, SortIcon } from '../../../components/common/icon';
-import { loadingState } from '../dto/SiteSlice';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { useSelector } from 'react-redux';
 import { TableColumn } from '../../../components/table/TableColumn';
@@ -22,7 +21,6 @@ const SearchResults: FC<ColumnProps> = ({
   totalRecords,
   changeHandler,
 }) => {
-  const requestStatus = useSelector(loadingState);
   let [currentPage, SetCurrentPage] = useState(1);
   let [resultsPerPage, SetResultsPerPage] = useState(5);
 
@@ -43,7 +41,6 @@ const SearchResults: FC<ColumnProps> = ({
     <Table
       showPageOptions={true}
       label="Search Results"
-      isLoading={requestStatus}
       columns={columns}
       data={data}
       totalResults={totalResults}

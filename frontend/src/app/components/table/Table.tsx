@@ -9,7 +9,7 @@ import TableBody from './body/TableBody';
 
 interface TableProps {
   label: string;
-  isLoading: RequestStatus;
+  isLoading?: RequestStatus;
   columns: TableColumn[];
   data: any;
   totalResults?: number;
@@ -69,12 +69,10 @@ const Table: FC<TableProps> = ({
       allRowsSelectedPages.findIndex(
         (pageNumber) => pageNumber === currentPage,
       ) !== -1;
-    console.log('is selected', isSelected);
     SetCurrentPageAllRowSelected(isSelected);
   };
 
   const selectAllRows = (event: any, checked: boolean) => {
-    console.log('All Rows Selected', event, checked, allRowsSelectedPages);
     if (event) {
       SetAllRowsSelectedEvenFlag(true);
       if (checked) {
@@ -98,7 +96,6 @@ const Table: FC<TableProps> = ({
   };
 
   const removePageFromAllRowsSelected = () => {
-    console.log('reseting all rows if set');
     if (allRowsSelectedPages.length > 0) {
       let pageFound = allRowsSelectedPages.findIndex(
         (pageNumber) => pageNumber === currentPage,
@@ -115,21 +112,13 @@ const Table: FC<TableProps> = ({
     isCurrentPageAllRowsSelected();
   }, [currentPage]);
 
-  const parentSortHandler =
-    sortHandler ??
-    ((row: any, ascSort: any) => {
-      console.log('Handle Sort Event', row, ascSort);
-    });
+  const parentSortHandler = sortHandler ?? (() => {});
 
   let tableSortHandler = (row: any, ascSort: any) => {
     SetCurrentSortColumn(row.graphQLPropertyName);
     parentSortHandler(row, ascSort);
   };
-  let rowDeleteHandler =
-    deleteHandler ??
-    ((row: any) => {
-      console.log('Handle Delete Event', row);
-    });
+  let rowDeleteHandler = deleteHandler ?? (() => {});
 
   return (
     <React.Fragment>

@@ -99,7 +99,6 @@ const Folios = () => {
   }, [folioDeleteStatus]);
 
   useEffect(() => {
-    console.log('updateStatus', updateStatus);
     SetEditMode(false);
 
     setTimeout(() => {
@@ -129,7 +128,6 @@ const Folios = () => {
   };
 
   const handleChange = (event: any) => {
-    console.log('event in folio', event);
     setTempArr((prevData) => {
       const folioToUpdate = prevData.map((folio) => {
         if (folio.id === event.row.id) {
@@ -242,7 +240,6 @@ const Folios = () => {
         <ModalDialog
           label="Are you sure you want to save these changes?"
           closeHandler={(response) => {
-            console.log('response', response);
             if (response) {
               let rowsToBeUpdated = tempArr.filter((x) => x.dirty === true);
 
@@ -251,7 +248,6 @@ const Folios = () => {
                 return row;
               });
 
-              console.log('rowsToBeUpdated', rowsToBeUpdated);
               dispatch(resetFolioSiteUpdateStatus(null));
               dispatch(updateFolioItem(rowsToBeUpdated));
             }
@@ -266,9 +262,7 @@ const Folios = () => {
         <ModalDialog
           label="Are you sure you to delete the folio?"
           closeHandler={(response) => {
-            console.log('response', response);
             if (response) {
-              console.log('response', deleteRow?.id);
               dispatch(resetFolioItemDeleteStatus(null));
               dispatch(deleteFolioItem(deleteRow?.id));
             } else {
@@ -301,7 +295,6 @@ const Folios = () => {
                 return row;
               });
 
-              console.log('rowsToBeUpdated', rowsToBeUpdated);
               dispatch(resetFolioSiteUpdateStatus(null));
               dispatch(updateFolioItem(rowsToBeUpdated))
                 .unwrap()

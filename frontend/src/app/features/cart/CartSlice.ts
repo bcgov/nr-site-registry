@@ -115,7 +115,6 @@ const cartSlice = createSlice({
         state.fetchRequestStatus = RequestStatus.failed;
       })
       .addCase(addCartItem.fulfilled, (state, action) => {
-        console.log('action.payload', action.payload);
         if (action?.payload?.data?.addCartItem?.httpStatusCode === 201)
           state.addRequestStatus = RequestStatus.success;
         else state.addRequestStatus = RequestStatus.failed;

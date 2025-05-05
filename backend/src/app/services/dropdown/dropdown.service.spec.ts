@@ -117,8 +117,8 @@ describe('DropdownService', () => {
   describe('getPeopleOrgsCd', () => {
     it('should return people organizations', async () => {
       const expectedOrgs = [
-        { id: 'org1', displayName: 'Organization 1' },
-        { id: 'org2', displayName: 'Organization 2' },
+        { id: 'org1', displayName: 'Organization 1', metaData: '' },
+        { id: 'org2', displayName: 'Organization 2', metaData: '' },
       ];
 
       const mockQueryBuilder = {
@@ -134,7 +134,11 @@ describe('DropdownService', () => {
       const result = await service.getPeopleOrgsCd('org', '');
 
       expect(result).toEqual(
-        expectedOrgs.map((org) => ({ key: org.id, value: org.displayName })),
+        expectedOrgs.map((org) => ({
+          key: org.id,
+          value: org.displayName,
+          metaData: org.metaData,
+        })),
       );
       expect(peopleOrgsRepository.createQueryBuilder).toHaveBeenCalledWith(
         'people_orgs',

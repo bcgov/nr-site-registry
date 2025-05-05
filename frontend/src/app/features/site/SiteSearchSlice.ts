@@ -5,7 +5,6 @@ import { getAxiosInstance } from '../../helpers/utility';
 import { GRAPHQL } from '../../helpers/endpoints';
 import { print } from 'graphql';
 import { graphQlSiteQuery } from './graphql/Site';
-import { resetSites } from '../details/srUpdates/state/srUpdatesTableSlice';
 
 const initialState: ISiteSearchState = {
   sites: [],

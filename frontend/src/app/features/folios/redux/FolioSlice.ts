@@ -36,7 +36,6 @@ export const fetchFolioItems = createAsyncThunk(
           userId: userId,
         },
       });
-      console.log('folion items response', response);
       return response.data;
     } catch (error) {
       throw error;
@@ -54,7 +53,6 @@ export const getSiteForFolio = createAsyncThunk(
           folioDTO: inputDTO,
         },
       });
-      console.log('folion items response', response);
       if (response === undefined) {
         return [];
       } else return response.data.data.getSitesForFolio.data;
@@ -73,7 +71,6 @@ export const addFolioItem = createAsyncThunk(
         FolioDTO: FolioInputDTO,
       },
     });
-    //console.log("request.data",request.data.data.httpStatusCode)
     return request.data;
   },
 );
@@ -107,7 +104,6 @@ export const deleteSitesInFolio = createAsyncThunk(
 export const updateFolioItem = createAsyncThunk(
   'updateFolioItem',
   async (FolioInputDTO: Folio[]) => {
-    console.log('FolioInputDTO', FolioInputDTO);
     const request = await getAxiosInstance().post(GRAPHQL, {
       query: print(updateFolioItemQL()),
       variables: {
@@ -196,7 +192,6 @@ const folioSlice = createSlice({
         else state.addRequestStatus = RequestStatus.success;
       })
       .addCase(addFolioItem.rejected, (state, action) => {
-        console.log('error', action);
         state.addRequestStatus = RequestStatus.failed;
       })
       .addCase(addSiteToFolio.fulfilled, (state, action) => {
@@ -227,7 +222,6 @@ const folioSlice = createSlice({
         }
       })
       .addCase(updateFolioItem.rejected, (state, action) => {
-        console.log('error', action);
         state.updateRequestStatus = RequestStatus.failed;
       })
       .addCase(deleteFolioItem.fulfilled, (state, action) => {
@@ -238,7 +232,6 @@ const folioSlice = createSlice({
         }
       })
       .addCase(getSiteForFolio.fulfilled, (state, action) => {
-        console.log('action ', action);
         state.sitesArray = action.payload;
       });
   },

@@ -22,7 +22,6 @@ export const ActionItems: DropdownItem[] = [
 export const getActionItems = (
   inlcudeSRApprovalOptions: boolean,
 ): DropdownItem[] => {
-  console.log('inlcudeSRApprovalOptions', inlcudeSRApprovalOptions);
   if (inlcudeSRApprovalOptions) {
     return [
       ...ActionItems,

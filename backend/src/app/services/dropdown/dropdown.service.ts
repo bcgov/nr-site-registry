@@ -106,11 +106,13 @@ export class DropdownService {
       this.sitesLogger.log('DropdownService.getPeopleOrgsCd() end');
       this.sitesLogger.debug('DropdownService.getPeopleOrgsCd() end');
       return (
-        result.map((obj: PeopleOrgs) => ({
-          key: obj.id,
-          value: obj.displayName,
-          metaData: obj.organizationName,
-        })) || []
+        result
+          .filter((obj) => obj?.id && obj?.displayName)
+          .map((obj: PeopleOrgs) => ({
+            key: obj.id,
+            value: obj.displayName,
+            metaData: obj.organizationName || '',
+          })) || []
       );
     } catch (error) {
       this.sitesLogger.error(

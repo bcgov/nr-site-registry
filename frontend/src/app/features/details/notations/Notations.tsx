@@ -128,8 +128,9 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         });
 
         // Store result in cache if successful
-        if (response?.data?.data?.getPeopleOrgsCd?.success) {
-          resultCache[searchParam] = response.data.data.getPeopleOrgsCd.data;
+        const { data, success } = response?.data?.data?.getPeopleOrgsCd;
+        if (success && data?.length > 0) {
+          resultCache[searchParam] = data;
           return response.data.data.getPeopleOrgsCd;
         }
       } catch (error) {

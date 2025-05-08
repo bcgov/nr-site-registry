@@ -197,7 +197,7 @@ export type DocumentResponse = {
 export type DropdownDto = {
   __typename?: 'DropdownDto';
   key: Scalars['String']['output'];
-  metaData: Scalars['String']['output'];
+  metaData?: Maybe<Scalars['String']['output']>;
   value: Scalars['String']['output'];
 };
 
@@ -449,7 +449,7 @@ export type LandUseCd = {
 
 export type LandUseCodeResponse = {
   __typename?: 'LandUseCodeResponse';
-  data: Array<LandUseCd>;
+  data?: Maybe<Array<LandUseCd>>;
   httpStatusCode?: Maybe<Scalars['Int']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;

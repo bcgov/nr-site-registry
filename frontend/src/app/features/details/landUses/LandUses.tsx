@@ -35,53 +35,6 @@ import { getLandUseColumns } from './LandUseColumnConfiguration';
 
 type createdAtSortDirection = 'newToOld' | 'oldTonew';
 
-const getColumns = (landUseCodes: any[] = [], editMode = false) => {
-  const landUseCodeColumns = editMode
-    ? {
-        id: 1,
-        displayName: 'Land Use',
-        active: true,
-        graphQLPropertyName: 'landUse.code',
-        displayType: {
-          type: FormFieldType.DropDown,
-          label: 'Land Use',
-          options: landUseCodes.map(({ description, code }) => {
-            return { value: description, key: code };
-          }),
-          graphQLPropertyName: 'landUse.code',
-          tableMode: true,
-          placeholder: 'Please enter land use',
-        },
-      }
-    : {
-        id: 1,
-        displayName: 'Land Use',
-        active: true,
-        graphQLPropertyName: 'landUse.description',
-        displayType: {
-          type: FormFieldType.Text,
-          label: 'Land Use',
-          graphQLPropertyName: 'landUse.code',
-          tableMode: true,
-          placeholder: 'Please enter land use note.',
-        },
-      };
-
-  const noteColumn = {
-    id: 2,
-    displayName: 'Notes',
-    active: true,
-    graphQLPropertyName: 'note',
-    displayType: {
-      type: FormFieldType.Text,
-      label: 'Notes',
-      graphQLPropertyName: 'note',
-      tableMode: true,
-    },
-  };
-  return [landUseCodeColumns, noteColumn];
-};
-
 interface LandUseUpdateInput {
   originalLandUseCode?: string | null;
   shouldDelete?: boolean;
@@ -237,7 +190,7 @@ const LandUses: FC = () => {
   };
 
   const handleAddLandUse = () => {
-    setTableData((prevData) => [...prevData, { guid: v4() }]);
+    setTableData((prevData) => [{ guid: v4() }, ...prevData]);
     const tracker = new ChangeTracker(IChangeType.Added, 'New Land Use');
     dispatch(trackChanges(tracker.toPlainObject()));
   };
@@ -363,7 +316,7 @@ const LandUses: FC = () => {
         selectedRowIds={selectedRowIds}
         handleRemoveLandUse={handleRemoveLandUse}
         handleAddLandUse={handleAddLandUse}
-      ></LandUseTable>
+      />
     </div>
   );
 };

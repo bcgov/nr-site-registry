@@ -4,6 +4,6 @@ import { LandUseCd } from '../entities/landUseCd.entity';
 
 @ObjectType()
 export class LandUseCodeResponse extends ResponseDto {
-  @Field(() => [LandUseCd], { defaultValue: [] })
-  data: LandUseCd[];
+  @Field(() => [LandUseCd], { defaultValue: [], nullable: true })
+  data?: LandUseCd[] | null;
 }

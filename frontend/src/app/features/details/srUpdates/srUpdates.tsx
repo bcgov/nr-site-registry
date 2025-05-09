@@ -825,7 +825,7 @@ const SRUpdates = () => {
             selectedRowIds={[]}
             handleRemoveLandUse={handleChange}
             handleAddLandUse={handleChange}
-          ></LandUseTable>
+          />
         </ApproveReject>
       )}
 

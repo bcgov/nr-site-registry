@@ -199,7 +199,7 @@ const Search = () => {
   };
 
   return (
-    <PageContainer role="Search">
+    <PageContainer role="Search" aria-label="Search">
       <div className="search-container">
         <h1 className="search-text-label">Search Site Registry</h1>
         <div className="">
@@ -227,6 +227,8 @@ const Search = () => {
               {noUserAction ? null : (
                 <div className="custom-text-search-end">
                   <CircleXMarkIcon
+                    role="button"
+                    aria-label="Clear search"
                     onClick={() => {
                       handleClearSearch();
                     }}
@@ -248,6 +250,7 @@ const Search = () => {
             aria-label="search-results-section-title"
           >
             <SearchResultsFilters
+              aria-label="search-results-filters"
               columns={columnsToDisplay}
               onColumnSelectionChange={toggleColumnSelectionForDisplay}
               resetColumns={resetDefaultColums}
@@ -256,9 +259,13 @@ const Search = () => {
               onFiltersSubmit={handleFormSubmit}
               onFiltersReset={handleReset}
             />
-            <SearchResultsActions selectedRows={selectedRows} />
+            <SearchResultsActions
+              selectedRows={selectedRows}
+              aria-label="search-results-actions"
+            />
           </div>
           <FilterPills
+            aria-label="selected-filters"
             filters={selectedFilters}
             onRemoveFilter={(filter) => {
               handleRemoveFilter(filter);
@@ -267,6 +274,7 @@ const Search = () => {
           <div>
             <div className="" aria-label="Search results">
               <Table
+                aria-label="Search results table"
                 showPageOptions={true}
                 label="Search Results"
                 isLoading={status || RequestStatus.idle}

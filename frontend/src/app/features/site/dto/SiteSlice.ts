@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getAxiosInstance, getUser } from '../../../helpers/utility';
 import { print } from 'graphql';
 import {
-  graphQlSiteQuery,
   graphqlSiteDetailsQuery,
   graphqlSiteDetailsQueryForLoggedIn,
   graphQlSiteQueryForAuthenticatedUsers,
@@ -15,16 +14,6 @@ import { SiteDetailsMode } from '../../details/dto/SiteDetailsMode';
 import { UserType } from '../../../helpers/requests/userType';
 
 const initialState: SiteState = {
-  sites: [],
-  error: '',
-  fetchStatus: RequestStatus.idle,
-  deleteStatus: RequestStatus.idle,
-  addedStatus: RequestStatus.idle,
-  updateStatus: RequestStatus.idle,
-  searchQuery: '',
-  currentPage: 1,
-  pageSize: 10,
-  resultsCount: 0,
   siteDetails: null,
   siteDetailsFetchStatus: RequestStatus.idle,
   siteDetailsDeleteStatus: RequestStatus.idle,
@@ -62,114 +51,11 @@ export const fetchSitesDetails = createAsyncThunk(
   },
 );
 
-export const fetchSites = createAsyncThunk(
-  'sites/fetchSites',
-  async (
-    args: {
-      searchParam?: string;
-      page?: number;
-      pageSize?: number;
-      filter?: {};
-    },
-    { getState },
-  ) => {
-    try {
-      const { searchParam = '', filter = {} } = args;
-      const state: any = getState();
-      const response = await getAxiosInstance().post(GRAPHQL, {
-        query: print(graphQlSiteQuery()),
-        variables: {
-          searchParam: searchParam,
-          page: state.sites.currentPage,
-          pageSize: state.sites.pageSize,
-          filters: filter,
-        },
-      });
-      return response.data.data.searchSites;
-    } catch (error) {
-      throw error;
-    }
-  },
-);
-
 const siteSlice = createSlice({
   name: 'sites',
   initialState,
 
   reducers: {
-    setFetchLoadingState: (state, action) => {
-      const newState = {
-        ...state,
-      };
-      newState.fetchStatus = RequestStatus.loading;
-      return newState;
-    },
-    resetSites: (state, action) => {
-      const newState = {
-        ...state,
-      };
-      newState.sites = [];
-      newState.fetchStatus = RequestStatus.idle;
-      return newState;
-    },
-    resetUpdateStatus: (state, action) => {
-      const newState = {
-        ...state,
-      };
-
-      newState.updateStatus = RequestStatus.idle;
-      newState.fetchStatus = RequestStatus.idle;
-
-      return newState;
-    },
-    resetAddedStatus: (state, action) => {
-      const newState = {
-        ...state,
-      };
-
-      newState.addedStatus = RequestStatus.idle;
-      newState.fetchStatus = RequestStatus.idle;
-
-      return newState;
-    },
-    resetDeleteStatus: (state, action) => {
-      const newState = {
-        ...state,
-      };
-      newState.fetchStatus = RequestStatus.idle;
-      newState.deleteStatus = RequestStatus.idle;
-      return newState;
-    },
-    siteAdded: {
-      reducer(state, action) {
-        const updatedArr: SiteResultDto[] = [state.sites, action.payload];
-        state.sites = updatedArr;
-      },
-      prepare(name: string, email: string): any {
-        return {
-          payload: {
-            id: new Date().getTime(),
-            name,
-            email,
-          },
-        };
-      },
-    },
-    updateSearchQuery: (state, action) => {
-      const newState = {
-        ...state,
-      };
-      newState.searchQuery = action.payload;
-      return newState;
-    },
-    updatePageSizeSetting: (state, action) => {
-      const newState = {
-        ...state,
-      };
-      newState.currentPage = action.payload.currentPage;
-      newState.pageSize = action.payload.pageSize;
-      return newState;
-    },
     trackChanges: (state, action) => {
       let recordExists = state.changeTracker.filter((tracked) => {
         return (
@@ -218,22 +104,6 @@ const siteSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(fetchSites.pending, (state, action) => {
-        const newState = { ...state };
-        newState.fetchStatus = RequestStatus.loading;
-        return newState;
-      })
-      .addCase(fetchSites.fulfilled, (state, action) => {
-        const newState = { ...state };
-        newState.fetchStatus = RequestStatus.success;
-        newState.sites = action.payload.sites;
-        newState.resultsCount = action.payload.count;
-        return newState;
-      })
-      .addCase(fetchSites.rejected, (state, action) => {
-        const newState = { ...state };
-        return newState;
-      })
       .addCase(fetchSitesDetails.pending, (state, action) => {
         const newState = { ...state };
         newState.siteDetailsFetchStatus = RequestStatus.loading;
@@ -253,10 +123,6 @@ const siteSlice = createSlice({
   },
 });
 
-export const selectAllSites = (state: any) => state.sites.sites;
-export const loadingState = (state: any) => state.sites.fetchStatus;
-export const currentPageSelection = (state: any) => state.sites.currentPage;
-export const currentPageSize = (state: any) => state.sites.pageSize;
 export const resultsCount = (state: any) => state.sites.resultsCount;
 export const siteDetailsLoadingState = (state: any) =>
   state.sites.fetchSitesDetails;
@@ -264,14 +130,8 @@ export const selectSiteDetails = (state: any) => state.sites.siteDetails;
 export const trackedChanges = (state: any) => state.sites.changeTracker;
 export const siteDetailsMode = (state: any) => state.sites.siteDetailsMode;
 export const resetSiteDetails = (state: any) => state.sites.resetSiteDetails;
-export const userTypeOnlyForDemo = (state: any) => state.sites.userType;
 
 export const {
-  siteAdded,
-  resetSites,
-  setFetchLoadingState,
-  updatePageSizeSetting,
-  updateSearchQuery,
   trackChanges,
   clearTrackChanges,
   updateSiteDetailsMode,

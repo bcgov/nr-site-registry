@@ -103,12 +103,14 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
 
         const response = await getAxiosInstance().post(GRAPHQL, {
           query: print(graphQLPeopleOrgsCd()),
-          variables: { searchParam, entity: 'ORG' },
+          variables: { searchParam, entityType: 'ORG' },
         });
 
         // Store result in cache if successful
-        if (response?.data?.data?.getPeopleOrgsCd?.success) {
-          resultCache[searchParam] = response.data.data.getPeopleOrgsCd.data;
+        const { data = [], success = false } =
+          response?.data?.data?.getPeopleOrgsCd || {};
+        if (success && data?.length > 0) {
+          resultCache[searchParam] = data;
           return response.data.data.getPeopleOrgsCd;
         }
       } catch (error) {

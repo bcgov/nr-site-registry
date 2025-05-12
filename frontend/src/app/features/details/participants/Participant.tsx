@@ -126,9 +126,11 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
         });
 
         // Store result in cache if successful
-        if (response?.data?.data?.getPeopleOrgsCd?.success) {
-          resultCache[searchParam] = response.data.data.getPeopleOrgsCd.data;
-          return response.data.data.getPeopleOrgsCd;
+        const getPeopleOrgsCd = response?.data?.data?.getPeopleOrgsCd;
+
+        if (getPeopleOrgsCd?.success && getPeopleOrgsCd.data?.length > 0) {
+          resultCache[searchParam] = getPeopleOrgsCd.data;
+          return getPeopleOrgsCd;
         }
       } catch (error) {
         console.error('Error fetching participant:', error);

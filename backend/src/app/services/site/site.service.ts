@@ -526,14 +526,14 @@ export class SiteService {
       if (pending) {
         const result = await this.siteRepository.findOne({
           where: { id: siteId, srAction: SRApprovalStatusEnum.PENDING },
+          relations: ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'],
         });
-
         response.data = result ? result : null;
       } else {
         const result = await this.siteRepository.findOne({
           where: { id: siteId },
+          relations: ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'],
         });
-
         response.data = result ? result : null;
       }
     } else {

@@ -20,6 +20,8 @@ export const graphQLSiteNotationBySiteId = () => {
           etypCode
           eclsCode
           srAction
+          whenCreated
+          whenUpdated
           notationParticipant {
             eventParticId
             eventId
@@ -28,6 +30,8 @@ export const graphQLSiteNotationBySiteId = () => {
             displayName
             srAction
             srValue
+            whenCreated
+            whenUpdated
           }
         }
       }

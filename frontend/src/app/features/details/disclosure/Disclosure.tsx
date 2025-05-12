@@ -68,11 +68,6 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 
-  // NEED TO ADD COLUMN FOR THIS IN DATABASE
-  const [srTimeStamp, setSRTimeStamp] = useState(
-    'Sent to SR on June 2nd, 2013 NOT FROM DB ',
-  );
-
   const [searchInternalContact, setSearchInternalContact] = useState('');
   const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
   const [internalRow, setInternalRow] = useState(

@@ -197,7 +197,7 @@ export type DocumentResponse = {
 export type DropdownDto = {
   __typename?: 'DropdownDto';
   key: Scalars['String']['output'];
-  metaData: Scalars['String']['output'];
+  metaData?: Maybe<Scalars['String']['output']>;
   value: Scalars['String']['output'];
 };
 
@@ -449,7 +449,7 @@ export type LandUseCd = {
 
 export type LandUseCodeResponse = {
   __typename?: 'LandUseCodeResponse';
-  data: Array<LandUseCd>;
+  data?: Maybe<Array<LandUseCd>>;
   httpStatusCode?: Maybe<Scalars['Int']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
@@ -592,6 +592,8 @@ export type NotationDto = {
   srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
+  whenCreated: Scalars['DateTime']['output'];
+  whenUpdated?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type NotationIputDto = {
@@ -610,6 +612,8 @@ export type NotationIputDto = {
   srAction: Scalars['String']['input'];
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
+  whenCreated?: InputMaybe<Scalars['DateTime']['input']>;
+  whenUpdated?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type NotationParticipantDto = {
@@ -622,6 +626,8 @@ export type NotationParticipantDto = {
   srAction?: Maybe<Scalars['String']['output']>;
   srValue: Scalars['Boolean']['output'];
   userAction: Scalars['String']['output'];
+  whenCreated: Scalars['DateTime']['output'];
+  whenUpdated?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type NotationParticipantInputDto = {
@@ -634,6 +640,8 @@ export type NotationParticipantInputDto = {
   srAction: Scalars['String']['input'];
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
+  whenCreated?: InputMaybe<Scalars['DateTime']['input']>;
+  whenUpdated?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type NotationResponse = {
@@ -999,8 +1007,10 @@ export type SiteAssocs = {
   note: Scalars['String']['output'];
   rwmFlag?: Maybe<Scalars['Float']['output']>;
   rwmNoteFlag?: Maybe<Scalars['Float']['output']>;
+  site: Sites;
   siteId: Scalars['String']['output'];
   siteIdAssociatedWith: Scalars['String']['output'];
+  siteIdAssociatedWith2: Sites;
   srAction?: Maybe<Scalars['String']['output']>;
   userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
@@ -1253,6 +1263,8 @@ export type SiteProfilesInputDto = {
   srAction: Scalars['String']['input'];
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
+  whenCreated?: InputMaybe<Scalars['DateTime']['input']>;
+  whenUpdated?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type SiteRecordsForSrAction = {

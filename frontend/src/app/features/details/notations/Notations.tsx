@@ -93,11 +93,6 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     useState<{ [key: string]: any | [Date, Date] }[]>(notations);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 
-  // NEED TO ADD COLUMN FOR THIS IN DATABASE
-  const [srTimeStamp, setSRTimeStamp] = useState(
-    'Sent to SR on June 2nd, 2013',
-  );
-
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [isDelete, setIsDelete] = useState(false);
@@ -133,9 +128,11 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         });
 
         // Store result in cache if successful
-        if (response?.data?.data?.getPeopleOrgsCd?.success) {
-          resultCache[searchParam] = response.data.data.getPeopleOrgsCd.data;
-          return response.data.data.getPeopleOrgsCd;
+        const getPeopleOrgsCd = response?.data?.data?.getPeopleOrgsCd;
+
+        if (getPeopleOrgsCd?.success && getPeopleOrgsCd.data?.length > 0) {
+          resultCache[searchParam] = getPeopleOrgsCd.data;
+          return getPeopleOrgsCd;
         }
       } catch (error) {
         console.error('Error fetching notation participant:', error);

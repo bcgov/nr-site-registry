@@ -36,7 +36,7 @@ export class LandUseCodeResolver {
         `Land use codes data not found`,
         HttpStatus.NOT_FOUND,
         false,
-        null,
+        [],
       );
     }
   }

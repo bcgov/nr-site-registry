@@ -78,7 +78,6 @@ const Cart = () => {
 
   const handleDeleteFromShoppingCart = () => {
     const loggedInUser = getUser();
-    console.log(cartItemsArr);
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
@@ -132,9 +131,7 @@ const Cart = () => {
           totalResults={[].length}
           allowRowsSelect={false}
           showPageOptions={false}
-          changeHandler={(event) => {
-            console.log('change event', event);
-          }}
+          changeHandler={() => {}}
           editMode={false}
           idColumnName="id"
           deleteHandler={(event) => {

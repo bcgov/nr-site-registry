@@ -84,10 +84,12 @@ export class SiteAssocs extends ChangeAuditEntity {
   @Column('character varying', { name: 'common_pid', length: 1 })
   commonPid: string;
 
+  @Field(() => Sites)
   @ManyToOne(() => Sites, (sites) => sites.siteAssocs, { onDelete: 'CASCADE' })
   @JoinColumn([{ name: 'site_id', referencedColumnName: 'id' }])
   site: Sites;
 
+  @Field(() => Sites)
   @ManyToOne(() => Sites, (sites) => sites.siteAssocs2, { onDelete: 'CASCADE' })
   @JoinColumn([{ name: 'site_id_associated_with', referencedColumnName: 'id' }])
   siteIdAssociatedWith2: Sites;

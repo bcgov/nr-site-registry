@@ -149,7 +149,6 @@ export const fetchPendingSiteDisclosure = createAsyncThunk(
 export const fetchPendingDocumentsForApproval = createAsyncThunk(
   'documents/fetchPendingDocumentsForApproval',
   async ({ siteId, showPending }: { siteId: string; showPending: boolean }) => {
-    console.log('herer');
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphQLSiteDocumentsBySiteId()),

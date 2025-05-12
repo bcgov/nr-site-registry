@@ -397,8 +397,8 @@ const SRUpdates = () => {
   const handleChange = (event: any) => {
     console.log('No Change Hanlder Required Here', event);
   };
+
   const handleAndReturnBoolean = (event: any): boolean => {
-    console.log('No Change Hanlder Required Here', event);
     return true;
   };
 
@@ -825,7 +825,7 @@ const SRUpdates = () => {
             selectedRowIds={[]}
             handleRemoveLandUse={handleChange}
             handleAddLandUse={handleChange}
-          ></LandUseTable>
+          />
         </ApproveReject>
       )}
 

@@ -58,13 +58,7 @@ import { LatLngTupleScalar } from './app/scalars/latLngTuple';
         federation: 2,
         path: process.env.GRAPHQL_SCHEMA_FILE_PATH || './schema.graphql',
       },
-      /*cors: {
-        credentials: true,
-        origin: true,
-      },*/
-      context: () => {
-        //console.log('req at user '+ new Date(),req)
-      },
+      context: () => {},
     }),
   ],
   controllers: [AppController],

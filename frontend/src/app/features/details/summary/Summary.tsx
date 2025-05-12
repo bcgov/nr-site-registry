@@ -64,14 +64,6 @@ const Summary = () => {
   }, [addCartItemStatus]);
   const { id } = useParams();
 
-  // useEffect(() => {
-  //   console.log("Calling From Summary")
-  //   if (id)
-  //     dispatch(
-  //       fetchSitesDetails({ siteId: id ?? '', showPending: showPending }),
-  //     );
-  // }, [id]);
-
   const [parcelSearchTerm, SetParcelSearchTeam] = useState('');
 
   setTimeout(() => {
@@ -94,7 +86,6 @@ const Summary = () => {
   const [editSiteDetailsObject, setEditSiteDetailsObject] = useState(details);
   const resetDetails = useSelector(resetSiteDetails);
   useEffect(() => {
-    console.log('Change in resetDetails');
     if (resetDetails) {
       setEditSiteDetailsObject(details);
     }
@@ -120,7 +111,6 @@ const Summary = () => {
   const initialParcelIds = [0];
 
   useEffect(() => {
-    console.log('Change in details');
     let address = document.getElementsByTagName('h3');
     address.length > 0 && address[0] && address[0].remove();
     setEditSiteDetailsObject(details);
@@ -167,7 +157,6 @@ const Summary = () => {
         ...editSiteDetailsObject,
         [graphQLPropertyName]: value,
       };
-      console.log(newState);
 
       dispatch(
         setupSiteSummaryForSaving({

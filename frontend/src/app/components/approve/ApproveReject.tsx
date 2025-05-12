@@ -67,11 +67,7 @@ export const ApproveRejectButtons: React.FC<IApproveRejectButtons> = ({
 }) => {
   approveLabel = approveLabel ?? 'Approve';
   rejectLabel = rejectLabel ?? 'Not Public';
-  approveRejectHandler =
-    approveRejectHandler ??
-    ((event) => {
-      console.log('approveRejectHandler not provided');
-    });
+  approveRejectHandler = approveRejectHandler ?? (() => {});
   return (
     <div
       className="approve-reject-actions"

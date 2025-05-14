@@ -33,4 +33,16 @@ describe('CsvController', () => {
     expect(mockCsvService.generateCSVFiles).toHaveBeenCalled();
     expect(result).toEqual({ message: 'CSV generated successfully' });
   });
+
+  it('should handle errors when generating CSV files', async () => {
+    mockCsvService.generateCSVFiles.mockRejectedValueOnce(
+      new Error('Something went wrong'),
+    );
+
+    try {
+      await csvController.generateCsv();
+    } catch (e) {
+      expect(e.message).toBe('Something went wrong');
+    }
+  });
 });

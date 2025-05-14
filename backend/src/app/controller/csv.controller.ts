@@ -1,4 +1,4 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { CsvService } from '../services/csv/csv.service';
 import { Resource } from 'nest-keycloak-connect';
 

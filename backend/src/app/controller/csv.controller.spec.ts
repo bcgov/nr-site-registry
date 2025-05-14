@@ -28,8 +28,7 @@ describe('CsvController', () => {
   it('should call csvService.generateCSVFiles and return success message', async () => {
     mockCsvService.generateCSVFiles.mockResolvedValueOnce(undefined); // Simulate successful execution
 
-    const req = {} as any; // mock request if needed
-    const result = await csvController.generateCsv(req);
+    const result = await csvController.generateCsv();
 
     expect(mockCsvService.generateCSVFiles).toHaveBeenCalled();
     expect(result).toEqual({ message: 'CSV generated successfully' });

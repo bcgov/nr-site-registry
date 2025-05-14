@@ -21,7 +21,7 @@ import { ChangeTracker } from '../../common/IChangeType';
 import { get } from '../utils';
 
 interface TableBodyProps {
-  isLoading: RequestStatus;
+  isLoading?: RequestStatus;
   columns: TableColumn[];
   data: any;
   allowRowsSelect: boolean;

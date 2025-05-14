@@ -28,6 +28,7 @@ const FilterPills: React.FC<FilterPillsProps> = ({
           {filter && `${filter.label} : ${filter.value}`}
           <div
             className="d-flex align-items-center x-mark"
+            data-testid={`remove-filter-${filter.key}`}
             onClick={() => onRemoveFilter(filter)}
           >
             <XmarkIcon />

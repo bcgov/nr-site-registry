@@ -28,11 +28,7 @@ const SummaryInfo: React.FC<ISummaryInfo> = ({
 }) => {
   showApproveRejectSection = showApproveRejectSection ?? false;
 
-  approveRejectHandler =
-    approveRejectHandler ??
-    (() => {
-      console.log('Approve Handler Not Provided');
-    });
+  approveRejectHandler = approveRejectHandler ?? (() => {});
 
   return (
     <PanelWithUpDown

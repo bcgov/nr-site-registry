@@ -160,6 +160,11 @@ jobs:
             --set-string global.secrets.keycloakRealm="${{ secrets.KEYCLOAK_REALM }}" \
             --set-string global.secrets.keycloakClientID="${{ secrets.KEYCLOAK_CLIENTID }}" \
             --set-string global.secrets.keycloakAuthURL="${{ secrets.KEYCLOAK_AUTH_URL }}" \
+            --set-string global.secrets.esraS3Endpoint="${{ secrets.ESRA_S3_ENDPOINT }}" \
+            --set-string global.secrets.esraS3AccessKey="${{ secrets.ESRA_S3_ACCESS_KEY }}" \
+            --set-string global.secrets.esraS3SecretKey="${{ secrets.ESRA_S3_SECRET_KEY }}" \
+            --set-string global.secrets.esraS3Bucket="${{ secrets.ESRA_S3_BUCKET }}" \
+            --set-string global.secrets.esraS3BucketEnv="${{ secrets.ESRA_S3_BUCKET_ENV }}" \
             --set-string global.config.dbUser=${{ inputs.db_user }} \
             ${{ inputs.params }} \
             --install --wait --atomic ${{ steps.vars.outputs.release }} --debug \

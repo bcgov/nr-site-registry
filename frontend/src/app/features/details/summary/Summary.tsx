@@ -439,7 +439,7 @@ const Summary = () => {
         handleInputChange={handleInputChange}
       />
 
-      {
+      {/* {
         <PanelWithUpDown
           label="Parcel ID(s)"
           secondChild={
@@ -478,9 +478,9 @@ const Summary = () => {
             )
           }
         />
-      }
+      } */}
 
-      {
+      {/* {
         <div className="">
           <div className="summary-details-border">
             <span className="summary-details-header">
@@ -502,9 +502,9 @@ const Summary = () => {
             />
           </div>
         </div>
-      }
+      } */}
 
-      {isUserPurchasedSite && (
+      {/* {isUserPurchasedSite && (
         <div className="summary-details-border">
           <span className="summary-details-header">Activity Log</span>
           <div className="col-12">
@@ -522,7 +522,7 @@ const Summary = () => {
             />
           </div>
         </div>
-      )}
+      )} */}
 
       {!isUserPurchasedSite && (
         <div className="external-purchase-section">

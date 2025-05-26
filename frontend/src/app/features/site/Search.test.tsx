@@ -83,7 +83,7 @@ describe('Search Component', () => {
     renderWithProviders(<Search />, store);
 
     const searchInput = screen.getByPlaceholderText(
-      'Search for site address or name',
+      'Search for site address or name or pid',
     );
     fireEvent.change(searchInput, { target: { value: 'test' } });
 
@@ -102,7 +102,7 @@ describe('Search Component', () => {
     renderWithProviders(<Search />, store);
 
     const searchInput = screen.getByPlaceholderText(
-      'Search for site address or name',
+      'Search for site address or name or pid',
     );
     fireEvent.change(searchInput, { target: { value: 'test' } });
 

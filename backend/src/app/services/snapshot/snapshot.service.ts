@@ -383,21 +383,25 @@ export class SnapshotsService {
       const createSnapShotContent = inputDto.map(async (dto) => {
         if (dto) {
           const { siteId } = dto;
-          let eventPartics = [];
+          const eventPartics: any = [];
           if (siteId !== '') {
             const snapShotContent: SnapshotSiteContent =
               new SnapshotSiteContent();
 
             snapShotContent.sitesSummary = await this.sitesRespository.findOne({
-              where: { id: siteId },
+              where: { id: siteId, srAction: SRApprovalStatusEnum.PUBLIC },
             });
+
+            if (snapShotContent.sitesSummary === null) {
+              throw new Error('Site not found');
+            }
 
             snapShotContent.events =
               await this.getNotationsForSnapshotCreation(siteId);
 
             await Promise.all(
               snapShotContent.events.map(async (event) => {
-                let response =
+                const response =
                   await this.getNotatioParticipantsForSnapshotCreation(
                     event.id,
                   );

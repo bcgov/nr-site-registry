@@ -178,11 +178,12 @@ export const showNotification = (
   currentStatus: RequestStatus,
   successMessage?: string,
   errorMessage?: string,
+  errorMessageTitle?: string,
 ) => {
   if (currentStatus === RequestStatus.success) {
     notifySuccess(successMessage);
   } else if (currentStatus === RequestStatus.failed) {
-    notifyError(errorMessage);
+    notifyError(errorMessage, errorMessageTitle);
   }
 };
 

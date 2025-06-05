@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getAxiosInstance, getUser } from '../../../helpers/utility';
 import { print } from 'graphql';
 import {
+  getSiteInsightsQL,
   graphqlSiteDetailsQuery,
   graphqlSiteDetailsQueryForLoggedIn,
   graphQlSiteQueryForAuthenticatedUsers,
@@ -23,6 +24,8 @@ const initialState: SiteState = {
   siteDetailsMode: SiteDetailsMode.ViewOnlyMode,
   resetSiteDetails: false,
   userType: UserType.External,
+  siteInsights: null,
+  siteInsightsFetchStatus: RequestStatus.idle,
 };
 
 export const fetchSitesDetails = createAsyncThunk(
@@ -45,6 +48,23 @@ export const fetchSitesDetails = createAsyncThunk(
       return user
         ? response.data?.data?.findSiteBySiteIdLoggedInUser?.data
         : response.data?.data?.findSiteBySiteId?.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
+
+export const fetchSitesInsights = createAsyncThunk(
+  'sites/fetchSitesInsights',
+  async (args: { siteId: string }) => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(getSiteInsightsQL()),
+        variables: {
+          siteId: args.siteId,
+        },
+      });
+      return response.data?.data?.getSiteInsights?.data;
     } catch (error) {
       throw error;
     }
@@ -119,6 +139,17 @@ const siteSlice = createSlice({
         const newState = { ...state };
         newState.siteDetailsFetchStatus = RequestStatus.failed;
         return newState;
+      })
+      .addCase(fetchSitesInsights.pending, (state, action) => {
+        const newState = { ...state };
+        newState.siteInsightsFetchStatus = RequestStatus.loading;
+        return newState;
+      })
+      .addCase(fetchSitesInsights.fulfilled, (state, action) => {
+        const newState = { ...state };
+        newState.siteInsights = action.payload;
+        newState.siteInsightsFetchStatus = RequestStatus.success;
+        return newState;
       });
   },
 });
@@ -130,6 +161,7 @@ export const selectSiteDetails = (state: any) => state.sites.siteDetails;
 export const trackedChanges = (state: any) => state.sites.changeTracker;
 export const siteDetailsMode = (state: any) => state.sites.siteDetailsMode;
 export const resetSiteDetails = (state: any) => state.sites.resetSiteDetails;
+export const selectSiteInsights = (state: any) => state.sites.siteInsights;
 
 export const {
   trackChanges,

@@ -7,7 +7,7 @@ export class ChangeAuditEntityDTO {
   @Field({ nullable: true })
   apiAction: string;
 
-  @Field()
+  @Field({ nullable: true })
   srAction: string;
 
   @Field(() => Boolean, { nullable: true })

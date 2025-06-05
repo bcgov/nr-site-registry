@@ -13,6 +13,7 @@ import {
   fetchSitesDetails,
   resetSiteDetails,
   selectSiteDetails,
+  selectSiteInsights,
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
@@ -37,7 +38,11 @@ import {
 } from '../../cart/CartSlice';
 import { getUser, isUserOfType, UserRoleType } from '../../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
-import { setupSiteSummaryForSaving } from '../SaveSiteDetailsSlice';
+import {
+  getSiteSummaryEdits,
+  setupSiteSummaryForSaving,
+  saveRequestStatus,
+} from '../SaveSiteDetailsSlice';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 
@@ -82,14 +87,35 @@ const Summary = () => {
   }, 3000);
 
   const detailsMode = useSelector(siteDetailsMode);
-  const details = useSelector(selectSiteDetails);
+  let details = useSelector(selectSiteDetails);
+  const savedEdits = useSelector(getSiteSummaryEdits);
+  const insights = useSelector(selectSiteInsights);
+
   const [editSiteDetailsObject, setEditSiteDetailsObject] = useState(details);
+
   const resetDetails = useSelector(resetSiteDetails);
+  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
+
+  useEffect(() => {
+    if (savedEdits) {
+      setEditSiteDetailsObject(savedEdits);
+    }
+  }, [savedEdits]);
   useEffect(() => {
     if (resetDetails) {
       setEditSiteDetailsObject(details);
     }
   }, [resetDetails]);
+
+  useEffect(() => {
+    if (saveSiteDetailsRequestStatus === RequestStatus.success) {
+      setEditSiteDetailsObject(details);
+    } else if (savedEdits) {
+      setEditSiteDetailsObject(savedEdits);
+    } else {
+      setEditSiteDetailsObject(details);
+    }
+  }, [savedEdits, details, saveSiteDetailsRequestStatus]);
 
   const [edit, setEdit] = useState(false);
   const [srMode, setSRMode] = useState(false);
@@ -113,7 +139,6 @@ const Summary = () => {
   useEffect(() => {
     let address = document.getElementsByTagName('h3');
     address.length > 0 && address[0] && address[0].remove();
-    setEditSiteDetailsObject(details);
   }, [details]);
 
   const [parcelIds, setParcelIds] = useState(initialParcelIds);
@@ -193,12 +218,12 @@ const Summary = () => {
       id: 4,
       displayName: 'Notations',
       active: true,
-      graphQLPropertyName: 'notation',
+      graphQLPropertyName: 'eventCount',
       displayType: {
         type: FormFieldType.Text,
         label: 'Site ID',
         placeholder: 'Separate IDs by a comma (",")',
-        graphQLPropertyName: 'id',
+        graphQLPropertyName: 'eventCount',
         value: '',
         validation: {
           pattern: /^[0-9,\s]*$/,
@@ -215,12 +240,12 @@ const Summary = () => {
       id: 5,
       displayName: 'Participants',
       active: true,
-      graphQLPropertyName: 'participants',
+      graphQLPropertyName: 'eventParticCount',
       displayType: {
         type: FormFieldType.Text,
         label: 'Site ID',
         placeholder: 'Separate IDs by a comma (",")',
-        graphQLPropertyName: 'id',
+        graphQLPropertyName: 'eventParticCount',
         value: '',
         validation: {
           pattern: /^[0-9,\s]*$/,
@@ -237,12 +262,12 @@ const Summary = () => {
       id: 1,
       displayName: 'Documents',
       active: true,
-      graphQLPropertyName: 'documents',
+      graphQLPropertyName: 'siteDocCount',
       displayType: {
         type: FormFieldType.Text,
         label: 'Site ID',
         placeholder: 'Separate IDs by a comma (",")',
-        graphQLPropertyName: 'id',
+        graphQLPropertyName: 'siteDocCount',
         value: '',
         validation: {
           pattern: /^[0-9,\s]*$/,
@@ -259,12 +284,12 @@ const Summary = () => {
       id: 2,
       displayName: 'Land Uses',
       active: true,
-      graphQLPropertyName: 'landUses',
+      graphQLPropertyName: 'landHistoryCount',
       displayType: {
         type: FormFieldType.Text,
         label: 'Site ID',
         placeholder: 'Separate IDs by a comma (",")',
-        graphQLPropertyName: 'id',
+        graphQLPropertyName: 'landHistoryCount',
         value: '',
         validation: {
           pattern: /^[0-9,\s]*$/,
@@ -281,12 +306,12 @@ const Summary = () => {
       id: 3,
       displayName: 'Associated Sites',
       active: true,
-      graphQLPropertyName: 'associatedSites',
+      graphQLPropertyName: 'siteAssocCount',
       displayType: {
         type: FormFieldType.Text,
         label: 'Site ID',
         placeholder: 'Separate IDs by a comma (",")',
-        graphQLPropertyName: 'id',
+        graphQLPropertyName: 'siteAssocCount',
         value: '',
         validation: {
           pattern: /^[0-9,\s]*$/,
@@ -304,12 +329,12 @@ const Summary = () => {
       id: 6,
       displayName: 'Parcel Description',
       active: true,
-      graphQLPropertyName: 'parcelDescription',
+      graphQLPropertyName: 'siteSubdivCount',
       displayType: {
         type: FormFieldType.Text,
         label: 'Site ID',
         placeholder: 'Separate IDs by a comma (",")',
-        graphQLPropertyName: 'id',
+        graphQLPropertyName: 'siteSubdivCount',
         value: '',
         validation: {
           pattern: /^[0-9,\s]*$/,
@@ -480,19 +505,17 @@ const Summary = () => {
         />
       } */}
 
-      {/* {
+      {
         <div className="">
           <div className="summary-details-border">
-            <span className="summary-details-header">
-              Summary of details types
-            </span>
+            <span className="summary-details-header">Summary Details</span>
           </div>
           <div className="col-12 overflow-auto w-100">
             <Table
               label="Summary Details"
               isLoading={RequestStatus.success}
               columns={columns}
-              data={data}
+              data={[insights]}
               totalResults={data.length}
               allowRowsSelect={false}
               showPageOptions={false}
@@ -502,7 +525,7 @@ const Summary = () => {
             />
           </div>
         </div>
-      } */}
+      }
 
       {/* {isUserPurchasedSite && (
         <div className="summary-details-border">
@@ -524,7 +547,7 @@ const Summary = () => {
         </div>
       )} */}
 
-      {!isUserPurchasedSite && (
+      {isUserOfType(UserRoleType.CLIENT) && !isUserPurchasedSite && (
         <div className="external-purchase-section">
           <div className="external-purchase-info">
             <span>

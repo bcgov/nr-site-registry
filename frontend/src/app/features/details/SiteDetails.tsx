@@ -17,6 +17,7 @@ import {
   siteDetailsMode,
   updateSiteDetailsMode,
   trackChanges,
+  fetchSitesInsights,
 } from '../site/dto/SiteSlice';
 import { AppDispatch } from '../../Store';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
@@ -193,6 +194,8 @@ const SiteDetails = () => {
       saveSiteDetailsRequestStatus === RequestStatus.failed
     ) {
       if (saveSiteDetailsRequestStatus === RequestStatus.success) {
+        dispatch(fetchSitesInsights({ siteId: id ?? '' }));
+        dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false }));
         dispatch(resetSaveSiteDetails(null));
         dispatch(clearTrackChanges(null));
         dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
@@ -312,7 +315,7 @@ const SiteDetails = () => {
     if (id) {
       dispatch(resetSaveSiteDetails(null));
       dispatch(setupSiteIdForSaving(id));
-
+      dispatch(fetchSitesInsights({ siteId: id ?? '' }));
       if (auth.user !== null) {
         Promise.all([
           dispatch(fetchSnapshots(id ?? '')),

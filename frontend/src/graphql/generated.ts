@@ -178,7 +178,7 @@ export type DocumentInputDto = {
   organizationName?: InputMaybe<Scalars['String']['input']>;
   psnorgId: Scalars['String']['input'];
   siteId: Scalars['String']['input'];
-  srAction: Scalars['String']['input'];
+  srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   submissionDate: Scalars['String']['input'];
   title: Scalars['String']['input'];
@@ -427,7 +427,7 @@ export type LandHistoriesInputDto = {
   note?: InputMaybe<Scalars['String']['input']>;
   originalLandUseCode?: InputMaybe<Scalars['String']['input']>;
   shouldDelete?: Scalars['Boolean']['input'];
-  srAction: Scalars['String']['input'];
+  srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
 };
@@ -609,7 +609,7 @@ export type NotationIputDto = {
   requirementDueDate?: InputMaybe<Scalars['DateTime']['input']>;
   requirementReceivedDate?: InputMaybe<Scalars['DateTime']['input']>;
   siteId: Scalars['String']['input'];
-  srAction: Scalars['String']['input'];
+  srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
   whenCreated?: InputMaybe<Scalars['DateTime']['input']>;
@@ -637,7 +637,7 @@ export type NotationParticipantInputDto = {
   eventId: Scalars['String']['input'];
   eventParticId: Scalars['String']['input'];
   psnorgId: Scalars['String']['input'];
-  srAction: Scalars['String']['input'];
+  srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
   whenCreated?: InputMaybe<Scalars['DateTime']['input']>;
@@ -672,7 +672,7 @@ export type ParcelDescriptionInputDto = {
   id: Scalars['String']['input'];
   idPinNumber: Scalars['String']['input'];
   landDescription: Scalars['String']['input'];
-  srAction: Scalars['String']['input'];
+  srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
 };
@@ -887,6 +887,8 @@ export type QuerySearchSitesArgs = {
   page: Scalars['Int']['input'];
   pageSize: Scalars['Int']['input'];
   searchParam: Scalars['String']['input'];
+  sortBy?: InputMaybe<SiteSortBy>;
+  sortByDir?: InputMaybe<SortByDirection>;
 };
 
 export type QueryResultForPendingSites = {
@@ -995,7 +997,7 @@ export type SiteAssociationsInputDto = {
   note?: InputMaybe<Scalars['String']['input']>;
   siteId: Scalars['String']['input'];
   siteIdAssociatedWith: Scalars['String']['input'];
-  srAction: Scalars['String']['input'];
+  srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
 };
@@ -1160,7 +1162,7 @@ export type SiteParticsInputDto = {
   prCode: Scalars['String']['input'];
   psnorgId: Scalars['String']['input'];
   siteId: Scalars['String']['input'];
-  srAction: Scalars['String']['input'];
+  srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
 };
@@ -1260,7 +1262,7 @@ export type SiteProfilesInputDto = {
   siteId: Scalars['String']['input'];
   siteRegDateEntered?: InputMaybe<Scalars['DateTime']['input']>;
   siteRegDateRecd?: InputMaybe<Scalars['DateTime']['input']>;
-  srAction: Scalars['String']['input'];
+  srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
   whenCreated?: InputMaybe<Scalars['DateTime']['input']>;
@@ -1281,6 +1283,24 @@ export type SiteRiskCd = {
   code: Scalars['String']['output'];
   description: Scalars['String']['output'];
 };
+
+export enum SiteSortBy {
+  City = 'CITY',
+  CommonName = 'COMMON_NAME',
+  GeneralDescription = 'GENERAL_DESCRIPTION',
+  Id = 'ID',
+  LatDeg = 'LAT_DEG',
+  LatDegreesMinutesSeconds = 'LAT_DEGREES_MINUTES_SECONDS',
+  LatLongReliabilityFlag = 'LAT_LONG_RELIABILITY_FLAG',
+  LongDeg = 'LONG_DEG',
+  LongDegreesMinutesSeconds = 'LONG_DEGREES_MINUTES_SECONDS',
+  SiteAddress = 'SITE_ADDRESS',
+  SiteRiskCode = 'SITE_RISK_CODE',
+  SrStatus = 'SR_STATUS',
+  WhenCreated = 'WHEN_CREATED',
+  WhenUpdated = 'WHEN_UPDATED',
+  WhoCreated = 'WHO_CREATED'
+}
 
 export type SiteStatusCd = {
   __typename?: 'SiteStatusCd';
@@ -1334,7 +1354,7 @@ export type SiteSummaryDto = {
   rwmFlag?: InputMaybe<Scalars['Float']['input']>;
   rwmGeneralDescFlag?: InputMaybe<Scalars['Float']['input']>;
   siteRiskCode?: InputMaybe<Scalars['String']['input']>;
-  srAction: Scalars['String']['input'];
+  srAction?: InputMaybe<Scalars['String']['input']>;
   srStatus?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   sstCode?: InputMaybe<Scalars['String']['input']>;
@@ -1424,6 +1444,11 @@ export type Snapshots = {
   whoCreated: Scalars['String']['output'];
   whoUpdated?: Maybe<Scalars['String']['output']>;
 };
+
+export enum SortByDirection {
+  Asc = 'ASC',
+  Desc = 'DESC'
+}
 
 export type _Service = {
   __typename?: '_Service';

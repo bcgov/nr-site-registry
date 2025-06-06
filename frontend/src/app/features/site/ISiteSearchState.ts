@@ -1,3 +1,4 @@
+import { SiteSortBy, SortByDirection } from '../../../graphql/generated';
 import { SiteResultDto } from './dto/Site';
 
 export interface ISiteSearchState {
@@ -6,6 +7,8 @@ export interface ISiteSearchState {
   page: number;
   pageSize: number;
   count: number;
+  sortBy: SiteSortBy;
+  sortByDir: SortByDirection;
   filter: {};
   error: string;
   status: string;

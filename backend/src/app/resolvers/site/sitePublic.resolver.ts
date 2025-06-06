@@ -11,6 +11,8 @@ import { DropdownDto } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { LoggerService } from '../../logger/logger.service';
 import { QueryResultForPendingSites } from '../../dto/sitesPendingReview.dto';
+import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
+import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
 
 @InputType()
 export class SiteFilters {
@@ -104,6 +106,10 @@ export class SitePublicResolver {
     @Args('searchParam', { type: () => String }) searchParam: string,
     @Args('page', { type: () => Int }) page: number,
     @Args('pageSize', { type: () => Int }) pageSize: number,
+    @Args({ name: 'sortBy', type: () => SiteSortBy, nullable: true })
+    sortBy: SiteSortBy = SiteSortBy.ID,
+    @Args({ name: 'sortByDir', type: () => SortByDirection, nullable: true })
+    sortByDir: SortByDirection = SortByDirection.ASC,
     @Args('filters', { type: () => SiteFilters })
     filters: SiteFilters,
   ) {
@@ -114,6 +120,8 @@ export class SitePublicResolver {
       searchParam,
       page,
       pageSize,
+      sortBy,
+      sortByDir,
       filters,
     );
   }

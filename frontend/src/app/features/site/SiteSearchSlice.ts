@@ -5,6 +5,7 @@ import { getAxiosInstance } from '../../helpers/utility';
 import { GRAPHQL } from '../../helpers/endpoints';
 import { print } from 'graphql';
 import { graphQlSiteQuery } from './graphql/Site';
+import { SiteSortBy, SortByDirection } from '../../../graphql/generated';
 
 const initialState: ISiteSearchState = {
   sites: [],
@@ -12,6 +13,8 @@ const initialState: ISiteSearchState = {
   page: 1,
   pageSize: 5,
   count: 0,
+  sortBy: SiteSortBy.Id,
+  sortByDir: SortByDirection.Asc,
   filter: {},
   error: '',
   status: RequestStatus.idle,
@@ -23,6 +26,8 @@ export const fetchSearchSites = createAsyncThunk(
     searchParam?: string;
     page?: number;
     pageSize?: number;
+    sortBy?: SiteSortBy;
+    sortByDir?: SortByDirection;
     filter?: {};
   }) => {
     try {
@@ -32,6 +37,8 @@ export const fetchSearchSites = createAsyncThunk(
           searchParam: args.searchParam,
           page: args.page || initialState.page,
           pageSize: args.pageSize || initialState.pageSize,
+          sortBy: args.sortBy || initialState.sortBy,
+          sortByDir: args.sortByDir || initialState.sortByDir,
           filters: args.filter || initialState.filter,
         },
       });
@@ -66,6 +73,8 @@ const siteSearchSlice = createSlice({
         state.searchParam = action.meta.arg.searchParam || state.searchParam;
         state.page = action.payload.page || state.page;
         state.pageSize = action.payload.pageSize || state.pageSize;
+        state.sortBy = action.meta.arg.sortBy || state.sortBy;
+        state.sortByDir = action.meta.arg.sortByDir || state.sortByDir;
         state.filter = action.meta.arg.filter || state.filter;
       })
       .addCase(fetchSearchSites.rejected, (state, action) => {

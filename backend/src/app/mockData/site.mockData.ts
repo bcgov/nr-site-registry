@@ -283,9 +283,9 @@ sampleSites = [
     siteCrownLandContaminated: siteCrownLandContaminated,
     recentViewedSites: recentViewedSites,
     snapshots: snapshots,
-    cart: cart,
+    cart: null,
     folioContents: folio,
-    srAction: '',
+    srAction: 'public',
     userAction: '',
   },
 ];

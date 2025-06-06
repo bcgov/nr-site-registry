@@ -2,6 +2,7 @@ import { Args, Field, InputType, Int, Query, Resolver } from '@nestjs/graphql';
 import { AuthenticatedUser, Unprotected } from 'nest-keycloak-connect';
 import {
   FetchSiteDetail,
+  FetchSiteInsights,
   SaveSiteDetailsResponse,
   SearchSiteResponse,
 } from '../../dto/response/genericResponse';
@@ -13,6 +14,7 @@ import { LoggerService } from '../../logger/logger.service';
 import { QueryResultForPendingSites } from '../../dto/sitesPendingReview.dto';
 import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
 import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
+import { SiteInsightsDto } from 'src/app/dto/siteInsights.dto';
 
 @InputType()
 export class SiteFilters {
@@ -91,6 +93,7 @@ export class SitePublicResolver {
     private readonly genericResponseProviderForSave: GenericResponseProvider<SaveSiteDetailsResponse>,
     private readonly sitesLogger: LoggerService,
     private readonly siteApprovalResponseProvider: GenericResponseProvider<QueryResultForPendingSites>,
+    private readonly genericResponseProviderForInsights: GenericResponseProvider<SiteInsightsDto>,
   ) {}
 
   /**
@@ -141,5 +144,21 @@ export class SitePublicResolver {
     );
 
     return this.siteService.findSiteBySiteId(siteId, showPending, null);
+  }
+
+  @Query(() => FetchSiteInsights, { name: 'getSiteInsights' })
+  async getSiteInsights(
+    @Args('siteId', { type: () => String }) siteId: string,
+  ) {
+    this.sitesLogger.log(
+      'SiteResolver.getSiteInsights() start siteId:' + ' ' + siteId,
+    );
+    const result = await this.siteService.getSiteInsights(siteId);
+    return this.genericResponseProviderForInsights.createResponse(
+      'Success',
+      200,
+      true,
+      result,
+    );
   }
 }

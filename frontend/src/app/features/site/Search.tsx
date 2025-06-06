@@ -303,7 +303,7 @@ const Search = () => {
                 <input
                   tabIndex={13}
                   aria-label="Search input"
-                  placeholder="Search for site address or name"
+                  placeholder="Search for site address or name or pid"
                   onChange={handleTextChange}
                   value={searchText}
                   type="text"
@@ -346,6 +346,10 @@ const Search = () => {
               onFiltersChange={handleInputChange}
               onFiltersSubmit={handleFormSubmit}
               onFiltersReset={handleReset}
+            />
+            <SearchResultsActions
+              selectedRows={selectedRows}
+              aria-label="search-results-actions"
             />
             <SearchResultsActions
               selectedRows={selectedRows}

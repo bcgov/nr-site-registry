@@ -102,12 +102,9 @@ export const flattenFormRows = (arr: IFormField[][]): IFormField[] => {
 };
 
 export function getUser() {
-  const oidcStorage = sessionStorage.getItem(
-    `oidc.user:` +
-      getClientSettings().authority +
-      `:` +
-      getClientSettings().client_id,
-  );
+  const { authority, client_id } = getClientSettings();
+  const storageKey = `oidc.user:${authority}:${client_id}`;
+  const oidcStorage = sessionStorage.getItem(storageKey);
   if (!oidcStorage) {
     return null;
   }
@@ -181,11 +178,12 @@ export const showNotification = (
   currentStatus: RequestStatus,
   successMessage?: string,
   errorMessage?: string,
+  errorMessageTitle?: string,
 ) => {
   if (currentStatus === RequestStatus.success) {
     notifySuccess(successMessage);
   } else if (currentStatus === RequestStatus.failed) {
-    notifyError(errorMessage);
+    notifyError(errorMessage, errorMessageTitle);
   }
 };
 
@@ -227,8 +225,9 @@ export const isUserOfType = (roleType: UserRoleType) => {
         }
       case 'sr':
         const srUserRole =
-          //  process.env?.REACT_APP_SITE_REGISTRAR_USER_ROLE
-          // ?? ((window as any)?._env_?.REACT_APP_SITE_REGISTRAR_USER_ROLE) ??
+          process.env.REACT_APP_SITE_REGISTRAR_USER_ROLE ||
+          ((window as any)._env_ &&
+            (window as any)._env_.REACT_APP_SITE_REGISTRAR_USER_ROLE) ||
           'site-site-registrar';
 
         if (userRoles.includes(srUserRole)) {

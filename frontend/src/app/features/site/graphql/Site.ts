@@ -204,3 +204,18 @@ export const bulkAproveRejectChangesQL = () => gql`
     }
   }
 `;
+
+export const getSiteInsightsQL = () => gql`
+  query getSiteInsights($siteId: String!) {
+    getSiteInsights(siteId: $siteId) {
+      data {
+        eventCount
+        eventParticCount
+        landHistoryCount
+        siteDocCount
+        siteSubdivCount
+        siteAssocCount
+      }
+    }
+  }
+`;

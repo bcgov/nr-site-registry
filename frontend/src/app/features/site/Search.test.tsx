@@ -74,7 +74,7 @@ describe('Search Component', () => {
   test('renders search input', () => {
     renderWithProviders(<Search />, store);
     const searchInput = screen.getByPlaceholderText(
-      'Search for site address or name',
+      'Search for site address or name or pid',
     );
     expect(searchInput).toBeInTheDocument();
   });

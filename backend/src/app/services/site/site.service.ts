@@ -350,7 +350,7 @@ export class SiteService {
           WHEN sites.lat_degrees IS NOT NULL THEN sites.lat_degrees
           WHEN sites.lat_minutes IS NOT NULL THEN sites.lat_minutes
           WHEN sites.lat_seconds IS NOT NULL THEN sites.lat_seconds
-          ELSE ''
+          ELSE NULL
         END
       `,
       [SiteSortBy.LONG_DEGREES_MINUTES_SECONDS]: `
@@ -358,7 +358,7 @@ export class SiteService {
           WHEN sites.long_degrees IS NOT NULL THEN sites.long_degrees
           WHEN sites.long_minutes IS NOT NULL THEN sites.long_minutes
           WHEN sites.long_seconds IS NOT NULL THEN sites.long_seconds
-          ELSE ''
+          ELSE NULL
         END
       `,
       [SiteSortBy.WHEN_CREATED]: 'sites.whenCreated',
@@ -367,6 +367,7 @@ export class SiteService {
       [SiteSortBy.LAT_LONG_RELIABILITY_FLAG]: 'sites.latlong_reliability_flag',
       [SiteSortBy.LAT_DEG]: 'sites.latdeg',
       [SiteSortBy.LONG_DEG]: 'sites.longdeg',
+      [SiteSortBy.CONSULTANT_SUBMITTED]: 'sites.consultant_submitted',
     };
 
     if (sortBy && sortFieldMap[sortBy]) {

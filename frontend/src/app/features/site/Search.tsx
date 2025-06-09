@@ -247,19 +247,21 @@ const Search = () => {
   // Mapping between GraphQL field names and SiteSortBy enum values
   const columnToSortByMap: Record<string, SiteSortBy> = {
     id: SiteSortBy.Id,
-    sr_status: SiteSortBy.SrStatus,
-    site_risk_code: SiteSortBy.SiteRiskCode,
-    common_name: SiteSortBy.CommonName,
+    srStatus: SiteSortBy.SrStatus,
+    siteRiskCode: SiteSortBy.SiteRiskCode,
+    commonName: SiteSortBy.CommonName,
     site_address: SiteSortBy.SiteAddress,
-    general_description: SiteSortBy.GeneralDescription,
+    generalDescription: SiteSortBy.GeneralDescription,
     city: SiteSortBy.City,
-    who_created: SiteSortBy.WhoCreated,
+    whoCreated: SiteSortBy.WhoCreated,
     latdeg: SiteSortBy.LatDeg,
     longdeg: SiteSortBy.LongDeg,
     latDegressMinutesSeconds: SiteSortBy.LatDegreesMinutesSeconds,
     longDegreesMinutesSeconds: SiteSortBy.LongDegreesMinutesSeconds,
     whenCreated: SiteSortBy.WhenCreated,
     whenUpdated: SiteSortBy.WhenUpdated,
+    latlongReliabilityFlag: SiteSortBy.LatLongReliabilityFlag,
+    consultantSubmitted: SiteSortBy.ConsultantSubmitted,
   };
 
   const handleTableSortChange = (column: TableColumn, descending: boolean) => {
@@ -267,17 +269,16 @@ const Search = () => {
       ? SortByDirection.Desc
       : SortByDirection.Asc;
     let sortBy: SiteSortBy = columnToSortByMap[column.graphQLPropertyName];
-    console.log(column, descending, sortBy, sortByDir);
     if (column.graphQLPropertyName === 'addrLine_1,addrLine_2,addrLine_3') {
       sortBy = columnToSortByMap['site_address'];
     } else if (
       column.graphQLPropertyName === 'longDegrees,longMinutes,longSeconds'
     ) {
-      sortBy = columnToSortByMap['latlongReliabilityFlag'];
+      sortBy = columnToSortByMap['longDegreesMinutesSeconds'];
     } else if (
       column.graphQLPropertyName === 'latDegrees,latMinutes,latSeconds'
     ) {
-      sortBy = columnToSortByMap['latlongReliabilityFlag'];
+      sortBy = columnToSortByMap['latDegressMinutesSeconds'];
     } else {
       sortBy = columnToSortByMap[column.graphQLPropertyName];
     }

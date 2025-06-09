@@ -290,6 +290,15 @@ export type FetchSiteDetail = {
   timestamp?: Maybe<Scalars['String']['output']>;
 };
 
+export type FetchSiteInsights = {
+  __typename?: 'FetchSiteInsights';
+  data?: Maybe<SiteInsightsDto>;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
 export type FetchSiteResponse = {
   __typename?: 'FetchSiteResponse';
   data: Array<Sites>;
@@ -746,6 +755,7 @@ export type Query = {
   getRecentViewsByUserId: RecentViewResponse;
   getSiteDisclosureBySiteId: DisclosureResponse;
   getSiteDocumentsBySiteId: DocumentResponse;
+  getSiteInsights: FetchSiteInsights;
   getSiteNotationBySiteId: NotationResponse;
   getSiteParticipantBySiteId: SiteParticsResponse;
   getSitesForFolio: FolioContentResponse;
@@ -834,6 +844,11 @@ export type QueryGetSiteDisclosureBySiteIdArgs = {
 
 export type QueryGetSiteDocumentsBySiteIdArgs = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
+  siteId: Scalars['String']['input'];
+};
+
+
+export type QueryGetSiteInsightsArgs = {
   siteId: Scalars['String']['input'];
 };
 
@@ -1099,6 +1114,16 @@ export type SiteFilters = {
   whoCreated?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type SiteInsightsDto = {
+  __typename?: 'SiteInsightsDto';
+  eventCount: Scalars['Int']['output'];
+  eventParticCount: Scalars['Int']['output'];
+  landHistoryCount: Scalars['Int']['output'];
+  siteAssocCount: Scalars['Int']['output'];
+  siteDocCount: Scalars['Int']['output'];
+  siteSubdivCount: Scalars['Int']['output'];
+};
+
 export type SiteParticRoles = {
   __typename?: 'SiteParticRoles';
   prCode: Scalars['String']['output'];
@@ -1287,6 +1312,7 @@ export type SiteRiskCd = {
 export enum SiteSortBy {
   City = 'CITY',
   CommonName = 'COMMON_NAME',
+  ConsultantSubmitted = 'CONSULTANT_SUBMITTED',
   GeneralDescription = 'GENERAL_DESCRIPTION',
   Id = 'ID',
   LatDeg = 'LAT_DEG',

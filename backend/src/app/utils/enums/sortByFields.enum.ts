@@ -16,6 +16,7 @@ export enum SiteSortBy {
   WHEN_UPDATED = 'whenUpdated',
   LAT_LONG_RELIABILITY_FLAG = 'latlongReliabilityFlag',
   GENERAL_DESCRIPTION = 'generalDescription',
+  CONSULTANT_SUBMITTED = 'consultantSubmitted',
 }
 
 registerEnumType(SiteSortBy, {

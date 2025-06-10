@@ -44,9 +44,7 @@ const Search = () => {
     count,
     sortBy,
     sortByDir,
-    filter,
     status,
-    error,
     searchParam,
   } = useSelector(getSites);
 

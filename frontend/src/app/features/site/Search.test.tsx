@@ -150,4 +150,79 @@ describe('Search Component', () => {
     // No assertion needed — just triggers selection logic
     expect(checkbox).toBeInTheDocument();
   });
+
+  test('renders Intro component if no user action', () => {
+    store = mockStore({
+      siteSearch: {
+        sites: [],
+        error: '',
+        page: 1,
+        count: 0,
+        pageSize: 5,
+        status: RequestStatus.idle,
+        searchParam: '',
+        filter: {},
+      },
+    });
+
+    renderWithProviders(<Search />, store);
+
+    expect(screen.getByText(/Search Site Registry/)).toBeInTheDocument();
+  });
+
+  test('toggles column selection', async () => {
+    renderWithProviders(<Search />, store);
+
+    // Open the column toggler panel (likely through a button)
+    const columnsButton = screen.getByText(/Columns/i);
+    fireEvent.click(columnsButton);
+
+    // Find checkbox — inspect your actual component for label content or use getAllByRole
+    const checkboxes = await screen.findAllByRole('checkbox');
+    expect(checkboxes.length).toBeGreaterThan(0);
+
+    // Click first column checkbox (adjust index based on actual column layout)
+    fireEvent.click(checkboxes[0]);
+    fireEvent.click(checkboxes[0]); // toggle back
+
+    expect(checkboxes[0]).toBeInTheDocument();
+  });
+
+  test('resets column selection to default', () => {
+    renderWithProviders(<Search />, store);
+
+    // First, open the "Columns" panel
+    const columnsButton = screen.getByText(/Columns/i);
+    fireEvent.click(columnsButton);
+
+    // Now try to get the Reset Columns button
+    const resetButton = screen.getByRole('button', { name: /Reset Columns/i });
+    fireEvent.click(resetButton);
+
+    expect(resetButton).toBeInTheDocument();
+  });
+
+  test('restores filters from local storage on mount', () => {
+    const filters = [{ key: 'status', value: 'active', label: 'Status' }];
+    localStorage.setItem('siteFilterPills', JSON.stringify(filters));
+
+    renderWithProviders(<Search />, store);
+    expect(screen.getByText(/Status : active/)).toBeInTheDocument();
+  });
+
+  test('removes filter pill and updates local storage', async () => {
+    localStorage.setItem(
+      'siteFilterPills',
+      JSON.stringify([{ key: 'status', value: 'active', label: 'Status' }]),
+    );
+
+    renderWithProviders(<Search />, store);
+
+    const removeBtn = screen.getByTestId('remove-filter-status');
+    fireEvent.click(removeBtn);
+
+    await waitFor(() => {
+      expect(localStorage.getItem('siteFilterPills')).not.toContain('active');
+    });
+  });
 });

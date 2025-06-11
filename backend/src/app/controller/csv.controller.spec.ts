@@ -1,13 +1,27 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CsvController } from './csv.controller';
 import { CsvService } from '../services/csv/csv.service';
+import { ConfigService } from '@nestjs/config';
+import { HttpStatus } from '@nestjs/common';
 
 describe('CsvController', () => {
   let csvController: CsvController;
   let csvService: CsvService;
+  let configService: ConfigService;
 
   const mockCsvService = {
     generateCSVFiles: jest.fn(),
+  };
+
+  const mockConfigService = {
+    get: jest.fn(),
+  };
+
+  const mockResponse = () => {
+    const res: any = {};
+    res.status = jest.fn().mockReturnValue(res);
+    res.json = jest.fn().mockReturnValue(res);
+    return res;
   };
 
   beforeEach(async () => {
@@ -18,31 +32,50 @@ describe('CsvController', () => {
           provide: CsvService,
           useValue: mockCsvService,
         },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
       ],
     }).compile();
 
     csvController = module.get<CsvController>(CsvController);
     csvService = module.get<CsvService>(CsvService);
+    configService = module.get<ConfigService>(ConfigService);
   });
 
-  it('should call csvService.generateCSVFiles and return success message', async () => {
-    mockCsvService.generateCSVFiles.mockResolvedValueOnce(undefined); // Simulate successful execution
+  it('should return 401 if secret is invalid', async () => {
+    const res = mockResponse();
+    mockConfigService.get.mockReturnValue('expected-secret');
 
-    const result = await csvController.generateCsv();
+    await csvController.generateCsv('wrong-secret', res);
+
+    expect(res.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Invalid API secret',
+    });
+  });
+
+  it('should call generateCSVFiles and return success message', async () => {
+    const res = mockResponse();
+    mockConfigService.get.mockReturnValue('expected-secret');
+    mockCsvService.generateCSVFiles.mockResolvedValueOnce(undefined);
+
+    const result = await csvController.generateCsv('expected-secret', res);
 
     expect(mockCsvService.generateCSVFiles).toHaveBeenCalled();
     expect(result).toEqual({ message: 'CSV generated successfully' });
   });
 
-  it('should handle errors when generating CSV files', async () => {
+  it('should propagate errors from generateCSVFiles', async () => {
+    const res = mockResponse();
+    mockConfigService.get.mockReturnValue('expected-secret');
     mockCsvService.generateCSVFiles.mockRejectedValueOnce(
       new Error('Something went wrong'),
     );
 
-    try {
-      await csvController.generateCsv();
-    } catch (e) {
-      expect(e.message).toBe('Something went wrong');
-    }
+    await expect(
+      csvController.generateCsv('expected-secret', res),
+    ).rejects.toThrow('Something went wrong');
   });
 });

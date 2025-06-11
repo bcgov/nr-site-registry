@@ -1,14 +1,38 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Res,
+  HttpException,
+  UnauthorizedException,
+  HttpStatus,
+} from '@nestjs/common';
+import { Headers as NestHeaders } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { CsvService } from '../services/csv/csv.service';
-import { Resource } from 'nest-keycloak-connect';
+import { Public } from 'nest-keycloak-connect';
+import { Http } from 'winston/lib/winston/transports';
 
-@Resource('csv')
+@Public()
 @Controller('csv')
 export class CsvController {
-  constructor(private readonly csvService: CsvService) {}
+  constructor(
+    private readonly csvService: CsvService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get('generate')
-  async generateCsv() {
+  async generateCsv(
+    @NestHeaders('x-api-secret') clientSecret: string,
+    @Res() Res,
+  ) {
+    const serverSecret = this.configService.get<string>('CSV_SECRET');
+
+    if (clientSecret !== serverSecret) {
+      return Res.status(HttpStatus.UNAUTHORIZED).json({
+        message: 'Invalid API secret',
+      });
+    }
+
     await this.csvService.generateCSVFiles();
     return { message: 'CSV generated successfully' };
   }

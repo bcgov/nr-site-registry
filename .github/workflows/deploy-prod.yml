@@ -1,14 +1,17 @@
 name: Deploy to PROD
 
-## TODO TODO: Need to replace hardcoded 'tag' with pr tag number. 
-## Can only verify this after we merge into dev which has PRs in it.
-
+# Merges into the dev branch will deploy to prod. 
+# Currently this also deploys to test, so test and prod should be in sync.
 on:
   push:
     branches:
-      # - dev  # Uncomment this if we want test deploys to also trigger prod deploys.
-      - feat/ocp-prod # Remove this before accepting PR! We desire this only to happen when merging to dev.
-
+      - dev
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag to deploy (optional)'
+        required: false
+        default: ''      
 concurrency:
   # Cancel in progress for PR open and close
   group: prod
@@ -17,20 +20,36 @@ concurrency:
 jobs:
 
 
-  # TODO - After switching to dev brand, verify this works in dev.
-  # Currently can't test it in feat/ocp-prod branch, as no PRs there.
   get-pr-info:
-    # Only run if the branch is 'dev'. If it's a feature branch like feat/ocp-prod, you MUST hardcode the tag below
-    if: github.ref_name == 'dev'  
+    if: github.ref_name == 'dev' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     outputs:
-      pr: ${{ steps.vars.outputs.pr }}
+      pr: ${{ steps.set-pr.outputs.pr }}
     steps:
-      - id: vars
-        uses: bcgov-nr/action-get-pr@v0.0.1
+      - id: set-pr
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.pr }}" != "" ]; then
+            echo "pr=${{ github.event.inputs.pr }}" >> $GITHUB_OUTPUT
+          else
+            echo "Fetching PR number from action-get-pr"
+            pr_num=$(gh pr view --json number -q .number || echo "")
+            echo "pr=$pr_num" >> $GITHUB_OUTPUT
+          fi
       - name: Echo PR number
         run: |
-          echo "PR: ${{ steps.vars.outputs.pr }}"
+          echo "PR: ${{ steps.set-pr.outputs.pr }}"
+
+  # get-pr-info:
+  #   if: github.ref_name == 'dev'  
+  #   runs-on: ubuntu-24.04
+  #   outputs:
+  #     pr: ${{ steps.vars.outputs.pr }}
+  #   steps:
+  #     - id: vars
+  #       uses: bcgov-nr/action-get-pr@v0.0.1
+  #     - name: Echo PR number
+  #       run: |
+  #         echo "PR: ${{ steps.vars.outputs.pr }}"
 
 # Typically, we do not build and deploy in the prod branch, we just re-use tags from other branches.
 # But during development, it's nice to be able to build changes, eg migration changes as we work through prod data import.
@@ -57,7 +76,8 @@ jobs:
           package: ${{ matrix.package }}
           # Use input tag if provided, otherwise fallback to branch name (feat-ocp-prod -> feat-ocp-prod)
           # tag: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || github.ref_name }}
-          tag: prod-experimental
+          # tag: prod
+          tag: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || 'prod' }}
           tag_fallback: latest
           triggers: ('${{ matrix.package }}/')
           build_file: ${{ matrix.build_file }}
@@ -85,7 +105,8 @@ jobs:
     with:
       environment: prod
       values: 'values-prod.yaml' # PROD env specific values file, will override values.yaml key/values but default to values.yaml
-      tag: prod-experimental
+      # tag: prod
+      tag: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || 'prod' }}
       # tag:  '${{ needs.get-pr-info.outputs.pr }}'
 
 

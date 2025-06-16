@@ -7,6 +7,7 @@ import { Sites } from '../../entities/sites.entity';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class CsvService {
@@ -15,6 +16,7 @@ export class CsvService {
     @InjectRepository(Sites)
     private siteRepository: Repository<Sites>,
     private readonly configService: ConfigService,
+    private readonly sitesLogger: LoggerService,
   ) {
     const s3Endpoint = this.configService.get<string>('ESRA_S3_ENDPOINT');
     const accessKeyId = this.configService.get<string>('ESRA_S3_ACCESS_KEY');
@@ -22,6 +24,9 @@ export class CsvService {
       this.configService.get<string>('ESRA_S3_SECRET_KEY');
 
     if (!s3Endpoint || !accessKeyId || !secretAccessKey) {
+      this.sitesLogger.log(
+        'Object Storage configuration missing essential credentials or endpoint',
+      );
       throw new Error(
         'Object Storage configuration missing essential credentials or endpoint',
       );
@@ -71,6 +76,7 @@ export class CsvService {
         }),
       );
     } catch (error) {
+      this.sitesLogger.error('Error generating CSV files:', error);
       console.error('Error generating CSV files:', error);
     }
   }
@@ -90,7 +96,8 @@ export class CsvService {
             resolve(fileUrl);
           } catch (error) {
             //reject(error);
-            console.log(error);
+            this.sitesLogger.error('Error uploading file:', error);
+            console.log('Error uploading file:', error);
           }
         });
 
@@ -99,6 +106,7 @@ export class CsvService {
       });
     } catch (error) {
       console.log(error);
+      this.sitesLogger.error('Error in generateCsv:', error);
       throw error;
     }
   }
@@ -126,7 +134,7 @@ export class CsvService {
 
       return `https://${this.configService.get<string>('S3_ENDPOINT')}/${bucketName}/${actualFilePath}`;
     } catch (error) {
-      console.log(error);
+      this.sitesLogger.error('Error in uploadFile', error);
       throw error;
     }
   }

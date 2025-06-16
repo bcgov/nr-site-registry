@@ -2,22 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Search.css';
 import '@bcgov/design-tokens/css/variables.css';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  fetchSites,
-  resetSites,
-  setFetchLoadingState,
-  updateSearchQuery,
-  updatePageSizeSetting,
-  resultsCount,
-} from './dto/SiteSlice';
-
 import { AppDispatch } from '../../Store';
-import {
-  selectAllSites,
-  currentPageSelection,
-  currentPageSize,
-} from './dto/SiteSlice';
-import SearchResults from './searchResults/SearchResults';
 import {
   CircleXMarkIcon,
   MagnifyingGlassIcon,
@@ -31,17 +16,15 @@ import FilterPills from './filters/FilterPills';
 import { formRows } from './dto/SiteFilterConfig';
 import { SearchResultsFilters } from './searchResults/SearchResultsFilters';
 import { SearchResultsActions } from './searchResults/SearchResultsActions';
+import { debounce, set } from 'lodash';
+import Table from '../../components/table/Table';
+import { fetchSearchSites, getSites, resetSiteSearch } from './SiteSearchSlice';
+import { RequestStatus } from '../../helpers/requests/status';
 
 const Search = () => {
-  const [searchText, setSearchText] = useState('');
   const dispatch = useDispatch<AppDispatch>();
-  const sites = useSelector(selectAllSites);
-  const currSearchVal = useSelector((state: any) => state.sites);
-  const currentPageInState = useSelector(currentPageSelection);
-  const currentPageSizeInState = useSelector(currentPageSize);
-  const totalRecords = useSelector(resultsCount);
+  const [searchText, setSearchText] = useState('');
   const [noUserAction, setUserAction] = useState(true);
-
   const columns = getSiteSearchResultsColumns();
   const [columnsToDisplay, setColumnsToDisplay] = useState<TableColumn[]>([
     ...columns,
@@ -53,6 +36,18 @@ const Search = () => {
   const [formData, setFormData] = useState<{
     [key: string]: any | [Date, Date];
   }>({});
+  const { sites, page, pageSize, count, filter, status, error, searchParam } =
+    useSelector(getSites);
+
+  const debouncedSearch = debounce(
+    (searchParam: string, page: number, pageSize: number, filters: any) => {
+      setSearchText(searchParam);
+      dispatch(
+        fetchSearchSites({ searchParam, page, pageSize, filter: filters }),
+      );
+    },
+    500,
+  );
 
   const toggleColumnSelectionForDisplay = (column: TableColumn) => {
     const index = columnsToDisplay.findIndex((item) => item.id === column.id);
@@ -67,76 +62,25 @@ const Search = () => {
     }
   };
 
-  useEffect(() => {
-    if (currSearchVal.searchQuery !== '') {
-      dispatch(
-        fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
-      );
-    }
-  }, [currentPageInState]);
-
-  useEffect(() => {
-    if (currSearchVal.searchQuery !== '') {
-      dispatch(
-        fetchSites({ searchParam: currSearchVal.searchQuery ?? searchText }),
-      );
-    }
-  }, [currentPageSizeInState]);
-
   const resetDefaultColums = () => {
     setColumnsToDisplay(columns);
   };
 
-  const pageChange = (pageRequested: number, resultsCount: number) => {
-    dispatch(
-      updatePageSizeSetting({
-        currentPage: pageRequested,
-        pageSize: resultsCount,
-      }),
-    );
-  };
-
-  useEffect(() => {
-    if (currSearchVal.searchQuery !== '') {
-      setUserAction(false);
-      setSearchText(currSearchVal.searchQuery);
-      dispatch(fetchSites({ searchParam: currSearchVal.searchQuery }));
-    }
-  }, []);
-
-  // useEffect(() => {
-  //   fetchSites(searchText);
-  // }, [dispatch,  searchText]);
-
   const handleClearSearch = () => {
     setSearchText('');
     setUserAction(true);
-    dispatch(resetSites(null));
-    dispatch(updateSearchQuery(''));
+    dispatch(resetSiteSearch());
   };
 
   const handleTextChange = (event: any) => {
     setUserAction(false);
     setSearchText(event.target.value);
     if (event.target.value.length >= 3) {
-      dispatch(setFetchLoadingState(null));
-      if (selectedFilters) {
-        const filterData: any = {};
-        selectedFilters.forEach((filter: any) => {
-          filterData[filter.key] = filter.value;
-        });
-        dispatch(
-          fetchSites({
-            searchParam: event.target.value,
-            filter: filterData,
-          }),
-        );
-      } else {
-        dispatch(fetchSites({ searchParam: event.target.value }));
-      }
-      dispatch(updateSearchQuery(event.target.value));
-    } else {
-      dispatch(resetSites(null));
+      const filterData: any = {};
+      selectedFilters.forEach((filter: any) => {
+        filterData[filter.key] = filter.value;
+      });
+      debouncedSearch(event.target.value, page, pageSize, filterData);
     }
   };
 
@@ -146,21 +90,10 @@ const Search = () => {
         const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
         if (index === -1) {
           SetSelectedRows([...selectedRows, event.row]);
-        } else {
-          // do nothing
         }
       } else {
         SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
       }
-
-      //const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
-      // if (index > -1 && !event.value) {
-      //   // If row is already selected, remove it
-      //   SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
-      // } else {
-      //   // If row is not selected, add it
-      //   SetSelectedRows([...selectedRows, event.row]);
-      // }
     } else if (event && event.property === 'select_all') {
       const newRows = event.value;
       if (event.selected) {
@@ -212,12 +145,7 @@ const Search = () => {
 
     // show and format pill.
     if (filters.length !== 0) {
-      dispatch(
-        fetchSites({
-          searchParam: currSearchVal.searchQuery,
-          filter: filteredFormData,
-        }),
-      );
+      debouncedSearch(searchParam, page, pageSize, filteredFormData);
       setSelectedFilters(filters);
 
       // Save filter selections to local storage
@@ -242,24 +170,36 @@ const Search = () => {
       setFormData(initialFormData);
       setSelectedFilters(parsedFilters);
     }
+
+    if (status === RequestStatus.success && sites.length > 0) {
+      setSearchText(searchParam);
+      setUserAction(false);
+    }
   }, []);
 
   const handleRemoveFilter = (filter: any) => {
     setFormData((prevData) => {
-      const newData = { ...prevData };
-      delete newData[filter.key]; // Remove the filter key from the form data
-      dispatch(
-        fetchSites({ searchParam: currSearchVal.searchQuery, filter: newData }),
-      );
-      return newData;
+      const updatedFilter = { ...prevData };
+      delete updatedFilter[filter.key]; // Remove the filter key from the form data
+      debouncedSearch(searchParam, page, pageSize, updatedFilter);
+
+      return updatedFilter;
     });
     let currFilter = selectedFilters.filter((item) => item.key !== filter.key);
     setSelectedFilters(currFilter);
     localStorage.setItem('siteFilterPills', JSON.stringify(currFilter));
   };
 
+  const handlePageSizeChange = (pageSize: number) => {
+    debouncedSearch(searchParam, page, pageSize, formData);
+  };
+
+  const handlePageChange = (page: number) => {
+    debouncedSearch(searchParam, page, pageSize, formData);
+  };
+
   return (
-    <PageContainer role="Search">
+    <PageContainer role="Search" aria-label="Search">
       <div className="search-container">
         <h1 className="search-text-label">Search Site Registry</h1>
         <div className="">
@@ -275,7 +215,7 @@ const Search = () => {
                 <input
                   tabIndex={13}
                   aria-label="Search input"
-                  placeholder="Search for site address or name"
+                  placeholder="Search for site address or name or pid"
                   onChange={handleTextChange}
                   value={searchText}
                   type="text"
@@ -287,6 +227,8 @@ const Search = () => {
               {noUserAction ? null : (
                 <div className="custom-text-search-end">
                   <CircleXMarkIcon
+                    role="button"
+                    aria-label="Clear search"
                     onClick={() => {
                       handleClearSearch();
                     }}
@@ -308,6 +250,7 @@ const Search = () => {
             aria-label="search-results-section-title"
           >
             <SearchResultsFilters
+              aria-label="search-results-filters"
               columns={columnsToDisplay}
               onColumnSelectionChange={toggleColumnSelectionForDisplay}
               resetColumns={resetDefaultColums}
@@ -316,9 +259,13 @@ const Search = () => {
               onFiltersSubmit={handleFormSubmit}
               onFiltersReset={handleReset}
             />
-            <SearchResultsActions selectedRows={selectedRows} />
+            <SearchResultsActions
+              selectedRows={selectedRows}
+              aria-label="search-results-actions"
+            />
           </div>
           <FilterPills
+            aria-label="selected-filters"
             filters={selectedFilters}
             onRemoveFilter={(filter) => {
               handleRemoveFilter(filter);
@@ -326,12 +273,22 @@ const Search = () => {
           />
           <div>
             <div className="" aria-label="Search results">
-              <SearchResults
-                pageChange={pageChange}
+              <Table
+                aria-label="Search results table"
+                showPageOptions={true}
+                label="Search Results"
+                isLoading={status || RequestStatus.idle}
+                columns={columns.filter((x) => x.isChecked === true)}
                 data={sites}
-                columns={columnsToDisplay.filter((x) => x.isChecked === true)}
-                totalRecords={totalRecords}
+                allowRowsSelect={true}
                 changeHandler={changeHandler}
+                editMode={false}
+                idColumnName="id"
+                totalResults={count}
+                selectPage={handlePageChange}
+                changeResultsPerPage={handlePageSizeChange}
+                currentPage={page}
+                resultsPerPage={pageSize}
               />
             </div>
           </div>

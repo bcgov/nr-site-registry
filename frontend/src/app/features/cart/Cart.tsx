@@ -57,6 +57,14 @@ const Cart = () => {
         'Successfully created snapshot',
       );
       dispatch(resetCreateSnapshotForSitesStatus(null));
+    } else {
+      showNotification(
+        createSnapshotRequestStatus,
+        '',
+        'Unable to create snapshot at this time.',
+        'Request Failed',
+      );
+      dispatch(resetCreateSnapshotForSitesStatus(null));
     }
   }, [createSnapshotRequestStatus]);
 
@@ -70,7 +78,6 @@ const Cart = () => {
 
   const handleDeleteFromShoppingCart = () => {
     const loggedInUser = getUser();
-    console.log(cartItemsArr);
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
@@ -124,9 +131,7 @@ const Cart = () => {
           totalResults={[].length}
           allowRowsSelect={false}
           showPageOptions={false}
-          changeHandler={(event) => {
-            console.log('change event', event);
-          }}
+          changeHandler={() => {}}
           editMode={false}
           idColumnName="id"
           deleteHandler={(event) => {

@@ -202,6 +202,7 @@ const Pagination: React.FC<PaginationProps> = ({
             onChange={(e) => {
               changeResultsPerPage?.(parseInt(e.target.value));
             }}
+            value={resultsPerPage}
           >
             <option>5</option>
             <option>10</option>

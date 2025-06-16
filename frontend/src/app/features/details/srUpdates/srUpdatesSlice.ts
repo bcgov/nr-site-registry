@@ -149,7 +149,6 @@ export const fetchPendingSiteDisclosure = createAsyncThunk(
 export const fetchPendingDocumentsForApproval = createAsyncThunk(
   'documents/fetchPendingDocumentsForApproval',
   async ({ siteId, showPending }: { siteId: string; showPending: boolean }) => {
-    console.log('herer');
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphQLSiteDocumentsBySiteId()),
@@ -238,8 +237,9 @@ export const fetchPendingLandUses = createAsyncThunk(
         query: print(getLandHistoriesForSiteQuery),
         variables: { siteId, searchTerm, sortDirection, pending: showPending },
       });
-
-      return response.data.data.getLandHistoriesForSite;
+      return response.status === 200
+        ? response.data.data.getLandHistoriesForSite
+        : [];
     } catch (error) {
       throw error;
     }
@@ -335,9 +335,8 @@ const srUpdatesSlice = createSlice({
       })
       .addCase(fetchPendingLandUses.fulfilled, (state, action) => {
         const newState = { ...state };
-        if (action.payload.httpStatusCode === 200)
-          newState.landUsesData = action.payload;
-        else newState.landUsesData = [];
+        newState.landUsesData = action.payload.data;
+
         return newState;
       })
       .addCase(fetchPendingLandUses.rejected, (state, action) => {

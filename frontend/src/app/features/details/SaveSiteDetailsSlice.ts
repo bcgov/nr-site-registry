@@ -171,6 +171,9 @@ export const getSiteNoatations = (state: any) => state.siteDetails.notationData;
 
 export const currentSiteId = (state: any) => state.siteDetails.siteId;
 
+export const getSiteSummaryEdits = (state: any) =>
+  state.siteDetails.sitesSummary;
+
 export const getSiteDocuments = (state: any) => state.siteDetails.documentsData;
 export const getSiteDisclosure = (state: any) => state.siteDetails.profilesData;
 export const getSiteParticipants = (state: any) =>

@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Brackets, EntityManager, In, Repository } from 'typeorm';
 import {
@@ -45,6 +50,7 @@ import { BC_ALBERS, LatLngTuple, WGS_84 } from '../../utils/geometry';
 import { RadiusSearchParams } from 'src/app/resolvers/site/site.resolver';
 import { MAX_CIRCLE_RADIUS, MIN_CIRCLE_RADIUS } from '../../utils/constants';
 import { SiteRegistry } from '../../entities/siteRegistry.entity';
+import { SiteInsightsDto } from 'src/app/dto/siteInsights.dto';
 
 /**
  * Nestjs Service For Region Entity
@@ -1121,7 +1127,11 @@ export class SiteService {
                       ...new SitePartics(),
                       ...existingSitePartic,
                       ...sitePartic,
-                      userAction: UserActionEnum.UPDATED,
+                      userAction:
+                        sitePartic.srAction === SRApprovalStatusEnum.PUBLIC ||
+                        sitePartic.srAction === SRApprovalStatusEnum.PRIVATE
+                          ? UserActionEnum.DEFAULT
+                          : UserActionEnum.UPDATED,
                       whenUpdated: new Date(),
                       whoUpdated: userInfo ? userInfo.givenName : '',
                     },
@@ -1487,7 +1497,11 @@ export class SiteService {
                   changes: {
                     ...existingSiteAssoc,
                     ...siteAssoc,
-                    userAction: UserActionEnum.UPDATED,
+                    userAction:
+                      asscos.srAction === SRApprovalStatusEnum.PUBLIC ||
+                      asscos.srAction === SRApprovalStatusEnum.PRIVATE
+                        ? UserActionEnum.DEFAULT
+                        : UserActionEnum.UPDATED,
                     whenUpdated: new Date(),
                     whoUpdated: userInfo ? userInfo.givenName : '',
                   },
@@ -1578,7 +1592,11 @@ export class SiteService {
                 profile = {
                   ...isExist,
                   ...profile,
-                  userAction: UserActionEnum.UPDATED,
+                  userAction:
+                    disclosure.srAction === SRApprovalStatusEnum.PUBLIC ||
+                    disclosure.srAction === SRApprovalStatusEnum.PRIVATE
+                      ? UserActionEnum.DEFAULT
+                      : UserActionEnum.UPDATED,
                   whenUpdated: new Date(),
                   whoUpdated: userInfo ? userInfo.givenName : '',
                 };
@@ -1624,56 +1642,56 @@ export class SiteService {
           FROM (
               SELECT id AS site_id, when_Updated ,who_updated 
               FROM sites.sites
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated , who_updated 
               FROM sites.events
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT e.site_id, e.when_Updated, e.who_updated 
               FROM sites.event_partics ep
               INNER JOIN sites.events e ON ep.event_id = e.id
-              WHERE e.sr_action = 'pending'
+              WHERE e.sr_action = 'pending' or e.user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated, who_updated 
               FROM sites.site_partics
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated, who_updated 
               FROM sites.site_docs
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated,who_updated 
               FROM sites.site_assocs
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated,who_updated 
               FROM sites.land_histories
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated,who_updated 
               FROM sites.site_subdivisions
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
               
               UNION ALL
               
               SELECT site_id, when_Updated ,who_updated 
               FROM sites.site_profiles
-              WHERE sr_action = 'pending'
+              WHERE sr_action = 'pending' or user_action = 'updated'
           ) AS updates
           GROUP BY site_id, who_updated
       )
@@ -1685,56 +1703,56 @@ export class SiteService {
       FROM (
           SELECT id AS site_id, 'summary' AS Change, when_Updated, who_updated ,addr_line_1,addr_line_2,addr_line_3 
           FROM sites.sites
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'notation', when_Updated, who_updated , '' , '', '' 
           FROM sites.events
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT e.site_id, 'notation participants' AS Change, e.when_Updated, e.who_updated , '' , '', '' 
           FROM sites.event_partics ep
           INNER JOIN sites.events e ON ep.event_id = e.id
-          WHERE e.sr_action = 'pending'
+          WHERE e.sr_action = 'pending' or e.user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'site participants' AS Change, when_Updated, who_updated ,  '' , '', '' 
           FROM sites.site_partics
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'documents' AS Change, when_Updated, who_updated,  '' , '', '' 
           FROM sites.site_docs
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'associated sites' AS Change, when_Updated, who_updated,  '' , '', '' 
           FROM sites.site_assocs
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'land histories' AS Change, when_Updated, who_updated,  '' , '', '' 
           FROM sites.land_histories
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'parcel description' AS Change, when_Updated, who_updated,  '' , '', '' 
           FROM sites.site_subdivisions
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
           
           UNION ALL
           
           SELECT site_id, 'site profiles' AS Change, when_Updated, who_updated ,  '' , '', '' 
           FROM sites.site_profiles
-          WHERE sr_action = 'pending'
+          WHERE sr_action = 'pending' or user_action = 'updated'
       ) AS c
       GROUP BY c.site_id,c.who_updated) Final
       JOIN LatestUpdates lu ON Final.site_id = lu.site_id and Final.who_updated = lu.who ) ResultInFo
@@ -2295,6 +2313,50 @@ export class SiteService {
         error,
       );
       return 0; // Return 0 on error
+    }
+  }
+
+  async getSiteInsights(siteId: string): Promise<SiteInsightsDto> {
+    try {
+      const result = await this.siteRepository.query(
+        `
+        SELECT
+          (SELECT COUNT(id) FROM sites.events WHERE site_id = $1) AS event_count,
+          (SELECT COUNT(sd.id) FROM sites.site_docs sd
+		  join sites.site_doc_partics  spr on sdoc_id = sd.id
+		  where site_id = $1) AS site_doc_count,
+          (SELECT COUNT(id) FROM sites.event_partics WHERE event_id IN (
+              SELECT id FROM sites.events WHERE site_id = $1
+          )) AS event_partic_count,
+          (SELECT COUNT(Lut_code) FROM sites.land_histories WHERE site_id = $1) AS land_history_count,
+          (SELECT COUNT(id) FROM sites.site_assocs WHERE site_id = $1) AS site_assoc_count,
+          (SELECT COUNT(subdiv_id) FROM sites.site_subdivisions WHERE site_id = $1) AS site_subdiv_count
+        `,
+        [siteId],
+      );
+
+      if (!result || result.length === 0) {
+        return null;
+      }
+
+      const raw = result[0];
+      const dto: SiteInsightsDto = {
+        eventCount: Number(raw.event_count),
+        siteDocCount: Number(raw.site_doc_count),
+        eventParticCount: Number(raw.event_partic_count),
+        landHistoryCount: Number(raw.land_history_count),
+        siteAssocCount: Number(raw.site_assoc_count),
+        siteSubdivCount: Number(raw.site_subdiv_count),
+      };
+
+      return dto;
+    } catch (error) {
+      // ✅ Optional: log error, rethrow as NestJS exception
+      this.sitesLogger.error(
+        `Error fetching site insights for siteId= ${siteId}:`,
+        error,
+      );
+      throw new InternalServerErrorException('Failed to fetch site counts');
     }
   }
 }

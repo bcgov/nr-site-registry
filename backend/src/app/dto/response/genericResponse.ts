@@ -2,6 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Sites } from '../../entities/sites.entity';
 import { BaseHttpResponse } from './baseHttpResponse';
 import { SiteInsightsDto } from '../siteInsights.dto';
+import { SiteDto } from '../site.dto';
 
 /**
  * Class for returing fetch site response from graphql services
@@ -45,6 +46,22 @@ export class SaveSiteDetailsResponse extends BaseHttpResponse {
 export class FetchSiteDetail extends BaseHttpResponse {
   @Field(() => Sites, { nullable: true })
   data?: Sites;
+
+  constructor(
+    message?: string,
+    httpStatusCode?: number,
+    success?: boolean,
+    data?: Sites | null,
+  ) {
+    super(message, httpStatusCode, success);
+    this.data = data;
+  }
+}
+
+@ObjectType()
+export class FetchSiteDetailDTO extends BaseHttpResponse {
+  @Field(() => Sites, { nullable: true })
+  data?: SiteDto;
 
   constructor(
     message?: string,

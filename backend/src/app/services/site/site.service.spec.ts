@@ -33,8 +33,7 @@ import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Place } from '../../entities/placeEntity';
 import { RadiusSearchParams } from '../../resolvers/site/site.resolver';
 import { SiteRegistry } from '../../entities/siteRegistry.entity';
-import { find } from 'rxjs';
-import { userInfo } from 'os';
+import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -488,6 +487,8 @@ describe('SiteService', () => {
         searchParam,
         page,
         pageSize,
+        null,
+        SortByDirection.ASC,
         {},
       );
       expect(mockQueryBuilder.andWhere).toHaveBeenNthCalledWith(
@@ -506,7 +507,9 @@ describe('SiteService', () => {
 
     it('throws an input error when filters.siteIds is an empty array', async () => {
       expect(async () => {
-        await siteService.searchSites({}, 'searchParam', 1, 1, { siteIds: [] });
+        await siteService.searchSites({}, 'searchParam', 1, 1, null, null, {
+          siteIds: [],
+        });
       }).rejects.toThrow(HttpException);
     });
 
@@ -542,7 +545,7 @@ describe('SiteService', () => {
 
       //const siteIds = [1, 2, 3];
       const searchParam = '123-456-789'; // Example pid with hyphen
-      await siteService.searchSites({}, searchParam, 1, 1, {});
+      await siteService.searchSites({}, searchParam, 1, 1, null, null, {});
 
       //expect(mockQueryBuilder.whereInIds).toHaveBeenCalledWith(siteIds);
       expect(mockQueryBuilder.innerJoin).toHaveBeenCalledWith(
@@ -578,7 +581,7 @@ describe('SiteService', () => {
         .mockImplementation(() => mockQueryBuilder as any);
 
       const searchParam = '123';
-      await siteService.searchSites({}, searchParam, 1, 1, {});
+      await siteService.searchSites({}, searchParam, 1, 1, null, null, {});
 
       expect(mockQueryBuilder.innerJoin).not.toHaveBeenCalled(); // No joins without pid
     });

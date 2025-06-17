@@ -3,6 +3,7 @@ import { RequestStatus } from '../../helpers/requests/status';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { GRAPHQL } from '../../helpers/endpoints';
+import { SiteSortBy, SortByDirection } from '../../../graphql/generated';
 
 const mock = new MockAdapter(axios);
 
@@ -13,6 +14,8 @@ describe('siteSearchSlice', () => {
     page: 1,
     pageSize: 5,
     count: 0,
+    sortBy: SiteSortBy.Id,
+    sortByDir: SortByDirection.Asc,
     filter: {},
     error: '',
     status: RequestStatus.idle,

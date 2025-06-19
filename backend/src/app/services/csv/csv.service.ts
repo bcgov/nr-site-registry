@@ -155,8 +155,8 @@ export class CsvService {
 
   private getApprovedSitesQuery = () => `SELECT
      SUBSTRING(to_char(SITES.ID, '0999999999') FROM 2 FOR 10) AS siteid
-    ,BCE_REGION_CD.DESCRIPTION,
-	SITE_STATUS_CD.description,
+    ,BCE_REGION_CD.DESCRIPTION as region,
+	SITE_STATUS_CD.description as status,
        SITES.COMMON_NAME,	   
     SITES.ADDR_LINE_1
     ,SITES.ADDR_LINE_2
@@ -171,8 +171,9 @@ export class CsvService {
   SUBSTRING(TO_CHAR(COALESCE(SITES.LONG_DEGREES, 0), '000') FROM 2 FOR 3) AS londeg,
   SUBSTRING(TO_CHAR(COALESCE(SITES.LONG_MINUTES, 0), '000') FROM 2 FOR 3) AS lonmin,
   SUBSTRING(TO_CHAR(COALESCE(SITES.LONG_SECONDS, 0) * 10, '000') FROM 2 FOR 3) AS lonsec
-    ,SITES.VICTORIA_FILE_NO
-    ,SITES.REGIONAL_FILE_NO,
+    ,LEFT(SITES.VICTORIA_FILE_NO, 40) AS VICTORIA_FILE_NO
+    ,LEFT(SITES.REGIONAL_FILE_NO, 40) AS REGIONAL_FILE_NO,
+	CLASSIFICATION_CD.DESCRIPTION,
 	SITES.general_description,
 	TO_CHAR(site_registry.INIT_APPROVAL_DATE, 'YYYY-MM-DD') AS regdate,
     TO_CHAR(site_registry.LAST_APPROVAL_DATE, 'YYYY-MM-DD') AS moddate,
@@ -181,6 +182,8 @@ export class CsvService {
      inner join sites.bce_region_cd on bce_region_cd.code = sites.BCER_CODE 
 	 inner join sites.site_registry on site_registry.site_id = sites.id
 	 inner join sites.SITE_STATUS_CD on SITE_STATUS_CD.CODE  =  SITES.SST_CODE
+	 inner join sites.CLASSIFICATION_CD on CLASSIFICATION_CD.CODE  =  SITES.CLASS_CODE
+
   WHERE 
 	sites.sr_action = 'public'`;
 

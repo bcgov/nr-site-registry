@@ -41,15 +41,16 @@ import {
 } from '../../dto/sitesPendingReview.dto';
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
 import { SiteFilters } from '../../resolvers/site/sitePublic.resolver';
-import { SnapshotResponse } from '../../dto/snapshot.dto';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { Place } from '../../entities/placeEntity';
 import { UserTypeEum } from '../../common/userType';
 import { BC_ALBERS, LatLngTuple, WGS_84 } from '../../utils/geometry';
-import { RadiusSearchParams } from 'src/app/resolvers/site/site.resolver';
+import { RadiusSearchParams } from '../../resolvers/site/site.resolver';
 import { MAX_CIRCLE_RADIUS, MIN_CIRCLE_RADIUS } from '../../utils/constants';
 import { SiteRegistry } from '../../entities/siteRegistry.entity';
+import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
+import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
 import { SiteInsightsDto } from 'src/app/dto/siteInsights.dto';
 
 /**
@@ -124,6 +125,8 @@ export class SiteService {
     searchParam: string,
     page: number,
     pageSize: number,
+    sortBy: SiteSortBy,
+    sortByDir: SortByDirection,
     filters: SiteFilters,
   ) {
     const {
@@ -326,6 +329,54 @@ export class SiteService {
         end: whenUpdated[1],
       });
     }
+
+    const sortFieldMap: Record<SiteSortBy, string> = {
+      [SiteSortBy.ID]: 'sites.id',
+      [SiteSortBy.SR_STATUS]: 'sites.srStatus',
+      [SiteSortBy.SITE_RISK_CODE]: 'sites.site_risk_code',
+      [SiteSortBy.COMMON_NAME]: 'sites.common_name',
+      [SiteSortBy.CITY]: 'sites.city',
+      [SiteSortBy.SITE_ADDRESS]: `
+        CASE
+          WHEN sites.addr_line_1 IS NOT NULL THEN sites.addr_line_1
+          WHEN sites.addr_line_2 IS NOT NULL THEN sites.addr_line_2
+          WHEN sites.addr_line_3 IS NOT NULL THEN sites.addr_line_3
+          ELSE ''
+        END
+      `,
+      [SiteSortBy.WHO_CREATED]: 'sites.who_created',
+      [SiteSortBy.LAT_DEGREES_MINUTES_SECONDS]: `
+        CASE
+          WHEN sites.lat_degrees IS NOT NULL THEN sites.lat_degrees
+          WHEN sites.lat_minutes IS NOT NULL THEN sites.lat_minutes
+          WHEN sites.lat_seconds IS NOT NULL THEN sites.lat_seconds
+          ELSE NULL
+        END
+      `,
+      [SiteSortBy.LONG_DEGREES_MINUTES_SECONDS]: `
+        CASE
+          WHEN sites.long_degrees IS NOT NULL THEN sites.long_degrees
+          WHEN sites.long_minutes IS NOT NULL THEN sites.long_minutes
+          WHEN sites.long_seconds IS NOT NULL THEN sites.long_seconds
+          ELSE NULL
+        END
+      `,
+      [SiteSortBy.WHEN_CREATED]: 'sites.whenCreated',
+      [SiteSortBy.WHEN_UPDATED]: 'sites.whenUpdated',
+      [SiteSortBy.GENERAL_DESCRIPTION]: 'sites.general_description',
+      [SiteSortBy.LAT_LONG_RELIABILITY_FLAG]: 'sites.latlong_reliability_flag',
+      [SiteSortBy.LAT_DEG]: 'sites.latdeg',
+      [SiteSortBy.LONG_DEG]: 'sites.longdeg',
+      [SiteSortBy.CONSULTANT_SUBMITTED]: 'sites.consultant_submitted',
+    };
+
+    if (sortBy && sortFieldMap[sortBy]) {
+      query.orderBy(
+        sortFieldMap[sortBy],
+        sortByDir === SortByDirection.DESC ? 'DESC' : 'ASC',
+      );
+    }
+
     const result = await query
       .skip((page - 1) * pageSize)
       .take(pageSize)

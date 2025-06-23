@@ -39,32 +39,53 @@ echo "Migrations completed."
 
 
 
-# Check for existence of SEED_DATA_PATH
-# Do we need to move this into configmap's seed.sh? Unsure which is running.
-echo "Before SEED_DATA_PATH check."
-if [ -n "$SEED_DATA_PATH" ]; then
-    echo "SEED_DATA_PATH set."
+# check if psql is present in container  or not
+if ! command -v psql &> /dev/null
+then
+    echo "psql could not be found"
+    exit 1
+fi
+
+    # check if seed is enabled or not SEED_ENABLED should be true
+if [ "$SEED_ENABLED" != "true" ]; then
+    echo "Seed data is not enabled. Exiting."
+    exit 0
+fi
+
+echo "SEED DATA PATH :: $SEED_DATA_PATH"
+# check if seed data path is set or not
+if [ -z "$SEED_DATA_PATH" ]; then
+    echo "SEED_DATA_PATH is not set. Exiting."
+    exit 0
+fi
+
+    # check if sites table has any rows or not. if seed is already done, even if it is enabled, here it checks and skips seeding again.
+if [ "$(PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -t -c "SELECT count(*) FROM sites.sites;")" -gt 0 ]; then
+      echo "Seed data already loaded. Exiting."
+      exit 0
+fi
+
+    echo "Seed data set, seed is enabled, and db is blank, disabling constraints."
     # Disable constraints before seeding, if file exists
-    if [ -f "/mnt/sql/disable_constraint.sql" ]; then
-        echo "Disabling constraints..."
-        PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/disable_constraint.sql"
-    fi
+if [ -f "/mnt/sql/disable_constraints.sql" ]; then
+    echo "Disabling constraints..."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/disable_constraints.sql"
+fi
 
-    # below line appears, but not above?
-    echo "Seed data set, attempting to load."
-    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "$SEED_DATA_PATH"
-    echo "Seed data successfully loaded."
 
+echo "Seed data set, attempting to load."
+# use -q and the > dev/null to suppress output
+PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -q -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "$SEED_DATA_PATH" > /dev/null
+echo "Seed data successfully loaded."
+
+   
     # Enable constraints after seeding, if file exists
-    if [ -f "/mnt/sql/enable_constraint.sql" ]; then
-        echo "Enabling constraints..."
-        PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/enable_constraint.sql"
-    fi
-else
-    echo "SEED_DATA_PATH is not set. Skipping seed data loading."
+if [ -f "/mnt/sql/enable_constraints.sql" ]; then
+    echo "Enabling constraints..."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/enable_constraints.sql"
 fi
 
 
 
-echo "Migration process complete."
+echo "Migration process complete with seed data loaded if applicable."
 exit 0

@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - dev
+      - feat/ocp-prod # remove this after, just triggering build
   workflow_dispatch:
     inputs:
       tag:

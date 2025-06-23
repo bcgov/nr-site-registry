@@ -20,6 +20,7 @@ import { debounce, set } from 'lodash';
 import Table from '../../components/table/Table';
 import { fetchSearchSites, getSites, resetSiteSearch } from './SiteSearchSlice';
 import { RequestStatus } from '../../helpers/requests/status';
+import { SiteSortBy, SortByDirection } from '../../../graphql/generated';
 
 const Search = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,14 +37,36 @@ const Search = () => {
   const [formData, setFormData] = useState<{
     [key: string]: any | [Date, Date];
   }>({});
-  const { sites, page, pageSize, count, filter, status, error, searchParam } =
-    useSelector(getSites);
+  const {
+    sites,
+    page,
+    pageSize,
+    count,
+    sortBy,
+    sortByDir,
+    status,
+    searchParam,
+  } = useSelector(getSites);
 
   const debouncedSearch = debounce(
-    (searchParam: string, page: number, pageSize: number, filters: any) => {
+    (
+      searchParam: string,
+      page: number,
+      pageSize: number,
+      sortBy: SiteSortBy = SiteSortBy.Id,
+      sortByDir: SortByDirection = SortByDirection.Asc,
+      filters: any,
+    ) => {
       setSearchText(searchParam);
       dispatch(
-        fetchSearchSites({ searchParam, page, pageSize, filter: filters }),
+        fetchSearchSites({
+          searchParam,
+          page,
+          pageSize,
+          sortBy,
+          sortByDir,
+          filter: filters,
+        }),
       );
     },
     500,
@@ -80,7 +103,14 @@ const Search = () => {
       selectedFilters.forEach((filter: any) => {
         filterData[filter.key] = filter.value;
       });
-      debouncedSearch(event.target.value, page, pageSize, filterData);
+      debouncedSearch(
+        event.target.value,
+        page,
+        pageSize,
+        SiteSortBy.Id,
+        SortByDirection.Asc,
+        filterData,
+      );
     }
   };
 
@@ -145,7 +175,14 @@ const Search = () => {
 
     // show and format pill.
     if (filters.length !== 0) {
-      debouncedSearch(searchParam, page, pageSize, filteredFormData);
+      debouncedSearch(
+        searchParam,
+        page,
+        pageSize,
+        sortBy,
+        sortByDir,
+        filteredFormData,
+      );
       setSelectedFilters(filters);
 
       // Save filter selections to local storage
@@ -181,7 +218,14 @@ const Search = () => {
     setFormData((prevData) => {
       const updatedFilter = { ...prevData };
       delete updatedFilter[filter.key]; // Remove the filter key from the form data
-      debouncedSearch(searchParam, page, pageSize, updatedFilter);
+      debouncedSearch(
+        searchParam,
+        page,
+        pageSize,
+        sortBy,
+        sortByDir,
+        updatedFilter,
+      );
 
       return updatedFilter;
     });
@@ -191,11 +235,54 @@ const Search = () => {
   };
 
   const handlePageSizeChange = (pageSize: number) => {
-    debouncedSearch(searchParam, page, pageSize, formData);
+    debouncedSearch(searchParam, page, pageSize, sortBy, sortByDir, formData);
   };
 
   const handlePageChange = (page: number) => {
-    debouncedSearch(searchParam, page, pageSize, formData);
+    debouncedSearch(searchParam, page, pageSize, sortBy, sortByDir, formData);
+  };
+
+  // Mapping between GraphQL field names and SiteSortBy enum values
+  const columnToSortByMap: Record<string, SiteSortBy> = {
+    id: SiteSortBy.Id,
+    srStatus: SiteSortBy.SrStatus,
+    siteRiskCode: SiteSortBy.SiteRiskCode,
+    commonName: SiteSortBy.CommonName,
+    site_address: SiteSortBy.SiteAddress,
+    generalDescription: SiteSortBy.GeneralDescription,
+    city: SiteSortBy.City,
+    whoCreated: SiteSortBy.WhoCreated,
+    latdeg: SiteSortBy.LatDeg,
+    longdeg: SiteSortBy.LongDeg,
+    latDegressMinutesSeconds: SiteSortBy.LatDegreesMinutesSeconds,
+    longDegreesMinutesSeconds: SiteSortBy.LongDegreesMinutesSeconds,
+    whenCreated: SiteSortBy.WhenCreated,
+    whenUpdated: SiteSortBy.WhenUpdated,
+    latlongReliabilityFlag: SiteSortBy.LatLongReliabilityFlag,
+    consultantSubmitted: SiteSortBy.ConsultantSubmitted,
+  };
+
+  const handleTableSortChange = (column: TableColumn, descending: boolean) => {
+    const sortByDir: SortByDirection = descending
+      ? SortByDirection.Desc
+      : SortByDirection.Asc;
+    let sortBy: SiteSortBy = columnToSortByMap[column.graphQLPropertyName];
+    if (column.graphQLPropertyName === 'addrLine_1,addrLine_2,addrLine_3') {
+      sortBy = columnToSortByMap['site_address'];
+    } else if (
+      column.graphQLPropertyName === 'longDegrees,longMinutes,longSeconds'
+    ) {
+      sortBy = columnToSortByMap['longDegreesMinutesSeconds'];
+    } else if (
+      column.graphQLPropertyName === 'latDegrees,latMinutes,latSeconds'
+    ) {
+      sortBy = columnToSortByMap['latDegressMinutesSeconds'];
+    } else {
+      sortBy = columnToSortByMap[column.graphQLPropertyName];
+    }
+    if (sortBy) {
+      debouncedSearch(searchParam, page, pageSize, sortBy, sortByDir, formData);
+    }
   };
 
   return (
@@ -263,6 +350,10 @@ const Search = () => {
               selectedRows={selectedRows}
               aria-label="search-results-actions"
             />
+            <SearchResultsActions
+              selectedRows={selectedRows}
+              aria-label="search-results-actions"
+            />
           </div>
           <FilterPills
             aria-label="selected-filters"
@@ -278,7 +369,7 @@ const Search = () => {
                 showPageOptions={true}
                 label="Search Results"
                 isLoading={status || RequestStatus.idle}
-                columns={columns.filter((x) => x.isChecked === true)}
+                columns={columnsToDisplay.filter((x) => x.isChecked === true)}
                 data={sites}
                 allowRowsSelect={true}
                 changeHandler={changeHandler}
@@ -289,6 +380,7 @@ const Search = () => {
                 changeResultsPerPage={handlePageSizeChange}
                 currentPage={page}
                 resultsPerPage={pageSize}
+                sortHandler={handleTableSortChange}
               />
             </div>
           </div>

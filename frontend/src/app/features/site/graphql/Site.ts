@@ -6,12 +6,16 @@ export const graphQlSiteQuery = () => {
       $searchParam: String!
       $page: Int!
       $pageSize: Int!
+      $sortBy: SiteSortBy
+      $sortByDir: SortByDirection
       $filters: SiteFilters!
     ) {
       searchSites(
         searchParam: $searchParam
         page: $page
         pageSize: $pageSize
+        sortBy: $sortBy
+        sortByDir: $sortByDir
         filters: $filters
       ) {
         sites {

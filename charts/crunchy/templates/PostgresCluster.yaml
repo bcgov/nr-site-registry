@@ -5,7 +5,6 @@ metadata:
   name: {{ template "crunchy-postgres.fullname" . }}
   labels: {{ include "crunchy-postgres.labels" . | nindent 4 }}
 spec:
-  openshit: true
   metadata:
     labels: {{ include "crunchy-postgres.labels" . | nindent 6 }}
   imagePullPolicy: {{.Values.crunchy.imagePullPolicy}}
@@ -230,4 +229,5 @@ spec:
                       {{ template "crunchy-postgres.fullname" . }}
                     postgres-operator.crunchydata.com/role: pgbouncer
   {{- end }}
+  openshift: true
   {{- end }}

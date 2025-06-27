@@ -39,19 +39,8 @@ import {
 import {
   FindSitesAndPlaces,
   FindSitesAndPlacesResponse,
-  MapSearchResponse,
 } from '../../dto/mapSearch.dto';
-import { LatLngTuple } from '../../utils/geometry';
-import { LatLngTupleScalar } from '../../scalars/latLngTuple';
 
-@InputType()
-export class RadiusSearchParams {
-  @Field(() => LatLngTupleScalar)
-  center: LatLngTuple;
-
-  @Field(() => Float)
-  radius: number;
-}
 /**
  * Resolver for Region
  */
@@ -235,49 +224,6 @@ export class SiteResolver {
         `Unable to update sites. `,
         HttpStatus.UNPROCESSABLE_ENTITY,
         false,
-      );
-    }
-  }
-
-  @Roles({
-    roles: [
-      CustomRoles.External,
-      CustomRoles.Internal,
-      CustomRoles.SiteRegistrar,
-    ],
-    mode: RoleMatchingMode.ANY,
-  })
-  @Query(() => MapSearchResponse, { name: 'mapSearch' })
-  async mapSearch(
-    @Args('searchParam', { type: () => String, nullable: true })
-    searchParam: string,
-    @Args('polygon', { type: () => [LatLngTupleScalar], nullable: true })
-    polygon?: LatLngTuple[],
-    @Args('circle', { type: () => RadiusSearchParams, nullable: true })
-    circle?: RadiusSearchParams,
-  ) {
-    this.sitesLogger.log('SiteResolver.mapSearch() start ');
-    try {
-      const data = await this.siteService.mapSearch({
-        searchTerm: searchParam,
-        polygon,
-        circle,
-      });
-      return this.mapSearchGenericResponseProvider.createResponse(
-        'Successfully fetched sites for map',
-        HttpStatus.OK,
-        true,
-        data,
-      );
-    } catch (e) {
-      this.sitesLogger.log(
-        `SiteResolver.mapSearch() failed, ${JSON.stringify(e)}`,
-      );
-      return this.mapSearchGenericResponseProvider.createResponse(
-        'Error fetching sites for map',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        false,
-        [],
       );
     }
   }

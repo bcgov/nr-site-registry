@@ -46,12 +46,13 @@ import { Snapshots } from '../../entities/snapshots.entity';
 import { Place } from '../../entities/placeEntity';
 import { UserTypeEum } from '../../common/userType';
 import { BC_ALBERS, LatLngTuple, WGS_84 } from '../../utils/geometry';
-import { RadiusSearchParams } from '../../resolvers/site/site.resolver';
+
 import { MAX_CIRCLE_RADIUS, MIN_CIRCLE_RADIUS } from '../../utils/constants';
 import { SiteRegistry } from '../../entities/siteRegistry.entity';
 import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
 import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
-import { SiteInsightsDto } from 'src/app/dto/siteInsights.dto';
+import { SiteInsightsDto } from '../../dto/siteInsights.dto';
+import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
 
 /**
  * Nestjs Service For Region Entity

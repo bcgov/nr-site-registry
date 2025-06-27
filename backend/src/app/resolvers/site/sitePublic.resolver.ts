@@ -1,4 +1,12 @@
-import { Args, Field, InputType, Int, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Field,
+  Float,
+  InputType,
+  Int,
+  Query,
+  Resolver,
+} from '@nestjs/graphql';
 import { AuthenticatedUser, Unprotected } from 'nest-keycloak-connect';
 import {
   FetchSiteDetail,
@@ -14,7 +22,12 @@ import { LoggerService } from '../../logger/logger.service';
 import { QueryResultForPendingSites } from '../../dto/sitesPendingReview.dto';
 import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
 import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
-import { SiteInsightsDto } from 'src/app/dto/siteInsights.dto';
+import { SiteInsightsDto } from '../../dto/siteInsights.dto';
+import { MapSearchResponse } from '../../dto/mapSearch.dto';
+import { LatLngTupleScalar } from '../../scalars/latLngTuple';
+import { LatLngTuple } from '../../utils/geometry';
+import { HttpStatus } from '@nestjs/common';
+import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
 
 @InputType()
 export class SiteFilters {
@@ -94,6 +107,9 @@ export class SitePublicResolver {
     private readonly sitesLogger: LoggerService,
     private readonly siteApprovalResponseProvider: GenericResponseProvider<QueryResultForPendingSites>,
     private readonly genericResponseProviderForInsights: GenericResponseProvider<SiteInsightsDto>,
+    private readonly mapSearchGenericResponseProvider: GenericResponseProvider<
+      Sites[]
+    >,
   ) {}
 
   /**
@@ -160,5 +176,40 @@ export class SitePublicResolver {
       true,
       result,
     );
+  }
+
+  @Query(() => MapSearchResponse, { name: 'mapSearch' })
+  async mapSearch(
+    @Args('searchParam', { type: () => String, nullable: true })
+    searchParam: string,
+    @Args('polygon', { type: () => [LatLngTupleScalar], nullable: true })
+    polygon?: LatLngTuple[],
+    @Args('circle', { type: () => RadiusSearchParams, nullable: true })
+    circle?: RadiusSearchParams,
+  ) {
+    this.sitesLogger.log('SiteResolver.mapSearch() start ');
+    try {
+      const data = await this.siteService.mapSearch({
+        searchTerm: searchParam,
+        polygon,
+        circle,
+      });
+      return this.mapSearchGenericResponseProvider.createResponse(
+        'Successfully fetched sites for map',
+        HttpStatus.OK,
+        true,
+        data,
+      );
+    } catch (e) {
+      this.sitesLogger.log(
+        `SiteResolver.mapSearch() failed, ${JSON.stringify(e)}`,
+      );
+      return this.mapSearchGenericResponseProvider.createResponse(
+        'Error fetching sites for map',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        false,
+        [],
+      );
+    }
   }
 }

@@ -2,7 +2,7 @@ import { Args, Field, InputType, Int, Query, Resolver } from '@nestjs/graphql';
 import { AuthenticatedUser, Unprotected } from 'nest-keycloak-connect';
 import {
   FetchSiteDetail,
-  FetchSiteDetailDTO,
+  FetchSiteDetailsResponse,
   FetchSiteInsights,
   SaveSiteDetailsResponse,
   SearchSiteResponse,
@@ -130,7 +130,7 @@ export class SitePublicResolver {
     );
   }
 
-  @Query(() => FetchSiteDetailDTO, { name: 'findSiteBySiteId' })
+  @Query(() => FetchSiteDetailsResponse, { name: 'findSiteBySiteId' })
   findSiteBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
     @Args('pending', { type: () => Boolean, nullable: true })

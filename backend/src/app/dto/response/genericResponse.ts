@@ -59,7 +59,7 @@ export class FetchSiteDetail extends BaseHttpResponse {
 }
 
 @ObjectType()
-export class FetchSiteDetailDTO extends BaseHttpResponse {
+export class FetchSiteDetailsResponse extends BaseHttpResponse {
   @Field(() => Sites, { nullable: true })
   data?: SiteDto;
 

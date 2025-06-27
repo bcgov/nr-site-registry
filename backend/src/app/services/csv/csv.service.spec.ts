@@ -5,6 +5,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { S3Client } from '@aws-sdk/client-s3';
 import * as fs from 'fs';
+import { LoggerService } from '../../logger/logger.service';
 
 jest.mock('@aws-sdk/client-s3');
 
@@ -12,6 +13,7 @@ describe('CsvService', () => {
   let service: CsvService;
   let mockSiteRepository: any;
   let mockConfigService: any;
+  let mockLoggerService: any;
   const mockData = [
     { id: 1, name: 'Test' },
     { id: 1, name: 'Test' },
@@ -23,10 +25,20 @@ describe('CsvService', () => {
       },
     };
 
+    const mockS3Client = {
+      send: jest.fn(),
+    };
+
     mockConfigService = {
       get: jest.fn(() => {
         return 'test-value';
       }),
+    };
+
+    mockLoggerService = {
+      log: jest.fn(),
+      debug: jest.fn(),
+      error: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -40,10 +52,20 @@ describe('CsvService', () => {
           provide: ConfigService,
           useValue: mockConfigService,
         },
+        {
+          provide: LoggerService,
+          useValue: mockLoggerService,
+        },
+        {
+          provide: S3Client,
+          useValue: mockS3Client,
+        },
       ],
     }).compile();
 
     service = module.get<CsvService>(CsvService);
+    mockLoggerService = module.get<LoggerService>(LoggerService);
+    mockConfigService = module.get<ConfigService>(ConfigService);
   });
 
   it('should be defined', () => {

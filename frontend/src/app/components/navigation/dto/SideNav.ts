@@ -122,11 +122,6 @@ const roleBasedSideBarList: Record<string, SideNav[]> = {
  * @returns An array of SideNav items for the specified role.
  */
 const getSideBarNavList = (userRole: UserRoleType) => {
-  console.log(
-    'roleBasedSideBarList[userRole]',
-    userRole,
-    roleBasedSideBarList[userRole],
-  );
   return roleBasedSideBarList[userRole] || [];
 };
 

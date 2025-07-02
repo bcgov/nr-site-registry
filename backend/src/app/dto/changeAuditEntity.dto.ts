@@ -2,7 +2,7 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @InputType({ isAbstract: true })
 @ObjectType({ isAbstract: true })
-export class ChangeEntityType {
+export class ChangeAuditType {
   @Field({ nullable: true })
   userAction?: string;
 
@@ -17,7 +17,7 @@ export class ChangeEntityType {
 }
 
 @InputType()
-export class ChangeAuditEntityDTO extends ChangeEntityType {}
+export class ChangeAuditEntityDTO extends ChangeAuditType {}
 
 @ObjectType()
-export class ChangeAuditObjectTypeDTO extends ChangeEntityType {}
+export class ChangeAuditObjectTypeDTO extends ChangeAuditType {}

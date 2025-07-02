@@ -1,9 +1,9 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { ChangeEntityType } from './changeAuditEntity.dto';
+import { ChangeAuditType } from './changeAuditEntity.dto';
 
 @InputType({ isAbstract: true })
 @ObjectType({ isAbstract: true })
-export class SiteBaseDto extends ChangeEntityType {
+export class SiteBaseDto extends ChangeAuditType {
   @Field()
   id: string;
 

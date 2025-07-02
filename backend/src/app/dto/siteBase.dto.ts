@@ -3,7 +3,7 @@ import { ChangeEntityType } from './changeAuditEntity.dto';
 
 @InputType({ isAbstract: true })
 @ObjectType({ isAbstract: true })
-export class SiteBastDto extends ChangeEntityType {
+export class SiteBaseDto extends ChangeEntityType {
   @Field()
   id: string;
 

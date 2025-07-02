@@ -1,5 +1,5 @@
 import { InputType } from '@nestjs/graphql';
-import { SiteBastDto } from './siteBase.dto';
+import { SiteBaseDto } from './siteBase.dto';
 
 @InputType()
-export class SiteSummaryDTO extends SiteBastDto {}
+export class SiteSummaryDTO extends SiteBaseDto {}

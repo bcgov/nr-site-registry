@@ -1,5 +1,5 @@
-import { Field, ObjectType } from '@nestjs/graphql';
-import { SiteBastDto as SiteBaseDto } from './siteBase.dto';
+import { ObjectType } from '@nestjs/graphql';
+import { SiteBaseDto as SiteBaseDto } from './siteBase.dto';
 
 @ObjectType()
 export class SiteDto extends SiteBaseDto {}

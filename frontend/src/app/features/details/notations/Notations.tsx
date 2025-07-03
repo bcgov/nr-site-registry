@@ -373,11 +373,11 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       if (key === 'etypCode') {
         if (Array.isArray(notationType.data)) {
-          const searchTermLower = searchTerm.toLowerCase(); // Capture searchTerm in a local variable
+          const searchTermLower = searchTerm.toLowerCase();
 
           let filteredData = notationType.data.filter((item: any) => {
-            console.log(item); // Check the item structure here for debugging purposes
-            // Ensure that dropdownDto exists and is an array
+            console.log(item);
+
             return (
               Array.isArray(item.dropdownDto) &&
               item.dropdownDto.some(

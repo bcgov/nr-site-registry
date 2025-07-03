@@ -376,8 +376,6 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
           const searchTermLower = searchTerm.toLowerCase();
 
           let filteredData = notationType.data.filter((item: any) => {
-            console.log(item);
-
             return (
               Array.isArray(item.dropdownDto) &&
               item.dropdownDto.some(

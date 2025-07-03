@@ -9,6 +9,9 @@ import { EventTypeCd } from '../../entities/eventTypeCd.entity';
 import { EventParticRoleCd } from '../../entities/eventParticRoleCd.entity';
 import { LoggerService } from '../../logger/logger.service';
 import { User } from '../../entities/user.entity';
+import { SiteRiskCd } from '../../entities/siteRiskCd.entity';
+import { BceRegionCd } from '../../entities/bceRegionCd.entity';
+import { SiteStatusCd } from '../../entities/siteStatusCd.entity';
 
 // Mock particRoleCd and peopleOrgs entities and their methods
 jest.mock('../../entities/particRoleCd.entity');
@@ -51,6 +54,18 @@ describe('DropdownService', () => {
         },
         {
           provide: getRepositoryToken(User),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(SiteRiskCd),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(BceRegionCd),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(SiteStatusCd),
           useClass: Repository,
         },
       ],

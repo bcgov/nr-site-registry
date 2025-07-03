@@ -1,27 +1,23 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-@InputType()
-export class ChangeAuditEntityDTO {
+
+@InputType({ isAbstract: true })
+@ObjectType({ isAbstract: true })
+export class ChangeAuditType {
   @Field({ nullable: true })
-  userAction: string;
+  userAction?: string;
 
   @Field({ nullable: true })
-  apiAction: string;
+  apiAction?: string;
 
   @Field({ nullable: true })
-  srAction: string;
+  srAction?: string;
 
   @Field(() => Boolean, { nullable: true })
-  srValue: boolean;
+  srValue?: boolean;
 }
+
+@InputType()
+export class ChangeAuditEntityDTO extends ChangeAuditType {}
 
 @ObjectType()
-export class ChangeAuditObjectTypeDTO {
-  @Field()
-  userAction: string;
-
-  @Field({ nullable: true })
-  srAction: string;
-
-  @Field()
-  srValue: boolean;
-}
+export class ChangeAuditObjectTypeDTO extends ChangeAuditType {}

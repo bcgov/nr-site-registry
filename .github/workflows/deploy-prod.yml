@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - dev
-      - feat/ocp-prod # remove this after, just triggering build
       - dev-to-prod # another temp deploy branch, after squashing to new branch due to messy history.
   workflow_dispatch:
     inputs:

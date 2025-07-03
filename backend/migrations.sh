@@ -35,8 +35,7 @@ echo "schema created"
 # run type orm migrations
 npm run typeorm:run-migrations
 
-echo "Migrations completed."
-
+echo "Migrations completed successfully."
 
 
 # check if psql is present in container  or not

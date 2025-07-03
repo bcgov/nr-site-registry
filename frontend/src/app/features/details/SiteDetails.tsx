@@ -514,7 +514,6 @@ const SiteDetails = () => {
         }
         break;
       case SiteActionBtn.CANCEL:
-        console.log('cancel', !id?.trim());
         if (!id?.trim()) {
           navigate(-1);
         } else {
@@ -1128,12 +1127,12 @@ const SiteDetails = () => {
                   items={
                     !id?.trim()
                       ? [
-                          { label: 'Create Site', value: 'create' },
-                          { label: 'Cancel', value: 'cancel' },
+                          { label: 'Create Site', value: SiteActionBtn.SAVE },
+                          { label: 'Cancel', value: SiteActionBtn.CANCEL },
                         ]
                       : [
-                          { label: 'Save', value: 'save' },
-                          { label: 'Cancel', value: 'cancel' },
+                          { label: 'Save', value: SiteActionBtn.SAVE },
+                          { label: 'Cancel', value: SiteActionBtn.CANCEL },
                         ]
                   }
                   onItemClick={handleItemClick}

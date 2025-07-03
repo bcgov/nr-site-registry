@@ -4,8 +4,8 @@ import { ChangeAuditType } from './changeAuditEntity.dto';
 @InputType({ isAbstract: true })
 @ObjectType({ isAbstract: true })
 export class SiteBaseDto extends ChangeAuditType {
-  @Field()
-  id: string;
+  @Field({ nullable: true })
+  id?: string | null;
 
   @Field({ nullable: true })
   bcerCode: string;

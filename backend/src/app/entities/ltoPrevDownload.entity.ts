@@ -1,11 +1,15 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 @Entity('lto_prev_download')
 export class LtoPrevDownload {
   @Field()
-  @Column('character varying', { primary: true, name: 'pid', length: 9 })
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Field()
+  @Column('character varying', { name: 'pid', length: 9 })
   pid: string;
 
   @Field()

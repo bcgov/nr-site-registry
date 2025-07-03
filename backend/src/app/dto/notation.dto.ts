@@ -67,9 +67,9 @@ export class NotationIputDTO extends ChangeAuditEntityDTO {
   @IsString()
   psnorgId: string;
 
-  @Field({ nullable: true })
+  @Field()
   @IsString()
-  siteId?: string | null;
+  siteId: string;
 
   @Field({ nullable: true })
   completionDate: Date | null;

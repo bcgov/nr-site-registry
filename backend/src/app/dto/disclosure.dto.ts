@@ -14,8 +14,8 @@ export class SiteProfilesInputDTO extends ChangeAuditEntityDTO {
   @Field()
   id: string;
 
-  @Field({ nullable: true })
-  siteId?: string | null;
+  @Field()
+  siteId: string;
 
   @Field()
   dateCompleted: Date;

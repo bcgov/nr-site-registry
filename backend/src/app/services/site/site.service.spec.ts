@@ -939,7 +939,6 @@ describe('SiteService', () => {
         siteDisclosure,
         userInfo,
         entityManager,
-        '456',
       );
       expect(entityManager.save).toHaveBeenCalled();
       const addedProfile = (entityManager.save as jest.Mock).mock.calls[0][1];
@@ -964,7 +963,6 @@ describe('SiteService', () => {
         siteDisclosure,
         userInfo,
         entityManager,
-        '456',
       );
       expect(entityManager.save).toHaveBeenCalled();
       const updatedProfile = (entityManager.save as jest.Mock).mock.calls[0][1];
@@ -992,7 +990,6 @@ describe('SiteService', () => {
         siteAccociated,
         userInfo,
         entityManager,
-        '123',
       );
       expect(entityManager.save).toHaveBeenCalled();
       const addedSiteAssoc = (entityManager.save as jest.Mock).mock.calls[0][1];
@@ -1019,7 +1016,6 @@ describe('SiteService', () => {
         siteAccociated,
         userInfo,
         entityManager,
-        '123',
       );
       const updatedAssoc = (entityManager.update as jest.Mock).mock.calls[0][2];
       expect(updatedAssoc.whenUpdated).toBeInstanceOf(Date);
@@ -1042,7 +1038,6 @@ describe('SiteService', () => {
         siteAccociated,
         userInfo,
         entityManager,
-        '1',
       );
       const deletedAssoc = (entityManager.delete as jest.Mock).mock.calls[0][1];
       expect(deletedAssoc.id).toBe('1');
@@ -1062,12 +1057,7 @@ describe('SiteService', () => {
       ];
       const userInfo = { givenName: 'Test User' };
 
-      await siteService.processDocuments(
-        documents,
-        userInfo,
-        entityManager,
-        '1',
-      );
+      await siteService.processDocuments(documents, userInfo, entityManager);
 
       expect(entityManager.save).toHaveBeenCalledTimes(2); // For SiteDocs and SiteDocPartics
       const savedDocuments = (entityManager.save as jest.Mock).mock.calls[0][1];
@@ -1091,12 +1081,7 @@ describe('SiteService', () => {
       ];
       const userInfo = { givenName: 'Test User' };
 
-      await siteService.processDocuments(
-        documents,
-        userInfo,
-        entityManager,
-        '1',
-      );
+      await siteService.processDocuments(documents, userInfo, entityManager);
 
       expect(entityManager.update).toHaveBeenCalledTimes(2); // For SiteDocs and SiteDocPartics
       expect(entityManager.update).toHaveBeenCalledWith(
@@ -1122,12 +1107,7 @@ describe('SiteService', () => {
       ];
       const userInfo = { givenName: 'Tester' };
 
-      await siteService.processDocuments(
-        documents,
-        userInfo,
-        entityManager,
-        '1',
-      );
+      await siteService.processDocuments(documents, userInfo, entityManager);
 
       expect(entityManager.update).toHaveBeenCalledTimes(2); // For SiteDocs and SiteDocPartics
       expect(entityManager.update).toHaveBeenCalledWith(
@@ -1160,7 +1140,6 @@ describe('SiteService', () => {
         siteParticipants,
         userInfo,
         entityManager,
-        '1',
       );
 
       expect(entityManager.save).toHaveBeenCalledTimes(2);
@@ -1193,7 +1172,6 @@ describe('SiteService', () => {
         siteParticipants,
         userInfo,
         entityManager,
-        '1',
       );
       const updatedSiteParticipant = (entityManager.update as jest.Mock).mock
         .calls[0][2];
@@ -1225,7 +1203,6 @@ describe('SiteService', () => {
         siteParticipants,
         userInfo,
         entityManager,
-        '1',
       );
       expect(entityManager.delete).toHaveBeenCalledTimes(2);
       expect(entityManager.delete).toHaveBeenCalledWith(SitePartics, {
@@ -1244,7 +1221,6 @@ describe('SiteService', () => {
         siteParticipants,
         userInfo,
         entityManager,
-        '1',
       );
 
       expect(entityManager.save).not.toHaveBeenCalled();
@@ -1284,7 +1260,7 @@ describe('SiteService', () => {
       ];
       const userInfo = { givenName: 'Test User' };
 
-      await siteService.processEvents(events, userInfo, entityManager, '1');
+      await siteService.processEvents(events, userInfo, entityManager);
       const addedEvent = (entityManager.save as jest.Mock).mock.calls[0][1];
       expect(addedEvent[0].whenCreated).toBeInstanceOf(Date);
       expect(addedEvent[0].whoCreated).toBe('Test User');
@@ -1321,7 +1297,7 @@ describe('SiteService', () => {
       ];
       const userInfo = { givenName: 'Updated User' };
 
-      await siteService.processEvents(events, userInfo, entityManager, '1');
+      await siteService.processEvents(events, userInfo, entityManager);
       const updatedEvent = (entityManager.update as jest.Mock).mock.calls[0][2];
       expect(updatedEvent.whoUpdated).toBe('Updated User');
       expect(entityManager.update).toHaveBeenCalledTimes(1);
@@ -1346,7 +1322,7 @@ describe('SiteService', () => {
       ];
       const userInfo = { givenName: 'Deleter User' };
 
-      await siteService.processEvents(events, userInfo, entityManager, '1');
+      await siteService.processEvents(events, userInfo, entityManager);
 
       expect(entityManager.delete).toHaveBeenCalledWith(EventPartics, {
         id: 'xxx-xxx',

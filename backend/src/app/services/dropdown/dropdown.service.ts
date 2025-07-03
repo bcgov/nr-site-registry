@@ -9,9 +9,6 @@ import { EventParticRoleCd } from '../../entities/eventParticRoleCd.entity';
 import { LoggerService } from '../../logger/logger.service';
 import { User } from '../../entities/user.entity';
 import { DropdownDto } from '../../dto/dropdown.dto';
-import { SiteRiskCd } from '../../entities/siteRiskCd.entity';
-import { BceRegionCd } from '../../entities/bceRegionCd.entity';
-import { SiteStatusCd } from '../../entities/siteStatusCd.entity';
 
 @Injectable()
 export class DropdownService {
@@ -33,15 +30,6 @@ export class DropdownService {
 
     @InjectRepository(User)
     private userRepository: Repository<User>,
-
-    @InjectRepository(SiteRiskCd)
-    private siteRiskCdRepository: Repository<SiteRiskCd>,
-
-    @InjectRepository(BceRegionCd)
-    private bceRegionRepository: Repository<BceRegionCd>,
-
-    @InjectRepository(SiteStatusCd)
-    private siteStatusCdRepository: Repository<SiteStatusCd>,
 
     private readonly sitesLogger: LoggerService,
   ) {}
@@ -309,63 +297,6 @@ export class DropdownService {
       );
       throw new HttpException(
         `Failed to get users name.`,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-  }
-
-  async getSiteRiskCd() {
-    try {
-      const siteRiskCd = await this.siteRiskCdRepository.find();
-      if (siteRiskCd?.length > 0) {
-        return siteRiskCd.map((obj: SiteRiskCd) => ({
-          key: obj.code,
-          value: obj.description,
-        }));
-      } else {
-        return [];
-      }
-    } catch (error) {
-      throw new HttpException(
-        `Failed to get site risk code.`,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-  }
-
-  async getBCeRegionCd() {
-    try {
-      const bCeRegionCd = await this.bceRegionRepository.find();
-      if (bCeRegionCd?.length > 0) {
-        return bCeRegionCd.map((obj: BceRegionCd) => ({
-          key: obj.code,
-          value: obj.description,
-        }));
-      } else {
-        return [];
-      }
-    } catch (error) {
-      throw new HttpException(
-        `Failed to get BCe region code.`,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-  }
-
-  async getSiteStatusCd() {
-    try {
-      const siteStatusCd = await this.siteStatusCdRepository.find();
-      if (siteStatusCd?.length > 0) {
-        return siteStatusCd.map((obj: SiteStatusCd) => ({
-          key: obj.code,
-          value: obj.description,
-        }));
-      } else {
-        return [];
-      }
-    } catch (error) {
-      throw new HttpException(
-        `Failed to get site status code.`,
         HttpStatus.NOT_FOUND,
       );
     }

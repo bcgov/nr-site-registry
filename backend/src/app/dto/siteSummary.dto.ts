@@ -3,8 +3,8 @@ import { ChangeAuditEntityDTO } from './changeAuditEntity.dto';
 
 @InputType()
 export class SiteSummaryDTO extends ChangeAuditEntityDTO {
-  @Field({ nullable: true })
-  id?: string | null;
+  @Field()
+  id: string;
 
   @Field({ nullable: true })
   bcerCode: string;

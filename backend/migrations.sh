@@ -14,7 +14,7 @@ fi
 # check if postgres is up and running, if not retry 10 times with exponential backoff, if it fails echo failure and exit
 for i in {1..10}; do
     echo "Checking if Postgres is up and running..."
-    if PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql "user=$POSTGRES_ADMIN_USERNAME password=$POSTGRES_ADMIN_PASSWORD host=$POSTGRESQL_HOST port=$POSTGRESQL_PORT dbname=$POSTGRES_DATABASE" -c '\q'; then
+    if PGPASSWORD="$POSTGRES_DB_PASSWORD" psql "host=$POSTGRESQL_HOST port=$POSTGRESQL_PORT dbname=$POSTGRES_DATABASE user=$POSTGRES_DB_USERNAME" -c '\q'; then
         break
     fi
     echo "Postgres is not up yet. Retrying in $((2 * i)) seconds..."
@@ -27,8 +27,8 @@ done
 
 echo "Postgres is up and running, proceeding..."
 
-# create schema
-psql "user=$POSTGRES_ADMIN_USERNAME password=$POSTGRES_ADMIN_PASSWORD host=$POSTGRESQL_HOST port=$POSTGRESQL_PORT dbname=$POSTGRES_DATABASE" -c "CREATE SCHEMA IF NOT EXISTS $POSTGRES_DB_SCHEMA AUTHORIZATION \"$POSTGRES_DB_USERNAME\""
+# create schema - still need admin user for this
+PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql "host=$POSTGRESQL_HOST port=$POSTGRESQL_PORT dbname=$POSTGRES_DATABASE user=$POSTGRES_ADMIN_USERNAME" -c "CREATE SCHEMA IF NOT EXISTS $POSTGRES_DB_SCHEMA AUTHORIZATION \"$POSTGRES_DB_USERNAME\""
 
 echo "schema created"
 

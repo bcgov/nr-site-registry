@@ -102,9 +102,9 @@ export class DocumentInputDTO extends ChangeAuditEntityDTO {
   @IsString()
   title: string;
 
-  @Field()
+  @Field({ nullable: true })
   bucketId: string;
 
-  @Field()
-  objectId: string;
+  @Field({ nullable: true })
+  objectId?: string;
 }

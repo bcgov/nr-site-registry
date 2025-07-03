@@ -90,8 +90,6 @@ spec:
           env:
             - name: SEED_ENABLED
               value: {{.Values.global.config.seed.enabled | quote}}
-            - name: SEED_DATA_PATH
-              value: "/mnt/sql/data_migration.sql"
             - name: POSTGRES_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -129,10 +127,13 @@ spec:
                 secretKeyRef:
                   key: user
                   name: postgres-crunchy-pguser-postgres
+            - name: SEED_DATA_PATH
+              value: "/mnt/sql/data_migration.sql"
           resources: # this is optional
             requests:
               cpu: {{ .Values.backend.resources.requests.cpu }}
               memory: {{ .Values.backend.resources.requests.memory }}
+        {{- end }}
       containers:
         - name: {{ include "backend.fullname" . }}
           {{- if .Values.backend.securityContext }}
@@ -259,4 +260,5 @@ spec:
                     values:
                       - {{ .Release.Name }}
               topologyKey: "kubernetes.io/hostname"
+
 {{- end }}

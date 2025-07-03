@@ -8,6 +8,7 @@ import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Brackets, EntityManager, In, Repository } from 'typeorm';
 import {
   FetchSiteDetail,
+  FetchSiteDetailsResponse,
   FetchSiteResponse,
   SearchSiteResponse,
 } from '../../dto/response/genericResponse';
@@ -559,7 +560,7 @@ export class SiteService {
   async findSiteBySiteId(siteId: string, pending: boolean, userInfo: any) {
     this.sitesLogger.log('SiteService.findSiteBySiteId() start');
     this.sitesLogger.debug('SiteService.findSiteBySiteId() start');
-    const response = new FetchSiteDetail();
+    const response = new FetchSiteDetailsResponse();
 
     response.httpStatusCode = 200;
 

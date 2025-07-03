@@ -86,9 +86,9 @@ export class DocumentInputDTO extends ChangeAuditEntityDTO {
   @IsString()
   organizationName?: string;
 
-  @Field()
+  @Field({ nullable: true })
   @IsString()
-  siteId: string;
+  siteId?: string | null;
 
   @Field()
   @IsString()

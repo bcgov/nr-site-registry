@@ -40,8 +40,8 @@ export class SiteAssociationsInputDTO extends ChangeAuditEntityDTO {
   @Field()
   id: string;
 
-  @Field()
-  siteId: string;
+  @Field({ nullable: true })
+  siteId?: string | null;
 
   @Field()
   siteIdAssociatedWith: string;

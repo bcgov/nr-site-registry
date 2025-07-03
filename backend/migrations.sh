@@ -46,23 +46,4 @@ else
     echo "SEED_DATA_PATH is not set. Skipping seed data loading."
 fi
 
-# Create bcgw read-only user if it doesn't exist
-echo "Creating bcgw read-only user..."
-PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql "host=$POSTGRESQL_HOST port=$POSTGRESQL_PORT dbname=$POSTGRES_DATABASE user=$POSTGRES_ADMIN_USERNAME" << EOF
-DO \$\$
-BEGIN
-    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'bcgw') THEN
-        CREATE USER bcgw WITH PASSWORD '$BCGW_DB_PASSWORD';
-    END IF;
-END
-\$\$;
-
--- Grant schema usage and table-specific permissions
-GRANT USAGE ON SCHEMA sites TO bcgw;
-GRANT SELECT ON sites.sites TO bcgw;
-GRANT SELECT ON sites.subdivisions TO bcgw;
-EOF
-
-echo "bcgw user created and permissions granted"
-
 exit 0

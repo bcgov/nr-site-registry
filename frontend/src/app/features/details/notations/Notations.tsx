@@ -339,6 +339,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const deepSearch = (obj: any, searchTerm: string): boolean => {
     for (const key in obj) {
+      console.log('key', key);
       const value = obj[key];
       if (typeof value === 'object') {
         if (deepSearch(value, searchTerm)) {
@@ -367,6 +368,29 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         searchTerm = searchTerm.replace(ordinalSuffixPattern, '$1');
         if (formattedDate.includes(searchTerm)) {
           return true;
+        }
+      }
+
+      if (key === 'etypCode') {
+        if (Array.isArray(notationType.data)) {
+          const searchTermLower = searchTerm.toLowerCase(); // Capture searchTerm in a local variable
+
+          let filteredData = notationType.data.filter((item: any) => {
+            console.log(item); // Check the item structure here for debugging purposes
+            // Ensure that dropdownDto exists and is an array
+            return (
+              Array.isArray(item.dropdownDto) &&
+              item.dropdownDto.some(
+                (x: any) =>
+                  x.key === value &&
+                  x.value.toLowerCase().includes(searchTermLower),
+              )
+            );
+          });
+
+          if (filteredData.length > 0) {
+            return true;
+          }
         }
       }
 

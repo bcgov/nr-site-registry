@@ -85,7 +85,20 @@ if [ -f "/mnt/sql/enable_constraints.sql" ]; then
     PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -f "/mnt/sql/enable_constraints.sql"
 fi
 
-
+# Check if bcgw user exists and grant permissions if it does
+# note: the BCGW user is created in the .dbdeployer.yaml file using the crunchy Postgres operator, so it should already exist.
+echo "Checking if bcgw user exists..."
+if PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" -tAc "SELECT 1 FROM pg_roles WHERE rolname='bcgw'" | grep -q 1; then
+    echo "bcgw user exists. Granting permissions..."
+    PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" <<EOF
+    GRANT USAGE ON SCHEMA sites TO bcgw;
+    GRANT SELECT ON sites.sites TO bcgw;
+    GRANT SELECT ON sites.subdivisions TO bcgw;
+EOF
+    echo "Permissions granted to bcgw user."
+else
+    echo "bcgw user does not exist. Skipping permission grants."
+fi
 
 echo "Migration process complete with seed data loaded if applicable."
 exit 0

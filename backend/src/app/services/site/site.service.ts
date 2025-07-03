@@ -223,7 +223,8 @@ export class SiteService {
       });
 
     if (id) {
-      query.andWhere('sites.id = :id', { id: id });
+      const ids = id.split(',').map((v) => v.trim());
+      query.andWhere('sites.id IN (:...ids)', { ids });
     }
 
     if (srStatus) {

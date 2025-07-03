@@ -259,5 +259,4 @@ spec:
                     values:
                       - {{ .Release.Name }}
               topologyKey: "kubernetes.io/hostname"
-
 {{- end }}

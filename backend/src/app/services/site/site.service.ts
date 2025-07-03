@@ -151,8 +151,8 @@ export class SiteService {
       whenCreated,
       whenUpdated,
     } = filters;
+
     this.sitesLogger.log('SiteService.searchSites() start');
-    this.sitesLogger.debug('SiteService.searchSites() start');
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
 
@@ -168,59 +168,67 @@ export class SiteService {
     }
 
     let pid;
-    // pid/pin are 9 in length and 11 in case its hyphenated
     if (searchParam?.length === 11 || searchParam?.length === 9) {
-      pid = searchParam.replace(/-/g, ''); // Replaces all '-' with an empty string
+      pid = searchParam.replace(/-/g, '');
     }
 
-    // Add joins to the query
     if (pid) {
       query
-        .innerJoin('sites.siteSubdivisions', 'siteSubdivisions') // Join the siteSubdivisions table
-        .innerJoin('siteSubdivisions.subdivision', 'subdivision'); // Join the subdivisions table
+        .innerJoin('sites.siteSubdivisions', 'siteSubdivisions')
+        .innerJoin('siteSubdivisions.subdivision', 'subdivision');
     }
 
-    query.andWhere(
-      new Brackets((qb) => {
-        qb.where('CAST(sites.id AS TEXT) LIKE :searchParam', {
-          searchParam: `%${searchParam}%`,
-        })
-          .orWhere('LOWER(sites.addr_line_1) LIKE LOWER(:searchParam)', {
-            searchParam: `%${searchParam.toLowerCase()}%`,
-          })
-          .orWhere('LOWER(sites.addr_line_2) LIKE LOWER(:searchParam)', {
-            searchParam: `%${searchParam.toLowerCase()}%`,
-          })
-          .orWhere('LOWER(sites.addr_line_3) LIKE LOWER(:searchParam)', {
-            searchParam: `%${searchParam.toLowerCase()}%`,
-          })
-          .orWhere('LOWER(sites.addr_line_4) LIKE LOWER(:searchParam)', {
-            searchParam: `%${searchParam.toLowerCase()}%`,
-          })
-          .orWhere('LOWER(sites.city) LIKE LOWER(:searchParam)', {
-            searchParam: `%${searchParam.toLowerCase()}%`,
-          })
-          .orWhere('LOWER(sites.provState) LIKE LOWER(:searchParam)', {
-            searchParam: `%${searchParam.toLowerCase()}%`,
-          })
-          .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchParam)', {
-            searchParam: `%${searchParam.toLowerCase()}%`,
-          });
-        if (pid) {
-          qb.orWhere('subdivision.pid = :pid', {
-            pid: pid,
-          });
-          qb.orWhere('subdivision.pin = :pin', {
-            pin: pid,
-          });
-        }
-      }),
-    );
+    if (searchParam?.trim()) {
+      const keywords = searchParam.trim().toLowerCase().split(/\s+/);
+      query.andWhere(
+        new Brackets((qb) => {
+          for (const word of keywords) {
+            qb.andWhere(
+              new Brackets((subQb) => {
+                subQb
+                  .orWhere('LOWER(sites.addr_line_1) LIKE :word', {
+                    word: `%${word}%`,
+                  })
+                  .orWhere('LOWER(sites.addr_line_2) LIKE :word', {
+                    word: `%${word}%`,
+                  })
+                  .orWhere('LOWER(sites.addr_line_3) LIKE :word', {
+                    word: `%${word}%`,
+                  })
+                  .orWhere('LOWER(sites.addr_line_4) LIKE :word', {
+                    word: `%${word}%`,
+                  })
+                  .orWhere('LOWER(sites.city) LIKE :word', {
+                    word: `%${word}%`,
+                  })
+                  .orWhere('LOWER(sites.common_name) LIKE :word', {
+                    word: `%${word}%`,
+                  })
+                  .orWhere('LOWER(sites.provState) LIKE :word', {
+                    word: `%${word}%`,
+                  })
+                  .orWhere('LOWER(sites.postalCode) LIKE :word', {
+                    word: `%${word}%`,
+                  })
+                  .orWhere('CAST(sites.id AS TEXT) LIKE :word', {
+                    word: `%${word}%`,
+                  });
+              }),
+            );
+          }
+          if (pid) {
+            qb.orWhere('subdivision.pid = :pid', { pid });
+            qb.orWhere('subdivision.pin = :pin', { pin: pid });
+          }
+        }),
+      );
+    }
 
-    if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR)
+    if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR) {
       query.andWhere('sites.srAction != :srAction', {
         srAction: SRApprovalStatusEnum.PRIVATE,
       });
+    }
 
     if (id) {
       const ids = id.split(',').map((v) => v.trim());
@@ -244,75 +252,39 @@ export class SiteService {
     }
 
     if (addrLine_1) {
-      const cleanedAddress = siteUtil.removeSpecialCharacters(addrLine_1); // clean all special characters from address
+      const cleanedAddress = siteUtil.removeSpecialCharacters(addrLine_1);
       query.andWhere(
         `regexp_replace(concat_ws('', sites.addr_line_1, sites.addr_line_2, sites.addr_line_3, sites.addr_line_4), '[^a-zA-Z0-9]', '', 'g') LIKE :cleanedAddress`,
         { cleanedAddress: `%${cleanedAddress}%` },
       );
     }
 
-    if (city) {
-      query.andWhere('sites.city = :city', { city: city });
-    }
-
-    if (whoCreated) {
-      query.andWhere('sites.who_created = :whoCreated', {
-        whoCreated: whoCreated,
-      });
-    }
-
-    if (latlongReliabilityFlag) {
+    if (city) query.andWhere('sites.city = :city', { city });
+    if (whoCreated)
+      query.andWhere('sites.who_created = :whoCreated', { whoCreated });
+    if (latlongReliabilityFlag)
       query.andWhere(
         'sites.latlong_reliability_flag = :latlongReliabilityFlag',
-        { latlongReliabilityFlag: latlongReliabilityFlag },
+        { latlongReliabilityFlag },
       );
-    }
 
-    if (latdeg) {
-      query.andWhere('sites.latdeg = :latdeg', { latdeg: latdeg });
-    }
-
-    if (latDegrees) {
-      query.andWhere('sites.lat_degrees = :latDegrees', {
-        latDegrees: latDegrees,
-      });
-    }
-
-    if (latMinutes) {
-      query.andWhere('sites.lat_minutes = :latMinutes', {
-        latMinutes: latMinutes,
-      });
-    }
-
-    if (latSeconds) {
-      query.andWhere('sites.lat_seconds = :latSeconds', {
-        latSeconds: latSeconds,
-      });
-    }
-
-    if (longdeg) {
-      query.andWhere('sites.longdeg = :longdeg', { longdeg: longdeg });
-    }
-
-    if (longDegrees) {
+    if (latdeg) query.andWhere('sites.latdeg = :latdeg', { latdeg });
+    if (latDegrees)
+      query.andWhere('sites.lat_degrees = :latDegrees', { latDegrees });
+    if (latMinutes)
+      query.andWhere('sites.lat_minutes = :latMinutes', { latMinutes });
+    if (latSeconds)
+      query.andWhere('sites.lat_seconds = :latSeconds', { latSeconds });
+    if (longdeg) query.andWhere('sites.longdeg = :longdeg', { longdeg });
+    if (longDegrees)
       query.andWhere('sites.long_degrees = :longDeg', { longDeg: longDegrees });
-    }
-
-    if (longMinutes) {
-      query.andWhere('sites.long_minutes = :longMinutes', {
-        longMinutes: longMinutes,
-      });
-    }
-
-    if (longSeconds) {
-      query.andWhere('sites.long_seconds = :longSeconds', {
-        longSeconds: longSeconds,
-      });
-    }
+    if (longMinutes)
+      query.andWhere('sites.long_minutes = :longMinutes', { longMinutes });
+    if (longSeconds)
+      query.andWhere('sites.long_seconds = :longSeconds', { longSeconds });
 
     if (
-      whenCreated &&
-      whenCreated.length === 2 &&
+      whenCreated?.length === 2 &&
       whenCreated.every((date) => date instanceof Date)
     ) {
       query.andWhere('sites.whenCreated BETWEEN :start AND :end', {
@@ -322,8 +294,7 @@ export class SiteService {
     }
 
     if (
-      whenUpdated &&
-      whenUpdated.length === 2 &&
+      whenUpdated?.length === 2 &&
       whenUpdated.every((date) => date instanceof Date)
     ) {
       query.andWhere('sites.whenUpdated BETWEEN :start AND :end', {
@@ -339,30 +310,30 @@ export class SiteService {
       [SiteSortBy.COMMON_NAME]: 'sites.common_name',
       [SiteSortBy.CITY]: 'sites.city',
       [SiteSortBy.SITE_ADDRESS]: `
-        CASE
-          WHEN sites.addr_line_1 IS NOT NULL THEN sites.addr_line_1
-          WHEN sites.addr_line_2 IS NOT NULL THEN sites.addr_line_2
-          WHEN sites.addr_line_3 IS NOT NULL THEN sites.addr_line_3
-          ELSE ''
-        END
-      `,
+      CASE
+        WHEN sites.addr_line_1 IS NOT NULL THEN sites.addr_line_1
+        WHEN sites.addr_line_2 IS NOT NULL THEN sites.addr_line_2
+        WHEN sites.addr_line_3 IS NOT NULL THEN sites.addr_line_3
+        ELSE ''
+      END
+    `,
       [SiteSortBy.WHO_CREATED]: 'sites.who_created',
       [SiteSortBy.LAT_DEGREES_MINUTES_SECONDS]: `
-        CASE
-          WHEN sites.lat_degrees IS NOT NULL THEN sites.lat_degrees
-          WHEN sites.lat_minutes IS NOT NULL THEN sites.lat_minutes
-          WHEN sites.lat_seconds IS NOT NULL THEN sites.lat_seconds
-          ELSE NULL
-        END
-      `,
+      CASE
+        WHEN sites.lat_degrees IS NOT NULL THEN sites.lat_degrees
+        WHEN sites.lat_minutes IS NOT NULL THEN sites.lat_minutes
+        WHEN sites.lat_seconds IS NOT NULL THEN sites.lat_seconds
+        ELSE NULL
+      END
+    `,
       [SiteSortBy.LONG_DEGREES_MINUTES_SECONDS]: `
-        CASE
-          WHEN sites.long_degrees IS NOT NULL THEN sites.long_degrees
-          WHEN sites.long_minutes IS NOT NULL THEN sites.long_minutes
-          WHEN sites.long_seconds IS NOT NULL THEN sites.long_seconds
-          ELSE NULL
-        END
-      `,
+      CASE
+        WHEN sites.long_degrees IS NOT NULL THEN sites.long_degrees
+        WHEN sites.long_minutes IS NOT NULL THEN sites.long_minutes
+        WHEN sites.long_seconds IS NOT NULL THEN sites.long_seconds
+        ELSE NULL
+      END
+    `,
       [SiteSortBy.WHEN_CREATED]: 'sites.whenCreated',
       [SiteSortBy.WHEN_UPDATED]: 'sites.whenUpdated',
       [SiteSortBy.GENERAL_DESCRIPTION]: 'sites.general_description',
@@ -384,12 +355,12 @@ export class SiteService {
       .take(pageSize)
       .getManyAndCount();
 
-    response.sites = result[0] ? result[0] : [];
-    response.count = result[1] ? result[1] : 0;
+    response.sites = result[0] || [];
+    response.count = result[1] || 0;
     response.page = page;
     response.pageSize = pageSize;
+
     this.sitesLogger.log('SiteService.searchSites() end');
-    this.sitesLogger.debug('SiteService.searchSites() end');
     return response;
   }
 

@@ -2,9 +2,22 @@ This guide describes how to upload a SQL file to a PersistentVolume (PV) and mak
 
 Purpose: We upload the starter yaml (from ora2pg). This makes it readable by all pods, and should work in PR deployments.
 
-TODO: Once this is done and working, must make sure that the `initDb.sh` is modified to check for existence of file at `/mnt/sql/file.sql`, and if so, it reads it.
+## Steps (NEW, using script)
 
-## Steps
+```bash
+
+## For dev and test, where we don't need constraints, just upload
+./upload_sql.sh
+
+## Prod only, pass in ENV var, so it uploads constraints too
+ENV=prod ./upload_sql.sh
+
+## If it fails, make sure to delete temp pod
+oc delete temp-pod.
+
+```
+
+## Steps (Old, manual way)
 
 1. Create a Temporary Pod:
 
@@ -19,11 +32,20 @@ oc apply -f temp-pod.yaml
 2. Upload the SQL File:
 
 ```bash
-oc cp /path/to/your/file.sql temp-pod:/mnt/sql/file.sql
+# oc cp /path/to/your/file.sql temp-pod:/mnt/sql/file.sql
+oc cp ./data_migration.sql temp-pod:/mnt/sql/data_migration.sql
+
 ```
 3. Cleanup:
 
 ```bash
 oc delete pod temp-pod
 ```
+
 Your SQL file is now available for read access by any pod that mounts the associated PersistentVolumeClaim (PVC).
+
+
+4. Ensure migrations are updated
+
+initDB.sh / migrations.sh
+

@@ -22,6 +22,7 @@ jobs:
         run: |
           echo "PR: ${{ steps.vars.outputs.pr }}"
 
+  # Test Deploy
   deploy_db:
     name: Deploys Database
     uses: ./.github/workflows/.dbdeployer.yml
@@ -39,6 +40,30 @@ jobs:
       environment: test
       tag:  '${{ needs.get-pr-info.outputs.pr }}'
       values: 'values.yaml' # TEST env specific values file
+
+
+
+  # ## Prod Deploy
+  # ## Curently trigering on merge to dev, we can change if desired
+  # ## So now, test and prod are identical from a code/commit perspective (differ in envs, db params, etc)
+  # deploy_db_prod:
+  #   name: Deploys Database
+  #   uses: ./.github/workflows/.dbdeployer.yml
+  #   secrets: inherit
+  #   with:
+  #     environment: prod
+  #     values: 'values-prod.yaml'
+  #     app_values: 'values.yaml' # PROD env specific values file for the APP
+  # # deploys_prod:
+  # #   name: Deploys to PROD
+  # #   uses: ./.github/workflows/.deployer.yml
+  # #   secrets: inherit
+  # #   needs: [get-pr-info, deploy_db]
+  # #   with:
+  # #     environment: prod
+  # #     tag:  '${{ needs.get-pr-info.outputs.pr }}'
+  # #     # values: 'values.yaml' # TEST env specific values file
+  # #     # TODO - get prod values.yaml here.
 
 
   schemaspy:

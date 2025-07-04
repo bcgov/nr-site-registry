@@ -674,8 +674,8 @@ describe('Associate component', () => {
 
     await waitFor(() => {
       const tableRows = screen.getAllByTestId('table-row');
-      expect(tableRows[0]).toHaveTextContent('Note 2');
-      expect(tableRows[1]).toHaveTextContent('Note 1');
+      expect(tableRows[0]).toHaveTextContent('Note 1');
+      expect(tableRows[1]).toHaveTextContent('Note 2');
     });
   });
 });

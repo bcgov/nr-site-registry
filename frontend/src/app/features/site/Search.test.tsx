@@ -68,6 +68,13 @@ describe('Search Component', () => {
         searchParam: 'Test',
         filter: {},
       },
+      dropdown: {
+        dropdowns: {
+          siteRiskCode: [],
+        },
+        status: RequestStatus.idle,
+        error: '',
+      },
     });
   });
 

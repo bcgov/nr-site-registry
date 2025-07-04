@@ -10,6 +10,7 @@ import {
 import { AuthenticatedUser, Unprotected } from 'nest-keycloak-connect';
 import {
   FetchSiteDetail,
+  FetchSiteDetailsResponse,
   FetchSiteInsights,
   SaveSiteDetailsResponse,
   SearchSiteResponse,
@@ -145,7 +146,7 @@ export class SitePublicResolver {
     );
   }
 
-  @Query(() => FetchSiteDetail, { name: 'findSiteBySiteId' })
+  @Query(() => FetchSiteDetailsResponse, { name: 'findSiteBySiteId' })
   findSiteBySiteId(
     @Args('siteId', { type: () => String }) siteId: string,
     @Args('pending', { type: () => Boolean, nullable: true })

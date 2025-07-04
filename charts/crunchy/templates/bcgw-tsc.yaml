@@ -1,0 +1,12 @@
+apiVersion: porter.devops.gov.bc.ca/v1alpha1
+kind: TransportServerClaim
+metadata:
+  name: {{ template "crunchy-postgres.fullname" . }}-bcgw-tsc
+  labels: {{ include "crunchy-postgres.labels" . | nindent 4 }}
+spec:
+  monitor:
+    interval: 10
+    timeout: 10
+    type: tcp
+  service: {{ template "crunchy-postgres.fullname" . }}-bcgw
+  servicePort: 5432

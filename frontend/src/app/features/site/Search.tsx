@@ -350,10 +350,6 @@ const Search = () => {
               selectedRows={selectedRows}
               aria-label="search-results-actions"
             />
-            <SearchResultsActions
-              selectedRows={selectedRows}
-              aria-label="search-results-actions"
-            />
           </div>
           <FilterPills
             aria-label="selected-filters"

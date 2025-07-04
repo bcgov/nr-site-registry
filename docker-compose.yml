@@ -27,6 +27,8 @@ services:
       retries: 5
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      # - add path to data_migration.sql
+      # - add path to enable/disable constraints.sql
 
   sites:
     networks:

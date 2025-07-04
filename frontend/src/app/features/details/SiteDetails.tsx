@@ -173,7 +173,11 @@ const SiteDetails = () => {
   const siteAssocs = useSelector(getSiteAssociated);
   const siteDocuments = useSelector(getSiteDocuments);
   const parentBucket = useSelector(getParentBucket);
-  const userActions = [UserActionEnum.added, UserActionEnum.updated];
+  const userActions = [
+    UserActionEnum.added,
+    UserActionEnum.updated,
+    UserActionEnum.deleted,
+  ];
   const { notationFormRowEditMode, notationColumnInternal } =
     GetNotationConfig();
   const { participantColumnInternal } = GetConfig();

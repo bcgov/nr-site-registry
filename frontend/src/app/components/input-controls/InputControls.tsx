@@ -176,22 +176,16 @@ export const TextInput: React.FC<InputProps> = ({
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (validation?.required) {
-      setError(null);
-      validateInput(value);
-    }
-  }, []);
+  const [currentValue, setCurrentValue] = useState(value ?? '');
 
   const validateInput = (inputValue: string) => {
     if (validation) {
-      if (validation?.pattern && !validation.pattern?.test(inputValue)) {
-        setError(validation.customMessage || '');
-        return false;
-      }
       if (validation.required && !inputValue.trim()) {
         setError(validation.customMessage || ' ');
+        return false;
+      }
+      if (validation?.pattern && !validation.pattern?.test(inputValue)) {
+        setError(validation.customMessage || '');
         return false;
       }
     }
@@ -202,21 +196,16 @@ export const TextInput: React.FC<InputProps> = ({
 
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
+    setCurrentValue(inputValue);
+    onChange(inputValue);
+
+    if (allowNumbersOnly || (inputValue && !validateInput(inputValue))) {
+      return;
+    }
+
     if (validation?.required) {
       validateInput(inputValue);
     }
-
-    if (allowNumbersOnly) {
-      if (validateInput(inputValue)) {
-        onChange(parseFloat(inputValue)); // Update parent component state only if validation passes
-      }
-    } else {
-      onChange(inputValue);
-    }
-  };
-
-  const handleCheckBoxChange = (isChecked: boolean) => {
-    onChange(isChecked);
   };
 
   // Replace any spaces in the label with underscores to create a valid id
@@ -246,14 +235,22 @@ export const TextInput: React.FC<InputProps> = ({
             customEditInputTextCss ?? 'custom-input-text'
           }  ${error && 'error'}`}
           placeholder={placeholder}
-          value={value ?? ''}
+          value={currentValue}
           onChange={handleTextInputChange}
           aria-label={label} // Accessibility
           required={error ? true : false}
           disabled={isDisabled ?? false}
+          {...(validation?.maxLength
+            ? { maxLength: validation.maxLength }
+            : {})}
+          {...(validation?.minLength
+            ? { minLength: validation.minLength }
+            : {})}
         />
       ) : (
-        <span className={`d-flex ${customInputTextCss ?? ''}`}>{value}</span>
+        <span className={`d-flex ${customInputTextCss ?? ''}`}>
+          {currentValue}
+        </span>
       )}
       {error && (
         <span
@@ -293,13 +290,6 @@ export const DropdownInput: React.FC<InputProps> = ({
   const drdownId = label.replace(/\s+/g, '_') + '_' + v4();
   const [selected, setSelected] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (validation?.required) {
-      setError(null);
-      validateInput(value);
-    }
-  }, []);
-
   const validateInput = (inputValue: string) => {
     if (validation) {
       if (validation?.required && !inputValue.trim()) {
@@ -311,6 +301,7 @@ export const DropdownInput: React.FC<InputProps> = ({
     setError(null);
     return true;
   };
+
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setError(null);
     const selectedOption = event.target.value.trim();
@@ -321,9 +312,6 @@ export const DropdownInput: React.FC<InputProps> = ({
     onChange(selectedOption);
   };
 
-  const handleCheckBoxChange = (isChecked: boolean) => {
-    onChange(isChecked);
-  };
   const isFirstOptionGrey = value === '';
   return (
     <ContainerElement
@@ -437,14 +425,8 @@ export const GroupInput: React.FC<InputProps> = ({
   isDisabled,
 }) => {
   const [error, setError] = useState<string | null>(null);
+
   let currentConcatenatedValue;
-  useEffect(() => {
-    children?.forEach((child) => {
-      if (child?.validation?.required) {
-        validateInput(child?.value, child);
-      }
-    });
-  }, []);
 
   if (!isEditing) {
     currentConcatenatedValue = children?.reduce((accumulator, currentValue) => {
@@ -480,7 +462,7 @@ export const GroupInput: React.FC<InputProps> = ({
     }
     if (child.allowNumbersOnly) {
       if (validateInput(inputValue, child)) {
-        child.onChange(parseFloat(inputValue)); // Update parent component state only if validation passes
+        child.onChange(inputValue); // Update parent component state only if validation passes
       }
     } else {
       child.onChange(inputValue);
@@ -529,7 +511,7 @@ export const GroupInput: React.FC<InputProps> = ({
                     customEditInputTextCss ?? 'custom-input-text'
                   } ${error && 'error'}`}
                   placeholder={child.placeholder}
-                  value={child.value ?? ''}
+                  va-lue={child.value ?? ''}
                   onChange={(e) => handleTextInputChange(e, child)}
                   aria-label={child.label} // Accessibility
                   disabled={isDisabled}
@@ -578,11 +560,6 @@ export const DateRangeInput: React.FC<InputProps> = ({
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    if (validation?.required) {
-      validateInput(value);
-    }
-  }, []);
 
   let dateRangeValue;
   if (value.length > 0) {
@@ -614,10 +591,6 @@ export const DateRangeInput: React.FC<InputProps> = ({
       validateInput(value);
     }
     onChange(value);
-  };
-
-  const handleCheckBoxChange = (isChecked: boolean) => {
-    onChange(isChecked);
   };
 
   // Replace any spaces in the label with underscores to create a valid id
@@ -702,15 +675,6 @@ export const DateInput: React.FC<InputProps> = ({
   if (value) {
     dateValue = formatDate(new Date(value));
   }
-  const handleCheckBoxChange = (isChecked: boolean) => {
-    onChange(isChecked);
-  };
-
-  useEffect(() => {
-    if (validation?.required) {
-      validateInput(value);
-    }
-  }, []);
 
   const validateInput = (inputValue: Date | null) => {
     if (validation) {
@@ -725,16 +689,17 @@ export const DateInput: React.FC<InputProps> = ({
   };
 
   const handleDateChange = (newDate: Date | null) => {
-    if (validation?.required) {
-      validateInput(newDate);
-    }
     // Check if the new value is a valid date
     if (newDate instanceof Date && !isNaN(newDate.getTime())) {
       // Pass valid date to the parent onChange function
       onChange(newDate);
     } else {
-      // Handle invalid date entry (Optional: error message, etc.)
+      // Handle invalid date entry (Optional: error message, etc.)4
       onChange(null); // Optionally set the value to null if invalid
+    }
+    if (validation?.required) {
+      validateInput(newDate);
+      return;
     }
   };
 
@@ -884,11 +849,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
   const cols = textAreaColoum ?? undefined;
   const rows = textAreaRow ?? undefined;
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    if (validation?.required) {
-      validateInput(value);
-    }
-  }, []);
+  const [currentValue, setCurrentValue] = useState(value ?? '');
 
   const validateInput = (inputValue: string) => {
     if (validation) {
@@ -908,15 +869,11 @@ export const TextAreaInput: React.FC<InputProps> = ({
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const inputValue = e.target.value;
-    if (validation?.required) {
-      validateInput(inputValue);
-    }
-    if (allowNumbersOnly) {
-      if (validateInput(inputValue)) {
-        onChange(inputValue); // Update parent component state only if validation passes
-      }
-    } else {
-      onChange(inputValue);
+    setCurrentValue(inputValue);
+    onChange(inputValue);
+
+    if (allowNumbersOnly || (inputValue && !validateInput(inputValue))) {
+      return;
     }
   };
 
@@ -944,7 +901,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
             customEditInputTextCss ?? 'custom-input-text'
           } ${error && 'error'}`}
           placeholder={placeholder}
-          value={value ?? ''}
+          value={currentValue}
           onChange={handleTextAreaChange}
           aria-label={label}
           rows={rows}
@@ -1002,12 +959,6 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
   const [filteredOpts, setFilteredOpts] =
     useState<{ key: any; value: any }[]>(filteredOptions);
   const [isClear, setIsClear] = useState(false);
-
-  useEffect(() => {
-    if (validation?.required) {
-      validateInput(value);
-    }
-  }, []);
 
   const validateInput = (inputValue: string) => {
     if (validation) {
@@ -1211,12 +1162,6 @@ export const SearchCustomInput: React.FC<InputProps> = ({
       setHasInfoMsg(null);
     }
   }, [isOpen]);
-
-  useEffect(() => {
-    if (validation?.required) {
-      validateInput(value.trim());
-    }
-  }, []);
 
   const validateInput = (inputValue: any) => {
     if (validation) {

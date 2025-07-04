@@ -21,6 +21,7 @@ import Table from '../../components/table/Table';
 import { fetchSearchSites, getSites, resetSiteSearch } from './SiteSearchSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 import { SiteSortBy, SortByDirection } from '../../../graphql/generated';
+import { fetchSiteRiskCd } from '../details/dropdowns/DropdownSlice';
 
 const Search = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -212,6 +213,8 @@ const Search = () => {
       setSearchText(searchParam);
       setUserAction(false);
     }
+
+    dispatch(fetchSiteRiskCd());
   }, []);
 
   const handleRemoveFilter = (filter: any) => {
@@ -345,10 +348,6 @@ const Search = () => {
               onFiltersChange={handleInputChange}
               onFiltersSubmit={handleFormSubmit}
               onFiltersReset={handleReset}
-            />
-            <SearchResultsActions
-              selectedRows={selectedRows}
-              aria-label="search-results-actions"
             />
             <SearchResultsActions
               selectedRows={selectedRows}

@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { RequestStatus } from '../../helpers/requests/status';
-import { recentViewedColumns } from './DashboardConfig';
+import { actionsItemsConfig, recentViewedColumns } from './DashboardConfig';
 import { useSelector } from 'react-redux';
 import { UserType } from '../../helpers/requests/userType';
 import './Dashboard.css';
 import PageContainer from '../../components/simple/PageContainer';
 import Widget from '../../components/widget/Widget';
 import { getUser } from '../../helpers/utility';
+import Actions from '../../components/action/Actions';
+import { useNavigate } from 'react-router-dom';
 
 interface DashboardWidgetProps {
   title?: string;
@@ -52,6 +54,7 @@ const DashboardTableWidget: React.FC<DashboardWidgetProps> = ({
 );
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const sites = useSelector((state: any) => state.dashboard);
   const loggedInUser = getUser();
 
@@ -86,9 +89,32 @@ const Dashboard = () => {
     }
   }, [sites.status]);
 
+  const handleActionItemClick = (item: any) => {
+    switch (item.toLowerCase()) {
+      case 'create-site':
+        navigate('site/create?applicationId=1');
+        break;
+      case 'search-site':
+        break;
+      case 'view-sites-on-map':
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <PageContainer role="Dashboard">
-      <h1 className="dashboard-title">Welcome{name}</h1>
+      <div className="d-flex justify-content-between align-items-center">
+        <h1 className="dashboard-title">Welcome{name}</h1>
+        {userType === UserType.Internal && (
+          <Actions
+            label="Actions"
+            items={actionsItemsConfig}
+            onItemClick={handleActionItemClick}
+          />
+        )}
+      </div>
       <DashboardTableWidget
         title="Recently Viewed"
         columns={recentViewedColumns}

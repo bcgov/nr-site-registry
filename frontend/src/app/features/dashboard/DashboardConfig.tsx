@@ -114,3 +114,18 @@ export const recentViewedColumns: TableColumn[] = [
     linkRedirectionURL: 'site/details/',
   },
 ];
+
+export const actionsItemsConfig = [
+  {
+    label: 'Create a Site',
+    value: 'create-site',
+  },
+  {
+    label: 'Search for a Site',
+    value: 'search-site',
+  },
+  {
+    label: 'View Sites on Map',
+    value: 'view-sites-on-map',
+  },
+];

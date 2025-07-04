@@ -177,7 +177,7 @@ export type DocumentInputDto = {
   objectId: Scalars['String']['input'];
   organizationName?: InputMaybe<Scalars['String']['input']>;
   psnorgId: Scalars['String']['input'];
-  siteId: Scalars['String']['input'];
+  siteId?: InputMaybe<Scalars['String']['input']>;
   srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   submissionDate: Scalars['String']['input'];
@@ -617,7 +617,7 @@ export type NotationIputDto = {
   requiredAction?: InputMaybe<Scalars['String']['input']>;
   requirementDueDate?: InputMaybe<Scalars['DateTime']['input']>;
   requirementReceivedDate?: InputMaybe<Scalars['DateTime']['input']>;
-  siteId: Scalars['String']['input'];
+  siteId?: InputMaybe<Scalars['String']['input']>;
   srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
@@ -739,6 +739,7 @@ export type Query = {
   findSiteBySiteIdLoggedInUser: FetchSiteDetail;
   findSitesAndPlaces: FindSitesAndPlacesResponse;
   getAssociatedSitesBySiteId: AssociatedSiteResponse;
+  getBCeRegionCd: DropdownResponse;
   getBannerType: BannerTypeResponse;
   getCartItemsForUser: CartResponse;
   getFolioItemsForUser: FolioResponse;
@@ -758,6 +759,8 @@ export type Query = {
   getSiteInsights: FetchSiteInsights;
   getSiteNotationBySiteId: NotationResponse;
   getSiteParticipantBySiteId: SiteParticsResponse;
+  getSiteRiskCd: DropdownResponse;
+  getSiteStatusCd: DropdownResponse;
   getSitesForFolio: FolioContentResponse;
   getSnapshots: SnapshotResponse;
   getSnapshotsById: SnapshotResponse;
@@ -1010,7 +1013,7 @@ export type SiteAssociationsInputDto = {
   effectiveDate: Scalars['DateTime']['input'];
   id: Scalars['String']['input'];
   note?: InputMaybe<Scalars['String']['input']>;
-  siteId: Scalars['String']['input'];
+  siteId?: InputMaybe<Scalars['String']['input']>;
   siteIdAssociatedWith: Scalars['String']['input'];
   srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
@@ -1186,7 +1189,7 @@ export type SiteParticsInputDto = {
   particRoleId: Scalars['String']['input'];
   prCode: Scalars['String']['input'];
   psnorgId: Scalars['String']['input'];
-  siteId: Scalars['String']['input'];
+  siteId?: InputMaybe<Scalars['String']['input']>;
   srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
@@ -1284,7 +1287,7 @@ export type SiteProfilesInputDto = {
   rwmDateReceived?: InputMaybe<Scalars['DateTime']['input']>;
   rwmParticId?: InputMaybe<Scalars['String']['input']>;
   siteDisclosureComment?: InputMaybe<Scalars['String']['input']>;
-  siteId: Scalars['String']['input'];
+  siteId?: InputMaybe<Scalars['String']['input']>;
   siteRegDateEntered?: InputMaybe<Scalars['DateTime']['input']>;
   siteRegDateRecd?: InputMaybe<Scalars['DateTime']['input']>;
   srAction?: InputMaybe<Scalars['String']['input']>;
@@ -1364,7 +1367,7 @@ export type SiteSummaryDto = {
   commonName?: InputMaybe<Scalars['String']['input']>;
   consultantSubmitted?: InputMaybe<Scalars['String']['input']>;
   generalDescription?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['String']['input'];
+  id?: InputMaybe<Scalars['String']['input']>;
   latDegrees?: InputMaybe<Scalars['Float']['input']>;
   latMinutes?: InputMaybe<Scalars['Float']['input']>;
   latSeconds?: InputMaybe<Scalars['Float']['input']>;
@@ -1427,8 +1430,8 @@ export type Sites = {
   provState: Scalars['String']['output'];
   recentViewedSites?: Maybe<Array<RecentViews>>;
   regionalFileNo?: Maybe<Scalars['String']['output']>;
-  rwmFlag: Scalars['Float']['output'];
-  rwmGeneralDescFlag: Scalars['Float']['output'];
+  rwmFlag?: Maybe<Scalars['Float']['output']>;
+  rwmGeneralDescFlag?: Maybe<Scalars['Float']['output']>;
   siteAssocs: Array<SiteAssocs>;
   siteAssocs2: Array<SiteAssocs>;
   siteCrownLandContaminated: SiteCrownLandContaminated;

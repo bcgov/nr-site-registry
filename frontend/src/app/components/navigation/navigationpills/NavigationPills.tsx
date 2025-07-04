@@ -18,12 +18,12 @@ const NavigationPills: React.FC<INavigationPills> = ({
 
   useEffect(() => {
     if (location?.search !== '') {
-      const component = components.find(
-        (item: any) => item.value === location?.search.replace('?', ''),
+      const component = components?.find(
+        (item: any) => item?.value === location?.search.replace('?', ''),
       );
 
       if (component !== null) {
-        handlePillClick(component.value);
+        handlePillClick(component?.value);
       }
     }
   }, [location, components]);
@@ -33,8 +33,8 @@ const NavigationPills: React.FC<INavigationPills> = ({
   };
 
   const getCurrentElementIndex = useCallback(() => {
-    const currentComponentIndex = components.findIndex(
-      (tab: any) => tab.value === activeTabKey,
+    const currentComponentIndex = components?.findIndex(
+      (tab: any) => tab?.value === activeTabKey,
     );
 
     return currentComponentIndex;
@@ -42,10 +42,10 @@ const NavigationPills: React.FC<INavigationPills> = ({
 
   useEffect(() => {
     if (
-      (activeTabKey === '' && components.length > 0) ||
+      (activeTabKey === '' && components?.length > 0) ||
       getCurrentElementIndex() === -1
     ) {
-      handlePillClick(components[0].value);
+      handlePillClick(components[0]?.value);
     }
   }, [activeTabKey, components, getCurrentElementIndex]);
 
@@ -54,29 +54,29 @@ const NavigationPills: React.FC<INavigationPills> = ({
   };
 
   const isActiveTabLastPosition = () => {
-    return getCurrentElementIndex() + 1 === components.length;
+    return getCurrentElementIndex() + 1 === components?.length;
   };
 
   const getNextElement = () => {
     const currentComponentindex = getCurrentElementIndex();
-    return components[currentComponentindex + 1].value;
+    return components[currentComponentindex + 1]?.value;
   };
 
   const getPreviousElement = () => {
     const currentComponentindex = getCurrentElementIndex();
-    return components[currentComponentindex - 1].value;
+    return components[currentComponentindex - 1]?.value;
   };
 
   return (
     <div key={activeTabKey} className="pt-5">
       <div className="d-flex d-xxl-flex d-xl-flex gap-2 d-none">
-        {components.map((item: any) => (
+        {components?.map((item: any) => (
           <Button
             size="small"
             disabled={isDisable && item !== activeTabKey}
-            variant={item.value === activeTabKey ? 'primary' : 'tertiary'}
-            onClick={() => handlePillClick(item.value)}
-            key={item.value}
+            variant={item?.value === activeTabKey ? 'primary' : 'tertiary'}
+            onClick={() => handlePillClick(item?.value)}
+            key={item?.value}
           >
             {item.label}
           </Button>
@@ -114,15 +114,15 @@ const NavigationPills: React.FC<INavigationPills> = ({
                 ></span>
               </div>
               <div className="ps-3 pe-2 m-0 p-0 w-100 text-center">
-                {components.map(
+                {components?.map(
                   (tab: any) =>
-                    tab.value === activeTabKey && (
+                    tab?.value === activeTabKey && (
                       <Button
                         size={isMobileScreen ? 'medium' : 'small'}
                         className="custom-nav-pill"
-                        key={tab.value}
+                        key={tab?.value}
                       >
-                        {tab.label}
+                        {tab?.label}
                       </Button>
                     ),
                 )}
@@ -148,8 +148,8 @@ const NavigationPills: React.FC<INavigationPills> = ({
         {components &&
           activeTabKey !== '' &&
           components?.map((tabComponent: any, index: number) => {
-            return tabComponent.value === activeTabKey ? (
-              <div key={index}>{tabComponent.component}</div>
+            return tabComponent?.value === activeTabKey ? (
+              <div key={index}>{tabComponent?.component}</div>
             ) : null;
           })}
       </div>

@@ -214,6 +214,14 @@ export class SiteProfiles extends ChangeAuditEntity {
   ownerParticId: string | null;
 
   @Field({ nullable: true })
+  @Column('bigint', { name: 'completor_partic_id', nullable: true })
+  completorParticId: string | null;
+
+  @Field({ nullable: true })
+  @Column('bigint', { name: 'contact_partic_id', nullable: true })
+  contactParticId: string | null;
+
+  @Field({ nullable: true })
   @Column('character varying', {
     name: 'site_address',
     nullable: true,

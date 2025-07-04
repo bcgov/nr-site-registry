@@ -31,14 +31,15 @@ export type AddSiteToFolioDto = {
 
 export type AssociatedSiteDto = {
   __typename?: 'AssociatedSiteDto';
+  apiAction?: Maybe<Scalars['String']['output']>;
   effectiveDate: Scalars['DateTime']['output'];
   id: Scalars['String']['output'];
   note?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
   siteIdAssociatedWith: Scalars['String']['output'];
   srAction?: Maybe<Scalars['String']['output']>;
-  srValue: Scalars['Boolean']['output'];
-  userAction: Scalars['String']['output'];
+  srValue?: Maybe<Scalars['Boolean']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
 };
 
 export type AssociatedSiteResponse = {
@@ -149,6 +150,7 @@ export type DocParticRoleCd = {
 
 export type DocumentDto = {
   __typename?: 'DocumentDto';
+  apiAction?: Maybe<Scalars['String']['output']>;
   bucketId?: Maybe<Scalars['String']['output']>;
   displayName?: Maybe<Scalars['String']['output']>;
   docParticId?: Maybe<Scalars['String']['output']>;
@@ -159,22 +161,22 @@ export type DocumentDto = {
   psnorgId?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
   srAction?: Maybe<Scalars['String']['output']>;
-  srValue: Scalars['Boolean']['output'];
+  srValue?: Maybe<Scalars['Boolean']['output']>;
   submissionDate: Scalars['String']['output'];
   title: Scalars['String']['output'];
-  userAction: Scalars['String']['output'];
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type DocumentInputDto = {
   apiAction?: InputMaybe<Scalars['String']['input']>;
-  bucketId: Scalars['String']['input'];
+  bucketId?: InputMaybe<Scalars['String']['input']>;
   displayName?: InputMaybe<Scalars['String']['input']>;
   docParticId?: InputMaybe<Scalars['String']['input']>;
   documentDate?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
-  objectId: Scalars['String']['input'];
+  objectId?: InputMaybe<Scalars['String']['input']>;
   organizationName?: InputMaybe<Scalars['String']['input']>;
   psnorgId: Scalars['String']['input'];
   siteId?: InputMaybe<Scalars['String']['input']>;
@@ -283,6 +285,15 @@ export type Events = {
 
 export type FetchSiteDetail = {
   __typename?: 'FetchSiteDetail';
+  data?: Maybe<Sites>;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
+export type FetchSiteDetailsResponse = {
+  __typename?: 'FetchSiteDetailsResponse';
   data?: Maybe<Sites>;
   httpStatusCode?: Maybe<Scalars['Int']['output']>;
   message?: Maybe<Scalars['String']['output']>;
@@ -411,6 +422,7 @@ export type LandHistories = {
 
 export type LandHistoriesDto = {
   __typename?: 'LandHistoriesDTO';
+  apiAction?: Maybe<Scalars['String']['output']>;
   guid: Scalars['String']['output'];
   landUse: LandUseCd;
   lutCode: Scalars['String']['output'];
@@ -422,8 +434,8 @@ export type LandHistoriesDto = {
   siteId: Scalars['String']['output'];
   siteProfile?: Maybe<Scalars['String']['output']>;
   srAction?: Maybe<Scalars['String']['output']>;
-  srValue: Scalars['Boolean']['output'];
-  userAction: Scalars['String']['output'];
+  srValue?: Maybe<Scalars['Boolean']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
@@ -587,6 +599,7 @@ export type NotationDropdownDto = {
 
 export type NotationDto = {
   __typename?: 'NotationDto';
+  apiAction?: Maybe<Scalars['String']['output']>;
   completionDate?: Maybe<Scalars['DateTime']['output']>;
   eclsCode: Scalars['String']['output'];
   etypCode: Scalars['String']['output'];
@@ -599,8 +612,8 @@ export type NotationDto = {
   requirementReceivedDate?: Maybe<Scalars['DateTime']['output']>;
   siteId: Scalars['String']['output'];
   srAction?: Maybe<Scalars['String']['output']>;
-  srValue: Scalars['Boolean']['output'];
-  userAction: Scalars['String']['output'];
+  srValue?: Maybe<Scalars['Boolean']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
 };
@@ -627,14 +640,15 @@ export type NotationIputDto = {
 
 export type NotationParticipantDto = {
   __typename?: 'NotationParticipantDto';
+  apiAction?: Maybe<Scalars['String']['output']>;
   displayName: Scalars['String']['output'];
   eprCode: Scalars['String']['output'];
   eventId: Scalars['String']['output'];
   eventParticId: Scalars['String']['output'];
   psnorgId: Scalars['String']['output'];
   srAction?: Maybe<Scalars['String']['output']>;
-  srValue: Scalars['Boolean']['output'];
-  userAction: Scalars['String']['output'];
+  srValue?: Maybe<Scalars['Boolean']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
 };
@@ -735,7 +749,7 @@ export type Place = {
 export type Query = {
   __typename?: 'Query';
   _service: _Service;
-  findSiteBySiteId: FetchSiteDetail;
+  findSiteBySiteId: FetchSiteDetailsResponse;
   findSiteBySiteIdLoggedInUser: FetchSiteDetail;
   findSitesAndPlaces: FindSitesAndPlacesResponse;
   getAssociatedSitesBySiteId: AssociatedSiteResponse;
@@ -1163,6 +1177,7 @@ export type SitePartics = {
 
 export type SiteParticsDto = {
   __typename?: 'SiteParticsDto';
+  apiAction?: Maybe<Scalars['String']['output']>;
   description: Scalars['String']['output'];
   displayName: Scalars['String']['output'];
   effectiveDate: Scalars['DateTime']['output'];
@@ -1174,8 +1189,8 @@ export type SiteParticsDto = {
   psnorgId: Scalars['String']['output'];
   siteId: Scalars['String']['output'];
   srAction?: Maybe<Scalars['String']['output']>;
-  srValue: Scalars['Boolean']['output'];
-  userAction: Scalars['String']['output'];
+  srValue?: Maybe<Scalars['Boolean']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
 };
 
 export type SiteParticsInputDto = {
@@ -1225,6 +1240,8 @@ export type SitePendingApprovalRecords = {
 export type SiteProfiles = {
   __typename?: 'SiteProfiles';
   comments?: Maybe<Scalars['String']['output']>;
+  completorParticId?: Maybe<Scalars['String']['output']>;
+  contactParticId?: Maybe<Scalars['String']['output']>;
   dateCompleted: Scalars['DateTime']['output'];
   govDocumentsComment?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
@@ -1367,7 +1384,8 @@ export type SiteSummaryDto = {
   commonName?: InputMaybe<Scalars['String']['input']>;
   consultantSubmitted?: InputMaybe<Scalars['String']['input']>;
   generalDescription?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['String']['input']>;
+  geometry?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['String']['input'];
   latDegrees?: InputMaybe<Scalars['Float']['input']>;
   latMinutes?: InputMaybe<Scalars['Float']['input']>;
   latSeconds?: InputMaybe<Scalars['Float']['input']>;
@@ -1380,8 +1398,6 @@ export type SiteSummaryDto = {
   postalCode?: InputMaybe<Scalars['String']['input']>;
   provState?: InputMaybe<Scalars['String']['input']>;
   regionalFileNo?: InputMaybe<Scalars['String']['input']>;
-  rwmFlag?: InputMaybe<Scalars['Float']['input']>;
-  rwmGeneralDescFlag?: InputMaybe<Scalars['Float']['input']>;
   siteRiskCode?: InputMaybe<Scalars['String']['input']>;
   srAction?: InputMaybe<Scalars['String']['input']>;
   srStatus?: InputMaybe<Scalars['String']['input']>;
@@ -1517,7 +1533,7 @@ export type MapSearch_FindSiteBySiteIdQueryVariables = Exact<{
 }>;
 
 
-export type MapSearch_FindSiteBySiteIdQuery = { __typename?: 'Query', findSiteBySiteId: { __typename?: 'FetchSiteDetail', data?: { __typename?: 'Sites', id: string, addrLine_1: string, addrLine_2?: string | null, addrLine_3?: string | null, addrLine_4?: string | null, city: string, latdeg?: number | null, longdeg?: number | null, latDegrees?: number | null, latMinutes?: number | null, latSeconds?: number | null, longDegrees?: number | null, longMinutes?: number | null, longSeconds?: number | null, generalDescription?: string | null, siteRiskCode: string } | null } };
+export type MapSearch_FindSiteBySiteIdQuery = { __typename?: 'Query', findSiteBySiteId: { __typename?: 'FetchSiteDetailsResponse', data?: { __typename?: 'Sites', id: string, addrLine_1: string, addrLine_2?: string | null, addrLine_3?: string | null, addrLine_4?: string | null, city: string, latdeg?: number | null, longdeg?: number | null, latDegrees?: number | null, latMinutes?: number | null, latSeconds?: number | null, longDegrees?: number | null, longMinutes?: number | null, longSeconds?: number | null, generalDescription?: string | null, siteRiskCode: string } | null } };
 
 export type MapSearch_FilterSearchResultsQueryVariables = Exact<{
   page: Scalars['Int']['input'];

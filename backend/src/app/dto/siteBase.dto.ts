@@ -71,12 +71,6 @@ export class SiteBaseDto extends ChangeAuditType {
   whenUpdated?: Date;
 
   @Field({ nullable: true })
-  rwmFlag: number;
-
-  @Field({ nullable: true })
-  rwmGeneralDescFlag: number;
-
-  @Field({ nullable: true })
   consultantSubmitted?: string;
 
   @Field({ nullable: true })

@@ -2,6 +2,8 @@
    <sequences>
       <sequence increment="1" name="folio_id_seq" startValue="1"/>
       <sequence increment="1" name="historylog_id_seq" startValue="1"/>
+      <sequence increment="1" name="lto_download_id_seq" startValue="1"/>
+      <sequence increment="1" name="lto_prev_download_id_seq" startValue="1"/>
       <sequence increment="1" name="migrations_id_seq" startValue="1"/>
       <sequence increment="1" name="recent_views_id_seq" startValue="1"/>
       <sequence increment="1" name="site_subdivision_site_subdiv_id_seq" startValue="1"/>
@@ -414,9 +416,10 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="child_pid" nullable="true" remarks="" size="9" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="child_pid_status_cd" nullable="true" remarks="" size="1" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="child_legal_description" nullable="true" remarks="" size="255" type="varchar" typeCode="12"/>
-         <primaryKey column="pid" sequenceNumberInPK="1"/>
-         <index name="PK_0bcb06db567ffea12eeb73f59fa" unique="true">
-            <column ascending="true" name="pid"/>
+         <column autoUpdated="true" defaultValue="nextval('sites.lto_download_id_seq'::regclass)" digits="0" id="6" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PK_527ef6494b7619c04af75fb8abd" unique="true">
+            <column ascending="true" name="id"/>
          </index>
       </table>
       <table name="lto_prev_download" remarks="" schema="sites" type="TABLE">
@@ -426,9 +429,10 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="child_pid" nullable="true" remarks="" size="9" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="child_pid_status_cd" nullable="true" remarks="" size="1" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="child_legal_description" nullable="true" remarks="" size="255" type="varchar" typeCode="12"/>
-         <primaryKey column="pid" sequenceNumberInPK="1"/>
-         <index name="PK_ca5a3547d8e33dcb25c3dbe64cd" unique="true">
-            <column ascending="true" name="pid"/>
+         <column autoUpdated="true" defaultValue="nextval('sites.lto_prev_download_id_seq'::regclass)" digits="0" id="6" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PK_e130ce535b697199ee8909aba6b" unique="true">
+            <column ascending="true" name="id"/>
          </index>
       </table>
       <table name="mailout" remarks="" schema="sites" type="TABLE">
@@ -1114,6 +1118,8 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="45" name="user_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="46" name="sr_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="47" name="id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="48" name="completor_partic_id" nullable="true" remarks="" size="19" type="int8" typeCode="-5"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="49" name="contact_partic_id" nullable="true" remarks="" size="19" type="int8" typeCode="-5"/>
          <primaryKey column="id" sequenceNumberInPK="1"/>
          <index name="PK_ff8a337252eb6cc03fa239c86c8" unique="true">
             <column ascending="true" name="id"/>

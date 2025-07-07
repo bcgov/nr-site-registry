@@ -760,7 +760,6 @@ export class SiteService {
             const updatedSite = {
               ...existingSite,
               ...summary,
-              // need to confirm this logic with midhun
               userAction:
                 sitesSummary.srAction === SRApprovalStatusEnum.PUBLIC ||
                 sitesSummary.srAction === SRApprovalStatusEnum.PRIVATE

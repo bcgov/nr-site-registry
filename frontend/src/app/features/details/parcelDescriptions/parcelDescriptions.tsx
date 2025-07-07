@@ -82,7 +82,7 @@ const ParcelDescriptions = () => {
 
   const { id } = useParams();
   const siteId = Number(id);
-  if (reduxState.siteId !== siteId) {
+  if (!!id?.trim() && reduxState.siteId !== siteId) {
     // The redux cache has data from another site. Re-initialize everything.
     dispatch(resetAllDataForSite(siteId));
     const fetchParams: IFetchParcelDescriptionsParams = {

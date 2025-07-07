@@ -13,5 +13,10 @@ spec:
         - podSelector:
             matchLabels:
               postgres-operator.crunchydata.com/cluster: {{ template "crunchy-postgres.fullname" . }}
+    - from:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 5432
   policyTypes:
     - Ingress

@@ -7,4 +7,5 @@ spec:
     - ReadOnlyMany
   resources:
     requests:
-      storage: 200Mi
+    # Prod needs like 900Mi or more, test just 200Mi.
+      storage: 1Gi

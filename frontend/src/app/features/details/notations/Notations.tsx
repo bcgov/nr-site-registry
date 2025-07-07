@@ -339,7 +339,6 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const deepSearch = (obj: any, searchTerm: string): boolean => {
     for (const key in obj) {
-      console.log('key', key);
       const value = obj[key];
       if (typeof value === 'object') {
         if (deepSearch(value, searchTerm)) {

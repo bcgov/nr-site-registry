@@ -76,13 +76,13 @@ const roleBasedSideBarList: Record<string, SideNav[]> = {
       createSideNav('Text Search', false, icons.textSearch, '/search'),
       createSideNav('Map Search', false, icons.mapLocation, '/map'),
     ]),
-    createSideNav('Resources', true, null, '/', [
-      createSideNav('Tools', false, icons.tools, '/tools'),
-      createSideNav('Reference', false, icons.reference, '/review'),
-    ]),
+    // createSideNav('Resources', true, null, '/', [
+    //   createSideNav('Tools', false, icons.tools, '/tools'),
+    //   createSideNav('Reference', false, icons.reference, '/review'),
+    // ]),
     createSideNav('Account', true, null, '/', [
       createSideNav('Folios', false, icons.folios, '/folios'),
-      createSideNav('Purchases', false, icons.purchases, '/purchases'),
+      // createSideNav('Purchases', false, icons.purchases, '/purchases'),
     ]),
     createSideNav('Cart', false, icons.cart, '/site/cart', [], true),
   ],
@@ -92,10 +92,10 @@ const roleBasedSideBarList: Record<string, SideNav[]> = {
       createSideNav('Text Search', false, icons.textSearch, '/search'),
       createSideNav('Map Search', false, icons.mapLocation, '/map'),
     ]),
-    createSideNav('Resources', true, null, '/', [
-      createSideNav('Tools', false, icons.tools, '/tools'),
-      createSideNav('Reference', false, icons.reference, '/ref'),
-    ]),
+    // createSideNav('Resources', true, null, '/', [
+    //   createSideNav('Tools', false, icons.tools, '/tools'),
+    //   createSideNav('Reference', false, icons.reference, '/ref'),
+    // ]),
   ],
   sr: [
     createSideNav('Dashboard', true, icons.dashboard, '/dashboard'),
@@ -121,8 +121,9 @@ const roleBasedSideBarList: Record<string, SideNav[]> = {
  * @param userRole - The role of the user (client, internal, sr, public).
  * @returns An array of SideNav items for the specified role.
  */
-const getSideBarNavList = (userRole: UserRoleType) =>
-  roleBasedSideBarList[userRole] || [];
+const getSideBarNavList = (userRole: UserRoleType) => {
+  return roleBasedSideBarList[userRole] || [];
+};
 
 // Exporting the functions and classes for external use
 export { getSideBarNavList };

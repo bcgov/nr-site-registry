@@ -20,7 +20,7 @@ describe('Mobile Menu Component', () => {
       </Provider>,
     );
 
-    expect(screen.getByText('Resources')).toBeInTheDocument();
+    //expect(screen.getByText('Resources')).toBeInTheDocument();
     expect(screen.getByText('Search')).toBeInTheDocument();
     expect(screen.getByText('Text Search')).toBeInTheDocument();
   });

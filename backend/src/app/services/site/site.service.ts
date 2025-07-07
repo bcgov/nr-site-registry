@@ -152,6 +152,7 @@ export class SiteService {
       whenUpdated,
     } = filters;
 
+
     this.sitesLogger.log('SiteService.searchSites() start');
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();

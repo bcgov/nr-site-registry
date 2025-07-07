@@ -191,6 +191,7 @@ export enum UserRoleType {
   CLIENT = 'client',
   INTERNAL = 'internal',
   SR = 'sr',
+  PUBLIC = 'public',
 }
 
 export const isUserOfType = (roleType: UserRoleType) => {
@@ -247,7 +248,7 @@ export const getLoggedInUserType = () => {
       ? UserRoleType.SR
       : isUserOfType(UserRoleType.INTERNAL)
         ? UserRoleType.INTERNAL
-        : UserRoleType.CLIENT;
+        : UserRoleType.PUBLIC;
 };
 
 export const isUserRoleInternalUser = () => {};

@@ -14,6 +14,10 @@ export class UserJWTTokenDecoderMiddleware implements NestMiddleware {
   ) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
+    if (req.originalUrl.startsWith('/csv/generate') && req.method === 'GET') {
+      return next(); // skip middleware for this route
+    }
+
     const token = req.headers['authorization']?.split(' ')[1];
     if (token && token !== 'undefined' && token.trim() !== '') {
       try {

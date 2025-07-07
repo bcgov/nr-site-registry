@@ -67,6 +67,11 @@ spec:
                 secretKeyRef:
                   key: user
                   name: postgres-crunchy-pguser-postgres
+            - name: BCGW_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-bcgw-credentials
+                  key: password
           resources: # this is optional
             requests:
               cpu: {{ .Values.backend.resources.requests.cpu }}

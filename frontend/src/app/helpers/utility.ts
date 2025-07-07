@@ -223,18 +223,19 @@ export const isUserOfType = (roleType: UserRoleType) => {
         } else {
           return false;
         }
-      case 'sr':
-        const srUserRole =
-          process.env.REACT_APP_SITE_REGISTRAR_USER_ROLE ||
-          ((window as any)._env_ &&
-            (window as any)._env_.REACT_APP_SITE_REGISTRAR_USER_ROLE) ||
-          'site-site-registrar';
+      // case 'sr':
+      //   console.log('inside sr');
+      //   const srUserRole =
+      //     process.env.REACT_APP_SITE_REGISTRAR_USER_ROLE ||
+      //     ((window as any)._env_ &&
+      //       (window as any)._env_.REACT_APP_SITE_REGISTRAR_USER_ROLE) ||
+      //     'site-site-registrar';
 
-        if (userRoles.includes(srUserRole)) {
-          return true;
-        } else {
-          return false;
-        }
+      //   if (userRoles.includes(srUserRole)) {
+      //     return true;
+      //   } else {
+      //     return false;
+      //   }
     }
   }
 };
@@ -573,4 +574,16 @@ export const dateFormatSR = (date: Date) => {
     day: 'numeric',
   });
   return formattedDate;
+};
+
+/**
+ * Safely parses a value to a float.
+ * Returns null if the value cannot be parsed as a float.
+ *
+ * @param value - The value to parse.
+ * @returns The parsed float or null if parsing fails.
+ */
+export const safeParseFloat = (value: any): number | null => {
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? null : parsed;
 };

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { RequestStatus } from '../../helpers/requests/status';
 import { actionsItemsConfig, recentViewedColumns } from './DashboardConfig';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { UserType } from '../../helpers/requests/userType';
 import './Dashboard.css';
 import PageContainer from '../../components/simple/PageContainer';
@@ -9,6 +9,8 @@ import Widget from '../../components/widget/Widget';
 import { getUser } from '../../helpers/utility';
 import Actions from '../../components/action/Actions';
 import { useNavigate } from 'react-router-dom';
+import { fetchRecentViews } from './DashboardSlice';
+import { AppDispatch } from '../../Store';
 
 interface DashboardWidgetProps {
   title?: string;
@@ -54,6 +56,7 @@ const DashboardTableWidget: React.FC<DashboardWidgetProps> = ({
 );
 
 const Dashboard = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const sites = useSelector((state: any) => state.dashboard);
   const loggedInUser = getUser();
@@ -79,6 +82,12 @@ const Dashboard = () => {
       ? setName(', ' + loggedInUser?.profile.given_name + ' ')
       : setName('');
   }, [loggedInUser]);
+
+  useEffect(() => {
+    if (loggedInUser?.profile.preferred_username) {
+      dispatch(fetchRecentViews(loggedInUser.profile.preferred_username));
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     if (sites.status === RequestStatus.success) {
@@ -120,7 +129,7 @@ const Dashboard = () => {
         columns={recentViewedColumns}
         loading={loading}
         data={data ?? []}
-        allowRowsSelect={true}
+        allowRowsSelect={false}
       />
     </PageContainer>
   );

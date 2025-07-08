@@ -224,19 +224,19 @@ export const isUserOfType = (roleType: UserRoleType) => {
         } else {
           return false;
         }
-      // case 'sr':
-      //   console.log('inside sr');
-      //   const srUserRole =
-      //     process.env.REACT_APP_SITE_REGISTRAR_USER_ROLE ||
-      //     ((window as any)._env_ &&
-      //       (window as any)._env_.REACT_APP_SITE_REGISTRAR_USER_ROLE) ||
-      //     'site-site-registrar';
+      case 'sr':
+        console.log('inside sr');
+        const srUserRole =
+          process.env.REACT_APP_SITE_REGISTRAR_USER_ROLE ||
+          ((window as any)._env_ &&
+            (window as any)._env_.REACT_APP_SITE_REGISTRAR_USER_ROLE) ||
+          'site-site-registrar';
 
-      //   if (userRoles.includes(srUserRole)) {
-      //     return true;
-      //   } else {
-      //     return false;
-      //   }
+        if (userRoles.includes(srUserRole)) {
+          return true;
+        } else {
+          return false;
+        }
     }
   }
 };

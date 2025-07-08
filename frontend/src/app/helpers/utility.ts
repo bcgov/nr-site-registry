@@ -225,7 +225,6 @@ export const isUserOfType = (roleType: UserRoleType) => {
           return false;
         }
       case 'sr':
-        console.log('inside sr');
         const srUserRole =
           process.env.REACT_APP_SITE_REGISTRAR_USER_ROLE ||
           ((window as any)._env_ &&

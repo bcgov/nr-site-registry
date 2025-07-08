@@ -11,6 +11,7 @@ import {
   selectSiteInsights,
   siteDetailsMode,
   trackChanges,
+  updateSiteDetail,
 } from '../../site/dto/SiteSlice';
 import { RequestStatus } from '../../../helpers/requests/status';
 import Table from '../../../components/table/Table';
@@ -61,7 +62,6 @@ const Summary = () => {
   const insights = useSelector(selectSiteInsights);
   const resetDetails = useSelector(resetSiteDetails);
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
-
   const userPurchasedSnapshot = useSelector(hasUserPurchasedSnapshot);
 
   const [parcelSearchTerm, SetParcelSearchTeam] = useState('');
@@ -80,22 +80,6 @@ const Summary = () => {
       dispatch(fetchCartItems());
     }
   }, [addCartItemStatus]);
-
-  // need to ask this logic from midhun
-  setTimeout(() => {
-    let address = document.getElementsByTagName('h3');
-    address.length > 0 && address[0] && address[0].remove();
-  }, 1000);
-
-  setTimeout(() => {
-    let address = document.getElementsByTagName('h3');
-    address.length > 0 && address[0] && address[0].remove();
-  }, 2000);
-
-  setTimeout(() => {
-    let address = document.getElementsByTagName('h3');
-    address.length > 0 && address[0] && address[0].remove();
-  }, 3000);
 
   useEffect(() => {
     if (savedEdits) {
@@ -131,12 +115,6 @@ const Summary = () => {
       setSRMode(false);
     }
   }, [detailsMode]);
-
-  // need to ask this logic from midhun
-  useEffect(() => {
-    let address = document.getElementsByTagName('h3');
-    address.length > 0 && address[0] && address[0].remove();
-  }, [details]);
 
   useEffect(() => {
     if (
@@ -179,6 +157,15 @@ const Summary = () => {
         [graphQLPropertyName]: value,
       };
 
+      dispatch(
+        updateSiteDetail({
+          ...newState,
+          apiAction: !id?.trim()
+            ? UserActionEnum.added
+            : UserActionEnum.updated,
+          srAction: SRApprovalStatusEnum.Pending,
+        }),
+      );
       dispatch(
         setupSiteSummaryForSaving({
           ...newState,

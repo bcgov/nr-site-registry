@@ -948,6 +948,15 @@ const SiteDetails = () => {
           : SRApprovalStatusEnum.Private,
     });
     dispatch(
+      updateSiteDetail({
+        ...details,
+        srAction:
+          event?.target?.checked === true
+            ? SRApprovalStatusEnum.Public
+            : SRApprovalStatusEnum.Private,
+      }),
+    );
+    dispatch(
       setupSiteSummaryForSaving({
         ...details,
         userAction: UserActionEnum.updated,

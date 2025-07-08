@@ -1385,7 +1385,7 @@ export type SiteSummaryDto = {
   consultantSubmitted?: InputMaybe<Scalars['String']['input']>;
   generalDescription?: InputMaybe<Scalars['String']['input']>;
   geometry?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['String']['input'];
+  id?: InputMaybe<Scalars['String']['input']>;
   latDegrees?: InputMaybe<Scalars['Float']['input']>;
   latMinutes?: InputMaybe<Scalars['Float']['input']>;
   latSeconds?: InputMaybe<Scalars['Float']['input']>;

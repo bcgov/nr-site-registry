@@ -92,7 +92,7 @@ const Dashboard = () => {
   const handleActionItemClick = (item: any) => {
     switch (item.toLowerCase()) {
       case 'create-site':
-        navigate('site/create?applicationId=1');
+        navigate('site/create');
         break;
       case 'search-site':
         break;

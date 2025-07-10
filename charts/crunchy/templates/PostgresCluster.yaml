@@ -115,10 +115,10 @@ spec:
       databases:
         - {{ .Values.global.config.dbName }}
         - postgres
-    {{- if .Values.crunchy.pgBackRest.enabled }}
+  {{- if .Values.crunchy.pgBackRest.enabled }}
   backups:
     pgbackrest:
-      {{- if .Values.crunchy.pgBackRest.s3.enabled}}
+      {{- if .Values.crunchy.pgBackRest.s3.enabled }}
       configuration:
         - secret:
             name: {{ .Release.Name }}-s3-secret
@@ -126,23 +126,13 @@ spec:
       global:
         repo1-retention-full: {{ .Values.crunchy.pgBackRest.pvc.retention | quote }}
         repo1-retention-full-type: {{ .Values.crunchy.pgBackRest.pvc.retentionFullType }}
-        {{- if .Values.crunchy.pgBackRest.s3.enabled}}
+        {{- if .Values.crunchy.pgBackRest.s3.enabled }}
         repo2-retention-full: {{ .Values.crunchy.pgBackRest.s3.retention | quote }}
         repo2-retention-full-type: {{ .Values.crunchy.pgBackRest.retentionFullType }}
         repo2-path: '{{ .Values.crunchy.pgBackRest.backupPath }}/{{ .Values.crunchy.pgBackRest.clusterCounter}}'
         repo2-s3-uri-style: path
         {{- end }}
       repos:
-        {{- if .Values.crunchy.pgBackRest.s3.enabled}}
-        - name: repo2
-          schedules:
-            full: {{ .Values.crunchy.pgBackRest.s3.fullBackupSchedule }}
-            incremental: {{ .Values.crunchy.pgBackRest.s3.incrementalBackupSchedule }}
-          s3:
-            bucket: {{ .Values.crunchy.pgBackRest.s3.bucket | quote }}
-            endpoint: {{ .Values.crunchy.pgBackRest.s3.endpoint | quote }}
-            region: "ca-central-1"
-        {{- end }}
         - name: repo1
           schedules:
             full: {{ .Values.crunchy.pgBackRest.pvc.fullBackupSchedule }}
@@ -155,6 +145,17 @@ spec:
                 requests:
                   storage: {{ .Values.crunchy.pgBackRest.pvc.volume.storage }}
               storageClassName: {{ .Values.crunchy.pgBackRest.pvc.volume.storageClassName }}
+        {{- if .Values.crunchy.pgBackRest.s3.enabled }}
+        - name: repo2
+          schedules:
+            full: {{ .Values.crunchy.pgBackRest.s3.fullBackupSchedule }}
+            incremental: {{ .Values.crunchy.pgBackRest.s3.incrementalBackupSchedule }}
+          s3:
+            bucket: {{ .Values.crunchy.pgBackRest.s3.bucket | quote }}
+            endpoint: {{ .Values.crunchy.pgBackRest.s3.endpoint | quote }}
+            region: "ca-central-1"
+        {{- end }}
+
         
       {{- if and .Values.crunchy.restore .Values.crunchy.restore.enabled }}
       restore:

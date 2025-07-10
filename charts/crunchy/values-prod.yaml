@@ -14,7 +14,7 @@ crunchy:
   pgBackRest:
     backupPath: /backups/prod/cluster/version # change it for PROD, create values-prod.yaml
     s3:
-      enabled: true
+      enabled: false
       retention: 1 # one day backup in object store for test environment
       bucket: nrsiteprod
       endpoint: nrs.objectstore.gov.bc.ca
@@ -23,4 +23,8 @@ crunchy:
       fullBackupSchedule: 0 9 * * * # full backup at GMT 9
       incrementalBackupSchedule: 0 0/4 * * * # every four hours
     pvc:
-      enabled: false
+      enabled: true
+      volume:
+        accessModes: "ReadWriteOnce"
+        storage: 3Gi
+        storageClassName: netapp-file-backup

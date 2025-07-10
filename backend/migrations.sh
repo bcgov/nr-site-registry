@@ -52,8 +52,7 @@ if PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRE
     echo "bcgw user exists. Granting permissions..."
     PGPASSWORD="$POSTGRES_ADMIN_PASSWORD" psql -h "$POSTGRESQL_HOST" -d "$POSTGRES_DATABASE" -U "$POSTGRES_ADMIN_USERNAME" <<EOF
     GRANT USAGE ON SCHEMA sites TO bcgw;
-    GRANT SELECT ON sites.sites TO bcgw;
-    GRANT SELECT ON sites.subdivisions TO bcgw;
+    GRANT SELECT ON ALL TABLES IN SCHEMA sites TO bcgw;
 EOF
     echo "Permissions granted to bcgw user."
 else

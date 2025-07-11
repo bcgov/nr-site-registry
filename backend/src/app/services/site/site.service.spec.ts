@@ -31,9 +31,10 @@ import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescripti
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Place } from '../../entities/placeEntity';
-import { RadiusSearchParams } from '../../resolvers/site/site.resolver';
+
 import { SiteRegistry } from '../../entities/siteRegistry.entity';
 import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
+import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
 
 describe('SiteService', () => {
   let siteService: SiteService;

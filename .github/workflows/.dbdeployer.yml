@@ -39,7 +39,7 @@ on:
         type: boolean
       timeout-minutes:
         description: 'Timeout minutes'
-        default: 20
+        default: 30
         required: false
         type: number
       triggers:
@@ -96,7 +96,7 @@ jobs:
         shell: bash
         run: |
           # OC Login
-          OC_TEMP_TOKEN=$(curl -k -X POST ${{ inputs.oc_server }}/api/v1/namespaces/${{ secrets.oc_namespace }}/serviceaccounts/pipeline/token --header "Authorization: Bearer ${{ secrets.oc_token }}" -d '{"spec": {"expirationSeconds": 600}}' -H 'Content-Type: application/json; charset=utf-8' | jq -r '.status.token' )
+          OC_TEMP_TOKEN=$(curl -k -X POST ${{ inputs.oc_server }}/api/v1/namespaces/${{ secrets.oc_namespace }}/serviceaccounts/pipeline/token --header "Authorization: Bearer ${{ secrets.oc_token }}" -d '{"spec": {"expirationSeconds": 1500}}' -H 'Content-Type: application/json; charset=utf-8' | jq -r '.status.token' )
 
           oc login --token=$OC_TEMP_TOKEN --server=${{ inputs.oc_server }}
           oc project ${{ secrets.oc_namespace }} # Safeguard!
@@ -108,7 +108,7 @@ jobs:
         run: |
           echo 'Deploying crunchy helm chart'
           if [ ${{ inputs.s3_enabled }} == true ]; then
-            helm upgrade --install --wait --set crunchy.pgBackRest.s3.enabled=true \
+            helm upgrade --install --wait \
              --set-string crunchy.pgBackRest.s3.accessKey=${{ secrets.s3_access_key }} \
               --set-string crunchy.pgBackRest.s3.secretKey=${{ secrets.s3_secret_key }} \
               --set-string crunchy.pgBackRest.s3.bucket=${{ secrets.s3_bucket }} \
@@ -116,6 +116,20 @@ jobs:
           else
             helm upgrade --install --wait --values ${{ inputs.values }} postgres .
           fi
+          # Verify successful db deployment; wait retry 90 times with 10 seconds interval
+          MAX_DB_READY_RETRIES=90
+          DB_READY_SLEEP_SECONDS=10
+          for i in $(seq 1 "$MAX_DB_READY_RETRIES"); do
+            # Check if the 'db' instance has at least 1 ready replica
+            if oc get PostgresCluster/postgres-crunchy -o json | jq -e '.status.instances[] | select(.name=="db") | .readyReplicas > 0' > /dev/null 2>&1; then
+              echo "Crunchy DB instance 'db' is ready."
+              READY=true
+              exit 0
+            else
+              echo "Attempt $i: Crunchy DB is not ready, waiting for $DB_READY_SLEEP_SECONDS seconds"
+              sleep $DB_READY_SLEEP_SECONDS
+            fi
+          done
 
       - name: Add bcgw user
         shell: bash

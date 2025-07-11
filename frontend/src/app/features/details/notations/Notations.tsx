@@ -370,6 +370,27 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         }
       }
 
+      if (key === 'etypCode') {
+        if (Array.isArray(notationType.data)) {
+          const searchTermLower = searchTerm.toLowerCase();
+
+          let filteredData = notationType.data.filter((item: any) => {
+            return (
+              Array.isArray(item.dropdownDto) &&
+              item.dropdownDto.some(
+                (x: any) =>
+                  x.key === value &&
+                  x.value.toLowerCase().includes(searchTermLower),
+              )
+            );
+          });
+
+          if (filteredData.length > 0) {
+            return true;
+          }
+        }
+      }
+
       if (stringValue.includes(searchTerm)) {
         return true;
       }

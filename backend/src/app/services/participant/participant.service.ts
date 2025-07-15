@@ -46,11 +46,13 @@ export class ParticipantService {
           result = await this.siteParticsRepository.find({
             where: { siteId, userAction: UserActionEnum.UPDATED },
             relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
+            order: { whenUpdated: 'DESC' },
           });
         } else {
           result = await this.siteParticsRepository.find({
             where: { siteId },
             relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
+            order: { whenUpdated: 'DESC' },
           });
         }
       } else {

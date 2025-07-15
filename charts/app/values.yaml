@@ -47,7 +47,7 @@ backend:
   resources:
     requests:
       cpu: 50m
-      memory: 150Mi
+      memory: 300Mi
   #-- the service for the component. for inter namespace communication, use the service name as the hostname.
   service:
     #-- the type of the service. it can be ClusterIP, NodePort, LoadBalancer, ExternalName. ClusterIP is the default and is recommended.
@@ -102,5 +102,9 @@ frontend:
     REACT_APP_AUTH_FILTER_PROTOCOL_CLAIMS: "true"
     REACT_APP_AUTH_LOAD_USER_INFO: "true"
     REACT_APP_AUTH_REVOKE_TOKENS_ON_SIGNOUT: "true"
+  resources:
+    requests:
+      cpu: 10m
+      memory: 100Mi
 
 

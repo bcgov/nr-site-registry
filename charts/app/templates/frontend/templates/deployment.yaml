@@ -61,8 +61,9 @@ spec:
             timeoutSeconds: 5
           resources:
             requests:
-              cpu: 15m
-              memory: 25Mi
+              cpu: {{ .Values.frontend.resources.requests.cpu }}
+              memory: {{ .Values.frontend.resources.requests.memory }}
+
           volumeMounts:
             - name: config-volume
               mountPath: /usr/share/nginx/html/config/config.js # Mount target path inside the container, match dockerfile workdir

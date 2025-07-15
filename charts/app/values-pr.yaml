@@ -43,4 +43,7 @@ frontend:
     REACT_APP_AUTH_FILTER_PROTOCOL_CLAIMS: "true"
     REACT_APP_AUTH_LOAD_USER_INFO: "true"
     REACT_APP_AUTH_REVOKE_TOKENS_ON_SIGNOUT: "true"
-
+  resources:
+    requests:
+      cpu: 10m
+      memory: 60Mi

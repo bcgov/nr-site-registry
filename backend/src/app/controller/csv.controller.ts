@@ -25,17 +25,21 @@ export class CsvController {
     @NestHeaders('x-api-secret') clientSecret: string,
     @Res() Res,
   ) {
-    const serverSecret = this.configService.get<string>('CSV_SECRET');
+    try {
+      const serverSecret = this.configService.get<string>('CSV_SECRET');
 
-    if (clientSecret !== serverSecret) {
-      return Res.status(HttpStatus.UNAUTHORIZED).json({
-        message: 'Invalid API secret',
+      if (clientSecret !== serverSecret) {
+        return Res.status(HttpStatus.UNAUTHORIZED).json({
+          message: 'Invalid API secret',
+        });
+      }
+
+      await this.csvService.generateCSVFiles();
+      return Res.status(HttpStatus.OK).json({
+        message: 'CSV files generated successfully',
       });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    await this.csvService.generateCSVFiles();
-    return Res.status(HttpStatus.OK).json({
-      message: 'CSV files generated successfully',
-    });
   }
 }

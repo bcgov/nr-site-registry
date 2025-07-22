@@ -39,6 +39,7 @@ export class CsvService {
         accessKeyId,
         secretAccessKey,
       },
+      region: 'region', // S3Client needs a region, but we don't have one
       forcePathStyle: true, // Required for some S3-compatible storage
     });
   }
@@ -81,6 +82,7 @@ export class CsvService {
     } catch (error) {
       this.sitesLogger.error('Error generating CSV files:', error);
       console.error('Error generating CSV files:', error);
+      throw error;
     }
   }
 

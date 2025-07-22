@@ -18,6 +18,9 @@ spec:
             command:
             - /bin/sh
             - -c
-            - curl -f http://{{ include "backend.fullname" . }}:{{ .Values.backend.service.port }}/csv/generate
+            - |
+              URL="http://{{ include "backend.fullname" . }}:{{ .Values.backend.service.port }}/csv/generate"
+              echo "Targetting URL: $URL"
+              curl -f "$URL"
           restartPolicy: OnFailure
 {{- end }}

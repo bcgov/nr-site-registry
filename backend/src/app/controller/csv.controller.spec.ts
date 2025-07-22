@@ -64,7 +64,11 @@ describe('CsvController', () => {
     const result = await csvController.generateCsv('expected-secret', res);
 
     expect(mockCsvService.generateCSVFiles).toHaveBeenCalled();
-    expect(result).toEqual({ message: 'CSV generated successfully' });
+    expect(result).toEqual(
+      res.status(HttpStatus.OK).json({
+        message: 'CSV files generated successfully',
+      }),
+    );
   });
 
   it('should propagate errors from generateCSVFiles', async () => {

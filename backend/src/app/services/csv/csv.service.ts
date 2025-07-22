@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { LoggerService } from '../../logger/logger.service';
+import { PassThrough } from 'stream';
 
 @Injectable()
 export class CsvService {
@@ -72,6 +73,8 @@ export class CsvService {
           if (data.length > 0) {
             const fileName = `${key}.csv`;
             await this.generateCsv(data, fileName);
+          } else {
+            console.log(`No data found for ${key}`);
           }
         }),
       );
@@ -83,58 +86,67 @@ export class CsvService {
 
   async generateCsv(data: any[], fileName: string): Promise<string> {
     try {
-      const filePath = path.join(__dirname, `../../${fileName}`);
-
-      const stream = fs.createWriteStream(filePath);
+      const passThrough = new PassThrough();
       const csvStream = fastCsv.format({ headers: false });
 
+      // Pipe the CSV stream to the in-memory stream
+      csvStream.pipe(passThrough);
+
+      // Buffer to collect chunks
+      const chunks: Buffer[] = [];
+
+      // Collect data chunks
+      passThrough.on('data', (chunk) => chunks.push(chunk));
+
       return new Promise((resolve, reject) => {
-        csvStream.pipe(stream).on('finish', async () => {
+        passThrough.on('end', async () => {
           try {
-            const fileUrl = await this.uploadFile(filePath, fileName);
-            fs.unlinkSync(filePath); // Delete local file after upload
+            const buffer = Buffer.concat(chunks);
+
+            // Now buffer contains the full CSV file in memory
+            const fileUrl = await this.uploadBuffer(buffer, fileName); // Implement this method
             resolve(fileUrl);
           } catch (error) {
-            //reject(error);
-            this.sitesLogger.error('Error uploading file:', error);
-            console.log('Error uploading file:', error);
+            this.sitesLogger.error('Error uploading file from buffer:', error);
+            reject(error);
           }
         });
 
+        passThrough.on('error', (err) => reject(err));
+
+        // Write data to CSV stream
         data.forEach((row) => csvStream.write(row));
         csvStream.end();
       });
     } catch (error) {
-      console.log(error);
       this.sitesLogger.error('Error in generateCsv:', error);
       throw error;
     }
   }
 
-  async uploadFile(filePath: string, fileName: string): Promise<string> {
+  async uploadBuffer(fileBuffer: Buffer, fileName: string): Promise<string> {
     try {
       const bucketName = this.configService.get<string>('ESRA_S3_BUCKET');
       const folderName = this.configService.get<string>('ESRA_S3_BUCKET_ENV');
       if (!folderName) throw new Error('Folder name not found');
       if (!bucketName) throw new Error('Bucket name not found');
+
       const folderPath = `dbdump/${folderName}/`;
       const actualFilePath = `${folderPath}${fileName}`;
-
-      const fileBuffer = fs.readFileSync(filePath);
 
       const command = new PutObjectCommand({
         Bucket: bucketName,
         Key: actualFilePath,
         Body: fileBuffer,
         ContentType: 'text/csv',
-        ACL: 'public-read', // or 'private'
+        ACL: 'public-read',
       });
 
-      await this.s3.send(command); // AWS SDK v3 uses `send(command)`
+      await this.s3.send(command);
 
       return `https://${this.configService.get<string>('S3_ENDPOINT')}/${bucketName}/${actualFilePath}`;
     } catch (error) {
-      this.sitesLogger.error('Error in uploadFile', error);
+      this.sitesLogger.error('Error in uploadBuffer', error);
       throw error;
     }
   }

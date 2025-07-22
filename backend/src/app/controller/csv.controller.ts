@@ -34,6 +34,8 @@ export class CsvController {
     }
 
     await this.csvService.generateCSVFiles();
-    return { message: 'CSV generated successfully' };
+    return Res.status(HttpStatus.OK).json({
+      message: 'CSV files generated successfully',
+    });
   }
 }

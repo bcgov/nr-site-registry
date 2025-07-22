@@ -22,8 +22,6 @@ spec:
               URL="https://{{ include "backend.fullname" . }}.apps.silver.devops.gov.bc.ca/csv/generate"
               API_SECRET="{{ .Values.global.secrets.csvSecret | quote }}"
               echo "Targetting URL: $URL"
-              echo "Using API Secret TODO REMOVE, JUST TO VERIFY: $API_SECRET" 
-              echo "Running curl command..."
               curl -f -H "x-api-secret: $API_SECRET" "$URL"
           restartPolicy: OnFailure
 {{- end }}

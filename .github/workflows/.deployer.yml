@@ -165,6 +165,7 @@ jobs:
             --set-string global.secrets.esraS3SecretKey="${{ secrets.ESRA_S3_SECRET_KEY }}" \
             --set-string global.secrets.esraS3Bucket="${{ secrets.ESRA_S3_BUCKET }}" \
             --set-string global.secrets.esraS3BucketEnv="${{ secrets.ESRA_S3_BUCKET_ENV }}" \
+            --set-string global.secrets.csvSecret="${{ secrets.CSV_SECRET }}" \
             --set-string global.config.dbUser=${{ inputs.db_user }} \
             ${{ inputs.params }} \
             --install --wait --atomic ${{ steps.vars.outputs.release }} --debug \

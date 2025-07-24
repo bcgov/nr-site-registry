@@ -9,6 +9,7 @@ import Actions from '../../../components/action/Actions';
 import { DropdownItem } from '../../../components/action/IActions';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
 import { Button } from '../../../components/button/Button';
+import { UserActionEnum } from '../../../common/userActionEnum';
 
 interface IParticipantTableProps {
   handleTableChange: (event: any) => void;
@@ -28,6 +29,7 @@ interface IParticipantTableProps {
     psnorgId: any;
     prCode: string;
     particRoleId: string;
+    apiAction: string;
   }[];
   handleRemoveParticipant: (particIsDelete?: boolean) => void;
   srVisibilityParcticConfig: DropdownItem[];
@@ -100,7 +102,11 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
               <Button
                 variant="secondary"
                 onClick={() => handleRemoveParticipant()}
-                disabled={selectedRows.length <= 0}
+                disabled={
+                  selectedRows.filter(
+                    (row) => row.apiAction !== UserActionEnum.added,
+                  ).length > 0 || selectedRows.length === 0
+                }
               >
                 <UserMinus />
                 Remove Participant

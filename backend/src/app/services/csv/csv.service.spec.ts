@@ -83,28 +83,28 @@ describe('CsvService', () => {
   });
 
   describe('generateCsv', () => {
-    it('should generate a CSV file and upload it', async () => {
+    it('should generate a CSV buffer and upload it', async () => {
       const mockData = [{ id: 1, name: 'Test' }];
       const fileName = 'test-file.csv';
-      const uploadFileSpy = jest
-        .spyOn(service, 'uploadFile')
-        .mockResolvedValue('test-url');
-      await service.generateCsv(mockData, fileName);
-      expect(uploadFileSpy).toHaveBeenCalledWith(expect.any(String), fileName);
-    });
-  });
 
-  describe('uploadFile', () => {
-    it('should upload a file to S3', async () => {
-      const filePath = '/test/path';
-      const fileName = 'test-file.csv';
-      mockConfigService.get.mockReturnValue('test-value');
-      jest.spyOn(fs, 'readFileSync').mockReturnValue('');
-      (S3Client as jest.Mock).mockImplementation(() => ({
-        send: jest.fn().mockResolvedValue({}),
-      }));
-      const result = await service.uploadFile(filePath, fileName);
-      expect(result).toMatch(/^https:\/\//);
+      // Mock the new uploadBuffer method instead of uploadFile
+      const uploadBufferSpy = jest
+        .spyOn(service, 'uploadBuffer')
+        .mockResolvedValue('test-url');
+
+      // Call generateCsv (which now uses uploadBuffer internally)
+      const result = await service.generateCsv(mockData, fileName);
+
+      expect(uploadBufferSpy).toHaveBeenCalledTimes(1);
+
+      // Check first arg is a Buffer
+      expect(uploadBufferSpy.mock.calls[0][0]).toBeInstanceOf(Buffer);
+
+      // Check second arg is fileName
+      expect(uploadBufferSpy.mock.calls[0][1]).toBe(fileName);
+
+      // Also check return value is the URL from uploadBuffer
+      expect(result).toBe('test-url');
     });
   });
 });

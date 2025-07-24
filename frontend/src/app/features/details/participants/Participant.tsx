@@ -82,6 +82,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
       psnorgId: any;
       prCode: string;
       particRoleId: string;
+      apiAction: string;
     }[]
   >([]);
   const [isDelete, setIsDelete] = useState(false);
@@ -385,6 +386,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
             psnorgId: row.psnorgId,
             prCode: row.prCode,
             particRoleId: row.particRoleId,
+            apiAction: row.apiAction,
           })),
         ]);
       } else {
@@ -397,6 +399,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
                   selectedRow.psnorgId === row.psnorgId &&
                   selectedRow.prCode === row.prCode &&
                   selectedRow.particRoleId === row.particRoleId,
+                selectedRow.apiAction === rows.apiAction,
               ),
           ),
         );

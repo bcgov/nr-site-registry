@@ -72,6 +72,10 @@ spec:
                 secretKeyRef:
                   name: {{ .Release.Name }}-bcgw-credentials
                   key: password
+            - name: SEED_ENABLED
+              value: {{ .Values.global.config.seed.enabled | quote }}
+            - name: SEED_DATA_PATH
+              value: "/mnt/sql/data_migration.sql"
           resources: # this is optional
             requests:
               cpu: {{ .Values.backend.resources.requests.cpu }}
@@ -209,10 +213,6 @@ spec:
               value: {{ .Values.global.secrets.esraS3BucketEnv | quote }}
             - name: CSV_SECRET
               value: {{ .Values.global.secrets.csvSecret | quote }}
-            - name: SEED_ENABLED
-              value: {{ .Values.global.config.seed.enabled | quote }}
-            - name: SEED_DATA_PATH
-              value: "/mnt/sql/data_migration.sql"
           ports:
             - name: http
               containerPort: {{ .Values.backend.service.targetPort }}

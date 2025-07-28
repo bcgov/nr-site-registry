@@ -58,6 +58,8 @@ const roleBasedRoutes: any = {
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
     { path: '/review', element: <SRUpdatesTables /> },
+    { path: '/dashboard', element: <Dashboard /> },
+    { path: '/dashboard/site/create', element: <SiteDetails /> },
   ],
   public: [
     { path: '/', element: <Search /> },

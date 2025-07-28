@@ -1,0 +1,27 @@
+{{- if .Values.backend.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "backend.fullname" . }}-daily
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+spec:
+  schedule: "0 0 * * *"  # Run at midnight every day
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: curl
+            image: curlimages/curl:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              URL="https://{{ include "backend.fullname" . }}.apps.silver.devops.gov.bc.ca/csv/generate"
+              API_SECRET="{{ .Values.global.secrets.csvSecret | quote }}"
+              echo "Targetting URL: $URL"
+              curl -f -H "x-api-secret: $API_SECRET" "$URL"
+          restartPolicy: OnFailure
+{{- end }}

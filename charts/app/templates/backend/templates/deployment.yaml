@@ -195,6 +195,18 @@ spec:
                 secretKeyRef:
                   key: user
                   name: postgres-crunchy-pguser-postgres
+            - name: ESRA_S3_ENDPOINT
+              value: {{ .Values.global.secrets.esraS3Endpoint | quote }}
+            - name: ESRA_S3_ACCESS_KEY
+              value: {{ .Values.global.secrets.esraS3AccessKey | quote }}
+            - name: ESRA_S3_SECRET_KEY
+              value: {{ .Values.global.secrets.esraS3SecretKey | quote }}
+            - name: ESRA_S3_BUCKET
+              value: {{ .Values.global.secrets.esraS3Bucket | quote }}
+            - name: ESRA_S3_BUCKET_ENV
+              value: {{ .Values.global.secrets.esraS3BucketEnv | quote }}
+            - name: CSV_SECRET
+              value: {{ .Values.global.secrets.csvSecret | quote }}
           ports:
             - name: http
               containerPort: {{ .Values.backend.service.targetPort }}

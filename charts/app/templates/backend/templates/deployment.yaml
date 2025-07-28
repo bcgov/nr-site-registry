@@ -127,6 +127,8 @@ spec:
                 secretKeyRef:
                   key: user
                   name: postgres-crunchy-pguser-postgres
+            - name: SEED_ENABLED
+              value: {{ .Values.global.config.seed.enabled | quote }}
             - name: SEED_DATA_PATH
               value: "/mnt/sql/data_migration.sql"
           resources: # this is optional

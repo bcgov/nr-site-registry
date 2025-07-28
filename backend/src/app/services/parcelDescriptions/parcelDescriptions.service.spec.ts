@@ -784,7 +784,7 @@ describe('ParcelDescriptionsService', () => {
           dateNoted: today,
           landDescription: 'should be ignored',
           srAction: 'pending',
-          userAction: 'pending',
+          userAction: 'added',
           apiAction: 'added',
           srValue: false,
         },
@@ -796,7 +796,7 @@ describe('ParcelDescriptionsService', () => {
 
       addedSubdivision = {
         srAction: 'pending',
-        userAction: 'pending',
+        userAction: 'added',
         dateNoted: today,
         pin: '123456',
         pid: null,
@@ -807,7 +807,7 @@ describe('ParcelDescriptionsService', () => {
       };
       addedSiteSubdivision = {
         srAction: 'pending',
-        userAction: 'pending',
+        userAction: 'added',
         siteId: siteId,
         subdivId: subdivId,
         dateNoted: today,
@@ -1024,7 +1024,7 @@ describe('ParcelDescriptionsService', () => {
       userInfo = { givenName: 'test' };
       databaseSubdivision = {
         srAction: 'pending',
-        userAction: 'pending',
+        userAction: 'added',
         id: '1',
         dateNoted: new Date(),
         pin: null,
@@ -1049,7 +1049,7 @@ describe('ParcelDescriptionsService', () => {
       };
       databaseSiteSubdivision = {
         srAction: 'pending',
-        userAction: 'pending',
+        userAction: 'added',
         siteId: '10',
         subdivId: '1',
         dateNoted: new Date(),
@@ -1312,7 +1312,7 @@ describe('ParcelDescriptionsService', () => {
           dateNoted: today,
           landDescription: 'should be ignored',
           srAction: 'approved',
-          userAction: 'approved',
+          userAction: 'default',
           apiAction: 'deleted',
           srValue: true,
         },
@@ -1320,7 +1320,7 @@ describe('ParcelDescriptionsService', () => {
 
       databaseSubdivision = {
         srAction: 'approved',
-        userAction: 'approved',
+        userAction: 'default',
         id: '1',
         dateNoted: today,
         pin: '654321',
@@ -1343,7 +1343,7 @@ describe('ParcelDescriptionsService', () => {
       } as Subdivisions;
       databaseSiteSubdivision = {
         srAction: 'pending',
-        userAction: 'pending',
+        userAction: 'added',
         siteId: siteId,
         subdivId: subdivId,
         dateNoted: today,

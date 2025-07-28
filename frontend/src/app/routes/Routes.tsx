@@ -43,8 +43,6 @@ const roleBasedRoutes: any = {
     { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/dashboard/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
-    { path: '/folios', element: <Folios /> },
-    { path: '/folios/:id', element: <FolioContents /> },
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
     { path: '/review', element: <SRUpdatesTables /> },
@@ -66,7 +64,6 @@ const roleBasedRoutes: any = {
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
     { path: '/site/cart', element: <Cart /> },
-    { path: '/folios/:id', element: <FolioContents /> },
   ],
 };
 
@@ -87,7 +84,7 @@ const createRoutesForRole = (role: string) => [
   },
 ];
 
-const userType = getLoggedInUserType();
-const siteRouter = createBrowserRouter(createRoutesForRole(userType));
-
+const siteRouter = (userType: string) => {
+  return createBrowserRouter(createRoutesForRole(userType));
+};
 export default siteRouter;

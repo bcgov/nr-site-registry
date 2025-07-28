@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RequestStatus } from '../../helpers/requests/status';
 
-import { getAxiosInstance } from '../../helpers/utility';
+import { getAxiosInstance, safeParseFloat } from '../../helpers/utility';
 import { GRAPHQL } from '../../helpers/endpoints';
 
 import { print } from 'graphql';
@@ -159,8 +159,30 @@ export const getSiteDetailsToBeSaved = (state: any) => {
     parcelDescriptions: state.siteDetails.parcelDescriptionsData,
     landHistories: state.siteDetails.landHistoriesData,
     profiles: state.siteDetails?.profilesData,
-    siteId: state.siteDetails.siteId,
-    sitesSummary: state.siteDetails.sitesSummary,
+    siteId: state.siteDetails?.siteId,
+    sitesSummary: state?.siteDetails?.sitesSummary
+      ? {
+          ...state.siteDetails.sitesSummary,
+          latDegrees: safeParseFloat(
+            state.siteDetails?.sitesSummary?.latDegrees,
+          ),
+          longDegrees: safeParseFloat(
+            state.siteDetails?.sitesSummary?.longDegrees,
+          ),
+          latMinutes: safeParseFloat(
+            state.siteDetails?.sitesSummary?.latMinutes,
+          ),
+          longMinutes: safeParseFloat(
+            state.siteDetails?.sitesSummary?.longMinutes,
+          ),
+          latSeconds: safeParseFloat(
+            state.siteDetails?.sitesSummary?.latSeconds,
+          ),
+          longSeconds: safeParseFloat(
+            state.siteDetails?.sitesSummary?.longSeconds,
+          ),
+        }
+      : null,
   };
 };
 
@@ -181,6 +203,8 @@ export const getSiteParticipants = (state: any) =>
 export const getSiteAssociated = (state: any) =>
   state.siteDetails.siteAssociationsData;
 export const getParentBucket = (state: any) => state.siteDetails.parentBucket;
+
+export const getSiteSummary = (state: any) => state.siteDetails.sitesSummary;
 
 export const {
   resetSaveSiteDetailsRequestStatus,

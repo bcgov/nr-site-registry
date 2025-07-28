@@ -29,12 +29,11 @@ import { ChangeAuditEntity } from './changeAuditEntity';
 // import { loggerMiddleware } from '../resolvers/site/site.resolver';
 
 @ObjectType()
-@Index('site_bco', ['bcerCode', 'classCode', 'id', 'rwmFlag', 'sstCode'], {})
+@Index('site_bco', ['bcerCode', 'classCode', 'id', 'sstCode'], {})
 @Index('site_responsibility_o_frgn', ['bcerCode'], {})
 @Index('site_classification', ['classCode'], {})
 @Index('site_geom_ddx', ['geometry'], {})
 @Index('sites_pkey', ['id'], { unique: true })
-@Index('site_gen_desc_flag', ['rwmGeneralDescFlag'], {})
 @Index('site_risk_is', ['siteRiskCode'], {})
 @Index('site_described_by_frgn', ['sstCode'], {})
 @Index('sites_victoria_file_no_key', ['victoriaFileNo'], { unique: true })
@@ -177,13 +176,15 @@ export class Sites extends ChangeAuditEntity {
   })
   whenUpdated: Date | null;
 
-  @Field()
-  @Column('smallint', { name: 'rwm_flag' })
-  rwmFlag: number;
+  //Make this nullable because we are not using it anymore and keeing it for historical data
+  @Field({ nullable: true })
+  @Column('smallint', { name: 'rwm_flag', nullable: true })
+  rwmFlag?: number | null;
 
-  @Field()
-  @Column('smallint', { name: 'rwm_general_desc_flag' })
-  rwmGeneralDescFlag: number;
+  //Make this nullable because we are not using it anymore and keeing it for historical data
+  @Field({ nullable: true })
+  @Column('smallint', { name: 'rwm_general_desc_flag', nullable: true })
+  rwmGeneralDescFlag?: number | null;
 
   @Field({ nullable: true })
   @Column('character', {

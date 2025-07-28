@@ -575,3 +575,15 @@ export const dateFormatSR = (date: Date) => {
   });
   return formattedDate;
 };
+
+/**
+ * Safely parses a value to a float.
+ * Returns null if the value cannot be parsed as a float.
+ *
+ * @param value - The value to parse.
+ * @returns The parsed float or null if parsing fails.
+ */
+export const safeParseFloat = (value: any): number | null => {
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? null : parsed;
+};

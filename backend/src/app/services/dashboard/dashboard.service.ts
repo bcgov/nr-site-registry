@@ -28,6 +28,7 @@ export class DashboardService {
       // Fetch recent views based on the provided userId
       const result = await this.recentViewsRepository.find({
         where: { userId },
+        order: { updated: 'DESC' },
       });
       if (result) {
         return result; // Return the fetched recent views

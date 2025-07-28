@@ -1,11 +1,12 @@
 import React from 'react';
-import { formRows } from '../dto/SiteFilterConfig';
 import './SiteFilterForm.css';
 import 'rsuite/DateRangePicker/styles/index.css';
 import Form from '../../../components/form/Form';
 import { Button } from '../../../components/button/Button';
+import { IFormField } from '../../../components/input-controls/IFormField';
 
 interface SiteFilterProps {
+  formRows: IFormField[][];
   formData: { [key: string]: any | [Date, Date] };
   onInputChange: (key: string, value: any) => void;
   onSubmit: (event: React.FormEvent) => void;
@@ -14,6 +15,7 @@ interface SiteFilterProps {
 }
 
 const SiteFilterForm: React.FC<SiteFilterProps> = ({
+  formRows,
   formData,
   onInputChange,
   onSubmit,

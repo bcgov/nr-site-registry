@@ -16,3 +16,11 @@
   overflow: auto;
   text-wrap: wrap;
 }
+
+.custom-summary-edit-input {
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 24px !important;
+  text-align: left;
+  color: var(--typography-color-secondary, #474543);
+}

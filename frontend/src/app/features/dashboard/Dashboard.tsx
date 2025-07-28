@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { RequestStatus } from '../../helpers/requests/status';
-import { recentViewedColumns } from './DashboardConfig';
-import { useSelector } from 'react-redux';
+import { actionsItemsConfig, recentViewedColumns } from './DashboardConfig';
+import { useDispatch, useSelector } from 'react-redux';
 import { UserType } from '../../helpers/requests/userType';
 import './Dashboard.css';
 import PageContainer from '../../components/simple/PageContainer';
 import Widget from '../../components/widget/Widget';
 import { getUser } from '../../helpers/utility';
+import Actions from '../../components/action/Actions';
+import { useNavigate } from 'react-router-dom';
+import { fetchRecentViews } from './DashboardSlice';
+import { AppDispatch } from '../../Store';
 
 interface DashboardWidgetProps {
   title?: string;
@@ -52,6 +56,8 @@ const DashboardTableWidget: React.FC<DashboardWidgetProps> = ({
 );
 
 const Dashboard = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const sites = useSelector((state: any) => state.dashboard);
   const loggedInUser = getUser();
 
@@ -78,6 +84,12 @@ const Dashboard = () => {
   }, [loggedInUser]);
 
   useEffect(() => {
+    if (loggedInUser?.profile.preferred_username) {
+      dispatch(fetchRecentViews(loggedInUser.profile.preferred_username));
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
     if (sites.status === RequestStatus.success) {
       setData(sites.dashboard.recentView.data);
       setLoading(sites.status);
@@ -86,15 +98,38 @@ const Dashboard = () => {
     }
   }, [sites.status]);
 
+  const handleActionItemClick = (item: any) => {
+    switch (item.toLowerCase()) {
+      case 'create-site':
+        navigate('site/create');
+        break;
+      case 'search-site':
+        break;
+      case 'view-sites-on-map':
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <PageContainer role="Dashboard">
-      <h1 className="dashboard-title">Welcome{name}</h1>
+      <div className="d-flex justify-content-between align-items-center">
+        <h1 className="dashboard-title">Welcome{name}</h1>
+        {userType === UserType.Internal && (
+          <Actions
+            label="Actions"
+            items={actionsItemsConfig}
+            onItemClick={handleActionItemClick}
+          />
+        )}
+      </div>
       <DashboardTableWidget
         title="Recently Viewed"
         columns={recentViewedColumns}
         loading={loading}
         data={data ?? []}
-        allowRowsSelect={true}
+        allowRowsSelect={false}
       />
     </PageContainer>
   );

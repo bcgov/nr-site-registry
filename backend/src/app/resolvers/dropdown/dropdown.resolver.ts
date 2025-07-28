@@ -223,4 +223,70 @@ export class DropdownResolver {
       );
     }
   }
+
+  @Query(() => DropdownResponse, { name: 'getSiteRiskCd' })
+  async getSiteRiskCd() {
+    this.sitesLogger.log('DropdownResolver.getSiteRiskCd() start');
+    const result = await this.dropdownService.getSiteRiskCd();
+    if (result?.length > 0) {
+      this.sitesLogger.log('DropdownResolver.getSiteRiskCd() RES:200 end');
+      return this.genericResponseProvider.createResponse(
+        'Site Risk Code fetched successfully',
+        HttpStatus.OK,
+        true,
+        result,
+      );
+    } else {
+      this.sitesLogger.log('DropdownResolver.getSiteRiskCd() RES:404 end');
+      return this.genericResponseProvider.createResponse(
+        `Site Risk Code not found`,
+        HttpStatus.NOT_FOUND,
+        false,
+      );
+    }
+  }
+
+  @Query(() => DropdownResponse, { name: 'getBCeRegionCd' })
+  async getBCeRegionCd() {
+    this.sitesLogger.log('DropdownResolver.getBCeRegionCd() start');
+    const result = await this.dropdownService.getBCeRegionCd();
+    if (result?.length > 0) {
+      this.sitesLogger.log('DropdownResolver.getBCeRegionCd() RES:200 end');
+      return this.genericResponseProvider.createResponse(
+        'BCe Region Code fetched successfully',
+        HttpStatus.OK,
+        true,
+        result,
+      );
+    } else {
+      this.sitesLogger.log('DropdownResolver.getBCeRegionCd() RES:404 end');
+      return this.genericResponseProvider.createResponse(
+        `BCe Region Code not found`,
+        HttpStatus.NOT_FOUND,
+        false,
+      );
+    }
+  }
+
+  @Query(() => DropdownResponse, { name: 'getSiteStatusCd' })
+  async getSiteStatusCd() {
+    this.sitesLogger.log('DropdownResolver.getSiteStatusCd() start');
+    const result = await this.dropdownService.getSiteStatusCd();
+    if (result?.length > 0) {
+      this.sitesLogger.log('DropdownResolver.getSiteStatusCd() RES:200 end');
+      return this.genericResponseProvider.createResponse(
+        'Site Status Code fetched successfully',
+        HttpStatus.OK,
+        true,
+        result,
+      );
+    } else {
+      this.sitesLogger.log('DropdownResolver.getSiteStatusCd() RES:404 end');
+      return this.genericResponseProvider.createResponse(
+        `Site Status Code not found`,
+        HttpStatus.NOT_FOUND,
+        false,
+      );
+    }
+  }
 }

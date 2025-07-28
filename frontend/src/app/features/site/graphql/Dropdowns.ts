@@ -105,3 +105,53 @@ export const getIDIRUserListForDropDownQL = () => {
     }
   `;
 };
+
+export const graphQLSiteRiskCd = () => {
+  return gql`
+    query getSiteRiskCd {
+      getSiteRiskCd {
+        httpStatusCode
+        success
+        message
+        timestamp
+        data {
+          key
+          value
+        }
+      }
+    }
+  `;
+};
+export const graphQLBCeRegionCd = () => {
+  return gql`
+    query getBCeRegionCd {
+      getBCeRegionCd {
+        httpStatusCode
+        success
+        message
+        timestamp
+        data {
+          key
+          value
+        }
+      }
+    }
+  `;
+};
+
+export const graphQLSiteStatusCd = () => {
+  return gql`
+    query getSiteStatusCd {
+      getSiteStatusCd {
+        httpStatusCode
+        success
+        message
+        timestamp
+        data {
+          key
+          value
+        }
+      }
+    }
+  `;
+};

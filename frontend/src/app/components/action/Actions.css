@@ -25,7 +25,7 @@
 
 @media screen and (max-width: 992px) {
   .custom-action-menu {
-    width: 7.06rem; /* Width for large screens */
+    width: auto; /* Width for large screens */
     min-width: 7.06rem !important;
   }
 

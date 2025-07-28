@@ -66,8 +66,9 @@ export class SiteParticsInputDto extends ChangeAuditEntityDTO {
   @IsString()
   psnorgId: string;
 
-  @Field()
-  siteId: string;
+  @Field({ nullable: true })
+  @IsString()
+  siteId?: string | null;
 
   @Field()
   @IsDate()

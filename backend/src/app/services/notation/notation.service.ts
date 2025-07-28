@@ -44,7 +44,7 @@ export class NotationService {
       if (user?.identity_provider === UserTypeEum.IDIR) {
         if (showPending) {
           events = await this.notationRepository.find({
-            where: { siteId, userAction: UserActionEnum.UPDATED },
+            where: { siteId, srAction: SRApprovalStatusEnum.PENDING  },
           });
         } else {
           events = await this.notationRepository.find({ where: { siteId } });

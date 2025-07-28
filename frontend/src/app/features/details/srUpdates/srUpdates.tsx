@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../Store';
 import { saveRequestStatus } from '../SaveSiteDetailsSlice';
@@ -69,18 +69,16 @@ import './srUpdates.css';
 import { TickIcon, XmarkIcon } from '../../../components/common/icon';
 import { ColumnSize } from '../../../components/table/TableColumn';
 import LandUseTable from '../landUses/LandUseTable';
-import {
-  fetchLandUseCodes,
-  selectLandUseCodes,
-} from '../landUses/LandUsesSlice';
+import { selectLandUseCodes } from '../landUses/LandUsesSlice';
 import { getLandUseColumns } from '../landUses/LandUseColumnConfiguration';
 import ParcelDescriptionTable from '../parcelDescriptions/ParcelDescriptionTable';
 import { IFetchParcelDescriptionsParams } from '../parcelDescriptions/parcelDescriptionsInterfaces';
 import { columns as columnConfigForParcelDescription } from '../parcelDescriptions/parcelDescriptionsConfig';
+import { GetSummaryConfig } from '../summary/SummaryConfig';
 
 const SRUpdates = () => {
   const dispatch = useDispatch<AppDispatch>();
-
+  const { summaryFormRows } = GetSummaryConfig();
   const {
     participantColumnInternal,
     participantColumnExternal,
@@ -669,6 +667,7 @@ const SRUpdates = () => {
           link="?summary"
         >
           <SummaryInfo
+            summaryFormRows={summaryFormRows}
             siteData={siteSummaryData}
             edit={false}
             srMode={false}
@@ -721,7 +720,7 @@ const SRUpdates = () => {
 
       {siteParticipantData && siteParticipantData.length > 0 && (
         <ApproveReject
-          name="Participants"
+          name="Site Participants"
           testId="srupdates-participant-component"
           link="?participants"
         >
@@ -780,7 +779,7 @@ const SRUpdates = () => {
 
       {associatedSitesData && associatedSitesData.length > 0 && (
         <ApproveReject
-          name="Site Associations"
+          name="Associated Sites"
           testId="srupdates-siteassociations-component"
           link="?associated"
         >
@@ -810,7 +809,7 @@ const SRUpdates = () => {
 
       {landUsesData && landUsesData.length > 0 && (
         <ApproveReject
-          name="LandUses"
+          name="Suspect Land Uses"
           testId="srupdates-landuses-component"
           link="?landuses"
         >
@@ -856,7 +855,7 @@ const SRUpdates = () => {
         )}
 
       {disclosureData && (
-        <ApproveReject name="Disclosure" link="?disclosure">
+        <ApproveReject name="Site Disclosure" link="?disclosure">
           <DisclosureComponent
             viewMode={SiteDetailsMode.ViewOnlyMode}
             userType={UserType.Internal}

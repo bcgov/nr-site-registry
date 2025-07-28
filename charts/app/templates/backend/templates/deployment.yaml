@@ -29,6 +29,11 @@ spec:
         - name: {{ include "backend.fullname" . }}-init
           image: "{{.Values.global.registry}}/{{.Values.global.repository}}/backend-migration:{{ .Values.global.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ default "Always" .Values.backend.imagePullPolicy }}
+          volumeMounts:
+            - mountPath: /mnt/sql
+              name: seed-data-mount
+            - mountPath: /mnt/scripts
+              name: seed-data-scripts
           env:
             - name: POSTGRES_DB_PASSWORD
               valueFrom:

@@ -720,7 +720,7 @@ const SRUpdates = () => {
 
       {siteParticipantData && siteParticipantData.length > 0 && (
         <ApproveReject
-          name="Participants"
+          name="Site Participants"
           testId="srupdates-participant-component"
           link="?participants"
         >
@@ -779,7 +779,7 @@ const SRUpdates = () => {
 
       {associatedSitesData && associatedSitesData.length > 0 && (
         <ApproveReject
-          name="Site Associations"
+          name="Associated Sites"
           testId="srupdates-siteassociations-component"
           link="?associated"
         >
@@ -809,7 +809,7 @@ const SRUpdates = () => {
 
       {landUsesData && landUsesData.length > 0 && (
         <ApproveReject
-          name="LandUses"
+          name="Suspect Land Uses"
           testId="srupdates-landuses-component"
           link="?landuses"
         >
@@ -855,7 +855,7 @@ const SRUpdates = () => {
         )}
 
       {disclosureData && (
-        <ApproveReject name="Disclosure" link="?disclosure">
+        <ApproveReject name="Site Disclosure" link="?disclosure">
           <DisclosureComponent
             viewMode={SiteDetailsMode.ViewOnlyMode}
             userType={UserType.Internal}

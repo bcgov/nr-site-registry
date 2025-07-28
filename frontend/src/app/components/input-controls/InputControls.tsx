@@ -511,7 +511,7 @@ export const GroupInput: React.FC<InputProps> = ({
                     customEditInputTextCss ?? 'custom-input-text'
                   } ${error && 'error'}`}
                   placeholder={child.placeholder}
-                  va-lue={child.value ?? ''}
+                  value={child.value ?? ''}
                   onChange={(e) => handleTextInputChange(e, child)}
                   aria-label={child.label} // Accessibility
                   disabled={isDisabled}

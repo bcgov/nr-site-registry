@@ -44,7 +44,7 @@ export class ParticipantService {
       if (user?.identity_provider === UserTypeEum.IDIR) {
         if (showPending) {
           result = await this.siteParticsRepository.find({
-            where: { siteId, userAction: UserActionEnum.UPDATED },
+            where: { siteId, srAction: SRApprovalStatusEnum.PENDING  },
             relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
             order: { whenUpdated: 'DESC' },
           });

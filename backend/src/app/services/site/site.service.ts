@@ -231,8 +231,8 @@ export class SiteService {
     }
 
     if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR) {
-      query.andWhere('sites.srAction != :srAction', {
-        srAction: SRApprovalStatusEnum.PRIVATE,
+      query.andWhere('sites.srAction = :srAction', {
+        srAction: SRApprovalStatusEnum.PUBLIC,
       });
     }
 

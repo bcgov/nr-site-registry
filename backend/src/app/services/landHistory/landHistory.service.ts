@@ -74,6 +74,12 @@ export class LandHistoryService {
       this.sitesLogger.debug(
         'LandHistoryService.getLandHistoriesForSite() end',
       );
+
+      if(!result.length)
+      {
+        return [];
+      }
+
       return result;
     } catch (error) {
       this.sitesLogger.error(

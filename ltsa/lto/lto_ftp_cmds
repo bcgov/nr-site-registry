@@ -1,0 +1,3 @@
+cd import
+put PARCEL_ID_LIST*.TXT
+quit

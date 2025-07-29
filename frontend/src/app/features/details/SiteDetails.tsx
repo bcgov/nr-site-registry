@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
@@ -18,6 +18,7 @@ import {
   updateSiteDetailsMode,
   trackChanges,
   fetchSitesInsights,
+  updateSiteDetail,
 } from '../site/dto/SiteSlice';
 import { AppDispatch } from '../../Store';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
@@ -39,7 +40,6 @@ import Actions from '../../components/action/Actions';
 import { getActionItems } from '../../components/action/ActionsConfig';
 import {
   deepFilterByUserAction,
-  formatDate,
   formatDateWithNoTimzoneName,
   getUser,
   isUserOfType,
@@ -49,12 +49,21 @@ import {
   validateForm,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
-import { fetchSiteParticipants } from './participants/ParticipantSlice';
-import { fetchSiteDisclosure } from './disclosure/DisclosureSlice';
+import {
+  fetchSiteParticipants,
+  updateSiteParticipants,
+} from './participants/ParticipantSlice';
+import {
+  fetchSiteDisclosure,
+  updateSiteDisclosure,
+} from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
-import { fetchNotationParticipants } from './notations/NotationSlice';
-import { documents, fetchDocuments } from './documents/DocumentsSlice';
+import {
+  fetchNotationParticipants,
+  updateSiteNotation,
+} from './notations/NotationSlice';
+import { fetchDocuments, updateSiteDocument } from './documents/DocumentsSlice';
 import {
   fetchSnapshots,
   snapshots,
@@ -64,11 +73,14 @@ import {
 } from './snapshot/SnapshotSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 import {
+  fetchBceRegionCd,
   fetchMinistryContact,
   fetchNotationClassCd,
   fetchNotationParticipantRoleCd,
   fetchNotationTypeCd,
   fetchParticipantRoleCd,
+  fetchSiteRiskCd,
+  fetchSiteStatusCd,
 } from './dropdowns/DropdownSlice';
 import BannerDetails from '../../components/banners/BannerDetails';
 import {
@@ -78,6 +90,7 @@ import {
   getSiteDocuments,
   getSiteNoatations,
   getSiteParticipants,
+  getSiteSummary,
   resetSaveSiteDetails,
   resetSaveSiteDetailsRequestStatus,
   saveRequestStatus,
@@ -90,7 +103,10 @@ import {
   setupSiteParticipantDataForSaving,
   setupSiteSummaryForSaving,
 } from './SaveSiteDetailsSlice';
-import { fetchAssociatedSites } from './associates/AssociateSlice';
+import {
+  fetchAssociatedSites,
+  updateAssociatedSites,
+} from './associates/AssociateSlice';
 import AddToFolio from '../folios/AddToFolio';
 import {
   fetchParcelDescriptionsForApproval,
@@ -126,19 +142,62 @@ import {
   updateObject,
 } from './documents/DocumentEndpoints';
 import { HttpStatusCode } from '../../common/httpStatusCode';
+import { GetSummaryConfig } from './summary/SummaryConfig';
+import { de } from 'date-fns/locale';
 
 const SiteDetails = () => {
+  const auth = useAuth();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const loggedInUser = getUser();
+  // TODO: this is for future use when we support automatic flow of creating new site for specific application.
+  // We need applicationid and newly created siteId to fill cats db  in order to keep both application in sync.
+  const [searchParams] = useSearchParams();
+  const dispatch = useDispatch<AppDispatch>();
+
+  // TODO: For future use when we support automatic flow of creating new site for specific application.
+  const applicationId = searchParams.get('applicationId');
+
+  const mode = useSelector(siteDetailsMode);
+  const details = useSelector(selectSiteDetails);
+  const bulkApproveRejectStatus = useSelector(bulkUpdateApproveRejectStatus);
+  const hasNoPendingUpdatesFromState = useSelector(hasNoPendingUpdates);
+  const snapshot = useSelector(snapshots);
+  const snapshotTakenDate = useSelector(getFirstSnapshotCreatedDate);
+  const bannerType = useSelector(selectBannerType);
+  const savedChanges = useSelector(trackedChanges);
+  const siteNotation = useSelector(getSiteNoatations);
+  const siteSummary = useSelector(getSiteSummary);
+  const disclosure = useSelector(getSiteDisclosure);
+  const sitePartics = useSelector(getSiteParticipants);
+  const siteAssocs = useSelector(getSiteAssociated);
+  const siteDocuments = useSelector(getSiteDocuments);
+  const parentBucket = useSelector(getParentBucket);
+  const srUpdateRequestStatus = useSelector(updateRequestStatus);
+  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
+
+  const { notationFormRowEditMode, notationColumnInternal } =
+    GetNotationConfig();
+  const { participantColumnInternal } = GetConfig();
+  const { associateColumnInternal } = GetAssociateConfig();
+  const { documentFormRowsEditMode } = GetDocumentsConfig();
+  const { createSiteFormRows } = GetSummaryConfig();
+
+  const [errorList, setErrorList] = useState<any[]>([]);
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
     null,
   );
-  const bulkApproveRejectStatus = useSelector(bulkUpdateApproveRejectStatus);
-  const hasNoPendingUpdatesFromState = useSelector(hasNoPendingUpdates);
-  const [navItems, SetNavItems] = useState<string[] | undefined>();
   const [navComponents, SetNavComponents] = useState<any[]>();
-  const [dropDownNavItems, SetDropDownNavItems] =
-    useState<{ label: string; value: string }[]>();
+  const [isVisible, setIsVisible] = useState(false);
+  const [edit, setEdit] = useState(false);
+  const [save, setSave] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [userType, setUserType] = useState<UserType | null>(null);
+  const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
+  const [isLoading, setIsLoading] = useState(true);
+  const [siteDetailsForSRMode, SetSiteDetailsForSRMode] = useState(details);
 
-  const auth = useAuth();
+  const userActions = [UserActionEnum.added, UserActionEnum.updated];
 
   useEffect(() => {
     SetNavComponents(getNavComponents(false));
@@ -155,38 +214,6 @@ const SiteDetails = () => {
       SetNavComponents(getNavComponents(false));
     }
   }, [hasNoPendingUpdatesFromState]);
-
-  const [isVisible, setIsVisible] = useState(false);
-  const snapshot = useSelector(snapshots);
-  const snapshotTakenDate = useSelector(getFirstSnapshotCreatedDate);
-  const bannerType = useSelector(selectBannerType);
-  const [edit, setEdit] = useState(false);
-  const [showLocationDetails, SetShowLocationDetails] = useState(false);
-  const [showParcelDetails, SetShowParcelDetails] = useState(false);
-  const [save, setSave] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [errorList, setErrorList] = useState<any[]>([]);
-  const savedChanges = useSelector(trackedChanges);
-  const siteNotation = useSelector(getSiteNoatations);
-  const disclosure = useSelector(getSiteDisclosure);
-  const sitePartics = useSelector(getSiteParticipants);
-  const siteAssocs = useSelector(getSiteAssociated);
-  const siteDocuments = useSelector(getSiteDocuments);
-  const parentBucket = useSelector(getParentBucket);
-  const userActions = [UserActionEnum.added, UserActionEnum.updated];
-  const { notationFormRowEditMode, notationColumnInternal } =
-    GetNotationConfig();
-  const { participantColumnInternal } = GetConfig();
-  const { associateColumnInternal } = GetAssociateConfig();
-  const { documentFormRowsEditMode } = GetDocumentsConfig();
-  const [userType, setUserType] = useState<UserType | null>(null);
-  const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
-  const [isLoading, setIsLoading] = useState(true);
-  const dispatch = useDispatch<AppDispatch>();
-
-  const srUpdateRequestStatus = useSelector(updateRequestStatus);
-
-  const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
 
   useEffect(() => {
     if (
@@ -241,21 +268,16 @@ const SiteDetails = () => {
     }
   }, [bulkApproveRejectStatus]);
 
-  const navigate = useNavigate();
   const onClickBackButton = () => {
     navigate(-1);
   };
 
-  const { id } = useParams();
-
-  const details = useSelector(selectSiteDetails);
-  const [siteDetailsForSRMode, SetSiteDetailsForSRMode] = useState(details);
-
   useEffect(() => {
     SetSiteDetailsForSRMode(details);
+    if (details && details.id === id) {
+      handleAddRecentView(details);
+    }
   }, [details]);
-
-  const loggedInUser = getUser();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -288,8 +310,6 @@ const SiteDetails = () => {
     }
   }, [loggedInUser]);
 
-  const mode = useSelector(siteDetailsMode);
-
   useEffect(() => {
     setViewMode(mode);
     if (
@@ -312,8 +332,10 @@ const SiteDetails = () => {
   // THERE ARE SOME CALLS WHICH MAY NOT REQUIRED ON DETAILS PAGE.
   useEffect(() => {
     setIsLoading(true); // Set loading state to true before starting API calls
-    if (id) {
-      dispatch(resetSaveSiteDetails(null));
+    dispatch(resetSaveSiteDetails(null));
+    fetchAllDropdownDetails();
+    if (!!id?.trim()) {
+      checkForRecordsPendingReview(id);
       dispatch(setupSiteIdForSaving(id));
       dispatch(fetchSitesInsights({ siteId: id ?? '' }));
       if (auth.user !== null) {
@@ -322,11 +344,7 @@ const SiteDetails = () => {
           userType === UserType.External
             ? dispatch(getBannerType(id ?? ''))
             : Promise.resolve(),
-          dispatch(fetchMinistryContact('EMP')),
-          dispatch(fetchNotationClassCd()),
-          dispatch(fetchNotationTypeCd()),
-          dispatch(fetchNotationParticipantRoleCd()),
-          dispatch(fetchParticipantRoleCd()),
+
           dispatch(
             fetchSiteParticipants({ siteId: id ?? '', showPending: false }),
           ),
@@ -360,14 +378,52 @@ const SiteDetails = () => {
             console.error('Error fetching data:', error);
           });
       }
+    } else {
+      if (userType === UserType.Internal && auth.user !== null) {
+        resetSite();
+        setEdit(true);
+        setViewMode(SiteDetailsMode.EditMode);
+        dispatch(updateSiteDetailsMode(SiteDetailsMode.EditMode));
+      }
     }
   }, [id, userType]);
 
   useEffect(() => {
-    if (id && id !== '') {
-      checkForRecordsPendingReview(id);
+    if (srUpdateRequestStatus === RequestStatus.success) {
+      if (id) {
+        Promise.all([
+          dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
+        ])
+          .then(() => {
+            setIsLoading(false); // Set loading state to false after all API calls are resolved
+          })
+          .catch((error) => {
+            console.error('Error fetching data:', error);
+          });
+      }
     }
-  }, [id]);
+  }, [srUpdateRequestStatus]);
+
+  const resetSite = () => {
+    dispatch(clearTrackChanges(null));
+    dispatch(updateSiteParticipants([]));
+    dispatch(updateSiteNotation([]));
+    dispatch(updateSiteDocument([]));
+    dispatch(updateSiteDisclosure([]));
+    dispatch(updateAssociatedSites([]));
+    dispatch(updateSiteDetail(null));
+  };
+
+  const fetchAllDropdownDetails = async () => {
+    dispatch(fetchMinistryContact('EMP'));
+    dispatch(fetchNotationClassCd());
+    dispatch(fetchNotationTypeCd());
+    dispatch(fetchNotationParticipantRoleCd());
+    dispatch(fetchParticipantRoleCd());
+    dispatch(fetchSiteRiskCd());
+    dispatch(fetchSiteStatusCd());
+    dispatch(fetchBceRegionCd());
+  };
 
   const checkForRecordsPendingReview = (siteId: string) => {
     if (siteId && siteId !== '' && isUserOfType(UserRoleType.SR)) {
@@ -420,28 +476,6 @@ const SiteDetails = () => {
     }
   };
 
-  useEffect(() => {
-    if (srUpdateRequestStatus === RequestStatus.success) {
-      if (id) {
-        Promise.all([
-          dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
-        ])
-          .then(() => {
-            setIsLoading(false); // Set loading state to false after all API calls are resolved
-          })
-          .catch((error) => {
-            console.error('Error fetching data:', error);
-          });
-      }
-    }
-  }, [srUpdateRequestStatus]);
-
-  useEffect(() => {
-    if (details && details.id === id) {
-      handleAddRecentView(details);
-    }
-  }, [details]);
-
   const handleItemClick = async (value: string) => {
     switch (value) {
       case SiteDetailsMode.EditMode:
@@ -462,26 +496,10 @@ const SiteDetails = () => {
       case SiteActionBtn.ApproveAll:
         setEdit(false);
         SetConfirmSiteReview(true);
-        // if(id)
-        // dispatch(
-        //   bulkAproveRejectChanges({
-        //     sites: [{siteId: id, changes: 'summary, notation, notation participants, site participants, documents, associated sites, land histories, site profiles, parcel description', whoUpdated: auth.user?.profile?.given_name ?? '', whenUpdated: new Date(), address:'', id : '1' }],
-        //     isApproved: true,
-        //     fromSiteDetails: true
-        //   }),
-        // );
         break;
       case SiteActionBtn.RejectAll:
         setEdit(false);
         SetConfirmSiteReview(false);
-        // if(id)
-        //   dispatch(
-        //     bulkAproveRejectChanges({
-        //       sites: [{siteId: id, changes: 'summary, notation, notation participants, site participants, documents, associated sites, land histories, site profiles, parcel description', whoUpdated: auth.user?.profile?.given_name ?? '', whenUpdated: new Date(), address:'', id : '1' }],
-        //       isApproved: false,
-        //       fromSiteDetails: true
-        //     }),
-        //   );
         break;
       case SiteActionBtn.SAVE:
         const errors = await validateSiteForms();
@@ -496,7 +514,11 @@ const SiteDetails = () => {
         }
         break;
       case SiteActionBtn.CANCEL:
-        handleCancelButton();
+        if (!id?.trim()) {
+          navigate(-1);
+        } else {
+          handleCancelButton();
+        }
         break;
       default:
         break;
@@ -512,12 +534,14 @@ const SiteDetails = () => {
         siteDocErrors,
         siteAssocErrors,
         siteDisclosureErrors,
+        siteSummaryErrors,
       ] = await Promise.all([
         validateNotationsForm(),
         validateSiteParticipantForm(),
         validateSiteDocumentsForm(),
         validateAssociatedSitesForm(),
         validateSiteDisclosureForm(),
+        validateSiteSummaryForm(),
       ]);
 
       // Combine all errors into one list
@@ -527,11 +551,34 @@ const SiteDetails = () => {
         ...siteDocErrors,
         ...siteAssocErrors,
         ...siteDisclosureErrors,
+        ...siteSummaryErrors,
       ];
       // You can now use `allErrors` for further processing
       return errors;
     } catch (error) {
       return []; // Return empty array in case of error to avoid breaking further logic
+    }
+  };
+
+  const validateSiteSummaryForm = async () => {
+    try {
+      if (siteSummary && Object.keys(siteSummary).length > 0) {
+        const errors = validateForm(
+          createSiteFormRows,
+          siteSummary,
+          'Site Summary',
+        );
+        if (errors?.length > 0) {
+          return errors;
+        } else {
+          return [];
+        }
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error(error);
+      return [];
     }
   };
 
@@ -834,7 +881,7 @@ const SiteDetails = () => {
     return getActionItems(includeSRApprovalActions);
   };
 
-  if (isLoading || snapshot.status === RequestStatus.loading) {
+  if (id && (isLoading || snapshot.status === RequestStatus.loading)) {
     return (
       <div className="loading-overlay">
         <div className="spinner-container">
@@ -843,6 +890,7 @@ const SiteDetails = () => {
       </div>
     );
   }
+
   if (snapshot.status === RequestStatus.failed)
     return <div>Error: {snapshot.error || 'Failed to load data'}</div>;
 
@@ -899,6 +947,15 @@ const SiteDetails = () => {
           ? SRApprovalStatusEnum.Public
           : SRApprovalStatusEnum.Private,
     });
+    dispatch(
+      updateSiteDetail({
+        ...details,
+        srAction:
+          event?.target?.checked === true
+            ? SRApprovalStatusEnum.Public
+            : SRApprovalStatusEnum.Private,
+      }),
+    );
     dispatch(
       setupSiteSummaryForSaving({
         ...details,
@@ -1001,7 +1058,11 @@ const SiteDetails = () => {
         await saveSiteDocumentData();
       }
       if (errorList.length === 0) {
-        await dispatch(saveSiteDetails()).unwrap();
+        const res = await dispatch(saveSiteDetails()).unwrap();
+        const { httpStatusCode, success } = res?.data?.updateSiteDetails;
+        if (httpStatusCode === HttpStatusCode.OK && success) {
+          navigate(-1);
+        }
       }
     } catch (error) {
       console.error('Error while saving site details:', error);
@@ -1019,14 +1080,22 @@ const SiteDetails = () => {
               Back
             </Button>
             <div className="d-flex flex-wrap align-items-center gap-2 pe-3 custom-sticky-header-lbl">
-              Site ID:{' '}
-              <span className="custom-sticky-header-txt">{id ?? ''}</span>
-              <span className="d-flex align-items-center justify-content-center px-2 custom-dot">
-                .
-              </span>
-              <div className="custom-sticky-header-lbl">
-                <span>{details && details.addrLine_1}</span>
-              </div>
+              {!!id?.trim() ? (
+                <>
+                  <span>Site ID:</span>
+                  <span className="custom-sticky-header-txt">{id}</span>
+                  <span className="d-flex align-items-center justify-content-center px-2 custom-dot">
+                    .
+                  </span>
+                  {details?.addrLine_1 && (
+                    <div className="custom-sticky-header-lbl">
+                      <span>{details.addrLine_1}</span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <span>Create New Site</span>
+              )}
             </div>
           </div>
           <div className="d-flex gap-2 justify-align-center pe-2 position-relative">
@@ -1047,14 +1116,16 @@ const SiteDetails = () => {
                 <>
                   <CustomLabel
                     labelType="c-b"
-                    label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
+                    label={`${!id?.trim() ? 'Create Site' : viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'} `}
                   />
                   <SaveButton
                     variant="secondary"
                     clickHandler={() => handleItemClick(SiteActionBtn.SAVE)}
                     isDisabled={savedChanges?.length > 0 ? false : true}
                   />
-                  <CancelButton clickHandler={handleCancelButton} />
+                  <CancelButton
+                    clickHandler={() => handleItemClick(SiteActionBtn.CANCEL)}
+                  />
                 </>
               )}
             </div>
@@ -1062,16 +1133,17 @@ const SiteDetails = () => {
               <div className="d-flex d-md-none d-lg-none d-xl-none">
                 <Actions
                   label="Actions"
-                  items={[
-                    {
-                      label: 'Save',
-                      value: 'save',
-                    },
-                    {
-                      label: 'Cancel',
-                      value: 'cancel',
-                    },
-                  ]}
+                  items={
+                    !id?.trim()
+                      ? [
+                          { label: 'Create Site', value: SiteActionBtn.SAVE },
+                          { label: 'Cancel', value: SiteActionBtn.CANCEL },
+                        ]
+                      : [
+                          { label: 'Save', value: SiteActionBtn.SAVE },
+                          { label: 'Cancel', value: SiteActionBtn.CANCEL },
+                        ]
+                  }
                   onItemClick={handleItemClick}
                 />
               </div>
@@ -1109,6 +1181,7 @@ const SiteDetails = () => {
               }}
             />
           )}
+
         {(save || hasError) && (
           <ModalDialog
             errorOption={hasError}
@@ -1199,14 +1272,16 @@ const SiteDetails = () => {
                   <>
                     <CustomLabel
                       labelType="c-b"
-                      label={`${viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'}`}
+                      label={`${!id?.trim() ? 'Create Site' : viewMode === SiteDetailsMode.SRMode ? 'SR Mode' : 'Edit Mode'} `}
                     />
                     <SaveButton
                       variant="secondary"
                       clickHandler={() => handleItemClick(SiteActionBtn.SAVE)}
                       isDisabled={savedChanges?.length > 0 ? false : true}
                     />
-                    <CancelButton clickHandler={handleCancelButton} />
+                    <CancelButton
+                      clickHandler={() => handleItemClick(SiteActionBtn.CANCEL)}
+                    />
                   </>
                 )}
               </div>
@@ -1214,20 +1289,22 @@ const SiteDetails = () => {
                 <div className="d-flex d-md-none d-lg-none d-xl-none">
                   <Actions
                     label="Actions"
-                    items={[
-                      {
-                        label: 'Save',
-                        value: 'save',
-                      },
-                      {
-                        label: 'Cancel',
-                        value: 'cancel',
-                      },
-                    ]}
+                    items={
+                      !id?.trim()
+                        ? [
+                            { label: 'Create Site', value: 'create' },
+                            { label: 'Cancel', value: 'cancel' },
+                          ]
+                        : [
+                            { label: 'Save', value: 'save' },
+                            { label: 'Cancel', value: 'cancel' },
+                          ]
+                    }
                     onItemClick={handleItemClick}
                   />
                 </div>
               )}
+
               {/* For Cart /Folio Controls*/}
               {!edit &&
                 viewMode === SiteDetailsMode.ViewOnlyMode &&
@@ -1245,6 +1322,7 @@ const SiteDetails = () => {
             </div>
           </div>
         )}
+
         <div className="section-details-header row">
           {UserType.External === userType && (
             <div>
@@ -1300,16 +1378,23 @@ const SiteDetails = () => {
                   </div>
                 </div>
               )}
-              <div>
-                <CustomLabel label="Site ID: " labelType="b-h5" />
-                <CustomLabel label={id ?? ''} labelType="r-h5" />
-              </div>
-              <div>
-                <CustomLabel
-                  label={details && details.addrLine_1}
-                  labelType="b-h1"
-                />
-              </div>
+
+              {!!id?.trim() ? (
+                <>
+                  <div>
+                    <CustomLabel label="Site ID: " labelType="b-h5" />
+                    <CustomLabel label={id} labelType="r-h5" />
+                  </div>
+                  <div>
+                    <CustomLabel
+                      label={details && details.addrLine_1}
+                      labelType="b-h1"
+                    />
+                  </div>
+                </>
+              ) : (
+                <CustomLabel label="Create New Site" labelType="b-h5" />
+              )}
             </>
           )}
         </div>
@@ -1318,7 +1403,11 @@ const SiteDetails = () => {
           isDisable={
             getUser() === null ||
             (UserType.External === userType &&
-              snapshot?.snapshot?.data === null)
+              snapshot?.snapshot?.data === null) ||
+            (UserType.Internal === userType &&
+              viewMode === SiteDetailsMode.EditMode &&
+              !id?.trim() &&
+              !(savedChanges?.length > 0))
           }
         />
       </PageContainer>

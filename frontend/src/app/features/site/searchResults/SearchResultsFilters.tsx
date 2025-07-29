@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   BarsIcon,
   FilterIcon,
@@ -10,6 +10,10 @@ import { Button } from '../../../components/button/Button';
 import Column from '../columns/Column';
 import type { TableColumn } from '../../../components/table/TableColumn';
 import SiteFilterForm from '../filters/SiteFilterForm';
+import { formRows } from '../dto/SiteFilterConfig';
+import { useDispatch, useSelector } from 'react-redux';
+import { siteRiskCodeDrpdown } from '../../details/dropdowns/DropdownSlice';
+import { updateFields } from '../../../helpers/utility';
 
 interface SearchResultsFiltersProps {
   columns: TableColumn[];
@@ -32,6 +36,23 @@ export const SearchResultsFilters: FC<SearchResultsFiltersProps> = ({
   onFiltersReset,
 }) => {
   const [panelToShow, setPanelToShow] = useState<PanelOption>(null);
+  const siteRiskCode = useSelector(siteRiskCodeDrpdown);
+  const [siteFilterFormRows, setSiteFilterFormRows] = useState(formRows);
+
+  useEffect(() => {
+    if (siteRiskCode?.data?.length > 0) {
+      setSiteFilterFormRows((prev) =>
+        updateFields(prev, {
+          indexToUpdate: prev.findIndex((row) =>
+            row.some((field) => field.graphQLPropertyName === 'siteRiskCode'),
+          ),
+          updates: {
+            options: siteRiskCode?.data,
+          },
+        }),
+      );
+    }
+  }, [siteRiskCode]);
 
   const togglePanel = (panel: PanelOption) => {
     if (panelToShow === panel) {
@@ -100,6 +121,7 @@ export const SearchResultsFilters: FC<SearchResultsFiltersProps> = ({
       )}
       {panelToShow === 'filters' && (
         <SiteFilterForm
+          formRows={siteFilterFormRows}
           formData={filtersFormData}
           onInputChange={onFiltersChange}
           onSubmit={onFiltersSubmit}

@@ -1,4 +1,5 @@
-.custom-notation-lbl-text {
+.custom-notation-lbl-text,
+.custom-notation-edit-label {
   font-size: 14px;
   font-weight: 700;
   line-height: 21.01px;
@@ -20,14 +21,6 @@
   line-height: 16px !important;
   text-align: left;
   color: var(--typography-color-primary, #2d2d2d) !important;
-}
-
-.custom-notation-edit-label {
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 21.01px;
-  text-align: left;
-  color: var(--typography-color-secondary, #474543);
 }
 
 .custom-notation-edit-input {

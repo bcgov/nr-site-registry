@@ -115,7 +115,7 @@ export const graphqlSiteDetailsQuery = () => {
           addrLine_4
           longDegrees
           longMinutes
-          longMinutes
+          longSeconds
           latDegrees
           latMinutes
           latSeconds
@@ -146,7 +146,7 @@ export const graphqlSiteDetailsQueryForLoggedIn = () => {
           addrLine_4
           longDegrees
           longMinutes
-          longMinutes
+          longSeconds
           latDegrees
           latMinutes
           latSeconds

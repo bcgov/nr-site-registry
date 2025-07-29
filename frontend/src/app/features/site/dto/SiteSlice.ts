@@ -121,6 +121,13 @@ const siteSlice = createSlice({
       newState.userType = action.payload;
       return newState;
     },
+    updateSiteDetail: (state, action) => {
+      const newState = {
+        ...state,
+      };
+      newState.siteDetails = action.payload;
+      return newState;
+    },
   },
   extraReducers(builder) {
     builder
@@ -168,6 +175,7 @@ export const {
   clearTrackChanges,
   updateSiteDetailsMode,
   updateUserType,
+  updateSiteDetail,
 } = siteSlice.actions;
 
 export default siteSlice.reducer;

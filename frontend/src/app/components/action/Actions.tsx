@@ -35,13 +35,13 @@ const Actions: React.FC<IActions> = ({
         className={`${customCssMenu ?? 'custom-action-menu'}`}
         align={'end'}
       >
-        {items.map((item, index) => {
+        {items?.map((item, index) => {
           if (!isValidElement(item) && 'value' in item) {
             return (
               <Dropdown.Item
                 key={index}
                 onClick={() => onItemClick(item.value, index)}
-                className={`disable ${customCssMenuItem ?? 'custom-action-item'}`}
+                className={`disable w-100 ${customCssMenuItem ?? 'custom-action-item'}`}
               >
                 {item.label}
               </Dropdown.Item>
@@ -50,7 +50,7 @@ const Actions: React.FC<IActions> = ({
           return (
             <Dropdown.Item
               key={index}
-              className={`disable ${customCssMenuItem ?? 'custom-action-item'}`}
+              className={`disable w-100 ${customCssMenuItem ?? 'custom-action-item'}`}
             >
               {item}
             </Dropdown.Item>

@@ -18,6 +18,7 @@ export const recentViewedColumns: TableColumn[] = [
       href: 'site/details/',
     },
     linkRedirectionURL: 'site/details/',
+    dynamicColumn: true,
   },
   {
     id: 2,
@@ -32,6 +33,7 @@ export const recentViewedColumns: TableColumn[] = [
       customInputTextCss: 'custom-dashboard-input-txt',
       tableMode: true,
     },
+    dynamicColumn: true,
   },
   {
     id: 3,
@@ -46,6 +48,7 @@ export const recentViewedColumns: TableColumn[] = [
       customInputTextCss: 'custom-dashboard-input-txt',
       tableMode: true,
     },
+    dynamicColumn: true,
   },
   {
     id: 4,
@@ -61,6 +64,7 @@ export const recentViewedColumns: TableColumn[] = [
       tableMode: true,
     },
     columnSize: ColumnSize.Triple,
+    dynamicColumn: true,
   },
   {
     id: 5,
@@ -77,6 +81,7 @@ export const recentViewedColumns: TableColumn[] = [
       customInputTextCss: 'custom-dashboard-input-txt',
       tableMode: true,
     },
+    dynamicColumn: true,
   },
   {
     id: 6,
@@ -94,6 +99,7 @@ export const recentViewedColumns: TableColumn[] = [
       href: '/map?site=',
       customIcon: <FillPinMapFill />,
     },
+    dynamicColumn: true,
   },
   {
     id: 7,
@@ -112,5 +118,21 @@ export const recentViewedColumns: TableColumn[] = [
       customIcon: <FillEye />,
     },
     linkRedirectionURL: 'site/details/',
+    dynamicColumn: true,
+  },
+];
+
+export const actionsItemsConfig = [
+  {
+    label: 'Create a Site',
+    value: 'create-site',
+  },
+  {
+    label: 'Search for a Site',
+    value: 'search-site',
+  },
+  {
+    label: 'View Sites on Map',
+    value: 'view-sites-on-map',
   },
 ];

@@ -4,11 +4,14 @@ import { GRAPHQL } from '../../../helpers/endpoints';
 import { print } from 'graphql';
 import {
   getIDIRUserListForDropDownQL,
+  graphQLBCeRegionCd,
   graphQLNotationClassCd,
   graphQLNotationParticipantRoleCd,
   graphQLNotationTypeCd,
   graphQLParticipantRoleCd,
   graphQLPeopleOrgsCd,
+  graphQLSiteRiskCd,
+  graphQLSiteStatusCd,
 } from '../../site/graphql/Dropdowns';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { IDropdownsState } from './IDropdownState';
@@ -23,6 +26,9 @@ const initialState: IDropdownsState = {
     notationParticipantRole: [],
     ministryContact: [],
     internalUserList: [],
+    siteRiskCode: [],
+    bceRegionCode: [],
+    siteStatusCode: [],
   },
   status: RequestStatus.idle,
   error: '',
@@ -133,6 +139,48 @@ export const fetchInternalUserNameForDropdown = createAsyncThunk(
   },
 );
 
+export const fetchSiteRiskCd = createAsyncThunk(
+  'dropdowns/getSiteRiskCd',
+  async () => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(graphQLSiteRiskCd()),
+      });
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
+
+export const fetchBceRegionCd = createAsyncThunk(
+  'dropdowns/getBceRegionCd',
+  async () => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(graphQLBCeRegionCd()),
+      });
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
+
+export const fetchSiteStatusCd = createAsyncThunk(
+  'dropdowns/getSiteStatusCd',
+  async () => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(graphQLSiteStatusCd()),
+      });
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
+
 // Define the recent views slice
 const dropdowns = createSlice({
   name: 'dropdowns',
@@ -213,6 +261,39 @@ const dropdowns = createSlice({
         )
           state.dropdowns.internalUserList =
             action.payload.data.getIDIRUserListForDropDown.data;
+      })
+      .addCase(fetchSiteRiskCd.pending, (state) => {
+        state.status = RequestStatus.loading;
+      })
+      .addCase(fetchSiteRiskCd.fulfilled, (state, action) => {
+        state.status = RequestStatus.success;
+        state.dropdowns.siteRiskCode = action.payload;
+      })
+      .addCase(fetchSiteRiskCd.rejected, (state, action) => {
+        state.status = RequestStatus.failed;
+        state.error = action.error.message;
+      })
+      .addCase(fetchBceRegionCd.pending, (state) => {
+        state.status = RequestStatus.loading;
+      })
+      .addCase(fetchBceRegionCd.fulfilled, (state, action) => {
+        state.status = RequestStatus.success;
+        state.dropdowns.bceRegionCode = action.payload;
+      })
+      .addCase(fetchBceRegionCd.rejected, (state, action) => {
+        state.status = RequestStatus.failed;
+        state.error = action.error.message;
+      })
+      .addCase(fetchSiteStatusCd.pending, (state) => {
+        state.status = RequestStatus.loading;
+      })
+      .addCase(fetchSiteStatusCd.fulfilled, (state, action) => {
+        state.status = RequestStatus.success;
+        state.dropdowns.siteStatusCode = action.payload;
+      })
+      .addCase(fetchSiteStatusCd.rejected, (state, action) => {
+        state.status = RequestStatus.failed;
+        state.error = action.error.message;
       });
   },
 });
@@ -236,5 +317,14 @@ export const updateNotationClass = (state: any) =>
 
 export const getInternalUserNameForDropdown = (state: any) =>
   state.dropdown.dropdowns.internalUserList;
+
+export const siteRiskCodeDrpdown = (state: any) =>
+  state.dropdown.dropdowns.siteRiskCode.getSiteRiskCd;
+
+export const bceRegionCodeDrpdown = (state: any) =>
+  state.dropdown.dropdowns.bceRegionCode.getBCeRegionCd;
+
+export const siteStatusCodeDrpdown = (state: any) =>
+  state.dropdown.dropdowns.siteStatusCode.getSiteStatusCd;
 
 export default dropdowns.reducer;

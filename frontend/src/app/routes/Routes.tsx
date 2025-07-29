@@ -40,6 +40,7 @@ const roleBasedRoutes: any = {
     { path: '/', element: <Search /> },
     { path: '/dashboard', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
+    { path: '/dashboard/site/create', element: <SiteDetails /> },
     { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/dashboard/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
@@ -55,6 +56,8 @@ const roleBasedRoutes: any = {
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
     { path: '/review', element: <SRUpdatesTables /> },
+    { path: '/dashboard', element: <Dashboard /> },
+    { path: '/dashboard/site/create', element: <SiteDetails /> },
   ],
   public: [
     { path: '/', element: <Search /> },

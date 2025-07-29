@@ -46,7 +46,12 @@ import { SnapshotsService } from '../snapshot/snapshot.service';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { Place } from '../../entities/placeEntity';
 import { UserTypeEum } from '../../common/userType';
-import { BC_ALBERS, LatLngTuple, WGS_84 } from '../../utils/geometry';
+import {
+  BC_ALBERS,
+  dmsToDecimal,
+  LatLngTuple,
+  WGS_84,
+} from '../../utils/geometry';
 
 import { MAX_CIRCLE_RADIUS, MIN_CIRCLE_RADIUS } from '../../utils/constants';
 import { SiteRegistry } from '../../entities/siteRegistry.entity';
@@ -153,7 +158,6 @@ export class SiteService {
       whenUpdated,
     } = filters;
 
-
     this.sitesLogger.log('SiteService.searchSites() start');
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
@@ -227,8 +231,8 @@ export class SiteService {
     }
 
     if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR) {
-      query.andWhere('sites.srAction != :srAction', {
-        srAction: SRApprovalStatusEnum.PRIVATE,
+      query.andWhere('sites.srAction = :srAction', {
+        srAction: SRApprovalStatusEnum.PUBLIC,
       });
     }
 
@@ -657,7 +661,7 @@ export class SiteService {
     inputDTO: SaveSiteDetailsDTO,
     userInfo: any,
   ): Promise<boolean> {
-    const {
+    let {
       siteId,
       sitesSummary,
       events,
@@ -671,9 +675,90 @@ export class SiteService {
     } = inputDTO;
 
     if (sitesSummary) {
-      sitesSummary.whenUpdated = new Date();
-      sitesSummary.whoUpdated = userInfo?.givenName;
-      await transactionalEntityManager.save(Sites, sitesSummary);
+      const { apiAction, ...summary } = sitesSummary;
+
+      switch (apiAction) {
+        case UserActionEnum.ADDED:
+          let siteCurrentMaxId = await this.getMaxId(this.siteRepository, 'id');
+          siteId = (siteCurrentMaxId + 1).toString();
+          this.sitesLogger.log(
+            `SiteService.saveSiteDetails(): Adding new site with id ${siteId}`,
+          );
+
+          const {
+            latDegrees,
+            latMinutes,
+            latSeconds,
+            longDegrees,
+            longMinutes,
+            longSeconds,
+          } = summary;
+
+          if (!!latDegrees) {
+            summary.latdeg = dmsToDecimal(latDegrees, latMinutes, latSeconds);
+          }
+
+          if (!!longDegrees) {
+            summary.longdeg = dmsToDecimal(
+              longDegrees,
+              longMinutes,
+              longSeconds,
+            );
+          }
+
+          const newSitesSummary = {
+            ...summary,
+            id: siteId,
+            userAction: UserActionEnum.ADDED,
+            srAction: SRApprovalStatusEnum.PENDING,
+            whenCreated: new Date(),
+            whoCreated: userInfo?.givenName,
+            whenUpdated: new Date(),
+            whoUpdated: userInfo?.givenName,
+          };
+          await transactionalEntityManager.save(Sites, newSitesSummary);
+          break;
+        case UserActionEnum.UPDATED:
+          this.sitesLogger.log(
+            `SiteService.saveSiteDetails(): Updating site with id ${sitesSummary.id}`,
+          );
+
+          const existingSite = await transactionalEntityManager.findOneOrFail(
+            Sites,
+            {
+              where: { id: sitesSummary.id },
+            },
+          );
+
+          if (existingSite) {
+            const updatedSite = {
+              ...existingSite,
+              ...summary,
+              userAction:
+                sitesSummary.srAction === SRApprovalStatusEnum.PUBLIC ||
+                sitesSummary.srAction === SRApprovalStatusEnum.PRIVATE
+                  ? UserActionEnum.DEFAULT
+                  : UserActionEnum.UPDATED,
+              whenUpdated: new Date(),
+              whoUpdated: userInfo?.givenName,
+            };
+            await transactionalEntityManager.update(
+              Sites,
+              { id: sitesSummary.id },
+              updatedSite,
+            );
+          } else {
+            this.sitesLogger.log(
+              `SiteService.saveSiteDetails(): Site with id ${sitesSummary.id} not found`,
+            );
+          }
+
+          break;
+        default:
+          this.sitesLogger.warn(
+            'SiteService.siteSummary(): Unknown action for site summary:',
+          );
+      }
     } else {
       this.sitesLogger.log(
         'SiteService.saveSiteDetails(): No changes To Site Summary',
@@ -681,7 +766,12 @@ export class SiteService {
     }
 
     if (events?.length > 0) {
-      await this.processEvents(events, userInfo, transactionalEntityManager);
+      await this.processEvents(
+        events,
+        userInfo,
+        transactionalEntityManager,
+        siteId,
+      );
     } else {
       this.sitesLogger.log(
         'SiteService.saveSiteDetails(): No changes To Site Events',
@@ -693,6 +783,7 @@ export class SiteService {
         siteParticipants,
         userInfo,
         transactionalEntityManager,
+        siteId,
       );
     } else {
       this.sitesLogger.log(
@@ -705,6 +796,7 @@ export class SiteService {
         documents,
         userInfo,
         transactionalEntityManager,
+        siteId,
       );
     } else {
       this.sitesLogger.log(
@@ -717,6 +809,7 @@ export class SiteService {
         siteAssociations,
         userInfo,
         transactionalEntityManager,
+        siteId,
       );
     } else {
       this.sitesLogger.log(
@@ -726,7 +819,7 @@ export class SiteService {
 
     if (parcelDescriptions) {
       await this.parcelDescriptionService.saveParcelDescriptionsForSite(
-        inputDTO.siteId,
+        siteId,
         parcelDescriptions,
         userInfo,
         transactionalEntityManager,
@@ -752,6 +845,7 @@ export class SiteService {
         profiles,
         userInfo,
         transactionalEntityManager,
+        siteId,
       );
     } else {
       this.sitesLogger.log(
@@ -767,7 +861,7 @@ export class SiteService {
       whenCreated: new Date(),
       whenUpdated: new Date(),
       whoUpdated: userInfo ? userInfo.givenName : '',
-      siteId: inputDTO.siteId,
+      siteId: siteId,
     };
 
     await transactionalEntityManager.save(HistoryLog, historyLog);
@@ -823,6 +917,7 @@ export class SiteService {
     documents: any[],
     userInfo: any,
     transactionalEntityManager: EntityManager,
+    siteId: string,
   ) {
     try {
       if (documents?.length > 0) {
@@ -884,6 +979,7 @@ export class SiteService {
               newDocuments.push({
                 ...siteDocument,
                 id: documentId,
+                siteId: siteId,
                 userAction: UserActionEnum.ADDED,
                 srAction: SRApprovalStatusEnum.PENDING,
                 whenCreated: currentDate,
@@ -1063,6 +1159,7 @@ export class SiteService {
     siteParticipants: any[],
     userInfo: any,
     transactionalEntityManager: EntityManager,
+    siteId: string,
   ) {
     try {
       if (siteParticipants?.length) {
@@ -1122,6 +1219,7 @@ export class SiteService {
                 newSitePartics.push({
                   ...sitePartic,
                   id: participantId,
+                  siteId: siteId,
                   userAction: UserActionEnum.ADDED,
                   whenCreated: currentDate,
                   whoCreated: userInfo ? userInfo.givenName : '',
@@ -1272,6 +1370,7 @@ export class SiteService {
     events: any[],
     userInfo: any,
     transactionalEntityManager: EntityManager,
+    siteId: string,
   ) {
     try {
       if (events?.length > 0) {
@@ -1376,6 +1475,7 @@ export class SiteService {
               newEvents.push({
                 ...event,
                 id: notationId,
+                siteId: siteId,
                 eventDate: new Date(),
                 userAction: UserActionEnum.ADDED,
                 whenCreated: currentDate,
@@ -1485,6 +1585,7 @@ export class SiteService {
     siteAccociated: any[],
     userInfo: any,
     transactionalEntityManager: EntityManager,
+    siteId: string,
   ) {
     try {
       if (siteAccociated?.length > 0) {
@@ -1505,6 +1606,7 @@ export class SiteService {
                 ...siteAssoc,
                 // Need to know common pid relation as it is non-nullable field in DB and we don't have visibility in our design for same.
                 commonPid: 'N',
+                siteId: siteId,
                 userAction: UserActionEnum.ADDED,
                 whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
@@ -1587,6 +1689,7 @@ export class SiteService {
     siteDisclosure: any[],
     userInfo: any,
     transactionalEntityManager: EntityManager,
+    siteId: string,
   ) {
     try {
       if (siteDisclosure?.length > 0) {
@@ -1601,6 +1704,7 @@ export class SiteService {
               const currentDate = new Date();
               profile = {
                 ...profile,
+                siteId: siteId,
                 userAction: UserActionEnum.ADDED,
                 whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',

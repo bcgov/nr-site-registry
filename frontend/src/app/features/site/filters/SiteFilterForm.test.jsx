@@ -1,22 +1,22 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SiteFilterForm from './SiteFilterForm';
+import { formRows } from '../dto/SiteFilterConfig';
 
 // Mocking the Form component
 jest.mock('../../../components/form/Form', () => {
   return function MockForm(props) {
     return (
       <div>
-        {props.formRows.map((row, index) => (
+        {props?.formRows?.map((row, index) => (
           <div key={index}>
             {row.map((field) => (
               <input
-                key={field.graphQLPropertyName}
-                data-testid={field.graphQLPropertyName}
-                value={props.formData[field.graphQLPropertyName] || ''}
+                key={field?.graphQLPropertyName}
+                data-testid={field?.graphQLPropertyName}
+                value={props.formData[field?.graphQLPropertyName] || ''}
                 onChange={(e) =>
                   props.handleInputChange(
-                    field.graphQLPropertyName,
+                    field?.graphQLPropertyName,
                     e.target.value,
                   )
                 }
@@ -75,6 +75,7 @@ describe('SiteFilterForm', () => {
   it('calls onInputChange when an input value changes', () => {
     render(
       <SiteFilterForm
+        formRows={formRows}
         formData={formData}
         onInputChange={mockOnInputChange}
         onSubmit={mockOnSubmit}

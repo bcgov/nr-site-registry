@@ -4,8 +4,8 @@ import { ChangeAuditType } from './changeAuditEntity.dto';
 @InputType({ isAbstract: true })
 @ObjectType({ isAbstract: true })
 export class SiteBaseDto extends ChangeAuditType {
-  @Field()
-  id: string;
+  @Field({ nullable: true })
+  id?: string | null;
 
   @Field({ nullable: true })
   bcerCode: string;
@@ -69,12 +69,6 @@ export class SiteBaseDto extends ChangeAuditType {
 
   @Field({ nullable: true })
   whenUpdated?: Date;
-
-  @Field({ nullable: true })
-  rwmFlag: number;
-
-  @Field({ nullable: true })
-  rwmGeneralDescFlag: number;
 
   @Field({ nullable: true })
   consultantSubmitted?: string;

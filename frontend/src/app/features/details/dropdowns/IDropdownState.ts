@@ -8,6 +8,9 @@ interface IDropdowns {
   notationType: [];
   ministryContact: [];
   internalUserList: [];
+  siteRiskCode: [];
+  bceRegionCode?: [];
+  siteStatusCode?: [];
 }
 
 export interface IDropdownsState {

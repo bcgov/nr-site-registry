@@ -288,7 +288,7 @@ export class ParcelDescriptionsService {
           crownLandsFileNo: crownLandsFileNo,
           dateNoted: parcelDescription.dateNoted,
           srAction: parcelDescription.srAction,
-          userAction: parcelDescription.userAction,
+          userAction: UserActionEnum.ADDED,
           whoUpdated: userInfo?.givenName,
           whenUpdated: now,
           whoCreated: userInfo?.givenName,
@@ -331,7 +331,7 @@ export class ParcelDescriptionsService {
           subdivId: newSubdivision.id,
           dateNoted: newSubdivision.dateNoted,
           userAction: newSubdivision.userAction,
-          srAction: newSubdivision.userAction,
+          srAction: newSubdivision.srAction,
           whoUpdated: newSubdivision.whoUpdated,
           whenUpdated: newSubdivision.whenUpdated,
           whoCreated: newSubdivision.whoCreated,
@@ -431,7 +431,7 @@ export class ParcelDescriptionsService {
           : null;
       subdivision.dateNoted = parcelDescription.dateNoted;
       subdivision.srAction = parcelDescription.srAction;
-      subdivision.userAction = parcelDescription.userAction;
+      subdivision.userAction = parcelDescription.srAction === SRApprovalStatusEnum.PUBLIC || parcelDescription.srAction === SRApprovalStatusEnum.PRIVATE ? UserActionEnum.DEFAULT : UserActionEnum.UPDATED;
       subdivision.whoUpdated = userInfo?.givenName;
       subdivision.whenUpdated = now;
       // Note: the user is never able to update the subdivision's legal/land

@@ -41,11 +41,7 @@ export const formRowsMap: { [key: string]: IFormField } = {
     label: 'Site Risk Code',
     placeholder: 'Select Code',
     graphQLPropertyName: 'siteRiskCode',
-    options: [
-      { key: 'HR', value: 'High-Risk' },
-      { key: 'NHR', value: 'Non High-Risk' },
-      { key: 'UNC', value: 'Unclassified' },
-    ],
+    options: [],
     value: '',
     colSize: 'col-lg-4 col-md-6 col-sm-12',
   },
@@ -223,10 +219,14 @@ export const formRows: IFormField[][] = [
   [
     formRowsMap['id'],
     formRowsMap['srStatus'],
-    formRowsMap['commonName'],
+    formRowsMap['latlongReliabilityFlag'],
+  ],
+  [
     formRowsMap['siteRiskCode'],
     formRowsMap['addrLine_1'],
-    formRowsMap['latlongReliabilityFlag'],
+    formRowsMap['commonName'],
+  ],
+  [
     formRowsMap['latdeg'],
     {
       type: FormFieldType.Group,
@@ -240,6 +240,8 @@ export const formRows: IFormField[][] = [
       ],
     },
     formRowsMap['whenCreated'],
+  ],
+  [
     formRowsMap['longdeg'],
     {
       type: FormFieldType.Group,

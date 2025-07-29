@@ -40,11 +40,10 @@ const roleBasedRoutes: any = {
     { path: '/', element: <Search /> },
     { path: '/dashboard', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
+    { path: '/dashboard/site/create', element: <SiteDetails /> },
     { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/dashboard/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
-    { path: '/folios', element: <Folios /> },
-    { path: '/folios/:id', element: <FolioContents /> },
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
     { path: '/review', element: <SRUpdatesTables /> },
@@ -57,6 +56,8 @@ const roleBasedRoutes: any = {
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
     { path: '/review', element: <SRUpdatesTables /> },
+    { path: '/dashboard', element: <Dashboard /> },
+    { path: '/dashboard/site/create', element: <SiteDetails /> },
   ],
   public: [
     { path: '/', element: <Search /> },
@@ -66,7 +67,6 @@ const roleBasedRoutes: any = {
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
     { path: '/site/cart', element: <Cart /> },
-    { path: '/folios/:id', element: <FolioContents /> },
   ],
 };
 
@@ -87,7 +87,7 @@ const createRoutesForRole = (role: string) => [
   },
 ];
 
-const userType = getLoggedInUserType();
-const siteRouter = createBrowserRouter(createRoutesForRole(userType));
-
+const siteRouter = (userType: string) => {
+  return createBrowserRouter(createRoutesForRole(userType));
+};
 export default siteRouter;

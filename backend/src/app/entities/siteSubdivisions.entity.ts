@@ -1,5 +1,12 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Sites } from './sites.entity';
 import { Subdivisions } from './subdivisions.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
@@ -16,6 +23,10 @@ import { ChangeAuditEntity } from './changeAuditEntity';
 @Index('sitesub_comprised_of_frgn', ['subdivId'], {})
 @Entity('site_subdivisions')
 export class SiteSubdivisions extends ChangeAuditEntity {
+  @Field()
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'site_subdiv_id' })
+  siteSubdivId: string;
+
   @Field()
   @Column('bigint', { name: 'site_id' })
   siteId: string;
@@ -61,10 +72,6 @@ export class SiteSubdivisions extends ChangeAuditEntity {
     nullable: true,
   })
   sprofDateCompleted: Date | null;
-
-  @Field()
-  @Column('bigint', { primary: true, name: 'site_subdiv_id' })
-  siteSubdivId: string;
 
   @Field()
   @Column('character varying', { name: 'send_to_sr', length: 1 })

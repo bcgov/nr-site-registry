@@ -6,14 +6,16 @@ interface PanelWithUpDownProps {
   label?: string;
   firstChild?: ReactNode;
   secondChild?: ReactNode; // Define children prop
+  isDefaultOpen?: boolean; // Optional prop to control initial visibility
 }
 
 const PanelWithUpDown: FC<PanelWithUpDownProps> = ({
   label,
   firstChild,
   secondChild,
+  isDefaultOpen,
 }) => {
-  const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(isDefaultOpen || false);
   return (
     <div
       className={`d-flex flex-column mb-3 section-container me-2`}

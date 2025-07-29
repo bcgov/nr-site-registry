@@ -1,10 +1,10 @@
-import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Dashboard from './Dashboard';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
+import { MemoryRouter } from 'react-router-dom';
 
 const mockStore = configureStore([thunk]);
 
@@ -34,7 +34,9 @@ describe('Dashboard Component', () => {
   it('renders Recently Viewed table', () => {
     const { getByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <MemoryRouter>
+          <Dashboard />
+        </MemoryRouter>
       </Provider>,
     );
     expect(getByText('Recently Viewed')).toBeInTheDocument();

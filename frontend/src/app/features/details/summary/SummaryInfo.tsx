@@ -1,15 +1,17 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React from 'react';
 import PanelWithUpDown from '../../../components/simple/PanelWithUpDown';
 // @ts-ignore
-import SummaryForm from '../SummaryForm';
+import SummaryForm from './SummaryForm';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
-import { MapContainer, useMap } from 'react-leaflet';
+import { MapContainer } from 'react-leaflet';
 import { TileLayer } from 'react-leaflet';
 import { SiteMarker } from '../../map/siteMarkers/SiteMarker';
-import './Summary.css';
 import 'leaflet/dist/leaflet.css';
+import { IFormField } from '../../../components/input-controls/IFormField';
 
 export interface ISummaryInfo {
+  siteId?: string;
+  summaryFormRows: IFormField[][];
   siteData: any;
   edit: boolean;
   srMode: boolean;
@@ -19,6 +21,8 @@ export interface ISummaryInfo {
 }
 
 const SummaryInfo: React.FC<ISummaryInfo> = ({
+  summaryFormRows,
+  siteId,
   siteData,
   edit,
   srMode,
@@ -33,40 +37,44 @@ const SummaryInfo: React.FC<ISummaryInfo> = ({
   return (
     <PanelWithUpDown
       label="Location Details"
+      isDefaultOpen={true}
       secondChild={
         <div className="row w-100">
-          <div className="col-12 col-lg-6">
-            <MapContainer
-              center={{
-                lat: siteData.latdeg,
-                lng: siteData.longdeg,
-              }}
-              zoom={14}
-              zoomControl={false}
-              className="map-container"
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <SiteMarker
-                position={{
-                  lat: siteData.latdeg,
-                  lng: siteData.longdeg,
+          {siteData && !!siteId?.trim() && (
+            <div className="col-lg-6 col-md-6 col-sm-12">
+              <MapContainer
+                center={{
+                  lat: siteData?.latdeg,
+                  lng: siteData?.longdeg,
                 }}
-              />
-            </MapContainer>
-          </div>
+                zoom={14}
+                zoomControl={false}
+                className="map-container"
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <SiteMarker
+                  position={{
+                    lat: siteData?.latdeg,
+                    lng: siteData?.longdeg,
+                  }}
+                />
+              </MapContainer>
+            </div>
+          )}
 
-          <div className="col-12 col-lg-6">
-            {siteData != null && (
-              <SummaryForm
-                sitesDetails={siteData}
-                edit={edit}
-                srMode={srMode}
-                changeHandler={handleInputChange}
-              />
-            )}
+          <div
+            className={`${!!siteId?.trim() ? 'col-lg-6 col-md-6 col-sm-12' : 'col-12'}`}
+          >
+            <SummaryForm
+              formRows={summaryFormRows}
+              sitesDetails={siteData ?? {}}
+              edit={edit}
+              srMode={srMode}
+              changeHandler={handleInputChange}
+            />
           </div>
           {showApproveRejectSection && (
             <ApproveRejectButtons approveRejectHandler={approveRejectHandler} />

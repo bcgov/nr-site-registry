@@ -108,6 +108,21 @@ describe('Site Registry Review Tab', () => {
             getPeopleOrgsCd: [],
           },
           ministryContact: { getPeopleOrgsCd: [] },
+          siteRiskCode: {
+            getSiteRiskCd: {
+              data: [{ key: 'LOW', value: 'Low' }],
+            },
+          },
+          bceRegionCode: {
+            getBCeRegionCd: {
+              data: [{ key: '1', value: 'Region 1' }],
+            },
+          },
+          siteStatusCode: {
+            getSiteStatusCd: {
+              data: [{ key: 'ACTIVE', value: 'Active' }],
+            },
+          },
         },
       },
     });

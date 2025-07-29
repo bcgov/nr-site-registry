@@ -54,8 +54,8 @@ export class LandHistoryService {
       if (showPending) {
         query.andWhere(
           new Brackets((qb) => {
-            qb.where('landHistory.user_action = :status', {
-              status: `${UserActionEnum.UPDATED}`,
+            qb.where('landHistory.sr_action = :status', {
+              status: `${SRApprovalStatusEnum.PENDING}`,
             });
           }),
         );
@@ -74,6 +74,12 @@ export class LandHistoryService {
       this.sitesLogger.debug(
         'LandHistoryService.getLandHistoriesForSite() end',
       );
+
+      if(!result.length)
+      {
+        return [];
+      }
+
       return result;
     } catch (error) {
       this.sitesLogger.error(

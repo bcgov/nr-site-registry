@@ -6,6 +6,7 @@ import thunk from 'redux-thunk';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { UserType } from '../../../helpers/requests/userType';
 import { GetDocumentsConfig } from './DocumentsConfig';
+import { useParams } from 'react-router-dom';
 
 const mockDocuments = [
   {
@@ -36,6 +37,10 @@ const mockDocuments = [
     displayName: 'Y.B. HOLDINGS LTD. (KAMLOOPS, B.C.)',
   },
 ];
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useParams: jest.fn(),
+}));
 
 // Mocking the useSelector hook with the correct state structure
 jest.mock('react-redux', () => {
@@ -299,6 +304,8 @@ describe('Documents component', () => {
   let dispatch;
   beforeEach(() => {
     dispatch = jest.fn(); // Create a mock dispatch function
+    
+    useParams.mockReturnValue({ id: '1550' });
 
     store = mockStore({
       documents: {
@@ -532,7 +539,8 @@ describe('Documents component', () => {
     useSelector.mockImplementation((callback) => {
       return callback({
         sites: {
-          siteDetailsMode: SiteDetailsMode.ViewOnlyMode,
+          id: '1550',
+          siteDetailsMode: SiteDetailsMode.EditMode,
           userType: UserType.Internal,
           resetSiteDetails: false,
         },
@@ -543,12 +551,14 @@ describe('Documents component', () => {
         },
         siteDetails: {
           saveRequestStatus: 'success',
+          siteId: '1550',
         },
       });
     });
 
     useDispatch.mockReturnValue(dispatch); // Return the mock dispatch function
   });
+
 
   afterEach(() => {
     jest.clearAllMocks();

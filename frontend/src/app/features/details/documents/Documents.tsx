@@ -54,6 +54,7 @@ import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { Button } from '../../../components/button/Button';
 import { createBucket, getObject } from './DocumentEndpoints';
+import { Alert } from 'react-bootstrap';
 
 const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   const {
@@ -699,6 +700,12 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
       dispatch(trackChanges(tracker.toPlainObject()));
     }
   };
+
+  if(!id?.trim()) {
+    return <Alert variant="warning" data-testid="no-site">
+      Please create a site before adding documents. Once the site is created, you can add documents to it.
+    </Alert>;
+  }
 
   return (
     <div className="px-2">

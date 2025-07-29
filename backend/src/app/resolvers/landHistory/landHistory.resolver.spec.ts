@@ -99,7 +99,7 @@ describe('LandHistoryResolver', () => {
         message: `Land uses data not found for site id: ${siteId}`,
         httpStatusCode: 404,
         success: false,
-        data: null,
+        data: [],
       };
 
       const showPending = false;
@@ -120,7 +120,7 @@ describe('LandHistoryResolver', () => {
         `Land uses data not found for site id: ${siteId}`,
         404,
         false,
-        null,
+        [],
       );
     });
   });

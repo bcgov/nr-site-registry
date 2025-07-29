@@ -69,7 +69,7 @@ export class LandHistoryResolver {
         `Land uses data not found for site id: ${siteId}`,
         HttpStatus.NOT_FOUND,
         false,
-        null,
+        [],
       );
     }
   }

@@ -343,7 +343,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   };
 
   const sortItems = (sortBy: any, data: any) => {
-    let sorted = [...data];
+    let sorted = !data?.length ? [] : [...data];
     switch (sortBy) {
       case 'newToOld':
         sorted.sort(
@@ -701,9 +701,16 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
     }
   };
 
-  if(!id?.trim()) {
-    return <Alert variant="warning" data-testid="no-site">
-      Please create a site before adding documents. Once the site is created, you can add documents to it.
+  if(!id?.trim() || (!formData?.length && viewMode === SiteDetailsMode.ViewOnlyMode)) {
+    const hasDocuments = !formData?.length && viewMode === SiteDetailsMode.ViewOnlyMode
+    return <Alert variant={hasDocuments ? "info" : "warning"} data-testid="no-site">
+     { 
+      hasDocuments
+      ? 
+      'No documents found for this site. Please add documents to it.'
+      :
+      'Please create a site before adding documents. Once the site is created, you can add documents to it.'
+    }
     </Alert>;
   }
 

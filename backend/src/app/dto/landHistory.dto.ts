@@ -6,8 +6,8 @@ import { Sites } from '../entities/sites.entity';
 
 @ObjectType()
 export class LandHistoryResponse extends ResponseDto {
-  @Field(() => [LandHistoriesDTO], { defaultValue: [] })
-  data: LandHistoriesDTO[];
+  @Field(() => [LandHistoriesDTO], { nullable: true })
+  data: LandHistoriesDTO[] | null;
 }
 
 @ObjectType()

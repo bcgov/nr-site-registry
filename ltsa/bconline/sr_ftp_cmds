@@ -1,0 +1,22 @@
+open bcsc01.gov.bc.ca
+user pa90248 #{bconline_ftp_password}
+cd ..
+cd olsrp.transfer
+ascii
+put srsites.lis  site
+put srevents.lis evnt
+put srevpart.lis epart
+put srsitpar.lis part
+put srparrol.lis prole
+put srsitdoc.lis docm
+put srdocpar.lis dpart
+put srassocs.lis assoc
+put srlands.lis  hist
+put srpinpid.lis rlat
+put srprofil.lis qprof
+put srprfuse.lis quse
+put srprfcat.lis qcat
+put srprfque.lis qdesc
+put srprfans.lis qansw
+put srdate.lis   date
+quit

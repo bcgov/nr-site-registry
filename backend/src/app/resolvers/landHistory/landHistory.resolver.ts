@@ -51,6 +51,7 @@ export class LandHistoryResolver {
       sortDirection,
       showPending,
     );
+    this.sitesLogger.log( `LandHistoryResolver.getLandHistoriesForSite() result: ${JSON.stringify(result)}`);
     if (result?.length > 0) {
       this.sitesLogger.log(
         'LandHistoryResolver.getLandHistoriesForSite() RES:200 end',
@@ -63,14 +64,24 @@ export class LandHistoryResolver {
       );
     } else {
       this.sitesLogger.log(
-        'LandHistoryResolver.getLandHistoriesForSite() RES:404 end',
+        `Land uses not found for site id ${siteId} with search term ${searchTerm} and sort direction ${sortDirection}`,
       );
-      return this.genericResponseProvider.createResponse(
+      
+      const response = this.genericResponseProvider.createResponse(
         `Land uses data not found for site id: ${siteId}`,
         HttpStatus.NOT_FOUND,
         false,
         [],
       );
+      
+      this.sitesLogger.log(
+        'LandHistoryResolver.getLandHistoriesForSite() response: ' +
+        JSON.stringify(response),
+      );
+      this.sitesLogger.log(
+        'LandHistoryResolver.getLandHistoriesForSite() RES:404 end',
+      );
+      return response;
     }
   }
 }

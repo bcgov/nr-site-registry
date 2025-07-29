@@ -6,6 +6,7 @@ import { LandHistoryResponse } from '../../dto/landHistory.dto';
 import { LandHistoryService } from '../../services/landHistory/landHistory.service';
 import { LoggerService } from '../../logger/logger.service';
 import { HttpStatus } from '@nestjs/common';
+import { CustomRoles } from '../../common/role';
 type SortDirection = 'ASC' | 'DESC';
 
 @Resolver(() => LandHistories)
@@ -18,7 +19,14 @@ export class LandHistoryResolver {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+      roles: [
+        CustomRoles.External,
+        CustomRoles.Internal,
+        CustomRoles.SiteRegistrar,
+      ],
+      mode: RoleMatchingMode.ANY,
+  })
   @Query(() => LandHistoryResponse, { name: 'getLandHistoriesForSite' })
   async getLandHistoriesForSite(
     @Args('siteId', { type: () => String })

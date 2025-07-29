@@ -6,6 +6,7 @@ import { LandUseCodeService } from '../../services/landUseCode/landUseCode.servi
 import { LandUseCodeResponse } from '../../dto/landUseCodeResponse.dto';
 import { LoggerService } from '../../logger/logger.service';
 import { HttpStatus } from '@nestjs/common';
+import { CustomRoles } from 'src/app/common/role';
 
 @Resolver(() => LandUseCd)
 export class LandUseCodeResolver {
@@ -17,7 +18,14 @@ export class LandUseCodeResolver {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  @Roles({ roles: ['site-admin'], mode: RoleMatchingMode.ANY })
+  @Roles({
+      roles: [
+        CustomRoles.External,
+        CustomRoles.Internal,
+        CustomRoles.SiteRegistrar,
+      ],
+      mode: RoleMatchingMode.ANY,
+    })
   @Query(() => LandUseCodeResponse, { name: 'getLandUseCodes' })
   async getLandUseCodes() {
     this.sitesLogger.log('LandUseCodeResolver.getLandUseCodes() start ');

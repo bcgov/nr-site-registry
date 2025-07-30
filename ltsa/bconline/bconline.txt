@@ -1,0 +1,267 @@
+----------------------------------------------------------------------------------
+BCOnline Data Formats
+Prepared 1996 January 12 by Dan MacDonald LGS Group Inc.
+Revised  1996 April 03   by Dan MacDonald
+----------------------------------------------------------------------------------
+
+SRDATE.LIS
+----------
+column downloaddate             format a10;
+
+
+SRSITES.LIS Site Detail/Tombstone Information
+---------------------------------------------
+column siteId                   format a10;
+column region                   format a40;
+column status                   format a40;     'PENDING' or valid status
+column commonName               format a40;
+column address_1                format a50;
+column address_2                format a50;
+column address_3                format a50;
+column address_4                format a50;
+column city                     format a30;
+column provState                format a2;
+column postalCode               format a10;
+column lat                      format a9;
+column latDeg                   format a3;
+column latMin                   format a3;
+column latSec                   format a3;
+column lon                      format a9;
+column lonDeg                   format a3;
+column lonMin                   format a3;
+column lonSec                   format a3;
+column victoriaFileNumber       format a40;
+column regionalFileNumber       format a40;
+column classification           format a40;
+column locationDescription      format a255;
+column registeredDate           format a10;
+column modifiedDate             format a10;
+column detailRemovedDate        format a10;
+
+SREVENTS.LIS Notations
+----------------------
+column siteId                   format a10;
+column eventId                  format a10;
+column eventType                format a80;
+column eventClass               format a80;
+column eventDate                format a10;
+column ministryContact          format a150;
+column noteString               format a255;
+column requiredAction           format a2000;
+
+SREVPART.LIS Notation Participants
+----------------------------------
+column eventId                  format a10;
+column nameString               format a150;
+column roleString               format a40;
+
+SRPINPID.LIS Pin/Pid/Crown Lands
+--------------------------------
+column siteId                   format a10;
+column pin                      format a9;
+column pid                      format a9;
+column crownLandsFileNumber     format a7;
+column legalDescription         format a255;
+column dateNoted                format a10;
+
+SRSITPAR.LIS Site Participants
+------------------------------
+column siteId                   format a10;
+column participantId            format a10;
+column nameString               format a150;
+column effectiveDate            format a10;
+column endDate                  format a10;
+column noteString               format a255;
+column participantType          format a12;
+
+SRPARROL.LIS Site Participant Roles
+-----------------------------------
+column participantId            format a10;
+column roleString               format a40;
+
+SRSITDOC.LIS Documents
+----------------------
+column siteId                   format a10;
+column docId                    format a10;
+column titleString              format a150;
+column submissionDate           format a10;
+column documentDate             format a10;
+column noteString               format a255;
+
+SRDOCPAR.LIS Document Participants
+----------------------------------
+column docId                    format a10;
+column nameString               format a150;
+column roleString               format a40;
+
+SRLANDS.LIS Suspect Land Uses
+-----------------------------
+column siteId                   format a10;
+column landUse                  format a40;
+column noteString               format a255;
+
+SRASSOCS.LIS Associations
+-------------------------
+column siteId                   format a10;
+column associatedSiteId         format a10;
+column effectDate               format a10;
+column noteString               format a255;
+
+--- SITE PROFILE INFORMATION ---
+
+SRPROFIL.LIS Site Profiles
+--------------------------
+column siteId                   format a10;
+column dateCompleted            format a10;
+column ownerParticipantId       format a10;  *always 0
+column contactParticipantId     format a10;  *always 0
+column completorParticipantId   format a10;  *always 0
+column dateLocalAuthority       format a10;
+column dateRegistrar            format a10;
+column dateDecision             format a10;  
+column comments                 format a2000; 
+
+SRPRFUSE.LIS Site Profile Land Use
+----------------------------------
+column siteId                   format a10;
+column dateCompleted            format a10;
+column landUseCode              format a6;
+column landUseString            format a40;
+
+SRPRFANS.LIS Site Profile Answers
+---------------------------------
+column siteId                   format a10;
+column questionId               format a10;
+column dateCompleted            format a10;
+column answer                   format a3;    'YES' and 'NO' <-- *NEW*
+
+SRPRFCAT.LIS Site Profile Categories
+------------------------------------
+column categoryId               format a10;
+column sequenceNumber           format a10;
+column effectiveDate            format a10;
+column expiryDate               format a10;
+column questionType             format a1;
+column categoryDescription      format a200;
+
+SRPRFQUE.LIS Site Profile Questions
+-----------------------------------
+column questionId               format a10;
+column sequenceNumber           format a10;
+column categoryId               format a10;
+column parentQuestionId         format a10;
+column effectiveDate            format a10;
+column expiryDate               format a10;
+column questionDescription      format a200;
+
+
+
+
+<<<Still Under Review>>>
+------------------------
+
+SRMEAPOP.LIS Measurement Populations
+------------------------------------
+column siteId                   format a10;
+column docId                    format a10;
+column populationId             format a10;
+column populationName           format a80;
+column measurementDate          format a10;
+column associatedAecId          format a40;
+
+SRMEASUR.LIS Measurements
+-------------------------
+column populationId             format a10;
+column media                    format a40;
+column contaminant              format a50;
+column numberOfSamples          format a4;
+column lowValue                 format
+column highValue                format
+column 90%Value                 format
+column meanValue                format
+column standardDeviation        format
+
+SRAECASS.LIS AEC Assessments
+----------------------------
+column siteId                   format a10;
+column aecId                    format a10;
+column assessmentDate           format a10;
+column location                 format a255;
+column waterFlow                format a10;
+column monitoringWells          format a1;   'Y' or blank
+column dnapl                    format a1;   'Y' or blank
+column lnapl                    format a1;   'Y' or blank
+column area                     format a8;
+column migrationPotential       format a4;
+
+
+SRSOURCE.LIS AEC Assessment Sources
+-----------------------------------
+column siteId                   format a10;
+column aecId                    format a10;
+column sourceString             format a80;
+
+SRMEDIA.LIS AEC Assessment Medias
+---------------------------------
+column siteId                   format a10;
+column aecId                    format a10;
+column mediaId                  format a10;
+column mediaString              format a40;
+column noteString               format a255;
+
+SRPCOCS.LIS AEC Assessment PCOCs
+--------------------------------
+column siteId                   format a10;
+column aecId                    format a10;
+column mediaId                  format a10;
+column pcocId                   format a10;
+column contaminant              format a50;
+column criteria                 format a100;
+column level                    format a6;
+
+SRREMEDS.LIS AEC Remediation Plans
+----------------------------------
+column siteId                   format a10;
+column planId                   format a10;
+column planDate                 format a10;
+column approach                 format a10;
+column siteUse                  format a40;
+column criteria                 format a100;
+column noteString               format a255;
+
+SRREMITM.LIS AEC Remediation Items
+----------------------------------
+column siteId                   format a10;
+column planId                   format a10;
+column approach                 format a10;
+column contaminant              format a50;
+column activityString           format a80;
+column targetLevel              format
+column units                    format a10;
+column compound                 format a40;
+column riskObjective            format a40;
+column riskAssessmentActivity   format a80;
+column riskCalculated           format
+column riskRemediated           format
+column hazardObjective          format a40;
+column hazardCalculated         format
+column hazardRemediated         format
+column riskAssessmentActivity   format a80;
+
+SRREMMEA.LIS AEC Remediation Measures
+-------------------------------------
+column siteId                   format a10;
+column planId                   format a10;
+column measureString            format a40;
+
+SRAPPROA.LIS AEC Assessment/Remediation Approaches
+--------------------------------------------------
+column siteId                   format a10;
+column planId                   format a10;
+column aecId                    format a10;
+column mediaId                  format a10;
+column pcocId                   format a10;
+column selected                 format a1;   'Y' or blank
+
+
+

@@ -1,0 +1,41 @@
+set termout off;
+
+rem -------------------------------------------------------------------
+rem SRSITDOC.SQL
+rem
+rem This sql*plus script file extracts the SR_SITE_DOCS information
+rem for export to the SR BCOnline system.
+rem
+rem 95.jan.03 ddjm * script created and tested
+rem 95.jan.05 ddjm * record length adjusted; 1st blank line dropped
+rem 95.jan.05 ddjm * id fields need leading zeros
+rem 97.nov.07 emv  * Changed order by clause.
+rem 98.oct.05 js   * included site_doc.notes
+rem -------------------------------------------------------------------
+
+set pagesize   0;
+set linesize 450;
+set embedded  on;
+set feedback off;
+set heading  off;
+
+spool srsitdoc.lis
+
+column siteid                   format a10;
+column docid                    format a10;
+column titlestring              format a150;
+column submissiondate           format a10;
+column documentdate             format a10;
+column notestring               format a255;
+
+select all substr(to_char(site_id,'0999999999'),2,10) siteid,
+           substr(to_char(doc_id,'0999999999'),2,10)  docid,
+           replace(title,chr(10),' ')                 titlestring,
+           to_char(submission_date,'YYYY-MM-DD')      submissiondate,
+           to_char(document_date,'YYYY-MM-DD')        documentdate,
+           replace(substr(note, 1,149),chr(10),' ')   notestring
+   from sr_site_docs
+   order by site_id, document_date desc, submission_date desc, title;
+
+spool off;
+set termout on;

@@ -104,8 +104,10 @@ const Dashboard = () => {
         navigate('site/create');
         break;
       case 'search-site':
+        navigate('/search');
         break;
       case 'view-sites-on-map':
+        navigate('/map');
         break;
       default:
         break;

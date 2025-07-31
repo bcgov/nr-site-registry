@@ -13,7 +13,7 @@ export class MasterScript1751906583595 implements MigrationInterface {
     await queryRunner.query(`
       SELECT setval(
         'sites.site_subdivisions_site_subdiv_id_seq',
-        COALESCE((SELECT MAX(site_subdiv_id) FROM sites.site_subdivisions), 0)
+        COALESCE((SELECT MAX(site_subdiv_id) FROM sites.site_subdivisions), 1)
       );
     `);
   }

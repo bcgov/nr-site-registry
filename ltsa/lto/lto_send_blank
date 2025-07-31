@@ -1,0 +1,7 @@
+open bcsc01.gov.bc.ca
+user pa90248 PASSWORD
+cd 'ealtp.pa90248.parcel'
+ascii
+put lto/desc.blk desc
+put lto/id.blk   id
+quit

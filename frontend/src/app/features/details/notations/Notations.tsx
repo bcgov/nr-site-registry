@@ -61,6 +61,7 @@ import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { IComponentProps } from '../navigation/NavigationPillsConfig';
 import Notation from './Notation';
 import { Button } from '../../../components/button/Button';
+import { Alert } from 'react-bootstrap';
 
 const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   const {
@@ -90,7 +91,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [userType, setUserType] = useState('');
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [formData, setFormData] =
-    useState<{ [key: string]: any | [Date, Date] }[]>(notations);
+    useState<{ [key: string]: any | [Date, Date] }[]>(notations || []);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
@@ -330,7 +331,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     const searchTerm = event.target.value;
     setSearchTerm(searchTerm);
 
-    const filteredData = notations.filter((notation: any) => {
+    const filteredData = notations?.filter((notation: any) => {
       // Check if any property of the notation object contains the searchTerm
       return deepSearch(notation, searchTerm.toLowerCase().trim());
     });
@@ -778,7 +779,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   };
 
   const sortItems = (sortBy: any, data: any) => {
-    let sorted = [...data];
+    let sorted = !data?.length ? [] : [...data];
     switch (sortBy) {
       case 'newToOld':
         sorted.sort(
@@ -1052,6 +1053,11 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     );
   };
 
+  if(!formData?.length && viewMode === SiteDetailsMode.ViewOnlyMode) {
+    return <Alert variant={"info"} className={viewMode === SiteDetailsMode.ViewOnlyMode ? "d-block" : ""} data-testid="no-site">
+      No notations found for this site. Please add notations to it.
+    </Alert>;
+  }
   return (
     <div className="px-2">
       {!showPending && (

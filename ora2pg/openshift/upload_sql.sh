@@ -36,8 +36,7 @@ else
 fi
 
 # Copy optional constraint files (only in production)
-if [[ "$ENV" == "prod" ]]; then
-    echo "Prod enabled, uploading constraint files..."
+echo "Checking and uploading constraint files..."
     if [[ -f "$ENABLE_CONSTRAINT_FILE" ]]; then
         oc cp "$ENABLE_CONSTRAINT_FILE" "$TEMP_POD:/mnt/sql/$ENABLE_CONSTRAINT_FILE"
         echo "Uploaded $ENABLE_CONSTRAINT_FILE"
@@ -46,7 +45,6 @@ if [[ "$ENV" == "prod" ]]; then
     if [[ -f "$DISABLE_CONSTRAINT_FILE" ]]; then
         oc cp "$DISABLE_CONSTRAINT_FILE" "$TEMP_POD:/mnt/sql/$DISABLE_CONSTRAINT_FILE"
         echo "Uploaded $DISABLE_CONSTRAINT_FILE"
-    fi
 fi
 
 # Cleanup pod

@@ -34,12 +34,15 @@ backend:
   enabled: true
   #-- the deployment strategy, can be "Recreate" or "RollingUpdate"
   deploymentStrategy: RollingUpdate
+
+  # Temporarily going for 1 pod max, so that we only run the SEED_DATA import scripts once, instead of twice concurrently.
+  replicaCount: 1
   #-- autoscaling for the component. it is optional and is an object.
   autoscaling:
     #-- enable or disable autoscaling.
     enabled: true
     #-- the minimum number of replicas.
-    minReplicas: 2
+    minReplicas: 1 # TODO - experimenting if this is causing initContainer issue with duplicate loading leading to locks for db rows.
     #-- the maximum number of replicas.
     maxReplicas: 3
     #-- the target cpu utilization percentage, is from request cpu and NOT LIMIT CPU.

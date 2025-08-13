@@ -4,7 +4,7 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
     dataVolumeClaimSpec:
       storage: 800Mi
       storageClassName: netapp-block-standard
-      walStorage: 700Mi
+      walStorage: 850Mi
   clone:
     enabled: false # enable it when the cluster needs to be cloned.
     s3:

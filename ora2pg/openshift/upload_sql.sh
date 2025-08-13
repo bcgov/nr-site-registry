@@ -50,6 +50,6 @@ fi
 
 # Cleanup pod
 echo "Cleaning up..."
-# oc delete pod "$TEMP_POD" --wait=true
+oc delete pod "$TEMP_POD" --wait=true
 
 echo "Done! SQL files are now available."

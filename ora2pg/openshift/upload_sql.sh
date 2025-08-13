@@ -6,10 +6,11 @@ set -e  # Exit immediately if a command exits with a non-zero status
 TEMP_POD="temp-pod"
 PVC_FILE="pvc.yaml"
 POD_FILE="temp-pod.yaml"
-NAMESPACE="SET THIS" # Intentionally wrong so you must set it.
+NAMESPACE="c6a6e5-test" # Intentionally wrong so you must set it.
 # SQL_FILE="data_migration.sql"
 # SQL_FILE="output-prod-17march.sql"
-SQL_FILE="output-prod-25march.sql"
+# SQL_FILE="output-prod-25march.sql"
+SQL_FILE="site-prod-7Aug.sql"
 # Contstraints files only exist in prod, not everywhere.
 ENABLE_CONSTRAINT_FILE="enable_constraints.sql"
 DISABLE_CONSTRAINT_FILE="disable_constraints.sql"
@@ -37,18 +38,18 @@ fi
 
 # Copy optional constraint files (only in production)
 echo "Checking and uploading constraint files..."
-    if [[ -f "$ENABLE_CONSTRAINT_FILE" ]]; then
-        oc cp "$ENABLE_CONSTRAINT_FILE" "$TEMP_POD:/mnt/sql/$ENABLE_CONSTRAINT_FILE"
-        echo "Uploaded $ENABLE_CONSTRAINT_FILE"
-    fi
+if [[ -f "$ENABLE_CONSTRAINT_FILE" ]]; then
+    oc cp "$ENABLE_CONSTRAINT_FILE" "$TEMP_POD:/mnt/sql/$ENABLE_CONSTRAINT_FILE"
+    echo "Uploaded $ENABLE_CONSTRAINT_FILE"
+fi
 
-    if [[ -f "$DISABLE_CONSTRAINT_FILE" ]]; then
-        oc cp "$DISABLE_CONSTRAINT_FILE" "$TEMP_POD:/mnt/sql/$DISABLE_CONSTRAINT_FILE"
-        echo "Uploaded $DISABLE_CONSTRAINT_FILE"
+if [[ -f "$DISABLE_CONSTRAINT_FILE" ]]; then
+    oc cp "$DISABLE_CONSTRAINT_FILE" "$TEMP_POD:/mnt/sql/$DISABLE_CONSTRAINT_FILE"
+    echo "Uploaded $DISABLE_CONSTRAINT_FILE"
 fi
 
 # Cleanup pod
 echo "Cleaning up..."
-oc delete pod "$TEMP_POD" --wait=true
+# oc delete pod "$TEMP_POD" --wait=true
 
 echo "Done! SQL files are now available."

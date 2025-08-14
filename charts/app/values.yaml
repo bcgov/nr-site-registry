@@ -36,11 +36,14 @@ backend:
   deploymentStrategy: RollingUpdate
 
   # Temporarily going for 1 pod max, so that we only run the SEED_DATA import scripts once, instead of twice concurrently.
-  # replicaCount: 1
+  # Looks like we might need to fix initContainers running for multiple pods. Scaling up works as it only happens once.
+  # Otherwise initial deploy looks like it needs to just be 1 pods.
+  replicaCount: 1
   #-- autoscaling for the component. it is optional and is an object.
   autoscaling:
     #-- enable or disable autoscaling.
-    enabled: true
+    # enabled: true
+    enabled: false # Temporarily disabled for initial deploy with seed data.
     #-- the minimum number of replicas.
     minReplicas: 2
     #-- the maximum number of replicas.

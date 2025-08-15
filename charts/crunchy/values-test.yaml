@@ -2,9 +2,9 @@
 crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single postgres
   instances:
     dataVolumeClaimSpec:
-      storage: 800Mi
+      storage: 2Gi
       storageClassName: netapp-block-standard
-      walStorage: 700Mi
+      walStorage: 2Gi
   clone:
     enabled: false # enable it when the cluster needs to be cloned.
     s3:

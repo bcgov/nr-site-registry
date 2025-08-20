@@ -181,7 +181,6 @@ export class LTSAService {
         .filter((line) => line.trim().length > 0);
       const ltoDownloadRecords: LtoDownload[] = [];
       let recordsProcessed = 0;
-      let recordsCleaned = 0;
 
       for (const line of lines) {
         recordsProcessed++;
@@ -255,25 +254,14 @@ export class LTSAService {
               .trim() || null;
         }
 
-        // Clean all string fields to remove null bytes and other problematic characters
-        const cleanString = (str: string | null): string | null => {
-          if (!str) return null;
-          const cleaned =
-            str.replace(CLEANING_PATTERNS.INVALID_CHARS, '').trim() || null;
-          if (cleaned !== str.trim() && str.trim() !== '') {
-            recordsCleaned++;
-          }
-          return cleaned;
-        };
-
         // Create LtoDownload entity with cleaned data
         const ltoDownloadRecord = this.ltoDownloadRepository.create({
-          pid: cleanString(pid),
-          pidStatusCd: cleanString(pidStatusCd),
-          legalDescription: cleanString(legalDescription),
-          childPid: cleanString(childPid),
-          childPidStatusCd: cleanString(childPidStatusCd),
-          childLegalDescription: cleanString(childLegalDescription),
+          pid: this.cleanString(pid),
+          pidStatusCd: this.cleanString(pidStatusCd),
+          legalDescription: this.cleanString(legalDescription),
+          childPid: this.cleanString(childPid),
+          childPidStatusCd: this.cleanString(childPidStatusCd),
+          childLegalDescription: this.cleanString(childLegalDescription),
         });
 
         ltoDownloadRecords.push(ltoDownloadRecord);
@@ -316,7 +304,7 @@ export class LTSAService {
       }
 
       this.sitesLogger.log(
-        `LTSAService.loadLtoData() completed - processed ${recordsProcessed} lines, loaded ${totalSavedRecords} records, cleaned ${recordsCleaned} fields`,
+        `LTSAService.loadLtoData() completed - processed ${recordsProcessed} lines, loaded ${totalSavedRecords} records`,
       );
 
       return {
@@ -685,5 +673,17 @@ export class LTSAService {
   private calculateValidPid(status: string): string | null {
     // Equivalent to: decode(status,'X',null,'E',null,'Y')
     return ['X', 'E'].includes(status) ? null : 'Y';
+  }
+
+  /**
+   * Clean string fields to remove null bytes and other problematic characters
+   * @param str - String to clean
+   * @returns Cleaned string or null if empty
+   */
+  private cleanString(str: string | null): string | null {
+    if (!str) return null;
+    const cleaned =
+      str.replace(CLEANING_PATTERNS.INVALID_CHARS, '').trim() || null;
+    return cleaned;
   }
 }

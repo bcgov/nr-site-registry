@@ -11,12 +11,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { AuthenticatedUser } from 'nest-keycloak-connect';
 import { LTSAService } from '../services/ltsa/ltsa.service';
+import { LoggerService } from '../logger/logger.service';
 
 @Controller('ltsa')
 export class LTSAController {
   constructor(
     private readonly configService: ConfigService,
     private readonly ltsaService: LTSAService,
+    private readonly logger: LoggerService,
   ) {}
 
   @Get('dump')
@@ -68,28 +70,26 @@ export class LTSAController {
       const lines = fileContent.split('\n');
       const first50Lines = lines.slice(0, 50).join('\n');
 
-      console.log('=== LTO Data File Content (First 50 lines) ===');
-      console.log(first50Lines);
-      console.log(
+      this.logger.log('=== LTO Data File Content (First 50 lines) ===');
+      this.logger.log(first50Lines);
+      this.logger.log(
         `=== End of LTO Data File Content (Showing 50 of ${lines.length - 1} lines) ===`,
       );
 
       // Stage 1: Perform lto_clean.sql operations
-      console.log('=== Starting LTO table cleaning operations ===');
+      this.logger.log('=== Starting LTO table cleaning operations ===');
       await this.ltsaService.cleanLtoTables();
-      console.log('=== LTO table cleaning completed ===');
+      this.logger.log('=== LTO table cleaning completed ===');
 
       // Stage 2: Load LTO data according to lto_load.ctl logic
-      console.log('=== Starting LTO data loading ===');
+      this.logger.log('=== Starting LTO table loading operations ===');
       const loadResult = await this.ltsaService.loadLtoData(fileContent);
-      console.log(
-        `=== LTO data loading completed: ${loadResult.recordsLoaded} records loaded from ${loadResult.recordsProcessed} processed ===`,
-      );
+      this.logger.log('=== LTO table loading completed ===');
 
       // Stage 3: Merge LTO descriptions (process changed records)
-      console.log('=== Starting LTO merge operations ===');
+      this.logger.log('=== Starting LTO merge operations ===');
       const mergeResult = await this.ltsaService.mergeLtoDescriptions();
-      console.log(
+      this.logger.log(
         `=== LTO merge completed: ${mergeResult.recordsProcessed} records processed, ` +
           `${mergeResult.subdivisionUpdates} subdivision updates, ${mergeResult.subdivisionInserts} subdivision inserts, ` +
           `${mergeResult.siteSubdivisionInserts} site subdivision inserts ===`,

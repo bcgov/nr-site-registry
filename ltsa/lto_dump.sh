@@ -68,14 +68,89 @@ fi
 
 print "\nCalling API endpoint..."
 
-API_RESPONSE=$(curl -s -X GET \
-  "${API_URL}/ltsa/dump?type=${TYPE}" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-  -H "Content-Type: application/json")
+# Retry configuration
+MAX_RETRIES=5
+RETRY_COUNT=0
+BASE_DELAY=1
 
-# Check if API request was successful
-if [[ $? -ne 0 ]]; then
-    print "Failed to make API request"
+# Function to make API request with retry logic
+get_api_data_with_retry() {
+    while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        
+        if [[ $RETRY_COUNT -gt 1 ]]; then
+            # Calculate exponential backoff delay
+            case $RETRY_COUNT in
+                2) DELAY=$((BASE_DELAY * 1)) ;;  # 1s
+                3) DELAY=$((BASE_DELAY * 2)) ;;  # 2s
+                4) DELAY=$((BASE_DELAY * 4)) ;;  # 4s
+                5) DELAY=$((BASE_DELAY * 8)) ;;  # 8s
+                *) DELAY=$((BASE_DELAY * 8)) ;;  # fallback to max delay
+            esac
+            print "Retry attempt $RETRY_COUNT/$MAX_RETRIES after ${DELAY}s delay..."
+            sleep $DELAY
+        else
+            print "Making initial API request (attempt $RETRY_COUNT/$MAX_RETRIES)..."
+        fi
+
+        # Make API request
+        API_RESPONSE=$(curl -s -X GET \
+          "${API_URL}/ltsa/dump?type=${TYPE}" \
+          -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+          -H "Content-Type: application/json" \
+          --connect-timeout 10 \
+          --max-time 60)
+
+        # Check if curl command was successful
+        CURL_EXIT_CODE=$?
+        if [[ $CURL_EXIT_CODE -ne 0 ]]; then
+            print "HTTP request failed with curl exit code: $CURL_EXIT_CODE"
+            if [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; then
+                print "Will retry..."
+                continue
+            else
+                print "All retry attempts exhausted. Final failure."
+                return 1
+            fi
+        fi
+
+        # Check if we got a valid JSON response with status success
+        STATUS=$(print "$API_RESPONSE" | jq -r '.status' 2>/dev/null)
+        
+        if [[ "$STATUS" == "success" ]]; then
+            # Verify we have data array
+            DATA_COUNT=$(print "$API_RESPONSE" | jq -r '.count' 2>/dev/null)
+            if [[ "$DATA_COUNT" != "null" ]] && [[ -n "$DATA_COUNT" ]]; then
+                print "Successfully retrieved $DATA_COUNT records on attempt $RETRY_COUNT"
+                return 0
+            else
+                print "Invalid response: missing or null data count"
+                print "Response: $API_RESPONSE"
+                if [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; then
+                    print "Will retry..."
+                    continue
+                else
+                    print "All retry attempts exhausted. Final failure."
+                    return 1
+                fi
+            fi
+        else
+            print "API returned error status: $STATUS"
+            print "Response: $API_RESPONSE"
+            if [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; then
+                print "Will retry..."
+                continue
+            else
+                print "All retry attempts exhausted. Final failure."
+                return 1
+            fi
+        fi
+    done
+}
+
+# Call the retry function
+if ! get_api_data_with_retry; then
+    print "Failed to get API data after $MAX_RETRIES attempts"
     exit 1
 fi
 

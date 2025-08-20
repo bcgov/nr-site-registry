@@ -521,7 +521,7 @@ export class LTSAService {
     } catch (error) {
       // If we get a duplicate key error, it might be a race condition
       // Try to find the record again and update it
-      if (error.code === DB_ERROR_CODES.POSTGRESQL_UNIQUE_VIOLATION) {
+      if (error?.code === DB_ERROR_CODES.POSTGRESQL_UNIQUE_VIOLATION) {
         // PostgreSQL unique violation error code
         this.sitesLogger.log(
           `Subdivision PID ${pid} already exists, updating instead`,

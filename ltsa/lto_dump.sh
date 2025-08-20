@@ -50,7 +50,7 @@ if [[ "$TYPE" != "1" ]] && [[ "$TYPE" != "2" ]]; then
 fi
 
 # Get the directory where this script is located
-SCRIPT_DIR=$(dirname $0)
+SCRIPT_DIR=$(dirname "$0")
 
 print "API URL: $API_URL"
 print "Type: $TYPE"

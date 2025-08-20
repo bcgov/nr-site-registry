@@ -39,6 +39,11 @@ const DB_CONSTANTS = {
   CHUNK_SIZE: 1000, // Maximum records to process in a single database operation
 } as const;
 
+// Database error codes
+const DB_ERROR_CODES = {
+  POSTGRESQL_UNIQUE_VIOLATION: '23505', // PostgreSQL unique constraint violation
+} as const;
+
 // Character cleaning constants
 const CLEANING_PATTERNS = {
   // Remove null bytes and control characters except newlines and tabs
@@ -516,7 +521,7 @@ export class LTSAService {
     } catch (error) {
       // If we get a duplicate key error, it might be a race condition
       // Try to find the record again and update it
-      if (error.code === '23505') {
+      if (error.code === DB_ERROR_CODES.POSTGRESQL_UNIQUE_VIOLATION) {
         // PostgreSQL unique violation error code
         this.sitesLogger.log(
           `Subdivision PID ${pid} already exists, updating instead`,

@@ -1,5 +1,5 @@
 ## Overview
-The `merge_lto_descirptions` procedure updates subdivision records and their associated site relationships based on new LTO data, but **only processes records that have changed** since the last run.
+The `merge_lto_descriptions` procedure updates subdivision records and their associated site relationships based on new LTO data, but **only processes records that have changed** since the last run.
 
 ## Key Components
 

@@ -3,14 +3,38 @@
 # Usage: KEYCLOAK_CLIENT_SECRET=your-secret ./lto_dump.sh [type]
 # type: 1 or 2 (required)
 
-# Configuration
-API_URL="${API_URL:-http://localhost:4007}"
+# Configuration - all environment variables are required
+API_URL="${API_URL}"
 OUTPUT_FILE="ltodump.lis"
+
+# Check if required environment variables are set
+if [[ -z "$API_URL" ]]; then
+    print "Error: API_URL environment variable is required"
+    print ""
+    print "Usage:"
+    print "  API_URL=http://your-api-url:port \\"
+    print "  KEYCLOAK_URL=https://your-keycloak-url/auth \\"
+    print "  KEYCLOAK_REALM=your-realm \\"
+    print "  KEYCLOAK_CLIENT_ID=your-client-id \\"
+    print "  KEYCLOAK_CLIENT_SECRET=your-secret \\"
+    print "  ./lto_dump.sh [type]"
+    print ""
+    print "Required environment variables:"
+    print "  API_URL - Site registry API URL"
+    print "  KEYCLOAK_URL - Keycloak server URL with /auth path"
+    print "  KEYCLOAK_REALM - Keycloak realm name"
+    print "  KEYCLOAK_CLIENT_ID - Keycloak client ID"
+    print "  KEYCLOAK_CLIENT_SECRET - Keycloak client secret"
+    print ""
+    print "Parameters:"
+    print "  type: 1 (PIDs < '025') or 2 (PIDs >= '025')"
+    exit 1
+fi
 
 # Check if type parameter is provided
 if [[ $# -eq 0 ]]; then
     print "Error: Type parameter is required"
-    print "Usage: KEYCLOAK_CLIENT_SECRET=your-secret ./lto_dump.sh [type]"
+    print "Usage: ./lto_dump.sh [type]"
     print " type: 1 (PIDs < '025') or 2 (PIDs >= '025')"
     exit 1
 fi

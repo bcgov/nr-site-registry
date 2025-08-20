@@ -4,10 +4,10 @@
 # Usage: ACCESS_TOKEN=$(./get_keycloak_token.sh)
 # Or: source ./get_keycloak_token.sh
 
-# Configuration - Read from environment variables or use defaults
-KEYCLOAK_URL="${KEYCLOAK_URL:-https://epd-keycloak-dev.apps.silver.devops.gov.bc.ca/auth}"
-REALM="${KEYCLOAK_REALM:-forms-flow-ai}"
-CLIENT_ID="${KEYCLOAK_CLIENT_ID:-site-service}"
+# Configuration - Read from environment variables (all required)
+KEYCLOAK_URL="${KEYCLOAK_URL}"
+REALM="${KEYCLOAK_REALM}"
+CLIENT_ID="${KEYCLOAK_CLIENT_ID}"
 CLIENT_SECRET="${KEYCLOAK_CLIENT_SECRET}"
 
 # Function to log to stderr
@@ -15,14 +15,36 @@ log() {
     print "$1" >&2
 }
 
-# Check if required environment variables are set
+# Check if all required environment variables are set
+MISSING_VARS=""
+if [[ -z "$KEYCLOAK_URL" ]]; then
+    MISSING_VARS="$MISSING_VARS KEYCLOAK_URL"
+fi
+if [[ -z "$REALM" ]]; then
+    MISSING_VARS="$MISSING_VARS KEYCLOAK_REALM"
+fi
+if [[ -z "$CLIENT_ID" ]]; then
+    MISSING_VARS="$MISSING_VARS KEYCLOAK_CLIENT_ID"
+fi
 if [[ -z "$CLIENT_SECRET" ]]; then
-    log "Error: KEYCLOAK_CLIENT_SECRET environment variable is required"
-    log "Usage: KEYCLOAK_CLIENT_SECRET=your-secret ./get_keycloak_token.sh"
-    log "Optional environment variables:"
-    log "  KEYCLOAK_URL (default: https://epd-keycloak-dev.apps.silver.devops.gov.bc.ca/auth)"
-    log "  KEYCLOAK_REALM (default: forms-flow-ai)"
-    log "  KEYCLOAK_CLIENT_ID (default: site-service)"
+    MISSING_VARS="$MISSING_VARS KEYCLOAK_CLIENT_SECRET"
+fi
+
+if [[ -n "$MISSING_VARS" ]]; then
+    log "Error: The following required environment variables are missing:$MISSING_VARS"
+    log ""
+    log "Usage:"
+    log "  KEYCLOAK_URL=https://your-keycloak-url/auth \\"
+    log "  KEYCLOAK_REALM=your-realm \\"
+    log "  KEYCLOAK_CLIENT_ID=your-client-id \\"
+    log "  KEYCLOAK_CLIENT_SECRET=your-secret \\"
+    log "  ./get_keycloak_token.sh"
+    log ""
+    log "Required environment variables:"
+    log "  KEYCLOAK_URL - Keycloak server URL with /auth path"
+    log "  KEYCLOAK_REALM - Keycloak realm name"
+    log "  KEYCLOAK_CLIENT_ID - Keycloak client ID"
+    log "  KEYCLOAK_CLIENT_SECRET - Keycloak client secret"
     exit 1
 fi
 

@@ -40,7 +40,7 @@ else
 fi
 
 # Get the directory where this script is located
-SCRIPT_DIR=$(dirname $0)
+SCRIPT_DIR=$(dirname "$0")
 
 # Check if data file exists
 if [[ ! -f "$SCRIPT_DIR/$DATA_FILE" ]]; then

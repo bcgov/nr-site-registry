@@ -1902,8 +1902,9 @@ export class SiteService {
             changes: res.changes,
             whoUpdated: res.who_updated,
             whenUpdated: res.latest_update,
-            address:
-              res.addr_line_1 + ' ' + res.addr_line_2 + ' ' + res.addr_line_3,
+            address: [res.addr_line_1, res.addr_line_2, res.addr_line_3]
+              .filter(Boolean)
+              .join(' '),
           };
         });
       }

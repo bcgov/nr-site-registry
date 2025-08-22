@@ -79,8 +79,10 @@ import {
   fetchNotationParticipantRoleCd,
   fetchNotationTypeCd,
   fetchParticipantRoleCd,
+  fetchSchedule2ReferenceCd,
   fetchSiteRiskCd,
   fetchSiteStatusCd,
+  schedule2ReferenceCdDrpdown,
 } from './dropdowns/DropdownSlice';
 import BannerDetails from '../../components/banners/BannerDetails';
 import {
@@ -129,7 +131,6 @@ import {
 import { Button } from '../../components/button/Button';
 import { IFormField } from '../../components/input-controls/IFormField';
 import { GetNotationConfig } from './notations/NotationsConfig';
-import { disclosureStatementConfigEditMode } from './disclosure/DisclosureConfig';
 import GetConfig from './participants/ParticipantConfig';
 import { GetAssociateConfig } from './associates/AssociateConfig';
 import { GetDocumentsConfig } from './documents/DocumentsConfig';
@@ -144,8 +145,12 @@ import {
 import { HttpStatusCode } from '../../common/httpStatusCode';
 import { GetSummaryConfig } from './summary/SummaryConfig';
 import { de } from 'date-fns/locale';
+import { siteDisclosureConfig } from './disclosure/DisclosureConfig';
 
 const SiteDetails = () => {
+  const { disclosureStatementConfigEditMode } = siteDisclosureConfig(
+    useSelector(schedule2ReferenceCdDrpdown)?.data,
+  );
   const auth = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -423,6 +428,7 @@ const SiteDetails = () => {
     dispatch(fetchSiteRiskCd());
     dispatch(fetchSiteStatusCd());
     dispatch(fetchBceRegionCd());
+    dispatch(fetchSchedule2ReferenceCd());
   };
 
   const checkForRecordsPendingReview = (siteId: string) => {
@@ -687,10 +693,10 @@ const SiteDetails = () => {
         Object.keys(disclosure).length > 0
       ) {
         const siteDisclosureErrors: any[] = [];
-        let updatedSiteDisclosure = deepFilterByUserAction(
-          disclosure,
-          userActions,
-        );
+        let updatedSiteDisclosure = deepFilterByUserAction(disclosure, [
+          ...userActions,
+          UserActionEnum.deleted,
+        ]);
         const errors = validateForm(
           disclosureStatementConfigEditMode,
           updatedSiteDisclosure,
@@ -718,6 +724,10 @@ const SiteDetails = () => {
           updatedSiteDisclosure = removeProperty(
             updatedSiteDisclosure,
             'position',
+          );
+          updatedSiteDisclosure = removeProperty(
+            updatedSiteDisclosure,
+            'description',
           );
           dispatch(setupSiteDisclosureDataForSaving(updatedSiteDisclosure));
           return [];

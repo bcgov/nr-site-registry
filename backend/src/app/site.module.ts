@@ -94,6 +94,8 @@ import { Place } from './entities/placeEntity';
 import { CsvController } from './controller/csv.controller';
 import { CsvService } from './services/csv/csv.service';
 import { SiteRegistry } from './entities/siteRegistry.entity';
+import { Schedule2Reference } from './entities/schedule2Reference';
+import { SiteProfileSchedule2Ref } from './entities/siteProfileSchedule2Ref';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -157,6 +159,8 @@ import { SiteRegistry } from './entities/siteRegistry.entity';
       HistoryLog,
       Place,
       SiteRegistry,
+      Schedule2Reference,
+      SiteProfileSchedule2Ref,
     ]),
   ],
   providers: [

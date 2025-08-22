@@ -444,7 +444,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const handleTableSort = (row: any, ascDir: any, disclosureId: any) => {
     let property = row['graphQLPropertyName'];
     setFormData((prevData) => {
-      if (prevData.disclosureId === disclosureId) {
+      if (prevData.id === disclosureId) {
         // Call the common sort function to sort the updatedParticipant array
         const updatedDisclosureSchedule = sortArray(
           [...prevData.siteProfileSchedule2Refs],

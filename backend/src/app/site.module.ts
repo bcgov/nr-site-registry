@@ -94,6 +94,9 @@ import { Place } from './entities/placeEntity';
 import { CsvController } from './controller/csv.controller';
 import { CsvService } from './services/csv/csv.service';
 import { SiteRegistry } from './entities/siteRegistry.entity';
+import { ComsService } from './services/coms/coms.service';
+import { ComsResolver } from './resolvers/coms/coms.resolver';
+import { HttpModule } from '@nestjs/axios';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -158,6 +161,7 @@ import { SiteRegistry } from './entities/siteRegistry.entity';
       Place,
       SiteRegistry,
     ]),
+    HttpModule,
   ],
   providers: [
     CsvService,
@@ -196,6 +200,8 @@ import { SiteRegistry } from './entities/siteRegistry.entity';
     AssociatedSiteService,
     TransactionManagerService,
     LoggerService,
+    ComsService,
+    ComsResolver,
   ],
   controllers: [CsvController],
 })

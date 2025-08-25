@@ -118,6 +118,20 @@ export type ClassificationCd = {
   description: Scalars['String']['output'];
 };
 
+export type Coms = {
+  __typename?: 'Coms';
+  bucketId: Scalars['String']['output'];
+};
+
+export type ComsResponse = {
+  __typename?: 'ComsResponse';
+  data?: Maybe<Coms>;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
 export type ConditionsText = {
   __typename?: 'ConditionsText';
   conditionsComment: Scalars['String']['output'];
@@ -455,7 +469,7 @@ export type LandHistoriesInputDto = {
 
 export type LandHistoryResponse = {
   __typename?: 'LandHistoryResponse';
-  data: Array<LandHistoriesDto>;
+  data?: Maybe<Array<LandHistoriesDto>>;
   httpStatusCode?: Maybe<Scalars['Int']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
@@ -522,6 +536,7 @@ export type Mutation = {
   addRecentView: RecentViewResponse;
   addSiteToFolio: FolioResponse;
   bulkAproveRejectChanges: SrApproveRejectResponse;
+  createBucket: ComsResponse;
   createSnapshotForSites: SnapshotResponse;
   deleteCartItem: CartResponse;
   deleteCartItemWithSiteId: CartResponse;
@@ -554,6 +569,12 @@ export type MutationAddSiteToFolioArgs = {
 
 export type MutationBulkAproveRejectChangesArgs = {
   approveRejectDTO: BulkApproveRejectChangesDto;
+};
+
+
+export type MutationCreateBucketArgs = {
+  bucketKey: Scalars['String']['input'];
+  bucketName: Scalars['String']['input'];
 };
 
 
@@ -1507,6 +1528,14 @@ export enum Link__Purpose {
   Security = 'SECURITY'
 }
 
+export type CreateBucketMutationVariables = Exact<{
+  bucketName: Scalars['String']['input'];
+  bucketKey: Scalars['String']['input'];
+}>;
+
+
+export type CreateBucketMutation = { __typename?: 'Mutation', createBucket: { __typename?: 'ComsResponse', message?: string | null, httpStatusCode?: number | null, success?: boolean | null, timestamp?: string | null, data?: { __typename?: 'Coms', bucketId: string } | null } };
+
 export type Folio_GetFolioItemsForUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1559,6 +1588,46 @@ export type MapSearch_FindSitesAndPlacesQueryVariables = Exact<{
 export type MapSearch_FindSitesAndPlacesQuery = { __typename?: 'Query', findSitesAndPlaces: { __typename?: 'FindSitesAndPlacesResponse', data: { __typename?: 'FindSitesAndPlaces', sites: Array<{ __typename?: 'Sites', id: string, commonName: string, latdeg?: number | null, longdeg?: number | null }>, places: Array<{ __typename?: 'Place', id: string, name: string, latdeg: number, longdeg: number }> } } };
 
 
+export const CreateBucketDocument = gql`
+    mutation createBucket($bucketName: String!, $bucketKey: String!) {
+  createBucket(bucketName: $bucketName, bucketKey: $bucketKey) {
+    message
+    httpStatusCode
+    success
+    timestamp
+    data {
+      bucketId
+    }
+  }
+}
+    `;
+export type CreateBucketMutationFn = Apollo.MutationFunction<CreateBucketMutation, CreateBucketMutationVariables>;
+
+/**
+ * __useCreateBucketMutation__
+ *
+ * To run a mutation, you first call `useCreateBucketMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBucketMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createBucketMutation, { data, loading, error }] = useCreateBucketMutation({
+ *   variables: {
+ *      bucketName: // value for 'bucketName'
+ *      bucketKey: // value for 'bucketKey'
+ *   },
+ * });
+ */
+export function useCreateBucketMutation(baseOptions?: Apollo.MutationHookOptions<CreateBucketMutation, CreateBucketMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateBucketMutation, CreateBucketMutationVariables>(CreateBucketDocument, options);
+      }
+export type CreateBucketMutationHookResult = ReturnType<typeof useCreateBucketMutation>;
+export type CreateBucketMutationResult = Apollo.MutationResult<CreateBucketMutation>;
+export type CreateBucketMutationOptions = Apollo.BaseMutationOptions<CreateBucketMutation, CreateBucketMutationVariables>;
 export const Folio_GetFolioItemsForUserDocument = gql`
     query Folio_getFolioItemsForUser {
   getFolioItemsForUser {

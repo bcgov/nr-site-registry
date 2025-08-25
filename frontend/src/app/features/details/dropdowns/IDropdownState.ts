@@ -11,6 +11,7 @@ interface IDropdowns {
   siteRiskCode: [];
   bceRegionCode?: [];
   siteStatusCode?: [];
+  schedule2Ref?: [];
 }
 
 export interface IDropdownsState {

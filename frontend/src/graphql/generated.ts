@@ -149,7 +149,7 @@ export type CreateSnapshotDto = {
 
 export type DisclosureResponse = {
   __typename?: 'DisclosureResponse';
-  data?: Maybe<Array<SiteProfiles>>;
+  data?: Maybe<Array<SiteProfilesDto>>;
   httpStatusCode?: Maybe<Scalars['Int']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
@@ -789,6 +789,7 @@ export type Query = {
   getPendingSiteForSRApproval: QueryResultForPendingSitesResponse;
   getPeopleOrgsCd: DropdownResponse;
   getRecentViewsByUserId: RecentViewResponse;
+  getSchedule2Ref: DropdownResponse;
   getSiteDisclosureBySiteId: DisclosureResponse;
   getSiteDocumentsBySiteId: DocumentResponse;
   getSiteInsights: FetchSiteInsights;
@@ -1258,6 +1259,40 @@ export type SitePendingApprovalRecords = {
   whoUpdated: Scalars['String']['output'];
 };
 
+export type SiteProfileSchedule2Ref = {
+  __typename?: 'SiteProfileSchedule2Ref';
+  id: Scalars['String']['output'];
+  profileId: Scalars['String']['output'];
+  schedule2ReferenceCode: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
+  whenCreated: Scalars['DateTime']['output'];
+  whenUpdated?: Maybe<Scalars['DateTime']['output']>;
+  whoCreated: Scalars['String']['output'];
+  whoUpdated?: Maybe<Scalars['String']['output']>;
+};
+
+export type SiteProfileSchedule2RefDto = {
+  __typename?: 'SiteProfileSchedule2RefDTO';
+  apiAction?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  profileId: Scalars['String']['output'];
+  schedule2ReferenceCode: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
+  srValue?: Maybe<Scalars['Boolean']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
+};
+
+export type SiteProfileSchedule2RefInputDto = {
+  apiAction?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['String']['input'];
+  profileId: Scalars['String']['input'];
+  schedule2ReferenceCode: Scalars['String']['input'];
+  srAction?: InputMaybe<Scalars['String']['input']>;
+  srValue?: InputMaybe<Scalars['Boolean']['input']>;
+  userAction?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type SiteProfiles = {
   __typename?: 'SiteProfiles';
   comments?: Maybe<Scalars['String']['output']>;
@@ -1301,6 +1336,7 @@ export type SiteProfiles = {
   siteDisclosureComment?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
   sitePostalCode?: Maybe<Scalars['String']['output']>;
+  siteProfileSchedule2Refs?: Maybe<Array<SiteProfileSchedule2Ref>>;
   siteRegDateEntered?: Maybe<Scalars['DateTime']['output']>;
   siteRegDateRecd?: Maybe<Scalars['DateTime']['output']>;
   siteRegParticId?: Maybe<Scalars['String']['output']>;
@@ -1310,6 +1346,31 @@ export type SiteProfiles = {
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
   whoUpdated?: Maybe<Scalars['String']['output']>;
+};
+
+export type SiteProfilesDto = {
+  __typename?: 'SiteProfilesDTO';
+  apiAction?: Maybe<Scalars['String']['output']>;
+  dateCompleted: Scalars['DateTime']['output'];
+  govDocumentsComment?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  localAuthDateForwarded?: Maybe<Scalars['DateTime']['output']>;
+  localAuthDateRecd?: Maybe<Scalars['DateTime']['output']>;
+  localAuthDateSubmitted?: Maybe<Scalars['DateTime']['output']>;
+  plannedActivityComment?: Maybe<Scalars['String']['output']>;
+  rwmDateDecision?: Maybe<Scalars['DateTime']['output']>;
+  rwmDateReceived?: Maybe<Scalars['DateTime']['output']>;
+  rwmParticId?: Maybe<Scalars['String']['output']>;
+  siteDisclosureComment?: Maybe<Scalars['String']['output']>;
+  siteId?: Maybe<Scalars['String']['output']>;
+  siteProfileSchedule2Refs?: Maybe<Array<SiteProfileSchedule2RefDto>>;
+  siteRegDateEntered?: Maybe<Scalars['DateTime']['output']>;
+  siteRegDateRecd?: Maybe<Scalars['DateTime']['output']>;
+  srAction?: Maybe<Scalars['String']['output']>;
+  srValue?: Maybe<Scalars['Boolean']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
+  whenCreated?: Maybe<Scalars['DateTime']['output']>;
+  whenUpdated?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type SiteProfilesInputDto = {
@@ -1326,6 +1387,7 @@ export type SiteProfilesInputDto = {
   rwmParticId?: InputMaybe<Scalars['String']['input']>;
   siteDisclosureComment?: InputMaybe<Scalars['String']['input']>;
   siteId?: InputMaybe<Scalars['String']['input']>;
+  siteProfileSchedule2Refs?: InputMaybe<Array<SiteProfileSchedule2RefInputDto>>;
   siteRegDateEntered?: InputMaybe<Scalars['DateTime']['input']>;
   siteRegDateRecd?: InputMaybe<Scalars['DateTime']['input']>;
   srAction?: InputMaybe<Scalars['String']['input']>;

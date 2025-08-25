@@ -59,7 +59,7 @@ describe('DisclosureService', () => {
         user,
       );
 
-      expect(result[0].whoCreated).toEqual(mockSiteProfile[0].whoCreated);
+      expect(result[0].whenCreated).toEqual(mockSiteProfile[0].whenCreated);
       expect(repository.find).toBeCalledWith({ where: { siteId } });
     });
 
@@ -87,6 +87,7 @@ export function generateMockSiteProfile(siteId: string, dateCompleted: Date) {
     localAuthName: 'Local Auth Name',
     localAuthAgency: 'Local Auth Agency',
     whoCreated: 'Test User', // Example of required field
+    whenCreated: new Date(),
   };
   return [mockSiteProfile];
 }

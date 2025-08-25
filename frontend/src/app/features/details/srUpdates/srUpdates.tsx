@@ -423,6 +423,7 @@ const SRUpdates = () => {
         ...siteSummaryData,
         userAction: UserActionEnum.default,
         srAction: SRApprovalStatusEnum.Public,
+        apiAction: UserActionEnum.updated,
       };
       saveDTO = {
         ...getDefaultObjectForSaving(),
@@ -433,6 +434,7 @@ const SRUpdates = () => {
         ...siteSummaryData,
         userAction: UserActionEnum.default,
         srAction: SRApprovalStatusEnum.Private,
+        apiAction: UserActionEnum.updated,
       };
       saveDTO = {
         ...getDefaultObjectForSaving(),

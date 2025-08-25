@@ -59,7 +59,7 @@ import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
 import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
 import { SiteInsightsDto } from '../../dto/siteInsights.dto';
 import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
-import { SiteProfileSchedule2Ref } from 'src/app/entities/siteProfileSchedule2Ref';
+import { SiteProfileSchedule2Ref } from '../../entities/siteProfileSchedule2Ref';
 
 /**
  * Nestjs Service For Region Entity

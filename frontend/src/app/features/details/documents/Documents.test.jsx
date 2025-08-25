@@ -7,6 +7,8 @@ import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { UserType } from '../../../helpers/requests/userType';
 import { GetDocumentsConfig } from './DocumentsConfig';
 import { useParams } from 'react-router-dom';
+import { CreateBucketDocument } from '../../../../graphql/generated';
+import { MockedProvider } from '@apollo/client/testing';
 
 const mockDocuments = [
   {
@@ -298,13 +300,36 @@ jest.mock('./DocumentsConfig', () => ({
 }));
 
 const mockStore = configureStore([thunk]);
-
+const mocks = [
+  {
+    request: {
+      query: CreateBucketDocument,
+      variables: {
+        bucketName: 'test-bucket',
+        bucketKey: 'test-key',
+      },
+    },
+    result: {
+      data: {
+        createBucket: {
+          httpStatusCode: 200,
+          success: true,
+          message: 'Fetched',
+          timestamp: new Date().toISOString(),
+          data: {
+            bucketId: '1',
+          },
+        },
+      },
+    },
+  },
+];
 describe('Documents component', () => {
   let store;
   let dispatch;
   beforeEach(() => {
     dispatch = jest.fn(); // Create a mock dispatch function
-    
+
     useParams.mockReturnValue({ id: '1550' });
 
     store = mockStore({
@@ -559,16 +584,17 @@ describe('Documents component', () => {
     useDispatch.mockReturnValue(dispatch); // Return the mock dispatch function
   });
 
-
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('renders Documents component', () => {
     render(
-      <Provider store={store}>
-        <Documents showPending={false} />
-      </Provider>,
+      <MockedProvider mocks={[]} addTypename={false}>
+        <Provider store={store}>
+          <Documents showPending={false} />
+        </Provider>
+      </MockedProvider>,
     );
     const documentsComponent = screen.getByTestId('document-component');
     expect(documentsComponent).toBeInTheDocument();
@@ -576,9 +602,11 @@ describe('Documents component', () => {
 
   it('search functionality works correctly', async () => {
     render(
-      <Provider store={store}>
-        <Documents showPending={false} />
-      </Provider>,
+      <MockedProvider mocks={[]} addTypename={false}>
+        <Provider store={store}>
+          <Documents showPending={false} />
+        </Provider>
+      </MockedProvider>,
     );
 
     const searchInput = screen.getByLabelText('Search');
@@ -598,7 +626,9 @@ describe('Documents component', () => {
   it('clearing the search works correctly', async () => {
     render(
       <Provider store={store}>
-        <Documents showPending={false} />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <Documents showPending={false} />
+        </MockedProvider>
       </Provider>,
     );
 

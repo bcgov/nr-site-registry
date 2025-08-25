@@ -299,9 +299,20 @@ describe('SiteService', () => {
                 dateCompleted: new Date(),
                 whenCreated: new Date(),
                 whoCreated: 'Test User',
+                SiteProfileSchedule2Refs: [],
               };
             }),
             save: jest.fn(),
+            create: jest.fn(() => {
+              return {
+                id: '123',
+                siteId: '456',
+                dateCompleted: new Date(),
+                whenCreated: new Date(),
+                whoCreated: 'Test User',
+                SiteProfileSchedule2Refs: [],
+              };
+            }),
           },
         },
         {
@@ -335,6 +346,7 @@ describe('SiteService', () => {
             // save: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
+            create: jest.fn(),
             findOne: jest.fn(
               async <T>(entityClass: T, options: FindOneOptions<T>) =>
                 entityClass === SiteRegistry &&
@@ -932,9 +944,23 @@ describe('SiteService', () => {
           id: '123',
           siteId: '456',
           dateCompleted: new Date(),
+          siteProfileSchedule2Refs: [],
         },
       ];
       const userInfo = { givenName: 'Test User' };
+
+      const mockSave = jest.fn(async (_entity, siteProfile) => ({
+        ...siteProfile,
+        id: siteProfile.id || '123',
+      }));
+      const mockCreate = jest.fn((_entity, data) => ({
+        ...data,
+        id: '123',
+      }));
+
+      // Injecting mocks into the shared `entityManager` object
+      (entityManager.save as jest.Mock) = mockSave;
+      (entityManager.create as jest.Mock) = mockCreate;
 
       await siteService.processSiteDisclosure(
         siteDisclosure,
@@ -942,12 +968,16 @@ describe('SiteService', () => {
         entityManager,
         '456',
       );
-      expect(entityManager.save).toHaveBeenCalled();
-      const addedProfile = (entityManager.save as jest.Mock).mock.calls[0][1];
-      expect(addedProfile.dateCompleted).toBeInstanceOf(Date);
-      expect(addedProfile.whenCreated).toBeInstanceOf(Date);
-      expect(addedProfile.siteId).toBe('456');
-      expect(addedProfile.whoCreated).toBe('Test User');
+
+      expect(mockSave).toHaveBeenCalled();
+
+      const savedInput = mockSave.mock.calls[0][1];
+      expect(savedInput.siteId).toBe('456');
+      expect(savedInput.whoCreated).toBe('Test User');
+      expect(savedInput.whenCreated).toBeInstanceOf(Date);
+      expect(savedInput.whenUpdated).toBeInstanceOf(Date);
+      expect(savedInput.userAction).toBe(UserActionEnum.ADDED);
+      expect(savedInput.dateCompleted).toBeInstanceOf(Date);
     });
 
     it('should update an existing site profile when action is UPDATED', async () => {
@@ -957,10 +987,16 @@ describe('SiteService', () => {
           id: '123',
           siteId: '456',
           dateCompleted: new Date(),
+          siteProfileSchedule2Refs: [],
         },
       ];
       const userInfo = { givenName: 'Updated User' };
+      const id = '123';
+      const existingSiteProfile = { id };
 
+      siteProfilesRepo.findOne = jest
+        .fn()
+        .mockResolvedValue(existingSiteProfile);
       await siteService.processSiteDisclosure(
         siteDisclosure,
         userInfo,
@@ -1072,13 +1108,8 @@ describe('SiteService', () => {
 
       expect(entityManager.save).toHaveBeenCalledTimes(2); // For SiteDocs and SiteDocPartics
       const savedDocuments = (entityManager.save as jest.Mock).mock.calls[0][1];
-      const savedDocPartics = (entityManager.save as jest.Mock).mock
-        .calls[0][1];
-
       expect(savedDocuments[0].whenCreated).toBeInstanceOf(Date);
       expect(savedDocuments[0].whoCreated).toBe('Test User');
-      expect(savedDocPartics[0].whenCreated).toBeInstanceOf(Date);
-      expect(savedDocPartics[0].whoCreated).toBe('Test User');
     });
 
     it('should update existing documents and participants when action is UPDATED', async () => {

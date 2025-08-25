@@ -6,26 +6,6 @@ export const COMS_API: string =
   process.env.REACT_APP_COMS_API ||
   ((window as any)._env_ && (window as any)._env_.REACT_APP_COMS_API);
 
-const COMS_ACCESS_KEY_ID: string =
-  process.env.REACT_APP_COMS_ACCESS_KEY_ID ||
-  ((window as any)._env_ && (window as any)._env_.REACT_APP_COMS_ACCESS_KEY_ID);
-
-const COMS_BUCKET: string =
-  process.env.REACT_APP_COMS_BUCKET ||
-  ((window as any)._env_ && (window as any)._env_.REACT_APP_COMS_BUCKET);
-
-const COMS_ENDPOINT: string =
-  process.env.REACT_APP_COMS_ENDPOINT ||
-  ((window as any)._env_ && (window as any)._env_.REACT_APP_COMS_ENDPOINT);
-
-const COMS_ACCESS_REGION: string =
-  process.env.REACT_APP_COMS_ACCESS_REGION ||
-  ((window as any)._env_ && (window as any)._env_.REACT_APP_COMS_ACCESS_REGION);
-
-const COMS_ACCESS_KEY: string =
-  process.env.REACT_APP_COMS_ACCESS_KEY ||
-  ((window as any)._env_ && (window as any)._env_.REACT_APP_COMS_ACCESS_KEY);
-
 type DownloadType = 'url' | 'proxy';
 
 export const COMS_ENDPOINTS = {
@@ -34,36 +14,6 @@ export const COMS_ENDPOINTS = {
   VERSION: '/version',
   CHILD: '/child',
   USER: '/user',
-};
-
-const CREATE_BUCKET_PARAMS = {
-  accessKeyId: COMS_ACCESS_KEY_ID,
-  active: true,
-  bucket: COMS_BUCKET,
-  endpoint: COMS_ENDPOINT,
-  region: COMS_ACCESS_REGION,
-  secretAccessKey: COMS_ACCESS_KEY,
-};
-
-export const createBucket = async (bucketName: string, bucketKey: string) => {
-  try {
-    const params = {
-      ...CREATE_BUCKET_PARAMS,
-      bucketName: bucketName,
-      key: bucketKey,
-    };
-    const response = await getAxiosInstance(COMS_API).put(
-      COMS_ENDPOINTS.BUCKET,
-      params,
-    );
-    // Check if the response has data and return it
-    if (response?.data) {
-      return response.data; // Return the response data to the calling method
-    }
-  } catch (error) {
-    console.error(`Error: Uploading Document-createBucket: ${error}`);
-    throw error;
-  }
 };
 
 export const createChildBucket = async (parentBucketId: string) => {

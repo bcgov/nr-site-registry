@@ -8,7 +8,7 @@ import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { plainToInstance } from 'class-transformer';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { UserTypeEum } from '../../common/userType';
-import { SiteProfilesDTO } from 'src/app/dto/disclosure.dto';
+import { SiteProfilesDTO } from '../../dto/disclosure.dto';
 
 @Injectable()
 export class DisclosureService {

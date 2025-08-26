@@ -22,4 +22,4 @@ COPY --from=build /app/dist ./dist
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/:3000
 # max old space the heap size, 120MB with 200MB limit in deployment.
-CMD ["--max-old-space-size=120", "/app/dist/main"]
+CMD ["--max-old-space-size=2048", "/app/dist/main"]

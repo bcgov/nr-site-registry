@@ -39,6 +39,45 @@ jest.mock('react-redux', () => {
         saveRequestStatus: 'success',
         profilesData: [mockDisclosure],
       },
+      dropdown: {
+        dropdowns: {
+          internalUserList: [],
+          participantRoles: {
+            getNotationParticipantRoleCd: [],
+          },
+          notationClass: {
+            getNotationClassCd: [],
+          },
+          notationType: { getNotationTypeCd: [] },
+          notationParticipantRole: {
+            getNotationParticipantRoleCd: [],
+          },
+          participantNames: {
+            getPeopleOrgsCd: [],
+          },
+          ministryContact: { getPeopleOrgsCd: [] },
+          siteRiskCode: {
+            getSiteRiskCd: {
+              data: [{ key: 'LOW', value: 'Low' }],
+            },
+          },
+          bceRegionCode: {
+            getBCeRegionCd: {
+              data: [{ key: '1', value: 'Region 1' }],
+            },
+          },
+          siteStatusCode: {
+            getSiteStatusCd: {
+              data: [{ key: 'ACTIVE', value: 'Active' }],
+            },
+          },
+          schedule2Ref: {
+            getSchedule2Ref: {
+              data: [{ key: '1', value: 'Schedule 2 Ref 1' }],
+            },
+          },
+        },
+      },
     })),
     useDispatch: jest.fn(() => ({
       siteDisclosure: {
@@ -54,6 +93,45 @@ jest.mock('react-redux', () => {
       siteDetails: {
         saveRequestStatus: 'success',
         profilesData: [mockDisclosure],
+      },
+      dropdown: {
+        dropdowns: {
+          internalUserList: [],
+          participantRoles: {
+            getNotationParticipantRoleCd: [],
+          },
+          notationClass: {
+            getNotationClassCd: [],
+          },
+          notationType: { getNotationTypeCd: [] },
+          notationParticipantRole: {
+            getNotationParticipantRoleCd: [],
+          },
+          participantNames: {
+            getPeopleOrgsCd: [],
+          },
+          ministryContact: { getPeopleOrgsCd: [] },
+          siteRiskCode: {
+            getSiteRiskCd: {
+              data: [{ key: 'LOW', value: 'Low' }],
+            },
+          },
+          bceRegionCode: {
+            getBCeRegionCd: {
+              data: [{ key: '1', value: 'Region 1' }],
+            },
+          },
+          siteStatusCode: {
+            getSiteStatusCd: {
+              data: [{ key: 'ACTIVE', value: 'Active' }],
+            },
+          },
+          schedule2Ref: {
+            getSchedule2Ref: {
+              data: [{ key: '1', value: 'Schedule 2 Ref 1' }],
+            },
+          },
+        },
       },
     })),
   };
@@ -84,6 +162,45 @@ describe('Disclosure Component', () => {
         saveRequestStatus: 'success',
         profilesData: mockDisclosure,
       },
+      dropdown: {
+        dropdowns: {
+          internalUserList: [],
+          participantRoles: {
+            getNotationParticipantRoleCd: [],
+          },
+          notationClass: {
+            getNotationClassCd: [],
+          },
+          notationType: { getNotationTypeCd: [] },
+          notationParticipantRole: {
+            getNotationParticipantRoleCd: [],
+          },
+          participantNames: {
+            getPeopleOrgsCd: [],
+          },
+          ministryContact: { getPeopleOrgsCd: [] },
+          siteRiskCode: {
+            getSiteRiskCd: {
+              data: [{ key: 'LOW', value: 'Low' }],
+            },
+          },
+          bceRegionCode: {
+            getBCeRegionCd: {
+              data: [{ key: '1', value: 'Region 1' }],
+            },
+          },
+          siteStatusCode: {
+            getSiteStatusCd: {
+              data: [{ key: 'ACTIVE', value: 'Active' }],
+            },
+          },
+          schedule2Ref: {
+            getSchedule2Ref: {
+              data: [{ key: '1', value: 'Schedule 2 Ref 1' }],
+            },
+          },
+        },
+      },
     });
 
     useSelector.mockImplementation((callback) => {
@@ -104,6 +221,45 @@ describe('Disclosure Component', () => {
         siteDetails: {
           saveRequestStatus: 'success',
           profilesData: mockDisclosure,
+        },
+        dropdown: {
+          dropdowns: {
+            internalUserList: [],
+            participantRoles: {
+              getNotationParticipantRoleCd: [],
+            },
+            notationClass: {
+              getNotationClassCd: [],
+            },
+            notationType: { getNotationTypeCd: [] },
+            notationParticipantRole: {
+              getNotationParticipantRoleCd: [],
+            },
+            participantNames: {
+              getPeopleOrgsCd: [],
+            },
+            ministryContact: { getPeopleOrgsCd: [] },
+            siteRiskCode: {
+              getSiteRiskCd: {
+                data: [{ key: 'LOW', value: 'Low' }],
+              },
+            },
+            bceRegionCode: {
+              getBCeRegionCd: {
+                data: [{ key: '1', value: 'Region 1' }],
+              },
+            },
+            siteStatusCode: {
+              getSiteStatusCd: {
+                data: [{ key: 'ACTIVE', value: 'Active' }],
+              },
+            },
+            schedule2Ref: {
+              getSchedule2Ref: {
+                data: [{ key: '1', value: 'Schedule 2 Ref 1' }],
+              },
+            },
+          },
         },
       });
     });
@@ -144,6 +300,45 @@ describe('Disclosure Component', () => {
           saveRequestStatus: 'success',
           profilesData: mockDisclosure,
         },
+        dropdown: {
+          dropdowns: {
+            internalUserList: [],
+            participantRoles: {
+              getNotationParticipantRoleCd: [],
+            },
+            notationClass: {
+              getNotationClassCd: [],
+            },
+            notationType: { getNotationTypeCd: [] },
+            notationParticipantRole: {
+              getNotationParticipantRoleCd: [],
+            },
+            participantNames: {
+              getPeopleOrgsCd: [],
+            },
+            ministryContact: { getPeopleOrgsCd: [] },
+            siteRiskCode: {
+              getSiteRiskCd: {
+                data: [{ key: 'LOW', value: 'Low' }],
+              },
+            },
+            bceRegionCode: {
+              getBCeRegionCd: {
+                data: [{ key: '1', value: 'Region 1' }],
+              },
+            },
+            siteStatusCode: {
+              getSiteStatusCd: {
+                data: [{ key: 'ACTIVE', value: 'Active' }],
+              },
+            },
+            schedule2Ref: {
+              getSchedule2Ref: {
+                data: [{ key: '1', value: 'Schedule 2 Ref 1' }],
+              },
+            },
+          },
+        },
       });
     });
     render(
@@ -172,6 +367,45 @@ describe('Disclosure Component', () => {
       siteDetails: {
         saveRequestStatus: 'success',
         profilesData: [mockDisclosure],
+      },
+      dropdown: {
+        dropdowns: {
+          internalUserList: [],
+          participantRoles: {
+            getNotationParticipantRoleCd: [],
+          },
+          notationClass: {
+            getNotationClassCd: [],
+          },
+          notationType: { getNotationTypeCd: [] },
+          notationParticipantRole: {
+            getNotationParticipantRoleCd: [],
+          },
+          participantNames: {
+            getPeopleOrgsCd: [],
+          },
+          ministryContact: { getPeopleOrgsCd: [] },
+          siteRiskCode: {
+            getSiteRiskCd: {
+              data: [{ key: 'LOW', value: 'Low' }],
+            },
+          },
+          bceRegionCode: {
+            getBCeRegionCd: {
+              data: [{ key: '1', value: 'Region 1' }],
+            },
+          },
+          siteStatusCode: {
+            getSiteStatusCd: {
+              data: [{ key: 'ACTIVE', value: 'Active' }],
+            },
+          },
+          schedule2Ref: {
+            getSchedule2Ref: {
+              data: [{ key: '1', value: 'Schedule 2 Ref 1' }],
+            },
+          },
+        },
       },
     });
 

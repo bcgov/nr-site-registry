@@ -176,7 +176,6 @@ export const TextInput: React.FC<InputProps> = ({
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
   const [error, setError] = useState<string | null>(null);
-  const [currentValue, setCurrentValue] = useState(value ?? '');
 
   const validateInput = (inputValue: string) => {
     if (validation) {
@@ -196,7 +195,6 @@ export const TextInput: React.FC<InputProps> = ({
 
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    setCurrentValue(inputValue);
     onChange(inputValue);
 
     if (allowNumbersOnly || (inputValue && !validateInput(inputValue))) {
@@ -235,7 +233,7 @@ export const TextInput: React.FC<InputProps> = ({
             customEditInputTextCss ?? 'custom-input-text'
           }  ${error && 'error'}`}
           placeholder={placeholder}
-          value={currentValue}
+          value={value || ''}
           onChange={handleTextInputChange}
           aria-label={label} // Accessibility
           required={error ? true : false}
@@ -249,7 +247,7 @@ export const TextInput: React.FC<InputProps> = ({
         />
       ) : (
         <span className={`d-flex ${customInputTextCss ?? ''}`}>
-          {currentValue}
+          {value || ''}
         </span>
       )}
       {error && (

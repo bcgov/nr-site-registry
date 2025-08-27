@@ -12,6 +12,7 @@ import { DropdownDto } from '../../dto/dropdown.dto';
 import { SiteRiskCd } from '../../entities/siteRiskCd.entity';
 import { BceRegionCd } from '../../entities/bceRegionCd.entity';
 import { SiteStatusCd } from '../../entities/siteStatusCd.entity';
+import { Schedule2Reference } from '../../entities/schedule2Reference';
 
 @Injectable()
 export class DropdownService {
@@ -42,6 +43,9 @@ export class DropdownService {
 
     @InjectRepository(SiteStatusCd)
     private siteStatusCdRepository: Repository<SiteStatusCd>,
+
+    @InjectRepository(Schedule2Reference)
+    private schedule2ReferenceRepository: Repository<Schedule2Reference>,
 
     private readonly sitesLogger: LoggerService,
   ) {}
@@ -366,6 +370,33 @@ export class DropdownService {
     } catch (error) {
       throw new HttpException(
         `Failed to get site status code.`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  async getSchedule2Ref() {
+    this.sitesLogger.log('DropdownService.getSchedule2Ref() start');
+    try {
+      const result = await this.schedule2ReferenceRepository.find();
+      if (result?.length > 0) {
+        this.sitesLogger.log('DropdownService.getSchedule2Ref() end');
+        return result.map((obj: any) => ({
+          key: obj.code,
+          value: obj.code.toUpperCase(),
+          metaData: obj.description,
+        }));
+      } else {
+        this.sitesLogger.log('DropdownService.getSchedule2Ref() end');
+        return [];
+      }
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occured in DropdownService.getSchedule2Ref() end',
+        JSON.stringify(error),
+      );
+      throw new HttpException(
+        `Failed to retrieve schedule 2 reference.`,
         HttpStatus.NOT_FOUND,
       );
     }

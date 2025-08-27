@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomLabel from '../../components/simple/CustomLabel';
@@ -284,22 +284,51 @@ const SiteDetails = () => {
     }
   }, [details]);
 
+  const lastScrollY = useRef(0);
+  const isVisibleRef = useRef(false); // track visibility without triggering re-renders
   useEffect(() => {
+    const thresholdShow = 100; // show header only after scrolling past 100px
+    const thresholdHide = 30; // hide header only when scrolling up to < 30px
+
     const handleScroll = () => {
-      if (window.scrollY > 5) {
-        // Adjust the scroll position as needed
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
+      const currentScrollY = window.scrollY;
+
+      // Always hide at the top
+      if (currentScrollY <= 5) {
+        if (isVisibleRef.current) {
+          setIsVisible(false);
+          isVisibleRef.current = false;
+        }
+        lastScrollY.current = currentScrollY;
+        return;
       }
+
+      const scrollingDown = currentScrollY > lastScrollY.current;
+      const scrollingUp = currentScrollY < lastScrollY.current;
+
+      if (
+        scrollingDown &&
+        currentScrollY > thresholdShow &&
+        !isVisibleRef.current
+      ) {
+        setIsVisible(true);
+        isVisibleRef.current = true;
+      }
+
+      if (
+        scrollingUp &&
+        currentScrollY < thresholdHide &&
+        isVisibleRef.current
+      ) {
+        setIsVisible(false);
+        isVisibleRef.current = false;
+      }
+
+      lastScrollY.current = currentScrollY;
     };
 
     window.addEventListener('scroll', handleScroll);
-
-    // Clean up the event listener on component unmount
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {

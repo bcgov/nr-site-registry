@@ -32,7 +32,7 @@ data:
     \"REACT_APP_AUTH_RESPONSE_TYPE\": \"code\",\n    
     \"REACT_APP_AUTH_SCOPE\": \"openid profile\",\n    
     \"REACT_APP_AUTH_FILTER_PROTOCOL_CLAIMS\": \"true\",\n  
-    \"REACT_APP_AUTH_LOAD_USER_INFO\": \"true\"\n
+    \"REACT_APP_AUTH_LOAD_USER_INFO\": \"true\",\n
     \"REACT_APP_COMS_API\": \"{{ .Values.frontend.config.REACT_APP_COMS_API}}\"\n
     }"
 {{- end }}

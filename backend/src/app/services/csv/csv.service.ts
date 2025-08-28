@@ -258,7 +258,6 @@ where ss1.site_subdiv_id in
     sites.subdivisions sub
  where V.SITE_ID = SS.id
  and     V.SUBDIV_ID  = SUB.ID
- and sub.sr_action = 'public'
  and ss.sr_action = 'public'`;
 
   private getApprovedLandHistories = () =>
@@ -433,8 +432,7 @@ FROM
 JOIN 
     sites.sites ON sites.id = site_profiles.site_id
 where
-	site_profiles.sr_action = 'public'
-	and sites.sr_action = 'public'
+  sites.sr_action = 'public'
 	
 order by siteid, datecompleted desc`;
 

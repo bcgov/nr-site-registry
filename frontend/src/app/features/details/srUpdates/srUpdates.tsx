@@ -39,6 +39,7 @@ import {
   notationParticipantRoleDrpdown,
   notationTypeDrpdown,
   participantRoleDrpdown,
+  schedule2ReferenceCdDrpdown,
 } from '../dropdowns/DropdownSlice';
 import {
   dateFormatSR,
@@ -56,12 +57,6 @@ import GetConfig from '../participants/ParticipantConfig';
 import Document from '../documents/Document';
 import { GetDocumentsConfig } from '../documents/DocumentsConfig';
 import DisclosureComponent from '../disclosure/DisclosureComponent';
-import {
-  disclosureCommentsConfig,
-  disclosureScheduleExternalConfig,
-  disclosureScheduleInternalConfig,
-  disclosureStatementConfig,
-} from '../disclosure/DisclosureConfig';
 import AssociateSiteComponent from '../associates/AssociateSiteComponent';
 import { GetAssociateConfig } from '../associates/AssociateConfig';
 import { useParams } from 'react-router-dom';
@@ -75,8 +70,16 @@ import ParcelDescriptionTable from '../parcelDescriptions/ParcelDescriptionTable
 import { IFetchParcelDescriptionsParams } from '../parcelDescriptions/parcelDescriptionsInterfaces';
 import { columns as columnConfigForParcelDescription } from '../parcelDescriptions/parcelDescriptionsConfig';
 import { GetSummaryConfig } from '../summary/SummaryConfig';
+import { siteDisclosureConfig } from '../disclosure/DisclosureConfig';
 
 const SRUpdates = () => {
+  const schedule2Ref = useSelector(schedule2ReferenceCdDrpdown);
+  const {
+    disclosureCommentsConfig,
+    disclosureScheduleExternalConfig,
+    disclosureScheduleInternalConfig,
+    disclosureStatementConfig,
+  } = siteDisclosureConfig(schedule2Ref?.data);
   const dispatch = useDispatch<AppDispatch>();
   const { summaryFormRows } = GetSummaryConfig();
   const {
@@ -420,6 +423,7 @@ const SRUpdates = () => {
         ...siteSummaryData,
         userAction: UserActionEnum.default,
         srAction: SRApprovalStatusEnum.Public,
+        apiAction: UserActionEnum.updated,
       };
       saveDTO = {
         ...getDefaultObjectForSaving(),
@@ -430,6 +434,7 @@ const SRUpdates = () => {
         ...siteSummaryData,
         userAction: UserActionEnum.default,
         srAction: SRApprovalStatusEnum.Private,
+        apiAction: UserActionEnum.updated,
       };
       saveDTO = {
         ...getDefaultObjectForSaving(),
@@ -645,10 +650,14 @@ const SRUpdates = () => {
     disclosure: any,
     isApproved: boolean,
   ) => {
-    const updatedDisclosure = getUpdateRecordForComponentTypes(
-      disclosure,
-      isApproved,
-    );
+    const updateDisclosureSchedule2Refs =
+      disclosure?.siteProfileSchedule2Refs.map((schedule: any) => {
+        return getUpdateRecordForComponentTypes(schedule, isApproved);
+      });
+    const updatedDisclosure = {
+      ...getUpdateRecordForComponentTypes(disclosure, isApproved),
+      siteProfileSchedule2Refs: updateDisclosureSchedule2Refs,
+    };
 
     let saveDTO = {
       ...getDefaultObjectForSaving(),
@@ -860,7 +869,18 @@ const SRUpdates = () => {
             viewMode={SiteDetailsMode.ViewOnlyMode}
             userType={UserType.Internal}
             handleWidgetCheckBox={handleChange}
-            formData={disclosureData}
+            formData={{
+              ...disclosureData,
+              siteProfileSchedule2Refs:
+                disclosureData?.siteProfileSchedule2Refs?.map((item: any) => {
+                  return {
+                    ...item,
+                    description: schedule2Ref?.data?.find(
+                      (ref: any) => ref.key === item.schedule2ReferenceCode,
+                    )?.metaData,
+                  };
+                }) ?? [],
+            }}
             disclosureStatementConfig={disclosureStatementConfig}
             handleInputChange={(
               id: any,

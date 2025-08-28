@@ -59,6 +59,7 @@ import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
 import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
 import { SiteInsightsDto } from '../../dto/siteInsights.dto';
 import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
+import { SiteProfileSchedule2Ref } from '../../entities/siteProfileSchedule2Ref';
 
 /**
  * Nestjs Service For Region Entity
@@ -1693,53 +1694,80 @@ export class SiteService {
   ) {
     try {
       if (siteDisclosure?.length > 0) {
-        const disclosurePromises = siteDisclosure.map(async (disclosure) => {
-          const { apiAction, id, ...disclosureData } = disclosure;
-          let profile = {
+        const disclosurePromises = siteDisclosure?.map(async (disclosure) => {
+          const {
+            apiAction,
+            id,
+            siteProfileSchedule2Refs = [],
+            ...disclosureData
+          } = disclosure;
+          let siteProfile: SiteProfiles = {
             ...new SiteProfiles(),
+            id,
             ...disclosureData,
           };
+
           switch (apiAction) {
             case UserActionEnum.ADDED:
               const currentDate = new Date();
-              profile = {
-                ...profile,
-                siteId: siteId,
+              siteProfile = transactionalEntityManager.create(SiteProfiles, {
+                ...disclosureData,
+                siteId,
                 userAction: UserActionEnum.ADDED,
                 whenCreated: currentDate,
-                whoCreated: userInfo ? userInfo.givenName : '',
+                whoCreated: userInfo?.givenName || '',
                 whenUpdated: currentDate,
-                whoUpdated: userInfo ? userInfo.givenName : '',
-              };
+                whoUpdated: userInfo?.givenName || '',
+              });
+
+              siteProfile = await transactionalEntityManager.save(
+                SiteProfiles,
+                siteProfile,
+              );
               break;
             case UserActionEnum.UPDATED:
-              const isExist =
-                disclosure.id &&
-                (await this.siteProfilesRepo.findOneByOrFail({
-                  id: disclosure.id,
-                }));
-              if (isExist) {
-                profile = {
-                  ...isExist,
-                  ...profile,
-                  userAction:
-                    disclosure.srAction === SRApprovalStatusEnum.PUBLIC ||
-                    disclosure.srAction === SRApprovalStatusEnum.PRIVATE
-                      ? UserActionEnum.DEFAULT
-                      : UserActionEnum.UPDATED,
-                  whenUpdated: new Date(),
-                  whoUpdated: userInfo ? userInfo.givenName : '',
-                };
-              } else {
-                this.sitesLogger.log(
-                  `SiteService.processSiteDisclosure():There is no profile in database againts id : ${disclosure.id}`,
-                );
+              const existing = await this.siteProfilesRepo.findOne({
+                where: { id },
+                relations: ['siteProfileSchedule2Refs'],
+              });
+
+              if (!existing) {
+                this.sitesLogger.log(`No site profile found for id: ${id}`);
+                return;
               }
+
+              Object.assign(existing, {
+                ...disclosureData,
+                userAction:
+                  disclosure.srAction === SRApprovalStatusEnum.PUBLIC ||
+                  disclosure.srAction === SRApprovalStatusEnum.PRIVATE
+                    ? UserActionEnum.DEFAULT
+                    : UserActionEnum.UPDATED,
+                whenUpdated: new Date(),
+                whoUpdated: userInfo?.givenName || '',
+              });
+
+              siteProfile = await transactionalEntityManager.save(
+                SiteProfiles,
+                existing,
+              );
+              break;
+            default:
+              this.sitesLogger.warn(`Unknown apiAction: ${apiAction}`);
               break;
           }
-          await transactionalEntityManager.save(SiteProfiles, profile);
+
+          if (siteProfile?.id && siteProfileSchedule2Refs.length > 0) {
+            await this.processSchedule2Refs(
+              siteProfileSchedule2Refs,
+              siteProfile.id,
+              userInfo,
+              transactionalEntityManager,
+            );
+          }
         });
 
+        // Handle schedule2Ref (ADD, UPDATE, DELETE)
         await Promise.all(disclosurePromises);
       }
     } catch (error) {
@@ -1747,6 +1775,83 @@ export class SiteService {
         `Failed to process site disclosure.`,
         HttpStatus.NOT_FOUND,
       );
+    }
+  }
+
+  private async processSchedule2Refs(
+    refs: any[],
+    profileId: string,
+    userInfo: any,
+    transactionalEntityManager: EntityManager,
+  ) {
+    // Get current DB state
+    const currentRefs = await transactionalEntityManager.find(
+      SiteProfileSchedule2Ref,
+      {
+        where: { profileId },
+      },
+    );
+
+    const currentMap = new Map(currentRefs.map((r) => [r.id, r]));
+
+    const toSave: SiteProfileSchedule2Ref[] = [];
+    const toDelete: SiteProfileSchedule2Ref[] = [];
+
+    for (const ref of refs) {
+      const { apiAction, id, schedule2ReferenceCode } = ref;
+      const existing = currentMap.get(id);
+
+      switch (apiAction) {
+        case UserActionEnum.ADDED:
+          if (!existing) {
+            toSave.push(
+              transactionalEntityManager.create(SiteProfileSchedule2Ref, {
+                schedule2ReferenceCode,
+                profileId,
+                srAction: ref.srAction,
+                userAction: UserActionEnum.ADDED,
+                whoCreated: userInfo?.givenName || '',
+                whenCreated: new Date(),
+                whoUpdated: userInfo?.givenName || '',
+                whenUpdated: new Date(),
+              }),
+            );
+          }
+          break;
+
+        case UserActionEnum.UPDATED:
+          if (existing) {
+            Object.assign(existing, {
+              ...ref,
+              userAction:
+                ref.srAction === SRApprovalStatusEnum.PUBLIC ||
+                ref.srAction === SRApprovalStatusEnum.PRIVATE
+                  ? UserActionEnum.DEFAULT
+                  : UserActionEnum.UPDATED,
+              whoUpdated: userInfo?.givenName || '',
+              whenUpdated: new Date(),
+            });
+            toSave.push(existing);
+          }
+          break;
+
+        case UserActionEnum.DELETED:
+          if (existing) {
+            toDelete.push(existing);
+          }
+          break;
+      }
+    }
+
+    if (toDelete.length) {
+      await transactionalEntityManager.remove(
+        SiteProfileSchedule2Ref,
+        toDelete,
+      );
+    }
+
+    if (toSave.length) {
+      await transactionalEntityManager.save(SiteProfileSchedule2Ref, toSave);
     }
   }
 
@@ -1819,9 +1924,10 @@ export class SiteService {
               
               UNION ALL
               
-              SELECT site_id, when_Updated ,who_updated 
-              FROM sites.site_profiles
-              WHERE sr_action = 'pending' or user_action = 'updated'
+              SELECT sp.site_id, sp.when_Updated , sp.who_updated 
+              FROM sites.site_profiles sp
+              INNER JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
+              WHERE sp.sr_action = 'pending' or sp.user_action = 'updated' or sp2r.sr_action = 'pending' or sp2r.user_action = 'updated'
           ) AS updates
           GROUP BY site_id, who_updated
       )
@@ -1880,9 +1986,10 @@ export class SiteService {
           
           UNION ALL
           
-          SELECT site_id, 'site profiles' AS Change, when_Updated, who_updated ,  '' , '', '' 
-          FROM sites.site_profiles
-          WHERE sr_action = 'pending' or user_action = 'updated'
+          SELECT site_id, 'site profiles' AS Change, sp.when_Updated, sp.who_updated ,  '' , '', '' 
+          FROM sites.site_profiles sp
+          INNER JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
+          WHERE sp.sr_action = 'pending' or sp.user_action = 'updated' or sp2r.sr_action = 'pending' or sp2r.user_action = 'updated'
       ) AS c
       GROUP BY c.site_id,c.who_updated) Final
       JOIN LatestUpdates lu ON Final.site_id = lu.site_id and Final.who_updated = lu.who ) ResultInFo

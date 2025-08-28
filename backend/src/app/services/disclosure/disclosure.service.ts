@@ -8,6 +8,7 @@ import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { plainToInstance } from 'class-transformer';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { UserTypeEum } from '../../common/userType';
+import { SiteProfilesDTO } from '../../dto/disclosure.dto';
 
 @Injectable()
 export class DisclosureService {
@@ -29,7 +30,7 @@ export class DisclosureService {
     siteId: string,
     showPending: boolean,
     user: any,
-  ): Promise<SiteProfiles[]> {
+  ) {
     try {
       this.sitesLogger.log(
         'DisclosureService.getSiteDisclosureBySiteId() start',
@@ -37,12 +38,18 @@ export class DisclosureService {
       // Fetch site profiles based on the provided siteId
       let result: SiteProfiles[] = [];
       if (user?.identity_provider === UserTypeEum.IDIR) {
+        result = await this.disclosureRepository.find({
+          where: { siteId },
+        });
+
         if (showPending) {
-          result = await this.disclosureRepository.find({
-            where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
-          });
-        } else {
-          result = await this.disclosureRepository.find({ where: { siteId } });
+          result = result.filter(
+            (profile) =>
+              profile.srAction === SRApprovalStatusEnum.PENDING ||
+              profile.siteProfileSchedule2Refs?.some(
+                (ref) => ref.srAction === SRApprovalStatusEnum.PENDING,
+              ),
+          );
         }
       } else {
         const userId: string = user?.sub ? user.sub : '';
@@ -71,13 +78,23 @@ export class DisclosureService {
           return {
             ...res,
             srAction: res.srAction === SRApprovalStatusEnum.PUBLIC,
+            siteProfileSchedule2Refs: res?.siteProfileSchedule2Refs?.map(
+              (ref) => {
+                return {
+                  ...ref,
+                  userAction: ref.userAction ?? UserActionEnum.DEFAULT,
+                  srValue: ref.srAction === SRApprovalStatusEnum.PUBLIC,
+                  srAction: ref.srAction,
+                };
+              },
+            ),
           };
         });
         this.sitesLogger.log(
           'DisclosureService.getSiteDisclosureBySiteId() end',
         );
         // Convert the transformed objects into DTOs
-        const disclosure = plainToInstance(SiteProfiles, res);
+        const disclosure = plainToInstance(SiteProfilesDTO, res);
         return disclosure;
       }
     } catch (error) {

@@ -1,4 +1,4 @@
-FROM perl:slim
+FROM perl:5.36-slim-bookworm
 
 ARG ORA2PG_VERSION=24.3
 

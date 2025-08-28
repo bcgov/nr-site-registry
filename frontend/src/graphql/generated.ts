@@ -118,6 +118,20 @@ export type ClassificationCd = {
   description: Scalars['String']['output'];
 };
 
+export type Coms = {
+  __typename?: 'Coms';
+  bucketId: Scalars['String']['output'];
+};
+
+export type ComsResponse = {
+  __typename?: 'ComsResponse';
+  data?: Maybe<Coms>;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
 export type ConditionsText = {
   __typename?: 'ConditionsText';
   conditionsComment: Scalars['String']['output'];
@@ -135,7 +149,7 @@ export type CreateSnapshotDto = {
 
 export type DisclosureResponse = {
   __typename?: 'DisclosureResponse';
-  data?: Maybe<Array<SiteProfiles>>;
+  data?: Maybe<Array<SiteProfilesDto>>;
   httpStatusCode?: Maybe<Scalars['Int']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
@@ -455,7 +469,7 @@ export type LandHistoriesInputDto = {
 
 export type LandHistoryResponse = {
   __typename?: 'LandHistoryResponse';
-  data: Array<LandHistoriesDto>;
+  data?: Maybe<Array<LandHistoriesDto>>;
   httpStatusCode?: Maybe<Scalars['Int']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
@@ -522,6 +536,7 @@ export type Mutation = {
   addRecentView: RecentViewResponse;
   addSiteToFolio: FolioResponse;
   bulkAproveRejectChanges: SrApproveRejectResponse;
+  createBucket: ComsResponse;
   createSnapshotForSites: SnapshotResponse;
   deleteCartItem: CartResponse;
   deleteCartItemWithSiteId: CartResponse;
@@ -554,6 +569,12 @@ export type MutationAddSiteToFolioArgs = {
 
 export type MutationBulkAproveRejectChangesArgs = {
   approveRejectDTO: BulkApproveRejectChangesDto;
+};
+
+
+export type MutationCreateBucketArgs = {
+  bucketKey: Scalars['String']['input'];
+  bucketName: Scalars['String']['input'];
 };
 
 
@@ -768,6 +789,7 @@ export type Query = {
   getPendingSiteForSRApproval: QueryResultForPendingSitesResponse;
   getPeopleOrgsCd: DropdownResponse;
   getRecentViewsByUserId: RecentViewResponse;
+  getSchedule2Ref: DropdownResponse;
   getSiteDisclosureBySiteId: DisclosureResponse;
   getSiteDocumentsBySiteId: DocumentResponse;
   getSiteInsights: FetchSiteInsights;
@@ -1237,6 +1259,40 @@ export type SitePendingApprovalRecords = {
   whoUpdated: Scalars['String']['output'];
 };
 
+export type SiteProfileSchedule2Ref = {
+  __typename?: 'SiteProfileSchedule2Ref';
+  id: Scalars['String']['output'];
+  profileId: Scalars['String']['output'];
+  schedule2ReferenceCode: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
+  whenCreated: Scalars['DateTime']['output'];
+  whenUpdated?: Maybe<Scalars['DateTime']['output']>;
+  whoCreated: Scalars['String']['output'];
+  whoUpdated?: Maybe<Scalars['String']['output']>;
+};
+
+export type SiteProfileSchedule2RefDto = {
+  __typename?: 'SiteProfileSchedule2RefDTO';
+  apiAction?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  profileId: Scalars['String']['output'];
+  schedule2ReferenceCode: Scalars['String']['output'];
+  srAction?: Maybe<Scalars['String']['output']>;
+  srValue?: Maybe<Scalars['Boolean']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
+};
+
+export type SiteProfileSchedule2RefInputDto = {
+  apiAction?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['String']['input'];
+  profileId: Scalars['String']['input'];
+  schedule2ReferenceCode: Scalars['String']['input'];
+  srAction?: InputMaybe<Scalars['String']['input']>;
+  srValue?: InputMaybe<Scalars['Boolean']['input']>;
+  userAction?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type SiteProfiles = {
   __typename?: 'SiteProfiles';
   comments?: Maybe<Scalars['String']['output']>;
@@ -1280,6 +1336,7 @@ export type SiteProfiles = {
   siteDisclosureComment?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
   sitePostalCode?: Maybe<Scalars['String']['output']>;
+  siteProfileSchedule2Refs?: Maybe<Array<SiteProfileSchedule2Ref>>;
   siteRegDateEntered?: Maybe<Scalars['DateTime']['output']>;
   siteRegDateRecd?: Maybe<Scalars['DateTime']['output']>;
   siteRegParticId?: Maybe<Scalars['String']['output']>;
@@ -1289,6 +1346,31 @@ export type SiteProfiles = {
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
   whoUpdated?: Maybe<Scalars['String']['output']>;
+};
+
+export type SiteProfilesDto = {
+  __typename?: 'SiteProfilesDTO';
+  apiAction?: Maybe<Scalars['String']['output']>;
+  dateCompleted: Scalars['DateTime']['output'];
+  govDocumentsComment?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  localAuthDateForwarded?: Maybe<Scalars['DateTime']['output']>;
+  localAuthDateRecd?: Maybe<Scalars['DateTime']['output']>;
+  localAuthDateSubmitted?: Maybe<Scalars['DateTime']['output']>;
+  plannedActivityComment?: Maybe<Scalars['String']['output']>;
+  rwmDateDecision?: Maybe<Scalars['DateTime']['output']>;
+  rwmDateReceived?: Maybe<Scalars['DateTime']['output']>;
+  rwmParticId?: Maybe<Scalars['String']['output']>;
+  siteDisclosureComment?: Maybe<Scalars['String']['output']>;
+  siteId?: Maybe<Scalars['String']['output']>;
+  siteProfileSchedule2Refs?: Maybe<Array<SiteProfileSchedule2RefDto>>;
+  siteRegDateEntered?: Maybe<Scalars['DateTime']['output']>;
+  siteRegDateRecd?: Maybe<Scalars['DateTime']['output']>;
+  srAction?: Maybe<Scalars['String']['output']>;
+  srValue?: Maybe<Scalars['Boolean']['output']>;
+  userAction?: Maybe<Scalars['String']['output']>;
+  whenCreated?: Maybe<Scalars['DateTime']['output']>;
+  whenUpdated?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type SiteProfilesInputDto = {
@@ -1305,6 +1387,7 @@ export type SiteProfilesInputDto = {
   rwmParticId?: InputMaybe<Scalars['String']['input']>;
   siteDisclosureComment?: InputMaybe<Scalars['String']['input']>;
   siteId?: InputMaybe<Scalars['String']['input']>;
+  siteProfileSchedule2Refs?: InputMaybe<Array<SiteProfileSchedule2RefInputDto>>;
   siteRegDateEntered?: InputMaybe<Scalars['DateTime']['input']>;
   siteRegDateRecd?: InputMaybe<Scalars['DateTime']['input']>;
   srAction?: InputMaybe<Scalars['String']['input']>;
@@ -1507,6 +1590,14 @@ export enum Link__Purpose {
   Security = 'SECURITY'
 }
 
+export type CreateBucketMutationVariables = Exact<{
+  bucketName: Scalars['String']['input'];
+  bucketKey: Scalars['String']['input'];
+}>;
+
+
+export type CreateBucketMutation = { __typename?: 'Mutation', createBucket: { __typename?: 'ComsResponse', message?: string | null, httpStatusCode?: number | null, success?: boolean | null, timestamp?: string | null, data?: { __typename?: 'Coms', bucketId: string } | null } };
+
 export type Folio_GetFolioItemsForUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1559,6 +1650,46 @@ export type MapSearch_FindSitesAndPlacesQueryVariables = Exact<{
 export type MapSearch_FindSitesAndPlacesQuery = { __typename?: 'Query', findSitesAndPlaces: { __typename?: 'FindSitesAndPlacesResponse', data: { __typename?: 'FindSitesAndPlaces', sites: Array<{ __typename?: 'Sites', id: string, commonName: string, latdeg?: number | null, longdeg?: number | null }>, places: Array<{ __typename?: 'Place', id: string, name: string, latdeg: number, longdeg: number }> } } };
 
 
+export const CreateBucketDocument = gql`
+    mutation createBucket($bucketName: String!, $bucketKey: String!) {
+  createBucket(bucketName: $bucketName, bucketKey: $bucketKey) {
+    message
+    httpStatusCode
+    success
+    timestamp
+    data {
+      bucketId
+    }
+  }
+}
+    `;
+export type CreateBucketMutationFn = Apollo.MutationFunction<CreateBucketMutation, CreateBucketMutationVariables>;
+
+/**
+ * __useCreateBucketMutation__
+ *
+ * To run a mutation, you first call `useCreateBucketMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBucketMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createBucketMutation, { data, loading, error }] = useCreateBucketMutation({
+ *   variables: {
+ *      bucketName: // value for 'bucketName'
+ *      bucketKey: // value for 'bucketKey'
+ *   },
+ * });
+ */
+export function useCreateBucketMutation(baseOptions?: Apollo.MutationHookOptions<CreateBucketMutation, CreateBucketMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateBucketMutation, CreateBucketMutationVariables>(CreateBucketDocument, options);
+      }
+export type CreateBucketMutationHookResult = ReturnType<typeof useCreateBucketMutation>;
+export type CreateBucketMutationResult = Apollo.MutationResult<CreateBucketMutation>;
+export type CreateBucketMutationOptions = Apollo.BaseMutationOptions<CreateBucketMutation, CreateBucketMutationVariables>;
 export const Folio_GetFolioItemsForUserDocument = gql`
     query Folio_getFolioItemsForUser {
   getFolioItemsForUser {

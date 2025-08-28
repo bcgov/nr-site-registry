@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "backend.fullname" . }}-daily
+  name: {{ include "backend.fullname" . }}-esra-csv-daily
   labels:
     {{- include "backend.labels" . | nindent 4 }}
 spec:

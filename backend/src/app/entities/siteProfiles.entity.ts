@@ -15,6 +15,7 @@ import { SiteProfileOwners } from './siteProfileOwners.entity';
 import { SitePartics } from './sitePartics.entity';
 import { Sites } from './sites.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
+import { SiteProfileSchedule2Ref } from './siteProfileSchedule2Ref';
 
 @ObjectType()
 @Index('site_profiles_pkey', ['dateCompleted', 'siteId'], { unique: true })
@@ -403,4 +404,10 @@ export class SiteProfiles extends ChangeAuditEntity {
   // @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles4)
   // @JoinColumn([{ name: 'site_reg_partic_id', referencedColumnName: 'id' }])
   // siteRegPartic: SitePartics;
+
+  @Field(() => [SiteProfileSchedule2Ref], { nullable: true })
+  @OneToMany(() => SiteProfileSchedule2Ref, (ref) => ref.siteProfile, {
+    eager: true,
+  })
+  siteProfileSchedule2Refs: SiteProfileSchedule2Ref[];
 }

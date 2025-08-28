@@ -123,6 +123,11 @@ describe('Site Registry Review Tab', () => {
               data: [{ key: 'ACTIVE', value: 'Active' }],
             },
           },
+          schedule2Ref: {
+            getSchedule2Ref: {
+              data: [{ key: '1', value: 'Schedule 2 Ref 1' }],
+            },
+          },
         },
       },
     });

@@ -155,18 +155,31 @@ export class CsvService {
 
   private async executeQuery(query: string) {
     const entityManager = this.siteRepository.manager;
-    const queryResult = await entityManager.query(query);
 
-    let result: any[] = [];
+    const startTime = new Date();
+    this.sitesLogger.log(`Query started at: ${startTime.toISOString()}`);
+
+    let queryResult: any[];
+    try {
+      queryResult = await entityManager.query(query);
+    } catch (err) {
+      const errorTime = new Date();
+      this.sitesLogger.error(
+        `Query failed at: ${errorTime.toISOString()} (Started: ${startTime.toISOString()})`,
+        err,
+      );
+      throw err;
+    }
+
+    const endTime = new Date();
+    this.sitesLogger.log(
+      `Query finished at: ${endTime.toISOString()} | Duration: ${
+        (endTime.getTime() - startTime.getTime()) / 1000
+      }s`,
+    );
 
     if (queryResult?.length > 0) {
-      result = queryResult.map((res) => {
-        return {
-          ...res,
-        };
-      });
-
-      return result;
+      return queryResult.map((res) => ({ ...res }));
     } else {
       return [];
     }
@@ -258,7 +271,6 @@ where ss1.site_subdiv_id in
     sites.subdivisions sub
  where V.SITE_ID = SS.id
  and     V.SUBDIV_ID  = SUB.ID
- and sub.sr_action = 'public'
  and ss.sr_action = 'public'`;
 
   private getApprovedLandHistories = () =>
@@ -433,8 +445,7 @@ FROM
 JOIN 
     sites.sites ON sites.id = site_profiles.site_id
 where
-	site_profiles.sr_action = 'public'
-	and sites.sr_action = 'public'
+  sites.sr_action = 'public'
 	
 order by siteid, datecompleted desc`;
 

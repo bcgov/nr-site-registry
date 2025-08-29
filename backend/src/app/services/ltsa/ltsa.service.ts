@@ -48,6 +48,12 @@ const DB_ERROR_CODES = {
 const CLEANING_PATTERNS = {
   // Remove null bytes and control characters except newlines and tabs
   INVALID_CHARS: /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g,
+  // Unicode quotation marks and similar characters that should be normalized
+  UNICODE_QUOTES: /[\u2018\u2019\u201C\u201D\u2032\u2033]/g,
+  // Other problematic Unicode characters that might appear in property descriptions
+  UNICODE_DASHES: /[\u2013\u2014]/g,
+  // Unicode spaces that might cause positioning issues
+  UNICODE_SPACES: /[\u00A0\u2000-\u200B\u2028\u2029]/g,
 } as const;
 
 @Injectable()
@@ -176,19 +182,17 @@ export class LTSAService {
     this.sitesLogger.log('LTSAService.loadLtoData() start');
 
     try {
-      // Clean the file content first to remove any problematic characters
-      const cleanedFileContent = fileContent.replace(
-        CLEANING_PATTERNS.INVALID_CHARS,
-        '',
-      );
-      const lines = cleanedFileContent
+      const lines = fileContent
         .split('\n')
         .filter((line) => line.trim().length > 0);
       const ltoDownloadRecords: LtoDownload[] = [];
       let recordsProcessed = 0;
 
-      for (const line of lines) {
+      for (const rawLine of lines) {
         recordsProcessed++;
+
+        // Clean the line first to normalize character positions
+        const line = this.cleanString(rawLine);
 
         // Skip lines that are too short to contain minimum required data (pid + status)
         if (line.length < MIN_LINE_LENGTHS.BASIC_RECORD) {
@@ -196,6 +200,13 @@ export class LTSAService {
             `Skipping line ${recordsProcessed}: too short (${line.length} chars, minimum ${MIN_LINE_LENGTHS.BASIC_RECORD})`,
           );
           continue;
+        }
+
+        // Debug logging for lines that had character encoding issues
+        if (rawLine !== line && recordsProcessed <= 10) {
+          this.sitesLogger.log(
+            `Line ${recordsProcessed} had Unicode characters normalized. Original length: ${rawLine.length}, cleaned length: ${line.length}`,
+          );
         }
 
         // Parse according to lto_load.ctl positions using defined constants
@@ -208,6 +219,14 @@ export class LTSAService {
             LTO_FILE_POSITIONS.PID_STATUS_CD.END,
           )
           .trim();
+
+        // Validate that we extracted a PID (basic sanity check)
+        if (!pid || pid.length === 0) {
+          this.sitesLogger.log(
+            `Skipping line ${recordsProcessed}: could not extract valid PID from positions ${LTO_FILE_POSITIONS.PID.START}-${LTO_FILE_POSITIONS.PID.END}`,
+          );
+          continue;
+        }
 
         // Legal description starts at position 11 (index 10) and goes to position 265 (index 264)
         let legalDescription = null;
@@ -228,45 +247,44 @@ export class LTSAService {
         let childLegalDescription = null;
 
         if (line.length >= MIN_LINE_LENGTHS.WITH_CHILD_PID) {
-          childPid =
-            line
-              .substring(
-                LTO_FILE_POSITIONS.CHILD_PID.START,
-                LTO_FILE_POSITIONS.CHILD_PID.END,
-              )
-              .trim() || null;
+          const childPidRaw = line
+            .substring(
+              LTO_FILE_POSITIONS.CHILD_PID.START,
+              Math.min(line.length, LTO_FILE_POSITIONS.CHILD_PID.END),
+            )
+            .trim();
+          childPid = childPidRaw || null;
         }
+
         if (line.length >= MIN_LINE_LENGTHS.WITH_CHILD_STATUS) {
-          childPidStatusCd =
-            line
-              .substring(
-                LTO_FILE_POSITIONS.CHILD_PID_STATUS_CD.START,
-                LTO_FILE_POSITIONS.CHILD_PID_STATUS_CD.END,
-              )
-              .trim() || null;
+          const childStatusRaw = line
+            .substring(
+              LTO_FILE_POSITIONS.CHILD_PID_STATUS_CD.START,
+              Math.min(line.length, LTO_FILE_POSITIONS.CHILD_PID_STATUS_CD.END),
+            )
+            .trim();
+          childPidStatusCd = childStatusRaw || null;
         }
+
         if (line.length >= MIN_LINE_LENGTHS.WITH_CHILD_DESCRIPTION) {
           const endPos = Math.min(
             line.length,
             LTO_FILE_POSITIONS.CHILD_LEGAL_DESCRIPTION.END,
           );
-          childLegalDescription =
-            line
-              .substring(
-                LTO_FILE_POSITIONS.CHILD_LEGAL_DESCRIPTION.START,
-                endPos,
-              )
-              .trim() || null;
+          const childDescRaw = line
+            .substring(LTO_FILE_POSITIONS.CHILD_LEGAL_DESCRIPTION.START, endPos)
+            .trim();
+          childLegalDescription = childDescRaw || null;
         }
 
         // Create LtoDownload entity with cleaned data
         const ltoDownloadRecord = this.ltoDownloadRepository.create({
-          pid: this.cleanString(pid),
-          pidStatusCd: this.cleanString(pidStatusCd),
-          legalDescription: this.cleanString(legalDescription),
-          childPid: this.cleanString(childPid),
-          childPidStatusCd: this.cleanString(childPidStatusCd),
-          childLegalDescription: this.cleanString(childLegalDescription),
+          pid: pid || null,
+          pidStatusCd: pidStatusCd || null,
+          legalDescription: legalDescription || null,
+          childPid: childPid || null,
+          childPidStatusCd: childPidStatusCd || null,
+          childLegalDescription: childLegalDescription || null,
         });
 
         ltoDownloadRecords.push(ltoDownloadRecord);
@@ -274,9 +292,11 @@ export class LTSAService {
         // Log first few records for debugging
         if (recordsProcessed <= 5) {
           this.sitesLogger.log(
-            `Record ${recordsProcessed}: pid="${ltoDownloadRecord.pid}", status="${ltoDownloadRecord.pidStatusCd}", ` +
-              `legalDesc="${ltoDownloadRecord.legalDescription ? ltoDownloadRecord.legalDescription.substring(0, 50) + '...' : 'null'}", ` +
-              `childPid="${ltoDownloadRecord.childPid}", childStatus="${ltoDownloadRecord.childPidStatusCd}"`,
+            `Record ${recordsProcessed}: pid="${ltoDownloadRecord.pid}" (pos ${LTO_FILE_POSITIONS.PID.START}-${LTO_FILE_POSITIONS.PID.END}), ` +
+              `status="${ltoDownloadRecord.pidStatusCd}" (pos ${LTO_FILE_POSITIONS.PID_STATUS_CD.START}-${LTO_FILE_POSITIONS.PID_STATUS_CD.END}), ` +
+              `legalDesc="${ltoDownloadRecord.legalDescription ? ltoDownloadRecord.legalDescription.substring(0, 50) + '...' : 'null'}" (pos ${LTO_FILE_POSITIONS.LEGAL_DESCRIPTION.START}-${Math.min(line.length, LTO_FILE_POSITIONS.LEGAL_DESCRIPTION.END)}), ` +
+              `childPid="${ltoDownloadRecord.childPid}" (pos ${LTO_FILE_POSITIONS.CHILD_PID.START}-${Math.min(line.length, LTO_FILE_POSITIONS.CHILD_PID.END)}), ` +
+              `lineLength=${line.length}`,
           );
         }
       }
@@ -682,13 +702,21 @@ export class LTSAService {
 
   /**
    * Clean string fields to remove null bytes and other problematic characters
+   * and normalize Unicode characters to ASCII equivalents
    * @param str - String to clean
    * @returns Cleaned string or null if empty
    */
   private cleanString(str: string | null): string | null {
     if (!str) return null;
+
     const cleaned =
-      str.replace(CLEANING_PATTERNS.INVALID_CHARS, '').trim() || null;
+      str
+        .replace(CLEANING_PATTERNS.INVALID_CHARS, ' ')
+        .replace(CLEANING_PATTERNS.UNICODE_QUOTES, "'")
+        .replace(CLEANING_PATTERNS.UNICODE_DASHES, '-')
+        .replace(CLEANING_PATTERNS.UNICODE_SPACES, ' ')
+        .trim() || null;
+
     return cleaned;
   }
 }

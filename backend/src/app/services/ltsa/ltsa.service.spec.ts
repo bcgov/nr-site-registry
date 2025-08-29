@@ -361,6 +361,71 @@ describe('LTSAService', () => {
       expect(ltoDownloadRepository.create).toHaveBeenCalled();
     });
 
+    it('should normalize Unicode quotation marks and other problematic characters', async () => {
+      // Test data with Unicode quotation marks and other problematic characters
+      const contentWithUnicodeChars = `000000001A${'Legal\u2019s \u201CDescription\u201D with\u2013dash'.padEnd(255)}`;
+
+      ltoDownloadRepository.create?.mockImplementation((data: any) => {
+        // Should normalize ' to ', " to ", and – to -
+        expect(data.legalDescription).toContain("Legal's");
+        expect(data.legalDescription).not.toContain('\u2019');
+        expect(data.legalDescription).not.toContain('\u201C');
+        expect(data.legalDescription).not.toContain('\u2013');
+        return mockLtoDownload;
+      });
+
+      await service.loadLtoData(contentWithUnicodeChars);
+
+      expect(ltoDownloadRepository.create).toHaveBeenCalled();
+    });
+
+    it('should handle records with Unicode characters that affect positioning', async () => {
+      // Simulate the exact problem case from the user's example
+      const problematicContent = `000995142ILOT C EXCEPT: FIRSTLY: PARCEL ONE\u2019 REFERENCE PLAN 49341${''.padEnd(200)}`;
+
+      const result = await service.loadLtoData(problematicContent);
+
+      expect(result.recordsProcessed).toBe(1);
+      expect(result.recordsLoaded).toBe(1);
+      expect(ltoDownloadRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pid: '000995142',
+          pidStatusCd: 'I',
+          legalDescription: expect.stringContaining(
+            "LOT C EXCEPT: FIRSTLY: PARCEL ONE' REFERENCE PLAN",
+          ),
+        }),
+      );
+    });
+
+    it('should handle the exact problematic case from user example', async () => {
+      // Test the exact case: "000995142ILOT C EXCEPT: FIRSTLY: PARCEL ONE  REFERENCE PLAN..."
+      // Where  is a right single quotation mark (U+2019) that was causing position issues
+      const exactProblematicLine =
+        '000995142ILOT C EXCEPT: FIRSTLY: PARCEL ONE\u2019 REFERENCE PLAN 49341 SECONDLY: PART SUBDIVIDED BY PLAN 55374THIRDLY:  PART ON BYLAW PLAN 49866FOURTHLY: PART ON STATUTORY RIGHT OF WAY PLAN 73193 SECTION 36 BLOCK 5 NORTH RANGE 4 WEST NEW WESTMINSTER DISTRICT PLAN 571   028376633ILOT A  SECTIONS 25 AND 36  BLOCK 5 NORTH  RANGE 4 WEST  NEW WESTMINSTER DISTRICT  PLAN BCP46527';
+
+      const result = await service.loadLtoData(exactProblematicLine);
+
+      expect(result.recordsProcessed).toBe(1);
+      expect(result.recordsLoaded).toBe(1);
+
+      // Verify the record was created with correct field parsing
+      expect(ltoDownloadRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pid: '000995142',
+          pidStatusCd: 'I',
+          legalDescription: expect.stringContaining(
+            "LOT C EXCEPT: FIRSTLY: PARCEL ONE' REFERENCE PLAN",
+          ),
+          childPid: '028376633',
+          childPidStatusCd: 'I',
+          childLegalDescription: expect.stringContaining(
+            'LOT A  SECTIONS 25 AND 36',
+          ),
+        }),
+      );
+    });
+
     it('should handle database errors during loading', async () => {
       ltoDownloadRepository.save?.mockRejectedValue(new Error('Save failed'));
 

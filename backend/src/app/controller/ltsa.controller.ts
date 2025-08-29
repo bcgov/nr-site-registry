@@ -61,7 +61,7 @@ export class LTSAController {
         throw new BadRequestException('No file uploaded');
       }
 
-      if (!file.originalname.endsWith('.txt')) {
+      if (!file.originalname.toLowerCase().endsWith('.txt')) {
         throw new BadRequestException('Only .txt files are allowed');
       }
 

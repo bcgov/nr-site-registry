@@ -222,56 +222,52 @@ export class CsvService {
   WHERE 
 	sites.sr_action = 'public'`;
 
-  private getApprovedPINsANDPIDs = () => `SELECT
-      SUBSTRING(to_char(SS.id, '0999999999') FROM 2 FOR 10) AS siteId,
-    SUB.PIN
-    ,SUB.PID
-    ,SUB.CROWN_LANDS_FILE_NO
-    ,SUB.LEGAL_DESCRIPTION
-    ,SUB.DATE_NOTED   
-FROM
-    sites.sites ss,
-    (select   SITE_ID               ,
- SUBDIV_ID              ,
- DATE_NOTED             ,
- INITIAL_INDICATOR      ,
- WHO_CREATED            ,
- WHO_UPDATED            ,
- WHEN_CREATED           ,
- WHEN_UPDATED           ,
- SPROF_DATE_COMPLETED   ,
- SITE_SUBDIV_ID         ,
- SEND_TO_SR
-from sites.site_subdivisions ss1
-where ss1.site_subdiv_id in
- (select a.site_subdiv_id
-  from sites.site_subdivisions a
-  where not exists
-         (select b.subdiv_id
-          from sites.site_subdivisions b
-          where a.site_subdiv_id  <> b.site_subdiv_id
-          and a.site_id = b.site_id
-          and a.subdiv_id = b.subdiv_id)
-  union
-  select c.site_subdiv_id
-  from sites.site_subdivisions c
-  where exists
-       (select d.subdiv_id
-        from sites.site_subdivisions d
-        where c.site_subdiv_id  <> d.site_subdiv_id
-        and c.site_id = d.site_id
-        and c.subdiv_id = d.subdiv_id)
-  and c.subdiv_id = ss1.subdiv_id
-  and c.sprof_date_completed =
-       (select max(d.sprof_date_completed)
-        from sites.site_subdivisions d
-        where c.site_id = d.site_id
-        and  c.subdiv_id = d.subdiv_id)
-  ))  v,
-    sites.subdivisions sub
- where V.SITE_ID = SS.id
- and     V.SUBDIV_ID  = SUB.ID
- and ss.sr_action = 'public'`;
+  private getApprovedPINsANDPIDs = () => `WITH ranked_subdivs AS (
+    SELECT
+        ss1.site_id,
+        ss1.subdiv_id,
+        ss1.site_subdiv_id,
+        ss1.date_noted,
+        ss1.initial_indicator,
+        ss1.who_created,
+        ss1.who_updated,
+        ss1.when_created,
+        ss1.when_updated,
+        ss1.sprof_date_completed,
+        ss1.send_to_sr,
+        ROW_NUMBER() OVER (
+            PARTITION BY ss1.site_id, ss1.subdiv_id
+            ORDER BY ss1.sprof_date_completed DESC NULLS LAST
+        ) AS rn,
+        COUNT(*) OVER (
+            PARTITION BY ss1.site_id, ss1.subdiv_id
+        ) AS dup_count
+    FROM sites.site_subdivisions ss1
+)
+, filtered_subdivs AS (
+    SELECT *
+    FROM ranked_subdivs r
+    WHERE 
+        -- keep if it's the only subdivision (NOT EXISTS equivalent)
+        (dup_count = 1)
+        OR
+        -- keep if there are duplicates but this is the latest (EXISTS + MAX() equivalent)
+        (dup_count > 1 AND rn = 1)
+)
+SELECT
+    SUBSTRING(to_char(ss.id, '0999999999') FROM 2 FOR 10) AS siteId,
+    sub.pin,
+    sub.pid,
+    sub.crown_lands_file_no,
+    sub.legal_description,
+    f.date_noted
+FROM sites.sites ss
+JOIN filtered_subdivs f
+    ON f.site_id = ss.id
+JOIN sites.subdivisions sub
+    ON f.subdiv_id = sub.id
+WHERE ss.sr_action = 'public';
+`;
 
   private getApprovedLandHistories = () =>
     `SELECT SUBSTRING(to_char(site_id, '0999999999') FROM 2 FOR 10) AS siteid, description as land_use, land_use_notes as  notestring FROM (SELECT 

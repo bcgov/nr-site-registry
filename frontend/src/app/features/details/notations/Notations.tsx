@@ -18,6 +18,7 @@ import {
   flattenFormRows,
   getAxiosInstance,
   getUser,
+  parseDate,
   resultCache,
   sortArray,
   UpdateDisplayTypeParams,
@@ -808,7 +809,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       id: v4(), // Generate a unique ID for the new notation
       siteId: siteId,
       etypCode: '', // Default values for other properties
-      requirementReceivedDate: new Date(),
+      requirementReceivedDate: parseDate(new Date()),
       completionDate: null,
       eclsCode: '',
       requirementDueDate: null,

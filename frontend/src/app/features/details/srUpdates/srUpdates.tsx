@@ -42,7 +42,7 @@ import {
   schedule2ReferenceCdDrpdown,
 } from '../dropdowns/DropdownSlice';
 import {
-  dateFormatSR,
+  formatDate,
   showNotification,
   UpdateDisplayTypeParams,
   updateFields,
@@ -770,7 +770,7 @@ const SRUpdates = () => {
                 viewMode={SiteDetailsMode.ViewOnlyMode}
                 handleInputChange={handleChange}
                 document={document}
-                srTimeStamp={`Send to SR on ${dateFormatSR(document?.whenUpdated ?? document?.whenCreated ?? new Date())}`}
+                srTimeStamp={`Send to SR on ${formatDate(document?.whenUpdated ?? document?.whenCreated ?? new Date())}`}
                 handleViewOnline={() => {}}
                 handleDownload={() => {}}
                 handleFileReplace={handleChange}

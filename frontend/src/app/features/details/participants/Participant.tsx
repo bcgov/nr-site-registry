@@ -28,6 +28,7 @@ import { v4 } from 'uuid';
 import {
   getAxiosInstance,
   getUser,
+  parseDate,
   resultCache,
   sortArray,
   UpdateDisplayTypeParams,
@@ -536,7 +537,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
       prCode: '',
       displayName: '',
       description: '',
-      effectiveDate: new Date(),
+      effectiveDate: parseDate(new Date()),
       endDate: null,
       note: '',
       apiAction: UserActionEnum.added,

@@ -690,7 +690,8 @@ export const DateInput: React.FC<InputProps> = ({
     }
 
     if (newDate instanceof Date && !isNaN(newDate.getTime())) {
-      const formatted = parseDate(newDate); // Send UTC string to API e.g., "1970-01-01T00:00:00.000Z"
+      const formatted =
+        parseDate(newDate)?.toISOString().split('T')[0] + 'T00:00:00.000Z'; // Send UTC string to API e.g., "1970-01-01T00:00:00.000Z"
       onChange(formatted);
     } else {
       onChange(null);

@@ -809,7 +809,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       id: v4(), // Generate a unique ID for the new notation
       siteId: siteId,
       etypCode: '', // Default values for other properties
-      requirementReceivedDate: parseDate(new Date()),
+      requirementReceivedDate: new Date(),
       completionDate: null,
       eclsCode: '',
       requirementDueDate: null,

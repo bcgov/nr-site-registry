@@ -93,7 +93,7 @@ export const parseDate = (value: Date | string | null): Date | null => {
     const year = value.getFullYear();
     const month = value.getMonth();
     const day = value.getDate();
-    return new Date(Date.UTC(year, month, day));
+    return new Date(year, month, day);
   }
 
   return null;

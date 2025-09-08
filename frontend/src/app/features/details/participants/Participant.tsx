@@ -537,7 +537,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
       prCode: '',
       displayName: '',
       description: '',
-      effectiveDate: parseDate(new Date()),
+      effectiveDate: new Date(),
       endDate: null,
       note: '',
       apiAction: UserActionEnum.added,

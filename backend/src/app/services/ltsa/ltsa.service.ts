@@ -118,15 +118,28 @@ export class LTSAService {
     this.sitesLogger.log('LTSAService.cleanLtoTables() start');
 
     try {
-      // First, truncate lto_prev_download (equivalent to truncate table lto_prev_download)
-      await this.ltoPrevDownloadRepository.clear();
-      this.sitesLogger.log('Truncated lto_prev_download table');
+      // IMPORTANT: The Oracle procedure does table swapping, not data copying!
+      // Original Oracle logic:
+      // 1. truncate table lto_prev_download;
+      // 2. rename lto_download to temp_lto_download;
+      // 3. rename lto_prev_download to lto_download;
+      // 4. rename temp_lto_download to lto_prev_download;
+      //
+      // Since PostgreSQL doesn't support table renaming in the same way,
+      // we simulate this by moving data:
+      // 1. Clear lto_prev_download
+      // 2. Move all data from lto_download to lto_prev_download
+      // 3. Clear lto_download (ready for new data)
 
-      // Step 1: Copy data from lto_download to lto_prev_download
+      // Step 1: Clear lto_prev_download (equivalent to truncate table lto_prev_download)
+      await this.ltoPrevDownloadRepository.clear();
+      this.sitesLogger.log('Cleared lto_prev_download table');
+
+      // Step 2: Move data from lto_download to lto_prev_download (equivalent to table swap)
       const ltoDownloadData = await this.ltoDownloadRepository.find();
       if (ltoDownloadData.length > 0) {
         this.sitesLogger.log(
-          `Found ${ltoDownloadData.length} records to copy from lto_download to lto_prev_download`,
+          `Moving ${ltoDownloadData.length} records from lto_download to lto_prev_download`,
         );
 
         // Map LtoDownload entities to LtoPrevDownload entities
@@ -143,29 +156,31 @@ export class LTSAService {
 
         // Insert in chunks to avoid database parameter limits
         const chunkSize = DB_CONSTANTS.CHUNK_SIZE;
-        let totalCopiedRecords = 0;
+        let totalMovedRecords = 0;
 
         for (let i = 0; i < ltoPrevDownloadData.length; i += chunkSize) {
           const chunk = ltoPrevDownloadData.slice(i, i + chunkSize);
           this.sitesLogger.log(
-            `Copying chunk ${Math.floor(i / chunkSize) + 1} of ${Math.ceil(ltoPrevDownloadData.length / chunkSize)} (${chunk.length} records)`,
+            `Moving chunk ${Math.floor(i / chunkSize) + 1} of ${Math.ceil(ltoPrevDownloadData.length / chunkSize)} (${chunk.length} records)`,
           );
 
           const savedChunk = await this.ltoPrevDownloadRepository.save(chunk);
-          totalCopiedRecords += savedChunk.length;
+          totalMovedRecords += savedChunk.length;
         }
 
         this.sitesLogger.log(
-          `Copied ${totalCopiedRecords} records from lto_download to lto_prev_download`,
+          `Moved ${totalMovedRecords} records from lto_download to lto_prev_download`,
         );
+      } else {
+        this.sitesLogger.log('No records found in lto_download to move');
       }
 
-      // Step 2: Clear lto_download table (equivalent to having an empty table ready for new data)
+      // Step 3: Clear lto_download table (equivalent to having an empty table ready for new data)
       await this.ltoDownloadRepository.clear();
-      this.sitesLogger.log('Cleared lto_download table');
+      this.sitesLogger.log('Cleared lto_download table (ready for new data)');
 
       this.sitesLogger.log(
-        'LTSAService.cleanLtoTables() completed successfully',
+        'LTSAService.cleanLtoTables() completed successfully - tables are now in correct state for loading',
       );
     } catch (error) {
       this.sitesLogger.error(
@@ -292,10 +307,9 @@ export class LTSAService {
         // Log first few records for debugging
         if (recordsProcessed <= 5) {
           this.sitesLogger.log(
-            `Record ${recordsProcessed}: pid="${ltoDownloadRecord.pid}" (pos ${LTO_FILE_POSITIONS.PID.START}-${LTO_FILE_POSITIONS.PID.END}), ` +
+            `LTO Load Record ${recordsProcessed}: pid="${ltoDownloadRecord.pid}" (length: ${ltoDownloadRecord.pid?.length}, pos ${LTO_FILE_POSITIONS.PID.START}-${LTO_FILE_POSITIONS.PID.END}), ` +
               `status="${ltoDownloadRecord.pidStatusCd}" (pos ${LTO_FILE_POSITIONS.PID_STATUS_CD.START}-${LTO_FILE_POSITIONS.PID_STATUS_CD.END}), ` +
-              `legalDesc="${ltoDownloadRecord.legalDescription ? ltoDownloadRecord.legalDescription.substring(0, 50) + '...' : 'null'}" (pos ${LTO_FILE_POSITIONS.LEGAL_DESCRIPTION.START}-${Math.min(line.length, LTO_FILE_POSITIONS.LEGAL_DESCRIPTION.END)}), ` +
-              `childPid="${ltoDownloadRecord.childPid}" (pos ${LTO_FILE_POSITIONS.CHILD_PID.START}-${Math.min(line.length, LTO_FILE_POSITIONS.CHILD_PID.END)}), ` +
+              `childPid="${ltoDownloadRecord.childPid}", childStatus="${ltoDownloadRecord.childPidStatusCd}", ` +
               `lineLength=${line.length}`,
           );
         }
@@ -466,7 +480,16 @@ export class LTSAService {
 
   private async getChangedLtoRecords(): Promise<LtoDownload[]> {
     // Equivalent to the MINUS query in Oracle using TypeORM QueryBuilder
-    // Get records that are in lto_download but not in lto_prev_download
+    // Oracle MINUS query:
+    // select pid, pid_status_cd, legal_description, child_pid, child_pid_status_cd, child_legal_description
+    // from lto_download
+    // minus
+    // select pid, pid_status_cd, legal_description, child_pid, child_pid_status_cd, child_legal_description
+    // from lto_prev_download;
+    //
+    // This finds records that are in lto_download but not in lto_prev_download
+    // Important: Oracle MINUS handles NULL comparisons correctly automatically
+
     const subQuery = this.ltoPrevDownloadRepository
       .createQueryBuilder('lpd')
       .select('1')
@@ -487,11 +510,17 @@ export class LTSAService {
         '(lpd.childLegalDescription = ld.childLegalDescription OR (lpd.childLegalDescription IS NULL AND ld.childLegalDescription IS NULL))',
       );
 
-    return await this.ltoDownloadRepository
+    const result = await this.ltoDownloadRepository
       .createQueryBuilder('ld')
       .where(`NOT EXISTS (${subQuery.getQuery()})`)
       .setParameters(subQuery.getParameters())
       .getMany();
+
+    this.sitesLogger.log(
+      `getChangedLtoRecords found ${result.length} changed records (equivalent to Oracle MINUS operation)`,
+    );
+
+    return result;
   }
 
   private async updateSubdivision(
@@ -500,20 +529,22 @@ export class LTSAService {
     description: string,
   ): Promise<{ updated: boolean }> {
     // Equivalent to: update subdivisions set ... where lpad(pid,9) = parentPid
+    // CRITICAL FIX: The Oracle procedure WHERE clause uses lpad(pid,9) = parentPid
+    // This means we look up by padded PID and update the pid field to the same padded value
     const validPid = this.calculateValidPid(status);
     const paddedPid = pid.padStart(9, '0');
 
-    // First check if subdivision already exists
+    // First check if subdivision already exists (lookup by padded PID)
     const existingSubdivision = await this.subdivisionsRepository.findOne({
       where: { pid: paddedPid },
     });
 
     if (existingSubdivision) {
-      // Update existing subdivision
+      // Update existing subdivision - set pid to the same padded value used in lookup
       await this.subdivisionsRepository.update(
         { pid: paddedPid },
         {
-          pid,
+          pid: paddedPid, // FIXED: Keep pid as padded value, don't change it to unpadded
           pidStatusCd: status,
           legalDescription: description,
           validPid,
@@ -521,6 +552,7 @@ export class LTSAService {
           whenUpdated: new Date(),
         },
       );
+
       return { updated: true };
     }
 
@@ -549,7 +581,7 @@ export class LTSAService {
         await this.subdivisionsRepository.update(
           { pid: paddedPid },
           {
-            pid,
+            pid: paddedPid, // FIXED: Keep pid as padded value consistent with lookup
             pidStatusCd: status,
             legalDescription: description,
             validPid,
@@ -583,18 +615,37 @@ export class LTSAService {
     wasUpdated: boolean;
   }> {
     // Step 1: Check if child subdivision exists
+    const paddedChildPid = childPid.padStart(9, '0');
     const existingChild = await this.subdivisionsRepository.findOne({
-      where: { pid: childPid.padStart(9, '0') },
+      where: { pid: paddedChildPid },
     });
 
     if (existingChild) {
-      // Child exists - update it
+      // CRITICAL FIX: Check if this subdivision was already updated by a parent record in this same run
+      // If the subdivision was updated by LTO-LOAD and the update time is very recent (within the last few minutes),
+      // it likely means this PID was already processed as a parent in this run
+      const recentUpdateThreshold = new Date(Date.now() - 5 * 60 * 1000); // 5 minutes ago
+      const wasRecentlyUpdatedByLto =
+        existingChild.whoUpdated === 'LTO-LOAD' &&
+        existingChild.whenUpdated &&
+        existingChild.whenUpdated > recentUpdateThreshold;
+
+      if (wasRecentlyUpdatedByLto) {
+        // Return the existing subdivision without updating (parent takes precedence)
+        return {
+          childSubdivId: existingChild.id,
+          wasInserted: false,
+          wasUpdated: false, // No update performed due to precedence rule
+        };
+      }
+
+      // Child exists and wasn't recently updated by parent processing - proceed with update
       const validPid = this.calculateValidPid(childStatus);
 
       await this.subdivisionsRepository.update(
-        { pid: childPid.padStart(9, '0') },
+        { pid: paddedChildPid },
         {
-          pid: childPid,
+          pid: paddedChildPid, // FIXED: Keep consistent padding
           pidStatusCd: childStatus,
           legalDescription: childDescription,
           validPid,
@@ -610,8 +661,9 @@ export class LTSAService {
       };
     } else {
       // Child doesn't exist - clone from parent
+      const paddedParentPid = parentPid.padStart(9, '0');
       const parentRecord = await this.subdivisionsRepository.findOne({
-        where: { pid: parentPid.padStart(9, '0') },
+        where: { pid: paddedParentPid },
       });
 
       if (!parentRecord) {
@@ -626,7 +678,7 @@ export class LTSAService {
       const newChild = this.subdivisionsRepository.create({
         dateNoted: new Date(),
         pin: parentRecord.pin,
-        pid: childPid.padStart(9, '0'),
+        pid: paddedChildPid,
         bcaaFolioNumber: parentRecord.bcaaFolioNumber,
         legalDescription: childDescription,
         crownLandsFileNo: parentRecord.crownLandsFileNo,
@@ -651,8 +703,9 @@ export class LTSAService {
     childSubdivId: string,
   ): Promise<number> {
     // Step 1: Get parent subdivision ID
+    const paddedParentPid = parentPid.padStart(9, '0');
     const parentSubdiv = await this.subdivisionsRepository.findOne({
-      where: { pid: parentPid.padStart(9, '0') },
+      where: { pid: paddedParentPid },
     });
 
     if (!parentSubdiv) {

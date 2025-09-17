@@ -4,7 +4,7 @@
 }
 
 .account-custom-toggle {
-  color: var(--typography-color-primary-invert) !important;
+  color: var(--typography-color-link) !important;
 }
 
 .account-custom-toggle-mobile {

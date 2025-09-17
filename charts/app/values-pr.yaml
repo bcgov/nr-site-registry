@@ -12,6 +12,9 @@ global:
     keycloakClientID: ~
     keycloakAuthURL: ~
   config:
+    VITE_COMS_API: 'https://epd-coms-dev.apps.silver.devops.gov.bc.ca/api/v1/'
+    VITE_S3_STORAGE_REGION: 'ca-central-1'
+    VITE_COMS_BUCKET: 'bucket'
     seed:
       enabled: true # TODO -> when test is successfully deployed, make PR/Dev env always cloned , so seed happens in TEST env
 #-- the components of the application, backend.
@@ -26,10 +29,6 @@ backend:
     requests:
       cpu: 50m
       memory: 150Mi
-  config:
-    VITE_COMS_API: 'https://epd-coms-dev.apps.silver.devops.gov.bc.ca/api/v1/'
-    VITE_S3_STORAGE_REGION: 'ca-central-1'
-    VITE_COMS_BUCKET: 'bucket'
 frontend:
   enabled: true
   deploymentStrategy: Recreate

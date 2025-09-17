@@ -14,10 +14,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import {
-  dateFormatSR,
   flattenFormRows,
+  formatDate,
   getAxiosInstance,
   getUser,
+  parseDate,
   resultCache,
   UpdateDisplayTypeParams,
   updateFields,
@@ -403,7 +404,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
               docParticId: v4(),
               siteId: id,
               psnorgId: '',
-              submissionDate: new Date(),
+              submissionDate: new Date(), // Set submissionDate to parseDate(new Date()),
               documentDate: new Date(file.lastModified),
               title: file.name.split('.')[0].trim(),
               displayName: '',
@@ -477,8 +478,8 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
               if (document.id === doc.id) {
                 let replacedDocument = {
                   ...doc,
-                  submissionDate: new Date(),
-                  documentDate: new Date(file.lastModified),
+                  submissionDate: parseDate(new Date()),
+                  documentDate: parseDate(new Date(file.lastModified)),
                   title: file.name.split('.')[0].trim(),
                   file: file,
                   apiAction: UserActionEnum.updated,
@@ -821,7 +822,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                 viewMode={viewMode}
                 handleInputChange={handleInputChange}
                 document={document}
-                srTimeStamp={`Send to SR on ${dateFormatSR(document?.whenUpdated ?? document?.whenCreated ?? new Date())}`}
+                srTimeStamp={`Send to SR on ${formatDate(document?.whenUpdated ?? document?.whenCreated ?? new Date())}`}
                 handleViewOnline={() => {
                   handleViewOnline(document);
                 }}

@@ -1192,13 +1192,13 @@ const SiteDetails = () => {
               viewMode === SiteDetailsMode.ViewOnlyMode &&
               userType === UserType.External && (
                 <>
-                  <Button variant="secondary" onClick={handleAddToCart}>
-                    <ShoppingCartIcon />
-                    Add to Cart
-                  </Button>
                   {id && (
                     <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
                   )}
+                  <Button onClick={handleAddToCart}>
+                    <ShoppingCartIcon />
+                    Add to Cart
+                  </Button>
                 </>
               )}
           </div>
@@ -1349,13 +1349,13 @@ const SiteDetails = () => {
                 viewMode === SiteDetailsMode.ViewOnlyMode &&
                 userType === UserType.External && (
                   <>
+                    {id && (
+                      <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
+                    )}
                     <Button onClick={handleAddToCart}>
                       <ShoppingCartIcon />
                       Add to Cart
                     </Button>
-                    {id && (
-                      <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
-                    )}
                   </>
                 )}
             </div>

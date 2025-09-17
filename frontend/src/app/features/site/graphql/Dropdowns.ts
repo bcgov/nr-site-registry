@@ -155,3 +155,21 @@ export const graphQLSiteStatusCd = () => {
     }
   `;
 };
+
+export const graphQLSchedule2Ref = () => {
+  return gql`
+    query {
+      getSchedule2Ref {
+        message
+        httpStatusCode
+        success
+        timestamp
+        data {
+          key
+          value
+          metaData
+        }
+      }
+    }
+  `;
+};

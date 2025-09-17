@@ -14,10 +14,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import {
-  dateFormatSR,
   flattenFormRows,
+  formatDate,
   getAxiosInstance,
   getUser,
+  parseDate,
   resultCache,
   UpdateDisplayTypeParams,
   updateFields,
@@ -53,10 +54,13 @@ import {
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { UserActionEnum } from '../../../common/userActionEnum';
 import { Button } from '../../../components/button/Button';
-import { createBucket, getObject } from './DocumentEndpoints';
+import { getObject } from './DocumentEndpoints';
 import { Alert } from 'react-bootstrap';
+import { useCreateBucketMutation } from '../../../../graphql/generated';
 
 const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
+  const [createBucket] = useCreateBucketMutation();
+
   const {
     documentFirstChildFormRowsForExternal,
     documentFirstChildFormRows,
@@ -377,12 +381,20 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
           } else {
             const bucketName = `sites/${id}`;
             const bucketKey = `sites/${id}`;
-            const parentBucketRes = await createBucket(bucketName, bucketKey);
+            const parentBucketRes = await createBucket({
+              variables: {
+                bucketName: bucketName,
+                bucketKey: bucketKey,
+              },
+            });
             if (parentBucketRes) {
               dispatch(
-                updateParentBucket({ bucketId: parentBucketRes?.bucketId }),
+                updateParentBucket({
+                  bucketId: parentBucketRes?.data?.createBucket?.data?.bucketId,
+                }),
               );
-              parentBucketId = parentBucketRes?.bucketId;
+              parentBucketId =
+                parentBucketRes?.data?.createBucket?.data?.bucketId ?? '';
             }
           }
 
@@ -392,7 +404,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
               docParticId: v4(),
               siteId: id,
               psnorgId: '',
-              submissionDate: new Date(),
+              submissionDate: new Date(), // Set submissionDate to parseDate(new Date()),
               documentDate: new Date(file.lastModified),
               title: file.name.split('.')[0].trim(),
               displayName: '',
@@ -417,6 +429,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
             );
             dispatch(trackChanges(tracker.toPlainObject()));
           }
+          event.target.value = ''; // Reset input value so same file can be uploaded again
         } else {
           alert('Please select a valid PDF file.');
         }
@@ -465,8 +478,8 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
               if (document.id === doc.id) {
                 let replacedDocument = {
                   ...doc,
-                  submissionDate: new Date(),
-                  documentDate: new Date(file.lastModified),
+                  submissionDate: parseDate(new Date()),
+                  documentDate: parseDate(new Date(file.lastModified)),
                   title: file.name.split('.')[0].trim(),
                   file: file,
                   apiAction: UserActionEnum.updated,
@@ -701,17 +714,19 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
     }
   };
 
-  if(!id?.trim() || (!formData?.length && viewMode === SiteDetailsMode.ViewOnlyMode)) {
-    const hasDocuments = !formData?.length && viewMode === SiteDetailsMode.ViewOnlyMode
-    return <Alert variant={hasDocuments ? "info" : "warning"} data-testid="no-site">
-     { 
-      hasDocuments
-      ? 
-      'No documents found for this site. Please add documents to it.'
-      :
-      'Please create a site before adding documents. Once the site is created, you can add documents to it.'
-    }
-    </Alert>;
+  if (
+    !id?.trim() ||
+    (!siteDocuments?.length && viewMode === SiteDetailsMode.ViewOnlyMode)
+  ) {
+    const hasDocuments =
+      !siteDocuments?.length && viewMode === SiteDetailsMode.ViewOnlyMode;
+    return (
+      <Alert variant={hasDocuments ? 'info' : 'warning'} data-testid="no-site">
+        {hasDocuments
+          ? 'No documents found for this site. Please add documents to it.'
+          : 'Please create a site before adding documents. Once the site is created, you can add documents to it.'}
+      </Alert>
+    );
   }
 
   return (
@@ -807,7 +822,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
                 viewMode={viewMode}
                 handleInputChange={handleInputChange}
                 document={document}
-                srTimeStamp={`Send to SR on ${dateFormatSR(document?.whenUpdated ?? document?.whenCreated ?? new Date())}`}
+                srTimeStamp={`Send to SR on ${formatDate(document?.whenUpdated ?? document?.whenCreated ?? new Date())}`}
                 handleViewOnline={() => {
                   handleViewOnline(document);
                 }}

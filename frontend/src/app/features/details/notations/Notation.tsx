@@ -11,7 +11,7 @@ import { RequestStatus } from '../../../helpers/requests/status';
 import { DropdownItem } from '../../../components/action/IActions';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
 import { Button } from '../../../components/button/Button';
-import { dateFormatSR } from '../../../helpers/utility';
+import { formatDate, parseDate } from '../../../helpers/utility';
 
 interface INotationProps {
   index?: number;
@@ -79,14 +79,18 @@ const Notation: React.FC<INotationProps> = ({
     eventParticsForEvent: any,
     dateFormatSR: (date: Date) => string,
   ) => {
-    let latestTimestamp = new Date(event.whenUpdated || event.whenCreated);
+    // Try to get a valid event timestamp
+    const eventDate =
+      parseDate(event?.whenUpdated) || parseDate(event?.whenCreated);
+
+    // Default to now if no valid date found
+    let latestTimestamp = eventDate || parseDate(new Date()) || new Date();
 
     eventParticsForEvent?.forEach((partic: any) => {
-      const particTimestamp = new Date(
-        partic.whenUpdated || partic.whenCreated,
-      );
-      if (particTimestamp > latestTimestamp) {
-        latestTimestamp = particTimestamp;
+      const particDate =
+        parseDate(partic?.whenUpdated) || parseDate(partic?.whenCreated);
+      if (particDate && particDate > latestTimestamp) {
+        latestTimestamp = particDate;
       }
     });
 
@@ -98,7 +102,7 @@ const Notation: React.FC<INotationProps> = ({
     calculateLatestTimestamp(
       notation,
       notation.notationParticipant,
-      dateFormatSR,
+      formatDate,
     );
 
   return (

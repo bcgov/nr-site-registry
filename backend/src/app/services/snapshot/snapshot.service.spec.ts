@@ -387,6 +387,7 @@ describe('SnapshotService', () => {
       // The two below have been added much later, unsure why required now, but was causing PR unit tests to fail.
       completorParticId: '5001',
       contactParticId: '6001',
+      siteProfileSchedule2Refs: [],
     },
   ];
 

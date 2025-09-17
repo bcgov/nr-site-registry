@@ -1,0 +1,12 @@
+
+mutation createBucket($bucketName: String!, $bucketKey: String!){
+  createBucket(bucketName: $bucketName, bucketKey: $bucketKey) {
+    message
+    httpStatusCode
+    success
+    timestamp
+    data {
+      bucketId
+    }
+  }
+}

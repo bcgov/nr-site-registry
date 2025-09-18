@@ -37,3 +37,7 @@
   text-align: left;
   color: var(--typography-color-primary, #2d2d2d);
 }
+
+.Toastify__close-button {
+  padding: 12px 5px 0px 0px; /* Padding */
+}

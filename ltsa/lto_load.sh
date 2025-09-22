@@ -36,14 +36,24 @@ cd ${export_path}
      echo 'No parcel file presence. Exiting...'
      exit 3 
    else
-     echo clean out existing data
-     sqlplus $account_pwd @${admin_lto_path}/lto_clean
-
-     echo load the new lto data into the temporary table
-     sqlldr userid=$account_pwd control=${admin_lto_path}/lto_load.ctl log=${app_path}/logs/lto_load.log
-
-     echo now load the data into the system
-     sqlplus $account_pwd @${admin_lto_path}/lto_load
+    echo loading data using new API-based process
+    
+    # Find the PARCEL_DESCRIPTION_RESPONSE file
+    PARCEL_FILE=$(ls -1 PARCEL_DESCRIPTION_RESPONSE_*.TXT 2>/dev/null | head -1)
+    
+    if [ -z "$PARCEL_FILE" ]; then
+      echo "Error: No PARCEL_DESCRIPTION_RESPONSE_*.TXT file found"
+      exit 1
+    fi
+    
+    echo "Found parcel file: $PARCEL_FILE"
+    
+    API_URL="${API_URL}" \
+    KEYCLOAK_URL="${KEYCLOAK_URL}" \
+    KEYCLOAK_REALM="${KEYCLOAK_REALM}" \
+    KEYCLOAK_CLIENT_ID="${KEYCLOAK_CLIENT_ID}" \
+    KEYCLOAK_CLIENT_SECRET="${KEYCLOAK_CLIENT_SECRET}" \
+    ${admin_lto_path}/../lto_load_new.sh "$PARCEL_FILE"
    fi
    
 date

@@ -1,12 +1,10 @@
 #!/bin/ksh
 
-# Usage: ./lto_load_new.sh [data_file]
-# data_file: path to the .txt file to upload (optional, defaults to load_test_data.txt)
+# Usage: ./lto_load_new.sh <data_file>
+# data_file: path to the .txt file to upload (required)
 
 # Configuration - all environment variables are required
 API_URL="${API_URL}"
-DEFAULT_DATA_FILE="load_test_data.txt"
-# DEFAULT_DATA_FILE="load_test_data_subset.txt"
 
 # Check if required environment variables are set
 if [[ -z "$API_URL" ]]; then
@@ -18,7 +16,7 @@ if [[ -z "$API_URL" ]]; then
     print "  KEYCLOAK_REALM=your-realm \\"
     print "  KEYCLOAK_CLIENT_ID=your-client-id \\"
     print "  KEYCLOAK_CLIENT_SECRET=your-secret \\"
-    print "  ./lto_load_new.sh [data_file]"
+    print "  ./lto_load_new.sh <data_file>"
     print ""
     print "Required environment variables:"
     print "  API_URL - Site registry API URL"
@@ -28,16 +26,20 @@ if [[ -z "$API_URL" ]]; then
     print "  KEYCLOAK_CLIENT_SECRET - Keycloak client secret"
     print ""
     print "Parameters:"
-    print "  data_file: path to the .txt file to upload (optional, defaults to load_test_data.txt)"
+    print "  data_file: path to the .txt file to upload (required)"
     exit 1
 fi
 
-# Check if data file parameter is provided, otherwise use default
+# Check if data file parameter is provided (required)
 if [[ $# -eq 0 ]]; then
-    DATA_FILE="$DEFAULT_DATA_FILE"
-else
-    DATA_FILE="$1"
+    print "Error: Data file parameter is required"
+    print ""
+    print "Usage: ./lto_load_new.sh <data_file>"
+    print "  data_file: path to the .txt file to upload"
+    exit 1
 fi
+
+DATA_FILE="$1"
 
 # Get the directory where this script is located
 SCRIPT_DIR=$(dirname "$0")

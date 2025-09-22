@@ -529,8 +529,6 @@ export class LTSAService {
     description: string,
   ): Promise<{ updated: boolean }> {
     // Equivalent to: update subdivisions set ... where lpad(pid,9) = parentPid
-    // CRITICAL FIX: The Oracle procedure WHERE clause uses lpad(pid,9) = parentPid
-    // This means we look up by padded PID and update the pid field to the same padded value
     const validPid = this.calculateValidPid(status);
     const paddedPid = pid.padStart(9, '0');
 
@@ -544,7 +542,7 @@ export class LTSAService {
       await this.subdivisionsRepository.update(
         { pid: paddedPid },
         {
-          pid: paddedPid, // FIXED: Keep pid as padded value, don't change it to unpadded
+          pid: paddedPid,
           pidStatusCd: status,
           legalDescription: description,
           validPid,
@@ -581,7 +579,7 @@ export class LTSAService {
         await this.subdivisionsRepository.update(
           { pid: paddedPid },
           {
-            pid: paddedPid, // FIXED: Keep pid as padded value consistent with lookup
+            pid: paddedPid,
             pidStatusCd: status,
             legalDescription: description,
             validPid,
@@ -621,10 +619,10 @@ export class LTSAService {
     });
 
     if (existingChild) {
-      // CRITICAL FIX: Check if this subdivision was already updated by a parent record in this same run
-      // If the subdivision was updated by LTO-LOAD and the update time is very recent (within the last few minutes),
+      // CRITICAL: Check if this subdivision was already updated by a parent record in this same run
+      // If the subdivision was updated by LTO-LOAD and the update time is very recent (within the last several minutes),
       // it likely means this PID was already processed as a parent in this run
-      const recentUpdateThreshold = new Date(Date.now() - 5 * 60 * 1000); // 5 minutes ago
+      const recentUpdateThreshold = new Date(Date.now() - 15 * 60 * 1000); // 15 minutes ago
       const wasRecentlyUpdatedByLto =
         existingChild.whoUpdated === 'LTO-LOAD' &&
         existingChild.whenUpdated &&

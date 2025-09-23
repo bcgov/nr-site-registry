@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomLabel from '../../components/simple/CustomLabel';
@@ -79,8 +79,10 @@ import {
   fetchNotationParticipantRoleCd,
   fetchNotationTypeCd,
   fetchParticipantRoleCd,
+  fetchSchedule2ReferenceCd,
   fetchSiteRiskCd,
   fetchSiteStatusCd,
+  schedule2ReferenceCdDrpdown,
 } from './dropdowns/DropdownSlice';
 import BannerDetails from '../../components/banners/BannerDetails';
 import {
@@ -129,7 +131,6 @@ import {
 import { Button } from '../../components/button/Button';
 import { IFormField } from '../../components/input-controls/IFormField';
 import { GetNotationConfig } from './notations/NotationsConfig';
-import { disclosureStatementConfigEditMode } from './disclosure/DisclosureConfig';
 import GetConfig from './participants/ParticipantConfig';
 import { GetAssociateConfig } from './associates/AssociateConfig';
 import { GetDocumentsConfig } from './documents/DocumentsConfig';
@@ -144,8 +145,12 @@ import {
 import { HttpStatusCode } from '../../common/httpStatusCode';
 import { GetSummaryConfig } from './summary/SummaryConfig';
 import { de } from 'date-fns/locale';
+import { siteDisclosureConfig } from './disclosure/DisclosureConfig';
 
 const SiteDetails = () => {
+  const { disclosureStatementConfigEditMode } = siteDisclosureConfig(
+    useSelector(schedule2ReferenceCdDrpdown)?.data,
+  );
   const auth = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -279,22 +284,51 @@ const SiteDetails = () => {
     }
   }, [details]);
 
+  const lastScrollY = useRef(0);
+  const isVisibleRef = useRef(false); // track visibility without triggering re-renders
   useEffect(() => {
+    const thresholdShow = 100; // show header only after scrolling past 100px
+    const thresholdHide = 30; // hide header only when scrolling up to < 30px
+
     const handleScroll = () => {
-      if (window.scrollY > 5) {
-        // Adjust the scroll position as needed
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
+      const currentScrollY = window.scrollY;
+
+      // Always hide at the top
+      if (currentScrollY <= 5) {
+        if (isVisibleRef.current) {
+          setIsVisible(false);
+          isVisibleRef.current = false;
+        }
+        lastScrollY.current = currentScrollY;
+        return;
       }
+
+      const scrollingDown = currentScrollY > lastScrollY.current;
+      const scrollingUp = currentScrollY < lastScrollY.current;
+
+      if (
+        scrollingDown &&
+        currentScrollY > thresholdShow &&
+        !isVisibleRef.current
+      ) {
+        setIsVisible(true);
+        isVisibleRef.current = true;
+      }
+
+      if (
+        scrollingUp &&
+        currentScrollY < thresholdHide &&
+        isVisibleRef.current
+      ) {
+        setIsVisible(false);
+        isVisibleRef.current = false;
+      }
+
+      lastScrollY.current = currentScrollY;
     };
 
     window.addEventListener('scroll', handleScroll);
-
-    // Clean up the event listener on component unmount
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
@@ -423,6 +457,7 @@ const SiteDetails = () => {
     dispatch(fetchSiteRiskCd());
     dispatch(fetchSiteStatusCd());
     dispatch(fetchBceRegionCd());
+    dispatch(fetchSchedule2ReferenceCd());
   };
 
   const checkForRecordsPendingReview = (siteId: string) => {
@@ -687,10 +722,10 @@ const SiteDetails = () => {
         Object.keys(disclosure).length > 0
       ) {
         const siteDisclosureErrors: any[] = [];
-        let updatedSiteDisclosure = deepFilterByUserAction(
-          disclosure,
-          userActions,
-        );
+        let updatedSiteDisclosure = deepFilterByUserAction(disclosure, [
+          ...userActions,
+          UserActionEnum.deleted,
+        ]);
         const errors = validateForm(
           disclosureStatementConfigEditMode,
           updatedSiteDisclosure,
@@ -718,6 +753,10 @@ const SiteDetails = () => {
           updatedSiteDisclosure = removeProperty(
             updatedSiteDisclosure,
             'position',
+          );
+          updatedSiteDisclosure = removeProperty(
+            updatedSiteDisclosure,
+            'description',
           );
           dispatch(setupSiteDisclosureDataForSaving(updatedSiteDisclosure));
           return [];
@@ -1153,13 +1192,13 @@ const SiteDetails = () => {
               viewMode === SiteDetailsMode.ViewOnlyMode &&
               userType === UserType.External && (
                 <>
-                  <Button variant="secondary" onClick={handleAddToCart}>
-                    <ShoppingCartIcon />
-                    Add to Cart
-                  </Button>
                   {id && (
                     <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
                   )}
+                  <Button onClick={handleAddToCart}>
+                    <ShoppingCartIcon />
+                    Add to Cart
+                  </Button>
                 </>
               )}
           </div>
@@ -1310,13 +1349,13 @@ const SiteDetails = () => {
                 viewMode === SiteDetailsMode.ViewOnlyMode &&
                 userType === UserType.External && (
                   <>
+                    {id && (
+                      <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
+                    )}
                     <Button onClick={handleAddToCart}>
                       <ShoppingCartIcon />
                       Add to Cart
                     </Button>
-                    {id && (
-                      <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
-                    )}
                   </>
                 )}
             </div>

@@ -155,18 +155,31 @@ export class CsvService {
 
   private async executeQuery(query: string) {
     const entityManager = this.siteRepository.manager;
-    const queryResult = await entityManager.query(query);
 
-    let result: any[] = [];
+    const startTime = new Date();
+    this.sitesLogger.log(`Query started at: ${startTime.toISOString()}`);
+
+    let queryResult: any[];
+    try {
+      queryResult = await entityManager.query(query);
+    } catch (err) {
+      const errorTime = new Date();
+      this.sitesLogger.error(
+        `Query failed at: ${errorTime.toISOString()} (Started: ${startTime.toISOString()})`,
+        err,
+      );
+      throw err;
+    }
+
+    const endTime = new Date();
+    this.sitesLogger.log(
+      `Query finished at: ${endTime.toISOString()} | Duration: ${
+        (endTime.getTime() - startTime.getTime()) / 1000
+      }s`,
+    );
 
     if (queryResult?.length > 0) {
-      result = queryResult.map((res) => {
-        return {
-          ...res,
-        };
-      });
-
-      return result;
+      return queryResult.map((res) => ({ ...res }));
     } else {
       return [];
     }
@@ -209,57 +222,53 @@ export class CsvService {
   WHERE 
 	sites.sr_action = 'public'`;
 
-  private getApprovedPINsANDPIDs = () => `SELECT
-      SUBSTRING(to_char(SS.id, '0999999999') FROM 2 FOR 10) AS siteId,
-    SUB.PIN
-    ,SUB.PID
-    ,SUB.CROWN_LANDS_FILE_NO
-    ,SUB.LEGAL_DESCRIPTION
-    ,SUB.DATE_NOTED   
-FROM
-    sites.sites ss,
-    (select   SITE_ID               ,
- SUBDIV_ID              ,
- DATE_NOTED             ,
- INITIAL_INDICATOR      ,
- WHO_CREATED            ,
- WHO_UPDATED            ,
- WHEN_CREATED           ,
- WHEN_UPDATED           ,
- SPROF_DATE_COMPLETED   ,
- SITE_SUBDIV_ID         ,
- SEND_TO_SR
-from sites.site_subdivisions ss1
-where ss1.site_subdiv_id in
- (select a.site_subdiv_id
-  from sites.site_subdivisions a
-  where not exists
-         (select b.subdiv_id
-          from sites.site_subdivisions b
-          where a.site_subdiv_id  <> b.site_subdiv_id
-          and a.site_id = b.site_id
-          and a.subdiv_id = b.subdiv_id)
-  union
-  select c.site_subdiv_id
-  from sites.site_subdivisions c
-  where exists
-       (select d.subdiv_id
-        from sites.site_subdivisions d
-        where c.site_subdiv_id  <> d.site_subdiv_id
-        and c.site_id = d.site_id
-        and c.subdiv_id = d.subdiv_id)
-  and c.subdiv_id = ss1.subdiv_id
-  and c.sprof_date_completed =
-       (select max(d.sprof_date_completed)
-        from sites.site_subdivisions d
-        where c.site_id = d.site_id
-        and  c.subdiv_id = d.subdiv_id)
-  ))  v,
-    sites.subdivisions sub
- where V.SITE_ID = SS.id
- and     V.SUBDIV_ID  = SUB.ID
- and sub.sr_action = 'public'
- and ss.sr_action = 'public'`;
+  private getApprovedPINsANDPIDs = () => `WITH site_subdiv_ranked AS (
+    SELECT
+        ss.site_id,
+        ss.subdiv_id,
+        ss.site_subdiv_id,
+        ss.date_noted,
+        ss.sr_action,
+        ss.sprof_date_completed,
+        RANK() OVER (
+            PARTITION BY ss.site_id, ss.subdiv_id
+            ORDER BY ss.sprof_date_completed DESC NULLS LAST
+        ) AS rnk
+    FROM sites.site_subdivisions ss
+),
+-- pick the latest completed subdivision(s) per site_id + subdiv_id
+latest_subdiv AS (
+    SELECT
+        site_id,
+        subdiv_id,
+        site_subdiv_id,
+        date_noted,
+        sr_action
+    FROM site_subdiv_ranked
+    WHERE rnk = 1
+)
+SELECT
+    substr(to_char(s.id, '0999999999'), 2, 10) AS siteid,
+    sub.pin,
+    lpad(sub.pid, 9, '0') AS pidno,
+    sub.crown_lands_file_no,
+    replace(sub.legal_description, chr(10), ' ') AS legaldesc,
+    to_char(v.date_noted, 'YYYY-MM-DD') AS datenoted   -- ✅ use alias v
+FROM sites.sites s
+JOIN sites.bce_region_cd bce
+    ON bce.code = s.bcer_code
+JOIN sites.site_status_cd ssc
+    ON ssc.code = s.sst_code
+JOIN sites.classification_cd classcd
+    ON classcd.code = s.class_code
+JOIN latest_subdiv v
+    ON v.site_id = s.id
+JOIN sites.subdivisions sub
+    ON sub.id = v.subdiv_id
+WHERE v.sr_action = 'public'
+and s.sr_action = 'public'
+ORDER BY s.id, sub.pin, sub.pid;
+`;
 
   private getApprovedLandHistories = () =>
     `SELECT SUBSTRING(to_char(site_id, '0999999999') FROM 2 FOR 10) AS siteid, description as land_use, land_use_notes as  notestring FROM (SELECT 
@@ -433,8 +442,7 @@ FROM
 JOIN 
     sites.sites ON sites.id = site_profiles.site_id
 where
-	site_profiles.sr_action = 'public'
-	and sites.sr_action = 'public'
+  sites.sr_action = 'public'
 	
 order by siteid, datecompleted desc`;
 

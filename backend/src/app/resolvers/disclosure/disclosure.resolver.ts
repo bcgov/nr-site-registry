@@ -8,7 +8,7 @@ import {
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
-import { DisclosureResponse } from '../../dto/disclosure.dto';
+import { DisclosureResponse, SiteProfilesDTO } from '../../dto/disclosure.dto';
 import { DisclosureService } from '../../services/disclosure/disclosure.service';
 import { CustomRoles } from '../../common/role';
 import { LoggerService } from '../../logger/logger.service';
@@ -18,7 +18,7 @@ export class DisclosureResolver {
   constructor(
     private readonly dsiclosureService: DisclosureService,
     private readonly genericResponseProvider: GenericResponseProvider<
-      SiteProfiles[]
+      SiteProfilesDTO[]
     >,
     private readonly sitesLogger: LoggerService,
   ) {}

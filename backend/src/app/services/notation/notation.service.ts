@@ -44,7 +44,7 @@ export class NotationService {
       if (user?.identity_provider === UserTypeEum.IDIR) {
         if (showPending) {
           events = await this.notationRepository.find({
-            where: { siteId, srAction: SRApprovalStatusEnum.PENDING  },
+            where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
           });
         } else {
           events = await this.notationRepository.find({ where: { siteId } });
@@ -109,33 +109,35 @@ export class NotationService {
             id: event.id,
             siteId: event.siteId,
             psnorgId: event.psnorgId,
-            completionDate: new Date(event.completionDate).toISOString(),
-            requirementDueDate: new Date(
-              event.requirementDueDate,
-            ).toISOString(),
-            requirementReceivedDate: new Date(
-              event.requirementReceivedDate,
-            ).toISOString(),
-            requiredAction: event.requiredAction?.trim(),
-            note: event.note?.trim(),
-            etypCode: event.etypCode,
-            eclsCode: event.eclsCode,
-            userAction: event.userAction ?? UserActionEnum.DEFAULT,
-            srAction: event.srAction === SRApprovalStatusEnum.PUBLIC,
-            whenCreated: event.whenCreated,
-            whenUpdated: event.whenUpdated,
+            completionDate:
+              event.completionDate &&
+              new Date(event.completionDate).toISOString(),
+            requirementDueDate:
+              event.requirementDueDate &&
+              new Date(event.requirementDueDate).toISOString(),
+            requirementReceivedDate:
+              event.requirementReceivedDate &&
+              new Date(event.requirementReceivedDate).toISOString(),
+            requiredAction: event?.requiredAction?.trim(),
+            note: event?.note?.trim(),
+            etypCode: event?.etypCode,
+            eclsCode: event?.eclsCode,
+            userAction: event?.userAction ?? UserActionEnum.DEFAULT,
+            srAction: event?.srAction === SRApprovalStatusEnum.PUBLIC,
+            whenCreated: event?.whenCreated,
+            whenUpdated: event?.whenUpdated,
             notationParticipant: eventParticsForEvent?.map((partic) => ({
-              eventParticId: partic.id,
-              eventId: partic.eventId,
-              spId: partic.spId,
-              eprCode: partic.eprCode,
-              psnorgId: partic.psnorgId,
-              displayName: partic.psnorg.displayName,
-              userAction: partic.userAction ?? UserActionEnum.DEFAULT,
-              srValue: partic.srAction === SRApprovalStatusEnum.PUBLIC,
-              srAction: partic.srAction,
-              whenCreated: partic.whenCreated,
-              whenUpdated: partic.whenUpdated,
+              eventParticId: partic?.id,
+              eventId: partic?.eventId,
+              spId: partic?.spId,
+              eprCode: partic?.eprCode,
+              psnorgId: partic?.psnorgId,
+              displayName: partic?.psnorg?.displayName,
+              userAction: partic?.userAction ?? UserActionEnum.DEFAULT,
+              srValue: partic?.srAction === SRApprovalStatusEnum.PUBLIC,
+              srAction: partic?.srAction,
+              whenCreated: partic?.whenCreated,
+              whenUpdated: partic?.whenUpdated,
             })),
           };
         });

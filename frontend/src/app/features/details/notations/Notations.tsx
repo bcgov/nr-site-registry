@@ -18,6 +18,7 @@ import {
   flattenFormRows,
   getAxiosInstance,
   getUser,
+  parseDate,
   resultCache,
   sortArray,
   UpdateDisplayTypeParams,
@@ -90,8 +91,9 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const [userType, setUserType] = useState('');
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
-  const [formData, setFormData] =
-    useState<{ [key: string]: any | [Date, Date] }[]>(notations || []);
+  const [formData, setFormData] = useState<
+    { [key: string]: any | [Date, Date] }[]
+  >(notations || []);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
@@ -1053,10 +1055,16 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     );
   };
 
-  if(!formData?.length && viewMode === SiteDetailsMode.ViewOnlyMode) {
-    return <Alert variant={"info"} className={viewMode === SiteDetailsMode.ViewOnlyMode ? "d-block" : ""} data-testid="no-site">
-      No notations found for this site. Please add notations to it.
-    </Alert>;
+  if (!notations?.length && viewMode === SiteDetailsMode.ViewOnlyMode) {
+    return (
+      <Alert
+        variant={'info'}
+        className={viewMode === SiteDetailsMode.ViewOnlyMode ? 'd-block' : ''}
+        data-testid="no-site"
+      >
+        No notations found for this site. Please add notations to it.
+      </Alert>
+    );
   }
   return (
     <div className="px-2">

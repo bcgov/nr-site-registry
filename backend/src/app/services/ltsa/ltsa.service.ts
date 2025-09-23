@@ -550,7 +550,6 @@ export class LTSAService {
           whenUpdated: new Date(),
         },
       );
-
       return { updated: true };
     }
 

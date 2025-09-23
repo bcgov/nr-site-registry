@@ -473,7 +473,6 @@ const TableBody: FC<TableBodyProps> = ({
         .split(',')
         .map((graphQLPropertyName) => getValue(rowIndex, graphQLPropertyName))
         .join(' ');
-
     return getTableCellHtml(
       column.displayType,
       column.displayName,

@@ -5,8 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { FormFieldType, IFormField } from './IFormField';
-import { formatDate, formatDateRange } from '../../helpers/utility';
+import { IFormField } from './IFormField';
 import { DatePicker, DateRangePicker } from 'rsuite';
 import {
   CalendarIcon,
@@ -22,6 +21,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import SearchInput from '../search/SearchInput';
 import Avatar from '../avatar/Avatar';
 import { RequestStatus } from '../../helpers/requests/status';
+import { formatDate, formatDateRange, parseDate } from '../../helpers/utility';
 
 interface InputProps extends IFormField {
   children?: InputProps[];
@@ -176,7 +176,6 @@ export const TextInput: React.FC<InputProps> = ({
 }) => {
   const ContainerElement = tableMode ? 'td' : 'div';
   const [error, setError] = useState<string | null>(null);
-  const [currentValue, setCurrentValue] = useState(value ?? '');
 
   const validateInput = (inputValue: string) => {
     if (validation) {
@@ -196,7 +195,6 @@ export const TextInput: React.FC<InputProps> = ({
 
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    setCurrentValue(inputValue);
     onChange(inputValue);
 
     if (allowNumbersOnly || (inputValue && !validateInput(inputValue))) {
@@ -235,7 +233,7 @@ export const TextInput: React.FC<InputProps> = ({
             customEditInputTextCss ?? 'custom-input-text'
           }  ${error && 'error'}`}
           placeholder={placeholder}
-          value={currentValue}
+          value={value || ''}
           onChange={handleTextInputChange}
           aria-label={label} // Accessibility
           required={error ? true : false}
@@ -249,7 +247,7 @@ export const TextInput: React.FC<InputProps> = ({
         />
       ) : (
         <span className={`d-flex ${customInputTextCss ?? ''}`}>
-          {currentValue}
+          {value || ''}
         </span>
       )}
       {error && (
@@ -667,39 +665,36 @@ export const DateInput: React.FC<InputProps> = ({
 }) => {
   const [error, setError] = useState<string | null>(null);
   const ContainerElement = tableMode ? 'td' : 'div';
-  let dateValue;
 
-  value = tableMode ? (value != '' ? new Date(value) : null) : value;
-  value = !tableMode && isEditing && value != null ? new Date(value) : value;
+  // --- Parse value into date safely (without timezone shift)
+  let parsedDate: Date | null = parseDate(value);
 
+  // --- For display (formatted UTC-based date)
+  let displayDate: string | null = null;
   if (value) {
-    dateValue = formatDate(new Date(value));
+    displayDate = formatDate(value);
   }
 
   const validateInput = (inputValue: Date | null) => {
-    if (validation) {
-      if (validation.required && !inputValue) {
-        setError(validation.customMessage || ' ');
-        return false;
-      }
+    if (validation?.required && !inputValue) {
+      setError(validation.customMessage || ' ');
+      return false;
     }
-
     setError(null);
     return true;
   };
 
   const handleDateChange = (newDate: Date | null) => {
-    // Check if the new value is a valid date
-    if (newDate instanceof Date && !isNaN(newDate.getTime())) {
-      // Pass valid date to the parent onChange function
-      onChange(newDate);
-    } else {
-      // Handle invalid date entry (Optional: error message, etc.)4
-      onChange(null); // Optionally set the value to null if invalid
-    }
     if (validation?.required) {
       validateInput(newDate);
-      return;
+    }
+
+    if (newDate instanceof Date && !isNaN(newDate.getTime())) {
+      const formatted =
+        parseDate(newDate)?.toISOString().split('T')[0] + 'T00:00:00.000Z'; // Send UTC string to API e.g., "1970-01-01T00:00:00.000Z"
+      onChange(formatted);
+    } else {
+      onChange(null);
     }
   };
 
@@ -732,7 +727,7 @@ export const DateInput: React.FC<InputProps> = ({
           placeholder={placeholder}
           format="MMM dd, yyyy"
           caretAs={CalendarIcon}
-          value={value ?? null}
+          value={parsedDate ?? null}
           onChange={handleDateChange}
           oneTap
           readOnly={isDisabled}
@@ -742,7 +737,7 @@ export const DateInput: React.FC<InputProps> = ({
           aria-label={label}
           className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
         >
-          {dateValue ?? ''}
+          {displayDate ?? ''}
         </span>
       )}
       {error && (

@@ -61,16 +61,42 @@ export const formatDateRange = (range: [Date, Date]) => {
   return `${formattedStartDate} - ${formattedEndDate}`;
 };
 
-export const formatDate = (date: Date) => {
-  // Validate the date
-  if (!(date instanceof Date) || isNaN(date.getTime())) {
-    console.error('Invalid date');
-    return ''; // Return empty string or some fallback
+/**
+ * Formats a date as "March 2nd, 2025" without timezone shift
+ */
+export const formatDate = (input: Date | string | null): string => {
+  let date: Date;
+
+  if (!input) {
+    return '';
   }
 
-  // If the date is valid, format it
-  const formattedDate = format(date, 'MMMM do, yyyy');
-  return formattedDate;
+  date = parseDate(input) || new Date();
+  return format(date, 'MMMM do, yyyy');
+};
+
+export const parseDate = (value: Date | string | null): Date | null => {
+  if (!value) return null;
+
+  // Handle ISO string or date-like string
+  if (typeof value === 'string') {
+    const isoString = new Date(value).toISOString(); // normalize input
+    const [year, month, day] = isoString.split('T')[0].split('-').map(Number);
+
+    // Construct local Date (for things like date pickers)
+    const parsed = new Date(year, month - 1, day);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  // Handle Date object
+  if (value instanceof Date && !isNaN(value.getTime())) {
+    const year = value.getFullYear();
+    const month = value.getMonth();
+    const day = value.getDate();
+    return new Date(year, month, day);
+  }
+
+  return null;
 };
 
 /*
@@ -564,16 +590,6 @@ export const removeProperty = (obj: any, propertyName: string): any => {
 
   // Return the value if it's neither an array nor an object (i.e., a primitive)
   return obj;
-};
-
-export const dateFormatSR = (date: Date) => {
-  const formatDate = new Date(date);
-  const formattedDate = formatDate.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  return formattedDate;
 };
 
 /**

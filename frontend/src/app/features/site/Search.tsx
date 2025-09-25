@@ -195,6 +195,14 @@ const Search = () => {
     setFormData({});
     setSelectedFilters([]);
     localStorage.removeItem('siteFilterPills');
+    debouncedSearch(
+      searchParam,
+      page,
+      pageSize,
+      SiteSortBy.Id,
+      SortByDirection.Asc,
+      {},
+    );
   };
 
   useEffect(() => {

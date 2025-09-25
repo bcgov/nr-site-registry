@@ -66,7 +66,7 @@ export class SiteFilters {
   latMinutes?: number;
 
   @Field({ nullable: true })
-  latSeconds?: string;
+  latSeconds?: number;
 
   @Field({ nullable: true })
   longdeg?: number;
@@ -78,7 +78,7 @@ export class SiteFilters {
   longMinutes?: number;
 
   @Field({ nullable: true })
-  longSeconds?: string;
+  longSeconds?: number;
 
   @Field(() => [Date, Date], { nullable: true })
   whenCreated?: [Date, Date];

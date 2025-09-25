@@ -31,6 +31,53 @@ export const fetchSearchSites = createAsyncThunk(
     filter?: {};
   }) => {
     try {
+      if (!args.searchParam || args.searchParam.trim() === '') {
+        return initialState;
+      }
+
+      if (args.pageSize && args.pageSize > 100) {
+        args.pageSize = 100; // enforce max page size of 100
+      }
+
+      if (args.page && args.page < 1) {
+        args.page = 1; // enforce min page number of 1
+      }
+
+      if (args.filter) {
+        const latitudeKeys = [
+          'latdeg',
+          'latDegrees',
+          'latMinutes',
+          'latSeconds',
+        ];
+        const longitudeKeys = [
+          'longdeg',
+          'longDegrees',
+          'longMinutes',
+          'longSeconds',
+        ];
+        const numericKeys = new Set([...latitudeKeys, ...longitudeKeys]);
+
+        // Clone the filter before modifying
+        const cleanedFilter: Record<string, any> = {};
+
+        for (const [key, value] of Object.entries(args.filter)) {
+          if (
+            value === null ||
+            value === undefined ||
+            value === '' ||
+            (Array.isArray(value) && value.length === 0)
+          ) {
+            continue; // skip empty
+          }
+
+          cleanedFilter[key] = numericKeys.has(key) ? Number(value) : value;
+        }
+
+        // Assign cleaned, mutable version
+        args.filter = cleanedFilter;
+      }
+
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphQlSiteQuery()),
         variables: {

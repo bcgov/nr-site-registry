@@ -26,6 +26,7 @@
 }
 
 .x-mark {
-  padding-top: 1px;
+  padding-top: 0px;
   color: var(--typography-color-primary-invert);
+  cursor: pointer;
 }

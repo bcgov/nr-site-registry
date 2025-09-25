@@ -107,7 +107,7 @@ export const formRowsMap: { [key: string]: IFormField } = {
   },
   latDegrees: {
     type: FormFieldType.Text,
-    label: 'Deg',
+    label: 'Latitude Degrees',
     placeholder: 'Deg',
     graphQLPropertyName: 'latDegrees',
     value: '',
@@ -120,7 +120,7 @@ export const formRowsMap: { [key: string]: IFormField } = {
   },
   latMinutes: {
     type: FormFieldType.Text,
-    label: 'Min',
+    label: 'Latitude Minutes',
     placeholder: 'Min',
     graphQLPropertyName: 'latMinutes',
     value: '',
@@ -133,7 +133,7 @@ export const formRowsMap: { [key: string]: IFormField } = {
   },
   latSeconds: {
     type: FormFieldType.Text,
-    label: 'Sec',
+    label: 'Latitude Seconds',
     placeholder: 'Sec',
     graphQLPropertyName: 'latSeconds',
     value: '',
@@ -160,7 +160,7 @@ export const formRowsMap: { [key: string]: IFormField } = {
   },
   longDegrees: {
     type: FormFieldType.Text,
-    label: 'Deg',
+    label: 'Longitude Degrees',
     placeholder: 'Deg',
     graphQLPropertyName: 'longDegrees',
     value: '',
@@ -173,7 +173,7 @@ export const formRowsMap: { [key: string]: IFormField } = {
   },
   longMinutes: {
     type: FormFieldType.Text,
-    label: 'Min',
+    label: 'Longitude Minutes',
     placeholder: 'Min',
     graphQLPropertyName: 'longMinutes',
     value: '',
@@ -186,7 +186,7 @@ export const formRowsMap: { [key: string]: IFormField } = {
   },
   longSeconds: {
     type: FormFieldType.Text,
-    label: 'Sec',
+    label: 'Longitude Seconds',
     placeholder: 'Sec',
     graphQLPropertyName: 'longSeconds',
     value: '',

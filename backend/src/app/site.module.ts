@@ -92,7 +92,9 @@ import { LoggerService } from './logger/logger.service';
 import { SitePublicResolver } from './resolvers/site/sitePublic.resolver';
 import { Place } from './entities/placeEntity';
 import { CsvController } from './controller/csv.controller';
+import { LTSAController } from './controller/ltsa.controller';
 import { CsvService } from './services/csv/csv.service';
+import { LTSAService } from './services/ltsa/ltsa.service';
 import { SiteRegistry } from './entities/siteRegistry.entity';
 import { Schedule2Reference } from './entities/schedule2Reference';
 import { SiteProfileSchedule2Ref } from './entities/siteProfileSchedule2Ref';
@@ -169,6 +171,7 @@ import { HttpModule } from '@nestjs/axios';
   ],
   providers: [
     CsvService,
+    LTSAService,
     SitePublicResolver,
     SiteResolver,
     SiteService,
@@ -207,7 +210,7 @@ import { HttpModule } from '@nestjs/axios';
     ComsService,
     ComsResolver,
   ],
-  controllers: [CsvController],
+  controllers: [CsvController, LTSAController],
 })
 export class SiteModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

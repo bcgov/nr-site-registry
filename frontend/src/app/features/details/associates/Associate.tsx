@@ -11,10 +11,12 @@ import {
 import {
   getAxiosInstance,
   getUser,
+  isUserOfType,
   resultCache,
   sortArray,
   UpdateDisplayTypeParams,
   updateTableColumn,
+  UserRoleType,
 } from '../../../helpers/utility';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
@@ -90,12 +92,13 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   // Handle user type based on username
   useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.includes('bceid')) {
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
+    ) {
       setUserType(UserType.External);
-    } else if (loggedInUser?.profile.preferred_username?.includes('idir')) {
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
       setUserType(UserType.Internal);
-    } else {
-      setUserType(UserType.External);
     }
   }, [loggedInUser]);
 

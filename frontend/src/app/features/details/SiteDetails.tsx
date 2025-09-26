@@ -144,7 +144,6 @@ import {
 } from './documents/DocumentEndpoints';
 import { HttpStatusCode } from '../../common/httpStatusCode';
 import { GetSummaryConfig } from './summary/SummaryConfig';
-import { de } from 'date-fns/locale';
 import { siteDisclosureConfig } from './disclosure/DisclosureConfig';
 
 const SiteDetails = () => {
@@ -332,15 +331,13 @@ const SiteDetails = () => {
   }, []);
 
   useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
-      setUserType(UserType.External);
-    } else if (
-      loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
     ) {
-      setUserType(UserType.Internal);
-    } else {
-      // not logged in
       setUserType(UserType.External);
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
+      setUserType(UserType.Internal);
     }
   }, [loggedInUser]);
 
@@ -895,7 +892,6 @@ const SiteDetails = () => {
   };
   const handleAddToCart = () => {
     dispatch(resetCartItemAddedStatus);
-    const loggedInUser = getUser();
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {

@@ -363,10 +363,6 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     setFormData(sorted);
   };
 
-  const handleWidgetCheckBox = (event: any) => {
-    alert(event);
-  };
-
   const handleTableChange = (event: any) => {
     if (
       event.property.includes('select_all') ||
@@ -447,7 +443,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
                 apiAction: assoc?.apiAction ?? UserActionEnum.updated,
                 srAction: event.value
                   ? SRApprovalStatusEnum.Public
-                  : SRApprovalStatusEnum.Pending,
+                  : SRApprovalStatusEnum.Private,
               };
             } else {
               return {
@@ -517,10 +513,8 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   const handleItemClick = (value: string) => {
     switch (value) {
       case SRVisibility.ShowSR:
-        alert('show');
         break;
       case SRVisibility.HideSR:
-        alert('hide');
         break;
       default:
         break;
@@ -631,7 +625,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
         <div>
           <AssociateSiteComponent
             handleTableChange={handleTableChange}
-            handleWidgetCheckBox={handleWidgetCheckBox}
+            handleWidgetCheckBox={() => {}}
             userType={userType}
             viewMode={viewMode}
             internalRow={internalRow}

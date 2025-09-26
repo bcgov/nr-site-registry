@@ -239,8 +239,8 @@ const SiteDetails = () => {
 
       showNotification(
         saveSiteDetailsRequestStatus,
-        'Successfully saved site details',
-        'Failed To save site details',
+        'Changes saved successfully',
+        'System error prevented changes from being saved.',
       );
       dispatch(resetSaveSiteDetailsRequestStatus(null));
     } else {

@@ -12,7 +12,7 @@ interface ErrorMsgProps {
 const createToastOptions = (type: 'error' | 'success'): ToastOptions => ({
   className: `toast-${type}`,
   type,
-  closeButton: false,
+  closeButton: true,
   position: 'top-center',
 });
 

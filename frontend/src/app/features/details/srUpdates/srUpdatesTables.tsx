@@ -232,6 +232,7 @@ const SRUpdatesTables = () => {
           onClick={() => handleApprove()}
           size="medium"
           className={`${selectedRows.length > 0 ? 'approve-btn' : ''}`}
+          data-testid="approve-btn"
         >
           <TickIcon className="me-2" />
           Approve
@@ -242,6 +243,7 @@ const SRUpdatesTables = () => {
           onClick={() => rejectHandler()}
           size="medium"
           className={`${selectedRows.length > 0 ? 'not-public-btn' : ''}`}
+          data-testid="reject-btn"
         >
           <XmarkIcon className="me-2" />
           Not Public

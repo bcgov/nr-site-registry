@@ -312,10 +312,6 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
     setFormData(siteParticipant);
   };
 
-  const handleWidgetCheckBox = (event: any) => {
-    alert(event);
-  };
-
   const handleRemoveParticipant = (particIsDelete: boolean = false) => {
     if (particIsDelete) {
       // Remove selected rows from formData state
@@ -578,10 +574,8 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   const handleItemClick = (value: string) => {
     switch (value) {
       case SRVisibility.ShowSR:
-        alert('show');
         break;
       case SRVisibility.HideSR:
-        alert('hide');
         break;
       default:
         break;
@@ -615,7 +609,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
       )}
       <ParticipantTable
         handleTableChange={handleTableChange}
-        handleWidgetCheckBox={handleWidgetCheckBox}
+        handleWidgetCheckBox={() => {}}
         internalRow={internalRow}
         externalRow={externalRow}
         userType={userType}

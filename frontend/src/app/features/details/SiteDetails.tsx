@@ -185,7 +185,7 @@ const SiteDetails = () => {
   const { participantColumnInternal } = GetConfig();
   const { associateColumnInternal } = GetAssociateConfig();
   const { documentFormRowsEditMode } = GetDocumentsConfig();
-  const { createSiteFormRows } = GetSummaryConfig();
+  const { createSiteFormRows, summaryFormRows } = GetSummaryConfig();
 
   const [errorList, setErrorList] = useState<any[]>([]);
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
@@ -596,7 +596,7 @@ const SiteDetails = () => {
     try {
       if (siteSummary && Object.keys(siteSummary).length > 0) {
         const errors = validateForm(
-          createSiteFormRows,
+          !id?.trim() ? createSiteFormRows : summaryFormRows,
           siteSummary,
           'Site Summary',
         );
@@ -1376,7 +1376,7 @@ const SiteDetails = () => {
           {!isVisible && (
             <>
               {viewMode === SiteDetailsMode.SRMode && (
-                <div className="sr-mode-content">
+                <div className="sr-mode-content mb-5">
                   <div className="sr-mode-info-banner">
                     <div className="sr-mode-info-content-layout">
                       <div>
@@ -1392,24 +1392,26 @@ const SiteDetails = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="form-check form-switch">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      role="switch"
-                      id="flexSwitchCheckChecked"
-                      checked={
-                        siteDetailsForSRMode?.srAction ===
+                  <div className="p-2">
+                    <div className="form-check form-switch">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="flexSwitchCheckChecked"
+                        checked={
+                          siteDetailsForSRMode?.srAction ===
+                          SRApprovalStatusEnum.Public
+                        }
+                        onChange={(event) => handleSiteSRVisiblity(event)}
+                      />
+                      <label className="form-check-label">
+                        {siteDetailsForSRMode?.srAction ===
                         SRApprovalStatusEnum.Public
-                      }
-                      onChange={(event) => handleSiteSRVisiblity(event)}
-                    />
-                    <label className="form-check-label">
-                      {siteDetailsForSRMode?.srAction ===
-                      SRApprovalStatusEnum.Public
-                        ? 'Site Published to Site Registry'
-                        : 'Publish Page To Site Registry'}
-                    </label>
+                          ? 'Publish page to Site Registry'
+                          : 'Hide page from Site Registry'}
+                      </label>
+                    </div>
                   </div>
                 </div>
               )}

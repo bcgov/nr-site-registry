@@ -113,16 +113,16 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
               </Button>
             </div>
           )}
-        {viewMode === SiteDetailsMode.SRMode &&
+        {/* {viewMode === SiteDetailsMode.SRMode &&
           userType === UserType.Internal && (
             <Actions
               label="Set SR Visibility"
               items={srVisibilityParcticConfig}
               onItemClick={handleItemClick}
-              disable={viewMode === SiteDetailsMode.SRMode}
+              disable={true}
               toggleButtonVariant="secondary"
             />
-          )}
+          )} */}
       </Widget>
     </div>
   );

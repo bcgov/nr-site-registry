@@ -80,7 +80,8 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
           viewMode === SiteDetailsMode.EditMode &&
           userType === UserType.Internal
         }
-        srMode={false}
+        srMode={viewMode === SiteDetailsMode.SRMode}
+        hideWidgetCheckbox={true}
         primaryKeycolumnName="id"
         sortHandler={(row: any, ascDir: any) => {
           handleTableSort(row, ascDir);
@@ -104,16 +105,16 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
               </Button>
             </div>
           )}
-        {viewMode === SiteDetailsMode.SRMode &&
+        {/* {viewMode === SiteDetailsMode.SRMode &&
           userType === UserType.Internal && (
             <Actions
               label="Set SR Visibility"
               items={srVisibilityAssocConfig}
               onItemClick={handleItemClick}
-              disable={viewMode !== SiteDetailsMode.SRMode}
+              disable={true}
               toggleButtonVariant="secondary"
             />
-          )}
+          )} */}
       </Widget>
     </React.Fragment>
   );

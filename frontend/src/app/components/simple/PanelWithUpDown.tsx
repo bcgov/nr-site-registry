@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp } from '../common/icon';
 import { ApproveRejectButtons } from '../approve/ApproveReject';
 
 interface PanelWithUpDownProps {
-  label?: string;
+  label?: string | ReactNode; // Optional label for the panel
   firstChild?: ReactNode;
   secondChild?: ReactNode; // Define children prop
   isDefaultOpen?: boolean; // Optional prop to control initial visibility
@@ -20,7 +20,7 @@ const PanelWithUpDown: FC<PanelWithUpDownProps> = ({
     <div
       className={`d-flex flex-column mb-3 section-container me-2`}
       role="region"
-      aria-label={label || 'Section'}
+      aria-label={typeof label === 'string' ? label || 'Section' : undefined}
       aria-expanded={showDetails}
     >
       {label && (

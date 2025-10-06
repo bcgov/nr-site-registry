@@ -118,15 +118,18 @@ import {
   fetchPendingSiteDisclosure,
   fetchPendingSiteNotationBySiteId,
   fetchPendingSiteParticipantsForApproval,
-  fetchPendingSitesDetailsFprApproval,
+  fetchPendingSitesDetailsForApproval,
   hasNoPendingUpdates,
   updateRequestStatus,
 } from './srUpdates/srUpdatesSlice';
 import { fetchLandUseCodes } from './landUses/LandUsesSlice';
 import { IFetchParcelDescriptionsParams } from './parcelDescriptions/parcelDescriptionsInterfaces';
 import {
+  bulkAproveRejectChanges,
   bulkUpdateApproveRejectStatus,
+  fetchPendingSiteForSRApproval,
   resetBulkUpdateStatus,
+  selectAllSites,
 } from './srUpdates/state/srUpdatesTableSlice';
 import { Button } from '../../components/button/Button';
 import { IFormField } from '../../components/input-controls/IFormField';
@@ -166,6 +169,7 @@ const SiteDetails = () => {
   const details = useSelector(selectSiteDetails);
   const bulkApproveRejectStatus = useSelector(bulkUpdateApproveRejectStatus);
   const hasNoPendingUpdatesFromState = useSelector(hasNoPendingUpdates);
+  const srUpdates = useSelector(selectAllSites);
   const snapshot = useSelector(snapshots);
   const snapshotTakenDate = useSelector(getFirstSnapshotCreatedDate);
   const bannerType = useSelector(selectBannerType);
@@ -356,6 +360,13 @@ const SiteDetails = () => {
 
   useEffect(() => {
     dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+    dispatch(
+      fetchPendingSiteForSRApproval({
+        searchParam: { id: id ?? '' },
+        page: 1,
+        pageSize: 5,
+      }),
+    );
   }, []);
 
   // NEEDS TO FETCH DATA BASED ON CONDITION WHEATHER IT IS EXTERNAL USER OR INTERNAL USER
@@ -471,7 +482,7 @@ const SiteDetails = () => {
 
       Promise.all([
         dispatch(
-          fetchPendingSitesDetailsFprApproval({ siteId, showPending: true }),
+          fetchPendingSitesDetailsForApproval({ siteId, showPending: true }),
         ),
 
         dispatch(
@@ -1207,9 +1218,28 @@ const SiteDetails = () => {
               label={`Are you sure to proceed`}
               closeHandler={(response) => {
                 if (response) {
-                  alert(confirmSiteReview);
                   if (confirmSiteReview) {
-                    //handleRemoveAssociate(response);
+                    if (srUpdates.length > 0) {
+                      dispatch(
+                        bulkAproveRejectChanges({
+                          sites: srUpdates,
+                          isApproved: true,
+                          fromSiteDetails: false,
+                        }),
+                      );
+                    }
+                  }
+
+                  if (!confirmSiteReview) {
+                    if (srUpdates.length > 0) {
+                      dispatch(
+                        bulkAproveRejectChanges({
+                          sites: srUpdates,
+                          isApproved: false,
+                          fromSiteDetails: false,
+                        }),
+                      );
+                    }
                   }
                 }
                 SetConfirmSiteReview(null);

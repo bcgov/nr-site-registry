@@ -183,8 +183,8 @@ export const fetchPendingSiteParticipantsForApproval = createAsyncThunk(
   },
 );
 
-export const fetchPendingSitesDetailsFprApproval = createAsyncThunk(
-  'sites/fetchPendingSitesDetailsFprApproval',
+export const fetchPendingSitesDetailsForApproval = createAsyncThunk(
+  'sites/fetchPendingSitesDetailsForApproval',
   async (args: { siteId: string; showPending: Boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
@@ -263,12 +263,12 @@ const srUpdatesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchPendingSitesDetailsFprApproval.pending, (state, action) => {
+      .addCase(fetchPendingSitesDetailsForApproval.pending, (state, action) => {
         const newState = { ...state };
         return newState;
       })
       .addCase(
-        fetchPendingSitesDetailsFprApproval.fulfilled,
+        fetchPendingSitesDetailsForApproval.fulfilled,
         (state, action) => {
           const newState = { ...state };
           if (action.payload.httpStatusCode === 200) {
@@ -281,7 +281,7 @@ const srUpdatesSlice = createSlice({
         },
       )
       .addCase(
-        fetchPendingSitesDetailsFprApproval.rejected,
+        fetchPendingSitesDetailsForApproval.rejected,
         (state, action) => {
           const newState = { ...state };
           return newState;

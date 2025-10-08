@@ -1,5 +1,6 @@
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
+import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 
 export enum ParcelDescriptionType {
@@ -19,6 +20,10 @@ export const columns: TableColumn[] = [
       type: FormFieldType.DropDown,
       label: 'DescriptionType',
       graphQLPropertyName: 'descriptionType',
+      customLabelCss: 'custom-parcelDescriptions-lbl-text',
+      customInputTextCss: 'custom-parcelDescriptions-input-text',
+      customEditLabelCss: 'custom-parcelDescriptions-edit-label',
+      customEditInputTextCss: 'custom-parcelDescriptions-edit-input',
       options: [
         {
           key: ParcelDescriptionType.ParcelID,
@@ -48,6 +53,10 @@ export const columns: TableColumn[] = [
       graphQLPropertyName: 'idPinNumber',
       value: '',
       tableMode: true,
+      customLabelCss: 'custom-parcelDescriptions-lbl-text',
+      customInputTextCss: 'custom-parcelDescriptions-input-text',
+      customEditLabelCss: 'custom-parcelDescriptions-edit-label',
+      customEditInputTextCss: 'custom-parcelDescriptions-edit-input',
     },
   },
   {
@@ -62,6 +71,10 @@ export const columns: TableColumn[] = [
       graphQLPropertyName: 'dateNoted',
       value: '',
       tableMode: true,
+      customLabelCss: 'custom-parcelDescriptions-lbl-text',
+      customInputTextCss: 'custom-parcelDescriptions-input-text',
+      customEditLabelCss: 'custom-parcelDescriptions-edit-label',
+      customEditInputTextCss: 'custom-parcelDescriptions-edit-input',
     },
   },
   {
@@ -77,6 +90,10 @@ export const columns: TableColumn[] = [
       value: '',
       tableMode: true,
       isDisabled: true,
+      customLabelCss: 'custom-parcelDescriptions-lbl-text',
+      customInputTextCss: 'custom-parcelDescriptions-input-text',
+      customEditLabelCss: 'custom-parcelDescriptions-edit-label',
+      customEditInputTextCss: 'custom-parcelDescriptions-edit-input',
     },
   },
 ];
@@ -86,7 +103,6 @@ const SRColumn: TableColumn = {
   displayName: 'SR',
   active: true,
   graphQLPropertyName: 'srValue',
-  columnSize: ColumnSize.Default,
   displayType: {
     type: FormFieldType.Checkbox,
     label: 'SR',
@@ -94,7 +110,11 @@ const SRColumn: TableColumn = {
     graphQLPropertyName: 'srValue',
     value: false,
     tableMode: true,
+    stickyCol: true,
   },
+  columnSize: ColumnSize.XtraSmall,
+  stickyCol: true,
+  dynamicColumn: true,
 };
 
 const DeleteColumn: TableColumn = {
@@ -102,7 +122,6 @@ const DeleteColumn: TableColumn = {
   displayName: 'Remove',
   active: true,
   graphQLPropertyName: 'deleteIcon',
-  columnSize: ColumnSize.Default,
   displayType: {
     type: FormFieldType.DeleteIcon,
     label: 'Delete',
@@ -110,6 +129,9 @@ const DeleteColumn: TableColumn = {
     value: '',
     tableMode: true,
   },
+  dynamicColumn: true,
+  columnSize: ColumnSize.XtraSmall,
+  stickyCol: true,
 };
 
 export const getAddDeleteParcelDescriptionTableColumns = () => {
@@ -118,8 +140,9 @@ export const getAddDeleteParcelDescriptionTableColumns = () => {
 
 export const getParcelDescriptionsTableColumns = (
   viewMode: SiteDetailsMode,
+  userType: UserType,
 ): TableColumn[] => {
-  if (viewMode === SiteDetailsMode.SRMode) {
+  if (userType === UserType.Internal) {
     return [...columns, SRColumn];
   } else {
     return columns;

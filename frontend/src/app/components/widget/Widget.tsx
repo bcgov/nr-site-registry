@@ -27,6 +27,11 @@ const Widget: React.FC<IWidget> = ({
   isRequired,
   widgetIschecked,
   hideWidgetCheckbox,
+  selectPage,
+  changeResultsPerPage,
+  resultsPerPage,
+  totalResults,
+  deleteHandler,
 }) => {
   let widgetSortHandler = sortHandler ?? (() => {});
   const [widgetData, setWidgetData] = useState(tableData);
@@ -73,6 +78,11 @@ const Widget: React.FC<IWidget> = ({
             idColumnName={primaryKeycolumnName ?? ''}
             sortHandler={widgetSortHandler}
             currentPage={currentPage}
+            selectPage={selectPage}
+            changeResultsPerPage={changeResultsPerPage}
+            resultsPerPage={resultsPerPage}
+            totalResults={totalResults}
+            deleteHandler={deleteHandler ?? (() => {})}
           />
         </div>
       )}

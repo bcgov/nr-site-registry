@@ -16,7 +16,7 @@ import FilterPills from './filters/FilterPills';
 import { formRows } from './dto/SiteFilterConfig';
 import { SearchResultsFilters } from './searchResults/SearchResultsFilters';
 import { SearchResultsActions } from './searchResults/SearchResultsActions';
-import { debounce, set } from 'lodash';
+import { debounce } from 'lodash';
 import Table from '../../components/table/Table';
 import { fetchSearchSites, getSites, resetSiteSearch } from './SiteSearchSlice';
 import { RequestStatus } from '../../helpers/requests/status';
@@ -58,7 +58,6 @@ const Search = () => {
       sortByDir: SortByDirection = SortByDirection.Asc,
       filters: any,
     ) => {
-      setSearchText(searchParam);
       dispatch(
         fetchSearchSites({
           searchParam,
@@ -70,7 +69,7 @@ const Search = () => {
         }),
       );
     },
-    500,
+    50,
   );
 
   const toggleColumnSelectionForDisplay = (column: TableColumn) => {
@@ -97,15 +96,24 @@ const Search = () => {
   };
 
   const handleTextChange = (event: any) => {
+    const value = event.target.value;
+    setSearchText(value);
     setUserAction(false);
-    setSearchText(event.target.value);
-    if (event.target.value.length >= 3) {
+
+    // Clear search results if input is empty
+    if (value.length === 0) {
+      dispatch(resetSiteSearch());
+      return;
+    }
+
+    // Trigger search for inputs with 3+ characters
+    if (value.length >= 3) {
       const filterData: any = {};
       selectedFilters.forEach((filter: any) => {
         filterData[filter.key] = filter.value;
       });
       debouncedSearch(
-        event.target.value,
+        value,
         page,
         pageSize,
         SiteSortBy.Id,
@@ -215,7 +223,7 @@ const Search = () => {
     }
 
     dispatch(fetchSiteRiskCd());
-  }, []);
+  }, [dispatch, searchParam, sites.length, status]);
 
   const handleRemoveFilter = (filter: any) => {
     setFormData((prevData) => {

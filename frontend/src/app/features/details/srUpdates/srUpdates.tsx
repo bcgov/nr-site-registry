@@ -10,7 +10,7 @@ import {
   fetchPendingSiteDisclosure,
   fetchPendingSiteNotationBySiteId,
   fetchPendingSiteParticipantsForApproval,
-  fetchPendingSitesDetailsFprApproval,
+  fetchPendingSitesDetailsForApproval,
   resetAllData,
   resetRequestStatus,
   selectAssociatedSites,
@@ -359,7 +359,7 @@ const SRUpdates = () => {
       dispatch(resetAllData(null));
 
       dispatch(
-        fetchPendingSitesDetailsFprApproval({ siteId, showPending: true }),
+        fetchPendingSitesDetailsForApproval({ siteId, showPending: true }),
       );
 
       dispatch(fetchPendingSiteNotationBySiteId({ siteId, showPending: true }));

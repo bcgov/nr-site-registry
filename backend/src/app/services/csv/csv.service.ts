@@ -222,51 +222,52 @@ export class CsvService {
   WHERE 
 	sites.sr_action = 'public'`;
 
-  private getApprovedPINsANDPIDs = () => `WITH ranked_subdivs AS (
+  private getApprovedPINsANDPIDs = () => `WITH site_subdiv_ranked AS (
     SELECT
-        ss1.site_id,
-        ss1.subdiv_id,
-        ss1.site_subdiv_id,
-        ss1.date_noted,
-        ss1.initial_indicator,
-        ss1.who_created,
-        ss1.who_updated,
-        ss1.when_created,
-        ss1.when_updated,
-        ss1.sprof_date_completed,
-        ss1.send_to_sr,
-        ROW_NUMBER() OVER (
-            PARTITION BY ss1.site_id, ss1.subdiv_id
-            ORDER BY ss1.sprof_date_completed DESC NULLS LAST
-        ) AS rn,
-        COUNT(*) OVER (
-            PARTITION BY ss1.site_id, ss1.subdiv_id
-        ) AS dup_count
-    FROM sites.site_subdivisions ss1
-)
-, filtered_subdivs AS (
-    SELECT *
-    FROM ranked_subdivs r
-    WHERE 
-        -- keep if it's the only subdivision (NOT EXISTS equivalent)
-        (dup_count = 1)
-        OR
-        -- keep if there are duplicates but this is the latest (EXISTS + MAX() equivalent)
-        (dup_count > 1 AND rn = 1)
+        ss.site_id,
+        ss.subdiv_id,
+        ss.site_subdiv_id,
+        ss.date_noted,
+        ss.sr_action,
+        ss.sprof_date_completed,
+        RANK() OVER (
+            PARTITION BY ss.site_id, ss.subdiv_id
+            ORDER BY ss.sprof_date_completed DESC NULLS LAST
+        ) AS rnk
+    FROM sites.site_subdivisions ss
+),
+-- pick the latest completed subdivision(s) per site_id + subdiv_id
+latest_subdiv AS (
+    SELECT
+        site_id,
+        subdiv_id,
+        site_subdiv_id,
+        date_noted,
+        sr_action
+    FROM site_subdiv_ranked
+    WHERE rnk = 1
 )
 SELECT
-    SUBSTRING(to_char(ss.id, '0999999999') FROM 2 FOR 10) AS siteId,
+    substr(to_char(s.id, '0999999999'), 2, 10) AS siteid,
     sub.pin,
-    sub.pid,
+    lpad(sub.pid, 9, '0') AS pidno,
     sub.crown_lands_file_no,
-    sub.legal_description,
-    f.date_noted
-FROM sites.sites ss
-JOIN filtered_subdivs f
-    ON f.site_id = ss.id
+    replace(sub.legal_description, chr(10), ' ') AS legaldesc,
+    to_char(v.date_noted, 'YYYY-MM-DD') AS datenoted   -- ✅ use alias v
+FROM sites.sites s
+JOIN sites.bce_region_cd bce
+    ON bce.code = s.bcer_code
+JOIN sites.site_status_cd ssc
+    ON ssc.code = s.sst_code
+JOIN sites.classification_cd classcd
+    ON classcd.code = s.class_code
+JOIN latest_subdiv v
+    ON v.site_id = s.id
 JOIN sites.subdivisions sub
-    ON f.subdiv_id = sub.id
-WHERE ss.sr_action = 'public';
+    ON sub.id = v.subdiv_id
+WHERE v.sr_action = 'public'
+and s.sr_action = 'public'
+ORDER BY s.id, sub.pin, sub.pid;
 `;
 
   private getApprovedLandHistories = () =>

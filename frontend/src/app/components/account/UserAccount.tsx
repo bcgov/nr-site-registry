@@ -15,8 +15,7 @@ const UserAccount = (props: any) => {
   const authRedirectUri =
     ((window as any)._env_ &&
       (window as any)._env_.REACT_APP_AUTH_LOGOUT_REDIRECT_URI) ||
-    process.env.REACT_APP_AUTH_LOGOUT_REDIRECT_URI ||
-    'http://localhost:4000/';
+    process.env.REACT_APP_AUTH_LOGOUT_REDIRECT_URI;
   const auth = useAuth();
   const loggedInUser = getUser();
   // Sample user data

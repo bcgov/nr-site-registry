@@ -1,7 +1,7 @@
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
 import { TableColumn } from '../../../components/table/TableColumn';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../Store';
 import {
@@ -51,6 +51,9 @@ import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { Button } from '../../../components/button/Button';
 import { UserMinus, UserPlus } from '../../../components/common/icon';
+import './ParcelDescription.css';
+import { UserType } from '../../../helpers/requests/userType';
+import { getUser, isUserOfType, UserRoleType } from '../../../helpers/utility';
 
 type ParcelDescriptionsChangeEvent = {
   property:
@@ -137,6 +140,19 @@ const ParcelDescriptions = () => {
   const [deletedRows, setDeletedRows] = React.useState<
     IParcelDescriptionSaveDto[]
   >(reduxState.deletedRows);
+
+  const loggedInUser = getUser();
+  const [userType, setUserType] = useState<UserType>(UserType.External);
+  useEffect(() => {
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
+    ) {
+      setUserType(UserType.External);
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
+      setUserType(UserType.Internal);
+    }
+  }, [loggedInUser]);
 
   const handleSelectPage = (newPage: number) => {
     if (newPage !== currentPage) {
@@ -388,7 +404,7 @@ const ParcelDescriptions = () => {
       id: nextId.toString(),
       descriptionType: ParcelDescriptionType.ParcelID,
       idPinNumber: '',
-      dateNoted: '',
+      dateNoted: new Date(),
       landDescription: '',
       apiAction: UserActionEnum.added,
       srAction: SRApprovalStatusEnum.Pending,
@@ -483,7 +499,7 @@ const ParcelDescriptions = () => {
             // This happens when clearing the date widget.
             newDateString = '';
           } else {
-            const newDate = event.value as Date;
+            const newDate = new Date(event.value as Date);
             newDateString = newDate.toISOString();
           }
           newRow = {
@@ -595,58 +611,32 @@ const ParcelDescriptions = () => {
     setDeletedRows(reduxState.deletedRows);
   }, [reduxState]);
 
-  const addRemoveButtons = () => {
-    if (viewMode === SiteDetailsMode.EditMode) {
-      return (
-        <div className="row">
-          <div className="d-flex gap-2 flex-wrap">
-            <Button variant="secondary" onClick={() => handleAddRow()}>
-              <UserPlus />
-              Add Parcel Description
-            </Button>
-            <Button
-              variant="secondary"
-              disabled={selectedRows.length === 0}
-              onClick={() => handleDeleteRows()}
-            >
-              <UserMinus />
-              Remove Parcel Description
-            </Button>
-          </div>
-        </div>
-      );
-    }
-  };
-
   const addedParcelDescriptions = () => {
     if (addedRows.length > 0 && viewMode === SiteDetailsMode.EditMode) {
       return (
         <div
+          className="row"
           id="parcel-descriptions-component-added"
           data-testid="parcel-descriptions-component-added"
         >
-          <div className="row">
-            <h3>Parcel Descriptions to Create</h3>
-            <hr />
-          </div>
-          <div className="row">
-            <ParcelDescriptionTable
-              showPageOptions={false}
-              requestStatus={requestStatus}
-              columns={getAddDeleteParcelDescriptionTableColumns()}
-              data={addedRows}
-              totalResults={addedRows.length}
-              handleSelectPage={() => {}}
-              handleChangeResultsPerPage={() => {}}
-              currentPage={1}
-              resultsPerPage={addedRows.length}
-              handleTableSortChange={() => {}}
-              viewMode={viewMode}
-              tableChangeHandler={handleAddTableChange}
-              deleteHandler={handleAddedRowRemoval}
-              allowRowsSelect={false}
-            />
-          </div>
+          <ParcelDescriptionTable
+            title="Create Parcel Descriptions"
+            showPageOptions={false}
+            requestStatus={requestStatus}
+            columns={getAddDeleteParcelDescriptionTableColumns()}
+            data={addedRows}
+            totalResults={addedRows.length}
+            handleSelectPage={() => {}}
+            handleChangeResultsPerPage={() => {}}
+            currentPage={1}
+            resultsPerPage={addedRows.length}
+            handleTableSortChange={() => {}}
+            viewMode={viewMode}
+            tableChangeHandler={handleAddTableChange}
+            deleteHandler={handleAddedRowRemoval}
+            allowRowsSelect={false}
+            showAddRemoveButtons={false}
+          />
         </div>
       );
     }
@@ -656,31 +646,28 @@ const ParcelDescriptions = () => {
     if (deletedRows.length > 0 && viewMode === SiteDetailsMode.EditMode) {
       return (
         <div
+          className="row"
           id="parcel-descriptions-component-deleted"
           data-testid="parcel-descriptions-component-deleted"
         >
-          <div className="row">
-            <h3>Parcel Descriptions to Delete</h3>
-            <hr />
-          </div>
-          <div className="row">
-            <ParcelDescriptionTable
-              showPageOptions={false}
-              requestStatus={requestStatus}
-              columns={getAddDeleteParcelDescriptionTableColumns()}
-              data={deletedRows}
-              totalResults={deletedRows.length}
-              handleSelectPage={() => {}}
-              handleChangeResultsPerPage={() => {}}
-              currentPage={1}
-              resultsPerPage={deletedRows.length}
-              handleTableSortChange={() => {}}
-              viewMode={SiteDetailsMode.ViewOnlyMode}
-              tableChangeHandler={() => {}}
-              deleteHandler={handleDeletedRowRemoval}
-              allowRowsSelect={false}
-            />
-          </div>
+          <ParcelDescriptionTable
+            title="Deleted Parcel Descriptions"
+            showPageOptions={false}
+            requestStatus={requestStatus}
+            columns={getAddDeleteParcelDescriptionTableColumns()}
+            data={deletedRows}
+            totalResults={deletedRows.length}
+            handleSelectPage={() => {}}
+            handleChangeResultsPerPage={() => {}}
+            currentPage={1}
+            resultsPerPage={deletedRows.length}
+            handleTableSortChange={() => {}}
+            viewMode={SiteDetailsMode.ViewOnlyMode}
+            tableChangeHandler={() => {}}
+            deleteHandler={handleDeletedRowRemoval}
+            allowRowsSelect={false}
+            showAddRemoveButtons={false}
+          />
         </div>
       );
     }
@@ -709,20 +696,16 @@ const ParcelDescriptions = () => {
             />
           </div>
         </div>
-        <div className="row">
-          <h2>Parcel Description</h2>
-          <hr />
-        </div>
-        {addRemoveButtons()}
         <div
           id="parcel-descriptions-component-existing-table"
           data-testid="parcel-descriptions-component-existing-table"
           className="row py-3"
         >
           <ParcelDescriptionTable
+            title="Parcel Descriptions"
             showPageOptions={true}
             requestStatus={requestStatus}
-            columns={getParcelDescriptionsTableColumns(viewMode)}
+            columns={getParcelDescriptionsTableColumns(viewMode, userType)}
             data={mergedRows}
             totalResults={totalResults}
             handleSelectPage={handleSelectPage}
@@ -734,6 +717,10 @@ const ParcelDescriptions = () => {
             tableChangeHandler={handleEditTableChange}
             deleteHandler={() => {}}
             allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
+            selectedRows={selectedRows}
+            handleAddRow={handleAddRow}
+            handleDeleteRows={handleDeleteRows}
+            showAddRemoveButtons={true}
           />
         </div>
         {addedParcelDescriptions()}

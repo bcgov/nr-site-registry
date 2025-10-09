@@ -150,6 +150,52 @@ const Pagination: React.FC<PaginationProps> = ({
     return pages;
   };
 
+  const getResultsPerPageOptions = () => {
+    const baseOptions = [5, 10, 25, 50, 100];
+    const maxReasonablePageSize = Math.min(100, totalResults);
+
+    // Filter options to only show those that make sense for the current data
+    let filteredOptions = baseOptions.filter(
+      (option) => option <= maxReasonablePageSize,
+    );
+
+    // If total results is very small, add an option to show all results
+    if (totalResults <= 100 && totalResults > 0) {
+      filteredOptions.push(totalResults);
+    }
+
+    // Ensure current resultsPerPage is included if it's not in the filtered options
+    if (
+      !filteredOptions.includes(resultsPerPage) &&
+      resultsPerPage <= totalResults
+    ) {
+      filteredOptions.push(resultsPerPage);
+    }
+
+    // Sort options for better UX
+    return filteredOptions.sort((a, b) => a - b);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    const newTotalPages = Math.ceil(totalResults / newPageSize);
+
+    // Calculate the target page based on current position
+    let targetPage = currentPage;
+
+    // If current page would be beyond the new total pages, go to the last page
+    if (currentPage > newTotalPages) {
+      targetPage = Math.max(1, newTotalPages);
+    }
+
+    // Change page size
+    changeResultsPerPage?.(newPageSize);
+
+    // If we need to change the page, do it
+    if (targetPage !== currentPage) {
+      selectPage?.(targetPage);
+    }
+  };
+
   const renderPageOptions = () => {
     const pages: JSX.Element[] = [];
 
@@ -200,15 +246,15 @@ const Pagination: React.FC<PaginationProps> = ({
             data-testid="results-per-page-select"
             className="reslect-options-select"
             onChange={(e) => {
-              changeResultsPerPage?.(parseInt(e.target.value));
+              handlePageSizeChange(parseInt(e.target.value));
             }}
             value={resultsPerPage}
           >
-            <option>5</option>
-            <option>10</option>
-            <option>25</option>
-            <option>50</option>
-            <option>100</option>
+            {getResultsPerPageOptions().map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
           </select>
         </div>
 

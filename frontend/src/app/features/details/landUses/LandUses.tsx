@@ -74,7 +74,7 @@ const LandUses: FC = () => {
     if (siteId) {
       dispatch(fetchLandUses({ siteId, showPending: false }));
     }
-  }, [dispatch, siteId]);
+  }, [siteId]);
 
   useEffect(() => {
     setTableData(landUsesData);
@@ -84,13 +84,13 @@ const LandUses: FC = () => {
     if (editModeEnabled) {
       dispatch(fetchLandUseCodes());
     }
-  }, [dispatch, editModeEnabled]);
+  }, [editModeEnabled]);
 
   useEffect(() => {
     dispatch(
       setupLandHistoriesDataForSaving(Array.from(editLandUsesData.values())),
     );
-  }, [dispatch, editLandUsesData]);
+  }, [editLandUsesData]);
 
   const tableLoading =
     landUseCodesFetchRequestStatus === RequestStatus.loading ||
@@ -177,7 +177,7 @@ const LandUses: FC = () => {
 
     const tracker = new ChangeTracker(IChangeType.Modified, description);
     dispatch(trackChanges(tracker.toPlainObject()));
-
+    dispatch(updateLandUses(updatedLandUses));
     setTableData(updatedLandUses);
   };
 
@@ -190,7 +190,19 @@ const LandUses: FC = () => {
   };
 
   const handleAddLandUse = () => {
-    setTableData((prevData) => [{ guid: v4() }, ...prevData]);
+    setTableData((prevData) => {
+      const newData = [
+        {
+          guid: v4(),
+          landUse: { code: '', description: '' },
+          note: '',
+          whenCreated: new Date().toISOString(),
+        },
+        ...prevData,
+      ];
+      dispatch(updateLandUses(newData));
+      return newData;
+    });
     const tracker = new ChangeTracker(IChangeType.Added, 'New Land Use');
     dispatch(trackChanges(tracker.toPlainObject()));
   };

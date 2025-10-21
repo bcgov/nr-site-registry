@@ -31,6 +31,7 @@ const getSiteSearchResultsColumns = (
       getColumnType('Site Address', 'addrLine_1,addrLine_2,addrLine_3', ''),
       'site/details/',
       false,
+      '',
       ColumnSize.Triple,
     ),
     new TableColumn(

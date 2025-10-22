@@ -86,7 +86,6 @@ export const CartTableColumns: TableColumn[] = [
       href: '/map?site=',
       customIcon: <FillPinMapFill />,
     },
-    columnSize: ColumnSize.Small,
     customHeaderCss: 'text-center',
   },
   {
@@ -124,7 +123,6 @@ export const CartTableColumns: TableColumn[] = [
       tableMode: true,
       customIcon: <TrashCanIcon />,
     },
-    stickyCol: true,
     customHeaderCss: 'custom-cart-table-header',
   },
 ];

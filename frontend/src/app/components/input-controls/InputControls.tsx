@@ -35,9 +35,11 @@ const renderTableCell = (
   content: JSX.Element | string,
   stickyCol?: boolean,
   customContainerCss?: string,
+  customContainerCss?: string,
 ) => {
   return (
     <td
+      className={`table-border-light align-content-center ${stickyCol ? 'positionSticky' : ''} ${customContainerCss ?? ''}`}
       className={`table-border-light align-content-center ${stickyCol ? 'positionSticky' : ''} ${customContainerCss ?? ''}`}
     >
       {content}
@@ -941,6 +943,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
   validation,
   customContainerCss,
   dropdownSearchLabel,
+  customContainerCss,
 }) => {
   const [error, setError] = useState<string | null>(null);
   const divRef = useRef<HTMLDivElement>(null);

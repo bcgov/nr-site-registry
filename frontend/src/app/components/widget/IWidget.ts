@@ -26,4 +26,5 @@ export interface IWidget {
   resultsPerPage?: number;
   totalResults?: number;
   deleteHandler?: (event: any) => void;
+  filter?: React.ReactNode;
 }

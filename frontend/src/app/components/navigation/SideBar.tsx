@@ -52,9 +52,8 @@ function SideBar() {
     const isCurrentPath = location.pathname === item.linkTo;
     const hasIcon = item.icon;
     const isCartLink = item.linkTo.includes('cart');
-    const displayCount = userCartItems.length > 0 ? userCartItems.length : '0';
+    const displayCount = userCartItems.length > 0 ? userCartItems.length : 0;
 
-    const linkContent = isCartLink ? displayCount : item.displayText;
     const isParentGroup: boolean = item.displayText && !item.icon;
     return (
       <section
@@ -70,19 +69,24 @@ function SideBar() {
             <Link
               to={item.linkTo}
               aria-label={item.displayText}
-              className="pb-1"
+              className="icon-wrapper m-0 p-0"
             >
               <item.icon className="sideBar-Icon" />
+              {isCartLink && userCartItems.length > 0 && (
+                <span className="cart-badge-wrapper">
+                  <span className="cart-badge">{displayCount}</span>
+                </span>
+              )}
             </Link>
           )}
-          {linkContent && hasIcon && (
+          {item.displayText && hasIcon && (
             <Link
               to={item.linkTo}
-              className={`sideBarDisplayText ${isCartLink ? 'cart-items-number' : ''} nav-section-bold-label nav-color-primary-default ps-2`}
+              className={`sideBarDisplayText nav-section-bold-label nav-color-primary-default ps-2`}
               aria-label={item.displayText}
               role="menuitem"
             >
-              {linkContent}
+              {item.displayText}
             </Link>
           )}
         </div>

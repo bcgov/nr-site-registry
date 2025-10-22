@@ -33,6 +33,7 @@ export interface IFormField {
     | FormFieldType.IconButton
     | FormFieldType.Search;
   label: string;
+  dropdownSearchLabel?: string;
   isLabel?: boolean;
   placeholder?: string;
   colSize?: string;

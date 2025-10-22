@@ -84,8 +84,8 @@ describe('SearchResults Component', () => {
       </Provider>,
     );
 
-    const siteIdLink = screen.getByText('View');
-    expect(siteIdLink).toBeInTheDocument();
+    const viewLinks = screen.getAllByText('View');
+    expect(viewLinks.length).toBe(mockData.length * 2);
   });
 
   test('checkbox selects row when clicked', async () => {

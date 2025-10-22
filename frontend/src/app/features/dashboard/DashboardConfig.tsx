@@ -60,7 +60,7 @@ export const recentViewedColumns: TableColumn[] = [
       label: 'General Description',
       graphQLPropertyName: 'generalDescription',
       value: '',
-      customInputTextCss: 'custom-dashboard-input-txt',
+      customInputTextCss: 'custom-dashboard-general-description-input-txt',
       tableMode: true,
     },
     columnSize: ColumnSize.Triple,

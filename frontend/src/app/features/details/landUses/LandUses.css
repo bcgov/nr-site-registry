@@ -1,6 +1,4 @@
 .custom-landuses-widget-lbl {
-  padding: var(--layout-padding-small) 0px var(--layout-padding-small) 0px !important;
-  border-bottom: 1px solid var(--surface-color-border-default, #d8d8d8) !important;
   font-size: 24px !important;
   font-weight: 700 !important;
   line-height: 40px !important;

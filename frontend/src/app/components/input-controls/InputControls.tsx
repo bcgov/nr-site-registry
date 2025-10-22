@@ -35,11 +35,9 @@ const renderTableCell = (
   content: JSX.Element | string,
   stickyCol?: boolean,
   customContainerCss?: string,
-  customContainerCss?: string,
 ) => {
   return (
     <td
-      className={`table-border-light align-content-center ${stickyCol ? 'positionSticky' : ''} ${customContainerCss ?? ''}`}
       className={`table-border-light align-content-center ${stickyCol ? 'positionSticky' : ''} ${customContainerCss ?? ''}`}
     >
       {content}
@@ -49,20 +47,10 @@ const renderTableCell = (
 
 export const Link: React.FC<InputProps> = ({
   label,
-  placeholder,
-  type,
   value,
-  validation,
-  allowNumbersOnly,
-  isEditing,
-  customLabelCss,
   customInputTextCss,
-  customEditLabelCss,
-  customEditInputTextCss,
   customLinkValue,
   customIcon,
-  onChange,
-  tableMode,
   stickyCol,
   href,
   customContainerCss,
@@ -118,19 +106,9 @@ export const DeleteIcon: React.FC<InputProps> = ({
 
 export const Label: React.FC<InputProps> = ({
   label,
-  placeholder,
-  type,
   value,
-  validation,
-  allowNumbersOnly,
-  isEditing,
-  customLabelCss,
   customInputTextCss,
-  customEditLabelCss,
-  customEditInputTextCss,
   stickyCol,
-  onChange,
-  tableMode,
   customContainerCss,
 }) => {
   return renderTableCell(
@@ -943,7 +921,6 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
   validation,
   customContainerCss,
   dropdownSearchLabel,
-  customContainerCss,
 }) => {
   const [error, setError] = useState<string | null>(null);
   const divRef = useRef<HTMLDivElement>(null);

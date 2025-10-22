@@ -2,8 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { SpinnerIcon } from '../../common/icon';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { TableColumn } from '../TableColumn';
-
-import { FormFieldType, IFormField } from '../../input-controls/IFormField';
+import { FormFieldType } from '../../input-controls/IFormField';
 import {
   Label,
   TextInput,
@@ -17,7 +16,6 @@ import {
   IconButton,
   SearchCustomInput,
 } from '../../input-controls/InputControls';
-import { ChangeTracker } from '../../common/IChangeType';
 import { get } from '../utils';
 
 interface TableBodyProps {
@@ -59,7 +57,14 @@ const TableBody: FC<TableBodyProps> = ({
   resetAllRowsSelectedEventFlag,
   removePageFromAllRowsSelected,
 }) => {
-  const [selectedRowIds, SetSelectedRowsId] = useState<SelectedRowsType>({});
+  const [selectedRowIds, setSelectedRowsId] = useState<SelectedRowsType>({});
+
+  useEffect(() => {
+    setSelectedRowsId((prev) => ({
+      ...prev,
+      [currentPage]: [],
+    }));
+  }, [data]);
 
   useEffect(() => {
     if (!allRowsSelectedEventFlag) return;
@@ -70,45 +75,45 @@ const TableBody: FC<TableBodyProps> = ({
     });
 
     if (allRowsSelected) {
-      SetSelectedRowsId((prevItems) => ({
+      setSelectedRowsId((prevItems) => ({
         ...prevItems,
-        [currentPage]: [...(prevItems[currentPage] || []), ...rowsIds],
+        [currentPage]: rowsIds,
       }));
     } else {
-      SetSelectedRowsId((prevItems) => ({
+      setSelectedRowsId((prevItems) => ({
         ...prevItems,
-        [currentPage]: (prevItems[currentPage] || []).filter(
-          (item) => !rowsIds.includes(item),
-        ),
+        [currentPage]: [],
       }));
     }
 
-    if (allRowsSelectedEventFlag) {
-      changeHandler({
-        id: 'select_all',
-        property: 'select_all',
-        value: data,
-        selected: allRowsSelected,
-      });
-      resetAllRowsSelectedEventFlag();
-    }
-  }, [allRowsSelected]);
+    changeHandler({
+      id: 'select_all',
+      property: 'select_all',
+      value: data,
+      selected: allRowsSelected,
+    });
 
-  const handleSelectTableRow = (isChecked: any, id: string, rowIndex: any) => {
-    if (isChecked) {
-      SetSelectedRowsId((prevItems) => ({
-        ...prevItems,
-        [currentPage]: [...(prevItems[currentPage] || []), id],
-      }));
-    } else {
-      SetSelectedRowsId((prevItems) => ({
-        ...prevItems,
-        [currentPage]: (prevItems[currentPage] || []).filter(
-          (item) => item !== id,
-        ),
-      }));
+    resetAllRowsSelectedEventFlag();
+  }, [allRowsSelectedEventFlag]);
 
-      removePageFromAllRowsSelected();
+  const handleSelectTableRow = (
+    isChecked: boolean,
+    id: string,
+    rowIndex: number,
+  ) => {
+    setSelectedRowsId((prevItems) => {
+      const currentSelected = prevItems[currentPage] || [];
+
+      return {
+        ...prevItems,
+        [currentPage]: isChecked
+          ? [...currentSelected, id]
+          : currentSelected.filter((item) => item !== id),
+      };
+    });
+
+    if (!isChecked) {
+      removePageFromAllRowsSelected(); // uncheck the header checkbox if one is deselected
     }
 
     tableRecordChangeHandler(rowIndex, 'select_row', isChecked);

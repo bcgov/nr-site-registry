@@ -32,6 +32,7 @@ const Widget: React.FC<IWidget> = ({
   resultsPerPage,
   totalResults,
   deleteHandler,
+  filter,
 }) => {
   let widgetSortHandler = sortHandler ?? (() => {});
   const [widgetData, setWidgetData] = useState(tableData);
@@ -53,12 +54,13 @@ const Widget: React.FC<IWidget> = ({
               isChecked={widgetIschecked}
             />
           )}
-          <div className="w-100 me-1">
+          <div className="widget-lbl-container w-100 me-1 d-flex flex-wrap align-items-center justify-content-between">
             <h4
               className={`${customLabelCss ?? `widget-lbl`} ${isRequired ? 'widget-required-field' : ''}`}
             >
               {title}
             </h4>
+            {filter}
           </div>
         </div>
       )}

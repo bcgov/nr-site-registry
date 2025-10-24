@@ -1,5 +1,4 @@
 import React, { FC, useEffect, useState } from 'react';
-import { SpinnerIcon, SortIcon } from '../common/icon';
 import { RequestStatus } from '../../helpers/requests/status';
 import { TableColumn } from './TableColumn';
 import './Table.css';
@@ -46,76 +45,63 @@ const Table: FC<TableProps> = ({
   sortHandler,
   deleteHandler,
 }) => {
-  const [currentSortColumn, SetCurrentSortColumn] = useState('');
-  const [allRowsSelectedPages, SetAllRowsSelectedPages] = useState<number[]>(
+  const [currentSortColumn, setCurrentSortColumn] = useState('');
+  const [allRowsSelectedPages, setAllRowsSelectedPages] = useState<number[]>(
     [],
   );
-
-  useEffect(() => {
-    if (data.length === 0) {
-      SetAllRowsSelectedPages([]);
-      SetCurrentPageAllRowSelected(false);
-    }
-  }, [data]);
-
-  const [currentPageAllRowSelected, SetCurrentPageAllRowSelected] = useState(
-    null || Boolean,
-  );
-  const [allRowsSelectedEventFlag, SetAllRowsSelectedEvenFlag] =
+  const [currentPageAllRowSelected, setCurrentPageAllRowSelected] =
+    useState(false);
+  const [allRowsSelectedEventFlag, setAllRowsSelectedEventFlag] =
     useState(false);
 
-  const isCurrentPageAllRowsSelected = () => {
+  useEffect(() => {
+    setAllRowsSelectedPages([]);
+    setCurrentPageAllRowSelected(false);
+    setAllRowsSelectedEventFlag(false);
+  }, [data]);
+
+  useEffect(() => {
     const isSelected =
       allRowsSelectedPages.findIndex(
         (pageNumber) => pageNumber === currentPage,
       ) !== -1;
-    SetCurrentPageAllRowSelected(isSelected);
-  };
+
+    setCurrentPageAllRowSelected(isSelected);
+  }, [allRowsSelectedPages, currentPage]);
 
   const selectAllRows = (event: any, checked: boolean) => {
     if (event) {
-      SetAllRowsSelectedEvenFlag(true);
-      if (checked) {
-        let pageFound = allRowsSelectedPages.find(
-          (pageNumber) => pageNumber === currentPage,
+      setAllRowsSelectedEventFlag(true);
+
+      if (checked && currentPage !== undefined) {
+        setAllRowsSelectedPages((prev) =>
+          prev.includes(currentPage) ? prev : [...prev, currentPage],
         );
-        if (!pageFound && currentPage != undefined) {
-          allRowsSelectedPages.push(currentPage);
-        }
-        SetAllRowsSelectedPages(allRowsSelectedPages);
       } else {
-        removePageFromAllRowsSelected();
+        setAllRowsSelectedPages((prev) =>
+          prev.filter((page) => page !== currentPage),
+        );
       }
 
-      isCurrentPageAllRowsSelected();
+      setCurrentPageAllRowSelected(checked);
     }
   };
 
   const resetAllRowsSelectedEventFlag = () => {
-    SetAllRowsSelectedEvenFlag(false);
+    setAllRowsSelectedEventFlag(false);
   };
 
   const removePageFromAllRowsSelected = () => {
-    if (allRowsSelectedPages.length > 0) {
-      let pageFound = allRowsSelectedPages.findIndex(
-        (pageNumber) => pageNumber === currentPage,
-      );
-      if (pageFound !== -1) {
-        allRowsSelectedPages.splice(pageFound, 1);
-      }
-      SetAllRowsSelectedPages(allRowsSelectedPages);
-      isCurrentPageAllRowsSelected();
-    }
+    setAllRowsSelectedPages((prev) =>
+      prev.filter((page) => page !== currentPage),
+    );
+    setCurrentPageAllRowSelected(false);
   };
-
-  useEffect(() => {
-    isCurrentPageAllRowsSelected();
-  }, [currentPage]);
 
   const parentSortHandler = sortHandler ?? (() => {});
 
   let tableSortHandler = (row: any, ascSort: any) => {
-    SetCurrentSortColumn(row.graphQLPropertyName);
+    setCurrentSortColumn(row.graphQLPropertyName);
     parentSortHandler(row, ascSort);
   };
   let rowDeleteHandler = deleteHandler ?? (() => {});

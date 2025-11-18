@@ -254,7 +254,16 @@ const Search = () => {
   };
 
   const handlePageSizeChange = (pageSize: number) => {
-    debouncedSearch(searchParam, page, pageSize, sortBy, sortByDir, formData);
+    dispatch(
+      fetchSearchSites({
+        searchParam,
+        page: 1,
+        pageSize,
+        sortBy,
+        sortByDir,
+        filter: formData,
+      }),
+    );
   };
 
   const handlePageChange = (page: number) => {

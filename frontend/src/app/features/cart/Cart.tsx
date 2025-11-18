@@ -29,14 +29,15 @@ import { CreateSnapshotInputDto } from '../details/snapshot/ISnapshotState';
 
 const Cart = () => {
   const auth = useAuth();
-
-  const [delteConfirm, setDeleteConfirm] = useState(false);
-
-  const [cartIdToDelte, setCartIdToDelete] = useState('');
-
+  const user = getUser();
   const dispatch = useDispatch<AppDispatch>();
 
-  const user = getUser();
+  const [delteConfirm, setDeleteConfirm] = useState(false);
+  const [cartIdToDelte, setCartIdToDelete] = useState('');
+
+  const cartItemsArr = useSelector(cartItems);
+  const deleteStatus = useSelector(deleteRequestStatus);
+  const createSnapshotRequestStatus = useSelector(createSnapshotForSitesStatus);
 
   useEffect(() => {
     if (user === null) {
@@ -44,24 +45,15 @@ const Cart = () => {
     }
   }, []);
 
-  const cartItemsArr = useSelector(cartItems);
-
-  const deleteStatus = useSelector(deleteRequestStatus);
-
-  const createSnapshotRequestStatus = useSelector(createSnapshotForSitesStatus);
-
   useEffect(() => {
     if (createSnapshotRequestStatus === RequestStatus.success) {
-      showNotification(
-        createSnapshotRequestStatus,
-        'Successfully created snapshot',
-      );
+      showNotification(createSnapshotRequestStatus, 'Payment Successful');
       dispatch(resetCreateSnapshotForSitesStatus(null));
     } else {
       showNotification(
         createSnapshotRequestStatus,
-        '',
-        'Unable to create snapshot at this time.',
+        'Failed',
+        'Something went wrong',
         'Request Failed',
       );
       dispatch(resetCreateSnapshotForSitesStatus(null));
@@ -126,7 +118,7 @@ const Cart = () => {
             } = x;
             const mergedObject = { ...xWithoutSite, ...siteWithoutId };
 
-            return mergedObject;
+            return { ...mergedObject, price: `$ ${x.price}` };
           })}
           totalResults={[].length}
           allowRowsSelect={false}

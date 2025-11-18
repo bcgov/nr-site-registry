@@ -176,47 +176,22 @@ const Pagination: React.FC<PaginationProps> = ({
     return filteredOptions.sort((a, b) => a - b);
   };
 
-  const handlePageSizeChange = (newPageSize: number) => {
-    const newTotalPages = Math.ceil(totalResults / newPageSize);
-
-    // Calculate the target page based on current position
-    let targetPage = currentPage;
-
-    // If current page would be beyond the new total pages, go to the last page
-    if (currentPage > newTotalPages) {
-      targetPage = Math.max(1, newTotalPages);
-    }
-
-    // Change page size
-    changeResultsPerPage?.(newPageSize);
-
-    // If we need to change the page, do it
-    if (targetPage !== currentPage) {
-      selectPage?.(targetPage);
-    }
-  };
-
   const renderPageOptions = () => {
     const pages: JSX.Element[] = [];
 
     let firstPagePosition = currentPage % pagesToDisplay;
-
     let startPage =
       currentPage - firstPagePosition === 0
         ? 1
         : currentPage - firstPagePosition;
-
     startPage =
       startPage === totalPagesRequired
         ? startPage - pagesToDisplay < 1
           ? 1
           : startPage - pagesToDisplay
         : startPage;
-
     let lastPage = startPage + pagesToDisplay;
-
     lastPage = lastPage > totalPagesRequired ? totalPagesRequired : lastPage;
-
     for (let i = startPage; i <= lastPage; i++) {
       pages.push(
         <div key={i} className="pagination-section">
@@ -224,10 +199,8 @@ const Pagination: React.FC<PaginationProps> = ({
         </div>,
       );
     }
-
     return <React.Fragment>{pages}</React.Fragment>;
   };
-
   return (
     <div className="pagination-control">
       <div className="pagination-pages">
@@ -246,7 +219,7 @@ const Pagination: React.FC<PaginationProps> = ({
             data-testid="results-per-page-select"
             className="reslect-options-select"
             onChange={(e) => {
-              handlePageSizeChange(parseInt(e.target.value));
+              changeResultsPerPage?.(parseInt(e.target.value));
             }}
             value={resultsPerPage}
           >
@@ -275,5 +248,4 @@ const Pagination: React.FC<PaginationProps> = ({
     </div>
   );
 };
-
 export default Pagination;

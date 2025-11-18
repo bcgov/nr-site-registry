@@ -145,6 +145,7 @@ export const GetConfig = () => {
       },
       columnSize: ColumnSize.XtraSmall,
       stickyCol: true,
+      dynamicColumn: true,
     },
   ];
 

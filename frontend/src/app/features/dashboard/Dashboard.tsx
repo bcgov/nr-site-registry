@@ -6,7 +6,7 @@ import { UserType } from '../../helpers/requests/userType';
 import './Dashboard.css';
 import PageContainer from '../../components/simple/PageContainer';
 import Widget from '../../components/widget/Widget';
-import { getUser } from '../../helpers/utility';
+import { getUser, isUserOfType, UserRoleType } from '../../helpers/utility';
 import Actions from '../../components/action/Actions';
 import { useNavigate } from 'react-router-dom';
 import { fetchRecentViews } from './DashboardSlice';
@@ -67,15 +67,13 @@ const Dashboard = () => {
   const [userType, setUserType] = useState<UserType>(UserType.External);
 
   useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
-      setUserType(UserType.External);
-    } else if (
-      loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
     ) {
-      setUserType(UserType.Internal);
-    } else {
-      // not logged in
       setUserType(UserType.External);
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
+      setUserType(UserType.Internal);
     }
 
     loggedInUser

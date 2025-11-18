@@ -18,10 +18,12 @@ import {
   formatDate,
   getAxiosInstance,
   getUser,
+  isUserOfType,
   parseDate,
   resultCache,
   UpdateDisplayTypeParams,
   updateFields,
+  UserRoleType,
 } from '../../../helpers/utility';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
@@ -257,12 +259,13 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   // Handle user type based on username
   useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.includes('bceid')) {
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
+    ) {
       setUserType(UserType.External);
-    } else if (loggedInUser?.profile.preferred_username?.includes('idir')) {
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
       setUserType(UserType.Internal);
-    } else {
-      setUserType(UserType.External);
     }
   }, [loggedInUser]);
 
@@ -438,29 +441,44 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
   };
 
   const handleViewOnline = async (document: any) => {
-    if (document?.objectId !== null) {
+    if (document?.objectId !== null && document?.objectId !== undefined) {
       const response = await getObject(document?.objectId);
       window.open(response, '_blank');
+    } else {
+      if (document?.file) {
+        window.open(URL.createObjectURL(document?.file), '_blank');
+      }
     }
   };
 
   const handleDownload = async (doc: any) => {
-    if (doc?.objectId !== null) {
-      const response = await getObject(doc?.objectId, 'proxy');
+    try {
+      let fileBlob: Blob | null = null;
+      if (doc?.objectId !== null && doc?.objectId !== undefined) {
+        fileBlob = await getObject(doc?.objectId, 'proxy');
+      } else {
+        if (doc?.file) {
+          fileBlob = doc?.file;
+        }
+      }
 
-      // Create an object URL for the Blob
-      const objectURL = URL.createObjectURL(response);
+      if (fileBlob) {
+        // Create an object URL for the Blob
+        const objectURL = URL.createObjectURL(fileBlob);
 
-      // Create an anchor element to trigger the download
-      const downloadLink = document.createElement('a');
-      downloadLink.href = objectURL; // Set the href to the Blob URL
-      downloadLink.download = doc?.title; // Provide a filename for the download
+        // Create an anchor element to trigger the download
+        const downloadLink = document.createElement('a');
+        downloadLink.href = objectURL; // Set the href to the Blob URL
+        downloadLink.download = doc?.title; // Provide a filename for the download
 
-      // Trigger the download
-      downloadLink.click();
+        // Trigger the download
+        downloadLink.click();
 
-      // Optionally, revoke the object URL after the download
-      URL.revokeObjectURL(objectURL);
+        // Optionally, revoke the object URL after the download
+        URL.revokeObjectURL(objectURL);
+      }
+    } catch (error) {
+      console.error('Error downloading file:', error);
     }
   };
 

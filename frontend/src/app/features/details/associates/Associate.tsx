@@ -11,10 +11,12 @@ import {
 import {
   getAxiosInstance,
   getUser,
+  isUserOfType,
   resultCache,
   sortArray,
   UpdateDisplayTypeParams,
   updateTableColumn,
+  UserRoleType,
 } from '../../../helpers/utility';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
@@ -90,12 +92,13 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   // Handle user type based on username
   useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.includes('bceid')) {
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
+    ) {
       setUserType(UserType.External);
-    } else if (loggedInUser?.profile.preferred_username?.includes('idir')) {
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
       setUserType(UserType.Internal);
-    } else {
-      setUserType(UserType.External);
     }
   }, [loggedInUser]);
 
@@ -360,10 +363,6 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     setFormData(sorted);
   };
 
-  const handleWidgetCheckBox = (event: any) => {
-    alert(event);
-  };
-
   const handleTableChange = (event: any) => {
     if (
       event.property.includes('select_all') ||
@@ -444,7 +443,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
                 apiAction: assoc?.apiAction ?? UserActionEnum.updated,
                 srAction: event.value
                   ? SRApprovalStatusEnum.Public
-                  : SRApprovalStatusEnum.Pending,
+                  : SRApprovalStatusEnum.Private,
               };
             } else {
               return {
@@ -514,10 +513,8 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   const handleItemClick = (value: string) => {
     switch (value) {
       case SRVisibility.ShowSR:
-        alert('show');
         break;
       case SRVisibility.HideSR:
-        alert('hide');
         break;
       default:
         break;
@@ -628,7 +625,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
         <div>
           <AssociateSiteComponent
             handleTableChange={handleTableChange}
-            handleWidgetCheckBox={handleWidgetCheckBox}
+            handleWidgetCheckBox={() => {}}
             userType={userType}
             viewMode={viewMode}
             internalRow={internalRow}

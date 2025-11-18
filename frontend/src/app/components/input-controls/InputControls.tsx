@@ -945,6 +945,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
   isDisabled,
   customErrorCss,
   validation,
+  dropdownSearchLabel,
 }) => {
   const [error, setError] = useState<string | null>(null);
   const divRef = useRef<HTMLDivElement>(null);
@@ -1050,7 +1051,7 @@ export const DropdownSearchInput: React.FC<InputProps> = ({
           <Dropdown.Menu className="custom-dropdown-menu" ref={divRef}>
             <div className="mx-2">
               <SearchInput
-                label={'Search Staff'}
+                label={dropdownSearchLabel ?? 'Search'}
                 searchTerm={searchTerm}
                 clearSearch={clearSearch}
                 handleSearchChange={handleSearchChange}

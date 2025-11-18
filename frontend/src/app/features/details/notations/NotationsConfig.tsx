@@ -549,7 +549,9 @@ export const GetNotationConfig = () => {
         value: false,
         tableMode: true,
       },
-      columnSize: ColumnSize.Default,
+      columnSize: ColumnSize.XtraSmall,
+      dynamicColumn: true,
+      stickyCol: true,
     },
   ];
 

@@ -5,7 +5,7 @@ export interface IParcelDescriptionDto {
   id: string;
   descriptionType: ParcelDescriptionType;
   idPinNumber: string;
-  dateNoted: string;
+  dateNoted: any;
   landDescription: string;
   srAction: string;
   userAction: string;

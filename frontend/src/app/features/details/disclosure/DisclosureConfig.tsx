@@ -263,7 +263,7 @@ export const siteDisclosureConfig = (
         stickyCol: true,
       },
       dynamicColumn: true,
-      columnSize: ColumnSize.Default,
+      columnSize: ColumnSize.XtraSmall,
       stickyCol: true,
     },
   ];

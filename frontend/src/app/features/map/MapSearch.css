@@ -83,11 +83,11 @@
   gap: 8px;
 }
 
-.point-search-slider-content {
+/* .point-search-slider-content {
   display: flex;
   align-items: center;
   gap: 16px;
-}
+} */
 
 .point-search-slider {
   flex: 0 0 290px;
@@ -126,9 +126,16 @@ p.point-search-slider-text {
   font-size: 14px;
 }
 
-.point-search-menu .MuiPaper-root {
+/* .point-search-menu .MuiPaper-root {
   overflow: visible;
   width: 400px;
+} */
+
+/* Fix overflow - change from visible to hidden/auto */
+.point-search-menu .MuiPaper-root {
+  overflow: hidden; /* Changed from visible to hidden */
+  width: 400px;
+  max-width: 400px;
 }
 
 .search-autocomplete .search-input {
@@ -157,4 +164,67 @@ div.search-autocomplete.MuiAutocomplete-hasClearIcon .MuiInputBase-root {
 .polygon-vertex {
   background-color: var(--surface-color-primary-default);
   border: 1px solid var(--surface-color-border-default);
+}
+
+/* Update existing point-search-slider-content */
+.point-search-slider-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  min-width: 350px;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden; /* Prevent overflow */
+}
+
+/* Radius Input Container */
+.radius-input-container {
+  width: 100%;
+  margin-bottom: 4px;
+  box-sizing: border-box;
+}
+
+.radius-text-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.radius-text-input .MuiOutlinedInput-root {
+  font-size: 14px;
+}
+
+.radius-text-input .MuiFormHelperText-root {
+  font-size: 11px;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* Slider Row - keeps slider and value on same row, contained */
+.radius-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  min-width: 0; /* Allow flex shrinking */
+}
+
+/* Make slider responsive and contained */
+.radius-slider-row .point-search-slider {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  margin-left: 0;
+  width: auto;
+}
+
+/* Ensure text stays on same line and doesn't overflow */
+.radius-slider-row .point-search-slider-text {
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-width: fit-content;
+  font-size: 14px;
 }

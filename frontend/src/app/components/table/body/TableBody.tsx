@@ -273,6 +273,8 @@ const TableBody: FC<TableBodyProps> = ({
           customLinkValue={field.customLinkValue}
           customIcon={field.customIcon}
           customContainerCss={field.customContainerCss}
+          componentName={field.componentName}
+          componentPath={field.componentPath}
         />
       );
     } else if (field.type === FormFieldType.DropDown) {

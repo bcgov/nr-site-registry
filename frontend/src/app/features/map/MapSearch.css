@@ -83,12 +83,6 @@
   gap: 8px;
 }
 
-/* .point-search-slider-content {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-} */
-
 .point-search-slider {
   flex: 0 0 290px;
   min-width: 290px;
@@ -125,11 +119,6 @@ p.point-search-slider-text {
   color: black;
   font-size: 14px;
 }
-
-/* .point-search-menu .MuiPaper-root {
-  overflow: visible;
-  width: 400px;
-} */
 
 /* Fix overflow - change from visible to hidden/auto */
 .point-search-menu .MuiPaper-root {

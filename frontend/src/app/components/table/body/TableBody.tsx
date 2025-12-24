@@ -452,12 +452,7 @@ const TableBody: FC<TableBodyProps> = ({
           options={field.options || []}
           value={value}
           onChange={(value) =>
-            tableRecordChangeHandler(
-              rowKey,
-              field.graphQLPropertyName,
-              value,
-              true,
-            )
+            tableRecordChangeHandler(rowKey, field.graphQLPropertyName, value)
           }
           type={field.type}
           isEditing={editMode ?? true}

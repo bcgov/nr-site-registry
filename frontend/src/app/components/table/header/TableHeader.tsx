@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { TableColumn } from '../TableColumn';
 import './TableHeader.css';
 import HeaderCell from './HeaderCell';
@@ -20,12 +20,12 @@ const TableHeader: FC<TableHeaderProps> = ({
   selectAllRowsHandler,
   currentPageAllRowsSelected,
 }) => {
-  const [isCurrentPageSelected, SetIsCurrentPageSelected] = useState(
+  const [isCurrentPageSelected, setIsCurrentPageSelected] = useState(
     currentPageAllRowsSelected,
   );
 
   useEffect(() => {
-    SetIsCurrentPageSelected(currentPageAllRowsSelected);
+    setIsCurrentPageSelected(currentPageAllRowsSelected);
   }, [currentPageAllRowsSelected]);
 
   if (!columns || columns.length === 0) {

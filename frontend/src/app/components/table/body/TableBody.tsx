@@ -194,6 +194,7 @@ const TableBody: FC<TableBodyProps> = ({
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
           isDisabled={field.isDisabled}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.Search) {
@@ -222,6 +223,7 @@ const TableBody: FC<TableBodyProps> = ({
           customInfoMessage={field.customInfoMessage}
           customMenuMessage={field.customMenuMessage}
           isDisabled={field.isDisabled}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.Label) {
@@ -244,6 +246,7 @@ const TableBody: FC<TableBodyProps> = ({
           isEditing={editMode ?? true}
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.Link) {
@@ -269,6 +272,7 @@ const TableBody: FC<TableBodyProps> = ({
           href={field.href}
           customLinkValue={field.customLinkValue}
           customIcon={field.customIcon}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.DropDown) {
@@ -295,6 +299,7 @@ const TableBody: FC<TableBodyProps> = ({
           href={field.href}
           options={field.options}
           isDisabled={field.isDisabled}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.Checkbox) {
@@ -322,6 +327,7 @@ const TableBody: FC<TableBodyProps> = ({
           stickyCol={field.stickyCol}
           href={field.href}
           options={field.options}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.Date) {
@@ -345,6 +351,7 @@ const TableBody: FC<TableBodyProps> = ({
           stickyCol={field.stickyCol}
           isDisabled={field.isDisabled ?? false}
           validation={field.validation}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.TextArea) {
@@ -371,6 +378,7 @@ const TableBody: FC<TableBodyProps> = ({
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
           isDisabled={field.isDisabled}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.DropDownWithSearch) {
@@ -399,6 +407,7 @@ const TableBody: FC<TableBodyProps> = ({
           customInfoMessage={field.customInfoMessage}
           isDisabled={field.isDisabled}
           validation={field.validation}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.DeleteIcon) {
@@ -425,6 +434,7 @@ const TableBody: FC<TableBodyProps> = ({
           isEditing={editMode ?? true}
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.IconButton) {
@@ -440,7 +450,12 @@ const TableBody: FC<TableBodyProps> = ({
           options={field.options || []}
           value={value}
           onChange={(value) =>
-            tableRecordChangeHandler(rowKey, field.graphQLPropertyName, value)
+            tableRecordChangeHandler(
+              rowKey,
+              field.graphQLPropertyName,
+              value,
+              true,
+            )
           }
           type={field.type}
           isEditing={editMode ?? true}
@@ -448,6 +463,7 @@ const TableBody: FC<TableBodyProps> = ({
           stickyCol={field.stickyCol}
           customLinkValue={field.customLinkValue}
           customIcon={field.customIcon}
+          customContainerCss={field.customContainerCss}
         />
       );
     }

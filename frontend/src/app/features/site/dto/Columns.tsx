@@ -40,7 +40,8 @@ const getSiteSearchResultsColumns = (
       ),
       'site/details/',
       false,
-      ColumnSize.Small,
+      '',
+      ColumnSize.Triple,
     ),
     new TableColumn(
       7,

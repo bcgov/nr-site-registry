@@ -35,11 +35,11 @@ export const fetchSearchSites = createAsyncThunk(
         query: print(graphQlSiteQuery()),
         variables: {
           searchParam: args.searchParam,
-          page: args.page || initialState.page,
-          pageSize: args.pageSize || initialState.pageSize,
-          sortBy: args.sortBy || initialState.sortBy,
-          sortByDir: args.sortByDir || initialState.sortByDir,
-          filters: args.filter || initialState.filter,
+          page: args.page ?? initialState.page,
+          pageSize: args.pageSize ?? initialState.pageSize,
+          sortBy: args.sortBy ?? initialState.sortBy,
+          sortByDir: args.sortByDir ?? initialState.sortByDir,
+          filters: args.filter ?? initialState.filter,
         },
       });
 
@@ -71,8 +71,9 @@ const siteSearchSlice = createSlice({
         state.sites = action.payload.sites;
         state.count = action.payload.count;
         state.searchParam = action.meta.arg.searchParam || state.searchParam;
-        state.page = action.payload.page || state.page;
-        state.pageSize = action.payload.pageSize || state.pageSize;
+        state.page = action.payload.page;
+        state.pageSize = action.payload.pageSize;
+
         state.sortBy = action.meta.arg.sortBy || state.sortBy;
         state.sortByDir = action.meta.arg.sortByDir || state.sortByDir;
         state.filter = action.meta.arg.filter || state.filter;

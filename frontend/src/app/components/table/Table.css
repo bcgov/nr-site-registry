@@ -171,19 +171,19 @@ div.tableWidth::-webkit-scrollbar-track {
 }
 
 .triple {
-  width: 60%;
+  max-width: 60%;
 }
 
 .custom-small {
-  width: 10%;
+  max-width: 10%;
 }
 
 .xtraSmall {
-  width: 5%;
+  max-width: 5%;
 }
 
 .double {
-  width: 40%;
+  max-width: 40%;
 }
 
 table td {

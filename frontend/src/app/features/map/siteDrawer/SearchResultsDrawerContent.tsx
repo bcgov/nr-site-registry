@@ -1,6 +1,5 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import { Site } from '../MapView';
-import SearchResults from '../../site/searchResults/SearchResults';
 import { SearchResultsFilters } from '../../site/searchResults/SearchResultsFilters';
 import { SearchResultsActions } from '../../site/searchResults/SearchResultsActions';
 import FilterPills, { FilterPill } from '../../site/filters/FilterPills';
@@ -11,11 +10,20 @@ import {
   SiteFilters,
   useMapSearch_FilterSearchResultsLazyQuery,
 } from '../../../../graphql/generated';
-import { SpinnerIcon } from '../../../components/common/icon';
+import {
+  BarsIcon,
+  FilterIcon,
+  SpinnerIcon,
+  TableColumnsIcon,
+} from '../../../components/common/icon';
 import useDebouncedValue from '../../../helpers/useDebouncedValue';
 import { formRowsMap } from '../../site/dto/SiteFilterConfig';
 import { formatDateRange } from '../../../helpers/utility';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
+import Widget from '../../../components/widget/Widget';
+import { RequestStatus } from '../../../helpers/requests/status';
+import { Button } from '../../../components/button/Button';
+import { Dropdown } from 'react-bootstrap';
 
 const defaultColumns = getSiteSearchResultsColumns(new Set(['map']));
 
@@ -64,6 +72,7 @@ export const SearchResultsDrawerContent: FC<
     if (siteIds.length === 0) {
       return;
     }
+    setSelectedRows([]);
     searchSitesQuery({
       variables: {
         ...pagination,
@@ -156,31 +165,126 @@ export const SearchResultsDrawerContent: FC<
   };
 
   const loading = siteIdsLoading || siteDetailsLoadingDebounced;
+  type PanelOption = 'filters' | 'columns' | null;
+  const [panelToShow, setPanelToShow] = useState<PanelOption>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [resultsPerPage, setResultsPerPage] = useState(5);
+
+  const totalResults = searchResults.count || 0;
+  const selectPage = (pageNumber: number): void => {
+    setCurrentPage(pageNumber);
+  };
+
+  const changeResultsPerPage = (pageNumber: number): void => {
+    setResultsPerPage(pageNumber);
+  };
+
+  useEffect(() => {
+    setPagination({ page: currentPage, pageSize: resultsPerPage });
+  }, [currentPage, resultsPerPage]);
+
+  const togglePanel = (panel: PanelOption) => {
+    if (panelToShow === panel) {
+      setPanelToShow(null);
+      return;
+    }
+    setPanelToShow(panel);
+  };
 
   return (
     <div className="d-flex flex-column gap-3">
-      <SearchResultsFilters
-        columns={columnsToDisplay}
-        onColumnSelectionChange={toggleColumnSelectionForDisplay}
-        resetColumns={() => setColumnsToDisplay(defaultColumns)}
-        filtersFormData={filtersFormData}
-        onFiltersChange={onFiltersChange}
-        onFiltersSubmit={onFiltersSubmit}
-        onFiltersReset={onFiltersReset}
-      />
-      <SearchResultsActions selectedRows={selectedRows} />
-
-      <FilterPills filters={filterPillsData} onRemoveFilter={onRemoveFilter} />
-
       {loading && <SpinnerIcon size={20} className="site-fa-spin" />}
-
-      <SearchResults
-        pageChange={(page, pageSize) => setPagination({ page, pageSize })}
-        data={searchResults.sites}
-        columns={columnsToDisplay.filter((x) => x.isChecked === true)}
-        totalRecords={searchResults.count}
+      <Widget
         changeHandler={changeHandler}
-      />
+        title={'Results'}
+        tableColumns={columnsToDisplay.filter((x) => x.isChecked === true)}
+        tableData={searchResults.sites}
+        tableIsLoading={loading ? RequestStatus.loading : RequestStatus.idle}
+        allowRowsSelect={true}
+        aria-label="Site Participant Widget"
+        customLabelCss="custom-search-widget-lbl"
+        hideTable={false}
+        hideTitle={false}
+        editMode={false}
+        srMode={false}
+        hideWidgetCheckbox={true}
+        primaryKeycolumnName="id"
+        // sortHandler={handleTableSortChange}
+        totalResults={searchResults.count}
+        selectPage={selectPage}
+        changeResultsPerPage={changeResultsPerPage}
+        currentPage={currentPage}
+        resultsPerPage={resultsPerPage}
+        showPageOptions={true}
+        filter={
+          <div>
+            <div className="table-actions d-none d-md-flex ">
+              <div
+                className={`table-actions-items ${panelToShow === 'columns' ? 'active' : ''} `}
+                onClick={() => {
+                  togglePanel('columns');
+                }}
+              >
+                <TableColumnsIcon />
+                Columns
+              </div>
+              <div
+                className={`table-actions-items ${panelToShow === 'filters' ? 'active' : ''}`}
+                onClick={() => {
+                  togglePanel('filters');
+                }}
+              >
+                <FilterIcon />
+                Filters
+              </div>
+            </div>
+            <Dropdown className="d-flex d-md-none">
+              <Dropdown.Toggle as={Button} variant="tertiary">
+                <BarsIcon size={24} />
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item
+                  onClick={() => togglePanel('columns')}
+                  className="d-flex align-items-center gap-2"
+                >
+                  <TableColumnsIcon />
+                  <span>Columns</span>
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() => togglePanel('filters')}
+                  className="d-flex align-items-center gap-2"
+                >
+                  <TableColumnsIcon />
+                  <span>Filters</span>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
+        }
+      >
+        <SearchResultsActions
+          selectedRows={selectedRows}
+          aria-label="search-results-actions"
+        />
+        <SearchResultsFilters
+          aria-label="search-results-filters"
+          columns={columnsToDisplay}
+          filtersFormData={filtersFormData}
+          panelToShow={panelToShow}
+          selectedFilter={filterPillsData}
+          setPanelToShow={setPanelToShow}
+          onColumnSelectionChange={toggleColumnSelectionForDisplay}
+          resetColumns={() => setColumnsToDisplay(defaultColumns)}
+          onFiltersChange={onFiltersChange}
+          onFiltersSubmit={onFiltersSubmit}
+          onFiltersReset={onFiltersReset}
+        />
+        <FilterPills
+          aria-label="selected-filters"
+          filters={filterPillsData}
+          onRemoveFilter={onRemoveFilter}
+        />
+      </Widget>
     </div>
   );
 };

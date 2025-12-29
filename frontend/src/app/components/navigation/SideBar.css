@@ -115,6 +115,9 @@
   border-radius: 0px;
   width: 40px;
   justify-content: center;
+  border-radius: var(--layout-border-radius-small);
+  min-width: 4vw;
+  padding: var(--layout-padding-small);
 }
 
 .currentPath .sideBar-Icon,
@@ -163,4 +166,50 @@
 .side-bar:hover .sideBar-menu-item-hover:hover .sideBar-Icon,
 .side-bar:hover .sideBar-menu-item-hover:hover .sideBarDisplayText {
   color: white !important;
+}
+
+.icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.cart-badge-wrapper {
+  margin-left: 4px; /* small space beside the icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.cart-badge {
+  background-color: white;
+  color: var(--surface-color-primary-default, #053662);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 10px;
+  line-height: 100%;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid var(--surface-color-primary-default, #053662);
+}
+
+/* When sidebar is hovered, show the full text next to badge */
+.side-bar:hover .cart-badge-wrapper::after {
+  content: attr(data-hover-text);
+  margin-left: 6px;
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  color: var(--surface-color-primary-default, #053662);
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
 }

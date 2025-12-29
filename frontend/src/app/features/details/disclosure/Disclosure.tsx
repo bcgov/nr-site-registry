@@ -45,6 +45,7 @@ import { siteDisclosureConfig } from './DisclosureConfig';
 
 const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const schedule2Ref = useSelector(schedule2ReferenceCdDrpdown);
+  const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const {
     disclosureStatementConfig,
     disclosureStatementConfigEditMode,
@@ -52,7 +53,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     disclosureScheduleExternalConfig,
     disclosureCommentsConfig,
     srVisibilityConfig,
-  } = siteDisclosureConfig(schedule2Ref?.data || []);
+  } = siteDisclosureConfig(schedule2Ref?.data || [], viewMode);
   const dispatch = useDispatch<AppDispatch>();
   const mode = useSelector(siteDetailsMode);
   const resetDetails = useSelector(resetSiteDetails);
@@ -70,7 +71,6 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     { disclosureId: any; scheduleId: any }[]
   >([]);
   const [userType, setUserType] = useState<UserType>(UserType.External);
-  const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 
   const [searchInternalContact, setSearchInternalContact] = useState('');
@@ -587,7 +587,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   };
 
   const handleWidgetCheckBox = (event: any) => {
-    alert(event);
+    // alert(event);
   };
 
   const handleItemClick = (value: string) => {

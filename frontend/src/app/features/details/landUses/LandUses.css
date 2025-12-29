@@ -1,0 +1,40 @@
+.custom-landuses-widget-lbl {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  line-height: 40px !important;
+  text-align: left;
+  color: var(--typography-color-primary, #2d2d2d) !important;
+  margin-bottom: 0;
+}
+
+.custom-landuses-lbl-text {
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+  text-align: left;
+  color: var(--typography-color-secondary, #474543) !important;
+}
+
+.custom-landuses-input-text {
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+  text-align: left;
+  color: var(--typography-color-primary, #2d2d2d) !important;
+}
+
+.custom-landuses-edit-label {
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+  text-align: left;
+  color: var(--typography-color-secondary, #474543) !important;
+}
+
+.custom-landuses-edit-input {
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+  text-align: left;
+  color: var(--typography-color-secondary, #474543) !important;
+}

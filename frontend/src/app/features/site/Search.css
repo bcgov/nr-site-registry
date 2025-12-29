@@ -231,6 +231,8 @@ div.search-parent {
   text-align: left;
   color: var(--surface-color-primary-default);
   text-decoration: none;
+  align-items: center;
+  padding-bottom: 5px;
 }
 
 .customSearchIcon {
@@ -238,4 +240,31 @@ div.search-parent {
   line-height: 24px;
   font-weight: 900;
   color: var(--icons-color-disabled, #9f9d9c);
+}
+
+.custom-search-input-text {
+  display: inline-block !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 24px !important;
+  text-align: left;
+  color: var(--typography-color-secondary) !important;
+  margin: 0;
+  padding: 0;
+}
+
+.custom-search-input-ellipsis {
+  max-width: 45vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-search-widget-lbl {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 40px;
+  text-align: left;
+  color: var(--typography-color-primary, #2d2d2d);
+  margin-bottom: 0;
 }

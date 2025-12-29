@@ -1,4 +1,5 @@
 import { FormFieldType } from '../../../components/input-controls/IFormField';
+import { ColumnSize } from '../../../components/table/TableColumn';
 
 export const getLandUseColumns = (
   landUseCodes: any[] = [],
@@ -19,6 +20,10 @@ export const getLandUseColumns = (
           graphQLPropertyName: 'landUse.code',
           tableMode: true,
           placeholder: 'Please enter land use',
+          customLabelCss: 'custom-landuses-lbl-text',
+          customInputTextCss: 'custom-landuses-input-text',
+          customEditLabelCss: 'custom-landuses-edit-label',
+          customEditInputTextCss: 'custom-landuses-edit-input',
         },
       }
     : {
@@ -32,6 +37,10 @@ export const getLandUseColumns = (
           graphQLPropertyName: 'landUse.code',
           tableMode: true,
           placeholder: 'Please enter land use note.',
+          customLabelCss: 'custom-landuses-lbl-text',
+          customInputTextCss: 'custom-landuses-input-text',
+          customEditLabelCss: 'custom-landuses-edit-label',
+          customEditInputTextCss: 'custom-landuses-edit-input',
         },
       };
 
@@ -45,6 +54,10 @@ export const getLandUseColumns = (
       label: 'Notes',
       graphQLPropertyName: 'note',
       tableMode: true,
+      customLabelCss: 'custom-landuses-lbl-text',
+      customInputTextCss: 'custom-landuses-input-text',
+      customEditLabelCss: 'custom-landuses-edit-label',
+      customEditInputTextCss: 'custom-landuses-edit-input',
     },
   };
 
@@ -59,6 +72,9 @@ export const getLandUseColumns = (
       graphQLPropertyName: 'srValue',
       tableMode: true,
     },
+    dynamicColumn: true,
+    columnSize: ColumnSize.XtraSmall,
+    stickyCol: true,
   };
 
   return [landUseCodeColumns, noteColumn, srColumn];

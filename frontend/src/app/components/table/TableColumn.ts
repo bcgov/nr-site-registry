@@ -22,6 +22,7 @@ export class TableColumn {
     public displayType?: IFormField,
     public linkRedirectionURL?: string,
     public dynamicColumn?: boolean,
+    public customHeaderCss?: string,
     public columnSize?: ColumnSize,
     public stickyCol?: boolean,
   ) {

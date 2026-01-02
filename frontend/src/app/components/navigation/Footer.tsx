@@ -1,14 +1,13 @@
-import React from 'react';
 import './Footer.css';
 import logo from '../../../app/images/logos/logo-white.png';
-import { FOOTER_TEXT_1, FOOTER_TEXT_2 } from '../../constants/Constant';
+import { CONTACT_US, FOOTER } from '../../constants/Constant';
 
 const Footer = () => {
   return (
     <footer>
       <section className="footer d-flex justify-content-center">
         <span className="footer-inner-content-width">
-          <p className="footer-section-content1">{FOOTER_TEXT_1}</p>
+          <p className="footer-section-content1">{CONTACT_US}</p>
         </span>
       </section>
       <section className="footer-section-two">
@@ -23,7 +22,7 @@ const Footer = () => {
                 />
               </a>
             </span>
-            <p className="footer-inner-content-width">{FOOTER_TEXT_2}</p>
+            <p className="footer-inner-content-width">{FOOTER}</p>
           </div>
           <div className="footer-section-two-column-two">
             <div className="content-header">More Info</div>

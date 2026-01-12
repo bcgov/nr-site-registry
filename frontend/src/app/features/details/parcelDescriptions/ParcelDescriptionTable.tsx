@@ -1,8 +1,10 @@
 import React from 'react';
-import Table from '../../../components/table/Table';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { TableColumn } from '../../../components/table/TableColumn';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
+import Widget from '../../../components/widget/Widget';
+import { Button } from '../../../components/button/Button';
+import { UserMinus, UserPlus } from '../../../components/common/icon';
 
 interface IParcelDescriptionTable {
   requestStatus: RequestStatus;
@@ -19,6 +21,11 @@ interface IParcelDescriptionTable {
   tableChangeHandler: (event: any) => void;
   deleteHandler: (event: any) => void;
   allowRowsSelect: boolean;
+  handleAddRow?: () => void;
+  handleDeleteRows?: () => void;
+  selectedRows?: any[];
+  showAddRemoveButtons?: boolean;
+  title?: string;
 }
 
 const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
@@ -36,14 +43,20 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
   tableChangeHandler,
   deleteHandler,
   allowRowsSelect,
+  handleAddRow,
+  handleDeleteRows,
+  selectedRows = [],
+  showAddRemoveButtons,
+  title,
 }) => {
   return (
-    <Table
+    <Widget
       showPageOptions={showPageOptions}
-      label="Search Results"
-      isLoading={requestStatus}
-      columns={columns}
-      data={data}
+      title={title ?? 'Parcel Descriptions'}
+      customLabelCss="custom-parcelDescriptions-widget-lbl"
+      tableIsLoading={requestStatus}
+      tableColumns={columns}
+      tableData={data}
       totalResults={totalResults}
       selectPage={handleSelectPage}
       changeResultsPerPage={handleChangeResultsPerPage}
@@ -52,10 +65,30 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
       allowRowsSelect={allowRowsSelect}
       changeHandler={tableChangeHandler}
       editMode={viewMode === SiteDetailsMode.EditMode}
-      idColumnName="id"
+      primaryKeycolumnName="id"
       sortHandler={handleTableSortChange}
       deleteHandler={deleteHandler}
-    ></Table>
+      srMode={viewMode === SiteDetailsMode.SRMode}
+      hideWidgetCheckbox={true}
+    >
+      {showAddRemoveButtons && viewMode === SiteDetailsMode.EditMode && (
+        <div className="d-flex gap-2 flex-wrap">
+          <Button variant="secondary" onClick={handleAddRow}>
+            <UserPlus />
+            Add Parcel Description
+          </Button>
+
+          <Button
+            variant="secondary"
+            onClick={handleDeleteRows}
+            disabled={selectedRows.length === 0}
+          >
+            <UserMinus />
+            Remove Parcel Description
+          </Button>
+        </div>
+      )}
+    </Widget>
   );
 };
 

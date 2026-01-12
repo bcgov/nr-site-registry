@@ -44,7 +44,7 @@ export class ParticipantService {
       if (user?.identity_provider === UserTypeEum.IDIR) {
         if (showPending) {
           result = await this.siteParticsRepository.find({
-            where: { siteId, srAction: SRApprovalStatusEnum.PENDING  },
+            where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
             relations: ['psnorg', 'siteParticRoles', 'siteParticRoles.prCode2'],
             order: { whenUpdated: 'DESC' },
           });
@@ -85,7 +85,8 @@ export class ParticipantService {
             id: item.id,
             siteId: item.siteId,
             psnorgId: item.psnorgId,
-            effectiveDate: new Date(item.effectiveDate).toISOString(),
+            effectiveDate:
+              item.effectiveDate && new Date(item.effectiveDate).toISOString(),
             endDate: item.endDate ? new Date(item.endDate).toISOString() : null,
             note: item.note?.trim() || '', // Ensure note is trimmed and defaults to an empty string if null
             displayName: item.psnorg?.displayName?.trim() || '', // Safely access displayName with default value

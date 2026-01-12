@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomLabel from '../../components/simple/CustomLabel';
@@ -79,8 +79,10 @@ import {
   fetchNotationParticipantRoleCd,
   fetchNotationTypeCd,
   fetchParticipantRoleCd,
+  fetchSchedule2ReferenceCd,
   fetchSiteRiskCd,
   fetchSiteStatusCd,
+  schedule2ReferenceCdDrpdown,
 } from './dropdowns/DropdownSlice';
 import BannerDetails from '../../components/banners/BannerDetails';
 import {
@@ -116,20 +118,22 @@ import {
   fetchPendingSiteDisclosure,
   fetchPendingSiteNotationBySiteId,
   fetchPendingSiteParticipantsForApproval,
-  fetchPendingSitesDetailsFprApproval,
+  fetchPendingSitesDetailsForApproval,
   hasNoPendingUpdates,
   updateRequestStatus,
 } from './srUpdates/srUpdatesSlice';
 import { fetchLandUseCodes } from './landUses/LandUsesSlice';
 import { IFetchParcelDescriptionsParams } from './parcelDescriptions/parcelDescriptionsInterfaces';
 import {
+  bulkAproveRejectChanges,
   bulkUpdateApproveRejectStatus,
+  fetchPendingSiteForSRApproval,
   resetBulkUpdateStatus,
+  selectAllSites,
 } from './srUpdates/state/srUpdatesTableSlice';
 import { Button } from '../../components/button/Button';
 import { IFormField } from '../../components/input-controls/IFormField';
 import { GetNotationConfig } from './notations/NotationsConfig';
-import { disclosureStatementConfigEditMode } from './disclosure/DisclosureConfig';
 import GetConfig from './participants/ParticipantConfig';
 import { GetAssociateConfig } from './associates/AssociateConfig';
 import { GetDocumentsConfig } from './documents/DocumentsConfig';
@@ -143,9 +147,12 @@ import {
 } from './documents/DocumentEndpoints';
 import { HttpStatusCode } from '../../common/httpStatusCode';
 import { GetSummaryConfig } from './summary/SummaryConfig';
-import { de } from 'date-fns/locale';
+import { siteDisclosureConfig } from './disclosure/DisclosureConfig';
 
 const SiteDetails = () => {
+  const { disclosureStatementConfigEditMode } = siteDisclosureConfig(
+    useSelector(schedule2ReferenceCdDrpdown)?.data,
+  );
   const auth = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -162,6 +169,7 @@ const SiteDetails = () => {
   const details = useSelector(selectSiteDetails);
   const bulkApproveRejectStatus = useSelector(bulkUpdateApproveRejectStatus);
   const hasNoPendingUpdatesFromState = useSelector(hasNoPendingUpdates);
+  const srUpdates = useSelector(selectAllSites);
   const snapshot = useSelector(snapshots);
   const snapshotTakenDate = useSelector(getFirstSnapshotCreatedDate);
   const bannerType = useSelector(selectBannerType);
@@ -181,7 +189,7 @@ const SiteDetails = () => {
   const { participantColumnInternal } = GetConfig();
   const { associateColumnInternal } = GetAssociateConfig();
   const { documentFormRowsEditMode } = GetDocumentsConfig();
-  const { createSiteFormRows } = GetSummaryConfig();
+  const { createSiteFormRows, summaryFormRows } = GetSummaryConfig();
 
   const [errorList, setErrorList] = useState<any[]>([]);
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
@@ -234,8 +242,8 @@ const SiteDetails = () => {
 
       showNotification(
         saveSiteDetailsRequestStatus,
-        'Successfully saved site details',
-        'Failed To save site details',
+        'Changes saved successfully',
+        'System error prevented changes from being saved.',
       );
       dispatch(resetSaveSiteDetailsRequestStatus(null));
     } else {
@@ -279,34 +287,61 @@ const SiteDetails = () => {
     }
   }, [details]);
 
+  const lastScrollY = useRef(0);
+  const isVisibleRef = useRef(false); // track visibility without triggering re-renders
   useEffect(() => {
+    const thresholdShow = 100; // show header only after scrolling past 100px
+    const thresholdHide = 30; // hide header only when scrolling up to < 30px
+
     const handleScroll = () => {
-      if (window.scrollY > 5) {
-        // Adjust the scroll position as needed
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
+      const currentScrollY = window.scrollY;
+
+      // Always hide at the top
+      if (currentScrollY <= 5) {
+        if (isVisibleRef.current) {
+          setIsVisible(false);
+          isVisibleRef.current = false;
+        }
+        lastScrollY.current = currentScrollY;
+        return;
       }
+
+      const scrollingDown = currentScrollY > lastScrollY.current;
+      const scrollingUp = currentScrollY < lastScrollY.current;
+
+      if (
+        scrollingDown &&
+        currentScrollY > thresholdShow &&
+        !isVisibleRef.current
+      ) {
+        setIsVisible(true);
+        isVisibleRef.current = true;
+      }
+
+      if (
+        scrollingUp &&
+        currentScrollY < thresholdHide &&
+        isVisibleRef.current
+      ) {
+        setIsVisible(false);
+        isVisibleRef.current = false;
+      }
+
+      lastScrollY.current = currentScrollY;
     };
 
     window.addEventListener('scroll', handleScroll);
-
-    // Clean up the event listener on component unmount
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
-      setUserType(UserType.External);
-    } else if (
-      loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
     ) {
-      setUserType(UserType.Internal);
-    } else {
-      // not logged in
       setUserType(UserType.External);
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
+      setUserType(UserType.Internal);
     }
   }, [loggedInUser]);
 
@@ -325,6 +360,13 @@ const SiteDetails = () => {
 
   useEffect(() => {
     dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+    dispatch(
+      fetchPendingSiteForSRApproval({
+        searchParam: { id: id ?? '' },
+        page: 1,
+        pageSize: 5,
+      }),
+    );
   }, []);
 
   // NEEDS TO FETCH DATA BASED ON CONDITION WHEATHER IT IS EXTERNAL USER OR INTERNAL USER
@@ -423,6 +465,7 @@ const SiteDetails = () => {
     dispatch(fetchSiteRiskCd());
     dispatch(fetchSiteStatusCd());
     dispatch(fetchBceRegionCd());
+    dispatch(fetchSchedule2ReferenceCd());
   };
 
   const checkForRecordsPendingReview = (siteId: string) => {
@@ -439,7 +482,7 @@ const SiteDetails = () => {
 
       Promise.all([
         dispatch(
-          fetchPendingSitesDetailsFprApproval({ siteId, showPending: true }),
+          fetchPendingSitesDetailsForApproval({ siteId, showPending: true }),
         ),
 
         dispatch(
@@ -564,7 +607,7 @@ const SiteDetails = () => {
     try {
       if (siteSummary && Object.keys(siteSummary).length > 0) {
         const errors = validateForm(
-          createSiteFormRows,
+          !id?.trim() ? createSiteFormRows : summaryFormRows,
           siteSummary,
           'Site Summary',
         );
@@ -687,10 +730,10 @@ const SiteDetails = () => {
         Object.keys(disclosure).length > 0
       ) {
         const siteDisclosureErrors: any[] = [];
-        let updatedSiteDisclosure = deepFilterByUserAction(
-          disclosure,
-          userActions,
-        );
+        let updatedSiteDisclosure = deepFilterByUserAction(disclosure, [
+          ...userActions,
+          UserActionEnum.deleted,
+        ]);
         const errors = validateForm(
           disclosureStatementConfigEditMode,
           updatedSiteDisclosure,
@@ -718,6 +761,10 @@ const SiteDetails = () => {
           updatedSiteDisclosure = removeProperty(
             updatedSiteDisclosure,
             'position',
+          );
+          updatedSiteDisclosure = removeProperty(
+            updatedSiteDisclosure,
+            'description',
           );
           dispatch(setupSiteDisclosureDataForSaving(updatedSiteDisclosure));
           return [];
@@ -856,7 +903,6 @@ const SiteDetails = () => {
   };
   const handleAddToCart = () => {
     dispatch(resetCartItemAddedStatus);
-    const loggedInUser = getUser();
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
@@ -1153,13 +1199,13 @@ const SiteDetails = () => {
               viewMode === SiteDetailsMode.ViewOnlyMode &&
               userType === UserType.External && (
                 <>
-                  <Button variant="secondary" onClick={handleAddToCart}>
-                    <ShoppingCartIcon />
-                    Add to Cart
-                  </Button>
                   {id && (
                     <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
                   )}
+                  <Button onClick={handleAddToCart}>
+                    <ShoppingCartIcon />
+                    Add to Cart
+                  </Button>
                 </>
               )}
           </div>
@@ -1172,9 +1218,28 @@ const SiteDetails = () => {
               label={`Are you sure to proceed`}
               closeHandler={(response) => {
                 if (response) {
-                  alert(confirmSiteReview);
                   if (confirmSiteReview) {
-                    //handleRemoveAssociate(response);
+                    if (srUpdates.length > 0) {
+                      dispatch(
+                        bulkAproveRejectChanges({
+                          sites: srUpdates,
+                          isApproved: true,
+                          fromSiteDetails: false,
+                        }),
+                      );
+                    }
+                  }
+
+                  if (!confirmSiteReview) {
+                    if (srUpdates.length > 0) {
+                      dispatch(
+                        bulkAproveRejectChanges({
+                          sites: srUpdates,
+                          isApproved: false,
+                          fromSiteDetails: false,
+                        }),
+                      );
+                    }
                   }
                 }
                 SetConfirmSiteReview(null);
@@ -1310,13 +1375,13 @@ const SiteDetails = () => {
                 viewMode === SiteDetailsMode.ViewOnlyMode &&
                 userType === UserType.External && (
                   <>
+                    {id && (
+                      <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
+                    )}
                     <Button onClick={handleAddToCart}>
                       <ShoppingCartIcon />
                       Add to Cart
                     </Button>
-                    {id && (
-                      <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
-                    )}
                   </>
                 )}
             </div>
@@ -1341,7 +1406,7 @@ const SiteDetails = () => {
           {!isVisible && (
             <>
               {viewMode === SiteDetailsMode.SRMode && (
-                <div className="sr-mode-content">
+                <div className="sr-mode-content mb-5">
                   <div className="sr-mode-info-banner">
                     <div className="sr-mode-info-content-layout">
                       <div>
@@ -1357,24 +1422,26 @@ const SiteDetails = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="form-check form-switch">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      role="switch"
-                      id="flexSwitchCheckChecked"
-                      checked={
-                        siteDetailsForSRMode?.srAction ===
+                  <div className="p-2">
+                    <div className="form-check form-switch">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="flexSwitchCheckChecked"
+                        checked={
+                          siteDetailsForSRMode?.srAction ===
+                          SRApprovalStatusEnum.Public
+                        }
+                        onChange={(event) => handleSiteSRVisiblity(event)}
+                      />
+                      <label className="form-check-label">
+                        {siteDetailsForSRMode?.srAction ===
                         SRApprovalStatusEnum.Public
-                      }
-                      onChange={(event) => handleSiteSRVisiblity(event)}
-                    />
-                    <label className="form-check-label">
-                      {siteDetailsForSRMode?.srAction ===
-                      SRApprovalStatusEnum.Public
-                        ? 'Site Published to Site Registry'
-                        : 'Publish Page To Site Registry'}
-                    </label>
+                          ? 'Publish page to Site Registry'
+                          : 'Hide page from Site Registry'}
+                      </label>
+                    </div>
                   </div>
                 </div>
               )}

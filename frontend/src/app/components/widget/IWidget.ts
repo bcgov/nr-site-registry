@@ -21,4 +21,10 @@ export interface IWidget {
   showPageOptions?: boolean;
   widgetIschecked?: boolean;
   hideWidgetCheckbox?: boolean;
+  selectPage?: (event: any) => void;
+  changeResultsPerPage?: (event: any) => void;
+  resultsPerPage?: number;
+  totalResults?: number;
+  deleteHandler?: (event: any) => void;
+  filter?: React.ReactNode;
 }

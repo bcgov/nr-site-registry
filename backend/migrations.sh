@@ -92,6 +92,7 @@ else
     fi
 fi
 
+npm run seed:generic-seeder
 
 echo "Migration process complete with seed data loaded if applicable."
 exit 0

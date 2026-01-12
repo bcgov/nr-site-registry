@@ -12,7 +12,7 @@ import { ApproveRejectButtons } from '../../../components/approve/ApproveReject'
 import { Button } from '../../../components/button/Button';
 import { v4 } from 'uuid';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
-import { dateFormatSR } from '../../../helpers/utility';
+import { formatDate } from '../../../helpers/utility';
 
 interface IDisclosureComponent {
   viewMode: SiteDetailsMode;
@@ -98,10 +98,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
           customLabelCss="custom-disclosure-widget-lbl"
           aria-label="Disclosure Widget"
         >
-          <div
-            className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : ''}`}
-            key={v4()}
-          >
+          <div className={`mt-3`} key={v4()}>
             {formData && (
               <Form
                 formRows={disclosureStatementConfig}
@@ -118,9 +115,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
         </Widget>
       </div>
       {/*  Not working yet as the actual source of table data is unknown.*/}
-      <div
-        className={`mb-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-5' : 'px-3'}`}
-      >
+      <div className={`mb-3 px-3}`}>
         <div
           className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : 'p-0'}`}
         >
@@ -137,10 +132,10 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                   ? disclosureScheduleInternalConfig
                   : disclosureScheduleExternalConfig
               }
-              tableData={formData.disclosureSchedule ?? []}
+              tableData={formData?.siteProfileSchedule2Refs ?? []}
               tableIsLoading={
-                formData.disclosureSchedule &&
-                formData.disclosureSchedule.length > 0
+                formData?.siteProfileSchedule2Refs &&
+                formData?.siteProfileSchedule2Refs?.length > 0
                   ? loading
                   : RequestStatus.idle
               }
@@ -152,8 +147,9 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                 viewMode === SiteDetailsMode.EditMode &&
                 userType === UserType.Internal
               }
-              srMode={false}
-              primaryKeycolumnName="scheduleId"
+              hideWidgetCheckbox={true}
+              srMode={viewMode === SiteDetailsMode.SRMode}
+              primaryKeycolumnName="id"
               sortHandler={(row, ascDir) => {
                 handleTableSort(row, ascDir, formData.id);
               }}
@@ -164,7 +160,6 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                     <Button
                       variant="secondary"
                       onClick={() => handleAddDisclosureSchedule(formData.id)}
-                      disabled={!isAnyDisclosureScheduleSelected(formData.id)}
                     >
                       <Plus />
                       Add
@@ -179,7 +174,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                     </Button>
                   </div>
                 )}
-              {viewMode === SiteDetailsMode.SRMode &&
+              {/* {viewMode === SiteDetailsMode.SRMode &&
                 userType === UserType.Internal && (
                   <Actions
                     label="Set SR Visibility"
@@ -191,14 +186,12 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                     disable={viewMode !== SiteDetailsMode.SRMode}
                     toggleButtonVariant="secondary"
                   />
-                )}
+                )} */}
             </Widget>
           )}
         </div>
       </div>
-      <div
-        className={`mb-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-5' : 'px-3'}`}
-      >
+      <div className={`mb-3 px-3}`}>
         <div
           className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : 'p-0'}`}
         >
@@ -235,7 +228,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
       </div>
       {userType === UserType.Internal && (
         <p className="sr-time-stamp">
-          {`Sent to SR on ${dateFormatSR(formData?.whenUpdated ?? formData?.whenCreated ?? new Date())}`}
+          {`Sent to SR on ${formatDate(formData?.whenUpdated ?? formData?.whenCreated ?? new Date())}`}
         </p>
       )}
       {showApproveRejectSection && (

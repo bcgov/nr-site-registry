@@ -28,10 +28,13 @@ import { v4 } from 'uuid';
 import {
   getAxiosInstance,
   getUser,
+  isUserOfType,
+  parseDate,
   resultCache,
   sortArray,
   UpdateDisplayTypeParams,
   updateTableColumn,
+  UserRoleType,
 } from '../../../helpers/utility';
 import ModalDialog from '../../../components/modaldialog/ModalDialog';
 import { participantRoleDrpdown } from '../dropdowns/DropdownSlice';
@@ -90,12 +93,13 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   // Handle user type based on username
   useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.includes('bceid')) {
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
+    ) {
       setUserType(UserType.External);
-    } else if (loggedInUser?.profile.preferred_username?.includes('idir')) {
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
       setUserType(UserType.Internal);
-    } else {
-      setUserType(UserType.External);
     }
   }, [loggedInUser]);
 
@@ -306,10 +310,6 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   const clearSearch = () => {
     setSearchTerm('');
     setFormData(siteParticipant);
-  };
-
-  const handleWidgetCheckBox = (event: any) => {
-    alert(event);
   };
 
   const handleRemoveParticipant = (particIsDelete: boolean = false) => {
@@ -574,10 +574,8 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   const handleItemClick = (value: string) => {
     switch (value) {
       case SRVisibility.ShowSR:
-        alert('show');
         break;
       case SRVisibility.HideSR:
-        alert('hide');
         break;
       default:
         break;
@@ -611,7 +609,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
       )}
       <ParticipantTable
         handleTableChange={handleTableChange}
-        handleWidgetCheckBox={handleWidgetCheckBox}
+        handleWidgetCheckBox={() => {}}
         internalRow={internalRow}
         externalRow={externalRow}
         userType={userType}

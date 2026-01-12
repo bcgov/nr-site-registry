@@ -27,6 +27,7 @@ import {
   getInternalUserNameForDropdown,
 } from '../dropdowns/DropdownSlice';
 import './srUpdatesTables.css';
+import { Button } from '../../../components/button/Button';
 
 const SRUpdatesTables = () => {
   const [displayFilters, SetDisplayFilters] = useState(false);
@@ -225,26 +226,28 @@ const SRUpdatesTables = () => {
         />
       )}
       <div className="search-result-actions">
-        <div
-          className={`approve-reject-btn ${selectedRows.length > 0 ? 'approve-btn ' : ''}`}
-          onClick={() => {
-            handleApprove();
-          }}
+        <Button
+          variant="secondary"
+          disabled={selectedRows.length === 0}
+          onClick={() => handleApprove()}
+          size="medium"
+          className={`${selectedRows.length > 0 ? 'approve-btn' : ''}`}
           data-testid="approve-btn"
         >
-          <TickIcon />
-          <span>Approve</span>
-        </div>
-        <div
-          className={`approve-reject-btn ${selectedRows.length > 0 ? 'not-public-btn' : ''}`}
-          onClick={() => {
-            rejectHandler();
-          }}
+          <TickIcon className="me-2" />
+          Approve
+        </Button>
+        <Button
+          variant="secondary"
+          disabled={selectedRows.length === 0}
+          onClick={() => rejectHandler()}
+          size="medium"
+          className={`${selectedRows.length > 0 ? 'not-public-btn' : ''}`}
           data-testid="reject-btn"
         >
-          <XmarkIcon />
-          <span>Not Public</span>
-        </div>
+          <XmarkIcon className="me-2" />
+          Not Public
+        </Button>
       </div>
       <div className="col-12" data-testid="srreview-table">
         <Table

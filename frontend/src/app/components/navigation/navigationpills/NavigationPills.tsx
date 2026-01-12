@@ -68,7 +68,7 @@ const NavigationPills: React.FC<INavigationPills> = ({
   };
 
   return (
-    <div key={activeTabKey} className="pt-5">
+    <div key={activeTabKey} className="pt-1">
       <div className="d-flex d-xxl-flex d-xl-flex gap-2 d-none">
         {components?.map((item: any) => (
           <Button

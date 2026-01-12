@@ -8,6 +8,8 @@ import { TileLayer } from 'react-leaflet';
 import { SiteMarker } from '../../map/siteMarkers/SiteMarker';
 import 'leaflet/dist/leaflet.css';
 import { IFormField } from '../../../components/input-controls/IFormField';
+import { Button } from '../../../components/button/Button';
+import { useNavigate } from 'react-router-dom';
 
 export interface ISummaryInfo {
   siteId?: string;
@@ -30,13 +32,28 @@ const SummaryInfo: React.FC<ISummaryInfo> = ({
   approveRejectHandler,
   showApproveRejectSection,
 }) => {
+  const navigate = useNavigate();
   showApproveRejectSection = showApproveRejectSection ?? false;
 
   approveRejectHandler = approveRejectHandler ?? (() => {});
-
   return (
     <PanelWithUpDown
-      label="Location Details"
+      label={
+        siteId ? (
+          <div className="d-flex gap-4 align-items-center">
+            Location Details
+            <Button
+              variant="secondary"
+              size="small"
+              onClick={() => navigate(`/map?site=${siteId}`)}
+            >
+              View on Map
+            </Button>
+          </div>
+        ) : (
+          'Location Details'
+        )
+      }
       isDefaultOpen={true}
       secondChild={
         <div className="row w-100">

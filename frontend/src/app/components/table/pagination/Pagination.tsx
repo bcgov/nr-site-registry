@@ -150,27 +150,48 @@ const Pagination: React.FC<PaginationProps> = ({
     return pages;
   };
 
+  const getResultsPerPageOptions = () => {
+    const baseOptions = [5, 10, 25, 50, 100];
+    const maxReasonablePageSize = Math.min(100, totalResults);
+
+    // Filter options to only show those that make sense for the current data
+    let filteredOptions = baseOptions.filter(
+      (option) => option <= maxReasonablePageSize,
+    );
+
+    // If total results is very small, add an option to show all results
+    if (totalResults <= 100 && totalResults > 0) {
+      filteredOptions.push(totalResults);
+    }
+
+    // Ensure current resultsPerPage is included if it's not in the filtered options
+    if (
+      !filteredOptions.includes(resultsPerPage) &&
+      resultsPerPage <= totalResults
+    ) {
+      filteredOptions.push(resultsPerPage);
+    }
+
+    // Sort options for better UX
+    return filteredOptions.sort((a, b) => a - b);
+  };
+
   const renderPageOptions = () => {
     const pages: JSX.Element[] = [];
 
     let firstPagePosition = currentPage % pagesToDisplay;
-
     let startPage =
       currentPage - firstPagePosition === 0
         ? 1
         : currentPage - firstPagePosition;
-
     startPage =
       startPage === totalPagesRequired
         ? startPage - pagesToDisplay < 1
           ? 1
           : startPage - pagesToDisplay
         : startPage;
-
     let lastPage = startPage + pagesToDisplay;
-
     lastPage = lastPage > totalPagesRequired ? totalPagesRequired : lastPage;
-
     for (let i = startPage; i <= lastPage; i++) {
       pages.push(
         <div key={i} className="pagination-section">
@@ -178,10 +199,8 @@ const Pagination: React.FC<PaginationProps> = ({
         </div>,
       );
     }
-
     return <React.Fragment>{pages}</React.Fragment>;
   };
-
   return (
     <div className="pagination-control">
       <div className="pagination-pages">
@@ -204,11 +223,11 @@ const Pagination: React.FC<PaginationProps> = ({
             }}
             value={resultsPerPage}
           >
-            <option>5</option>
-            <option>10</option>
-            <option>25</option>
-            <option>50</option>
-            <option>100</option>
+            {getResultsPerPageOptions().map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -229,5 +248,4 @@ const Pagination: React.FC<PaginationProps> = ({
     </div>
   );
 };
-
 export default Pagination;

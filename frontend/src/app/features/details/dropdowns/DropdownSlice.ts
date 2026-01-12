@@ -10,6 +10,7 @@ import {
   graphQLNotationTypeCd,
   graphQLParticipantRoleCd,
   graphQLPeopleOrgsCd,
+  graphQLSchedule2Ref,
   graphQLSiteRiskCd,
   graphQLSiteStatusCd,
 } from '../../site/graphql/Dropdowns';
@@ -29,6 +30,7 @@ const initialState: IDropdownsState = {
     siteRiskCode: [],
     bceRegionCode: [],
     siteStatusCode: [],
+    schedule2Ref: [],
   },
   status: RequestStatus.idle,
   error: '',
@@ -181,6 +183,20 @@ export const fetchSiteStatusCd = createAsyncThunk(
   },
 );
 
+export const fetchSchedule2ReferenceCd = createAsyncThunk(
+  'dropdowns/getSchedule2ReferenceCd',
+  async () => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(graphQLSchedule2Ref()),
+      });
+      return response.data.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+);
+
 // Define the recent views slice
 const dropdowns = createSlice({
   name: 'dropdowns',
@@ -294,6 +310,17 @@ const dropdowns = createSlice({
       .addCase(fetchSiteStatusCd.rejected, (state, action) => {
         state.status = RequestStatus.failed;
         state.error = action.error.message;
+      })
+      .addCase(fetchSchedule2ReferenceCd.pending, (state) => {
+        state.status = RequestStatus.loading;
+      })
+      .addCase(fetchSchedule2ReferenceCd.fulfilled, (state, action) => {
+        state.status = RequestStatus.success;
+        state.dropdowns.schedule2Ref = action.payload;
+      })
+      .addCase(fetchSchedule2ReferenceCd.rejected, (state, action) => {
+        state.status = RequestStatus.failed;
+        state.error = action.error.message;
       });
   },
 });
@@ -326,5 +353,8 @@ export const bceRegionCodeDrpdown = (state: any) =>
 
 export const siteStatusCodeDrpdown = (state: any) =>
   state.dropdown.dropdowns.siteStatusCode.getSiteStatusCd;
+
+export const schedule2ReferenceCdDrpdown = (state: any) =>
+  state.dropdown.dropdowns.schedule2Ref.getSchedule2Ref;
 
 export default dropdowns.reducer;

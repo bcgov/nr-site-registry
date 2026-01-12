@@ -1,5 +1,5 @@
 import { Resolver, Query, Args } from '@nestjs/graphql';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import { RoleMatchingMode, Roles, Unprotected } from 'nest-keycloak-connect';
 import {
   DropdownDto,
   DropdownResponse,
@@ -225,6 +225,7 @@ export class DropdownResolver {
   }
 
   @Query(() => DropdownResponse, { name: 'getSiteRiskCd' })
+  @Unprotected()
   async getSiteRiskCd() {
     this.sitesLogger.log('DropdownResolver.getSiteRiskCd() start');
     const result = await this.dropdownService.getSiteRiskCd();
@@ -286,6 +287,37 @@ export class DropdownResolver {
         `Site Status Code not found`,
         HttpStatus.NOT_FOUND,
         false,
+      );
+    }
+  }
+
+  @Roles({
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => DropdownResponse, { name: 'getSchedule2Ref' })
+  async getSchedule2Ref() {
+    this.sitesLogger.log('DropdownResolver.getSchedule2Ref() start');
+    const result = await this.dropdownService.getSchedule2Ref();
+    if (result?.length > 0) {
+      this.sitesLogger.log('DropdownResolver.getSchedule2Ref() RES:200 end');
+      return this.genericResponseProvider.createResponse(
+        'Schedule 2 Ref code fetched successfully',
+        HttpStatus.OK,
+        true,
+        result,
+      );
+    } else {
+      this.sitesLogger.log('DropdownResolver.getSchedule2Ref() RES:404 end');
+      return this.genericResponseProvider.createResponse(
+        `Schedule 2 Ref code not found`,
+        HttpStatus.NOT_FOUND,
+        false,
+        null,
       );
     }
   }

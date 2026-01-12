@@ -4,8 +4,11 @@ import '@bcgov/design-tokens/css/variables.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch } from '../../Store';
 import {
+  BarsIcon,
   CircleXMarkIcon,
+  FilterIcon,
   MagnifyingGlassIcon,
+  TableColumnsIcon,
 } from '../../components/common/icon';
 import Intro from './Intro';
 import { TableColumn } from '../../components/table/TableColumn';
@@ -16,12 +19,15 @@ import FilterPills from './filters/FilterPills';
 import { formRows } from './dto/SiteFilterConfig';
 import { SearchResultsFilters } from './searchResults/SearchResultsFilters';
 import { SearchResultsActions } from './searchResults/SearchResultsActions';
-import { debounce, set } from 'lodash';
+import { debounce } from 'lodash';
 import Table from '../../components/table/Table';
 import { fetchSearchSites, getSites, resetSiteSearch } from './SiteSearchSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 import { SiteSortBy, SortByDirection } from '../../../graphql/generated';
 import { fetchSiteRiskCd } from '../details/dropdowns/DropdownSlice';
+import Widget from '../../components/widget/Widget';
+import { Dropdown } from 'react-bootstrap';
+import { Button } from '../../components/button/Button';
 
 const Search = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -31,7 +37,7 @@ const Search = () => {
   const [columnsToDisplay, setColumnsToDisplay] = useState<TableColumn[]>([
     ...columns,
   ]);
-  const [selectedRows, SetSelectedRows] = useState<any[]>([]);
+  const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<
     { key: string; value: string; label: string }[]
   >([]);
@@ -58,7 +64,7 @@ const Search = () => {
       sortByDir: SortByDirection = SortByDirection.Asc,
       filters: any,
     ) => {
-      setSearchText(searchParam);
+      setSelectedRows([]);
       dispatch(
         fetchSearchSites({
           searchParam,
@@ -70,7 +76,7 @@ const Search = () => {
         }),
       );
     },
-    500,
+    50,
   );
 
   const toggleColumnSelectionForDisplay = (column: TableColumn) => {
@@ -97,15 +103,24 @@ const Search = () => {
   };
 
   const handleTextChange = (event: any) => {
+    const value = event.target.value;
+    setSearchText(value);
     setUserAction(false);
-    setSearchText(event.target.value);
-    if (event.target.value.length >= 3) {
+
+    // Clear search results if input is empty
+    if (value.length === 0) {
+      dispatch(resetSiteSearch());
+      return;
+    }
+
+    // Trigger search for inputs with 3+ characters
+    if (value.length >= 3) {
       const filterData: any = {};
       selectedFilters.forEach((filter: any) => {
         filterData[filter.key] = filter.value;
       });
       debouncedSearch(
-        event.target.value,
+        value,
         page,
         pageSize,
         SiteSortBy.Id,
@@ -120,15 +135,15 @@ const Search = () => {
       if (event.value) {
         const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
         if (index === -1) {
-          SetSelectedRows([...selectedRows, event.row]);
+          setSelectedRows([...selectedRows, event.row]);
         }
       } else {
-        SetSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
+        setSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
       }
     } else if (event && event.property === 'select_all') {
       const newRows = event.value;
       if (event.selected) {
-        SetSelectedRows((prevArray) => {
+        setSelectedRows((prevArray) => {
           const existingIds = new Set(prevArray.map((obj) => obj.id));
           const uniqueRows = newRows.filter(
             (row: any) => !existingIds.has(row.id),
@@ -136,7 +151,7 @@ const Search = () => {
           return [...prevArray, ...uniqueRows];
         });
       } else {
-        SetSelectedRows((prevArray) => {
+        setSelectedRows((prevArray) => {
           const idsToRemove = new Set(newRows.map((row: any) => row.id));
           return prevArray.filter((obj) => !idsToRemove.has(obj.id));
         });
@@ -195,6 +210,7 @@ const Search = () => {
     setFormData({});
     setSelectedFilters([]);
     localStorage.removeItem('siteFilterPills');
+    debouncedSearch(searchParam, page, pageSize, sortBy, sortByDir, {});
   };
 
   useEffect(() => {
@@ -215,7 +231,7 @@ const Search = () => {
     }
 
     dispatch(fetchSiteRiskCd());
-  }, []);
+  }, [dispatch, searchParam, sites.length, status]);
 
   const handleRemoveFilter = (filter: any) => {
     setFormData((prevData) => {
@@ -238,7 +254,16 @@ const Search = () => {
   };
 
   const handlePageSizeChange = (pageSize: number) => {
-    debouncedSearch(searchParam, page, pageSize, sortBy, sortByDir, formData);
+    dispatch(
+      fetchSearchSites({
+        searchParam,
+        page: 1,
+        pageSize,
+        sortBy,
+        sortByDir,
+        filter: formData,
+      }),
+    );
   };
 
   const handlePageChange = (page: number) => {
@@ -288,6 +313,16 @@ const Search = () => {
     }
   };
 
+  type PanelOption = 'filters' | 'columns' | null;
+  const [panelToShow, setPanelToShow] = useState<PanelOption>(null);
+
+  const togglePanel = (panel: PanelOption) => {
+    if (panelToShow === panel) {
+      setPanelToShow(null);
+      return;
+    }
+    setPanelToShow(panel);
+  };
   return (
     <PageContainer role="Search" aria-label="Search">
       <div className="search-container">
@@ -335,54 +370,99 @@ const Search = () => {
         </div>
       ) : (
         <div className="search-parent">
-          <div
-            className="row search-container results"
-            aria-label="search-results-section-title"
+          <Widget
+            changeHandler={changeHandler}
+            title={'Results'}
+            tableColumns={columnsToDisplay.filter((x) => x.isChecked === true)}
+            tableData={sites}
+            tableIsLoading={status ?? RequestStatus.idle}
+            allowRowsSelect={true}
+            aria-label="Site Participant Widget"
+            customLabelCss="custom-search-widget-lbl"
+            hideTable={false}
+            hideTitle={false}
+            editMode={false}
+            srMode={false}
+            hideWidgetCheckbox={true}
+            primaryKeycolumnName="id"
+            sortHandler={handleTableSortChange}
+            totalResults={count}
+            selectPage={handlePageChange}
+            changeResultsPerPage={handlePageSizeChange}
+            currentPage={page}
+            resultsPerPage={pageSize}
+            showPageOptions={true}
+            filter={
+              <div>
+                <div className="table-actions d-none d-md-flex ">
+                  <div
+                    className={`table-actions-items ${panelToShow === 'columns' ? 'active' : ''} `}
+                    onClick={() => {
+                      togglePanel('columns');
+                    }}
+                  >
+                    <TableColumnsIcon />
+                    Columns
+                  </div>
+                  <div
+                    className={`table-actions-items ${panelToShow === 'filters' ? 'active' : ''}`}
+                    onClick={() => {
+                      togglePanel('filters');
+                    }}
+                  >
+                    <FilterIcon />
+                    Filters
+                  </div>
+                </div>
+                <Dropdown className="d-flex d-md-none">
+                  <Dropdown.Toggle as={Button} variant="tertiary">
+                    <BarsIcon size={24} />
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item
+                      onClick={() => togglePanel('columns')}
+                      className="d-flex align-items-center gap-2"
+                    >
+                      <TableColumnsIcon />
+                      <span>Columns</span>
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      onClick={() => togglePanel('filters')}
+                      className="d-flex align-items-center gap-2"
+                    >
+                      <TableColumnsIcon />
+                      <span>Filters</span>
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
+            }
           >
-            <SearchResultsFilters
-              aria-label="search-results-filters"
-              columns={columnsToDisplay}
-              onColumnSelectionChange={toggleColumnSelectionForDisplay}
-              resetColumns={resetDefaultColums}
-              filtersFormData={formData}
-              onFiltersChange={handleInputChange}
-              onFiltersSubmit={handleFormSubmit}
-              onFiltersReset={handleReset}
-            />
             <SearchResultsActions
               selectedRows={selectedRows}
               aria-label="search-results-actions"
             />
-          </div>
-          <FilterPills
-            aria-label="selected-filters"
-            filters={selectedFilters}
-            onRemoveFilter={(filter) => {
-              handleRemoveFilter(filter);
-            }}
-          />
-          <div>
-            <div className="" aria-label="Search results">
-              <Table
-                aria-label="Search results table"
-                showPageOptions={true}
-                label="Search Results"
-                isLoading={status || RequestStatus.idle}
-                columns={columnsToDisplay.filter((x) => x.isChecked === true)}
-                data={sites}
-                allowRowsSelect={true}
-                changeHandler={changeHandler}
-                editMode={false}
-                idColumnName="id"
-                totalResults={count}
-                selectPage={handlePageChange}
-                changeResultsPerPage={handlePageSizeChange}
-                currentPage={page}
-                resultsPerPage={pageSize}
-                sortHandler={handleTableSortChange}
-              />
-            </div>
-          </div>
+            <SearchResultsFilters
+              aria-label="search-results-filters"
+              columns={columnsToDisplay}
+              filtersFormData={formData}
+              panelToShow={panelToShow}
+              selectedFilter={selectedFilters}
+              setPanelToShow={setPanelToShow}
+              onColumnSelectionChange={toggleColumnSelectionForDisplay}
+              resetColumns={resetDefaultColums}
+              onFiltersChange={handleInputChange}
+              onFiltersSubmit={handleFormSubmit}
+              onFiltersReset={handleReset}
+            />
+            <FilterPills
+              aria-label="selected-filters"
+              filters={selectedFilters}
+              onRemoveFilter={(filter) => {
+                handleRemoveFilter(filter);
+              }}
+            />
+          </Widget>
         </div>
       )}
     </PageContainer>

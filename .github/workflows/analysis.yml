@@ -43,7 +43,7 @@ jobs:
           - dir: frontend
             token: SONAR_TOKEN_FRONTEND
     steps:
-      - uses: bcgov/action-test-and-analyse@v1.7.0
+      - uses: bcgov/action-test-and-analyse@v1.6.0
         env:
           LOG_LEVEL: info
           LOG_FILE_LOCATION: /tmp/sites-%DATE%.log

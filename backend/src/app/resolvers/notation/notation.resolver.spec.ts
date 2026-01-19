@@ -20,6 +20,7 @@ describe('NotationResolver', () => {
           provide: NotationService,
           useValue: {
             getSiteNotationBySiteId: jest.fn(),
+            deleteSiteNotation: jest.fn(),
           },
         },
         {
@@ -79,6 +80,7 @@ describe('NotationResolver', () => {
         srValue: false,
         whenCreated: new Date('2024-07-17'),
         whenUpdated: new Date('2024-07-17'),
+        whenDeleted: null,
         notationParticipant: [
           {
             eventParticId: 'GUID001',
@@ -243,5 +245,103 @@ describe('NotationResolver', () => {
 
     expect(result.success).toEqual(true);
     expect(result.data).toHaveLength(1000);
+  });
+
+  describe('deleteSiteNotation', () => {
+    it('should delete a site notation successfully', async () => {
+      const eventId = '123';
+      const mockDeleteResult = true;
+      const expectedResult: NotationResponse = {
+        message: 'Site Notation deleted successfully',
+        httpStatusCode: 200,
+        success: true,
+        data: null,
+      };
+
+      jest
+        .spyOn(notationService, 'deleteSiteNotation')
+        .mockResolvedValueOnce(mockDeleteResult);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await resolver.deleteSiteNotation(eventId, user);
+
+      expect(result).toEqual(expectedResult);
+      expect(notationService.deleteSiteNotation).toHaveBeenCalledWith(
+        eventId,
+        user,
+      );
+      expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
+        'Site Notation deleted successfully',
+        200,
+        true,
+        null,
+      );
+    });
+
+    it('should return error message if site notation not found for deletion', async () => {
+      const eventId = '123';
+      const mockDeleteResult = false;
+      const expectedResult: NotationResponse = {
+        message: `Site Notation not found for event id: ${eventId}`,
+        httpStatusCode: 404,
+        success: false,
+        data: null,
+      };
+
+      jest
+        .spyOn(notationService, 'deleteSiteNotation')
+        .mockResolvedValueOnce(mockDeleteResult);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await resolver.deleteSiteNotation(eventId, user);
+
+      expect(result).toEqual(expectedResult);
+      expect(notationService.deleteSiteNotation).toHaveBeenCalledWith(
+        eventId,
+        user,
+      );
+      expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
+        `Site Notation not found for event id: ${eventId}`,
+        404,
+        false,
+        null,
+      );
+    });
+
+    it('should validate eventId parameter type', async () => {
+      const eventId = 123; // Invalid type
+      const mockDeleteResult = false;
+
+      jest
+        .spyOn(notationService, 'deleteSiteNotation')
+        .mockResolvedValueOnce(mockDeleteResult);
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await resolver.deleteSiteNotation(eventId as any, user);
+
+      expect(result.httpStatusCode).toEqual(404);
+      expect(result.success).toEqual(false);
+      expect(result.message).toContain(
+        `Site Notation not found for event id: ${eventId}`,
+      );
+    });
+
+    it('should return an error for empty eventId parameter', async () => {
+      const eventId = '';
+      const mockDeleteResult = false;
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await resolver.deleteSiteNotation(eventId, user);
+
+      expect(result.httpStatusCode).toEqual(404);
+      expect(result.success).toEqual(false);
+      expect(result.message).toContain(
+        'Site Notation not found for event id: ',
+      );
+    });
   });
 });

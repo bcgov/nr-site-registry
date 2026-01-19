@@ -96,6 +96,7 @@ describe('SnapshotService', () => {
       regionDate: new Date(),
       whoCreated: 'creator123',
       whoUpdated: null,
+      whenDeleted: null,
       whenCreated: new Date(),
       whenUpdated: null,
       rwmFlag: 1,

@@ -53,6 +53,9 @@ export class NotationDto extends ChangeAuditObjectTypeDTO {
   @Field({ nullable: true })
   whenUpdated: Date | null;
 
+  @Field({ nullable: true })
+  whenDeleted: Date | null;
+
   @Field(() => [NotationParticipantDto], { nullable: true })
   notationParticipant: NotationParticipantDto[] | null;
 }

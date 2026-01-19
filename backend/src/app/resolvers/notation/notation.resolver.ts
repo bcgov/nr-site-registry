@@ -1,4 +1,4 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { HttpStatus, UsePipes } from '@nestjs/common';
 import {
   AuthenticatedUser,
@@ -68,6 +68,40 @@ export class NotationResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Site Notation data not found for site id: ${siteId}`,
+        HttpStatus.NOT_FOUND,
+        false,
+        null,
+      );
+    }
+  }
+
+  @Roles({
+    roles: [CustomRoles.Internal, CustomRoles.SiteRegistrar],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Mutation(() => NotationResponse, { name: 'deleteSiteNotation' })
+  @UsePipes(new GenericValidationPipe())
+  async deleteSiteNotation(
+    @Args('eventId', { type: () => String }) eventId: string,
+    @AuthenticatedUser() user: any,
+  ) {
+    this.sitesLogger.log(
+      'NotationResolver.deleteSiteNotation() start eventId:' + eventId,
+    );
+
+    const result = await this.notationService.deleteSiteNotation(eventId, user);
+    if (result) {
+      this.sitesLogger.log('NotationResolver.deleteSiteNotation() RES:200 end');
+      return this.genericResponseProvider.createResponse(
+        'Site Notation deleted successfully',
+        HttpStatus.OK,
+        true,
+        null,
+      );
+    } else {
+      this.sitesLogger.log('NotationResolver.deleteSiteNotation() RES:404 end');
+      return this.genericResponseProvider.createResponse(
+        `Site Notation not found for event id: ${eventId}`,
         HttpStatus.NOT_FOUND,
         false,
         null,

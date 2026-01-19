@@ -126,6 +126,7 @@ export class NotationService {
             srAction: event?.srAction === SRApprovalStatusEnum.PUBLIC,
             whenCreated: event?.whenCreated,
             whenUpdated: event?.whenUpdated,
+            whenDeleted: event?.whenDeleted,
             notationParticipant: eventParticsForEvent?.map((partic) => ({
               eventParticId: partic?.id,
               eventId: partic?.eventId,
@@ -156,6 +157,49 @@ export class NotationService {
       throw new HttpException(
         `Failed to retrieve site notations by site ID: ${siteId}`,
         HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  /**
+   * Soft deletes a notation by updating the whenDeleted timestamp
+   *
+   * @param eventId - The ID of the event (notation) to delete
+   * @param user - The authenticated user performing the deletion
+   * @returns true if deletion was successful, false otherwise
+   * @throws Error if there's an issue with the deletion
+   */
+  async deleteSiteNotation(eventId: string, user: any): Promise<boolean> {
+    this.sitesLogger.log('NotationService.deleteSiteNotation() start');
+    this.sitesLogger.debug('NotationService.deleteSiteNotation() start');
+
+    try {
+      const eventToDelete = await this.notationRepository.findOne({
+        where: { id: eventId },
+      });
+
+      if (!eventToDelete) {
+        this.sitesLogger.log(
+          `NotationService.deleteSiteNotation() - Event not found: ${eventId}`,
+        );
+        return false;
+      }
+
+      eventToDelete.whenDeleted = new Date();
+
+      await this.notationRepository.save(eventToDelete);
+
+      this.sitesLogger.log('NotationService.deleteSiteNotation() end');
+      this.sitesLogger.debug('NotationService.deleteSiteNotation() end');
+      return true;
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception occurred in NotationService.deleteSiteNotation() end',
+        JSON.stringify(error),
+      );
+      throw new HttpException(
+        `Failed to delete site notation with event ID: ${eventId}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

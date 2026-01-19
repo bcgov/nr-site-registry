@@ -69,6 +69,7 @@ describe('NotationService', () => {
           whoCreated: 'creator123',
           whoUpdated: null,
           whenCreated: new Date(),
+          whenDeleted: null,
           whenUpdated: null,
           rwmFlag: 1,
           rwmNoteFlag: 0,
@@ -194,6 +195,7 @@ describe('NotationService', () => {
           whoUpdated: null,
           whenCreated: new Date(),
           whenUpdated: null,
+          whenDeleted: null,
           rwmFlag: 1,
           rwmNoteFlag: 0,
           rwmApprovalDate: new Date(),
@@ -267,6 +269,7 @@ describe('NotationService', () => {
           whoUpdated: null,
           whenCreated: new Date(),
           whenUpdated: null,
+          whenDeleted: null,
           rwmFlag: 1,
           rwmNoteFlag: 0,
           rwmApprovalDate: new Date(),
@@ -330,6 +333,7 @@ describe('NotationService', () => {
           whoUpdated: null,
           whenCreated: new Date(),
           whenUpdated: null,
+          whenDeleted: null,
           rwmFlag: 1,
           rwmNoteFlag: 0,
           rwmApprovalDate: new Date(),
@@ -421,6 +425,84 @@ describe('NotationService', () => {
       await expect(
         service.getSiteNotationBySiteId(siteId, false, user),
       ).rejects.toThrow(mockError);
+    });
+  });
+
+  describe('deleteSiteNotation', () => {
+    it('should return true when event is successfully deleted', async () => {
+      const eventId = 'event1';
+      const mockEvent = {
+        id: eventId,
+        siteId: 'site1',
+        eventDate: new Date(),
+        completionDate: new Date(),
+        etypCode: 'ETYP01',
+        psnorgId: 'PSNORG01',
+        spId: 'SP01',
+        requiredAction: 'Complete task X',
+        note: 'This is a note about the event.',
+        regionAppFlag: 'Y',
+        regionUserid: 'user123',
+        regionDate: new Date(),
+        whoCreated: 'creator123',
+        whoUpdated: null,
+        whenCreated: new Date(),
+        whenUpdated: null,
+        whenDeleted: null,
+        rwmFlag: 1,
+        rwmNoteFlag: 0,
+        rwmApprovalDate: new Date(),
+        eclsCode: 'ECLS01',
+        requirementDueDate: new Date(),
+        requirementReceivedDate: new Date(),
+        conditionsTexts: null,
+        eventTypeCd: null,
+        site: null,
+        userAction: 'pending',
+        srAction: 'pending',
+        eventPartics: [],
+      };
+      jest
+        .spyOn(notationRepository, 'findOne')
+        .mockResolvedValueOnce(mockEvent);
+      jest.spyOn(notationRepository, 'save').mockResolvedValueOnce(mockEvent);
+
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await service.deleteSiteNotation(eventId, user);
+
+      expect(result).toBe(true);
+      expect(mockEvent.whenDeleted).toBeDefined();
+    });
+
+    it('should return false when event is not found', async () => {
+      const eventId = 'nonExistentEvent';
+      jest.spyOn(notationRepository, 'findOne').mockResolvedValueOnce(null);
+
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      const result = await service.deleteSiteNotation(eventId, user);
+
+      expect(result).toBe(false);
+    });
+
+    it('should throw an error when repository throws an error', async () => {
+      const eventId = 'event1';
+      const mockError = new Error(
+        `Failed to delete site notation with event ID: ${eventId}`,
+      );
+      jest
+        .spyOn(notationRepository, 'findOne')
+        .mockRejectedValueOnce(mockError);
+
+      const user = {
+        identity_provider: UserTypeEum.IDIR,
+      };
+      await expect(service.deleteSiteNotation(eventId, user)).rejects.toThrow(
+        mockError,
+      );
     });
   });
 });

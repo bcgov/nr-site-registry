@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Set NODE_ENV environment variable
-#ENV NODE_ENV production
+ENV NODE_ENV development
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
 RUN npm ci

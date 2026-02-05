@@ -43,7 +43,8 @@ services:
     links:
       - site-database
     ports:
-      - "4007:4007"
+      - "4007:4007" # GraphQL API port
+      - "9222:9222" # Debugging port
     expose:
       - 4007
     volumes:
@@ -75,8 +76,8 @@ services:
     hostname: frontend
     image: node:16.14.0-alpine
     ports:
-      - "4000:3000"
-      - "35729:35729"
+      - "4000:3000" # Map the frontend port to 4000 to avoid conflict with SRS
+      - "35729:35729" # Live reload port
     volumes:
       - ./frontend:/app:z
       - /app/node_modules

@@ -37,6 +37,8 @@ export class NotationResolver {
     @Args('siteId', { type: () => String }) siteId: string,
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
+    @Args('includeDeleted', { type: () => Boolean, nullable: true })
+    includeDeleted: boolean = false,
     @AuthenticatedUser() user: any,
   ) {
     this.sitesLogger.log(
@@ -51,6 +53,7 @@ export class NotationResolver {
       siteId,
       showPending,
       user,
+      includeDeleted,
     );
     if (result?.length > 0) {
       this.sitesLogger.log(

@@ -81,6 +81,10 @@ describe('NotationService', () => {
           site: null,
           userAction: 'pending',
           srAction: 'pending',
+          whoDeleted: null,
+          whenDeleted: null,
+          whoRestored: null,
+          whenRestored: null,
           eventPartics: [
             {
               id: '1',
@@ -205,6 +209,10 @@ describe('NotationService', () => {
           site: null,
           userAction: 'pending',
           srAction: 'pending',
+          whoDeleted: null,
+          whenDeleted: null,
+          whoRestored: null,
+          whenRestored: null,
           eventPartics: [
             {
               id: '1',
@@ -278,6 +286,10 @@ describe('NotationService', () => {
           site: null,
           userAction: 'pending',
           srAction: 'pending',
+          whoDeleted: null,
+          whenDeleted: null,
+          whoRestored: null,
+          whenRestored: null,
           eventPartics: [],
         },
       ];
@@ -341,6 +353,10 @@ describe('NotationService', () => {
           site: null,
           userAction: 'pending',
           srAction: 'pending',
+          whoDeleted: null,
+          whenDeleted: null,
+          whoRestored: null,
+          whenRestored: null,
           eventPartics: [
             {
               id: '1',
@@ -421,6 +437,159 @@ describe('NotationService', () => {
       await expect(
         service.getSiteNotationBySiteId(siteId, false, user),
       ).rejects.toThrow(mockError);
+    });
+
+    it('should exclude deleted notations by default', async () => {
+      const siteId = 'site1';
+      const user = { identity_provider: UserTypeEum.IDIR };
+
+      const mockEvents: Events[] = [
+        {
+          id: '1',
+          siteId: siteId,
+          eventDate: new Date(),
+          completionDate: new Date(),
+          etypCode: 'ETYP01',
+          psnorgId: 'PSNORG01',
+          spId: 'SP01',
+          requiredAction: 'Complete task',
+          note: 'Test note',
+          regionAppFlag: 'Y',
+          regionUserid: 'user123',
+          regionDate: new Date(),
+          whoCreated: 'creator123',
+          whoUpdated: null,
+          whenCreated: new Date(),
+          whenUpdated: null,
+          rwmFlag: 1,
+          rwmNoteFlag: 0,
+          rwmApprovalDate: new Date(),
+          eclsCode: 'ECLS01',
+          requirementDueDate: new Date(),
+          requirementReceivedDate: new Date(),
+          conditionsTexts: null,
+          eventTypeCd: null,
+          site: null,
+          userAction: 'pending',
+          srAction: 'pending',
+          whoDeleted: null,
+          whenDeleted: null,
+          whoRestored: null,
+          whenRestored: null,
+          eventPartics: [],
+        },
+      ];
+
+      jest.spyOn(notationRepository, 'find').mockResolvedValueOnce(mockEvents);
+      jest.spyOn(notationParticRepository, 'find').mockResolvedValueOnce([]);
+
+      await service.getSiteNotationBySiteId(siteId, false, user, false);
+
+      expect(notationRepository.find).toHaveBeenCalledWith({
+        where: { siteId, whenDeleted: null },
+      });
+    });
+
+    it('should include deleted notations when includeDeleted is true', async () => {
+      const siteId = 'site1';
+      const user = { identity_provider: UserTypeEum.IDIR };
+
+      const mockEvents: Events[] = [
+        {
+          id: '1',
+          siteId: siteId,
+          eventDate: new Date(),
+          completionDate: new Date(),
+          etypCode: 'ETYP01',
+          psnorgId: 'PSNORG01',
+          spId: 'SP01',
+          requiredAction: 'Complete task',
+          note: 'Test note',
+          regionAppFlag: 'Y',
+          regionUserid: 'user123',
+          regionDate: new Date(),
+          whoCreated: 'creator123',
+          whoUpdated: null,
+          whenCreated: new Date(),
+          whenUpdated: null,
+          rwmFlag: 1,
+          rwmNoteFlag: 0,
+          rwmApprovalDate: new Date(),
+          eclsCode: 'ECLS01',
+          requirementDueDate: new Date(),
+          requirementReceivedDate: new Date(),
+          conditionsTexts: null,
+          eventTypeCd: null,
+          site: null,
+          userAction: 'pending',
+          srAction: 'pending',
+          whoDeleted: 'user123',
+          whenDeleted: new Date(),
+          whoRestored: null,
+          whenRestored: null,
+          eventPartics: [],
+        },
+      ];
+
+      jest.spyOn(notationRepository, 'find').mockResolvedValueOnce(mockEvents);
+      jest.spyOn(notationParticRepository, 'find').mockResolvedValueOnce([]);
+
+      await service.getSiteNotationBySiteId(siteId, false, user, true);
+
+      expect(notationRepository.find).toHaveBeenCalledWith({
+        where: { siteId },
+      });
+    });
+
+    it('should return notations with pending srAction when showPending is true', async () => {
+      const siteId = 'site1';
+      const user = { identity_provider: UserTypeEum.IDIR };
+
+      const mockEvents: Events[] = [
+        {
+          id: '1',
+          siteId: siteId,
+          eventDate: new Date(),
+          completionDate: new Date(),
+          etypCode: 'ETYP01',
+          psnorgId: 'PSNORG01',
+          spId: 'SP01',
+          requiredAction: 'Complete task',
+          note: 'Test note',
+          regionAppFlag: 'Y',
+          regionUserid: 'user123',
+          regionDate: new Date(),
+          whoCreated: 'creator123',
+          whoUpdated: null,
+          whenCreated: new Date(),
+          whenUpdated: null,
+          rwmFlag: 1,
+          rwmNoteFlag: 0,
+          rwmApprovalDate: new Date(),
+          eclsCode: 'ECLS01',
+          requirementDueDate: new Date(),
+          requirementReceivedDate: new Date(),
+          conditionsTexts: null,
+          eventTypeCd: null,
+          site: null,
+          userAction: 'pending',
+          srAction: 'pending',
+          whoDeleted: null,
+          whenDeleted: null,
+          whoRestored: null,
+          whenRestored: null,
+          eventPartics: [],
+        },
+      ];
+
+      jest.spyOn(notationRepository, 'find').mockResolvedValueOnce(mockEvents);
+      jest.spyOn(notationParticRepository, 'find').mockResolvedValueOnce([]);
+
+      await service.getSiteNotationBySiteId(siteId, true, user, false);
+
+      expect(notationRepository.find).toHaveBeenCalledWith({
+        where: { siteId, srAction: 'pending', whenDeleted: null },
+      });
     });
   });
 });

@@ -100,6 +100,9 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [formData, setFormData] = useState<
     { [key: string]: any | [Date, Date] }[]
   >(notations || []);
+  const [archivedFormData, setArchivedFormData] = useState<
+    { [key: string]: any | [Date, Date] }[]
+  >([]);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
@@ -112,6 +115,14 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     { id: any; participantId: any }[]
   >([]);
   const [currentNotation, setCurrentNotation] = useState({});
+  const [notationToDelete, setNotationToDelete] = useState<string | null>(null);
+  const [showDeleteNotationModal, setShowDeleteNotationModal] = useState(false);
+  const [showArchivedNotations, setShowArchivedNotations] = useState(false);
+  const [notationToRestore, setNotationToRestore] = useState<string | null>(
+    null,
+  );
+  const [showRestoreNotationModal, setShowRestoreNotationModal] =
+    useState(false);
   const [ministryContactOptions, setMinistryContactOptions] = useState([]);
   const [internalTableColumn, setInternalTableColumn] = useState(
     notationColumnInternal,
@@ -121,6 +132,28 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   );
   const [searchSiteParticipant, setSearchSiteParticipant] = useState('');
   const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
+
+  const isNotationArchived = (notation: any) => {
+    if (notation?.apiAction === UserActionEnum.deleted) {
+      return true;
+    }
+
+    if (notation?.apiAction === UserActionEnum.restored) {
+      return false;
+    }
+
+    return notation?.whenDeleted != null;
+  };
+
+  const getUnarchivedNotations = (notations: any[]) => {
+    return (notations ?? []).filter(
+      (notation) => !isNotationArchived(notation),
+    );
+  };
+
+  const getArchivedNotations = (notations: any[]) => {
+    return (notations ?? []).filter((notation) => isNotationArchived(notation));
+  };
 
   // Function to fetch notation participant
   const fetchNotationParticipant = useCallback(async (searchParam: string) => {
@@ -220,10 +253,8 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         );
       }
 
-      // Always update formData if different
-      if (JSON.stringify(formData) !== JSON.stringify(notations)) {
-        setFormData(notations);
-      }
+      setFormData(getUnarchivedNotations(notations));
+      setArchivedFormData(getArchivedNotations(notations));
     }
   }, [notations, status]);
 
@@ -344,7 +375,8 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       // Check if any property of the notation object contains the searchTerm
       return deepSearch(notation, searchTerm.toLowerCase().trim());
     });
-    setFormData(filteredData);
+    setFormData(getUnarchivedNotations(filteredData));
+    setArchivedFormData(getArchivedNotations(filteredData));
   };
 
   const deepSearch = (obj: any, searchTerm: string): boolean => {
@@ -413,7 +445,8 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const clearSearch = () => {
     setSearchTerm('');
-    setFormData(notations);
+    setFormData(getUnarchivedNotations(notations));
+    setArchivedFormData(getArchivedNotations(notations));
   };
 
   const updateNotationsForSRMode = (
@@ -513,7 +546,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       );
     }
 
-    setFormData(updatedNotation);
+    setFormData(getUnarchivedNotations(updatedNotation));
     dispatch(updateSiteNotation(updatedNotation));
     dispatch(setupNotationDataForSaving(updatedTrackNotation));
 
@@ -603,7 +636,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         ),
       }));
 
-      setFormData(filteredPartics);
+      setFormData(getUnarchivedNotations(filteredPartics));
       dispatch(updateSiteNotation(filteredPartics));
       dispatch(setupNotationDataForSaving(updatedTrackNotatn));
 
@@ -761,7 +794,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         event,
         true,
       );
-      setFormData(updateNotationParticipant);
+      setFormData(getUnarchivedNotations(updateNotationParticipant));
       dispatch(updateSiteNotation(updateNotationParticipant));
       // Update trackNotation without parameters
       const trackNotatn = updateParticipants(
@@ -820,7 +853,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       default:
         break;
     }
-    setFormData(sorted);
+    setFormData(getUnarchivedNotations(sorted));
   };
 
   const handleOnAddNotation = () => {
@@ -866,6 +899,98 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
+  const handleDeleteNotation = (notationId: string) => {
+    setNotationToDelete(notationId);
+    setShowDeleteNotationModal(true);
+  };
+
+  const confirmDeleteNotation = async () => {
+    if (!notationToDelete) return;
+
+    try {
+      const allNotations = [...(formData ?? []), ...(archivedFormData ?? [])];
+      const updatedNotations = allNotations.map((notation) => {
+        if (notation.id === notationToDelete) {
+          return {
+            ...notation,
+            apiAction: UserActionEnum.deleted,
+            srAction: SRApprovalStatusEnum.Pending,
+          };
+        }
+        return notation;
+      });
+
+      setFormData(getUnarchivedNotations(updatedNotations));
+      setArchivedFormData(getArchivedNotations(updatedNotations));
+      dispatch(updateSiteNotation(updatedNotations));
+      dispatch(setupNotationDataForSaving(updatedNotations));
+
+      const tracker = new ChangeTracker(
+        IChangeType.Deleted,
+        `Notation ${notationToDelete}`,
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+
+      setNotationToDelete(null);
+      setShowDeleteNotationModal(false);
+    } catch (error) {
+      console.error('Error deleting notation:', error);
+      setNotationToDelete(null);
+      setShowDeleteNotationModal(false);
+    }
+  };
+
+  const cancelDeleteNotation = () => {
+    setNotationToDelete(null);
+    setShowDeleteNotationModal(false);
+  };
+
+  const handleRestoreNotation = (notationId: string) => {
+    setNotationToRestore(notationId);
+    setShowRestoreNotationModal(true);
+  };
+
+  const confirmRestoreNotation = async () => {
+    if (!notationToRestore) return;
+
+    try {
+      const allNotations = [...(formData ?? []), ...(archivedFormData ?? [])];
+      const updatedNotations = allNotations.map((notation) => {
+        if (notation.id === notationToRestore) {
+          return {
+            ...notation,
+            apiAction: UserActionEnum.restored,
+            srAction: SRApprovalStatusEnum.Pending,
+          };
+        }
+        return notation;
+      });
+
+      setFormData(getUnarchivedNotations(updatedNotations));
+      setArchivedFormData(getArchivedNotations(updatedNotations));
+      dispatch(updateSiteNotation(updatedNotations));
+      dispatch(setupNotationDataForSaving(updatedNotations));
+
+      const tracker = new ChangeTracker(
+        IChangeType.Restored,
+        'Notation Restored',
+      );
+      dispatch(trackChanges(tracker.toPlainObject()));
+
+      setNotationToRestore(null);
+      setShowRestoreNotationModal(false);
+    } catch (error) {
+      console.error('Error restoring notation:', error);
+      setNotationToRestore(null);
+      setShowRestoreNotationModal(false);
+    }
+  };
+
+  const cancelRestoreNotation = () => {
+    setNotationToRestore(null);
+    setShowRestoreNotationModal(false);
+  };
+
   const handleAddParticipant = (id: any) => {
     const newParticipant = {
       displayName: '',
@@ -904,7 +1029,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       id,
     );
 
-    setFormData(updatedParticipants);
+    setFormData(getUnarchivedNotations(updatedParticipants));
     dispatch(updateSiteNotation(updatedParticipants));
     dispatch(setupNotationDataForSaving(updatedTrackParticipants));
     const tracker = new ChangeTracker(
@@ -1109,6 +1234,17 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
                   <Plus />
                   Add Notation
                 </Button>
+                {viewMode === SiteDetailsMode.EditMode && (
+                  <Button
+                    variant="secondary"
+                    className="ms-2"
+                    onClick={() =>
+                      setShowArchivedNotations(!showArchivedNotations)
+                    }
+                  >
+                    {showArchivedNotations ? 'Hide Archived' : 'Show Archived'}
+                  </Button>
+                )}
               </div>
             )}
           <div
@@ -1144,7 +1280,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       >
         {formData &&
           formData.map((notation, index) => (
-            <div key={index}>
+            <div key={`active-${notation.id}`}>
               {!showPending &&
                 viewMode === SiteDetailsMode.SRMode &&
                 userType === UserType.Internal && (
@@ -1186,11 +1322,55 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
                 handleAddParticipant={handleAddParticipant}
                 isAnyParticipantSelected={isAnyParticipantSelected}
                 handleRemoveParticipant={handleRemoveParticipant}
+                handleDeleteNotation={handleDeleteNotation}
+                handleRestoreNotation={handleRestoreNotation}
                 srVisibilityConfig={srVisibilityConfig}
                 handleItemClick={handleItemClick}
+                isArchived={false}
               />
             </div>
           ))}
+
+        {showArchivedNotations && archivedFormData?.length > 0 && (
+          <div className="mt-3">
+            <h5>Archived Notations</h5>
+            {archivedFormData.map((notation, index) => (
+              <div
+                key={`archived-${notation?.id ?? index}`}
+                className="notation-archived"
+              >
+                <Notation
+                  notation={notation}
+                  handleNotationFormRowFirstChild={
+                    handleNotationFormRowFirstChild
+                  }
+                  viewMode={viewMode}
+                  handleInputChange={handleInputChange}
+                  userType={userType}
+                  handleNotationFormRowExternal={handleNotationFormRowExternal}
+                  handleChangeNotationFormRow={handleChangeNotationFormRow}
+                  handleNotationFormRowsInternal={
+                    handleNotationFormRowsInternal
+                  }
+                  handleTableChange={handleTableChange}
+                  handleWidgetCheckBox={handleWidgetCheckBox}
+                  internalTableColumn={internalTableColumn}
+                  externalTableColumn={externalTableColumn}
+                  loading={loading}
+                  handleTableSort={handleTableSort}
+                  handleAddParticipant={handleAddParticipant}
+                  isAnyParticipantSelected={isAnyParticipantSelected}
+                  handleRemoveParticipant={handleRemoveParticipant}
+                  handleDeleteNotation={handleDeleteNotation}
+                  handleRestoreNotation={handleRestoreNotation}
+                  srVisibilityConfig={srVisibilityConfig}
+                  handleItemClick={handleItemClick}
+                  isArchived={true}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       {isDelete && (
         <ModalDialog
@@ -1204,6 +1384,34 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
             }
             setCurrentNotation({});
             setIsDelete(false);
+          }}
+        />
+      )}
+      {showDeleteNotationModal && (
+        <ModalDialog
+          key={v4()}
+          label="Archive notation?"
+          children={'Are you sure you want to archive this notation?'}
+          closeHandler={(response) => {
+            if (response) {
+              confirmDeleteNotation();
+            } else {
+              cancelDeleteNotation();
+            }
+          }}
+        />
+      )}
+      {showRestoreNotationModal && (
+        <ModalDialog
+          key={v4()}
+          label="Restore notation?"
+          children={'Are you sure you want to restore this notation?'}
+          closeHandler={(response) => {
+            if (response) {
+              confirmRestoreNotation();
+            } else {
+              cancelRestoreNotation();
+            }
           }}
         />
       )}

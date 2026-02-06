@@ -1527,9 +1527,57 @@ export class SiteService {
               break;
 
             case UserActionEnum.DELETED:
-              // Handle deletion if necessary
-              break;
+              const eventToDelete =
+                await this.eventsRepositoryRepo.findOneByOrFail({
+                  id: notation.id,
+                });
 
+              if (eventToDelete) {
+                // Deleting is just a special form of updating, so it's safe to push.
+                updatedEvents.push({
+                  id: notation.id,
+                  changes: {
+                    ...new Events(),
+                    ...eventToDelete,
+                    ...event,
+                    whoDeleted: userInfo ? userInfo.givenName : '',
+                    whenDeleted: new Date(),
+                    whoRestored: null,
+                    whenRestored: null,
+                  },
+                });
+              } else {
+                this.sitesLogger.log(
+                  `SiteService.processEvents(): Event with id ${notation.id} not found for deletion`,
+                );
+              }
+              break;
+            case UserActionEnum.RESTORED:
+              const eventToRestore =
+                await this.eventsRepositoryRepo.findOneByOrFail({
+                  id: notation.id,
+                });
+
+              if (eventToRestore) {
+                // Restoring is just a special form of updating, so it's safe to push.
+                updatedEvents.push({
+                  id: notation.id,
+                  changes: {
+                    ...new Events(),
+                    ...eventToRestore,
+                    ...event,
+                    whoRestored: userInfo ? userInfo.givenName : '',
+                    whenRestored: new Date(),
+                    whoDeleted: null,
+                    whenDeleted: null,
+                  },
+                });
+              } else {
+                this.sitesLogger.log(
+                  `SiteService.processEvents(): Event with id ${notation.id} not found for restoration`,
+                );
+              }
+              break;
             default:
               this.sitesLogger.warn(
                 'SiteService.processEvents Unknown action for event',

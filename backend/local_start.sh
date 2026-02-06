@@ -1,35 +1,25 @@
 #!/bin/bash
 
-#Make sure you change line endings to LF
+echo 'Sourcing environment variables...'
+source ./.env
 
-if [ ! "$POSTGRESQL_HOST" ];
-then
-   echo 'Sourcing from .env'
-   . ./.env
-else
-    echo 'Environment variables set...'
-fi
+echo 'creating database...'
+psql "user=$POSTGRES_ADMIN_USERNAME password=$POSTGRES_ADMIN_PASSWORD host=$POSTGRESQL_HOST port=$POSTGRESQL_PORT" -c "CREATE DATABASE \"$POSTGRES_DATABASE\" OWNER $POSTGRES_ADMIN_USERNAME;"
 
-# create database
-psql "user=$POSTGRES_ADMIN_USERNAME password=$POSTGRES_ADMIN_PASSWORD host=$POSTGRESQL_HOST port=$POSTGRESQL_PORT" -c "CREATE DATABASE $POSTGRES_DATABASE OWNER $POSTGRES_ADMIN_USERNAME;"
-
-# create extension
+echo 'creating required extensions...'
 psql "user=$POSTGRES_ADMIN_USERNAME password=$POSTGRES_ADMIN_PASSWORD host=$POSTGRESQL_HOST port=$POSTGRESQL_PORT dbname=$POSTGRES_DATABASE" -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;' 
 psql "user=$POSTGRES_ADMIN_USERNAME password=$POSTGRES_ADMIN_PASSWORD host=$POSTGRESQL_HOST port=$POSTGRESQL_PORT dbname=$POSTGRES_DATABASE" -c 'CREATE EXTENSION IF NOT EXISTS postgis;' 
 
-
-echo 'pwd'
-echo $POSTGRES_DB_PASSWORD;
-
-# create schema user
+echo 'creating database user...'
 psql "user=$POSTGRES_ADMIN_USERNAME password=$POSTGRES_ADMIN_PASSWORD host=$POSTGRESQL_HOST port=$POSTGRESQL_PORT dbname=$POSTGRES_DATABASE" -c "CREATE ROLE $POSTGRES_DB_USERNAME WITH LOGIN    NOSUPERUSER    NOCREATEDB    NOCREATEROLE    NOINHERIT    NOREPLICATION    CONNECTION LIMIT -1 PASSWORD '$POSTGRES_DB_PASSWORD';"
 
-# create schema
+echo 'creating database schema...'
 psql "user=$POSTGRES_ADMIN_USERNAME password=$POSTGRES_ADMIN_PASSWORD host=$POSTGRESQL_HOST port=$POSTGRESQL_PORT dbname=$POSTGRES_DATABASE" -c "CREATE SCHEMA IF NOT EXISTS $POSTGRES_DB_SCHEMA AUTHORIZATION \"$POSTGRES_DB_USERNAME\""
 
-echo "schema created"
-# run type orm migrations
+echo 'There may be some harmless errors above if the DB or user already exist.'
+
+echo 'Running database migrations...'
 npm run typeorm:run-migrations
 
-# start the API
+# echo 'Starting backend in development mode...'
 npm run start:dev

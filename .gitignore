@@ -134,5 +134,7 @@ schema.graphql
 
 # MacOS Desktop Service Storage files
 .DS_Store
+
+# IDEs and editors
 .idea
 .vscode

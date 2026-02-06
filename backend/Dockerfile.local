@@ -20,10 +20,10 @@ RUN npm run build
 RUN set -x \
         && chmod -R 777 /app/
 
-RUN apk add postgresql-client
+RUN apk add postgresql-client npm
 
 # Expose port - mostly a convention, for readability
-EXPOSE 4005
+EXPOSE 4007
 
 # Start up command
 ENTRYPOINT ["sh","/app/local_start.sh"]

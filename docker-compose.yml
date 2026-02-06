@@ -1,6 +1,6 @@
 ---
 networks:
-  app-tier:
+  site-backend:
     driver: bridge
 
 volumes:
@@ -12,18 +12,17 @@ services:
   site-database:
     image: postgis/postgis:16-3.4
     networks:
-      - app-tier
+      - site-backend
     container_name: site-database
+    env_file:
+      - ./backend/.env
     environment:
-      # These must match the backend/.env values
-      POSTGRES_USER: postgres 
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_ADMIN_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DATABASE:-postgres}
     hostname: site-database
     ports:
       - "5432:5432"
-    expose:
-      - 5432
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready --host=127.0.0.1 --port=5432"]
@@ -35,22 +34,20 @@ services:
 
   site-backend:
     networks:
-      - app-tier
+      - site-backend
     build:
       context: backend/
       dockerfile: ./Dockerfile.local
     container_name: site-backend
+    env_file:
+      - ./backend/.env
     hostname: site-backend
     depends_on:
       site-database:
         condition: service_healthy
-    links:
-      - site-database
     ports:
       - "4007:4007" # GraphQL API port
       - "9222:9222" # Debugging port
-    expose:
-      - 4007
     volumes:
       - ./backend/:/app
       - ./backend/node_modules:/app/node_modules
@@ -63,14 +60,14 @@ services:
 
   frontend:
     container_name: site-frontend
-    entrypoint:
-      - "sh"
-      - "-c"
-      - "npm i && npm run start"
-    environment:
-      - WATCHPACK_POLLING=true
-      - NODE_ENV=development
-      - BACKEND_URL=site-backend
+    build:
+      context: frontend/
+      dockerfile: ./Dockerfile.local
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      site-backend:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "wget", "--spider", "http://127.0.0.1:3000" ]
       interval: 5s

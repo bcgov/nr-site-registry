@@ -1,0 +1,7 @@
+FROM node:22-alpine
+
+WORKDIR /app
+
+RUN apk add npm
+
+ENTRYPOINT [ "sh", "/app/local_start.sh" ]

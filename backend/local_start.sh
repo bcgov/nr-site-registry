@@ -18,8 +18,11 @@ psql "user=$POSTGRES_ADMIN_USERNAME password=$POSTGRES_ADMIN_PASSWORD host=$POST
 
 echo 'There may be some harmless errors above if the DB or user already exist.'
 
+echo 'Installing backend dependencies...'
+npm i
+
 echo 'Running database migrations...'
 npm run typeorm:run-migrations
 
-# echo 'Starting backend in development mode...'
+echo 'Starting backend in development mode...'
 npm run start:dev

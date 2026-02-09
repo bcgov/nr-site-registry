@@ -25,4 +25,4 @@ echo 'Running database migrations...'
 npm run typeorm:run-migrations
 
 echo 'Starting backend in development mode...'
-npm run start:dev
+npm run start:debug

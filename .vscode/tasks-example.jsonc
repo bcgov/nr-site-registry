@@ -1,0 +1,67 @@
+// These are some example tasks that I find useful for quickly running common commands related to this project. Add
+// these to your `tasks.json` to use them.
+
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "install",
+      "path": "frontend",
+      "group": "none",
+      "problemMatcher": [],
+      "label": "Install NPM Packages (frontend)",
+      "detail": "install frontend dependencies",
+    },
+    {
+      "type": "npm",
+      "script": "install",
+      "path": "backend",
+      "group": "none",
+      "problemMatcher": [],
+      "label": "Install NPM Packages (backend)",
+      "detail": "install backend dependencies",
+    },
+    {
+      "type": "npm",
+      "script": "codegen",
+      "path": "frontend",
+      "group": "none",
+      "problemMatcher": [],
+      "label": "Generate GraphQL Code",
+      "detail": "generates GraphQL code from schema definitions",
+    },
+    {
+      "type": "shell",
+      "command": "docker exec -w /app site-backend npm run typeorm:generate-migration",
+      "group": "none",
+      "problemMatcher": [],
+      "label": "Generate Database Migration",
+      "detail": "attaches to the running backend container and generates a new database migration based on changes to the entities",
+    },
+    {
+      "type": "shell",
+      "command": "docker exec -w /app site-backend npm run typeorm:run-migrations",
+      "group": "none",
+      "problemMatcher": [],
+      "label": "Run Database Migrations",
+      "detail": "attaches to the running backend container and runs database migrations",
+    },
+    {
+      "type": "shell",
+      "command": "open http://localhost:4000",
+      "group": "none",
+      "problemMatcher": [],
+      "label": "Open Frontend in Browser (MacOS)",
+      "detail": "Opens the frontend application in the default web browser",
+    },
+    {
+      "type": "shell",
+      "command": "open http://localhost:4007/graphql/",
+      "group": "none",
+      "problemMatcher": [],
+      "label": "Open GraphQL playground in Browser (MacOS)",
+      "detail": "Opens the GraphQL playground in the default web browser",
+    },
+  ],
+}

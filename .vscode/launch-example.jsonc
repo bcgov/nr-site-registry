@@ -1,0 +1,27 @@
+// Example launch configurations. These will allow you to debug both frontend and backend when they are running in
+// docker. Add these configs to your `launch.json`.
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend",
+      "type": "node",
+      "request": "attach",
+      "address": "127.0.0.1",
+      "port": 9229,
+      "localRoot": "${workspaceFolder}/backend",
+      "remoteRoot": "/app",
+    },
+    {
+      "name": "Frontend",
+      "type": "msedge", // or "chrome" depending on your browser. I haven't tested firefox. Presumably you need an addon.
+      "request": "launch",
+      "url": "http://127.0.0.1:4000",
+      "webRoot": "${workspaceFolder}/frontend",
+      "sourceMapPathOverrides": {
+        "/app/*": "${webRoot}/*",
+        "file:///app/*": "${webRoot}/*",
+      },
+    },
+  ],
+}

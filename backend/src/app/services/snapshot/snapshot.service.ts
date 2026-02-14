@@ -389,7 +389,11 @@ export class SnapshotsService {
               new SnapshotSiteContent();
 
             snapShotContent.sitesSummary = await this.sitesRespository.findOne({
-              where: { id: siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+              where: {
+                id: siteId,
+                srAction: SRApprovalStatusEnum.PUBLIC,
+                whoDeleted: IsNull(), // Prevent purchasing snapshots of deleted sites
+              },
             });
 
             if (snapShotContent.sitesSummary === null) {

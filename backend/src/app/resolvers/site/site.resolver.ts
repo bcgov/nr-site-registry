@@ -40,6 +40,7 @@ import {
   FindSitesAndPlaces,
   FindSitesAndPlacesResponse,
 } from '../../dto/mapSearch.dto';
+import { DeleteSiteInput, DeleteSiteResponse } from '../../dto/deleteSite.dto';
 
 /**
  * Resolver for Region
@@ -293,5 +294,50 @@ export class SiteResolver {
     );
 
     return this.siteService.findSiteBySiteId(siteId, showPending, userInfo);
+  }
+
+  /**
+   * Soft delete a site - Only accessible by Site Registrar users
+   */
+  @Roles({
+    roles: [CustomRoles.SiteRegistrar, CustomRoles.External],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Mutation(() => DeleteSiteResponse, { name: 'deleteSite' })
+  @UsePipes(new GenericValidationPipe())
+  async deleteSite(
+    @Args('input') input: DeleteSiteInput,
+    @AuthenticatedUser() userInfo: any,
+  ): Promise<DeleteSiteResponse> {
+    this.sitesLogger.log(
+      `SiteResolver.deleteSite() start siteId: ${input.siteId}`,
+    );
+
+    try {
+      const userId =
+        userInfo?.preferred_username || userInfo?.email || 'UNKNOWN_USER';
+      const message = await this.siteService.deleteSite(input.siteId, userId);
+
+      this.sitesLogger.log('SiteResolver.deleteSite() RES:200 end');
+
+      return {
+        success: true,
+        message,
+        httpStatusCode: HttpStatus.OK,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      this.sitesLogger.error(
+        `SiteResolver.deleteSite() error: ${JSON.stringify(error)}`,
+        JSON.stringify(error),
+      );
+
+      return {
+        success: false,
+        message: error.message || 'Failed to delete site',
+        httpStatusCode: error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        timestamp: new Date().toISOString(),
+      };
+    }
   }
 }

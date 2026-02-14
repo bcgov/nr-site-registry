@@ -25,9 +25,7 @@ const ErrorMsg: React.FC<ErrorMsgProps> = ({
     <div className="custom custom-border">
       <span className="error-heading ">
         {' '}
-        {customErrorHeading
-          ? customErrorHeading
-          : 'Changes could not be saved'}{' '}
+        {customErrorHeading ?? 'Changes could not be saved'}{' '}
       </span>
       <span className="error-text">
         {customMessage

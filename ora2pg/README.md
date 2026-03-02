@@ -38,3 +38,5 @@ or with a docker-compose:
 docker compose up -d --build
 
 ```
+
+## Execute DB Script (Ora2pg/db_script/rwmFlagLogic.sql) after migrations and existing data is loaded into postgres db

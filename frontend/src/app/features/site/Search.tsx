@@ -230,8 +230,12 @@ const Search = () => {
       setUserAction(false);
     }
 
-    dispatch(fetchSiteRiskCd());
+    // dispatch(fetchSiteRiskCd());
   }, [dispatch, searchParam, sites.length, status]);
+
+  useEffect(() => {
+    dispatch(fetchSiteRiskCd());
+  }, []);
 
   const handleRemoveFilter = (filter: any) => {
     setFormData((prevData) => {

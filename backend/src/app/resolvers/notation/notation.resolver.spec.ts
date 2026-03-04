@@ -124,8 +124,8 @@ describe('NotationResolver', () => {
     const result = await resolver.getSiteNotationBySiteId(
       siteId,
       false,
-      false,
       user,
+      false,
     );
 
     expect(result).toEqual(expectedResult);
@@ -167,8 +167,8 @@ describe('NotationResolver', () => {
     const result = await resolver.getSiteNotationBySiteId(
       siteId,
       false,
-      false,
       user,
+      false,
     );
 
     expect(result).toEqual(expectedResult);
@@ -199,8 +199,8 @@ describe('NotationResolver', () => {
     const result = await resolver.getSiteNotationBySiteId(
       siteId as any,
       false,
-      false,
       user,
+      false,
     );
 
     expect(result.httpStatusCode).toEqual(404);
@@ -219,8 +219,8 @@ describe('NotationResolver', () => {
     const result = await resolver.getSiteNotationBySiteId(
       siteId,
       false,
-      false,
       user,
+      false,
     );
 
     expect(result.httpStatusCode).toEqual(404);
@@ -262,8 +262,8 @@ describe('NotationResolver', () => {
     const result = await resolver.getSiteNotationBySiteId(
       siteId,
       false,
-      false,
       user,
+      false,
     );
 
     expect(result.success).toEqual(true);

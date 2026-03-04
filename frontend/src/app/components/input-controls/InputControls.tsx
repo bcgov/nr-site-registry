@@ -702,6 +702,7 @@ export const DateInput: React.FC<InputProps> = ({
           value={parsedDate ?? null}
           onChange={handleDateChange}
           oneTap
+          disabled={isDisabled}
           readOnly={isDisabled}
         />
       ) : (

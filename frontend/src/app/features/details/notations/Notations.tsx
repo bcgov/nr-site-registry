@@ -361,11 +361,12 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       dispatch(
         fetchNotationParticipants({
           siteId: siteId ?? '',
-          showPending: showPending,
+          showPending,
+          includeDeleted: showArchivedNotations,
         }),
       );
     }
-  }, [resetDetails, saveSiteDetailsRequestStatus]);
+  }, [resetDetails, saveSiteDetailsRequestStatus, showArchivedNotations]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value;
@@ -447,6 +448,21 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     setSearchTerm('');
     setFormData(getUnarchivedNotations(notations));
     setArchivedFormData(getArchivedNotations(notations));
+  };
+
+  const handleToggleArchivedNotations = () => {
+    const nextShowArchivedNotations = !showArchivedNotations;
+    setShowArchivedNotations(nextShowArchivedNotations);
+
+    if (nextShowArchivedNotations) {
+      dispatch(
+        fetchNotationParticipants({
+          siteId: siteId ?? '',
+          showPending,
+          includeDeleted: true,
+        }),
+      );
+    }
   };
 
   const updateNotationsForSRMode = (
@@ -1238,9 +1254,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
                   <Button
                     variant="secondary"
                     className="ms-2"
-                    onClick={() =>
-                      setShowArchivedNotations(!showArchivedNotations)
-                    }
+                    onClick={handleToggleArchivedNotations}
                   >
                     {showArchivedNotations ? 'Hide Archived' : 'Show Archived'}
                   </Button>
@@ -1331,44 +1345,52 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
             </div>
           ))}
 
-        {showArchivedNotations && archivedFormData?.length > 0 && (
+        {showArchivedNotations && (
           <div className="mt-3">
             <h5>Archived Notations</h5>
-            {archivedFormData.map((notation, index) => (
-              <div
-                key={`archived-${notation?.id ?? index}`}
-                className="notation-archived"
-              >
-                <Notation
-                  notation={notation}
-                  handleNotationFormRowFirstChild={
-                    handleNotationFormRowFirstChild
-                  }
-                  viewMode={viewMode}
-                  handleInputChange={handleInputChange}
-                  userType={userType}
-                  handleNotationFormRowExternal={handleNotationFormRowExternal}
-                  handleChangeNotationFormRow={handleChangeNotationFormRow}
-                  handleNotationFormRowsInternal={
-                    handleNotationFormRowsInternal
-                  }
-                  handleTableChange={handleTableChange}
-                  handleWidgetCheckBox={handleWidgetCheckBox}
-                  internalTableColumn={internalTableColumn}
-                  externalTableColumn={externalTableColumn}
-                  loading={loading}
-                  handleTableSort={handleTableSort}
-                  handleAddParticipant={handleAddParticipant}
-                  isAnyParticipantSelected={isAnyParticipantSelected}
-                  handleRemoveParticipant={handleRemoveParticipant}
-                  handleDeleteNotation={handleDeleteNotation}
-                  handleRestoreNotation={handleRestoreNotation}
-                  srVisibilityConfig={srVisibilityConfig}
-                  handleItemClick={handleItemClick}
-                  isArchived={true}
-                />
-              </div>
-            ))}
+            {archivedFormData?.length > 0 ? (
+              archivedFormData.map((notation, index) => (
+                <div
+                  key={`archived-${notation?.id ?? index}`}
+                  className="notation-archived"
+                >
+                  <Notation
+                    notation={notation}
+                    handleNotationFormRowFirstChild={
+                      handleNotationFormRowFirstChild
+                    }
+                    viewMode={viewMode}
+                    handleInputChange={handleInputChange}
+                    userType={userType}
+                    handleNotationFormRowExternal={
+                      handleNotationFormRowExternal
+                    }
+                    handleChangeNotationFormRow={handleChangeNotationFormRow}
+                    handleNotationFormRowsInternal={
+                      handleNotationFormRowsInternal
+                    }
+                    handleTableChange={handleTableChange}
+                    handleWidgetCheckBox={handleWidgetCheckBox}
+                    internalTableColumn={internalTableColumn}
+                    externalTableColumn={externalTableColumn}
+                    loading={loading}
+                    handleTableSort={handleTableSort}
+                    handleAddParticipant={handleAddParticipant}
+                    isAnyParticipantSelected={isAnyParticipantSelected}
+                    handleRemoveParticipant={handleRemoveParticipant}
+                    handleDeleteNotation={handleDeleteNotation}
+                    handleRestoreNotation={handleRestoreNotation}
+                    srVisibilityConfig={srVisibilityConfig}
+                    handleItemClick={handleItemClick}
+                    isArchived={true}
+                  />
+                </div>
+              ))
+            ) : (
+              <Alert variant="info" data-testid="no-archived-notations">
+                No archived notations found.
+              </Alert>
+            )}
           </div>
         )}
       </div>
@@ -1390,8 +1412,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       {showDeleteNotationModal && (
         <ModalDialog
           key={v4()}
-          label="Archive notation?"
-          children={'Are you sure you want to archive this notation?'}
+          label="Delete notation?"
+          children={
+            'Are you sure you want to delete this notation? Once deleted, it will be archived.'
+          }
           closeHandler={(response) => {
             if (response) {
               confirmDeleteNotation();

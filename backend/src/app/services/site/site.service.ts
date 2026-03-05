@@ -1478,6 +1478,9 @@ export class SiteService {
             ...new Events(),
             ...eventData,
           };
+          const dbEvent = await this.eventsRepositoryRepo.findOneByOrFail({
+            id: notationId,
+          });
           switch (apiAction) {
             case UserActionEnum.ADDED:
               // Get the ID of the newly created event
@@ -1527,18 +1530,13 @@ export class SiteService {
               break;
 
             case UserActionEnum.DELETED:
-              const eventToDelete =
-                await this.eventsRepositoryRepo.findOneByOrFail({
-                  id: notation.id,
-                });
-
-              if (eventToDelete) {
+              if (dbEvent) {
                 // Deleting is just a special form of updating, so it's safe to push.
                 updatedEvents.push({
                   id: notation.id,
                   changes: {
                     ...new Events(),
-                    ...eventToDelete,
+                    ...dbEvent,
                     ...event,
                     whoDeleted: userInfo ? userInfo.givenName : '',
                     whenDeleted: new Date(),
@@ -1553,18 +1551,13 @@ export class SiteService {
               }
               break;
             case UserActionEnum.RESTORED:
-              const eventToRestore =
-                await this.eventsRepositoryRepo.findOneByOrFail({
-                  id: notation.id,
-                });
-
-              if (eventToRestore) {
+              if (dbEvent) {
                 // Restoring is just a special form of updating, so it's safe to push.
                 updatedEvents.push({
                   id: notation.id,
                   changes: {
                     ...new Events(),
-                    ...eventToRestore,
+                    ...dbEvent,
                     ...event,
                     whoRestored: userInfo ? userInfo.givenName : '',
                     whenRestored: new Date(),

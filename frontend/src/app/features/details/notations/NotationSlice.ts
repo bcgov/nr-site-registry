@@ -27,7 +27,7 @@ export const fetchNotationParticipants = createAsyncThunk(
         variables: {
           siteId: args.siteId,
           pending: args.showPending,
-          includeDeleted: args.includeDeleted ?? true,
+          includeDeleted: args.includeDeleted ?? false,
         },
       });
       return response.data.data.getSiteNotationBySiteId.data;

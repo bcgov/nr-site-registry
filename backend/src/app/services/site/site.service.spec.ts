@@ -802,6 +802,62 @@ describe('SiteService', () => {
           expect.stringMatching(/.*No changes to Parcel Descriptions.*/),
         );
       });
+
+      it('normalizes addrType to uppercase before creating a site summary', async () => {
+        const userInfo = { sub: 'userId', givenName: 'UserName' };
+
+        jest.spyOn(siteService as any, 'getMaxId').mockResolvedValue(100);
+        const saveSpy = jest.spyOn(entityManager, 'save');
+
+        const inputDTO: SaveSiteDetailsDTO = {
+          siteId: '1',
+          sitesSummary: {
+            apiAction: UserActionEnum.ADDED,
+            bcerCode: 'REG1',
+            sstCode: 'ACTIVE',
+            commonName: 'Test Site',
+            addrType: ' mailing ',
+            addrLine_1: '123 Main St',
+            city: 'Victoria',
+            provState: 'BC',
+            srAction: SRApprovalStatusEnum.PENDING,
+          } as any,
+        };
+
+        await siteService.commitSiteDetails(entityManager, inputDTO, userInfo);
+
+        expect(saveSpy).toHaveBeenCalledWith(
+          Sites,
+          expect.objectContaining({ addrType: 'MAILING' }),
+        );
+      });
+
+      it('throws a bad request error when addrType is not in the allowed list', async () => {
+        const userInfo = { sub: 'userId', givenName: 'UserName' };
+
+        const inputDTO: SaveSiteDetailsDTO = {
+          siteId: '1',
+          sitesSummary: {
+            apiAction: UserActionEnum.ADDED,
+            bcerCode: 'REG1',
+            sstCode: 'ACTIVE',
+            commonName: 'Test Site',
+            addrType: 'office',
+            addrLine_1: '123 Main St',
+            city: 'Victoria',
+            provState: 'BC',
+            srAction: SRApprovalStatusEnum.PENDING,
+          } as any,
+        };
+
+        await expect(
+          siteService.commitSiteDetails(entityManager, inputDTO, userInfo),
+        ).rejects.toThrow(HttpException);
+
+        await expect(
+          siteService.commitSiteDetails(entityManager, inputDTO, userInfo),
+        ).rejects.toMatchObject({ status: HttpStatus.BAD_REQUEST });
+      });
     });
   });
 

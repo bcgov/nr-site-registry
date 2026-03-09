@@ -183,10 +183,16 @@ export const GetSummaryConfig = () => {
       },
     },
     addrType: {
-      type: FormFieldType.Text,
+      type: FormFieldType.DropDown,
       label: 'Address Type',
-      placeholder: 'Please enter address type...',
+      placeholder: 'Please select address type...',
       graphQLPropertyName: 'addrType',
+      options: [
+        { key: 'CIVIC', value: 'Civic' },
+        { key: 'MAILING', value: 'Mailing' },
+        { key: 'LEGAL', value: 'Legal' },
+        { key: 'RA', value: 'RA' },
+      ],
       value: '',
       customLabelCss: 'custom-summary-lbl-text',
       customInputTextCss: 'custom-summary-input-text',

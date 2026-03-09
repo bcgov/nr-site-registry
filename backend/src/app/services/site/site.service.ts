@@ -66,6 +66,13 @@ import { SiteProfileSchedule2Ref } from '../../entities/siteProfileSchedule2Ref'
  */
 @Injectable()
 export class SiteService {
+  private readonly validAddrTypes = new Set([
+    'CIVIC',
+    'MAILING',
+    'LEGAL',
+    'RA',
+  ]);
+
   constructor(
     @InjectRepository(Sites)
     private siteRepository: Repository<Sites>,
@@ -104,6 +111,23 @@ export class SiteService {
     private readonly sitesLogger: LoggerService,
     private readonly snapShotService: SnapshotsService,
   ) {}
+
+  private sanitizeAddrType(addrType?: string | null): string | undefined {
+    if (addrType === undefined || addrType === null) {
+      return undefined;
+    }
+
+    const normalizedAddrType = addrType.trim().toUpperCase();
+
+    if (!this.validAddrTypes.has(normalizedAddrType)) {
+      throw new HttpException(
+        'Invalid addrType. Allowed values are CIVIC, MAILING, LEGAL, RA.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return normalizedAddrType;
+  }
 
   /**
    * Find All method for returining all sites
@@ -688,6 +712,10 @@ export class SiteService {
 
     if (sitesSummary) {
       const { apiAction, ...summary } = sitesSummary;
+
+      if (summary.addrType !== undefined && summary.addrType !== null) {
+        summary.addrType = this.sanitizeAddrType(summary.addrType);
+      }
 
       switch (apiAction) {
         case UserActionEnum.ADDED:

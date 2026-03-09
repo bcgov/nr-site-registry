@@ -1,4 +1,6 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { Transform } from 'class-transformer';
+import { IsIn, IsOptional, IsString } from 'class-validator';
 import { ChangeAuditType } from './changeAuditEntity.dto';
 
 @InputType({ isAbstract: true })
@@ -16,7 +18,14 @@ export class SiteBaseDto extends ChangeAuditType {
   @Field({ nullable: true })
   commonName: string;
 
-  @Field({ nullable: true })
+  @Field()
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.trim().toUpperCase() : value,
+  )
+  @IsString()
+  @IsIn(['CIVIC', 'MAILING', 'LEGAL', 'RA'], {
+    message: 'addrType must be one of CIVIC, MAILING, LEGAL, RA',
+  })
   addrType: string;
 
   @Field()

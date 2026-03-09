@@ -151,6 +151,12 @@ const siteDetailsSlice = createSlice({
 });
 
 export const getSiteDetailsToBeSaved = (state: any) => {
+  const rawAddrType = state?.siteDetails?.sitesSummary?.addrType;
+  const normalizedAddrType =
+    typeof rawAddrType === 'string'
+      ? rawAddrType.trim().toUpperCase()
+      : rawAddrType;
+
   return {
     events: state.siteDetails?.notationData,
     siteParticipants: state.siteDetails?.siteParticipantData,
@@ -163,6 +169,7 @@ export const getSiteDetailsToBeSaved = (state: any) => {
     sitesSummary: state?.siteDetails?.sitesSummary
       ? {
           ...state.siteDetails.sitesSummary,
+          addrType: normalizedAddrType,
           latDegrees: safeParseFloat(
             state.siteDetails?.sitesSummary?.latDegrees,
           ),

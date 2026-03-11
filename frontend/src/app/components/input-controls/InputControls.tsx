@@ -2,6 +2,8 @@ import React, {
   CSSProperties,
   useCallback,
   useEffect,
+  useId,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -568,8 +570,9 @@ export const DateRangeInput: React.FC<InputProps> = ({
     onChange(value);
   };
 
-  // Replace any spaces in the label with underscores to create a valid id
-  const dateRangeId = label.replace(/\s+/g, '_') + '_' + v4();
+  // Keep DateRangePicker id stable across re-renders to avoid remount loops.
+  const dateRangeInputId = useId();
+  const dateRangeId = `${label.replace(/\s+/g, '_')}_${dateRangeInputId}`;
   return (
     <ContainerElement
       className={tableMode ? 'table-border-light align-content-center' : 'mb-3'}
@@ -644,14 +647,15 @@ export const DateInput: React.FC<InputProps> = ({
   const [error, setError] = useState<string | null>(null);
   const ContainerElement = tableMode ? 'td' : 'div';
 
-  // --- Parse value into date safely (without timezone shift)
-  let parsedDate: Date | null = parseDate(value);
+  // Memoize date conversion so DatePicker doesn't receive a new Date object every render.
+  const parsedDate: Date | null = useMemo(() => parseDate(value), [value]);
 
-  // --- For display (formatted UTC-based date)
-  let displayDate: string | null = null;
-  if (value) {
-    displayDate = formatDate(value);
-  }
+  const displayDate: string | null = useMemo(() => {
+    if (!value) {
+      return null;
+    }
+    return formatDate(value);
+  }, [value]);
 
   const validateInput = (inputValue: Date | null) => {
     if (validation?.required && !inputValue) {
@@ -676,8 +680,9 @@ export const DateInput: React.FC<InputProps> = ({
     }
   };
 
-  // Replace any spaces in the label with underscores to create a valid id
-  const dateRangeId = label.replace(/\s+/g, '_') + '_' + v4();
+  // Keep DatePicker id stable across re-renders to avoid remount loops.
+  const dateInputId = useId();
+  const dateRangeId = `${label.replace(/\s+/g, '_')}_${dateInputId}`;
   return (
     <ContainerElement
       className={`${tableMode ? 'table-border-light align-content-center' : 'mb-3'} ${customContainerCss ?? ''}`}

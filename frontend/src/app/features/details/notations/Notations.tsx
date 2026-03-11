@@ -155,6 +155,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     return (notations ?? []).filter((notation) => isNotationArchived(notation));
   };
 
+  const areNotationsEqual = (a: any[], b: any[]) => {
+    return JSON.stringify(a ?? []) === JSON.stringify(b ?? []);
+  };
+
   // Function to fetch notation participant
   const fetchNotationParticipant = useCallback(async (searchParam: string) => {
     if (searchParam.trim()) {
@@ -253,8 +257,19 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         );
       }
 
-      setFormData(getUnarchivedNotations(notations));
-      setArchivedFormData(getArchivedNotations(notations));
+      const unarchivedNotations = getUnarchivedNotations(notations);
+      const archivedNotations = getArchivedNotations(notations);
+
+      setFormData((prev) =>
+        areNotationsEqual(prev as any[], unarchivedNotations)
+          ? prev
+          : unarchivedNotations,
+      );
+      setArchivedFormData((prev) =>
+        areNotationsEqual(prev as any[], archivedNotations)
+          ? prev
+          : archivedNotations,
+      );
     }
   }, [notations, status]);
 

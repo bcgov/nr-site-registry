@@ -1,6 +1,6 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Transform } from 'class-transformer';
-import { IsIn, IsOptional, IsString } from 'class-validator';
+import { IsIn, IsString } from 'class-validator';
 import { ChangeAuditType } from './changeAuditEntity.dto';
 
 // Keep this in sync with the frontend SummaryConfig addrType options.

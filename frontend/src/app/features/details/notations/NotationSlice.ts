@@ -18,7 +18,7 @@ export const fetchNotationParticipants = createAsyncThunk(
   'notationParticipant/fetchNotationParticipants',
   async (args: {
     siteId: string;
-    showPending: Boolean;
+    showPending: boolean;
     includeDeleted?: boolean;
   }) => {
     try {

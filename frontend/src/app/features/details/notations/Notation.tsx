@@ -17,7 +17,6 @@ import { DropdownItem } from '../../../components/action/IActions';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
 import { Button } from '../../../components/button/Button';
 import { formatDate, parseDate } from '../../../helpers/utility';
-import { UserActionEnum } from '../../../common/userActionEnum';
 
 interface INotationProps {
   index?: number;

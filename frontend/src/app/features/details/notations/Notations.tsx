@@ -101,7 +101,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     { [key: string]: any | [Date, Date] }[]
   >(notations || []);
   const [archivedFormData, setArchivedFormData] = useState<
-    { [key: string]: any | [Date, Date] }[]
+    { [key: string]: any }[]
   >([]);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 

@@ -28,3 +28,6 @@ crunchy:
         accessModes: "ReadWriteOnce"
         storage: 3Gi
         storageClassName: netapp-file-backup
+
+pgbackrestLogRotator:
+  enabled: true

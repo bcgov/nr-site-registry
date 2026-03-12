@@ -51,7 +51,7 @@ frontend:
       cpu: 10m
       memory: 60Mi
 
-pgBackRestLogRotator:
+pgbackrestLogRotator:
   enabled: true
   schedule: 0 10 * * *  # 2am Pacific
   serviceAccountName: pipeline

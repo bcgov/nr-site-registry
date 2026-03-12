@@ -39,7 +39,7 @@ frontend:
     REACT_APP_AUTH_REVOKE_TOKENS_ON_SIGNOUT: "true"
     REACT_APP_COMS_API : "prod-coms-api"
 
-pgBackRestLogRotator:
+pgbackrestLogRotator:
   enabled: true
   schedule: 0 10 * * *  # 2am Pacific
   serviceAccountName: pipeline

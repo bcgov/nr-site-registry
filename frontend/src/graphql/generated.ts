@@ -1459,7 +1459,7 @@ export type SiteSummaryDto = {
   addrLine_2?: InputMaybe<Scalars['String']['input']>;
   addrLine_3?: InputMaybe<Scalars['String']['input']>;
   addrLine_4?: InputMaybe<Scalars['String']['input']>;
-  addrType?: InputMaybe<Scalars['String']['input']>;
+  addrType: Scalars['String']['input'];
   apiAction?: InputMaybe<Scalars['String']['input']>;
   bcerCode?: InputMaybe<Scalars['String']['input']>;
   city: Scalars['String']['input'];

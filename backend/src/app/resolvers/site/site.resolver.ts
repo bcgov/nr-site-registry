@@ -24,7 +24,7 @@ import { Sites } from '../../entities/sites.entity';
 import { SiteService } from '../../services/site/site.service';
 import { DropdownDto, DropdownResponse } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { HttpStatus, UsePipes } from '@nestjs/common';
+import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { CustomRoles } from '../../common/role';
@@ -122,7 +122,11 @@ export class SiteResolver {
   })
   @Mutation(() => SaveSiteDetailsResponse, { name: 'updateSiteDetails' })
   async updateSiteDetails(
-    @Args('siteDetailsDTO', { type: () => SaveSiteDetailsDTO })
+    @Args(
+      'siteDetailsDTO',
+      { type: () => SaveSiteDetailsDTO },
+      new ValidationPipe(),
+    )
     siteDetailsDTO: SaveSiteDetailsDTO,
     @AuthenticatedUser()
     user: any,

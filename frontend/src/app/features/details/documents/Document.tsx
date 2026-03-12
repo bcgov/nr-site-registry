@@ -89,7 +89,7 @@ const Document: React.FC<IDocumentProps> = ({
           >
             <Button onClick={handleViewOnline}>
               <ViewOnlyIcon />
-              View Online
+              View Document
             </Button>
             <Button
               variant="secondary"

@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
@@ -156,6 +161,12 @@ const SiteDetails = () => {
   const auth = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromPath =
+    location.state?.fromPath || location.state?.fromLabel || 'Search'; // Default to "search" if no state is passed
+  const fromScreen = location.state?.fromLabel || 'Search'; // Default to "Unknown Screen" if no state is passed
+  const fromPathRef = useRef(fromPath);
+  const fromScreenRef = useRef(fromScreen);
   const loggedInUser = getUser();
   // TODO: this is for future use when we support automatic flow of creating new site for specific application.
   // We need applicationid and newly created siteId to fill cats db  in order to keep both application in sync.
@@ -277,7 +288,7 @@ const SiteDetails = () => {
   }, [bulkApproveRejectStatus]);
 
   const onClickBackButton = () => {
-    navigate(-1);
+    navigate(`/${fromPathRef.current.replace(/\s+/g, '').toLowerCase()}`);
   };
 
   useEffect(() => {
@@ -1123,7 +1134,7 @@ const SiteDetails = () => {
           <div className="d-flex gap-2 flex-wrap align-items-center">
             <Button variant="secondary" onClick={onClickBackButton}>
               <AngleLeft />
-              Back
+              {`Back to ${fromScreenRef.current}`}
             </Button>
             <div className="d-flex flex-wrap align-items-center gap-2 pe-3 custom-sticky-header-lbl">
               {!!id?.trim() ? (
@@ -1252,6 +1263,8 @@ const SiteDetails = () => {
             errorOption={hasError}
             customHeaderCss={hasError ? 'custom-modal-error-header-text' : ''}
             headerLabel={hasError ? 'Please fix the errors' : ''}
+            label="Are you sure you want to save changes ?"
+            saveBtnLabel="Yes, Save Changes"
             closeHandler={async (response) => {
               setSave(false);
               if (response && errorList?.length === 0) {
@@ -1294,7 +1307,7 @@ const SiteDetails = () => {
                   <span className="custom-modal-data-text">
                     {savedChanges.length > 0
                       ? 'The following fields will be updated:'
-                      : 'No changes to save'}
+                      : ''}
                   </span>
                 </div>
                 {savedChanges.length > 0 && (
@@ -1316,7 +1329,7 @@ const SiteDetails = () => {
         {!isVisible && (
           <div className="d-flex justify-content-between">
             <Button variant="secondary" onClick={onClickBackButton}>
-              <AngleLeft /> Back to
+              <AngleLeft /> {`Back to ${fromScreenRef.current}`}
             </Button>
 
             <div className="d-flex gap-2 justify-align-center pe-2 pos-relative">

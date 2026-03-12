@@ -11,7 +11,8 @@
   color: var(--typography-color-primary);
 }
 
-.account-custom-toggle:active {
+.account-custom-toggle:active,
+.account-custom-toggle:focus {
   border-color: transparent !important;
 }
 

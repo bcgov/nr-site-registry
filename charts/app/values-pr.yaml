@@ -50,3 +50,12 @@ frontend:
     requests:
       cpu: 10m
       memory: 60Mi
+
+pgBackRestLogRotator:
+  enabled: true
+  schedule: 0 10 * * *  # 2am Pacific
+  serviceAccountName: pipeline
+  image:
+    repository: registry.redhat.io/openshift4/ose-cli
+  env:
+    CRUNCHY_CLUSTER: postgres-crunchy

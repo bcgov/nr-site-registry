@@ -39,4 +39,11 @@ frontend:
     REACT_APP_AUTH_REVOKE_TOKENS_ON_SIGNOUT: "true"
     REACT_APP_COMS_API : "prod-coms-api"
 
-
+pgBackRestLogRotator:
+  enabled: true
+  schedule: 0 10 * * *  # 2am Pacific
+  serviceAccountName: pipeline
+  image:
+    repository: registry.redhat.io/openshift4/ose-cli
+  env:
+    CRUNCHY_CLUSTER: postgres-crunchy

@@ -5,7 +5,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ template "crunchy-postgres.fullname" . }}-cleanup-pgbackrest-logs
+  name: {{ template "backend.fullname" . }}-cleanup-pgbackrest-logs
 spec:
   schedule: {{ .Values.pgbackrestLogRotator.schedule  }}
   jobTemplate:

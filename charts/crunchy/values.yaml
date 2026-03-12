@@ -126,3 +126,11 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
         memory: 16Mi
   databaseInitSQL:
     enabled: true
+
+pgbackrestLogRotator:
+  schedule: 0 10 * * *  # 2am Pacific
+  serviceAccountName: pipeline
+  image:
+    repository: registry.redhat.io/openshift4/ose-cli
+  env:
+    CRUNCHY_CLUSTER: postgres-crunchy

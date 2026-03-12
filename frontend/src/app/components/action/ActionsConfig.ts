@@ -26,11 +26,11 @@ export const getActionItems = (
     return [
       ...ActionItems,
       {
-        label: 'Approve All Changes',
+        label: 'Public All Changes',
         value: SiteActionBtn.ApproveAll,
       },
       {
-        label: 'Not Public',
+        label: 'Private All Changes',
         value: SiteActionBtn.RejectAll,
       },
     ];

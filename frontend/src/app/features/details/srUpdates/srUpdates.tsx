@@ -107,16 +107,17 @@ const SRUpdates = () => {
     displayName: '',
     active: true,
     graphQLPropertyName: SRApprovalStatusEnum.Public,
-    columnSize: ColumnSize.Default,
+    columnSize: ColumnSize.XtraSmall,
+    dynamicColumn: true,
     displayType: {
       type: FormFieldType.IconButton,
       label: '',
-      placeholder: 'Approve',
+      placeholder: 'Public',
       graphQLPropertyName: SRApprovalStatusEnum.Public,
       value: '',
       tableMode: true,
       customIcon: <TickIcon />,
-      customLinkValue: 'Approve',
+      customLinkValue: 'Public',
       customInputTextCss: 'approve-tick-icon',
     },
   };
@@ -126,16 +127,17 @@ const SRUpdates = () => {
     displayName: '',
     active: true,
     graphQLPropertyName: SRApprovalStatusEnum.Private,
-    columnSize: ColumnSize.Default,
+    columnSize: ColumnSize.XtraSmall,
+    dynamicColumn: true,
     displayType: {
       type: FormFieldType.IconButton,
       label: '',
-      placeholder: 'Not Public',
+      placeholder: 'Private',
       graphQLPropertyName: SRApprovalStatusEnum.Private,
       value: '',
       tableMode: true,
       customIcon: <XmarkIcon />,
-      customLinkValue: 'Not Public',
+      customLinkValue: 'Private',
       customInputTextCss: 'close-tick-icon',
     },
   };
@@ -395,9 +397,7 @@ const SRUpdates = () => {
     }
   }, [updateRequestStatusFromState]);
 
-  const handleChange = (event: any) => {
-    console.log('No Change Hanlder Required Here', event);
-  };
+  const handleChange = () => {};
 
   const handleAndReturnBoolean = (event: any): boolean => {
     return true;

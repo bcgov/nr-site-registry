@@ -18,7 +18,13 @@ const getSiteSearchResultsColumns = (
       isDefault: true,
       sortOrder: 1,
       isChecked: true,
-      displayType: getLinkColumnType('Site ID', 'id', '', '/site/details/'),
+      displayType: getLinkColumnType(
+        hiddenColumns,
+        'Site ID',
+        'id',
+        '',
+        '/site/details/',
+      ),
       stickyCol: true,
     },
     new TableColumn(
@@ -234,6 +240,7 @@ const getSiteSearchResultsColumns = (
           sortOrder: 1,
           isChecked: true,
           displayType: getLinkColumnType(
+            hiddenColumns,
             'Map',
             'id',
             '',
@@ -256,6 +263,7 @@ const getSiteSearchResultsColumns = (
       sortOrder: 1,
       isChecked: true,
       displayType: getLinkColumnType(
+        hiddenColumns,
         'Details',
         'id',
         '',
@@ -310,6 +318,7 @@ const getColumnType = (
 };
 
 const getLinkColumnType = (
+  hiddenColumns: Set<string>,
   label: string,
   propertyName: string,
   value: string,
@@ -329,6 +338,8 @@ const getLinkColumnType = (
     href: href,
     customLinkValue: customLabel ?? null,
     customIcon: customIcon ?? null,
+    componentName: hiddenColumns.has('map') ? 'Map' : 'Search',
+    componentPath: hiddenColumns.has('map') ? 'map' : 'search',
   };
 };
 

@@ -235,7 +235,7 @@ const SRUpdatesTables = () => {
           data-testid="approve-btn"
         >
           <TickIcon className="me-2" />
-          Approve
+          Public
         </Button>
         <Button
           variant="secondary"
@@ -246,7 +246,7 @@ const SRUpdatesTables = () => {
           data-testid="reject-btn"
         >
           <XmarkIcon className="me-2" />
-          Not Public
+          Private
         </Button>
       </div>
       <div className="col-12" data-testid="srreview-table">

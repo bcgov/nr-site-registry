@@ -1,13 +1,13 @@
 # This is a temporary cronjbob to clean up pgBackrest logs until the issue is resolved in pgBackrest itself.
 # The upstream bug is tracked here: https://github.com/CrunchyData/postgres-operator/issues/4142
 
-{{- if .Values.pgBackrestLogRotator.enabled }}
+{{- if .Values.pgbackrestlogRotator.enabled }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ template "crunchy-postgres.fullname" . }}-cleanup-pgbackrest-logs
 spec:
-  schedule: {{ .Values.pgBackrestLogRotator.schedule  }}
+  schedule: {{ .Values.pgbackrestlogRotator.schedule  }}
   jobTemplate:
     spec:
       template:
@@ -15,10 +15,10 @@ spec:
           serviceAccountName: {{ .Values.pgbackrestLogRotator.serviceAccountName  }}
           containers:
           - name: cleanup
-            image: {{ .Values.pgBackrestLogRotator.image.repository  }}
+            image: {{ .Values.pgbackrestlogRotator.image.repository  }}
             env:
             - name: CRUNCHY_CLUSTER
-              value: {{ .Values.pgBackrestLogRotator.env.CRUNCHY_CLUSTER  }}
+              value: {{ .Values.pgbackrestlogRotator.env.CRUNCHY_CLUSTER  }}
             command:
               - /bin/sh
               - '-c'

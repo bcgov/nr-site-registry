@@ -45,6 +45,8 @@ const SRUpdatesTableConfiguration: TableColumn[] = [
       value: '',
       tableMode: true,
       href: '/site/details/',
+      componentName: 'SR Approvals',
+      componentPath: 'review',
     },
   },
   {
@@ -89,6 +91,8 @@ const SRUpdatesTableConfiguration: TableColumn[] = [
       tableMode: true,
       href: '/site/details/',
       customLinkValue: 'View',
+      componentName: 'SR Approvals',
+      componentPath: 'review',
     },
   },
 ];

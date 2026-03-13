@@ -54,12 +54,18 @@ export const Link: React.FC<InputProps> = ({
   stickyCol,
   href,
   customContainerCss,
+  componentName,
+  componentPath,
 }) => {
   return renderTableCell(
     <RouterLink
       to={href + value}
       className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
       aria-label={`${label + ' ' + value}`}
+      state={{
+        fromPath: componentPath ?? '',
+        fromLabel: componentName ?? '',
+      }}
     >
       {customIcon && customIcon}{' '}
       <span className="ps-1">{customLinkValue ?? value}</span>
@@ -702,6 +708,7 @@ export const DateInput: React.FC<InputProps> = ({
           value={parsedDate ?? null}
           onChange={handleDateChange}
           oneTap
+          disabled={isDisabled}
           readOnly={isDisabled}
         />
       ) : (

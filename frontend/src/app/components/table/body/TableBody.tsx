@@ -273,6 +273,8 @@ const TableBody: FC<TableBodyProps> = ({
           customLinkValue={field.customLinkValue}
           customIcon={field.customIcon}
           customContainerCss={field.customContainerCss}
+          componentName={field.componentName}
+          componentPath={field.componentPath}
         />
       );
     } else if (field.type === FormFieldType.DropDown) {
@@ -450,12 +452,7 @@ const TableBody: FC<TableBodyProps> = ({
           options={field.options || []}
           value={value}
           onChange={(value) =>
-            tableRecordChangeHandler(
-              rowKey,
-              field.graphQLPropertyName,
-              value,
-              true,
-            )
+            tableRecordChangeHandler(rowKey, field.graphQLPropertyName, value)
           }
           type={field.type}
           isEditing={editMode ?? true}

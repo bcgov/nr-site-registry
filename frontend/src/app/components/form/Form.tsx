@@ -176,7 +176,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   type={field.type}
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
-                  validation={(editMode || srMode) ? field.validation: undefined}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                 />
               )}
               {field.type === FormFieldType.Date && (

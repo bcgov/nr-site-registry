@@ -80,7 +80,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   }
                   options={field.options || []}
                   type={FormFieldType.Text}
-                  validation={(editMode || srMode) ? field.validation: undefined}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                   allowNumbersOnly={field.allowNumbersOnly}
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}

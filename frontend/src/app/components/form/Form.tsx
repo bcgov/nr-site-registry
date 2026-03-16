@@ -247,7 +247,7 @@ const Form: React.FC<IFormRendererProps> = ({
                     handleInputChange(field.graphQLPropertyName, value)
                   }
                   srMode={srMode}
-                  validation={(editMode || srMode) ? field.validation: undefined}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                 />
               )}
             </div>

@@ -196,7 +196,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
                   isDisabled={field.isDisabled ?? false}
-                  validation={(editMode || srMode) ? field.validation: undefined}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                 />
               )}
               {field.type === FormFieldType.Group && (

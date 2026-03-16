@@ -131,7 +131,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   isEditing={editMode ?? true}
                   isImage={field.isImage}
                   srMode={srMode ?? false}
-                  validation={(editMode || srMode) ? field.validation: undefined}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                   isDisabled={field.isDisabled}
                 />
               )}

@@ -157,7 +157,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   isLoading={field.isLoading}
                   customInfoMessage={field.customInfoMessage}
                   isDisabled={field.isDisabled}
-                  validation={(editMode || srMode) ? field.validation: undefined}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                 />
               )}
               {field.type === FormFieldType.DateRange && (

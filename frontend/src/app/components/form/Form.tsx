@@ -228,7 +228,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   customEditInputTextCss={field.customEditInputTextCss}
                   customPlaceholderCss={field.customPlaceholderCss}
                   customInfoMessage={field.customInfoMessage}
-                  validation={(editMode || srMode) ? field.validation: undefined}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                   isDisabled={field.isDisabled}
                 />
               )}

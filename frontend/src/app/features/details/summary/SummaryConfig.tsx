@@ -24,6 +24,7 @@ export const GetSummaryConfig = () => {
       placeholder: 'Please enter site ID...',
       graphQLPropertyName: 'id',
       value: '',
+      isDisabled: true,
       validation: {
         pattern: /^[0-9,\s]*$/,
         customMessage: 'Site ID can only contain numbers and commas',

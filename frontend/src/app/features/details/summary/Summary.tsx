@@ -153,6 +153,7 @@ const Summary = () => {
       const newState = {
         ...editSiteDetailsObject,
         [graphQLPropertyName]: value,
+        provState: "BC",
       };
 
       dispatch(

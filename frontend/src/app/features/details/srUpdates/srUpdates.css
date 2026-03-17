@@ -4,6 +4,7 @@
   line-height: 16px;
   text-align: left;
   color: var(--icons-color-success, #42814a);
+  cursor: pointer;
 }
 
 .close-tick-icon {
@@ -12,4 +13,5 @@
   line-height: 16px;
   text-align: left;
   color: var(--icons-color-danger, #ce3e39);
+  cursor: pointer;
 }

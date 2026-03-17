@@ -24,6 +24,7 @@ export const GetSummaryConfig = () => {
       placeholder: 'Please enter site ID...',
       graphQLPropertyName: 'id',
       value: '',
+      isDisabled: true,
       validation: {
         pattern: /^[0-9,\s]*$/,
         customMessage: 'Site ID can only contain numbers and commas',
@@ -210,18 +211,13 @@ export const GetSummaryConfig = () => {
       label: 'Province',
       placeholder: 'Please enter Province abbreviation...',
       graphQLPropertyName: 'provState',
-      value: '',
+      isDisabled: true,
+      value: 'BC',
       customLabelCss: 'custom-summary-lbl-text',
       customInputTextCss: 'custom-summary-input-text',
       customEditInputTextCss: 'custom-summary-edit-input',
       customEditLabelCss: 'custom-summary-lbl-text',
       colSize: 'col-lg-3 col-md-3 col-sm-12',
-      validation: {
-        required: true,
-        pattern: /^[A-Za-z]{2}$/, // Two-letter province code
-        customMessage: 'Province abbreviation must be two letters',
-        maxLength: 2,
-      },
     },
     city: {
       type: FormFieldType.Text,

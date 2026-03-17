@@ -37,6 +37,7 @@ import {
   ChangeTracker,
   IChangeType,
 } from '../../components/common/IChangeType';
+import { getFieldLabel, ChangeContext } from '../../helpers/fieldLabelMapper';
 
 import './SiteDetails.css'; // Ensure this import is correct
 import { SiteActionBtn, SiteDetailsMode } from './dto/SiteDetailsMode';
@@ -215,6 +216,9 @@ const SiteDetails = () => {
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
   const [siteDetailsForSRMode, SetSiteDetailsForSRMode] = useState(details);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(),
+  );
 
   const userActions = [UserActionEnum.added, UserActionEnum.updated];
 
@@ -528,6 +532,30 @@ const SiteDetails = () => {
         dispatch(fetchParcelDescriptionsForApproval(params)),
       ]);
     }
+  };
+
+  const groupChangesByContextAndType = (changes: any[]) => {
+    const grouped: { [key: string]: any[] } = {};
+    changes.forEach((item) => {
+      const key = `${item.changeType}-${item.context || ''}`;
+      if (!grouped[key]) {
+        grouped[key] = [];
+      }
+      grouped[key].push(item);
+    });
+    return grouped;
+  };
+
+  const toggleSection = (key: string) => {
+    setExpandedSections((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) {
+        newSet.delete(key);
+      } else {
+        newSet.add(key);
+      }
+      return newSet;
+    });
   };
 
   const handleItemClick = async (value: string) => {
@@ -1024,7 +1052,11 @@ const SiteDetails = () => {
       }),
     );
 
-    const tracker = new ChangeTracker(IChangeType.Modified, 'Site : SR Status');
+    const tracker = new ChangeTracker(
+      IChangeType.Modified,
+      getFieldLabel('srValue'),
+      ChangeContext.SITE,
+    );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
@@ -1305,19 +1337,49 @@ const SiteDetails = () => {
               <React.Fragment>
                 <div>
                   <span className="custom-modal-data-text">
-                    {savedChanges.length > 0
-                      ? 'The following fields will be updated:'
-                      : ''}
+                    {savedChanges.length > 0 ? '' : 'No changes to save'}
                   </span>
                 </div>
                 {savedChanges.length > 0 && (
                   <div>
-                    <ul className="custom-modal-data-text">
-                      {savedChanges.map((item: any) => (
-                        <li key={item.label}>
-                          {IChangeType[item.changeType]} {item.label}
-                        </li>
-                      ))}
+                    <ul className="custom-modal-data-text change-group-list">
+                      {Object.entries(
+                        groupChangesByContextAndType(savedChanges),
+                      ).map(([key, items]) => {
+                        const isExpanded = expandedSections.has(key);
+                        const firstItem = items[0];
+                        const changeTypeName =
+                          IChangeType[firstItem.changeType];
+                        const context = firstItem.context || '';
+                        const isModified =
+                          firstItem.changeType === IChangeType.Modified;
+                        return (
+                          <li key={key} className="change-group-item">
+                            <div
+                              onClick={
+                                isModified
+                                  ? () => toggleSection(key)
+                                  : undefined
+                              }
+                              className={`change-group-header${isModified ? ' change-group-header--expandable' : ''}`}
+                            >
+                              {isModified && (
+                                <span>{isExpanded ? '▼' : '▶'}</span>
+                              )}
+                              <span>
+                                {changeTypeName} {context}
+                              </span>
+                            </div>
+                            {isModified && isExpanded && (
+                              <ul className="change-group-details">
+                                {items.map((item: any, idx: number) => (
+                                  <li key={`${key}-${idx}`}>{item.label}</li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 )}

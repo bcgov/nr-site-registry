@@ -9,6 +9,10 @@ import {
   trackChanges,
 } from '../../site/dto/SiteSlice';
 import {
+  getFieldLabel,
+  ChangeContext,
+} from '../../../helpers/fieldLabelMapper';
+import {
   getAxiosInstance,
   getUser,
   isUserOfType,
@@ -471,23 +475,29 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
         (row) => row.graphQLPropertyName === event.property,
       );
       if (viewMode === SiteDetailsMode.SRMode && event.property === 'srValue') {
-        dispatch(
-          trackChanges(
-            new ChangeTracker(
-              IChangeType.Modified,
-              'Associated Sites: SR Status',
-            ).toPlainObject(),
-          ),
-        );
+        if (event.row?.apiAction !== UserActionEnum.added) {
+          dispatch(
+            trackChanges(
+              new ChangeTracker(
+                IChangeType.Modified,
+                getFieldLabel('srValue'),
+                ChangeContext.ASSOCIATED_SITES,
+              ).toPlainObject(),
+            ),
+          );
+        }
       } else {
-        dispatch(
-          trackChanges(
-            new ChangeTracker(
-              IChangeType.Modified,
-              'Associated Sites: ' + currLabel?.displayName,
-            ).toPlainObject(),
-          ),
-        );
+        if (event.row?.apiAction !== UserActionEnum.added) {
+          dispatch(
+            trackChanges(
+              new ChangeTracker(
+                IChangeType.Modified,
+                getFieldLabel(event.property),
+                ChangeContext.ASSOCIATED_SITES,
+              ).toPlainObject(),
+            ),
+          );
+        }
       }
     }
   };
@@ -563,7 +573,11 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
       setFormData(filteredPartics);
       dispatch(updateAssociatedSites(filteredPartics));
       dispatch(setupSiteAssociationDataForSaving(updatedTrackAssocSite));
-      const tracker = new ChangeTracker(IChangeType.Deleted, 'Associated Site');
+      const tracker = new ChangeTracker(
+        IChangeType.Deleted,
+        getFieldLabel('siteIdAssociatedWith'),
+        ChangeContext.ASSOCIATED_SITES,
+      );
       dispatch(trackChanges(tracker.toPlainObject()));
       setSelectedRows([]);
       setIsDelete(false);
@@ -594,7 +608,8 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
       trackChanges(
         new ChangeTracker(
           IChangeType.Added,
-          'New Associated Site',
+          getFieldLabel('siteIdAssociatedWith'),
+          ChangeContext.ASSOCIATED_SITES,
         ).toPlainObject(),
       ),
     );

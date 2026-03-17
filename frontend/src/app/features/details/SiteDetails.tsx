@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
@@ -32,6 +37,7 @@ import {
   ChangeTracker,
   IChangeType,
 } from '../../components/common/IChangeType';
+import { getFieldLabel, ChangeContext } from '../../helpers/fieldLabelMapper';
 
 import './SiteDetails.css'; // Ensure this import is correct
 import { SiteActionBtn, SiteDetailsMode } from './dto/SiteDetailsMode';
@@ -118,15 +124,18 @@ import {
   fetchPendingSiteDisclosure,
   fetchPendingSiteNotationBySiteId,
   fetchPendingSiteParticipantsForApproval,
-  fetchPendingSitesDetailsFprApproval,
+  fetchPendingSitesDetailsForApproval,
   hasNoPendingUpdates,
   updateRequestStatus,
 } from './srUpdates/srUpdatesSlice';
 import { fetchLandUseCodes } from './landUses/LandUsesSlice';
 import { IFetchParcelDescriptionsParams } from './parcelDescriptions/parcelDescriptionsInterfaces';
 import {
+  bulkAproveRejectChanges,
   bulkUpdateApproveRejectStatus,
+  fetchPendingSiteForSRApproval,
   resetBulkUpdateStatus,
+  selectAllSites,
 } from './srUpdates/state/srUpdatesTableSlice';
 import { Button } from '../../components/button/Button';
 import { IFormField } from '../../components/input-controls/IFormField';
@@ -144,7 +153,6 @@ import {
 } from './documents/DocumentEndpoints';
 import { HttpStatusCode } from '../../common/httpStatusCode';
 import { GetSummaryConfig } from './summary/SummaryConfig';
-import { de } from 'date-fns/locale';
 import { siteDisclosureConfig } from './disclosure/DisclosureConfig';
 
 const SiteDetails = () => {
@@ -154,6 +162,12 @@ const SiteDetails = () => {
   const auth = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromPath =
+    location.state?.fromPath || location.state?.fromLabel || 'Search'; // Default to "search" if no state is passed
+  const fromScreen = location.state?.fromLabel || 'Search'; // Default to "Unknown Screen" if no state is passed
+  const fromPathRef = useRef(fromPath);
+  const fromScreenRef = useRef(fromScreen);
   const loggedInUser = getUser();
   // TODO: this is for future use when we support automatic flow of creating new site for specific application.
   // We need applicationid and newly created siteId to fill cats db  in order to keep both application in sync.
@@ -167,6 +181,7 @@ const SiteDetails = () => {
   const details = useSelector(selectSiteDetails);
   const bulkApproveRejectStatus = useSelector(bulkUpdateApproveRejectStatus);
   const hasNoPendingUpdatesFromState = useSelector(hasNoPendingUpdates);
+  const srUpdates = useSelector(selectAllSites);
   const snapshot = useSelector(snapshots);
   const snapshotTakenDate = useSelector(getFirstSnapshotCreatedDate);
   const bannerType = useSelector(selectBannerType);
@@ -186,7 +201,7 @@ const SiteDetails = () => {
   const { participantColumnInternal } = GetConfig();
   const { associateColumnInternal } = GetAssociateConfig();
   const { documentFormRowsEditMode } = GetDocumentsConfig();
-  const { createSiteFormRows } = GetSummaryConfig();
+  const { createSiteFormRows, summaryFormRows } = GetSummaryConfig();
 
   const [errorList, setErrorList] = useState<any[]>([]);
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
@@ -201,6 +216,9 @@ const SiteDetails = () => {
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
   const [siteDetailsForSRMode, SetSiteDetailsForSRMode] = useState(details);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(),
+  );
 
   const userActions = [UserActionEnum.added, UserActionEnum.updated];
 
@@ -239,8 +257,8 @@ const SiteDetails = () => {
 
       showNotification(
         saveSiteDetailsRequestStatus,
-        'Successfully saved site details',
-        'Failed To save site details',
+        'Changes saved successfully',
+        'System error prevented changes from being saved.',
       );
       dispatch(resetSaveSiteDetailsRequestStatus(null));
     } else {
@@ -274,7 +292,7 @@ const SiteDetails = () => {
   }, [bulkApproveRejectStatus]);
 
   const onClickBackButton = () => {
-    navigate(-1);
+    navigate(`/${fromPathRef.current.replace(/\s+/g, '').toLowerCase()}`);
   };
 
   useEffect(() => {
@@ -332,15 +350,13 @@ const SiteDetails = () => {
   }, []);
 
   useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.indexOf('bceid') !== -1) {
-      setUserType(UserType.External);
-    } else if (
-      loggedInUser?.profile.preferred_username?.indexOf('idir') !== -1
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
     ) {
-      setUserType(UserType.Internal);
-    } else {
-      // not logged in
       setUserType(UserType.External);
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
+      setUserType(UserType.Internal);
     }
   }, [loggedInUser]);
 
@@ -359,6 +375,13 @@ const SiteDetails = () => {
 
   useEffect(() => {
     dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
+    dispatch(
+      fetchPendingSiteForSRApproval({
+        searchParam: { id: id ?? '' },
+        page: 1,
+        pageSize: 5,
+      }),
+    );
   }, []);
 
   // NEEDS TO FETCH DATA BASED ON CONDITION WHEATHER IT IS EXTERNAL USER OR INTERNAL USER
@@ -474,7 +497,7 @@ const SiteDetails = () => {
 
       Promise.all([
         dispatch(
-          fetchPendingSitesDetailsFprApproval({ siteId, showPending: true }),
+          fetchPendingSitesDetailsForApproval({ siteId, showPending: true }),
         ),
 
         dispatch(
@@ -509,6 +532,30 @@ const SiteDetails = () => {
         dispatch(fetchParcelDescriptionsForApproval(params)),
       ]);
     }
+  };
+
+  const groupChangesByContextAndType = (changes: any[]) => {
+    const grouped: { [key: string]: any[] } = {};
+    changes.forEach((item) => {
+      const key = `${item.changeType}-${item.context || ''}`;
+      if (!grouped[key]) {
+        grouped[key] = [];
+      }
+      grouped[key].push(item);
+    });
+    return grouped;
+  };
+
+  const toggleSection = (key: string) => {
+    setExpandedSections((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) {
+        newSet.delete(key);
+      } else {
+        newSet.add(key);
+      }
+      return newSet;
+    });
   };
 
   const handleItemClick = async (value: string) => {
@@ -599,7 +646,7 @@ const SiteDetails = () => {
     try {
       if (siteSummary && Object.keys(siteSummary).length > 0) {
         const errors = validateForm(
-          createSiteFormRows,
+          !id?.trim() ? createSiteFormRows : summaryFormRows,
           siteSummary,
           'Site Summary',
         );
@@ -895,7 +942,6 @@ const SiteDetails = () => {
   };
   const handleAddToCart = () => {
     dispatch(resetCartItemAddedStatus);
-    const loggedInUser = getUser();
     if (loggedInUser === null) {
       auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
     } else {
@@ -1006,7 +1052,11 @@ const SiteDetails = () => {
       }),
     );
 
-    const tracker = new ChangeTracker(IChangeType.Modified, 'Site : SR Status');
+    const tracker = new ChangeTracker(
+      IChangeType.Modified,
+      getFieldLabel('srValue'),
+      ChangeContext.SITE,
+    );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
@@ -1116,7 +1166,7 @@ const SiteDetails = () => {
           <div className="d-flex gap-2 flex-wrap align-items-center">
             <Button variant="secondary" onClick={onClickBackButton}>
               <AngleLeft />
-              Back
+              {`Back to ${fromScreenRef.current}`}
             </Button>
             <div className="d-flex flex-wrap align-items-center gap-2 pe-3 custom-sticky-header-lbl">
               {!!id?.trim() ? (
@@ -1192,13 +1242,13 @@ const SiteDetails = () => {
               viewMode === SiteDetailsMode.ViewOnlyMode &&
               userType === UserType.External && (
                 <>
-                  <Button variant="secondary" onClick={handleAddToCart}>
-                    <ShoppingCartIcon />
-                    Add to Cart
-                  </Button>
                   {id && (
                     <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
                   )}
+                  <Button onClick={handleAddToCart}>
+                    <ShoppingCartIcon />
+                    Add to Cart
+                  </Button>
                 </>
               )}
           </div>
@@ -1211,9 +1261,28 @@ const SiteDetails = () => {
               label={`Are you sure to proceed`}
               closeHandler={(response) => {
                 if (response) {
-                  alert(confirmSiteReview);
                   if (confirmSiteReview) {
-                    //handleRemoveAssociate(response);
+                    if (srUpdates.length > 0) {
+                      dispatch(
+                        bulkAproveRejectChanges({
+                          sites: srUpdates,
+                          isApproved: true,
+                          fromSiteDetails: false,
+                        }),
+                      );
+                    }
+                  }
+
+                  if (!confirmSiteReview) {
+                    if (srUpdates.length > 0) {
+                      dispatch(
+                        bulkAproveRejectChanges({
+                          sites: srUpdates,
+                          isApproved: false,
+                          fromSiteDetails: false,
+                        }),
+                      );
+                    }
                   }
                 }
                 SetConfirmSiteReview(null);
@@ -1226,6 +1295,8 @@ const SiteDetails = () => {
             errorOption={hasError}
             customHeaderCss={hasError ? 'custom-modal-error-header-text' : ''}
             headerLabel={hasError ? 'Please fix the errors' : ''}
+            label="Are you sure you want to save changes ?"
+            saveBtnLabel="Yes, Save Changes"
             closeHandler={async (response) => {
               setSave(false);
               if (response && errorList?.length === 0) {
@@ -1266,19 +1337,49 @@ const SiteDetails = () => {
               <React.Fragment>
                 <div>
                   <span className="custom-modal-data-text">
-                    {savedChanges.length > 0
-                      ? 'The following fields will be updated:'
-                      : 'No changes to save'}
+                    {savedChanges.length > 0 ? '' : 'No changes to save'}
                   </span>
                 </div>
                 {savedChanges.length > 0 && (
                   <div>
-                    <ul className="custom-modal-data-text">
-                      {savedChanges.map((item: any) => (
-                        <li key={item.label}>
-                          {IChangeType[item.changeType]} {item.label}
-                        </li>
-                      ))}
+                    <ul className="custom-modal-data-text change-group-list">
+                      {Object.entries(
+                        groupChangesByContextAndType(savedChanges),
+                      ).map(([key, items]) => {
+                        const isExpanded = expandedSections.has(key);
+                        const firstItem = items[0];
+                        const changeTypeName =
+                          IChangeType[firstItem.changeType];
+                        const context = firstItem.context || '';
+                        const isModified =
+                          firstItem.changeType === IChangeType.Modified;
+                        return (
+                          <li key={key} className="change-group-item">
+                            <div
+                              onClick={
+                                isModified
+                                  ? () => toggleSection(key)
+                                  : undefined
+                              }
+                              className={`change-group-header${isModified ? ' change-group-header--expandable' : ''}`}
+                            >
+                              {isModified && (
+                                <span>{isExpanded ? '▼' : '▶'}</span>
+                              )}
+                              <span>
+                                {changeTypeName} {context}
+                              </span>
+                            </div>
+                            {isModified && isExpanded && (
+                              <ul className="change-group-details">
+                                {items.map((item: any, idx: number) => (
+                                  <li key={`${key}-${idx}`}>{item.label}</li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 )}
@@ -1290,7 +1391,7 @@ const SiteDetails = () => {
         {!isVisible && (
           <div className="d-flex justify-content-between">
             <Button variant="secondary" onClick={onClickBackButton}>
-              <AngleLeft /> Back to
+              <AngleLeft /> {`Back to ${fromScreenRef.current}`}
             </Button>
 
             <div className="d-flex gap-2 justify-align-center pe-2 pos-relative">
@@ -1349,13 +1450,13 @@ const SiteDetails = () => {
                 viewMode === SiteDetailsMode.ViewOnlyMode &&
                 userType === UserType.External && (
                   <>
+                    {id && (
+                      <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
+                    )}
                     <Button onClick={handleAddToCart}>
                       <ShoppingCartIcon />
                       Add to Cart
                     </Button>
-                    {id && (
-                      <AddToFolio selectedSiteIds={[id]} label="Add to Folio" />
-                    )}
                   </>
                 )}
             </div>
@@ -1380,7 +1481,7 @@ const SiteDetails = () => {
           {!isVisible && (
             <>
               {viewMode === SiteDetailsMode.SRMode && (
-                <div className="sr-mode-content">
+                <div className="sr-mode-content mb-5">
                   <div className="sr-mode-info-banner">
                     <div className="sr-mode-info-content-layout">
                       <div>
@@ -1396,24 +1497,26 @@ const SiteDetails = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="form-check form-switch">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      role="switch"
-                      id="flexSwitchCheckChecked"
-                      checked={
-                        siteDetailsForSRMode?.srAction ===
+                  <div className="p-2">
+                    <div className="form-check form-switch">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="flexSwitchCheckChecked"
+                        checked={
+                          siteDetailsForSRMode?.srAction ===
+                          SRApprovalStatusEnum.Public
+                        }
+                        onChange={(event) => handleSiteSRVisiblity(event)}
+                      />
+                      <label className="form-check-label">
+                        {siteDetailsForSRMode?.srAction ===
                         SRApprovalStatusEnum.Public
-                      }
-                      onChange={(event) => handleSiteSRVisiblity(event)}
-                    />
-                    <label className="form-check-label">
-                      {siteDetailsForSRMode?.srAction ===
-                      SRApprovalStatusEnum.Public
-                        ? 'Site Published to Site Registry'
-                        : 'Publish Page To Site Registry'}
-                    </label>
+                          ? 'Publish page to Site Registry'
+                          : 'Hide page from Site Registry'}
+                      </label>
+                    </div>
                   </div>
                 </div>
               )}

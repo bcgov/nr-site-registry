@@ -1,8 +1,5 @@
 import React from 'react';
-import Table from '../../../components/table/Table';
 import { RequestStatus } from '../../../helpers/requests/status';
-import { TableColumn } from '../../../components/table/TableColumn';
-import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
 import Widget from '../../../components/widget/Widget';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { Minus, Plus } from '../../../components/common/icon';
@@ -40,6 +37,7 @@ const LandUseTable: React.FC<ILandUseTable> = ({
       currentPage={1}
       changeHandler={onTableChange}
       title={'Suspect Land Uses'}
+      customLabelCss="custom-participant-widget-lbl"
       tableColumns={tableColumns}
       tableData={dataWithTextSearchApplied ?? []}
       allowRowsSelect={editModeEnabled}

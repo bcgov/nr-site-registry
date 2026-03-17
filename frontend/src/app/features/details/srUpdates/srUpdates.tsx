@@ -10,7 +10,7 @@ import {
   fetchPendingSiteDisclosure,
   fetchPendingSiteNotationBySiteId,
   fetchPendingSiteParticipantsForApproval,
-  fetchPendingSitesDetailsFprApproval,
+  fetchPendingSitesDetailsForApproval,
   resetAllData,
   resetRequestStatus,
   selectAssociatedSites,
@@ -42,7 +42,7 @@ import {
   schedule2ReferenceCdDrpdown,
 } from '../dropdowns/DropdownSlice';
 import {
-  dateFormatSR,
+  formatDate,
   showNotification,
   UpdateDisplayTypeParams,
   updateFields,
@@ -107,16 +107,17 @@ const SRUpdates = () => {
     displayName: '',
     active: true,
     graphQLPropertyName: SRApprovalStatusEnum.Public,
-    columnSize: ColumnSize.Default,
+    columnSize: ColumnSize.XtraSmall,
+    dynamicColumn: true,
     displayType: {
       type: FormFieldType.IconButton,
       label: '',
-      placeholder: 'Approve',
+      placeholder: 'Public',
       graphQLPropertyName: SRApprovalStatusEnum.Public,
       value: '',
       tableMode: true,
       customIcon: <TickIcon />,
-      customLinkValue: 'Approve',
+      customLinkValue: 'Public',
       customInputTextCss: 'approve-tick-icon',
     },
   };
@@ -126,16 +127,17 @@ const SRUpdates = () => {
     displayName: '',
     active: true,
     graphQLPropertyName: SRApprovalStatusEnum.Private,
-    columnSize: ColumnSize.Default,
+    columnSize: ColumnSize.XtraSmall,
+    dynamicColumn: true,
     displayType: {
       type: FormFieldType.IconButton,
       label: '',
-      placeholder: 'Not Public',
+      placeholder: 'Private',
       graphQLPropertyName: SRApprovalStatusEnum.Private,
       value: '',
       tableMode: true,
       customIcon: <XmarkIcon />,
-      customLinkValue: 'Not Public',
+      customLinkValue: 'Private',
       customInputTextCss: 'close-tick-icon',
     },
   };
@@ -359,7 +361,7 @@ const SRUpdates = () => {
       dispatch(resetAllData(null));
 
       dispatch(
-        fetchPendingSitesDetailsFprApproval({ siteId, showPending: true }),
+        fetchPendingSitesDetailsForApproval({ siteId, showPending: true }),
       );
 
       dispatch(fetchPendingSiteNotationBySiteId({ siteId, showPending: true }));
@@ -395,9 +397,7 @@ const SRUpdates = () => {
     }
   }, [updateRequestStatusFromState]);
 
-  const handleChange = (event: any) => {
-    console.log('No Change Hanlder Required Here', event);
-  };
+  const handleChange = () => {};
 
   const handleAndReturnBoolean = (event: any): boolean => {
     return true;
@@ -770,7 +770,7 @@ const SRUpdates = () => {
                 viewMode={SiteDetailsMode.ViewOnlyMode}
                 handleInputChange={handleChange}
                 document={document}
-                srTimeStamp={`Send to SR on ${dateFormatSR(document?.whenUpdated ?? document?.whenCreated ?? new Date())}`}
+                srTimeStamp={`Send to SR on ${formatDate(document?.whenUpdated ?? document?.whenCreated ?? new Date())}`}
                 handleViewOnline={() => {}}
                 handleDownload={() => {}}
                 handleFileReplace={handleChange}

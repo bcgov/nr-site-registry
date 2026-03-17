@@ -2,8 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { SpinnerIcon } from '../../common/icon';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { TableColumn } from '../TableColumn';
-
-import { FormFieldType, IFormField } from '../../input-controls/IFormField';
+import { FormFieldType } from '../../input-controls/IFormField';
 import {
   Label,
   TextInput,
@@ -17,7 +16,6 @@ import {
   IconButton,
   SearchCustomInput,
 } from '../../input-controls/InputControls';
-import { ChangeTracker } from '../../common/IChangeType';
 import { get } from '../utils';
 
 interface TableBodyProps {
@@ -59,7 +57,14 @@ const TableBody: FC<TableBodyProps> = ({
   resetAllRowsSelectedEventFlag,
   removePageFromAllRowsSelected,
 }) => {
-  const [selectedRowIds, SetSelectedRowsId] = useState<SelectedRowsType>({});
+  const [selectedRowIds, setSelectedRowsId] = useState<SelectedRowsType>({});
+
+  useEffect(() => {
+    setSelectedRowsId((prev) => ({
+      ...prev,
+      [currentPage]: [],
+    }));
+  }, [data]);
 
   useEffect(() => {
     if (!allRowsSelectedEventFlag) return;
@@ -70,45 +75,45 @@ const TableBody: FC<TableBodyProps> = ({
     });
 
     if (allRowsSelected) {
-      SetSelectedRowsId((prevItems) => ({
+      setSelectedRowsId((prevItems) => ({
         ...prevItems,
-        [currentPage]: [...(prevItems[currentPage] || []), ...rowsIds],
+        [currentPage]: rowsIds,
       }));
     } else {
-      SetSelectedRowsId((prevItems) => ({
+      setSelectedRowsId((prevItems) => ({
         ...prevItems,
-        [currentPage]: (prevItems[currentPage] || []).filter(
-          (item) => !rowsIds.includes(item),
-        ),
+        [currentPage]: [],
       }));
     }
 
-    if (allRowsSelectedEventFlag) {
-      changeHandler({
-        id: 'select_all',
-        property: 'select_all',
-        value: data,
-        selected: allRowsSelected,
-      });
-      resetAllRowsSelectedEventFlag();
-    }
-  }, [allRowsSelected]);
+    changeHandler({
+      id: 'select_all',
+      property: 'select_all',
+      value: data,
+      selected: allRowsSelected,
+    });
 
-  const handleSelectTableRow = (isChecked: any, id: string, rowIndex: any) => {
-    if (isChecked) {
-      SetSelectedRowsId((prevItems) => ({
-        ...prevItems,
-        [currentPage]: [...(prevItems[currentPage] || []), id],
-      }));
-    } else {
-      SetSelectedRowsId((prevItems) => ({
-        ...prevItems,
-        [currentPage]: (prevItems[currentPage] || []).filter(
-          (item) => item !== id,
-        ),
-      }));
+    resetAllRowsSelectedEventFlag();
+  }, [allRowsSelectedEventFlag]);
 
-      removePageFromAllRowsSelected();
+  const handleSelectTableRow = (
+    isChecked: boolean,
+    id: string,
+    rowIndex: number,
+  ) => {
+    setSelectedRowsId((prevItems) => {
+      const currentSelected = prevItems[currentPage] || [];
+
+      return {
+        ...prevItems,
+        [currentPage]: isChecked
+          ? [...currentSelected, id]
+          : currentSelected.filter((item) => item !== id),
+      };
+    });
+
+    if (!isChecked) {
+      removePageFromAllRowsSelected(); // uncheck the header checkbox if one is deselected
     }
 
     tableRecordChangeHandler(rowIndex, 'select_row', isChecked);
@@ -189,6 +194,7 @@ const TableBody: FC<TableBodyProps> = ({
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
           isDisabled={field.isDisabled}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.Search) {
@@ -217,6 +223,7 @@ const TableBody: FC<TableBodyProps> = ({
           customInfoMessage={field.customInfoMessage}
           customMenuMessage={field.customMenuMessage}
           isDisabled={field.isDisabled}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.Label) {
@@ -239,6 +246,7 @@ const TableBody: FC<TableBodyProps> = ({
           isEditing={editMode ?? true}
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.Link) {
@@ -264,6 +272,9 @@ const TableBody: FC<TableBodyProps> = ({
           href={field.href}
           customLinkValue={field.customLinkValue}
           customIcon={field.customIcon}
+          customContainerCss={field.customContainerCss}
+          componentName={field.componentName}
+          componentPath={field.componentPath}
         />
       );
     } else if (field.type === FormFieldType.DropDown) {
@@ -290,6 +301,7 @@ const TableBody: FC<TableBodyProps> = ({
           href={field.href}
           options={field.options}
           isDisabled={field.isDisabled}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.Checkbox) {
@@ -317,6 +329,7 @@ const TableBody: FC<TableBodyProps> = ({
           stickyCol={field.stickyCol}
           href={field.href}
           options={field.options}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.Date) {
@@ -340,6 +353,7 @@ const TableBody: FC<TableBodyProps> = ({
           stickyCol={field.stickyCol}
           isDisabled={field.isDisabled ?? false}
           validation={field.validation}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.TextArea) {
@@ -366,6 +380,7 @@ const TableBody: FC<TableBodyProps> = ({
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
           isDisabled={field.isDisabled}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.DropDownWithSearch) {
@@ -394,6 +409,7 @@ const TableBody: FC<TableBodyProps> = ({
           customInfoMessage={field.customInfoMessage}
           isDisabled={field.isDisabled}
           validation={field.validation}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.DeleteIcon) {
@@ -420,6 +436,7 @@ const TableBody: FC<TableBodyProps> = ({
           isEditing={editMode ?? true}
           tableMode={field.tableMode ?? false}
           stickyCol={field.stickyCol}
+          customContainerCss={field.customContainerCss}
         />
       );
     } else if (field.type === FormFieldType.IconButton) {
@@ -443,6 +460,7 @@ const TableBody: FC<TableBodyProps> = ({
           stickyCol={field.stickyCol}
           customLinkValue={field.customLinkValue}
           customIcon={field.customIcon}
+          customContainerCss={field.customContainerCss}
         />
       );
     }
@@ -473,7 +491,6 @@ const TableBody: FC<TableBodyProps> = ({
         .split(',')
         .map((graphQLPropertyName) => getValue(rowIndex, graphQLPropertyName))
         .join(' ');
-
     return getTableCellHtml(
       column.displayType,
       column.displayName,

@@ -4,19 +4,20 @@
 }
 
 .account-custom-toggle {
-  color: var(--typography-color-primary-invert) !important;
+  color: var(--typography-color-link) !important;
 }
 
 .account-custom-toggle-mobile {
   color: var(--typography-color-primary);
 }
 
-.account-custom-toggle:active {
+.account-custom-toggle:active,
+.account-custom-toggle:focus {
   border-color: transparent !important;
 }
 
 .account-custom-menu {
-  height: 231px;
+  height: auto;
   border-radius: var(--layout-border-radius-medium) !important;
   padding: var(--layout-padding-medium) 0px var(--layout-padding-medium) 0px !important;
   background-color: var(--surface-color-background-white) !important;

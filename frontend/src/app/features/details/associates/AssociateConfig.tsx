@@ -103,7 +103,9 @@ export const GetAssociateConfig = () => {
         value: false,
         tableMode: true,
       },
-      columnSize: ColumnSize.Default,
+      columnSize: ColumnSize.XtraSmall,
+      dynamicColumn: true,
+      stickyCol: true,
     },
   ];
 
@@ -194,7 +196,9 @@ export const GetAssociateConfig = () => {
         value: false,
         tableMode: true,
       },
-      columnSize: ColumnSize.Default,
+      columnSize: ColumnSize.XtraSmall,
+      dynamicColumn: true,
+      stickyCol: true,
     },
   ];
 

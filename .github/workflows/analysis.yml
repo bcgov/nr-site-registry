@@ -18,8 +18,7 @@ jobs:
 
   tests:
     name: Unit Tests
-    # TODO - Re-enable below before submitting PR, jsut have it disabled while I work via draft.
-    # if: ${{ ! github.event.pull_request.draft }}
+    if: ${{ ! github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     services:
@@ -43,7 +42,7 @@ jobs:
           - dir: frontend
             token: SONAR_TOKEN_FRONTEND
     steps:
-      - uses: bcgov/action-test-and-analyse@v1.2.1
+      - uses: bcgov/action-test-and-analyse@v1.6.0
         env:
           LOG_LEVEL: info
           LOG_FILE_LOCATION: /tmp/sites-%DATE%.log

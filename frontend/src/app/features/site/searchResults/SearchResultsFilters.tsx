@@ -23,6 +23,9 @@ interface SearchResultsFiltersProps {
   onFiltersChange: (key: string, value: any) => void;
   onFiltersSubmit: (e: React.FormEvent) => void;
   onFiltersReset: () => void;
+  panelToShow?: PanelOption;
+  setPanelToShow?: (panel: PanelOption) => void;
+  selectedFilter?: { key: string; value: string; label: string }[];
 }
 
 type PanelOption = 'filters' | 'columns' | null;
@@ -34,8 +37,10 @@ export const SearchResultsFilters: FC<SearchResultsFiltersProps> = ({
   onFiltersChange,
   onFiltersSubmit,
   onFiltersReset,
+  panelToShow,
+  setPanelToShow = () => {},
+  selectedFilter = [],
 }) => {
-  const [panelToShow, setPanelToShow] = useState<PanelOption>(null);
   const siteRiskCode = useSelector(siteRiskCodeDrpdown);
   const [siteFilterFormRows, setSiteFilterFormRows] = useState(formRows);
 
@@ -63,54 +68,7 @@ export const SearchResultsFilters: FC<SearchResultsFiltersProps> = ({
   };
 
   return (
-    <>
-      <div className="search-results-section-header-top">
-        <div>
-          <h2 className="search-results-section-title">Results</h2>
-        </div>
-
-        <div className="table-actions d-none d-md-flex">
-          <div
-            className={`table-actions-items ${panelToShow === 'columns' ? 'active' : ''} `}
-            onClick={() => {
-              togglePanel('columns');
-            }}
-          >
-            <TableColumnsIcon />
-            Columns
-          </div>
-          <div
-            className={`table-actions-items ${panelToShow === 'filters' ? 'active' : ''}`}
-            onClick={() => {
-              togglePanel('filters');
-            }}
-          >
-            <FilterIcon />
-            Filters
-          </div>
-        </div>
-        <Dropdown className="d-flex d-md-none">
-          <Dropdown.Toggle as={Button} variant="tertiary">
-            <BarsIcon size={24} />
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            <Dropdown.Item
-              onClick={() => togglePanel('columns')}
-              className="d-flex align-items-center gap-2"
-            >
-              <TableColumnsIcon />
-              <span>Columns</span>
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={() => togglePanel('filters')}
-              className="d-flex align-items-center gap-2"
-            >
-              <TableColumnsIcon />
-              <span>Filters</span>
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      </div>
+    <div className="py-4">
       {panelToShow === 'columns' && (
         <Column
           toggleColumnSelectionForDisplay={onColumnSelectionChange}
@@ -124,11 +82,15 @@ export const SearchResultsFilters: FC<SearchResultsFiltersProps> = ({
           formRows={siteFilterFormRows}
           formData={filtersFormData}
           onInputChange={onFiltersChange}
-          onSubmit={onFiltersSubmit}
+          onSubmit={(e) => {
+            onFiltersSubmit(e);
+            togglePanel(null);
+          }}
           onReset={onFiltersReset}
           cancelSearchFilter={() => togglePanel(null)}
+          selectedFilter={selectedFilter}
         />
       )}
-    </>
+    </div>
   );
 };

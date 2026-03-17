@@ -1,5 +1,5 @@
 import { Resolver, Query, Args } from '@nestjs/graphql';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import { RoleMatchingMode, Roles, Unprotected } from 'nest-keycloak-connect';
 import {
   DropdownDto,
   DropdownResponse,
@@ -225,6 +225,7 @@ export class DropdownResolver {
   }
 
   @Query(() => DropdownResponse, { name: 'getSiteRiskCd' })
+  @Unprotected()
   async getSiteRiskCd() {
     this.sitesLogger.log('DropdownResolver.getSiteRiskCd() start');
     const result = await this.dropdownService.getSiteRiskCd();

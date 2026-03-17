@@ -12,6 +12,7 @@ interface SiteFilterProps {
   onSubmit: (event: React.FormEvent) => void;
   onReset: () => void;
   cancelSearchFilter: () => void;
+  selectedFilter?: { key: string; value: string; label: string }[];
 }
 
 const SiteFilterForm: React.FC<SiteFilterProps> = ({
@@ -21,6 +22,7 @@ const SiteFilterForm: React.FC<SiteFilterProps> = ({
   onSubmit,
   onReset,
   cancelSearchFilter,
+  selectedFilter,
 }) => {
   return (
     <>
@@ -36,13 +38,21 @@ const SiteFilterForm: React.FC<SiteFilterProps> = ({
               variant="secondary"
               onClick={onReset}
               data-testid="Reset Filters"
+              disabled={
+                Object.keys(formData).length === 0 ||
+                selectedFilter?.length === 0
+              }
             >
               Reset Filters
             </Button>
           </div>
           <div className="d-flex gap-2">
-            <Button type="submit" data-testid="Submit">
-              Submit
+            <Button
+              type="submit"
+              data-testid="Submit"
+              disabled={Object.keys(formData).length === 0}
+            >
+              Apply
             </Button>
             <Button
               variant="tertiary"

@@ -8,6 +8,10 @@ import {
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
+import {
+  getFieldLabel,
+  ChangeContext,
+} from '../../../helpers/fieldLabelMapper';
 import './Disclosure.css';
 import { RequestStatus } from '../../../helpers/requests/status';
 import {
@@ -17,8 +21,10 @@ import {
 import {
   flattenFormRows,
   getUser,
+  isUserOfType,
   serializeDate,
   sortArray,
+  UserRoleType,
 } from '../../../helpers/utility';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import {
@@ -43,6 +49,7 @@ import { siteDisclosureConfig } from './DisclosureConfig';
 
 const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const schedule2Ref = useSelector(schedule2ReferenceCdDrpdown);
+  const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const {
     disclosureStatementConfig,
     disclosureStatementConfigEditMode,
@@ -50,7 +57,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     disclosureScheduleExternalConfig,
     disclosureCommentsConfig,
     srVisibilityConfig,
-  } = siteDisclosureConfig(schedule2Ref?.data || []);
+  } = siteDisclosureConfig(schedule2Ref?.data || [], viewMode);
   const dispatch = useDispatch<AppDispatch>();
   const mode = useSelector(siteDetailsMode);
   const resetDetails = useSelector(resetSiteDetails);
@@ -68,7 +75,6 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     { disclosureId: any; scheduleId: any }[]
   >([]);
   const [userType, setUserType] = useState<UserType>(UserType.External);
-  const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 
   const [searchInternalContact, setSearchInternalContact] = useState('');
@@ -136,12 +142,13 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Handle user type based on username
 
   useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.includes('bceid')) {
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
+    ) {
       setUserType(UserType.External);
-    } else if (loggedInUser?.profile.preferred_username?.includes('idir')) {
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
       setUserType(UserType.Internal);
-    } else {
-      setUserType(UserType.External);
     }
   }, [loggedInUser]);
 
@@ -341,17 +348,30 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       viewMode === SiteDetailsMode.SRMode &&
       graphQLPropertyName === 'srCheckbox'
     ) {
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Site Disclosure: SR Status',
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      if (updatedFormData?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel('srValue'),
+          ChangeContext.DISCLOSURE,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     } else {
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Site Disclosure: ' + currLabel?.label,
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      if (updatedFormData?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel(graphQLPropertyName),
+          ChangeContext.DISCLOSURE,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      } else if (updatedFormData?.apiAction === UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Added,
+          getFieldLabel(graphQLPropertyName),
+          ChangeContext.DISCLOSURE,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     }
   };
 
@@ -433,11 +453,14 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
         disclosureScheduleInternalConfig.find(
           (row) => row.graphQLPropertyName === event.property,
         );
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Site Disclosure Schedule' + currLabel?.displayName,
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      if (event.row?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel(event.property),
+          ChangeContext.DISCLOSURE_SCHEDULE,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     }
   };
 
@@ -495,7 +518,8 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
     const tracker = new ChangeTracker(
       IChangeType.Added,
-      'Site Dosclosure Schedule',
+      getFieldLabel('schedule2ReferenceCode'),
+      ChangeContext.DISCLOSURE_SCHEDULE,
     );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
@@ -570,7 +594,8 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       setIsDelete(false);
       const tracker = new ChangeTracker(
         IChangeType.Deleted,
-        'Site Disclosure Schedule',
+        getFieldLabel('schedule2ReferenceCode'),
+        ChangeContext.DISCLOSURE_SCHEDULE,
       );
       dispatch(trackChanges(tracker.toPlainObject()));
     } else {
@@ -584,7 +609,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   };
 
   const handleWidgetCheckBox = (event: any) => {
-    alert(event);
+    // alert(event);
   };
 
   const handleItemClick = (value: string) => {

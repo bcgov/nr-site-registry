@@ -1,5 +1,8 @@
+import React from 'react';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { TableColumn, ColumnSize } from '../../../components/table/TableColumn';
+import { FillEye, FillPinMapFill } from '../../../components/common/icon';
+import '../Search.css';
 
 const getSiteSearchResultsColumns = (
   hiddenColumns: Set<string> = new Set(),
@@ -15,7 +18,13 @@ const getSiteSearchResultsColumns = (
       isDefault: true,
       sortOrder: 1,
       isChecked: true,
-      displayType: getLinkColumnType('Site ID', 'id', '', '/site/details/'),
+      displayType: getLinkColumnType(
+        hiddenColumns,
+        'Site ID',
+        'id',
+        '',
+        '/site/details/',
+      ),
       stickyCol: true,
     },
     new TableColumn(
@@ -28,9 +37,16 @@ const getSiteSearchResultsColumns = (
       true,
       1,
       true,
-      getColumnType('Site Address', 'addrLine_1,addrLine_2,addrLine_3', ''),
+      getColumnType(
+        'Site Address',
+        'addrLine_1,addrLine_2,addrLine_3',
+        '',
+        FormFieldType.Text,
+        'custom-input-text',
+      ),
       'site/details/',
       false,
+      '',
       ColumnSize.Triple,
     ),
     new TableColumn(
@@ -78,8 +94,14 @@ const getSiteSearchResultsColumns = (
       false,
       true,
       1,
-      false,
-      getColumnType('General Description', 'generalDescription', ''),
+      true,
+      getColumnType(
+        'General Description',
+        'generalDescription',
+        '',
+        FormFieldType.Label,
+        'custom-search-input-text custom-search-input-ellipsis',
+      ),
     ),
     new TableColumn(
       5,
@@ -179,7 +201,7 @@ const getSiteSearchResultsColumns = (
       true,
       1,
       false,
-      getColumnType('Date Created', 'whenCreated', ''),
+      getColumnType('Date Created', 'whenCreated', '', FormFieldType.Date),
     ),
     new TableColumn(
       15,
@@ -190,8 +212,8 @@ const getSiteSearchResultsColumns = (
       false,
       true,
       1,
-      false,
-      getColumnType('Last Updated', 'whenCreated', ''),
+      true,
+      getColumnType('Last Updated', 'whenCreated', '', FormFieldType.Date),
     ),
     new TableColumn(
       16,
@@ -209,7 +231,7 @@ const getSiteSearchResultsColumns = (
       ? null
       : {
           id: 17,
-          displayName: 'View',
+          displayName: 'Map',
           active: true,
           graphQLPropertyName: 'id',
           groupId: 4,
@@ -217,7 +239,15 @@ const getSiteSearchResultsColumns = (
           isDefault: true,
           sortOrder: 1,
           isChecked: true,
-          displayType: getLinkColumnType('Map', 'id', '', '/map?site=', 'Map'),
+          displayType: getLinkColumnType(
+            hiddenColumns,
+            'Map',
+            'id',
+            '',
+            '/map?site=',
+            'View',
+            <FillPinMapFill />,
+          ),
           linkRedirectionURL: '/map?site=',
           dynamicColumn: true,
           stickyCol: true,
@@ -233,11 +263,13 @@ const getSiteSearchResultsColumns = (
       sortOrder: 1,
       isChecked: true,
       displayType: getLinkColumnType(
+        hiddenColumns,
         'Details',
         'id',
         '',
         '/site/details/',
-        'Details',
+        'View',
+        <FillEye />,
       ),
       linkRedirectionURL: 'site/details/',
       dynamicColumn: true,
@@ -265,25 +297,34 @@ const getColumnTypeWithSticky = (
   };
 };
 
-const getColumnType = (label: string, propertyName: string, value: string) => {
+const getColumnType = (
+  label: string,
+  propertyName: string,
+  value: string,
+  type: FormFieldType = FormFieldType.Label,
+  customInputText: string = 'custom-search-input-text',
+  customLabel?: string,
+) => {
   return {
-    type: FormFieldType.Label,
+    type: type,
     label: label,
     graphQLPropertyName: propertyName,
     value: value,
-    customLabelCss: 'custom-lbl-text',
-    customInputTextCss: 'custom-input-text',
+    customLabelCss: customLabel,
+    customInputTextCss: customInputText,
     tableMode: true,
     stickyCol: false,
   };
 };
 
 const getLinkColumnType = (
+  hiddenColumns: Set<string>,
   label: string,
   propertyName: string,
   value: string,
   href: string,
   customLabel?: string,
+  customIcon?: React.ReactNode,
 ) => {
   return {
     type: FormFieldType.Link,
@@ -296,6 +337,9 @@ const getLinkColumnType = (
     stickyCol: true,
     href: href,
     customLinkValue: customLabel ?? null,
+    customIcon: customIcon ?? null,
+    componentName: hiddenColumns.has('map') ? 'Map' : 'Search',
+    componentPath: hiddenColumns.has('map') ? 'map' : 'search',
   };
 };
 

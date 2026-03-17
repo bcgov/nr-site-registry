@@ -5,9 +5,11 @@ import {
 } from '../../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
+import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 
 export const siteDisclosureConfig = (
-  schedule2Refs: { key: string; value: string }[],
+  schedule2Refs: { key: string; value: string; metaData: string }[],
+  userMode?: SiteDetailsMode,
 ) => {
   const disclosureStatementConfig: IFormField[][] = [
     [
@@ -211,7 +213,7 @@ export const siteDisclosureConfig = (
     ],
   ];
 
-  const disclosureScheduleInternalConfig: TableColumn[] = [
+  const disclosureScheduleConfig: TableColumn[] = [
     {
       id: 1,
       displayName: 'Schedule 2 Reference',
@@ -222,14 +224,42 @@ export const siteDisclosureConfig = (
         label: '',
         placeholder: 'Select Schedule 2 reference.',
         graphQLPropertyName: 'schedule2ReferenceCode',
-        options: schedule2Refs,
+        options: schedule2Refs?.map((ref) => ({
+          key: ref.key,
+          value:
+            userMode === SiteDetailsMode.EditMode ? ref.metaData : ref.value,
+        })),
         value: '',
         colSize: 'col-lg-6 col-md-6 col-sm-12',
         customInputTextCss: 'custom-disclosure-input-text-tbl',
         tableMode: true,
       },
-      columnSize: ColumnSize.Default,
+      columnSize:
+        userMode === SiteDetailsMode.EditMode
+          ? ColumnSize.Default
+          : ColumnSize.XtraSmall,
     },
+    {
+      id: 3,
+      displayName: 'SR',
+      active: true,
+      graphQLPropertyName: 'srValue',
+      displayType: {
+        type: FormFieldType.Checkbox,
+        label: 'SR',
+        placeholder: '',
+        graphQLPropertyName: 'srValue',
+        value: false,
+        tableMode: true,
+        stickyCol: true,
+      },
+      dynamicColumn: true,
+      columnSize: ColumnSize.XtraSmall,
+      stickyCol: true,
+    },
+  ];
+
+  const disclosureScheduleDescription: TableColumn[] = [
     {
       id: 2,
       displayName: 'Description',
@@ -247,24 +277,6 @@ export const siteDisclosureConfig = (
         tableMode: true,
       },
       columnSize: ColumnSize.Triple,
-    },
-    {
-      id: 3,
-      displayName: 'SR',
-      active: true,
-      graphQLPropertyName: 'srValue',
-      displayType: {
-        type: FormFieldType.Checkbox,
-        label: 'SR',
-        placeholder: '',
-        graphQLPropertyName: 'srValue',
-        value: false,
-        tableMode: true,
-        stickyCol: true,
-      },
-      dynamicColumn: true,
-      columnSize: ColumnSize.Default,
-      stickyCol: true,
     },
   ];
 
@@ -285,7 +297,7 @@ export const siteDisclosureConfig = (
         customInputTextCss: 'custom-disclosure-input-text-tbl',
         tableMode: true,
       },
-      columnSize: ColumnSize.Default,
+      columnSize: ColumnSize.XtraSmall,
     },
     {
       id: 2,
@@ -368,6 +380,15 @@ export const siteDisclosureConfig = (
       value: SRVisibility.HideSR,
     },
   ];
+
+  const disclosureScheduleInternalConfig =
+    userMode !== SiteDetailsMode.EditMode
+      ? [
+          ...disclosureScheduleConfig.slice(0, 1),
+          ...disclosureScheduleDescription,
+          ...disclosureScheduleConfig.slice(1),
+        ]
+      : [...disclosureScheduleConfig];
 
   return {
     disclosureStatementConfig,

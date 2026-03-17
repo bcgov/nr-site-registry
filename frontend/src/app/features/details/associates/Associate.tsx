@@ -9,12 +9,18 @@ import {
   trackChanges,
 } from '../../site/dto/SiteSlice';
 import {
+  getFieldLabel,
+  ChangeContext,
+} from '../../../helpers/fieldLabelMapper';
+import {
   getAxiosInstance,
   getUser,
+  isUserOfType,
   resultCache,
   sortArray,
   UpdateDisplayTypeParams,
   updateTableColumn,
+  UserRoleType,
 } from '../../../helpers/utility';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
@@ -90,12 +96,13 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   // Handle user type based on username
   useEffect(() => {
-    if (loggedInUser?.profile.preferred_username?.includes('bceid')) {
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
+    ) {
       setUserType(UserType.External);
-    } else if (loggedInUser?.profile.preferred_username?.includes('idir')) {
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
       setUserType(UserType.Internal);
-    } else {
-      setUserType(UserType.External);
     }
   }, [loggedInUser]);
 
@@ -360,10 +367,6 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     setFormData(sorted);
   };
 
-  const handleWidgetCheckBox = (event: any) => {
-    alert(event);
-  };
-
   const handleTableChange = (event: any) => {
     if (
       event.property.includes('select_all') ||
@@ -444,7 +447,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
                 apiAction: assoc?.apiAction ?? UserActionEnum.updated,
                 srAction: event.value
                   ? SRApprovalStatusEnum.Public
-                  : SRApprovalStatusEnum.Pending,
+                  : SRApprovalStatusEnum.Private,
               };
             } else {
               return {
@@ -472,23 +475,29 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
         (row) => row.graphQLPropertyName === event.property,
       );
       if (viewMode === SiteDetailsMode.SRMode && event.property === 'srValue') {
-        dispatch(
-          trackChanges(
-            new ChangeTracker(
-              IChangeType.Modified,
-              'Associated Sites: SR Status',
-            ).toPlainObject(),
-          ),
-        );
+        if (event.row?.apiAction !== UserActionEnum.added) {
+          dispatch(
+            trackChanges(
+              new ChangeTracker(
+                IChangeType.Modified,
+                getFieldLabel('srValue'),
+                ChangeContext.ASSOCIATED_SITES,
+              ).toPlainObject(),
+            ),
+          );
+        }
       } else {
-        dispatch(
-          trackChanges(
-            new ChangeTracker(
-              IChangeType.Modified,
-              'Associated Sites: ' + currLabel?.displayName,
-            ).toPlainObject(),
-          ),
-        );
+        if (event.row?.apiAction !== UserActionEnum.added) {
+          dispatch(
+            trackChanges(
+              new ChangeTracker(
+                IChangeType.Modified,
+                getFieldLabel(event.property),
+                ChangeContext.ASSOCIATED_SITES,
+              ).toPlainObject(),
+            ),
+          );
+        }
       }
     }
   };
@@ -514,10 +523,8 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   const handleItemClick = (value: string) => {
     switch (value) {
       case SRVisibility.ShowSR:
-        alert('show');
         break;
       case SRVisibility.HideSR:
-        alert('hide');
         break;
       default:
         break;
@@ -566,7 +573,11 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
       setFormData(filteredPartics);
       dispatch(updateAssociatedSites(filteredPartics));
       dispatch(setupSiteAssociationDataForSaving(updatedTrackAssocSite));
-      const tracker = new ChangeTracker(IChangeType.Deleted, 'Associated Site');
+      const tracker = new ChangeTracker(
+        IChangeType.Deleted,
+        getFieldLabel('siteIdAssociatedWith'),
+        ChangeContext.ASSOCIATED_SITES,
+      );
       dispatch(trackChanges(tracker.toPlainObject()));
       setSelectedRows([]);
       setIsDelete(false);
@@ -597,7 +608,8 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
       trackChanges(
         new ChangeTracker(
           IChangeType.Added,
-          'New Associated Site',
+          getFieldLabel('siteIdAssociatedWith'),
+          ChangeContext.ASSOCIATED_SITES,
         ).toPlainObject(),
       ),
     );
@@ -628,7 +640,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
         <div>
           <AssociateSiteComponent
             handleTableChange={handleTableChange}
-            handleWidgetCheckBox={handleWidgetCheckBox}
+            handleWidgetCheckBox={() => {}}
             userType={userType}
             viewMode={viewMode}
             internalRow={internalRow}

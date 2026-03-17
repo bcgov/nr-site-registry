@@ -112,7 +112,7 @@ const roleBasedSideBarList: Record<string, SideNav[]> = {
       createSideNav('Text Search', false, icons.textSearch, '/search'),
       createSideNav('Map Search', false, icons.mapLocation, '/map'),
     ]),
-    createSideNav('Cart', false, icons.cart, '/site/cart', [], true),
+    // createSideNav('Cart', false, icons.cart, '/site/cart', [], true),
   ],
 };
 

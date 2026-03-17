@@ -22,7 +22,7 @@ const SRUpdatesFilterRows = () => {
       {
         type: FormFieldType.DropDown,
         label: 'Updated Fields',
-        placeholder: 'Select Fields Types',
+        placeholder: 'Field Type',
         graphQLPropertyName: 'changes',
         options: [
           { key: 'summary', value: 'Summary' },
@@ -49,7 +49,7 @@ const SRUpdatesFilterRows = () => {
       {
         type: FormFieldType.DateRange,
         label: 'When Updated',
-        placeholder: 'When Updated',
+        placeholder: 'Last Updated',
         graphQLPropertyName: 'whenUpdated',
         value: '',
         colSize: 'col-lg-4 col-md-6 col-sm-12',

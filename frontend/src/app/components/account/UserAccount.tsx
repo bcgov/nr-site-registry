@@ -15,8 +15,7 @@ const UserAccount = (props: any) => {
   const authRedirectUri =
     ((window as any)._env_ &&
       (window as any)._env_.REACT_APP_AUTH_LOGOUT_REDIRECT_URI) ||
-    process.env.REACT_APP_AUTH_LOGOUT_REDIRECT_URI ||
-    'http://localhost:4000/';
+    process.env.REACT_APP_AUTH_LOGOUT_REDIRECT_URI;
   const auth = useAuth();
   const loggedInUser = getUser();
   // Sample user data
@@ -81,15 +80,6 @@ const UserAccount = (props: any) => {
               aria-labelledby="account-dropdown"
               className="p-0"
             >
-              {/* Account settings */}
-              <div
-                role="menuitem"
-                aria-label="Account Settings"
-                tabIndex={0} // Make focusable with keyboard
-                className="account-custom-item-mobile"
-              >
-                Account Settings
-              </div>
               {/* Logout */}
               <div
                 role="menuitem"
@@ -163,15 +153,6 @@ const UserAccount = (props: any) => {
               </div>
             </Dropdown.Item>
             <div className="pt-3">
-              {/* Account settings */}
-              <Dropdown.Item
-                role="menuitem"
-                className="account-custom-item"
-                aria-label="Account Settings"
-              >
-                Account Settings
-              </Dropdown.Item>
-
               {/* Logout */}
               <Dropdown.Item
                 role="menuitem"

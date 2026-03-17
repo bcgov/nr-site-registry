@@ -217,12 +217,6 @@ export const GetSummaryConfig = () => {
       customEditInputTextCss: 'custom-summary-edit-input',
       customEditLabelCss: 'custom-summary-lbl-text',
       colSize: 'col-lg-3 col-md-3 col-sm-12',
-      validation: {
-        required: true,
-        pattern: /^[A-Za-z]{2}$/, // Two-letter province code
-        customMessage: 'Province abbreviation must be two letters',
-        maxLength: 2,
-      },
     },
     city: {
       type: FormFieldType.Text,

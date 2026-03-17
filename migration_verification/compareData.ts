@@ -30,9 +30,6 @@ function toSnakeCase(str: string): string {
 async function testConnection() {
   let connection;
   try {
-    console.log('username:', process.env.ORACLE_USER);
-    console.log('password:', process.env.ORACLE_PASSWORD);
-    console.log('conn string:', process.env.ORACLE_CONN_STRING);
     connection = await oracledb.getConnection(oracleConfig);
 
     // Simple test query

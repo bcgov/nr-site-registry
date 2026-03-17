@@ -8,6 +8,10 @@ import {
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
+import {
+  getFieldLabel,
+  ChangeContext,
+} from '../../../helpers/fieldLabelMapper';
 import './Disclosure.css';
 import { RequestStatus } from '../../../helpers/requests/status';
 import {
@@ -344,17 +348,30 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       viewMode === SiteDetailsMode.SRMode &&
       graphQLPropertyName === 'srCheckbox'
     ) {
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Site Disclosure: SR Status',
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      if (updatedFormData?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel('srValue'),
+          ChangeContext.DISCLOSURE,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     } else {
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Site Disclosure: ' + currLabel?.label,
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      if (updatedFormData?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel(graphQLPropertyName),
+          ChangeContext.DISCLOSURE,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      } else if (updatedFormData?.apiAction === UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Added,
+          getFieldLabel(graphQLPropertyName),
+          ChangeContext.DISCLOSURE,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     }
   };
 
@@ -436,11 +453,14 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
         disclosureScheduleInternalConfig.find(
           (row) => row.graphQLPropertyName === event.property,
         );
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Site Disclosure Schedule' + currLabel?.displayName,
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      if (event.row?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel(event.property),
+          ChangeContext.DISCLOSURE_SCHEDULE,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     }
   };
 
@@ -498,7 +518,8 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
     const tracker = new ChangeTracker(
       IChangeType.Added,
-      'Site Dosclosure Schedule',
+      getFieldLabel('schedule2ReferenceCode'),
+      ChangeContext.DISCLOSURE_SCHEDULE,
     );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
@@ -573,7 +594,8 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       setIsDelete(false);
       const tracker = new ChangeTracker(
         IChangeType.Deleted,
-        'Site Disclosure Schedule',
+        getFieldLabel('schedule2ReferenceCode'),
+        ChangeContext.DISCLOSURE_SCHEDULE,
       );
       dispatch(trackChanges(tracker.toPlainObject()));
     } else {

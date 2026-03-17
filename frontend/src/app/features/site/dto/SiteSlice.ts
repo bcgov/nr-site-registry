@@ -80,7 +80,8 @@ const siteSlice = createSlice({
       let recordExists = state.changeTracker.filter((tracked) => {
         return (
           tracked.changeType === action.payload.changeType &&
-          tracked.label === action.payload.label
+          tracked.label === action.payload.label &&
+          tracked.context === action.payload.context
         );
       });
 

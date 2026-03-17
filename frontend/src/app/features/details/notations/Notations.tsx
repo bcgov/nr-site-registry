@@ -15,6 +15,10 @@ import {
   trackChanges,
 } from '../../site/dto/SiteSlice';
 import {
+  getFieldLabel,
+  ChangeContext,
+} from '../../../helpers/fieldLabelMapper';
+import {
   flattenFormRows,
   getAxiosInstance,
   getUser,
@@ -522,17 +526,25 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       viewMode === SiteDetailsMode.SRMode &&
       (value === 'checked' || value === 'unchecked')
     ) {
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Notations: SR Status',
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      const currentNotation = updatedNotation?.find((n: any) => n.id === id);
+      if (currentNotation?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel('srValue'),
+          ChangeContext.NOTATIONS,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     } else {
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Notations: ' + currLabel?.label,
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      const currentNotation = updatedNotation?.find((n: any) => n.id === id);
+      if (currentNotation?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel(graphQLPropertyName),
+          ChangeContext.NOTATIONS,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     }
   };
 
@@ -597,7 +609,8 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       const tracker = new ChangeTracker(
         IChangeType.Deleted,
-        'Notation Participant Delete',
+        getFieldLabel('psnorgId'),
+        ChangeContext.NOTATION_PARTICIPANT,
       );
       dispatch(trackChanges(tracker.toPlainObject()));
 
@@ -764,11 +777,14 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         notationColumnInternal.find(
           (row) => row.graphQLPropertyName === event.property,
         );
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Notation Participant: ' + currLabel?.displayName,
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      if (event.row?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel(event.property),
+          ChangeContext.NOTATION_PARTICIPANT,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     }
   };
 
@@ -842,7 +858,11 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         ...(trackNotation ?? (formData || [])),
       ]),
     );
-    const tracker = new ChangeTracker(IChangeType.Added, 'New Notation Added');
+    const tracker = new ChangeTracker(
+      IChangeType.Added,
+      getFieldLabel('etypCode'),
+      ChangeContext.NOTATIONS,
+    );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
@@ -889,7 +909,8 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     dispatch(setupNotationDataForSaving(updatedTrackParticipants));
     const tracker = new ChangeTracker(
       IChangeType.Added,
-      'Notation Participant Added',
+      getFieldLabel('psnorgId'),
+      ChangeContext.NOTATION_PARTICIPANT,
     );
     dispatch(trackChanges(tracker.toPlainObject()));
   };

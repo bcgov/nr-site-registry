@@ -43,6 +43,10 @@ import {
   IChangeType,
 } from '../../../components/common/IChangeType';
 import {
+  getFieldLabel,
+  ChangeContext,
+} from '../../../helpers/fieldLabelMapper';
+import {
   saveRequestStatus,
   setupParcelDescriptionsDataForSaving,
 } from '../SaveSiteDetailsSlice';
@@ -279,7 +283,8 @@ const ParcelDescriptions = () => {
       trackChanges(
         new ChangeTracker(
           IChangeType.Modified,
-          `Parcel Descriptions: ${newRow.id}`,
+          getFieldLabel('parcelDescription'),
+          ChangeContext.PARCEL_DESCRIPTIONS,
         ).toPlainObject(),
       ),
     );
@@ -304,7 +309,8 @@ const ParcelDescriptions = () => {
       trackChanges(
         new ChangeTracker(
           IChangeType.Added,
-          `Parcel Descriptions: Added New Parcel Description(s)`,
+          getFieldLabel('parcelDescription'),
+          ChangeContext.PARCEL_DESCRIPTIONS,
         ).toPlainObject(),
       ),
     );
@@ -429,7 +435,8 @@ const ParcelDescriptions = () => {
         trackChanges(
           new ChangeTracker(
             IChangeType.Deleted,
-            `Parcel Descriptions: ${deletedRow.id}`,
+            getFieldLabel('parcelDescription'),
+            ChangeContext.PARCEL_DESCRIPTIONS,
           ).toPlainObject(),
         ),
       );

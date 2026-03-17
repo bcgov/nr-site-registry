@@ -179,7 +179,6 @@ const LandUses: FC = () => {
         ? getFieldLabel('srValue')
         : propertyLabel;
 
-    console.log(landUsesData, editedRowId, existingLandUse);
     const currentRecord = landUsesData[editedRowId];
     const tracker = new ChangeTracker(
       IChangeType.Modified,

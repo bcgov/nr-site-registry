@@ -159,6 +159,28 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     return JSON.stringify(a ?? []) === JSON.stringify(b ?? []);
   };
 
+  const mergeFetchedAndTrackedNotations = (
+    fetchedNotations: any[] = [],
+    trackedNotations: any[] = [],
+  ) => {
+    if (!Array.isArray(trackedNotations) || trackedNotations.length === 0) {
+      return fetchedNotations ?? [];
+    }
+
+    const merged = new Map<any, any>();
+
+    (fetchedNotations ?? []).forEach((notation) => {
+      merged.set(notation.id, notation);
+    });
+
+    // Keep local in-progress edits authoritative over freshly fetched rows.
+    trackedNotations.forEach((notation) => {
+      merged.set(notation.id, notation);
+    });
+
+    return Array.from(merged.values());
+  };
+
   // Function to fetch notation participant
   const fetchNotationParticipant = useCallback(async (searchParam: string) => {
     if (searchParam.trim()) {
@@ -212,7 +234,12 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Update form data when notations change
   useEffect(() => {
     if (status === RequestStatus.success && notations) {
-      const psnOrgs = notations.flatMap((item: any) =>
+      const sourceNotations = mergeFetchedAndTrackedNotations(
+        notations,
+        trackNotation,
+      );
+
+      const psnOrgs = sourceNotations.flatMap((item: any) =>
         Array.isArray(item.notationParticipant)
           ? item.notationParticipant.map((participant: any) => ({
               key: participant.psnorgId,
@@ -257,8 +284,8 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         );
       }
 
-      const unarchivedNotations = getUnarchivedNotations(notations);
-      const archivedNotations = getArchivedNotations(notations);
+      const unarchivedNotations = getUnarchivedNotations(sourceNotations);
+      const archivedNotations = getArchivedNotations(sourceNotations);
 
       setFormData((prev) =>
         areNotationsEqual(prev as any[], unarchivedNotations)
@@ -271,7 +298,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
           : archivedNotations,
       );
     }
-  }, [notations, status]);
+  }, [notations, status, trackNotation]);
 
   // Handle user type based on username
   useEffect(() => {
@@ -387,7 +414,12 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     const searchTerm = event.target.value;
     setSearchTerm(searchTerm);
 
-    const filteredData = notations?.filter((notation: any) => {
+    const sourceNotations = mergeFetchedAndTrackedNotations(
+      notations,
+      trackNotation,
+    );
+
+    const filteredData = sourceNotations?.filter((notation: any) => {
       // Check if any property of the notation object contains the searchTerm
       return deepSearch(notation, searchTerm.toLowerCase().trim());
     });
@@ -461,8 +493,12 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const clearSearch = () => {
     setSearchTerm('');
-    setFormData(getUnarchivedNotations(notations));
-    setArchivedFormData(getArchivedNotations(notations));
+    const sourceNotations = mergeFetchedAndTrackedNotations(
+      notations,
+      trackNotation,
+    );
+    setFormData(getUnarchivedNotations(sourceNotations));
+    setArchivedFormData(getArchivedNotations(sourceNotations));
   };
 
   const handleToggleArchivedNotations = () => {

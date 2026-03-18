@@ -542,6 +542,11 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     graphQLPropertyName: any,
     value: String | [Date, Date],
   ) => {
+    // Combine active (formData) and archived notations so updates operate on the full list.
+    const allNotations = Array.isArray(archivedFormData)
+      ? [...formData, ...archivedFormData]
+      : formData;
+
     let updatedNotation = null;
     let updatedTrackNotation = null;
     if (
@@ -549,28 +554,28 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       (value === 'checked' || value === 'unchecked')
     ) {
       updatedNotation = updateNotationsForSRMode(
-        formData,
+        allNotations,
         id,
         value === 'checked' ? true : false,
       );
 
       updatedTrackNotation = updateNotationsForSRMode(
-        trackNotation ?? formData,
+        trackNotation ?? allNotations,
         id,
         value === 'checked' ? true : false,
       );
     } else {
-      // Update both formData and trackNotation in one go
+      // Update both formData and trackNotation in one go, using the full list.
 
       updatedNotation = updateNotations(
-        formData,
+        allNotations,
         id,
         graphQLPropertyName,
         value,
       );
 
       updatedTrackNotation = updateNotations(
-        trackNotation ?? formData,
+        trackNotation ?? allNotations,
         id,
         graphQLPropertyName,
         value,
@@ -650,12 +655,17 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         });
       };
 
-      // Update both formData and trackNotation
-      const updatedPartics = updateNotations(formData);
-      const updatedTrackNotatn = updateNotations(trackNotation ?? formData);
+      // Build combined list of active and archived notations
+      const combinedNotations = [...formData, ...archivedFormData];
 
-      // Filter out participants based on selectedRows for formData
-      const filteredPartics = updatedPartics.map((notation: any) => ({
+      // Update both combined notations and trackNotation
+      const updatedNotations = updateNotations(combinedNotations);
+      const updatedTrackNotatn = updateNotations(
+        trackNotation ?? combinedNotations,
+      );
+
+      // Filter out participants based on selectedRows for all notations
+      const filteredNotations = updatedNotations.map((notation: any) => ({
         ...notation,
         notationParticipant: notation.notationParticipant.filter(
           (participant: any) =>
@@ -667,8 +677,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         ),
       }));
 
-      setFormData(getUnarchivedNotations(filteredPartics));
-      dispatch(updateSiteNotation(filteredPartics));
+      // Re-split filtered notations into active and archived lists
+      setFormData(getUnarchivedNotations(filteredNotations));
+      setArchivedFormData(getArchivedNotations(filteredNotations));
+      dispatch(updateSiteNotation(filteredNotations));
       dispatch(setupNotationDataForSaving(updatedTrackNotatn));
 
       const tracker = new ChangeTracker(

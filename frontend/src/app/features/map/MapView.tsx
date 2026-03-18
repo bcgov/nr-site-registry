@@ -28,6 +28,8 @@ import { RadiusSearchLayer } from './layers/RadiusSearchLayer';
 import { PolygonSearchLayer } from './layers/PolygonSearchLayer';
 import { MIN_CIRCLE_RADIUS } from '../../constants/Constant';
 import { MapDataLayers } from './dataLayers/MapDataLayers';
+import { buildSitesToShow } from './buildSitesToShow';
+import { useFlyToSelectedSite } from './useFlyToSelectedSite';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -95,33 +97,18 @@ function MapView() {
   });
   const selectedSite = selectedSiteData?.findSiteBySiteId?.data;
 
-  const sitesToShow: Site[] = (() => {
-    if (!selectedSiteId || !selectedSite?.latdeg || !selectedSite?.longdeg)
-      return sites;
-    const alreadyInList = sites.some(
-      (s) => String(s.id) === String(selectedSiteId),
-    );
-    return alreadyInList
-      ? sites
-      : [...sites, { ...selectedSite, id: selectedSiteId } as Site];
-  })();
+  const sitesToShow = buildSitesToShow(
+    sites,
+    selectedSiteId,
+    selectedSite ?? undefined,
+  );
 
-  const hasFlownToSelectedSiteRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (!selectedSiteId) {
-      hasFlownToSelectedSiteRef.current = null;
-      return;
-    }
-    if (!selectedSite?.latdeg || !selectedSite?.longdeg || !mapRef.current)
-      return;
-    if (hasFlownToSelectedSiteRef.current === selectedSiteId) return;
-    hasFlownToSelectedSiteRef.current = selectedSiteId;
-    mapRef.current.flyTo(
-      { lat: selectedSite.latdeg, lng: selectedSite.longdeg },
-      getZoom(mapRef.current),
-      MAP_FLY_OPTIONS,
-    );
-  }, [selectedSiteId, selectedSite?.latdeg, selectedSite?.longdeg]);
+  useFlyToSelectedSite(
+    mapRef,
+    selectedSiteId,
+    selectedSite?.latdeg ?? undefined,
+    selectedSite?.longdeg ?? undefined,
+  );
 
   useEffect(() => {
     if (activeTool === null) {

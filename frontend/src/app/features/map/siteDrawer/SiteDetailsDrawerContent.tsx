@@ -123,6 +123,10 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
           <Link
             to={`/site/details/${selectedSiteId}`}
             className="justify-content-center"
+            state={{
+              fromPath: `${'map?site=' + selectedSiteId}`,
+              fromLabel: 'Map',
+            }}
           >
             <Button
               variant="secondary"

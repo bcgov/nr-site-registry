@@ -14,10 +14,11 @@ import {
   MapSearchQuery,
   MapSearchQueryVariables,
   useMapSearchQuery,
+  useMapSearch_FindSiteBySiteIdQuery,
 } from '../../../graphql/generated';
 import { SiteMarkers } from './siteMarkers/SiteMarkers';
 import { MapControls } from './MapControls';
-import { MAP_FLY_OPTIONS } from './mapOptions';
+import { MAP_FLY_OPTIONS, getZoom } from './mapOptions';
 import {
   MapSearchQueryProvider,
   useMapSearchContext,
@@ -42,8 +43,14 @@ function MapView() {
   // Feature flag for turning OpenStreetMap tiles gray
   const osmGrayscale = false;
 
-  const { searchTerm, activeTool, polygonVertices, center, radius } =
-    useMapSearchContext();
+  const {
+    searchTerm,
+    activeTool,
+    polygonVertices,
+    center,
+    radius,
+    selectedSiteId,
+  } = useMapSearchContext();
 
   const variables: MapSearchQueryVariables = {
     searchParam: searchTerm || '',
@@ -82,6 +89,40 @@ function MapView() {
   const [sites, setSites] = useState<Site[]>([]);
   const clearSites = () => setSites([]);
 
+  const { data: selectedSiteData } = useMapSearch_FindSiteBySiteIdQuery({
+    variables: { siteId: selectedSiteId ?? '' },
+    skip: !selectedSiteId,
+  });
+  const selectedSite = selectedSiteData?.findSiteBySiteId?.data;
+
+  const sitesToShow: Site[] = (() => {
+    if (!selectedSiteId || !selectedSite?.latdeg || !selectedSite?.longdeg)
+      return sites;
+    const alreadyInList = sites.some(
+      (s) => String(s.id) === String(selectedSiteId),
+    );
+    return alreadyInList
+      ? sites
+      : [...sites, { ...selectedSite, id: selectedSiteId } as Site];
+  })();
+
+  const hasFlownToSelectedSiteRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!selectedSiteId) {
+      hasFlownToSelectedSiteRef.current = null;
+      return;
+    }
+    if (!selectedSite?.latdeg || !selectedSite?.longdeg || !mapRef.current)
+      return;
+    if (hasFlownToSelectedSiteRef.current === selectedSiteId) return;
+    hasFlownToSelectedSiteRef.current = selectedSiteId;
+    mapRef.current.flyTo(
+      { lat: selectedSite.latdeg, lng: selectedSite.longdeg },
+      getZoom(mapRef.current),
+      MAP_FLY_OPTIONS,
+    );
+  }, [selectedSiteId, selectedSite?.latdeg, selectedSite?.longdeg]);
+
   useEffect(() => {
     if (activeTool === null) {
       setSites(data?.mapSearch.data || []);
@@ -110,7 +151,7 @@ function MapView() {
           setLocationVisible={setLocationVisible}
         />
         {<MyLocationMarker isLocationVisible={isLocationVisible} />}
-        <SiteMarkers sites={sites} />
+        <SiteMarkers sites={sitesToShow} />
         <RadiusSearchLayer
           onCrossHairClick={clearSites}
           sites={sites}

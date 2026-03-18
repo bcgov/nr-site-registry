@@ -39,31 +39,60 @@ export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
     [moveToSiteLocation, setQuery],
   );
 
-  const markers = useMemo(() => {
-    return sites.map((site) => {
-      if (!site.latdeg || !site.longdeg) return null;
-      return (
-        <SiteMarker
-          key={site.id}
-          isSelected={site.id === selectedSiteId}
-          position={{
-            lat: site.latdeg,
-            lng: site.longdeg,
-          }}
-          onClick={() => onSiteMarkerClick(site)}
-        />
-      );
+  const { selectedMarker, clusterMarkers } = useMemo(() => {
+    const restMarkers: React.ReactNode[] = [];
+    const selectedSite = sites.find(
+      (site) =>
+        site.latdeg != null &&
+        site.longdeg != null &&
+        String(site.id) === String(selectedSiteId),
+    );
+    sites.forEach((site) => {
+      if (!site.latdeg || !site.longdeg) return;
+      const isSelected = String(site.id) === String(selectedSiteId);
+      if (!isSelected) {
+        restMarkers.push(
+          <SiteMarker
+            key={site.id}
+            isSelected={false}
+            position={{
+              lat: site.latdeg,
+              lng: site.longdeg,
+            }}
+            onClick={() => onSiteMarkerClick(site)}
+          />,
+        );
+      }
     });
+    const selectedMarkerNode =
+      selectedSite != null ? (
+        <SiteMarker
+          key={selectedSite.id}
+          isSelected={true}
+          position={{
+            lat: selectedSite.latdeg ?? 0,
+            lng: selectedSite.longdeg ?? 0,
+          }}
+          onClick={() => onSiteMarkerClick(selectedSite)}
+        />
+      ) : null;
+    return {
+      selectedMarker: selectedMarkerNode,
+      clusterMarkers: restMarkers,
+    };
   }, [onSiteMarkerClick, selectedSiteId, sites]);
 
   return (
-    <MarkerClusterGroup
-      chunkedLoading
-      maxClusterRadius={80}
-      spiderfyOnMaxZoom={false}
-      showCoverageOnHover={false}
-    >
-      {markers}
-    </MarkerClusterGroup>
+    <>
+      {selectedMarker}
+      <MarkerClusterGroup
+        chunkedLoading
+        maxClusterRadius={80}
+        spiderfyOnMaxZoom={false}
+        showCoverageOnHover={false}
+      >
+        {clusterMarkers}
+      </MarkerClusterGroup>
+    </>
   );
 };

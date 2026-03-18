@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { LatLngBounds, LatLngTuple, Map } from 'leaflet';
+import { LatLngTuple, Map } from 'leaflet';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -18,7 +18,7 @@ import {
 } from '../../../graphql/generated';
 import { SiteMarkers } from './siteMarkers/SiteMarkers';
 import { MapControls } from './MapControls';
-import { MAP_FLY_OPTIONS, getZoom } from './mapOptions';
+import { MAP_FLY_OPTIONS } from './mapOptions';
 import {
   MapSearchQueryProvider,
   useMapSearchContext,
@@ -30,6 +30,10 @@ import { MIN_CIRCLE_RADIUS } from '../../constants/Constant';
 import { MapDataLayers } from './dataLayers/MapDataLayers';
 import { buildSitesToShow } from './buildSitesToShow';
 import { useFlyToSelectedSite } from './useFlyToSelectedSite';
+import {
+  extendSearchResultBounds,
+  sitesWhenMapToolCleared,
+} from './mapViewHelpers';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -71,16 +75,11 @@ function MapView() {
     },
   });
 
-  const flyToSiteBounds = (sites: Site[]) => {
-    if (!searchTerm || !mapRef.current) return;
-
-    const bounds = new LatLngBounds([]);
-    sites.forEach((site) => {
-      if (!site.latdeg || !site.longdeg) return;
-      const lat = site.latdeg;
-      const lng = site.longdeg;
-      bounds.extend({ lat, lng });
-    });
+  const flyToSiteBounds = (siteList: Site[]) => {
+    if (!searchTerm || !mapRef.current) {
+      return;
+    }
+    const bounds = extendSearchResultBounds(siteList);
     if (bounds.isValid()) {
       mapRef.current.flyToBounds(bounds, MAP_FLY_OPTIONS);
     }
@@ -111,8 +110,9 @@ function MapView() {
   );
 
   useEffect(() => {
-    if (activeTool === null) {
-      setSites(data?.mapSearch.data || []);
+    const next = sitesWhenMapToolCleared(activeTool, data?.mapSearch.data);
+    if (next !== null) {
+      setSites(next);
     }
   }, [activeTool]);
 

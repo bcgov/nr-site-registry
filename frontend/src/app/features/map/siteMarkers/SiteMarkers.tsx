@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback, useMemo, type ReactNode } from 'react';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { SiteMarker } from './SiteMarker';
 import { useMap } from 'react-leaflet';
@@ -64,8 +64,9 @@ export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
         );
       }
     });
-    const selectedMarkerNode =
-      selectedSite != null ? (
+    let selectedMarkerNode: ReactNode = null;
+    if (selectedSite) {
+      selectedMarkerNode = (
         <SiteMarker
           key={selectedSite.id}
           isSelected={true}
@@ -75,7 +76,8 @@ export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
           }}
           onClick={() => onSiteMarkerClick(selectedSite)}
         />
-      ) : null;
+      );
+    }
     return {
       selectedMarker: selectedMarkerNode,
       clusterMarkers: restMarkers,

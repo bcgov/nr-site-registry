@@ -160,8 +160,7 @@ export class SiteService {
     } = filters;
 
     this.sitesLogger.log('SiteService.searchSites() start');
-    this.sitesLogger.log(`Filters received: ${JSON.stringify(filters)}`);
-    this.sitesLogger.log(`ID filter value: ${id}, type: ${typeof id}`);
+
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
 
@@ -389,11 +388,6 @@ export class SiteService {
         .skip((page - 1) * pageSize)
         .take(pageSize)
         .getManyAndCount();
-
-      this.sitesLogger.log(`Generated SQL: ${query.getSql()}`);
-      this.sitesLogger.log(
-        `Query parameters: ${JSON.stringify(query.getParameters())}`,
-      );
 
       response.sites = result[0] || [];
       response.count = result[1] || 0;

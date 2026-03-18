@@ -47,7 +47,7 @@ services:
         condition: service_healthy
     ports:
       - "4007:4007" # GraphQL API port
-      - "127.0.0.1:9229:9229" # Debugging port (bound to loopback for safety)
+      - "127.0.0.1:9229:9229"
     volumes:
       - ./backend/:/app
       - ./backend/node_modules:/app/node_modules

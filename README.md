@@ -3,15 +3,15 @@
 ## Developer Onboarding.
 
 1. You need a docker daemon. I have tested both of these:
-    - Docker Desktop works and requires not configuration, but it does have a
+    - Docker Desktop works and requires no configuration, but it does have a
       non-FOSS license.
     - [Colima](https://github.com/abiosoft/colima) is FOSS software that
       provides a docker daemon for Mac. I recommend editing the configuration to
       use at _least_ 4GB of memory to avoid memory allocation errors in this
       project, and to use the `vz` backend with `virtiofs` file mounting. I've
-      had issues with the `qemu` and `sshfs` backend in the past. Also: mine
+      had issues with the `qemu` and `sshfs` backends in the past. Also: Colima
       provides a docker daemon by default, but it _also_ has the ability to
-      provide a podman daemon, so make sure that is set to docker. You can bring
+      provide a podman daemon, so make sure it is set to docker. You can bring
       it up with `colima start --edit` to review the configuration.
 
       `brew install colima`
@@ -37,5 +37,5 @@
    implementing an automatic database seeder in the nearish future.
 
 1. Happy Hacking! The frontend runs on http://127.0.0.1:4000 by default. Check
-   check the included example `.vscode/launch-example.jsonc` and
-   `.vscode/tasks.jsonc` for more information.
+   the included example `.vscode/launch-example.jsonc` and
+   `.vscode/tasks-example.jsonc` for more information.

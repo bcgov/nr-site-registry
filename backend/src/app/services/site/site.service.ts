@@ -164,7 +164,7 @@ export class SiteService {
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
 
-    if (!searchParam?.trim()) {
+    if (!searchParam?.trim() && (!siteIds || siteIds.length === 0)) {
       response.sites = [];
       response.count = 0;
       response.page = page;

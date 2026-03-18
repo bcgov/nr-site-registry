@@ -827,8 +827,14 @@ const SiteDetails = () => {
           UserActionEnum.deleted,
           UserActionEnum.restored,
         ]);
+        // Exclude deleted notations from validation, but keep them for saving
+        const notationsForValidation = Array.isArray(updatedSiteNotations)
+          ? updatedSiteNotations.filter(
+              (notation: any) => notation?.userAction !== UserActionEnum.deleted,
+            )
+          : updatedSiteNotations;
         const [notationErrors, notationParticipantErrors] = await Promise.all([
-          validateNotations(updatedSiteNotations), // Async function handling Notation validation
+          validateNotations(notationsForValidation), // Async function handling Notation validation
           validateNotationParticipants(updatedSiteNotations), // Async function handling Notation Participant validation
         ]);
         // Combine and return the errors from both functions

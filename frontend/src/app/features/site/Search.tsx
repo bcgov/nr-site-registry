@@ -121,7 +121,7 @@ const Search = () => {
       });
       debouncedSearch(
         value,
-        page,
+        1,
         pageSize,
         SiteSortBy.Id,
         SortByDirection.Asc,
@@ -193,7 +193,7 @@ const Search = () => {
     if (filters.length !== 0) {
       debouncedSearch(
         searchParam,
-        page,
+        1,
         pageSize,
         sortBy,
         sortByDir,
@@ -210,7 +210,7 @@ const Search = () => {
     setFormData({});
     setSelectedFilters([]);
     localStorage.removeItem('siteFilterPills');
-    debouncedSearch(searchParam, page, pageSize, sortBy, sortByDir, {});
+    debouncedSearch(searchParam, 1, pageSize, sortBy, sortByDir, {});
   };
 
   useEffect(() => {
@@ -224,7 +224,9 @@ const Search = () => {
       setFormData(initialFormData);
       setSelectedFilters(parsedFilters);
     }
+  }, []);
 
+  useEffect(() => {
     if (status === RequestStatus.success && sites.length > 0) {
       setSearchText(searchParam);
       setUserAction(false);
@@ -241,7 +243,7 @@ const Search = () => {
       delete updatedFilter[filter.key]; // Remove the filter key from the form data
       debouncedSearch(
         searchParam,
-        page,
+        1,
         pageSize,
         sortBy,
         sortByDir,
@@ -269,7 +271,19 @@ const Search = () => {
   };
 
   const handlePageChange = (page: number) => {
-    debouncedSearch(searchParam, page, pageSize, sortBy, sortByDir, formData);
+    // Use only submitted filters (selectedFilters), not unsubmitted formData
+    const submittedFilters: any = {};
+    selectedFilters.forEach((filter) => {
+      submittedFilters[filter.key] = filter.value;
+    });
+    debouncedSearch(
+      searchParam,
+      page,
+      pageSize,
+      sortBy,
+      sortByDir,
+      submittedFilters,
+    );
   };
 
   // Mapping between GraphQL field names and SiteSortBy enum values
@@ -311,7 +325,19 @@ const Search = () => {
       sortBy = columnToSortByMap[column.graphQLPropertyName];
     }
     if (sortBy) {
-      debouncedSearch(searchParam, page, pageSize, sortBy, sortByDir, formData);
+      // Use only submitted filters (selectedFilters), not unsubmitted formData
+      const submittedFilters: any = {};
+      selectedFilters.forEach((filter) => {
+        submittedFilters[filter.key] = filter.value;
+      });
+      debouncedSearch(
+        searchParam,
+        page,
+        pageSize,
+        sortBy,
+        sortByDir,
+        submittedFilters,
+      );
     }
   };
 

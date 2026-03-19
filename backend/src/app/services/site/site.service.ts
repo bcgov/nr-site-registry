@@ -160,6 +160,7 @@ export class SiteService {
     } = filters;
 
     this.sitesLogger.log('SiteService.searchSites() start');
+
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
 
@@ -246,7 +247,23 @@ export class SiteService {
 
       if (id) {
         const ids = id.split(',').map((v) => v.trim());
-        query.andWhere('sites.id IN (:...ids)', { ids });
+        this.sitesLogger.log(`Applying id filter: ${JSON.stringify(ids)}`);
+        // Build OR conditions for each ID
+        query.andWhere(
+          new Brackets((qb) => {
+            ids.forEach((siteId, index) => {
+              if (index === 0) {
+                qb.where(`CAST(sites.id AS TEXT) = :id${index}`, {
+                  [`id${index}`]: siteId,
+                });
+              } else {
+                qb.orWhere(`CAST(sites.id AS TEXT) = :id${index}`, {
+                  [`id${index}`]: siteId,
+                });
+              }
+            });
+          }),
+        );
       }
 
       if (srStatus) {

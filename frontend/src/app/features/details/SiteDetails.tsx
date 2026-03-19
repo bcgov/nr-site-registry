@@ -821,12 +821,20 @@ const SiteDetails = () => {
     try {
       // Run both validations in parallel and wait for them to finish
       if (siteNotation?.length > 0) {
-        let updatedSiteNotations = deepFilterByUserAction(
-          siteNotation,
-          userActions,
-        );
+        let updatedSiteNotations = deepFilterByUserAction(siteNotation, [
+          UserActionEnum.added,
+          UserActionEnum.updated,
+          UserActionEnum.deleted,
+          UserActionEnum.restored,
+        ]);
+        // Exclude deleted notations from validation, but keep them for saving
+        const notationsForValidation = Array.isArray(updatedSiteNotations)
+          ? updatedSiteNotations.filter(
+              (notation: any) => notation?.userAction !== UserActionEnum.deleted,
+            )
+          : updatedSiteNotations;
         const [notationErrors, notationParticipantErrors] = await Promise.all([
-          validateNotations(updatedSiteNotations), // Async function handling Notation validation
+          validateNotations(notationsForValidation), // Async function handling Notation validation
           validateNotationParticipants(updatedSiteNotations), // Async function handling Notation Participant validation
         ]);
         // Combine and return the errors from both functions
@@ -881,6 +889,9 @@ const SiteDetails = () => {
       const notationParticipantErrors: any[] = [];
       // Loop through siteNotation and their notationParticipants
       for (const [index, notation] of updatedSiteNotations?.entries()) {
+        if (notation?.apiAction === UserActionEnum.deleted) {
+          continue;
+        }
         if (
           notation?.notationParticipant &&
           notation?.notationParticipant?.length > 0
@@ -889,6 +900,9 @@ const SiteDetails = () => {
             participantIndex,
             notationParticipant,
           ] of notation.notationParticipant.entries()) {
+            if (notationParticipant?.apiAction === UserActionEnum.deleted) {
+              continue;
+            }
             // Validate and accumulate errors for each notation participant
             const errors = validateForm(
               notationParticipantTable,
@@ -897,7 +911,7 @@ const SiteDetails = () => {
             );
             notationParticipantErrors.push(...errors);
           }
-        } else {
+        } else if (notation?.apiAction !== UserActionEnum.deleted) {
           notationParticipantErrors.push({
             label: 'Notation Participants',
             errorMessage: `Notation [${notation?.position + 1}] Atleast one  Notation Participant is required.`,

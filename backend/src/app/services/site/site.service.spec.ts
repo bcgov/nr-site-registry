@@ -730,6 +730,8 @@ describe('SiteService', () => {
               srValue: true,
               whenCreated: new Date(),
               whenUpdated: new Date(),
+              whenDeleted: null,
+              whenRestored: null,
               notationParticipant: [
                 {
                   apiAction: UserActionEnum.ADDED,
@@ -1293,14 +1295,19 @@ describe('SiteService', () => {
           id: '1',
           siteId: '1',
           psnorgId: '1',
-          completionDate: '2004-06-16T07:00:00.000Z',
-          requirementDueDate: '1970-01-01T00:00:00.000Z',
-          requirementReceivedDate: '1970-01-01T00:00:00.000Z',
+          completionDate: new Date('2004-06-16T07:00:00.000Z'),
+          requirementDueDate: new Date('1970-01-01T00:00:00.000Z'),
+          requirementReceivedDate: new Date('1970-01-01T00:00:00.000Z'),
           requiredAction: null,
           note: null,
           etypCode: 'CMI',
           eclsCode: 'ADM',
           srAction: 'false',
+          userAction: UserActionEnum.ADDED,
+          whenCreated: new Date(),
+          whenUpdated: new Date(),
+          whenDeleted: null,
+          whenRestored: null,
           notationParticipant: [
             {
               apiAction: UserActionEnum.ADDED,
@@ -1310,6 +1317,11 @@ describe('SiteService', () => {
               psnorgId: '1',
               displayName: 'SAGER, J.',
               srAction: 'false',
+              userAction: UserActionEnum.ADDED,
+              whenCreated: new Date(),
+              whenUpdated: new Date(),
+              whenDeleted: null,
+              whenRestored: null,
             },
           ],
         },
@@ -1338,6 +1350,10 @@ describe('SiteService', () => {
           id: '1',
           etypCode: 'type',
           eclsCode: 'class',
+          whenCreated: new Date(),
+          whenUpdated: new Date(),
+          whenDeleted: null,
+          whenRestored: null,
           notationParticipant: [
             {
               apiAction: UserActionEnum.ADDED,
@@ -1347,6 +1363,11 @@ describe('SiteService', () => {
               psnorgId: '1',
               displayName: 'SAGER, J.',
               srAction: 'false',
+              userAction: UserActionEnum.ADDED,
+              whenCreated: new Date(),
+              whenUpdated: new Date(),
+              whenDeleted: null,
+              whenRestored: null,
             },
           ],
         },
@@ -1368,10 +1389,18 @@ describe('SiteService', () => {
       const events = [
         {
           id: '1',
+          whenCreated: new Date(),
+          whenUpdated: new Date(),
+          whenDeleted: null,
+          whenRestored: null,
           notationParticipant: [
             {
               apiAction: UserActionEnum.DELETED,
               eventParticId: 'xxx-xxx',
+              whenCreated: new Date(),
+              whenUpdated: new Date(),
+              whenDeleted: null,
+              whenRestored: null,
             },
           ],
         },
@@ -1383,6 +1412,148 @@ describe('SiteService', () => {
       expect(entityManager.delete).toHaveBeenCalledWith(EventPartics, {
         id: 'xxx-xxx',
       });
+    });
+
+    it('should soft delete notation when action is DELETED', async () => {
+      const existingEvent = {
+        id: '1',
+        siteId: '1',
+        note: 'existing notation',
+        whoDeleted: null,
+        whenDeleted: null,
+        whoRestored: null,
+        whenRestored: null,
+      };
+      jest
+        .spyOn(eventsRepository, 'findOneByOrFail')
+        .mockResolvedValueOnce(existingEvent as any);
+
+      const events = [
+        {
+          apiAction: UserActionEnum.DELETED,
+          id: '1',
+          notationParticipant: [
+            {
+              apiAction: UserActionEnum.ADDED,
+              eventParticId: 'ep-1',
+              eventId: '1',
+              eprCode: 'RVB',
+              psnorgId: '1',
+              displayName: 'Participant',
+              srAction: SRApprovalStatusEnum.PENDING,
+            },
+          ],
+        },
+      ];
+
+      await siteService.processEvents(
+        events,
+        { givenName: 'Deleter User' },
+        entityManager,
+        '1',
+      );
+
+      // Verify that update was called once for the event
+      expect(entityManager.update).toHaveBeenCalledWith(
+        Events,
+        { id: '1' },
+        expect.objectContaining({
+          id: '1',
+          siteId: '1',
+          note: 'existing notation',
+          whoDeleted: 'Deleter User',
+          whoRestored: null,
+          whenRestored: null,
+        }),
+      );
+
+      // Validate the complete updatedEvents array content via the update call
+      const updateCall = (entityManager.update as jest.Mock).mock.calls.find(
+        (call) => call[0] === Events && call[1]?.id === '1',
+      );
+      expect(updateCall).toBeDefined();
+      expect(updateCall[1]).toEqual({ id: '1' });
+
+      const deletedEvent = updateCall[2];
+      expect(deletedEvent).toBeDefined();
+      expect(deletedEvent.id).toBe('1');
+      expect(deletedEvent.siteId).toBe('1');
+      expect(deletedEvent.note).toBe('existing notation');
+      expect(deletedEvent.whoDeleted).toBe('Deleter User');
+      expect(deletedEvent.whenDeleted).toBeInstanceOf(Date);
+      expect(deletedEvent.whoRestored).toBeNull();
+      expect(deletedEvent.whenRestored).toBeNull();
+    });
+
+    it('should restore notation when action is RESTORED', async () => {
+      const existingEvent = {
+        id: '1',
+        siteId: '1',
+        note: 'deleted notation',
+        whoDeleted: 'Old User',
+        whenDeleted: new Date('2024-01-01T00:00:00.000Z'),
+        whoRestored: null,
+        whenRestored: null,
+      };
+      jest
+        .spyOn(eventsRepository, 'findOneByOrFail')
+        .mockResolvedValueOnce(existingEvent as any);
+
+      const events = [
+        {
+          apiAction: UserActionEnum.RESTORED,
+          id: '1',
+          notationParticipant: [
+            {
+              apiAction: UserActionEnum.ADDED,
+              eventParticId: 'ep-2',
+              eventId: '1',
+              eprCode: 'RVB',
+              psnorgId: '1',
+              displayName: 'Participant',
+              srAction: SRApprovalStatusEnum.PENDING,
+            },
+          ],
+        },
+      ];
+
+      await siteService.processEvents(
+        events,
+        { givenName: 'Restorer User' },
+        entityManager,
+        '1',
+      );
+
+      // Verify that update was called once for the event
+      expect(entityManager.update).toHaveBeenCalledWith(
+        Events,
+        { id: '1' },
+        expect.objectContaining({
+          id: '1',
+          siteId: '1',
+          note: 'deleted notation',
+          whoRestored: 'Restorer User',
+          whoDeleted: null,
+          whenDeleted: null,
+        }),
+      );
+
+      // Validate the complete updatedEvents array content via the update call
+      const updateCall = (entityManager.update as jest.Mock).mock.calls.find(
+        (call) => call[0] === Events && call[1]?.id === '1',
+      );
+      expect(updateCall).toBeDefined();
+      expect(updateCall[1]).toEqual({ id: '1' });
+
+      const restoredEvent = updateCall[2];
+      expect(restoredEvent).toBeDefined();
+      expect(restoredEvent.id).toBe('1');
+      expect(restoredEvent.siteId).toBe('1');
+      expect(restoredEvent.note).toBe('deleted notation');
+      expect(restoredEvent.whoRestored).toBe('Restorer User');
+      expect(restoredEvent.whenRestored).toBeInstanceOf(Date);
+      expect(restoredEvent.whoDeleted).toBeNull();
+      expect(restoredEvent.whenDeleted).toBeNull();
     });
   });
 

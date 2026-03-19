@@ -2,6 +2,7 @@ export enum IChangeType {
   Added,
   Modified,
   Deleted,
+  Restored,
   None,
 }
 

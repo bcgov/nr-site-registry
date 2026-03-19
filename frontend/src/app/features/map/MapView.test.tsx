@@ -20,21 +20,17 @@ jest.mock('react-leaflet', () => {
   const React = require('react') as typeof import('react');
   return {
     __esModule: true,
-    MapContainer: React.forwardRef(
-      (
-        {
-          children,
-        }: {
-          children: React.ReactNode;
-        },
-        ref: { current: Partial<Map> | null },
-      ) => {
+    MapContainer: React.forwardRef<Partial<Map>, { children: React.ReactNode }>(
+      ({ children }, ref) => {
         React.useLayoutEffect(() => {
-          if (ref && typeof ref === 'object') {
-            ref.current = mockLeafletMap;
+          if (!ref) return;
+          const map = mockLeafletMap as Partial<Map>;
+          if (typeof ref !== 'function') {
+            (ref as React.MutableRefObject<Partial<Map> | null>).current = map;
+          } else {
+            ref(map);
           }
         }, [ref]);
-
         return <div data-testid="map-container">{children}</div>;
       },
     ),

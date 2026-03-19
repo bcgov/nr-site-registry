@@ -1,4 +1,5 @@
 import { LatLngBounds } from 'leaflet';
+import { MAP_FLY_OPTIONS } from './mapOptions';
 
 /** Build bounds from site coordinates (for text search fly-to-bounds). */
 export function extendSearchResultBounds(
@@ -26,4 +27,23 @@ export function sitesWhenMapToolCleared<T>(
     return null;
   }
   return mapSearchData || [];
+}
+
+export interface LeafletMapFlyToBounds {
+  flyToBounds(bounds: LatLngBounds, options: typeof MAP_FLY_OPTIONS): void;
+}
+
+/** After text search results load, fit map bounds when search term is set. */
+export function flyToBoundsForTextSearch(
+  searchTerm: string,
+  siteList: { latdeg?: number | null; longdeg?: number | null }[],
+  map: LeafletMapFlyToBounds | null,
+): void {
+  if (!searchTerm || !map) {
+    return;
+  }
+  const bounds = extendSearchResultBounds(siteList);
+  if (bounds.isValid()) {
+    map.flyToBounds(bounds, MAP_FLY_OPTIONS);
+  }
 }

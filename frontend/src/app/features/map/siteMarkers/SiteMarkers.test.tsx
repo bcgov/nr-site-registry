@@ -56,8 +56,8 @@ describe('SiteMarkers', () => {
     render(
       <SiteMarkers
         sites={[
-          { id: 99, latdeg: 49, longdeg: -123, addrLine_1: 'a' },
-          { id: 100, latdeg: 50, longdeg: -124, addrLine_1: 'b' },
+          { id: '99', latdeg: 49, longdeg: -123, addrLine_1: 'a' },
+          { id: '100', latdeg: 50, longdeg: -124, addrLine_1: 'b' },
         ]}
       />,
     );
@@ -73,7 +73,7 @@ describe('SiteMarkers', () => {
   it('renders only non-selected markers in cluster when none selected', () => {
     render(
       <SiteMarkers
-        sites={[{ id: 1, latdeg: 49, longdeg: -123, addrLine_1: 'x' }]}
+        sites={[{ id: '1', latdeg: 49, longdeg: -123, addrLine_1: 'x' }]}
       />,
     );
     expect(screen.getAllByTestId('site-marker')).toHaveLength(1);
@@ -87,7 +87,7 @@ describe('SiteMarkers', () => {
     });
     render(
       <SiteMarkers
-        sites={[{ id: 1, latdeg: null, longdeg: -123, addrLine_1: '' }]}
+        sites={[{ id: '1', latdeg: null, longdeg: -123, addrLine_1: '' }]}
       />,
     );
     expect(screen.queryAllByTestId('site-marker')).toHaveLength(0);
@@ -96,11 +96,33 @@ describe('SiteMarkers', () => {
   it('calls setQuery and flyTo on marker click', () => {
     render(
       <SiteMarkers
-        sites={[{ id: 55, latdeg: 48, longdeg: -122, addrLine_1: 'z' }]}
+        sites={[{ id: '55', latdeg: 48, longdeg: -122, addrLine_1: 'z' }]}
       />,
     );
     fireEvent.click(screen.getByTestId('site-marker'));
-    expect(mockSetQuery).toHaveBeenCalledWith({ site: 55 });
+    expect(mockSetQuery).toHaveBeenCalledWith({ site: '55' });
+    expect(mockFlyTo).toHaveBeenCalled();
+  });
+
+  it('calls setQuery and flyTo when clicking selected marker', () => {
+    (useMapSearchContext as jest.Mock).mockReturnValue({
+      selectedSiteId: '77',
+      setQuery: mockSetQuery,
+    });
+    render(
+      <SiteMarkers
+        sites={[
+          { id: '77', latdeg: 49, longdeg: -123, addrLine_1: 'sel' },
+          { id: '78', latdeg: 50, longdeg: -124, addrLine_1: 'other' },
+        ]}
+      />,
+    );
+    const selected = screen
+      .getAllByTestId('site-marker')
+      .find((m) => m.dataset.selected === 'true');
+    expect(selected).toBeTruthy();
+    fireEvent.click(selected!);
+    expect(mockSetQuery).toHaveBeenCalledWith({ site: '77' });
     expect(mockFlyTo).toHaveBeenCalled();
   });
 });

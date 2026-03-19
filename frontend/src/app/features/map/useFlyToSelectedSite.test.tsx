@@ -24,7 +24,7 @@ describe('useFlyToSelectedSite', () => {
     expect(flyTo).toHaveBeenCalledWith({ lat: 49, lng: -123 }, 12, {});
 
     flyTo.mockClear();
-    rerender({ id: null, lat: undefined, lng: undefined });
+    rerender({ id: null, lat: 0, lng: 0 });
     rerender({ id: '5', lat: 49, lng: -123 });
     expect(flyTo).toHaveBeenCalledTimes(1);
     expect(flyTo).toHaveBeenCalledWith({ lat: 49, lng: -123 }, 12, {});

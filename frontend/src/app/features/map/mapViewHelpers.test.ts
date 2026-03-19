@@ -1,5 +1,6 @@
 import {
   extendSearchResultBounds,
+  flyToBoundsForTextSearch,
   sitesWhenMapToolCleared,
 } from './mapViewHelpers';
 
@@ -50,5 +51,36 @@ describe('sitesWhenMapToolCleared', () => {
 
   it('returns null when activeTool is undefined', () => {
     expect(sitesWhenMapToolCleared(undefined, [{ id: 1 }])).toBeNull();
+  });
+});
+
+describe('flyToBoundsForTextSearch', () => {
+  it('does nothing when searchTerm empty', () => {
+    const flyToBounds = jest.fn();
+    flyToBoundsForTextSearch('', [{ latdeg: 49, longdeg: -123 }], {
+      flyToBounds,
+    });
+    expect(flyToBounds).not.toHaveBeenCalled();
+  });
+
+  it('does nothing when map is null', () => {
+    flyToBoundsForTextSearch('x', [{ latdeg: 49, longdeg: -123 }], null);
+  });
+
+  it('does nothing when bounds invalid', () => {
+    const flyToBounds = jest.fn();
+    flyToBoundsForTextSearch('x', [], { flyToBounds });
+    expect(flyToBounds).not.toHaveBeenCalled();
+  });
+
+  it('calls flyToBounds when search term and valid sites and map', () => {
+    const flyToBounds = jest.fn();
+    flyToBoundsForTextSearch('victoria', [{ latdeg: 48.4, longdeg: -123.4 }], {
+      flyToBounds,
+    });
+    expect(flyToBounds).toHaveBeenCalledTimes(1);
+    const [bounds, opts] = flyToBounds.mock.calls[0];
+    expect(bounds.isValid()).toBe(true);
+    expect(opts).toBeDefined();
   });
 });

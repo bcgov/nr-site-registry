@@ -12,13 +12,11 @@ import './MapView.css';
 import { MapSearch } from './MapSearch';
 import {
   MapSearchQuery,
-  MapSearchQueryVariables,
   useMapSearchQuery,
   useMapSearch_FindSiteBySiteIdQuery,
 } from '../../../graphql/generated';
 import { SiteMarkers } from './siteMarkers/SiteMarkers';
 import { MapControls } from './MapControls';
-import { MAP_FLY_OPTIONS } from './mapOptions';
 import {
   MapSearchQueryProvider,
   useMapSearchContext,
@@ -31,9 +29,10 @@ import { MapDataLayers } from './dataLayers/MapDataLayers';
 import { buildSitesToShow } from './buildSitesToShow';
 import { useFlyToSelectedSite } from './useFlyToSelectedSite';
 import {
-  extendSearchResultBounds,
+  flyToBoundsForTextSearch,
   sitesWhenMapToolCleared,
 } from './mapViewHelpers';
+import { buildMapSearchQueryVariables } from './mapSearchVariables';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -58,36 +57,28 @@ function MapView() {
     selectedSiteId,
   } = useMapSearchContext();
 
-  const variables: MapSearchQueryVariables = {
-    searchParam: searchTerm || '',
-    ...(polygonVertices.length > 0 && { polygon: polygonVertices }),
-  };
+  const mapRef = useRef<Map>(null);
+  const [sites, setSites] = useState<Site[]>([]);
 
-  if (center && radius >= MIN_CIRCLE_RADIUS) {
-    variables.circle = { center, radius };
-  }
+  const searchParam = searchTerm ?? '';
+
+  const variables = buildMapSearchQueryVariables(
+    searchParam,
+    polygonVertices,
+    center,
+    radius,
+    MIN_CIRCLE_RADIUS,
+  );
 
   const { data, loading: sitesLoading } = useMapSearchQuery({
     variables,
-    onCompleted: ({ mapSearch: { data } }) => {
-      flyToSiteBounds(data);
-      setSites(data);
+    onCompleted: ({ mapSearch: { data: siteData } }) => {
+      flyToBoundsForTextSearch(searchParam, siteData, mapRef.current);
+      setSites(siteData);
     },
   });
 
-  const flyToSiteBounds = (siteList: Site[]) => {
-    if (!searchTerm || !mapRef.current) {
-      return;
-    }
-    const bounds = extendSearchResultBounds(siteList);
-    if (bounds.isValid()) {
-      mapRef.current.flyToBounds(bounds, MAP_FLY_OPTIONS);
-    }
-  };
-
-  const mapRef = useRef<Map>(null);
   const [isLocationVisible, setLocationVisible] = useState(false);
-  const [sites, setSites] = useState<Site[]>([]);
   const clearSites = () => setSites([]);
 
   const { data: selectedSiteData } = useMapSearch_FindSiteBySiteIdQuery({

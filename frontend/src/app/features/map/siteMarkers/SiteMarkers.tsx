@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback, useMemo, type ReactNode } from 'react';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { SiteMarker } from './SiteMarker';
 import { useMap } from 'react-leaflet';
@@ -39,31 +39,62 @@ export const SiteMarkers: FC<SiteMarkersProps> = ({ sites }) => {
     [moveToSiteLocation, setQuery],
   );
 
-  const markers = useMemo(() => {
-    return sites.map((site) => {
-      if (!site.latdeg || !site.longdeg) return null;
-      return (
+  const { selectedMarker, clusterMarkers } = useMemo(() => {
+    const restMarkers: React.ReactNode[] = [];
+    const selectedSite = sites.find(
+      (site) =>
+        site.latdeg != null &&
+        site.longdeg != null &&
+        String(site.id) === String(selectedSiteId),
+    );
+    sites.forEach((site) => {
+      if (!site.latdeg || !site.longdeg) return;
+      const isSelected = String(site.id) === String(selectedSiteId);
+      if (!isSelected) {
+        restMarkers.push(
+          <SiteMarker
+            key={site.id}
+            isSelected={false}
+            position={{
+              lat: site.latdeg,
+              lng: site.longdeg,
+            }}
+            onClick={() => onSiteMarkerClick(site)}
+          />,
+        );
+      }
+    });
+    let selectedMarkerNode: ReactNode = null;
+    if (selectedSite) {
+      selectedMarkerNode = (
         <SiteMarker
-          key={site.id}
-          isSelected={site.id === selectedSiteId}
+          key={selectedSite.id}
+          isSelected={true}
           position={{
-            lat: site.latdeg,
-            lng: site.longdeg,
+            lat: selectedSite.latdeg ?? 0,
+            lng: selectedSite.longdeg ?? 0,
           }}
-          onClick={() => onSiteMarkerClick(site)}
+          onClick={() => onSiteMarkerClick(selectedSite)}
         />
       );
-    });
+    }
+    return {
+      selectedMarker: selectedMarkerNode,
+      clusterMarkers: restMarkers,
+    };
   }, [onSiteMarkerClick, selectedSiteId, sites]);
 
   return (
-    <MarkerClusterGroup
-      chunkedLoading
-      maxClusterRadius={80}
-      spiderfyOnMaxZoom={false}
-      showCoverageOnHover={false}
-    >
-      {markers}
-    </MarkerClusterGroup>
+    <>
+      {selectedMarker}
+      <MarkerClusterGroup
+        chunkedLoading
+        maxClusterRadius={80}
+        spiderfyOnMaxZoom={false}
+        showCoverageOnHover={false}
+      >
+        {clusterMarkers}
+      </MarkerClusterGroup>
+    </>
   );
 };

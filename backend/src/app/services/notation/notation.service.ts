@@ -33,6 +33,7 @@ export class NotationService {
     siteId: string,
     showPending: boolean,
     user: any,
+    includeDeleted: boolean = false,
   ) {
     this.sitesLogger.log('NotationService.getSiteNotationBySiteId() start');
     this.sitesLogger.debug('NotationService.getSiteNotationBySiteId() start');
@@ -43,11 +44,22 @@ export class NotationService {
       let eventPartics: EventPartics[] = [];
       if (user?.identity_provider === UserTypeEum.IDIR) {
         if (showPending) {
+          const whereClause: any = {
+            siteId,
+            srAction: SRApprovalStatusEnum.PENDING,
+          };
+          if (!includeDeleted) {
+            whereClause.whenDeleted = null;
+          }
           events = await this.notationRepository.find({
-            where: { siteId, srAction: SRApprovalStatusEnum.PENDING },
+            where: whereClause,
           });
         } else {
-          events = await this.notationRepository.find({ where: { siteId } });
+          const whereClause: any = { siteId };
+          if (!includeDeleted) {
+            whereClause.whenDeleted = null;
+          }
+          events = await this.notationRepository.find({ where: whereClause });
         }
 
         if (events?.length > 0) {
@@ -126,6 +138,8 @@ export class NotationService {
             srAction: event?.srAction === SRApprovalStatusEnum.PUBLIC,
             whenCreated: event?.whenCreated,
             whenUpdated: event?.whenUpdated,
+            whenDeleted: event?.whenDeleted,
+            whenRestored: event?.whenRestored,
             notationParticipant: eventParticsForEvent?.map((partic) => ({
               eventParticId: partic?.id,
               eventId: partic?.eventId,

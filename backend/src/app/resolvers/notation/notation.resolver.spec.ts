@@ -79,6 +79,8 @@ describe('NotationResolver', () => {
         srValue: false,
         whenCreated: new Date('2024-07-17'),
         whenUpdated: new Date('2024-07-17'),
+        whenDeleted: null,
+        whenRestored: null,
         notationParticipant: [
           {
             eventParticId: 'GUID001',
@@ -119,7 +121,12 @@ describe('NotationResolver', () => {
     const user = {
       identity_provider: UserTypeEum.IDIR,
     };
-    const result = await resolver.getSiteNotationBySiteId(siteId, false, user);
+    const result = await resolver.getSiteNotationBySiteId(
+      siteId,
+      false,
+      user,
+      false,
+    );
 
     expect(result).toEqual(expectedResult);
     expect(mockNotations[0].id).toEqual('1');
@@ -131,6 +138,7 @@ describe('NotationResolver', () => {
       siteId,
       false,
       user,
+      false,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       'Site Notation fetched successfully',
@@ -156,13 +164,19 @@ describe('NotationResolver', () => {
     const user = {
       identity_provider: UserTypeEum.IDIR,
     };
-    const result = await resolver.getSiteNotationBySiteId(siteId, false, user);
+    const result = await resolver.getSiteNotationBySiteId(
+      siteId,
+      false,
+      user,
+      false,
+    );
 
     expect(result).toEqual(expectedResult);
     expect(notationService.getSiteNotationBySiteId).toHaveBeenCalledWith(
       siteId,
       false,
       user,
+      false,
     );
     expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
       `Site Notation data not found for site id: ${siteId}`,
@@ -186,6 +200,7 @@ describe('NotationResolver', () => {
       siteId as any,
       false,
       user,
+      false,
     );
 
     expect(result.httpStatusCode).toEqual(404);
@@ -201,7 +216,12 @@ describe('NotationResolver', () => {
     const user = {
       identity_provider: UserTypeEum.IDIR,
     };
-    const result = await resolver.getSiteNotationBySiteId(siteId, false, user);
+    const result = await resolver.getSiteNotationBySiteId(
+      siteId,
+      false,
+      user,
+      false,
+    );
 
     expect(result.httpStatusCode).toEqual(404);
     expect(result.success).toEqual(false);
@@ -239,7 +259,12 @@ describe('NotationResolver', () => {
     const user = {
       identity_provider: UserTypeEum.IDIR,
     };
-    const result = await resolver.getSiteNotationBySiteId(siteId, false, user);
+    const result = await resolver.getSiteNotationBySiteId(
+      siteId,
+      false,
+      user,
+      false,
+    );
 
     expect(result.success).toEqual(true);
     expect(result.data).toHaveLength(1000);

@@ -160,6 +160,7 @@ export class SiteService {
     } = filters;
 
     this.sitesLogger.log('SiteService.searchSites() start');
+
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
 
@@ -246,7 +247,23 @@ export class SiteService {
 
       if (id) {
         const ids = id.split(',').map((v) => v.trim());
-        query.andWhere('sites.id IN (:...ids)', { ids });
+        this.sitesLogger.log(`Applying id filter: ${JSON.stringify(ids)}`);
+        // Build OR conditions for each ID
+        query.andWhere(
+          new Brackets((qb) => {
+            ids.forEach((siteId, index) => {
+              if (index === 0) {
+                qb.where(`CAST(sites.id AS TEXT) = :id${index}`, {
+                  [`id${index}`]: siteId,
+                });
+              } else {
+                qb.orWhere(`CAST(sites.id AS TEXT) = :id${index}`, {
+                  [`id${index}`]: siteId,
+                });
+              }
+            });
+          }),
+        );
       }
 
       if (srStatus) {
@@ -1478,6 +1495,9 @@ export class SiteService {
             ...new Events(),
             ...eventData,
           };
+          const dbEvent = await this.eventsRepositoryRepo.findOneByOrFail({
+            id: notationId,
+          });
           switch (apiAction) {
             case UserActionEnum.ADDED:
               // Get the ID of the newly created event
@@ -1527,9 +1547,47 @@ export class SiteService {
               break;
 
             case UserActionEnum.DELETED:
-              // Handle deletion if necessary
+              if (dbEvent) {
+                // Deleting is just a special form of updating, so it's safe to push.
+                updatedEvents.push({
+                  id: notation.id,
+                  changes: {
+                    ...new Events(),
+                    ...dbEvent,
+                    ...event,
+                    whoDeleted: userInfo ? userInfo.givenName : '',
+                    whenDeleted: new Date(),
+                    whoRestored: null,
+                    whenRestored: null,
+                  },
+                });
+              } else {
+                this.sitesLogger.log(
+                  `SiteService.processEvents(): Event with id ${notation.id} not found for deletion`,
+                );
+              }
               break;
-
+            case UserActionEnum.RESTORED:
+              if (dbEvent) {
+                // Restoring is just a special form of updating, so it's safe to push.
+                updatedEvents.push({
+                  id: notation.id,
+                  changes: {
+                    ...new Events(),
+                    ...dbEvent,
+                    ...event,
+                    whoRestored: userInfo ? userInfo.givenName : '',
+                    whenRestored: new Date(),
+                    whoDeleted: null,
+                    whenDeleted: null,
+                  },
+                });
+              } else {
+                this.sitesLogger.log(
+                  `SiteService.processEvents(): Event with id ${notation.id} not found for restoration`,
+                );
+              }
+              break;
             default:
               this.sitesLogger.warn(
                 'SiteService.processEvents Unknown action for event',

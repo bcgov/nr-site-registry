@@ -704,6 +704,8 @@ const SRUpdates = () => {
                   handleNotationFormRowFirstChild
                 }
                 handleChangeNotationFormRow={handleChange}
+                handleDeleteNotation={(_notationId: string) => {}}
+                handleRestoreNotation={(_notationId: string) => {}}
                 handleInputChange={handleChange}
                 userType={UserType.Internal}
                 handleNotationFormRowsInternal={handleNotationFormRowsInternal}

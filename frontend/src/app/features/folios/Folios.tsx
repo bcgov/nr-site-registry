@@ -113,10 +113,14 @@ const Folios = () => {
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = event.target.value;
     SetSearchText(searchTerm);
-    const filteredData = tempArr.filter((folio: any) => {
-      return deepSearch(folio, searchTerm.toLowerCase().trim());
-    });
-    setTempArr(filteredData);
+    if (searchTerm.trim() === '') {
+      setTempArr(folioItemsArr);
+    } else {
+      const filteredData = folioItemsArr.filter((folio: any) => {
+        return deepSearch(folio, searchTerm.toLowerCase().trim());
+      });
+      setTempArr(filteredData);
+    }
   };
 
   useEffect(() => {

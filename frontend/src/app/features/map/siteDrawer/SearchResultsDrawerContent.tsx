@@ -264,6 +264,7 @@ export const SearchResultsDrawerContent: FC<
       >
         <SearchResultsActions
           selectedRows={selectedRows}
+          selectedColumns={columnsToDisplay}
           aria-label="search-results-actions"
         />
         <SearchResultsFilters

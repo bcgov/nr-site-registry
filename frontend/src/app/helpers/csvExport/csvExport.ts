@@ -11,7 +11,7 @@ const EXCLUDED_COLUMN_NAMES = new Set(['Map', 'Details']);
 // Excel follows CSV quoting rules for cells containing commas, quotes, or line breaks.
 // Wrap those values in quotes and double any inner quotes so the cell is parsed correctly.
 function escapeCSVValue(value: string): string {
-  if (/[",\n]/.test(value)) {
+  if (/[",\r\n]/.test(value)) {
     return `"${value.replace(/"/g, '""')}"`;
   }
 
@@ -26,6 +26,22 @@ function normalizeValue(value: unknown): string {
   }
 
   return String(value);
+}
+
+// Prevent spreadsheet formula interpretation when CSV is opened in Excel/Sheets.
+// If the first non-whitespace character is one of = + - @, prefix with a single quote.
+// This is probably overkill for our use case but provides a strong safeguard against CSV injection and accidental
+// formula parsing.
+function neutralizeSpreadsheetFormula(value: string): string {
+  if (!value) {
+    return value;
+  }
+
+  if (value.startsWith("'")) {
+    return value;
+  }
+
+  return /^[\t ]*[=+\-@]/.test(value) ? `'${value}` : value;
 }
 
 // Excel on Windows is most reliable with UTF-8 BOM + CRLF line endings.
@@ -125,7 +141,11 @@ export function convertRowsToCSV(
   const escapedRows = rows
     .map((row) =>
       headers
-        .map((header) => escapeCSVValue(normalizeValue(row[header])))
+        .map((header) =>
+          escapeCSVValue(
+            neutralizeSpreadsheetFormula(normalizeValue(row[header])),
+          ),
+        )
         .join(','),
     )
     .join('\n');

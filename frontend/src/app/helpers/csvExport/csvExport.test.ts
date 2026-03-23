@@ -19,6 +19,41 @@ describe('convertRowsToCSV', () => {
 
     expect(convertRowsToCSV(rows, ['B', 'A'])).toBe('B,A\ntwo,one\nfour,three');
   });
+
+  it('should quote values that contain carriage return characters', () => {
+    const rows = [{ A: 'line1\rline2' }];
+
+    expect(convertRowsToCSV(rows, ['A'])).toBe('A\n"line1\rline2"');
+  });
+
+  it('should preserve embedded CRLF/LF inside quoted cells', () => {
+    const rows = [{ A: 'first\r\nsecond\nthird' }];
+
+    expect(convertRowsToCSV(rows, ['A'])).toBe('A\n"first\r\nsecond\nthird"');
+  });
+
+  it('should neutralize formula-like prefixes for spreadsheet safety', () => {
+    const rows = [
+      {
+        A: '=1+1',
+        B: '+SUM(A1:A2)',
+        C: '-10+2',
+        D: '@cmd',
+      },
+    ];
+
+    expect(convertRowsToCSV(rows, ['A', 'B', 'C', 'D'])).toBe(
+      "A,B,C,D\n'=1+1,'+SUM(A1:A2),'-10+2,'@cmd",
+    );
+  });
+
+  it('should neutralize formula-like values even with leading spaces', () => {
+    const rows = [{ A: '   =HYPERLINK("http://example.com")' }];
+
+    expect(convertRowsToCSV(rows, ['A'])).toBe(
+      `A\n"'   =HYPERLINK(""http://example.com"")"`,
+    );
+  });
 });
 
 describe('convertSelectedColumnsToCSV', () => {

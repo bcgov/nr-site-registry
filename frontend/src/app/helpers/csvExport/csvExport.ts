@@ -154,6 +154,9 @@ export function downloadSelectedColumnsCSV(
   a.setAttribute('download', filename);
   document.body.appendChild(a);
   a.click();
+  window.setTimeout(() => {
+    window.URL.revokeObjectURL(url);
+  }, 0);
   document.body.removeChild(a);
 }
 

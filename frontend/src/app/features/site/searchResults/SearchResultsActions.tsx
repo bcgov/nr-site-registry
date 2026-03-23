@@ -16,17 +16,17 @@ import { addCartItem, resetCartItemAddedStatus } from '../../cart/CartSlice';
 
 interface SearchResultsActionsProps {
   selectedRows: any[]; // TODO: type this properly, should be Site
-  selectedColumns: TableColumn[];
+  selectedColumns?: TableColumn[];
 }
 export const SearchResultsActions: FC<SearchResultsActionsProps> = ({
   selectedRows,
-  selectedColumns,
+  selectedColumns = [],
 }) => {
   const auth = useAuth();
   const dispatch = useDispatch<AppDispatch>();
 
   const handleExport = () => {
-    if (selectedRows.length > 0) {
+    if (selectedRows.length > 0 && selectedColumns.length > 0) {
       downloadSelectedColumnsCSV(selectedRows, selectedColumns);
     }
   };

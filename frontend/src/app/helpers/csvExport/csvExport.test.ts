@@ -4,11 +4,209 @@ import {
   convertRowsToCSV,
   convertSelectedColumnsToCSV,
   toExcelFriendlyCSVContent,
+  escapeCSVValue,
+  normalizeValue,
+  neutralizeSpreadsheetFormula,
+  getValueByPath,
+  getColumnValue,
 } from './csvExport';
+
+describe('escapeCSVValue', () => {
+  it('should not quote simple alphanumeric values', () => {
+    expect(escapeCSVValue('simple')).toBe('simple');
+  });
+
+  it('should quote values containing commas', () => {
+    expect(escapeCSVValue('a,b')).toBe('"a,b"');
+  });
+
+  it('should quote and escape values containing quotes', () => {
+    expect(escapeCSVValue('a"b')).toBe('"a""b"');
+  });
+
+  it('should quote values containing line breaks', () => {
+    expect(escapeCSVValue('a\nb')).toBe('"a\nb"');
+  });
+
+  it('should quote values containing carriage returns', () => {
+    expect(escapeCSVValue('a\rb')).toBe('"a\rb"');
+  });
+});
+
+describe('normalizeValue', () => {
+  it('should convert null to empty string', () => {
+    expect(normalizeValue(null)).toBe('');
+  });
+
+  it('should convert undefined to empty string', () => {
+    expect(normalizeValue(undefined)).toBe('');
+  });
+
+  it('should convert numbers to strings', () => {
+    expect(normalizeValue(123)).toBe('123');
+  });
+
+  it('should convert booleans to strings', () => {
+    expect(normalizeValue(true)).toBe('true');
+    expect(normalizeValue(false)).toBe('false');
+  });
+
+  it('should keep strings as-is', () => {
+    expect(normalizeValue('hello')).toBe('hello');
+  });
+});
+
+describe('neutralizeSpreadsheetFormula', () => {
+  it('should leave safe values unchanged', () => {
+    expect(neutralizeSpreadsheetFormula('hello')).toBe('hello');
+  });
+
+  it('should neutralize leading equals', () => {
+    expect(neutralizeSpreadsheetFormula('=SUM(A1)')).toBe("'=SUM(A1)");
+  });
+
+  it('should neutralize leading plus', () => {
+    expect(neutralizeSpreadsheetFormula('+SUM(A1)')).toBe("'+SUM(A1)");
+  });
+
+  it('should neutralize leading minus', () => {
+    expect(neutralizeSpreadsheetFormula('-10')).toBe("'-10");
+  });
+
+  it('should neutralize leading at sign', () => {
+    expect(neutralizeSpreadsheetFormula('@cmd')).toBe("'@cmd");
+  });
+
+  it('should not neutralize if already prefixed with quote', () => {
+    expect(neutralizeSpreadsheetFormula("'=SUM(A1)")).toBe("'=SUM(A1)");
+  });
+
+  it('should handle empty string', () => {
+    expect(neutralizeSpreadsheetFormula('')).toBe('');
+  });
+
+  it('should neutralize after leading whitespace', () => {
+    expect(neutralizeSpreadsheetFormula('  =SUM(A1)')).toBe("'  =SUM(A1)");
+  });
+});
+
+describe('getValueByPath', () => {
+  it('should retrieve simple property values', () => {
+    const obj = { name: 'John', age: 30 };
+    expect(getValueByPath(obj, 'name')).toBe('John');
+    expect(getValueByPath(obj, 'age')).toBe(30);
+  });
+
+  it('should retrieve nested property values', () => {
+    const obj = { user: { name: 'John', email: 'john@example.com' } };
+    expect(getValueByPath(obj, 'user.name')).toBe('John');
+    expect(getValueByPath(obj, 'user.email')).toBe('john@example.com');
+  });
+
+  it('should retrieve array element values', () => {
+    const obj = { items: ['a', 'b', 'c'] };
+    expect(getValueByPath(obj, 'items.0')).toBe('a');
+    expect(getValueByPath(obj, 'items.2')).toBe('c');
+  });
+
+  it('should retrieve nested array element properties', () => {
+    const obj = { items: [{ name: 'first' }, { name: 'second' }] };
+    expect(getValueByPath(obj, 'items.0.name')).toBe('first');
+    expect(getValueByPath(obj, 'items.1.name')).toBe('second');
+  });
+
+  it('should return undefined for non-existent properties', () => {
+    const obj = { name: 'John' };
+    expect(getValueByPath(obj, 'nonexistent')).toBeUndefined();
+  });
+
+  it('should return undefined for non-integer array indices', () => {
+    const obj = { items: ['a', 'b', 'c'] };
+    expect(getValueByPath(obj, 'items.abc')).toBeUndefined();
+  });
+});
+
+describe('getColumnValue', () => {
+  it('should return empty string for columns with empty property names', () => {
+    const row = { name: 'test' };
+    const column = new TableColumn(
+      1,
+      'Empty',
+      true,
+      '',
+      1,
+      false,
+      true,
+      1,
+      true,
+      { type: FormFieldType.Label, label: 'Empty' },
+    );
+
+    expect(getColumnValue(row, column)).toBe('');
+  });
+
+  it('should return simple property value for non-date columns', () => {
+    const row = { name: 'John' };
+    const column = new TableColumn(
+      1,
+      'Name',
+      true,
+      'name',
+      1,
+      false,
+      true,
+      1,
+      true,
+      { type: FormFieldType.Label, label: 'Name' },
+    );
+
+    expect(getColumnValue(row, column)).toBe('John');
+  });
+
+  it('should join multiple properties with space separator', () => {
+    const row = { first: 'John', last: 'Doe', middle: 'Q' };
+    const column = new TableColumn(
+      1,
+      'Full Name',
+      true,
+      'first,middle,last',
+      1,
+      false,
+      true,
+      1,
+      true,
+      { type: FormFieldType.Label, label: 'Full Name' },
+    );
+
+    expect(getColumnValue(row, column)).toBe('John Q Doe');
+  });
+
+  it('should handle missing properties in multi-field columns', () => {
+    const row = { first: 'John' };
+    const column = new TableColumn(
+      1,
+      'Full Name',
+      true,
+      'first,middle,last',
+      1,
+      false,
+      true,
+      1,
+      true,
+      { type: FormFieldType.Label, label: 'Full Name' },
+    );
+
+    expect(getColumnValue(row, column)).toBe('John');
+  });
+});
 
 describe('convertRowsToCSV', () => {
   it('should return an empty string when headers are missing', () => {
     expect(convertRowsToCSV([{ a: 'x' }], [])).toBe('');
+  });
+
+  it('should return an empty string when rows are empty', () => {
+    expect(convertRowsToCSV([], ['A'])).toBe('');
   });
 
   it('should convert rows using explicit header order', () => {
@@ -18,6 +216,24 @@ describe('convertRowsToCSV', () => {
     ];
 
     expect(convertRowsToCSV(rows, ['B', 'A'])).toBe('B,A\ntwo,one\nfour,three');
+  });
+
+  it('should not quote values that do not contain special characters', () => {
+    const rows = [{ A: 'simple-value' }];
+
+    expect(convertRowsToCSV(rows, ['A'])).toBe('A\nsimple-value');
+  });
+
+  it('should quote and escape values that contain double quotes', () => {
+    const rows = [{ A: 'He said "hello"' }];
+
+    expect(convertRowsToCSV(rows, ['A'])).toBe('A\n"He said ""hello"""');
+  });
+
+  it('should quote values that contain commas', () => {
+    const rows = [{ A: 'value, with, commas' }];
+
+    expect(convertRowsToCSV(rows, ['A'])).toBe('A\n"value, with, commas"');
   });
 
   it('should quote values that contain carriage return characters', () => {
@@ -196,6 +412,201 @@ describe('convertSelectedColumnsToCSV', () => {
     expect(convertSelectedColumnsToCSV(rowsWithInvalidDate, dateColumns)).toBe(
       'Last Updated\n',
     );
+  });
+
+  it('should join multiple properties with spaces', () => {
+    const rows = [
+      {
+        firstName: 'John',
+        lastName: 'Doe',
+        middleName: 'Q',
+      },
+    ];
+
+    const columns: TableColumn[] = [
+      new TableColumn(
+        1,
+        'Full Name',
+        true,
+        'firstName, middleName, lastName',
+        1,
+        false,
+        true,
+        1,
+        true,
+        { type: FormFieldType.Label, label: 'Full Name' },
+      ),
+    ];
+
+    expect(convertSelectedColumnsToCSV(rows, columns)).toBe(
+      'Full Name\nJohn Q Doe',
+    );
+  });
+
+  it('should exclude action columns like Map and Details from export', () => {
+    const rows = [
+      {
+        id: 1,
+        name: 'Test',
+      },
+    ];
+
+    const columns: TableColumn[] = [
+      new TableColumn(1, 'ID', true, 'id', 1, false, true, 1, true, {
+        type: FormFieldType.Label,
+        label: 'ID',
+      }),
+      new TableColumn(
+        2,
+        'Map',
+        true,
+        'id',
+        1,
+        true,
+        true,
+        1,
+        true,
+        { type: FormFieldType.Link, label: 'Map' },
+        '/map?site=',
+        true,
+      ),
+      new TableColumn(3, 'Name', true, 'name', 1, false, true, 1, true, {
+        type: FormFieldType.Label,
+        label: 'Name',
+      }),
+    ];
+
+    expect(convertSelectedColumnsToCSV(rows, columns)).toBe('ID,Name\n1,Test');
+  });
+
+  it('should handle missing properties by returning empty values', () => {
+    const rows = [
+      {
+        id: 1,
+      },
+    ];
+
+    const columns: TableColumn[] = [
+      new TableColumn(1, 'ID', true, 'id', 1, false, true, 1, true, {
+        type: FormFieldType.Label,
+        label: 'ID',
+      }),
+      new TableColumn(
+        2,
+        'Missing Field',
+        true,
+        'nonexistent',
+        1,
+        false,
+        true,
+        1,
+        true,
+        { type: FormFieldType.Label, label: 'Missing Field' },
+      ),
+    ];
+
+    expect(convertSelectedColumnsToCSV(rows, columns)).toBe(
+      'ID,Missing Field\n1,',
+    );
+  });
+
+  it('should handle null and undefined values in cells', () => {
+    const rows = [
+      {
+        name: 'Test',
+        value1: null,
+        value2: undefined,
+      },
+    ];
+
+    const columns: TableColumn[] = [
+      new TableColumn(1, 'Name', true, 'name', 1, false, true, 1, true, {
+        type: FormFieldType.Label,
+        label: 'Name',
+      }),
+      new TableColumn(2, 'Value 1', true, 'value1', 1, false, true, 1, true, {
+        type: FormFieldType.Label,
+        label: 'Value 1',
+      }),
+      new TableColumn(3, 'Value 2', true, 'value2', 1, false, true, 1, true, {
+        type: FormFieldType.Label,
+        label: 'Value 2',
+      }),
+    ];
+
+    expect(convertSelectedColumnsToCSV(rows, columns)).toBe(
+      'Name,Value 1,Value 2\nTest,,',
+    );
+  });
+
+  it('should handle numeric and special values', () => {
+    const rows = [
+      {
+        id: 123,
+        active: true,
+        score: 45.67,
+      },
+    ];
+
+    const columns: TableColumn[] = [
+      new TableColumn(1, 'ID', true, 'id', 1, false, true, 1, true, {
+        type: FormFieldType.Label,
+        label: 'ID',
+      }),
+      new TableColumn(2, 'Active', true, 'active', 1, false, true, 1, true, {
+        type: FormFieldType.Label,
+        label: 'Active',
+      }),
+      new TableColumn(3, 'Score', true, 'score', 1, false, true, 1, true, {
+        type: FormFieldType.Label,
+        label: 'Score',
+      }),
+    ];
+
+    expect(convertSelectedColumnsToCSV(rows, columns)).toBe(
+      'ID,Active,Score\n123,true,45.67',
+    );
+  });
+
+  it('should handle multiple rows with mixed data', () => {
+    const rows = [
+      {
+        id: 1,
+        name: 'First',
+        email: 'first@test.com',
+      },
+      {
+        id: 2,
+        name: 'Second',
+        email: 'second@test.com',
+      },
+      {
+        id: 3,
+        name: 'Third',
+        email: 'third@test.com',
+      },
+    ];
+
+    const columns: TableColumn[] = [
+      new TableColumn(1, 'ID', true, 'id', 1, false, true, 1, true, {
+        type: FormFieldType.Label,
+        label: 'ID',
+      }),
+      new TableColumn(2, 'Name', true, 'name', 1, false, true, 1, true, {
+        type: FormFieldType.Label,
+        label: 'Name',
+      }),
+      new TableColumn(3, 'Email', true, 'email', 1, false, true, 1, true, {
+        type: FormFieldType.Label,
+        label: 'Email',
+      }),
+    ];
+
+    const result = convertSelectedColumnsToCSV(rows, columns);
+    expect(result).toContain('ID,Name,Email');
+    expect(result).toContain('1,First,first@test.com');
+    expect(result).toContain('2,Second,second@test.com');
+    expect(result).toContain('3,Third,third@test.com');
   });
 });
 

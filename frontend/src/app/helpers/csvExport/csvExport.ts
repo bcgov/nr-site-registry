@@ -10,7 +10,7 @@ const EXCLUDED_COLUMN_NAMES = new Set(['Map', 'Details']);
 
 // Excel follows CSV quoting rules for cells containing commas, quotes, or line breaks.
 // Wrap those values in quotes and double any inner quotes so the cell is parsed correctly.
-function escapeCSVValue(value: string): string {
+export function escapeCSVValue(value: string): string {
   if (/[",\r\n]/.test(value)) {
     return `"${value.replace(/"/g, '""')}"`;
   }
@@ -20,7 +20,7 @@ function escapeCSVValue(value: string): string {
 
 // Normalize null/undefined to empty cells and coerce other values to strings,
 // which keeps CSV output stable for Excel import and display.
-function normalizeValue(value: unknown): string {
+export function normalizeValue(value: unknown): string {
   if (value === undefined || value === null) {
     return '';
   }
@@ -32,7 +32,7 @@ function normalizeValue(value: unknown): string {
 // If the first non-whitespace character is one of = + - @, prefix with a single quote.
 // This is probably overkill for our use case but provides a strong safeguard against CSV injection and accidental
 // formula parsing.
-function neutralizeSpreadsheetFormula(value: string): string {
+export function neutralizeSpreadsheetFormula(value: string): string {
   if (!value) {
     return value;
   }
@@ -55,7 +55,7 @@ export function toExcelFriendlyCSVContent(csvString: string): string {
   return `\uFEFF${normalizedLineEndings}`;
 }
 
-function getValueByPath(
+export function getValueByPath(
   record: Record<string, unknown>,
   path: string,
 ): unknown {
@@ -92,7 +92,7 @@ function getExportableColumns(columns: TableColumn[]): TableColumn[] {
   );
 }
 
-function getColumnValue(
+export function getColumnValue(
   row: Record<string, unknown>,
   column: TableColumn,
 ): string {

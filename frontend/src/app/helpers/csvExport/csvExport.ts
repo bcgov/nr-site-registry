@@ -61,19 +61,25 @@ function getValueByPath(
 ): unknown {
   // Pathsegments handles the case where the path includes array indexing, e.g. "items[0].name".
   // This will determine whether to use the key as an object property or an array index.
-  const pathSegments = path.match(/[^.[\]]+/g) ?? [];
+  const pathSegments: string[] = path.match(/[^.[\]]+/g) || [];
+  let currentValue: unknown = record;
 
-  return pathSegments.reduce<unknown>((currentValue: unknown, key: string) => {
+  for (const key of pathSegments) {
     if (Array.isArray(currentValue)) {
       const index = Number(key);
-      return Number.isInteger(index) ? currentValue[index] : undefined;
+      currentValue = Number.isInteger(index) ? currentValue[index] : undefined;
+      continue;
     }
 
     if (isObject(currentValue)) {
-      return currentValue[key];
+      currentValue = currentValue[key];
+      continue;
     }
+
     return undefined;
-  }, record);
+  }
+
+  return currentValue;
 }
 
 function getExportableColumns(columns: TableColumn[]): TableColumn[] {

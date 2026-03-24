@@ -12,7 +12,7 @@ const EXCLUDED_COLUMN_NAMES = new Set(['Map', 'Details']);
 // Wrap those values in quotes and double any inner quotes so the cell is parsed correctly.
 export function escapeCSVValue(value: string): string {
   if (/[",\r\n]/.test(value)) {
-    return `"${value.replace(/"/g, '""')}"`;
+    return `"${value.replaceAll('"', '""')}"`;
   }
 
   return value;
@@ -22,6 +22,12 @@ export function escapeCSVValue(value: string): string {
 // which keeps CSV output stable for Excel import and display.
 export function normalizeValue(value: unknown): string {
   if (value === undefined || value === null) {
+    return '';
+  }
+
+  // Objects are intentionally returned as empty — passing one to String() would
+  // silently produce "[object Object]", which is never a useful CSV cell value.
+  if (typeof value === 'object') {
     return '';
   }
 
@@ -51,7 +57,10 @@ export function toExcelFriendlyCSVContent(csvString: string): string {
     return '';
   }
 
-  const normalizedLineEndings = csvString.replace(/\r\n|\r|\n/g, '\r\n');
+  const normalizedLineEndings = csvString
+    .replaceAll('\r\n', '\n')
+    .replaceAll('\r', '\n')
+    .replaceAll('\n', '\r\n');
   return `\uFEFF${normalizedLineEndings}`;
 }
 
@@ -173,15 +182,15 @@ export function downloadSelectedColumnsCSV(
   const blob = new Blob([excelFriendlyCSV], {
     type: 'text/csv;charset=utf-8;',
   });
-  const url = window.URL.createObjectURL(blob);
+  const url = globalThis.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.setAttribute('hidden', '');
   a.setAttribute('href', url);
   a.setAttribute('download', filename);
   document.body.appendChild(a);
   a.click();
-  window.setTimeout(() => {
-    window.URL.revokeObjectURL(url);
+  globalThis.setTimeout(() => {
+    globalThis.URL.revokeObjectURL(url);
   }, 0);
   document.body.removeChild(a);
 }

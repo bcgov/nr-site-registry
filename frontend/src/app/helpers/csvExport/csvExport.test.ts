@@ -9,6 +9,7 @@ import {
   neutralizeSpreadsheetFormula,
   getValueByPath,
   getColumnValue,
+  downloadSelectedColumnsCSV,
 } from './csvExport';
 
 describe('escapeCSVValue', () => {
@@ -53,6 +54,10 @@ describe('normalizeValue', () => {
 
   it('should keep strings as-is', () => {
     expect(normalizeValue('hello')).toBe('hello');
+  });
+
+  it('should return empty string for object values', () => {
+    expect(normalizeValue({ a: 1 })).toBe('');
   });
 });
 
@@ -123,6 +128,11 @@ describe('getValueByPath', () => {
   it('should return undefined for non-integer array indices', () => {
     const obj = { items: ['a', 'b', 'c'] };
     expect(getValueByPath(obj, 'items.abc')).toBeUndefined();
+  });
+
+  it('should return the original record when path has no segments', () => {
+    const obj = { name: 'John' };
+    expect(getValueByPath(obj, '[]')).toEqual(obj);
   });
 });
 
@@ -197,6 +207,24 @@ describe('getColumnValue', () => {
     );
 
     expect(getColumnValue(row, column)).toBe('John');
+  });
+
+  it('should return empty for invalid Date objects', () => {
+    const row = { whenCreated: new Date('invalid-date') };
+    const column = new TableColumn(
+      1,
+      'Last Updated',
+      true,
+      'whenCreated',
+      1,
+      false,
+      true,
+      1,
+      true,
+      { type: FormFieldType.Date, label: 'Last Updated' },
+    );
+
+    expect(getColumnValue(row, column)).toBe('');
   });
 });
 
@@ -607,6 +635,87 @@ describe('convertSelectedColumnsToCSV', () => {
     expect(result).toContain('1,First,first@test.com');
     expect(result).toContain('2,Second,second@test.com');
     expect(result).toContain('3,Third,third@test.com');
+  });
+});
+
+describe('downloadSelectedColumnsCSV', () => {
+  const exportColumns: TableColumn[] = [
+    new TableColumn(1, 'ID', true, 'id', 1, false, true, 1, true, {
+      type: FormFieldType.Label,
+      label: 'ID',
+    }),
+  ];
+
+  it('should return early when there is no CSV content to export', () => {
+    const originalCreateObjectURL = globalThis.URL.createObjectURL;
+    const createObjectURLMock = jest.fn(() => 'blob:mock');
+
+    Object.defineProperty(globalThis.URL, 'createObjectURL', {
+      configurable: true,
+      writable: true,
+      value: createObjectURLMock,
+    });
+
+    downloadSelectedColumnsCSV([], exportColumns);
+
+    expect(createObjectURLMock).not.toHaveBeenCalled();
+
+    Object.defineProperty(globalThis.URL, 'createObjectURL', {
+      configurable: true,
+      writable: true,
+      value: originalCreateObjectURL,
+    });
+  });
+
+  it('should create and revoke a blob URL when exporting', () => {
+    jest.useFakeTimers();
+
+    const originalCreateObjectURL = globalThis.URL.createObjectURL;
+    const originalRevokeObjectURL = globalThis.URL.revokeObjectURL;
+
+    const createObjectURLMock = jest.fn(() => 'blob:mock');
+    const revokeObjectURLMock = jest.fn();
+
+    Object.defineProperty(globalThis.URL, 'createObjectURL', {
+      configurable: true,
+      writable: true,
+      value: createObjectURLMock,
+    });
+
+    Object.defineProperty(globalThis.URL, 'revokeObjectURL', {
+      configurable: true,
+      writable: true,
+      value: revokeObjectURLMock,
+    });
+
+    const appendSpy = jest.spyOn(document.body, 'appendChild');
+    const removeSpy = jest.spyOn(document.body, 'removeChild');
+
+    const rows = [{ id: 123 }];
+    downloadSelectedColumnsCSV(rows, exportColumns, 'sites.csv');
+    jest.runAllTimers();
+
+    expect(createObjectURLMock).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURLMock).toHaveBeenCalledWith('blob:mock');
+    expect(appendSpy).toHaveBeenCalledTimes(1);
+    expect(removeSpy).toHaveBeenCalledTimes(1);
+
+    appendSpy.mockRestore();
+    removeSpy.mockRestore();
+
+    Object.defineProperty(globalThis.URL, 'createObjectURL', {
+      configurable: true,
+      writable: true,
+      value: originalCreateObjectURL,
+    });
+
+    Object.defineProperty(globalThis.URL, 'revokeObjectURL', {
+      configurable: true,
+      writable: true,
+      value: originalRevokeObjectURL,
+    });
+
+    jest.useRealTimers();
   });
 });
 

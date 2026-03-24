@@ -40,6 +40,8 @@ import {
   FindSitesAndPlaces,
   FindSitesAndPlacesResponse,
 } from '../../dto/mapSearch.dto';
+import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
+import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
 
 /**
  * Resolver for Region
@@ -170,6 +172,10 @@ export class SiteResolver {
     searchParam: SearchParams,
     @Args('page', { type: () => String }) page: number,
     @Args('pageSize', { type: () => String }) pageSize: number,
+    @Args({ name: 'sortBy', type: () => SiteSortBy, nullable: true })
+    sortBy: SiteSortBy = SiteSortBy.ID,
+    @Args({ name: 'sortByDir', type: () => SortByDirection, nullable: true })
+    sortByDir: SortByDirection = SortByDirection.ASC,
   ) {
     this.sitesLogger.log(
       'SiteResolver.getPendingSiteForSRApproval() start dto:' +
@@ -185,6 +191,8 @@ export class SiteResolver {
       searchParam,
       page,
       pageSize,
+      sortBy,
+      sortByDir,
     );
 
     return this.siteApprovalResponseProvider.createResponse(

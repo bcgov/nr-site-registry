@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Brackets, EntityManager, FindOneOptions, Repository } from 'typeorm';
-import { SiteService } from './site.service';
+import { SiteService, sortSRReviewTableResults } from './site.service';
 import { Sites } from '../../entities/sites.entity';
 import { FetchSiteDetail } from '../../dto/response/genericResponse';
 import { sampleSites } from '../../mockData/site.mockData';
@@ -34,6 +34,7 @@ import { Place } from '../../entities/placeEntity';
 
 import { SiteRegistry } from '../../entities/siteRegistry.entity';
 import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
+import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
 import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
 
 describe('SiteService', () => {
@@ -1790,6 +1791,129 @@ describe('SiteService', () => {
       });
 
       expect(mockQueryBuilder.getManyAndCount).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('sortPendingResults', () => {
+    const mockData = [
+      {
+        siteId: '3',
+        whoUpdated: 'Charlie',
+        whenUpdated: '2026-03-19',
+        address: '789 Oak St',
+      },
+      {
+        siteId: '1',
+        whoUpdated: 'Alice',
+        whenUpdated: '2025-07-28',
+        address: '123 Main St',
+      },
+      {
+        siteId: '2',
+        whoUpdated: 'Bob',
+        whenUpdated: '2026-03-11',
+        address: '456 Elm St',
+      },
+    ];
+
+    it('should sort by siteId ascending by default', () => {
+      const result = sortSRReviewTableResults(mockData);
+      expect(result.map((r) => r.siteId)).toEqual(['1', '2', '3']);
+    });
+
+    it('should sort by siteId descending', () => {
+      const result = sortSRReviewTableResults(
+        mockData,
+        SiteSortBy.ID,
+        SortByDirection.DESC,
+      );
+      expect(result.map((r) => r.siteId)).toEqual(['3', '2', '1']);
+    });
+
+    it('should sort by whenUpdated ascending (date comparison)', () => {
+      const result = sortSRReviewTableResults(
+        mockData,
+        SiteSortBy.WHEN_UPDATED,
+        SortByDirection.ASC,
+      );
+      expect(result.map((r) => r.whenUpdated)).toEqual([
+        '2025-07-28',
+        '2026-03-11',
+        '2026-03-19',
+      ]);
+    });
+
+    it('should sort by whenUpdated descending (date comparison)', () => {
+      const result = sortSRReviewTableResults(
+        mockData,
+        SiteSortBy.WHEN_UPDATED,
+        SortByDirection.DESC,
+      );
+      expect(result.map((r) => r.whenUpdated)).toEqual([
+        '2026-03-19',
+        '2026-03-11',
+        '2025-07-28',
+      ]);
+    });
+
+    it('should sort by whoUpdated ascending', () => {
+      const result = sortSRReviewTableResults(
+        mockData,
+        SiteSortBy.WHO_CREATED,
+        SortByDirection.ASC,
+      );
+      expect(result.map((r) => r.whoUpdated)).toEqual([
+        'Alice',
+        'Bob',
+        'Charlie',
+      ]);
+    });
+
+    it('should sort by address descending', () => {
+      const result = sortSRReviewTableResults(
+        mockData,
+        SiteSortBy.SITE_ADDRESS,
+        SortByDirection.DESC,
+      );
+      expect(result.map((r) => r.address)).toEqual([
+        '789 Oak St',
+        '456 Elm St',
+        '123 Main St',
+      ]);
+    });
+
+    it('should not mutate the original array', () => {
+      const original = [...mockData];
+      sortSRReviewTableResults(mockData, SiteSortBy.ID, SortByDirection.DESC);
+      expect(mockData).toEqual(original);
+    });
+
+    it('should handle null/undefined values gracefully', () => {
+      const dataWithNulls = [
+        {
+          siteId: '2',
+          whoUpdated: 'Bob',
+          whenUpdated: null,
+          address: '456 Elm St',
+        },
+        {
+          siteId: '1',
+          whoUpdated: 'Alice',
+          whenUpdated: '2026-03-11',
+          address: '123 Main St',
+        },
+      ];
+      const result = sortSRReviewTableResults(
+        dataWithNulls,
+        SiteSortBy.WHEN_UPDATED,
+        SortByDirection.ASC,
+      );
+      expect(result).toHaveLength(2);
+    });
+
+    it('should return empty array when given empty input', () => {
+      const result = sortSRReviewTableResults([]);
+      expect(result).toEqual([]);
     });
   });
 });

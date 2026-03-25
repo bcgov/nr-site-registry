@@ -691,6 +691,7 @@ const SRUpdates = () => {
         notationData.map((notation: any, index: number) => {
           return (
             <ApproveReject
+              key={notation.id ?? index}
               name="Notations"
               testId="srupdates-notation-component"
               link="?notations"
@@ -760,6 +761,7 @@ const SRUpdates = () => {
         documentsData.map((document: any, index: number) => {
           return (
             <ApproveReject
+              key={document.id ?? index}
               name="Documents"
               testId="srupdates-documents-component"
               link="?documents"

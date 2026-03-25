@@ -1,4 +1,5 @@
 import { RequestStatus } from '../../../../helpers/requests/status';
+import { SiteSortBy, SortByDirection } from '../../../../../graphql/generated';
 
 export class SRReviewListState {
   sites: SitePendingApprovalDTO[] = [];
@@ -10,6 +11,8 @@ export class SRReviewListState {
   currentPage: number = 1;
   resultsCount: number = 0;
   searchParam: any = null;
+  sortBy: SiteSortBy = SiteSortBy.Id;
+  sortByDir: SortByDirection = SortByDirection.Asc;
 }
 
 export class SitePendingApprovalDTO {

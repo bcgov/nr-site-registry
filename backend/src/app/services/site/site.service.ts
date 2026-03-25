@@ -1928,6 +1928,8 @@ export class SiteService {
     searchParam: SearchParams,
     page: number,
     pageSize: number,
+    sortBy: SiteSortBy = SiteSortBy.ID,
+    sortByDir: SortByDirection = SortByDirection.ASC,
   ): Promise<QueryResultForPendingSites> {
     try {
       this.sitesLogger.log(
@@ -2134,6 +2136,8 @@ export class SiteService {
       }
 
       const startIndex = (page - 1) * pageSize;
+
+      result = sortSRReviewTableResults(result, sortBy, sortByDir);
 
       const paginatedRecords = result.slice(startIndex, startIndex + pageSize);
 
@@ -2666,4 +2670,34 @@ export class SiteService {
       throw new InternalServerErrorException('Failed to fetch site counts');
     }
   }
+}
+
+export function sortSRReviewTableResults(
+  results: any[],
+  sortBy: SiteSortBy = SiteSortBy.ID,
+  sortByDir: SortByDirection = SortByDirection.ASC,
+): any[] {
+  const pendingSortFieldMap: Record<string, string> = {
+    [SiteSortBy.ID]: 'siteId',
+    [SiteSortBy.WHEN_UPDATED]: 'whenUpdated',
+    [SiteSortBy.WHO_CREATED]: 'whoUpdated',
+    [SiteSortBy.SITE_ADDRESS]: 'address',
+  };
+
+  const sortField = pendingSortFieldMap[sortBy] || 'siteId';
+  const dateFields = new Set(['whenUpdated']);
+
+  return [...results].sort((a, b) => {
+    const aVal = a[sortField] ?? '';
+    const bVal = b[sortField] ?? '';
+    let comparison: number;
+    if (dateFields.has(sortField)) {
+      comparison = new Date(aVal).getTime() - new Date(bVal).getTime();
+    } else {
+      comparison = String(aVal).localeCompare(String(bVal), undefined, {
+        numeric: true,
+      });
+    }
+    return sortByDir === SortByDirection.DESC ? -comparison : comparison;
+  });
 }

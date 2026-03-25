@@ -1,6 +1,4 @@
-import React, { useEffect } from 'react';
-// import Landing from "../features/landing/Landing"
-import { Routes, Route, createBrowserRouter } from 'react-router-dom';
+import { Navigate, createBrowserRouter } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
@@ -11,16 +9,16 @@ import Cart from '../features/cart/Cart';
 import Folios from '../features/folios/Folios';
 import FolioContents from '../features/folios/FolioContent';
 import App from '../../App';
-import {
-  getLoggedInUserType,
-  getUser,
-  isUserOfType,
-  UserRoleType,
-} from '../helpers/utility';
 import MapView from '../features/map/MapView';
 import SRUpdatesTables from '../features/details/srUpdates/srUpdatesTables';
 
-const roleBasedRoutes: any = {
+type AppRoute = {
+  path: string;
+  element: JSX.Element;
+  children?: AppRoute[];
+};
+
+export const roleBasedRoutes: Record<string, AppRoute[]> = {
   client: [
     { path: '/', element: <Search /> },
     { path: '/dashboard', element: <Dashboard /> },
@@ -37,7 +35,7 @@ const roleBasedRoutes: any = {
     { path: '/site/cart/site/details/:id', element: <SiteDetails /> },
   ],
   internal: [
-    { path: '/', element: <Search /> },
+    { path: '/', element: <Navigate to="/dashboard" replace /> },
     { path: '/dashboard', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
     { path: '/dashboard/site/create', element: <SiteDetails /> },
@@ -49,7 +47,7 @@ const roleBasedRoutes: any = {
     { path: '/review', element: <SRUpdatesTables /> },
   ],
   sr: [
-    { path: '/', element: <Search /> },
+    { path: '/', element: <Navigate to="/dashboard" replace /> },
     { path: '/search', element: <Search /> },
     { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
@@ -80,7 +78,7 @@ const createRoutesForRole = (role: string) => [
       </QueryParamProvider>
     ),
     errorElement: <h1>Page not found</h1>,
-    children: roleBasedRoutes[role]?.map((route: any) => ({
+    children: roleBasedRoutes[role]?.map((route: AppRoute) => ({
       path: route.path,
       element: route.element,
       children: route.children,

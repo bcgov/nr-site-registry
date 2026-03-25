@@ -1,8 +1,34 @@
+import { UserActionEnum } from '../../common/userActionEnum';
 import { RequestStatus } from '../../helpers/requests/status';
 import reducer, { resetSaveSiteDetails } from './SaveSiteDetailsSlice';
 
 describe('siteDetailsSlice', () => {
   describe('resetSaveSiteDetails', () => {
+
+    describe('parcelDescriptions normalization on save', () => {
+      it('updates existing rows', () => {
+        const initialState: any = {
+          parcelDescriptionsData: [],
+        };
+
+        const payload = [
+          { id: 10 },
+        ];
+
+        const action = {
+          type: 'siteDetails/setupParcelDescriptionsDataForSaving',
+          payload,
+        };
+
+        const result = reducer(initialState, action);
+
+        expect(result.parcelDescriptionsData[0].apiAction)
+          .toBe(UserActionEnum.updated);
+      });
+    });
+
+
+
     it('nullifies data', () => {
       const initialState = {
         saveRequestStatus: RequestStatus.loading,
@@ -73,3 +99,6 @@ describe('siteDetailsSlice', () => {
     });
   });
 });
+
+
+

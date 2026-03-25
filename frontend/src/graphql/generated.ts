@@ -869,6 +869,8 @@ export type QueryGetPendingSiteForSrApprovalArgs = {
   page: Scalars['String']['input'];
   pageSize: Scalars['String']['input'];
   searchParam?: InputMaybe<SearchParams>;
+  sortBy?: InputMaybe<SiteSortBy>;
+  sortByDir?: InputMaybe<SortByDirection>;
 };
 
 

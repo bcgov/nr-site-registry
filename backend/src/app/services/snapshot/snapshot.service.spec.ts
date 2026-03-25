@@ -110,6 +110,10 @@ describe('SnapshotService', () => {
       userAction: 'pending',
       srAction: 'pending',
       eventPartics: sampleNotationParticipants,
+      whoDeleted: null,
+      whenDeleted: null,
+      whoRestored: null,
+      whenRestored: null,
     },
   ];
 

@@ -18,8 +18,15 @@ const getSiteSearchResultsColumns = (
       isDefault: true,
       sortOrder: 1,
       isChecked: true,
-      displayType: getLinkColumnType('Site ID', 'id', '', '/site/details/'),
+      displayType: getLinkColumnType(
+        hiddenColumns,
+        'Site ID',
+        'id',
+        '',
+        '/site/details/',
+      ),
       stickyCol: true,
+      columnSize: ColumnSize.w100,
     },
     new TableColumn(
       6,
@@ -37,11 +44,13 @@ const getSiteSearchResultsColumns = (
         '',
         FormFieldType.Text,
         'custom-input-text',
+        '',
+        'w300',
       ),
       'site/details/',
       false,
       '',
-      ColumnSize.Triple,
+      ColumnSize.w300,
     ),
     new TableColumn(
       7,
@@ -94,8 +103,14 @@ const getSiteSearchResultsColumns = (
         'generalDescription',
         '',
         FormFieldType.Label,
-        'custom-search-input-text custom-search-input-ellipsis',
+        'custom-search-input-text custom-search-input-ellipsis default',
+        '',
+        'w400',
       ),
+      undefined,
+      false,
+      undefined,
+      ColumnSize.w400,
     ),
     new TableColumn(
       5,
@@ -208,6 +223,11 @@ const getSiteSearchResultsColumns = (
       1,
       true,
       getColumnType('Last Updated', 'whenCreated', '', FormFieldType.Date),
+      undefined,
+      false,
+      undefined,
+      ColumnSize.w200,
+      false,
     ),
     new TableColumn(
       16,
@@ -234,6 +254,7 @@ const getSiteSearchResultsColumns = (
           sortOrder: 1,
           isChecked: true,
           displayType: getLinkColumnType(
+            hiddenColumns,
             'Map',
             'id',
             '',
@@ -256,6 +277,7 @@ const getSiteSearchResultsColumns = (
       sortOrder: 1,
       isChecked: true,
       displayType: getLinkColumnType(
+        hiddenColumns,
         'Details',
         'id',
         '',
@@ -296,6 +318,7 @@ const getColumnType = (
   type: FormFieldType = FormFieldType.Label,
   customInputText: string = 'custom-search-input-text',
   customLabel?: string,
+  customContainerCss?: string,
 ) => {
   return {
     type: type,
@@ -306,10 +329,12 @@ const getColumnType = (
     customInputTextCss: customInputText,
     tableMode: true,
     stickyCol: false,
+    customContainerCss: customContainerCss,
   };
 };
 
 const getLinkColumnType = (
+  hiddenColumns: Set<string>,
   label: string,
   propertyName: string,
   value: string,
@@ -329,6 +354,8 @@ const getLinkColumnType = (
     href: href,
     customLinkValue: customLabel ?? null,
     customIcon: customIcon ?? null,
+    componentName: hiddenColumns.has('map') ? 'Map' : 'Search',
+    componentPath: hiddenColumns.has('map') ? 'map' : 'search',
   };
 };
 

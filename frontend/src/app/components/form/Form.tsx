@@ -51,12 +51,12 @@ const Form: React.FC<IFormRendererProps> = ({
                   customEditInputTextCss={field.customEditInputTextCss}
                   customPlaceholderCss={field.customPlaceholderCss}
                   placeholder={field.placeholder}
-                  value={formData[field.graphQLPropertyName ?? ''] || ''}
+                  value={formData[field.graphQLPropertyName ?? ''] ?? field.value ?? ''}
                   onChange={(value) =>
                     handleInputChange(field.graphQLPropertyName, value)
                   }
                   type={field.type}
-                  validation={field.validation}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                   allowNumbersOnly={field.allowNumbersOnly}
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
@@ -80,7 +80,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   }
                   options={field.options || []}
                   type={FormFieldType.Text}
-                  validation={field.validation}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                   allowNumbersOnly={field.allowNumbersOnly}
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
@@ -104,7 +104,7 @@ const Form: React.FC<IFormRendererProps> = ({
                     handleInputChange(field.graphQLPropertyName, value)
                   }
                   type={field.type}
-                  validation={field.validation}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                   allowNumbersOnly={field.allowNumbersOnly}
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
@@ -131,7 +131,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   isEditing={editMode ?? true}
                   isImage={field.isImage}
                   srMode={srMode ?? false}
-                  validation={field.validation}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                   isDisabled={field.isDisabled}
                 />
               )}
@@ -157,7 +157,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   isLoading={field.isLoading}
                   customInfoMessage={field.customInfoMessage}
                   isDisabled={field.isDisabled}
-                  validation={field.validation}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                 />
               )}
               {field.type === FormFieldType.DateRange && (
@@ -176,7 +176,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   type={field.type}
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
-                  validation={field.validation}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                 />
               )}
               {field.type === FormFieldType.Date && (
@@ -196,7 +196,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   isEditing={editMode ?? true}
                   srMode={srMode ?? false}
                   isDisabled={field.isDisabled ?? false}
-                  validation={field.validation}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                 />
               )}
               {field.type === FormFieldType.Group && (
@@ -228,7 +228,7 @@ const Form: React.FC<IFormRendererProps> = ({
                   customEditInputTextCss={field.customEditInputTextCss}
                   customPlaceholderCss={field.customPlaceholderCss}
                   customInfoMessage={field.customInfoMessage}
-                  validation={field.validation}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                   isDisabled={field.isDisabled}
                 />
               )}
@@ -247,7 +247,7 @@ const Form: React.FC<IFormRendererProps> = ({
                     handleInputChange(field.graphQLPropertyName, value)
                   }
                   srMode={srMode}
-                  validation={field.validation}
+                  validation={(editMode || srMode) ? field.validation : undefined}
                 />
               )}
             </div>

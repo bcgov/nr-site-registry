@@ -18,6 +18,8 @@ import {
   selectAllSites,
   bulkUpdateApproveRejectStatus,
   resetBulkUpdateStatus,
+  getSortBy,
+  getSortByDir,
 } from './state/srUpdatesTableSlice';
 import SRUpdatesTableFilter from './srUpdatesTableFilter';
 import Table from '../../../components/table/Table';
@@ -28,6 +30,8 @@ import {
 } from '../dropdowns/DropdownSlice';
 import './srUpdatesTables.css';
 import { Button } from '../../../components/button/Button';
+import { SiteSortBy, SortByDirection } from '../../../../graphql/generated';
+import { TableColumn } from '../../../components/table/TableColumn';
 
 const SRUpdatesTables = () => {
   const [displayFilters, SetDisplayFilters] = useState(false);
@@ -39,6 +43,8 @@ const SRUpdatesTables = () => {
   const totalRecords = useSelector(getTotalRecords);
   const updateRequestStatus = useSelector(bulkUpdateApproveRejectStatus);
   const searchParamRef = useSelector(getSearchParam);
+  const sortBy = useSelector(getSortBy);
+  const sortByDir = useSelector(getSortByDir);
   const [searchParam, SetSearchParam] = useState(searchParamRef);
   useEffect(() => {
     SetSearchParam(searchParamRef);
@@ -121,6 +127,8 @@ const SRUpdatesTables = () => {
         searchParam: searchParam,
         page: currentPage,
         pageSize: resultsPerPage,
+        sortBy: sortBy,
+        sortByDir: sortByDir,
       }),
     );
   }, []);
@@ -131,6 +139,29 @@ const SRUpdatesTables = () => {
 
   const changeResultsPerPage = (pageNumber: number): void => {
     SetResultsPerPage(pageNumber);
+  };
+
+  const columnToSortByMap: Record<string, SiteSortBy> = {
+    whenUpdated: SiteSortBy.WhenUpdated,
+    whoUpdated: SiteSortBy.WhoCreated,
+    siteId: SiteSortBy.Id,
+    address: SiteSortBy.SiteAddress,
+    changes: SiteSortBy.Id,
+  };
+
+  const handleSortChange = (column: TableColumn, ascSort: boolean) => {
+    const newSortByDir = ascSort ? SortByDirection.Asc : SortByDirection.Desc;
+    const newSortBy =
+      columnToSortByMap[column.graphQLPropertyName] ?? SiteSortBy.Id;
+    dispatch(
+      fetchPendingSiteForSRApproval({
+        searchParam: searchParam,
+        page: currentPage,
+        pageSize: resultsPerPage,
+        sortBy: newSortBy,
+        sortByDir: newSortByDir,
+      }),
+    );
   };
 
   useEffect(() => {
@@ -152,6 +183,8 @@ const SRUpdatesTables = () => {
         searchParam: searchParam,
         page: currentPage,
         pageSize: resultsPerPage,
+        sortBy: sortBy,
+        sortByDir: sortByDir,
       }),
     );
   }, [updateRequestStatus, currentPage, resultsPerPage]);
@@ -235,7 +268,7 @@ const SRUpdatesTables = () => {
           data-testid="approve-btn"
         >
           <TickIcon className="me-2" />
-          Approve
+          Public
         </Button>
         <Button
           variant="secondary"
@@ -246,7 +279,7 @@ const SRUpdatesTables = () => {
           data-testid="reject-btn"
         >
           <XmarkIcon className="me-2" />
-          Not Public
+          Private
         </Button>
       </div>
       <div className="col-12" data-testid="srreview-table">
@@ -267,6 +300,7 @@ const SRUpdatesTables = () => {
           }}
           editMode={false}
           idColumnName="id"
+          sortHandler={handleSortChange}
         ></Table>
       </div>
     </PageContainer>

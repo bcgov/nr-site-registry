@@ -157,6 +157,7 @@ export const graphqlSiteDetailsQueryForLoggedIn = () => {
           siteRiskCode
           whenUpdated
           srAction
+          addrType
         }
         httpStatusCode
       }
@@ -170,11 +171,15 @@ export const getPendingSiteForSRApprovalQL = () => {
       $searchParam: SearchParams
       $page: String!
       $pageSize: String!
+      $sortBy: SiteSortBy
+      $sortByDir: SortByDirection
     ) {
       getPendingSiteForSRApproval(
         searchParam: $searchParam
         page: $page
         pageSize: $pageSize
+        sortBy: $sortBy
+        sortByDir: $sortByDir
       ) {
         httpStatusCode
         message

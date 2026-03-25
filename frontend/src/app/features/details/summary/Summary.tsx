@@ -13,6 +13,10 @@ import {
   trackChanges,
   updateSiteDetail,
 } from '../../site/dto/SiteSlice';
+import {
+  getFieldLabel,
+  ChangeContext,
+} from '../../../helpers/fieldLabelMapper';
 import { RequestStatus } from '../../../helpers/requests/status';
 import Table from '../../../components/table/Table';
 import './Summary.css';
@@ -129,32 +133,27 @@ const Summary = () => {
   }, [userPurchasedSnapshot]);
 
   // Utility Functions
-  const getTrackerLabel = (graphQLPropertyName: any) => {
-    if (graphQLPropertyName === 'id') return 'Site ID';
-    if (graphQLPropertyName.includes('addr')) return 'Address';
-    if (graphQLPropertyName.includes('common')) return 'Common Name';
-    if (graphQLPropertyName.includes('region')) return 'Region';
-    return graphQLPropertyName;
-  };
-
   const handleInputChange = (graphQLPropertyName: any, value: any) => {
-    const trackerLabel = getTrackerLabel(graphQLPropertyName);
+    const trackerLabel = getFieldLabel(graphQLPropertyName);
     if (detailsMode === SiteDetailsMode.SRMode) {
       const tracker = new ChangeTracker(
         IChangeType.Modified,
-        'Site Location Details SR Mode For ' + trackerLabel,
+        trackerLabel,
+        ChangeContext.SITE_LOCATION_SR,
       );
       dispatch(trackChanges(tracker.toPlainObject()));
     } else {
       const tracker = new ChangeTracker(
         IChangeType.Modified,
-        'Site Location Details ' + trackerLabel,
+        trackerLabel,
+        ChangeContext.SITE_LOCATION,
       );
       dispatch(trackChanges(tracker.toPlainObject()));
 
       const newState = {
         ...editSiteDetailsObject,
         [graphQLPropertyName]: value,
+        provState: "BC",
       };
 
       dispatch(
@@ -181,13 +180,21 @@ const Summary = () => {
   };
 
   const handleParcelIdDelete = (pid: any) => {
-    const tracker = new ChangeTracker(IChangeType.Deleted, 'Parcel ID ' + pid);
+    const tracker = new ChangeTracker(
+      IChangeType.Deleted,
+      getFieldLabel('pid') + ' ' + pid,
+      ChangeContext.SITE_LOCATION,
+    );
     dispatch(trackChanges(tracker.toPlainObject()));
     setParcelIds(parcelIds.filter((x) => x !== pid));
   };
 
   const handleAddNewParcelId = (pid: string) => {
-    const tracker = new ChangeTracker(IChangeType.Added, 'Parcel ID ' + pid);
+    const tracker = new ChangeTracker(
+      IChangeType.Added,
+      getFieldLabel('pid') + ' ' + pid,
+      ChangeContext.SITE_LOCATION,
+    );
     dispatch(trackChanges(tracker.toPlainObject()));
     let parcelIdsLocal = [...parcelIds, parseInt(pid)];
     //parcelIdsLocal.push();

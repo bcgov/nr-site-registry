@@ -1,39 +1,216 @@
+import { FormFieldType } from '../../components/input-controls/IFormField';
+import { TableColumn } from '../../components/table/TableColumn';
+import { formatDate } from '../utility';
+
 function isObject(item: unknown): item is Record<string, unknown> {
   return typeof item === 'object' && item !== null;
 }
 
-export function convertArrayToCSV(array: unknown[]) {
-  if (array.length === 0 || !isObject(array[0])) {
+const EXCLUDED_COLUMN_NAMES = new Set(['Map', 'Details']);
+
+// Excel follows CSV quoting rules for cells containing commas, quotes, or line breaks.
+// Wrap those values in quotes and double any inner quotes so the cell is parsed correctly.
+export function escapeCSVValue(value: string): string {
+  if (/[",\r\n]/.test(value)) {
+    return `"${value.replaceAll('"', '""')}"`;
+  }
+
+  return value;
+}
+
+// Normalize null/undefined to empty cells and coerce other values to strings,
+// which keeps CSV output stable for Excel import and display.
+export function normalizeValue(value: unknown): string {
+  if (value === undefined || value === null) {
     return '';
   }
 
-  // Collect all unique keys from all objects
-  const keys = Array.from(
-    new Set(array.flatMap((item) => (isObject(item) ? Object.keys(item) : []))),
-  );
+  // Objects are intentionally returned as empty — passing one to String() would
+  // silently produce "[object Object]", which is never a useful CSV cell value.
+  if (typeof value === 'object') {
+    return '';
+  }
 
-  const header = keys.join(',');
-  const rows = array
-    .map((row) => {
-      if (isObject(row)) {
-        return keys.map((key) => row[key] ?? '').join(',');
-      }
-      return '';
-    })
-    .join('\n');
-
-  return `${header}\n${rows}`;
+  return String(value);
 }
 
-export function downloadCSV(array: unknown[], filename: string = 'export.csv') {
-  const csvString = convertArrayToCSV(array);
-  const blob = new Blob([csvString], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
+// Prevent spreadsheet formula interpretation when CSV is opened in Excel/Sheets.
+// If the first non-whitespace character is one of = + - @, prefix with a single quote.
+// This is probably overkill for our use case but provides a strong safeguard against CSV injection and accidental
+// formula parsing.
+export function neutralizeSpreadsheetFormula(value: string): string {
+  if (!value) {
+    return value;
+  }
+
+  if (value.startsWith("'")) {
+    return value;
+  }
+
+  return /^[\t ]*[=+\-@]/.test(value) ? `'${value}` : value;
+}
+
+// Excel on Windows is most reliable with UTF-8 BOM + CRLF line endings.
+// Add BOM for character encoding detection and normalize line breaks to CRLF.
+export function toExcelFriendlyCSVContent(csvString: string): string {
+  if (!csvString) {
+    return '';
+  }
+
+  const normalizedLineEndings = csvString
+    .replaceAll('\r\n', '\n')
+    .replaceAll('\r', '\n')
+    .replaceAll('\n', '\r\n');
+  return `\uFEFF${normalizedLineEndings}`;
+}
+
+export function getValueByPath(
+  record: Record<string, unknown>,
+  path: string,
+): unknown {
+  // Pathsegments handles the case where the path includes array indexing, e.g. "items[0].name".
+  // This will determine whether to use the key as an object property or an array index.
+  const pathSegments: string[] = path.match(/[^.[\]]+/g) || [];
+  let currentValue: unknown = record;
+
+  for (const key of pathSegments) {
+    if (Array.isArray(currentValue)) {
+      const index = Number(key);
+      currentValue = Number.isInteger(index) ? currentValue[index] : undefined;
+      continue;
+    }
+
+    if (isObject(currentValue)) {
+      currentValue = currentValue[key];
+      continue;
+    }
+
+    return undefined;
+  }
+
+  return currentValue;
+}
+
+function getExportableColumns(columns: TableColumn[]): TableColumn[] {
+  return columns.filter(
+    (column) =>
+      Boolean(column.isChecked) &&
+      Boolean(column.graphQLPropertyName) &&
+      !column.dynamicColumn &&
+      !EXCLUDED_COLUMN_NAMES.has(column.displayName),
+  );
+}
+
+export function getColumnValue(
+  row: Record<string, unknown>,
+  column: TableColumn,
+): string {
+  const propertyNames = column.graphQLPropertyName
+    .split(',')
+    .map((propertyName) => propertyName.trim())
+    .filter((propertyName) => propertyName.length > 0);
+
+  if (propertyNames.length === 0) {
+    return '';
+  }
+
+  if (column.displayType?.type === FormFieldType.Date) {
+    const rawDate = getValueByPath(row, propertyNames[0]);
+    if (rawDate instanceof Date) {
+      if (Number.isNaN(rawDate.getTime())) {
+        return '';
+      }
+      return formatDate(rawDate);
+    }
+
+    if (typeof rawDate === 'string') {
+      const parsedDate = new Date(rawDate);
+      if (Number.isNaN(parsedDate.getTime())) {
+        return '';
+      }
+      return formatDate(rawDate);
+    }
+
+    return '';
+  }
+
+  if (propertyNames.length === 1) {
+    return normalizeValue(getValueByPath(row, propertyNames[0]));
+  }
+
+  return propertyNames
+    .map((propertyName) => normalizeValue(getValueByPath(row, propertyName)))
+    .filter((value) => value.length > 0)
+    .join(' ');
+}
+
+export function convertRowsToCSV(
+  rows: Record<string, unknown>[],
+  headers: string[],
+): string {
+  if (rows.length === 0 || headers.length === 0) {
+    return '';
+  }
+
+  const escapedHeader = headers.map(escapeCSVValue).join(',');
+  const escapedRows = rows
+    .map((row) =>
+      headers
+        .map((header) =>
+          escapeCSVValue(
+            neutralizeSpreadsheetFormula(normalizeValue(row[header])),
+          ),
+        )
+        .join(','),
+    )
+    .join('\n');
+
+  return `${escapedHeader}\n${escapedRows}`;
+}
+
+export function downloadSelectedColumnsCSV(
+  selectedRows: Record<string, unknown>[],
+  columns: TableColumn[],
+  filename: string = 'export.csv',
+) {
+  const csvString = convertSelectedColumnsToCSV(selectedRows, columns);
+  if (!csvString) {
+    return;
+  }
+
+  const excelFriendlyCSV = toExcelFriendlyCSVContent(csvString);
+  const blob = new Blob([excelFriendlyCSV], {
+    type: 'text/csv;charset=utf-8;',
+  });
+  const url = globalThis.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.setAttribute('hidden', '');
   a.setAttribute('href', url);
   a.setAttribute('download', filename);
   document.body.appendChild(a);
   a.click();
+  globalThis.setTimeout(() => {
+    globalThis.URL.revokeObjectURL(url);
+  }, 0);
   document.body.removeChild(a);
+}
+
+export function convertSelectedColumnsToCSV(
+  selectedRows: Record<string, unknown>[],
+  columns: TableColumn[],
+) {
+  const exportColumns = getExportableColumns(columns);
+  if (selectedRows.length === 0 || exportColumns.length === 0) {
+    return '';
+  }
+
+  const headers = exportColumns.map((column) => column.displayName);
+  const formattedRows = selectedRows.map((row) => {
+    return exportColumns.reduce<Record<string, unknown>>((acc, column) => {
+      acc[column.displayName] = getColumnValue(row, column);
+      return acc;
+    }, {});
+  });
+
+  return convertRowsToCSV(formattedRows, headers);
 }

@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
@@ -32,6 +37,7 @@ import {
   ChangeTracker,
   IChangeType,
 } from '../../components/common/IChangeType';
+import { getFieldLabel, ChangeContext } from '../../helpers/fieldLabelMapper';
 
 import './SiteDetails.css'; // Ensure this import is correct
 import { SiteActionBtn, SiteDetailsMode } from './dto/SiteDetailsMode';
@@ -156,6 +162,12 @@ const SiteDetails = () => {
   const auth = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromPath =
+    location.state?.fromPath || location.state?.fromLabel || 'Search'; // Default to "search" if no state is passed
+  const fromScreen = location.state?.fromLabel || 'Search'; // Default to "Unknown Screen" if no state is passed
+  const fromPathRef = useRef(fromPath);
+  const fromScreenRef = useRef(fromScreen);
   const loggedInUser = getUser();
   // TODO: this is for future use when we support automatic flow of creating new site for specific application.
   // We need applicationid and newly created siteId to fill cats db  in order to keep both application in sync.
@@ -204,6 +216,9 @@ const SiteDetails = () => {
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
   const [siteDetailsForSRMode, SetSiteDetailsForSRMode] = useState(details);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(),
+  );
 
   const userActions = [UserActionEnum.added, UserActionEnum.updated];
 
@@ -277,7 +292,7 @@ const SiteDetails = () => {
   }, [bulkApproveRejectStatus]);
 
   const onClickBackButton = () => {
-    navigate(-1);
+    navigate(`/${fromPathRef.current.replace(/\s+/g, '').toLowerCase()}`);
   };
 
   useEffect(() => {
@@ -517,6 +532,30 @@ const SiteDetails = () => {
         dispatch(fetchParcelDescriptionsForApproval(params)),
       ]);
     }
+  };
+
+  const groupChangesByContextAndType = (changes: any[]) => {
+    const grouped: { [key: string]: any[] } = {};
+    changes.forEach((item) => {
+      const key = `${item.changeType}-${item.context || ''}`;
+      if (!grouped[key]) {
+        grouped[key] = [];
+      }
+      grouped[key].push(item);
+    });
+    return grouped;
+  };
+
+  const toggleSection = (key: string) => {
+    setExpandedSections((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) {
+        newSet.delete(key);
+      } else {
+        newSet.add(key);
+      }
+      return newSet;
+    });
   };
 
   const handleItemClick = async (value: string) => {
@@ -782,12 +821,20 @@ const SiteDetails = () => {
     try {
       // Run both validations in parallel and wait for them to finish
       if (siteNotation?.length > 0) {
-        let updatedSiteNotations = deepFilterByUserAction(
-          siteNotation,
-          userActions,
-        );
+        let updatedSiteNotations = deepFilterByUserAction(siteNotation, [
+          UserActionEnum.added,
+          UserActionEnum.updated,
+          UserActionEnum.deleted,
+          UserActionEnum.restored,
+        ]);
+        // Exclude deleted notations from validation, but keep them for saving
+        const notationsForValidation = Array.isArray(updatedSiteNotations)
+          ? updatedSiteNotations.filter(
+              (notation: any) => notation?.userAction !== UserActionEnum.deleted,
+            )
+          : updatedSiteNotations;
         const [notationErrors, notationParticipantErrors] = await Promise.all([
-          validateNotations(updatedSiteNotations), // Async function handling Notation validation
+          validateNotations(notationsForValidation), // Async function handling Notation validation
           validateNotationParticipants(updatedSiteNotations), // Async function handling Notation Participant validation
         ]);
         // Combine and return the errors from both functions
@@ -842,6 +889,9 @@ const SiteDetails = () => {
       const notationParticipantErrors: any[] = [];
       // Loop through siteNotation and their notationParticipants
       for (const [index, notation] of updatedSiteNotations?.entries()) {
+        if (notation?.apiAction === UserActionEnum.deleted) {
+          continue;
+        }
         if (
           notation?.notationParticipant &&
           notation?.notationParticipant?.length > 0
@@ -850,6 +900,9 @@ const SiteDetails = () => {
             participantIndex,
             notationParticipant,
           ] of notation.notationParticipant.entries()) {
+            if (notationParticipant?.apiAction === UserActionEnum.deleted) {
+              continue;
+            }
             // Validate and accumulate errors for each notation participant
             const errors = validateForm(
               notationParticipantTable,
@@ -858,7 +911,7 @@ const SiteDetails = () => {
             );
             notationParticipantErrors.push(...errors);
           }
-        } else {
+        } else if (notation?.apiAction !== UserActionEnum.deleted) {
           notationParticipantErrors.push({
             label: 'Notation Participants',
             errorMessage: `Notation [${notation?.position + 1}] Atleast one  Notation Participant is required.`,
@@ -1013,7 +1066,11 @@ const SiteDetails = () => {
       }),
     );
 
-    const tracker = new ChangeTracker(IChangeType.Modified, 'Site : SR Status');
+    const tracker = new ChangeTracker(
+      IChangeType.Modified,
+      getFieldLabel('srValue'),
+      ChangeContext.SITE,
+    );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
@@ -1123,7 +1180,7 @@ const SiteDetails = () => {
           <div className="d-flex gap-2 flex-wrap align-items-center">
             <Button variant="secondary" onClick={onClickBackButton}>
               <AngleLeft />
-              Back
+              {`Back to ${fromScreenRef.current}`}
             </Button>
             <div className="d-flex flex-wrap align-items-center gap-2 pe-3 custom-sticky-header-lbl">
               {!!id?.trim() ? (
@@ -1252,6 +1309,8 @@ const SiteDetails = () => {
             errorOption={hasError}
             customHeaderCss={hasError ? 'custom-modal-error-header-text' : ''}
             headerLabel={hasError ? 'Please fix the errors' : ''}
+            label="Are you sure you want to save changes ?"
+            saveBtnLabel="Yes, Save Changes"
             closeHandler={async (response) => {
               setSave(false);
               if (response && errorList?.length === 0) {
@@ -1292,19 +1351,49 @@ const SiteDetails = () => {
               <React.Fragment>
                 <div>
                   <span className="custom-modal-data-text">
-                    {savedChanges.length > 0
-                      ? 'The following fields will be updated:'
-                      : 'No changes to save'}
+                    {savedChanges.length > 0 ? '' : 'No changes to save'}
                   </span>
                 </div>
                 {savedChanges.length > 0 && (
                   <div>
-                    <ul className="custom-modal-data-text">
-                      {savedChanges.map((item: any) => (
-                        <li key={item.label}>
-                          {IChangeType[item.changeType]} {item.label}
-                        </li>
-                      ))}
+                    <ul className="custom-modal-data-text change-group-list">
+                      {Object.entries(
+                        groupChangesByContextAndType(savedChanges),
+                      ).map(([key, items]) => {
+                        const isExpanded = expandedSections.has(key);
+                        const firstItem = items[0];
+                        const changeTypeName =
+                          IChangeType[firstItem.changeType];
+                        const context = firstItem.context || '';
+                        const isModified =
+                          firstItem.changeType === IChangeType.Modified;
+                        return (
+                          <li key={key} className="change-group-item">
+                            <div
+                              onClick={
+                                isModified
+                                  ? () => toggleSection(key)
+                                  : undefined
+                              }
+                              className={`change-group-header${isModified ? ' change-group-header--expandable' : ''}`}
+                            >
+                              {isModified && (
+                                <span>{isExpanded ? '▼' : '▶'}</span>
+                              )}
+                              <span>
+                                {changeTypeName} {context}
+                              </span>
+                            </div>
+                            {isModified && isExpanded && (
+                              <ul className="change-group-details">
+                                {items.map((item: any, idx: number) => (
+                                  <li key={`${key}-${idx}`}>{item.label}</li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 )}
@@ -1316,7 +1405,7 @@ const SiteDetails = () => {
         {!isVisible && (
           <div className="d-flex justify-content-between">
             <Button variant="secondary" onClick={onClickBackButton}>
-              <AngleLeft /> Back to
+              <AngleLeft /> {`Back to ${fromScreenRef.current}`}
             </Button>
 
             <div className="d-flex gap-2 justify-align-center pe-2 pos-relative">

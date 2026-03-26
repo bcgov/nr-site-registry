@@ -54,7 +54,6 @@ function normalizeParcelDescription(dto: { id: any; apiAction: UserActionEnum; }
   return { ...dto, apiAction: UserActionEnum.added };
 }
 
-
 const siteDetailsSlice = createSlice({
   name: 'siteDetails',
   initialState,

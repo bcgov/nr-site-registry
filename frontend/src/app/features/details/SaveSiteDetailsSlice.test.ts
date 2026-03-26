@@ -138,5 +138,3 @@ describe('siteDetailsSlice', () => {
   });
 });
 
-
-

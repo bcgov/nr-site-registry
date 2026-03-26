@@ -300,6 +300,13 @@ export class ParcelDescriptionsService {
       },
     );
 
+    await transactionalEntityManager.query(`
+      SELECT setval(
+        pg_get_serial_sequence('sites.subdivisions', 'id'),
+        (SELECT COALESCE(MAX(id), 0) FROM sites.subdivisions)
+      )
+    `);
+
     // Insert the new subdivisions into the database.
     let insertResult: InsertResult;
     try {

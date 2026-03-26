@@ -166,11 +166,13 @@ export class SitePublicResolver {
   @Query(() => FetchSiteInsights, { name: 'getSiteInsights' })
   async getSiteInsights(
     @Args('siteId', { type: () => String }) siteId: string,
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
   ) {
     this.sitesLogger.log(
       'SiteResolver.getSiteInsights() start siteId:' + ' ' + siteId,
     );
-    const result = await this.siteService.getSiteInsights(siteId);
+    const result = await this.siteService.getSiteInsights(siteId, showPending);
     return this.genericResponseProviderForInsights.createResponse(
       'Success',
       200,

@@ -56,12 +56,13 @@ export const fetchSitesDetails = createAsyncThunk(
 
 export const fetchSitesInsights = createAsyncThunk(
   'sites/fetchSitesInsights',
-  async (args: { siteId: string }) => {
+  async (args: { siteId: string; showPending?: boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(getSiteInsightsQL()),
         variables: {
           siteId: args.siteId,
+          pending: args.showPending ?? false,
         },
       });
       return response.data?.data?.getSiteInsights?.data;

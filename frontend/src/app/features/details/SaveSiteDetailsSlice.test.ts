@@ -1,8 +1,72 @@
+import { UserActionEnum } from '../../common/userActionEnum';
 import { RequestStatus } from '../../helpers/requests/status';
 import reducer, { resetSaveSiteDetails } from './SaveSiteDetailsSlice';
 
 describe('siteDetailsSlice', () => {
   describe('resetSaveSiteDetails', () => {
+
+    describe('parcelDescriptions normalization on save', () => {
+      it('deletes rows correctly', () => {
+        const initialState: any = {
+          parcelDescriptionsData: [],
+        };
+
+        const payload = [
+          { id: 5, apiAction: UserActionEnum.deleted },
+        ];
+
+        const action = {
+          type: 'siteDetails/setupParcelDescriptionsDataForSaving',
+          payload,
+        };
+
+        const result = reducer(initialState, action);
+
+        expect(result.parcelDescriptionsData[0].apiAction)
+          .toBe(UserActionEnum.deleted);
+      });
+
+      it('updates existing rows', () => {
+        const initialState: any = {
+          parcelDescriptionsData: [],
+        };
+
+        const payload = [
+          { id: 10 },
+        ];
+
+        const action = {
+          type: 'siteDetails/setupParcelDescriptionsDataForSaving',
+          payload,
+        };
+
+        const result = reducer(initialState, action);
+
+        expect(result.parcelDescriptionsData[0].apiAction)
+          .toBe(UserActionEnum.updated);
+      });
+
+      it('adds new rows', () => {
+        const initialState: any = {
+          parcelDescriptionsData: [],
+        };
+
+        const payload = [
+          { id: -1 },
+        ];
+
+        const action = {
+          type: 'siteDetails/setupParcelDescriptionsDataForSaving',
+          payload,
+        };
+
+        const result = reducer(initialState, action);
+
+        expect(result.parcelDescriptionsData[0].apiAction)
+          .toBe(UserActionEnum.added);
+      });
+    });
+
     it('nullifies data', () => {
       const initialState = {
         saveRequestStatus: RequestStatus.loading,
@@ -73,3 +137,4 @@ describe('siteDetailsSlice', () => {
     });
   });
 });
+

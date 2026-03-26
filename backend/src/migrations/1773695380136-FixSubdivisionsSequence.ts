@@ -1,4 +1,3 @@
-
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class FixSubdivisionsSequence1773695380136 implements MigrationInterface {

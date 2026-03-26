@@ -189,7 +189,6 @@ const SiteDetails = () => {
   const savedChanges = useSelector(trackedChanges);
   const siteNotation = useSelector(getSiteNoatations);
   const siteSummary = useSelector(getSiteSummary);
-  const disclosure = useSelector(getSiteDisclosure);
   const disclosureSourceOfTruth = useSelector(
     siteDisclosureSelector,
   )?.siteDisclosure;

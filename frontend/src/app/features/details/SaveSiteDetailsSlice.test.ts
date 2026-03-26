@@ -67,8 +67,6 @@ describe('siteDetailsSlice', () => {
       });
     });
 
-
-
     it('nullifies data', () => {
       const initialState = {
         saveRequestStatus: RequestStatus.loading,

@@ -468,6 +468,7 @@ const Search = () => {
           >
             <SearchResultsActions
               selectedRows={selectedRows}
+              selectedColumns={columnsToDisplay}
               aria-label="search-results-actions"
             />
             <SearchResultsFilters

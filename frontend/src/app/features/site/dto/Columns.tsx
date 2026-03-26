@@ -26,6 +26,7 @@ const getSiteSearchResultsColumns = (
         '/site/details/',
       ),
       stickyCol: true,
+      columnSize: ColumnSize.w100,
     },
     new TableColumn(
       6,
@@ -43,11 +44,13 @@ const getSiteSearchResultsColumns = (
         '',
         FormFieldType.Text,
         'custom-input-text',
+        '',
+        'w300',
       ),
       'site/details/',
       false,
       '',
-      ColumnSize.Triple,
+      ColumnSize.w300,
     ),
     new TableColumn(
       7,
@@ -100,8 +103,14 @@ const getSiteSearchResultsColumns = (
         'generalDescription',
         '',
         FormFieldType.Label,
-        'custom-search-input-text custom-search-input-ellipsis',
+        'custom-search-input-text custom-search-input-ellipsis default',
+        '',
+        'w400',
       ),
+      undefined,
+      false,
+      undefined,
+      ColumnSize.w400,
     ),
     new TableColumn(
       5,
@@ -214,6 +223,11 @@ const getSiteSearchResultsColumns = (
       1,
       true,
       getColumnType('Last Updated', 'whenCreated', '', FormFieldType.Date),
+      undefined,
+      false,
+      undefined,
+      ColumnSize.w200,
+      false,
     ),
     new TableColumn(
       16,
@@ -304,6 +318,7 @@ const getColumnType = (
   type: FormFieldType = FormFieldType.Label,
   customInputText: string = 'custom-search-input-text',
   customLabel?: string,
+  customContainerCss?: string,
 ) => {
   return {
     type: type,
@@ -314,6 +329,7 @@ const getColumnType = (
     customInputTextCss: customInputText,
     tableMode: true,
     stickyCol: false,
+    customContainerCss: customContainerCss,
   };
 };
 

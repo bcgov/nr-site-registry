@@ -300,7 +300,6 @@ export class ParcelDescriptionsService {
       },
     );
 
-
     await transactionalEntityManager.query(`
       SELECT setval(
         pg_get_serial_sequence('sites.subdivisions', 'id'),

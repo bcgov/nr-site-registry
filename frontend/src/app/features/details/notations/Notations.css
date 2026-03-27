@@ -47,6 +47,10 @@
   color: var(--typography-color-disabled, #9f9d9c);
 }
 
+.notation-archived > .section-container {
+  background-color: var(--surface-color-forms-disabled, #edebe9);
+}
+
 .custom-notation-edit-dateInput
   .rs-input-group.rs-input-group-inside
   .rs-input-group-addon {

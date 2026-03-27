@@ -37,6 +37,23 @@ export const saveSiteDetails = createAsyncThunk(
   },
 );
 
+function normalizeParcelDescription(dto: { id: any; apiAction: UserActionEnum; }) {
+  const isExisting = Number(dto.id) > 0;
+
+  // Deleted rows
+  if (dto.apiAction === UserActionEnum.deleted) {
+    return { ...dto, apiAction: UserActionEnum.deleted };
+  }
+
+  // Existing DB rows
+  if (isExisting) {
+    return { ...dto, apiAction: UserActionEnum.updated };
+  }
+
+  // Newly added rows (negative IDs)
+  return { ...dto, apiAction: UserActionEnum.added };
+}
+
 const siteDetailsSlice = createSlice({
   name: 'siteDetails',
   initialState,
@@ -109,10 +126,14 @@ const siteDetailsSlice = createSlice({
       return newState;
     },
     setupParcelDescriptionsDataForSaving: (state, action) => {
-      const newState = {
-        ...state,
-      };
-      newState.parcelDescriptionsData = action.payload;
+      const newState = { ...state };
+
+      // ⭐ Normalize all parcel description actions before saving
+      const normalized = action.payload.map((dto: { id: any; apiAction: UserActionEnum; }) =>
+        normalizeParcelDescription(dto)
+      );
+
+      newState.parcelDescriptionsData = normalized;
       return newState;
     },
     setupSiteAssociationDataForSaving: (state, action) => {

@@ -107,16 +107,17 @@ const SRUpdates = () => {
     displayName: '',
     active: true,
     graphQLPropertyName: SRApprovalStatusEnum.Public,
-    columnSize: ColumnSize.Default,
+    columnSize: ColumnSize.XtraSmall,
+    dynamicColumn: true,
     displayType: {
       type: FormFieldType.IconButton,
       label: '',
-      placeholder: 'Approve',
+      placeholder: 'Public',
       graphQLPropertyName: SRApprovalStatusEnum.Public,
       value: '',
       tableMode: true,
       customIcon: <TickIcon />,
-      customLinkValue: 'Approve',
+      customLinkValue: 'Public',
       customInputTextCss: 'approve-tick-icon',
     },
   };
@@ -126,16 +127,17 @@ const SRUpdates = () => {
     displayName: '',
     active: true,
     graphQLPropertyName: SRApprovalStatusEnum.Private,
-    columnSize: ColumnSize.Default,
+    columnSize: ColumnSize.XtraSmall,
+    dynamicColumn: true,
     displayType: {
       type: FormFieldType.IconButton,
       label: '',
-      placeholder: 'Not Public',
+      placeholder: 'Private',
       graphQLPropertyName: SRApprovalStatusEnum.Private,
       value: '',
       tableMode: true,
       customIcon: <XmarkIcon />,
-      customLinkValue: 'Not Public',
+      customLinkValue: 'Private',
       customInputTextCss: 'close-tick-icon',
     },
   };
@@ -395,9 +397,7 @@ const SRUpdates = () => {
     }
   }, [updateRequestStatusFromState]);
 
-  const handleChange = (event: any) => {
-    console.log('No Change Hanlder Required Here', event);
-  };
+  const handleChange = () => {};
 
   const handleAndReturnBoolean = (event: any): boolean => {
     return true;
@@ -691,6 +691,7 @@ const SRUpdates = () => {
         notationData.map((notation: any, index: number) => {
           return (
             <ApproveReject
+              key={notation.id ?? index}
               name="Notations"
               testId="srupdates-notation-component"
               link="?notations"
@@ -704,6 +705,8 @@ const SRUpdates = () => {
                   handleNotationFormRowFirstChild
                 }
                 handleChangeNotationFormRow={handleChange}
+                handleDeleteNotation={(_notationId: string) => {}}
+                handleRestoreNotation={(_notationId: string) => {}}
                 handleInputChange={handleChange}
                 userType={UserType.Internal}
                 handleNotationFormRowsInternal={handleNotationFormRowsInternal}
@@ -758,6 +761,7 @@ const SRUpdates = () => {
         documentsData.map((document: any, index: number) => {
           return (
             <ApproveReject
+              key={document.id ?? index}
               name="Documents"
               testId="srupdates-documents-component"
               link="?documents"

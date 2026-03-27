@@ -82,7 +82,10 @@ export const SearchResultsFilters: FC<SearchResultsFiltersProps> = ({
           formRows={siteFilterFormRows}
           formData={filtersFormData}
           onInputChange={onFiltersChange}
-          onSubmit={onFiltersSubmit}
+          onSubmit={(e) => {
+            onFiltersSubmit(e);
+            togglePanel(null);
+          }}
           onReset={onFiltersReset}
           cancelSearchFilter={() => togglePanel(null)}
           selectedFilter={selectedFilter}

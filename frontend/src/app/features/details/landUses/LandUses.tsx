@@ -18,6 +18,10 @@ import {
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
+import {
+  getFieldLabel,
+  ChangeContext,
+} from '../../../helpers/fieldLabelMapper';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { Plus, Minus } from '../../../components/common/icon';
 import { v4 } from 'uuid';
@@ -192,15 +196,22 @@ const loggedInUser = getUser();
     const tableColumn = tableColumns.find(
       (column: { graphQLPropertyName: any; }) => column.graphQLPropertyName === event.property,
     );
-    const propertyLabel = tableColumn?.displayName || '';
+    const propertyLabel = getFieldLabel(event.property);
 
     const description =
       viewMode === SiteDetailsMode.SRMode && event.property === 'srValue'
-        ? 'Suspect Land Uses: SR Status'
-        : 'Suspect Land Uses: ' + propertyLabel;
+        ? getFieldLabel('srValue')
+        : propertyLabel;
 
-    const tracker = new ChangeTracker(IChangeType.Modified, description);
-    dispatch(trackChanges(tracker.toPlainObject()));
+    const currentRecord = landUsesData[editedRowId];
+    const tracker = new ChangeTracker(
+      IChangeType.Modified,
+      description,
+      ChangeContext.LAND_USES,
+    );
+    if (existingLandUse.siteId !== undefined) {
+      dispatch(trackChanges(tracker.toPlainObject()));
+    }
     dispatch(updateLandUses(updatedLandUses));
     setTableData(updatedLandUses);
   };
@@ -227,7 +238,11 @@ const loggedInUser = getUser();
       dispatch(updateLandUses(newData));
       return newData;
     });
-    const tracker = new ChangeTracker(IChangeType.Added, 'New Land Use');
+    const tracker = new ChangeTracker(
+      IChangeType.Added,
+      getFieldLabel('landUse'),
+      ChangeContext.LAND_USES,
+    );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
@@ -263,7 +278,11 @@ const loggedInUser = getUser();
 
     setSelectedRowIds(new Set());
 
-    const tracker = new ChangeTracker(IChangeType.Deleted, 'Land Use');
+    const tracker = new ChangeTracker(
+      IChangeType.Deleted,
+      getFieldLabel('landUse'),
+      ChangeContext.LAND_USES,
+    );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 

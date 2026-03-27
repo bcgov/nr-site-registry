@@ -292,8 +292,12 @@ export type Events = {
   srAction?: Maybe<Scalars['String']['output']>;
   userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
+  whenDeleted?: Maybe<Scalars['DateTime']['output']>;
+  whenRestored?: Maybe<Scalars['DateTime']['output']>;
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
+  whoDeleted?: Maybe<Scalars['String']['output']>;
+  whoRestored?: Maybe<Scalars['String']['output']>;
   whoUpdated?: Maybe<Scalars['String']['output']>;
 };
 
@@ -636,6 +640,8 @@ export type NotationDto = {
   srValue?: Maybe<Scalars['Boolean']['output']>;
   userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
+  whenDeleted?: Maybe<Scalars['DateTime']['output']>;
+  whenRestored?: Maybe<Scalars['DateTime']['output']>;
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -656,6 +662,8 @@ export type NotationIputDto = {
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
   whenCreated?: InputMaybe<Scalars['DateTime']['input']>;
+  whenDeleted?: InputMaybe<Scalars['DateTime']['input']>;
+  whenRestored?: InputMaybe<Scalars['DateTime']['input']>;
   whenUpdated?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
@@ -861,6 +869,8 @@ export type QueryGetPendingSiteForSrApprovalArgs = {
   page: Scalars['String']['input'];
   pageSize: Scalars['String']['input'];
   searchParam?: InputMaybe<SearchParams>;
+  sortBy?: InputMaybe<SiteSortBy>;
+  sortByDir?: InputMaybe<SortByDirection>;
 };
 
 
@@ -893,6 +903,7 @@ export type QueryGetSiteInsightsArgs = {
 
 
 export type QueryGetSiteNotationBySiteIdArgs = {
+  includeDeleted?: InputMaybe<Scalars['Boolean']['input']>;
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
@@ -1459,7 +1470,7 @@ export type SiteSummaryDto = {
   addrLine_2?: InputMaybe<Scalars['String']['input']>;
   addrLine_3?: InputMaybe<Scalars['String']['input']>;
   addrLine_4?: InputMaybe<Scalars['String']['input']>;
-  addrType?: InputMaybe<Scalars['String']['input']>;
+  addrType: Scalars['String']['input'];
   apiAction?: InputMaybe<Scalars['String']['input']>;
   bcerCode?: InputMaybe<Scalars['String']['input']>;
   city: Scalars['String']['input'];

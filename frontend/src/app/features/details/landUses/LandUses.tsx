@@ -32,6 +32,8 @@ import { UserActionEnum } from '../../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import LandUseTable from './LandUseTable';
 import { getLandUseColumns } from './LandUseColumnConfiguration';
+import { UserType } from '../../../helpers/requests/userType';
+import { getUser, isUserOfType, UserRoleType } from '../../../helpers/utility';
 
 type createdAtSortDirection = 'newToOld' | 'oldTonew';
 
@@ -66,9 +68,31 @@ const LandUses: FC = () => {
   );
 
   const editModeEnabled = viewMode === SiteDetailsMode.EditMode;
+  
+const [userType, setUserType] = useState<UserType>(UserType.External);
+const loggedInUser = getUser();
+
+  useEffect(() => {
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
+    ) {
+      setUserType(UserType.External);
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
+      setUserType(UserType.Internal);
+    }
+    
+  }, [loggedInUser]);
+
+
   const tableColumns = useMemo(() => {
-    return getLandUseColumns(landUseCodes, editModeEnabled);
-  }, [editModeEnabled, landUseCodes]);
+    return getLandUseColumns(
+      landUseCodes,
+      editModeEnabled,
+      userType === UserType.Internal
+    );
+  }, [editModeEnabled, landUseCodes, viewMode, userType]);
+
 
   useEffect(() => {
     if (siteId) {
@@ -94,7 +118,7 @@ const LandUses: FC = () => {
 
   const tableLoading =
     landUseCodesFetchRequestStatus === RequestStatus.loading ||
-    landUsesFetchRequestStatus === RequestStatus.loading
+      landUsesFetchRequestStatus === RequestStatus.loading
       ? RequestStatus.loading
       : RequestStatus.idle;
 
@@ -166,7 +190,7 @@ const LandUses: FC = () => {
     });
 
     const tableColumn = tableColumns.find(
-      (column) => column.graphQLPropertyName === event.property,
+      (column: { graphQLPropertyName: any; }) => column.graphQLPropertyName === event.property,
     );
     const propertyLabel = tableColumn?.displayName || '';
 
@@ -291,12 +315,12 @@ const LandUses: FC = () => {
   const dataWithTextSearchApplied = !searchTerm
     ? tableData
     : tableData.filter((rowData) => {
-        const term = searchTerm.toLowerCase().trim();
-        return (
-          rowData.note?.toLowerCase().includes(term) ||
-          rowData.landUse?.description?.toLowerCase().includes(term)
-        );
-      });
+      const term = searchTerm.toLowerCase().trim();
+      return (
+        rowData.note?.toLowerCase().includes(term) ||
+        rowData.landUse?.description?.toLowerCase().includes(term)
+      );
+    });
 
   return (
     <div>

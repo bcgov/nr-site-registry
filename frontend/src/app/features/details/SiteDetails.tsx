@@ -95,7 +95,6 @@ import BannerDetails from '../../components/banners/BannerDetails';
 import {
   getParentBucket,
   getSiteAssociated,
-  getSiteDisclosure,
   getSiteDocuments,
   getSiteNoatations,
   getSiteParticipants,

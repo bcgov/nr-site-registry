@@ -7,7 +7,6 @@ import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom';
 import { SiteDetailsMode } from './dto/SiteDetailsMode';
 import { RequestStatus } from '../../helpers/requests/status';
 import { useAuth } from 'react-oidc-context';
-import PageContainer from '../../components/simple/PageContainer';
 
 // ---------------- MOCKS ----------------
 jest.mock('../../components/simple/PageContainer', () => ({
@@ -65,7 +64,6 @@ jest.mock('./navigation/NavigationPillsConfig', () => ({
   getNavComponents: jest.fn(() => []),
 }));
 
-// ✅ FIXED (handles both default + named export)
 jest.mock(
   '../../components/navigation/navigationpills/NavigationPills',
   () => ({
@@ -209,8 +207,24 @@ describe('SiteDetails Component', () => {
     jest.clearAllMocks();
   });
 
-  const renderComponent = (stateOverride = {}) => {
-    useSelector.mockImplementation((cb) => cb(buildState(stateOverride)));
+  const renderComponent = (override = {}) => {
+    const state = buildState();
+
+    // Deep merge ONLY what you need
+    const mergedState = {
+      ...state,
+      ...override,
+      sites: { ...state.sites, ...(override.sites || {}) },
+      siteDetails: { ...state.siteDetails, ...(override.siteDetails || {}) },
+      snapshots: { ...state.snapshots, ...(override.snapshots || {}) },
+      dropdown: { ...state.dropdown, ...(override.dropdown || {}) },
+      siteDisclosure: {
+        ...state.siteDisclosure,
+        ...(override.siteDisclosure || {}),
+      },
+    };
+
+    useSelector.mockImplementation((cb) => cb(mergedState));
 
     return render(
       <Provider store={store}>

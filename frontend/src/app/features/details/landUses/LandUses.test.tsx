@@ -1,15 +1,24 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
 import LandUses from './LandUses';
 import { UserRoleType } from '../../../helpers/utility';
 
 /* =========================
-   MOCKS
+   MOCK react-redux
 ========================= */
+jest.mock('react-redux', () => ({
+  useDispatch: () => jest.fn(),
+  useSelector: () => ({
+    landUses: [],
+    landUseCodes: [],
+    landUsesFetchRequestStatus: 'idle',
+    landUseCodesFetchRequestStatus: 'idle',
+  }),
+}));
 
-// Mock user utilities
+/* =========================
+   MOCK utilities
+========================= */
 jest.mock('../../../helpers/utility', () => ({
   getUser: jest.fn(() => ({ id: 'test-user' })),
   isUserOfType: jest.fn(),
@@ -20,36 +29,23 @@ jest.mock('../../../helpers/utility', () => ({
   },
 }));
 
-// Mock LandUseTable to just render column keys
+/* =========================
+   MOCK child component
+========================= */
 jest.mock('./LandUseTable', () => {
   return ({ columns }: any) => (
     <div>
       {columns.map((col: any) => (
-        <div key={col.graphQLPropertyName}>
-          {col.graphQLPropertyName}
-        </div>
+        <div key={col.displayName}>{col.displayName}</div>
       ))}
     </div>
   );
 });
 
 /* =========================
-   HELPERS
-========================= */
-
-const { isUserOfType } = jest.requireMock('../../../helpers/utility');
-
-const renderWithStore = (ui: React.ReactElement) => {
-  const store = configureStore({
-    reducer: () => ({}), // minimal dummy reducer
-  });
-
-  return render(<Provider store={store}>{ui}</Provider>);
-};
-
-/* =========================
    TESTS
 ========================= */
+const { isUserOfType } = jest.requireMock('../../../helpers/utility');
 
 describe('LandUses – SR column visibility', () => {
   afterEach(() => {
@@ -61,23 +57,19 @@ describe('LandUses – SR column visibility', () => {
       (role: string) => role === UserRoleType.INTERNAL
     );
 
-    renderWithStore(<LandUses />);
+    render(<LandUses />);
 
-    expect(
-      await screen.findByText('srApprovalStatus')
-    ).toBeInTheDocument();
+    expect(await screen.findByText('SR')).toBeInTheDocument();
   });
 
-  it('hides SR column for external users', async () => {
+  it('hides SR column for external users', () => {
     isUserOfType.mockImplementation(
       (role: string) =>
         role === UserRoleType.CLIENT || role === UserRoleType.PUBLIC
     );
 
-    renderWithStore(<LandUses />);
+    render(<LandUses />);
 
-    expect(
-      screen.queryByText('srApprovalStatus')
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('SR')).not.toBeInTheDocument();
   });
 });

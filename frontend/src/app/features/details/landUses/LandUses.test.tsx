@@ -32,6 +32,7 @@ jest.mock('../../../helpers/utility', () => ({
 /* =========================
    MOCK child component
 ========================= */
+
 jest.mock('./LandUseTable', () => {
   return ({ columns }: any) => (
     <div>

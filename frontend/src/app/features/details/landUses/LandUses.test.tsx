@@ -1,13 +1,15 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
 import LandUses from './LandUses';
-import { UserType } from '../../../helpers/requests/userType';
 import { UserRoleType } from '../../../helpers/utility';
 
 /* =========================
    MOCKS
-   ========================= */
+========================= */
 
+// Mock user utilities
 jest.mock('../../../helpers/utility', () => ({
   getUser: jest.fn(() => ({ id: 'test-user' })),
   isUserOfType: jest.fn(),
@@ -18,6 +20,7 @@ jest.mock('../../../helpers/utility', () => ({
   },
 }));
 
+// Mock LandUseTable to just render column keys
 jest.mock('./LandUseTable', () => {
   return ({ columns }: any) => (
     <div>
@@ -31,10 +34,22 @@ jest.mock('./LandUseTable', () => {
 });
 
 /* =========================
-   TESTS
-   ========================= */
+   HELPERS
+========================= */
 
 const { isUserOfType } = jest.requireMock('../../../helpers/utility');
+
+const renderWithStore = (ui: React.ReactElement) => {
+  const store = configureStore({
+    reducer: () => ({}), // minimal dummy reducer
+  });
+
+  return render(<Provider store={store}>{ui}</Provider>);
+};
+
+/* =========================
+   TESTS
+========================= */
 
 describe('LandUses – SR column visibility', () => {
   afterEach(() => {
@@ -46,7 +61,7 @@ describe('LandUses – SR column visibility', () => {
       (role: string) => role === UserRoleType.INTERNAL
     );
 
-    render(<LandUses />);
+    renderWithStore(<LandUses />);
 
     expect(
       await screen.findByText('srApprovalStatus')
@@ -59,7 +74,7 @@ describe('LandUses – SR column visibility', () => {
         role === UserRoleType.CLIENT || role === UserRoleType.PUBLIC
     );
 
-    render(<LandUses />);
+    renderWithStore(<LandUses />);
 
     expect(
       screen.queryByText('srApprovalStatus')

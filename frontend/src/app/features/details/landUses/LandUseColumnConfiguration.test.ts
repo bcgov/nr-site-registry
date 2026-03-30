@@ -1,19 +1,25 @@
-import { getLandUseColumns } from "./LandUseColumnConfiguration";
+import { getLandUseColumns } from './LandUseColumnConfiguration';
 
 describe('getLandUseColumns', () => {
   it('includes SR column for internal users', () => {
     const columns = getLandUseColumns([], false, true);
 
-    expect(columns.some(
-      col => col.graphQLPropertyName === 'srApprovalStatus'
-    )).toBe(true);
+    const hasSrColumn = columns.some(
+      (column) => column.displayName === 'SR'
+    );
+
+    expect(hasSrColumn).toBe(true);
+    expect(columns.length).toBe(3);
   });
 
   it('excludes SR column for external users', () => {
     const columns = getLandUseColumns([], false, false);
 
-    expect(columns.some(
-      col => col.graphQLPropertyName === 'srApprovalStatus'
-    )).toBe(false);
+    const hasSrColumn = columns.some(
+      (column) => column.displayName === 'SR'
+    );
+
+    expect(hasSrColumn).toBe(false);
+    expect(columns.length).toBe(2);
   });
 });

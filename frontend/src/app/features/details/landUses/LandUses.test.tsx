@@ -35,7 +35,7 @@ jest.mock('../../../helpers/utility', () => ({
 jest.mock('./LandUseTable', () => {
   return ({ columns }: any) => (
     <div>
-      {columns.map((col: any) => (
+      {(columns ?? []).map((col: any) => (
         <div key={col.displayName}>{col.displayName}</div>
       ))}
     </div>

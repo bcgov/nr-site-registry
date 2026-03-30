@@ -244,7 +244,12 @@ const SiteDetails = () => {
       saveSiteDetailsRequestStatus === RequestStatus.failed
     ) {
       if (saveSiteDetailsRequestStatus === RequestStatus.success) {
-        dispatch(fetchSitesInsights({ siteId: id ?? '' }));
+        dispatch(
+          fetchSitesInsights({
+            siteId: id ?? '',
+            showPending: userType === UserType.Internal,
+          }),
+        );
         dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false }));
         dispatch(resetSaveSiteDetails(null));
         dispatch(clearTrackChanges(null));
@@ -394,7 +399,12 @@ const SiteDetails = () => {
     if (!!id?.trim()) {
       checkForRecordsPendingReview(id);
       dispatch(setupSiteIdForSaving(id));
-      dispatch(fetchSitesInsights({ siteId: id ?? '' }));
+      dispatch(
+        fetchSitesInsights({
+          siteId: id ?? '',
+          showPending: userType === UserType.Internal,
+        }),
+      );
       if (auth.user !== null) {
         Promise.all([
           dispatch(fetchSnapshots(id ?? '')),
@@ -830,7 +840,8 @@ const SiteDetails = () => {
         // Exclude deleted notations from validation, but keep them for saving
         const notationsForValidation = Array.isArray(updatedSiteNotations)
           ? updatedSiteNotations.filter(
-              (notation: any) => notation?.userAction !== UserActionEnum.deleted,
+              (notation: any) =>
+                notation?.userAction !== UserActionEnum.deleted,
             )
           : updatedSiteNotations;
         const [notationErrors, notationParticipantErrors] = await Promise.all([

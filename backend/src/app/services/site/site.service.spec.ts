@@ -76,6 +76,7 @@ describe('SiteService', () => {
         {
           provide: getRepositoryToken(Sites),
           useValue: {
+            query: jest.fn(),
             find: jest.fn(() => {
               return [
                 { id: '123', commonName: 'victoria' },
@@ -1791,6 +1792,63 @@ describe('SiteService', () => {
       });
 
       expect(mockQueryBuilder.getManyAndCount).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getSiteInsights', () => {
+    const mockQueryResult = [
+      {
+        event_count: '5',
+        site_doc_count: '3',
+        event_partic_count: '10',
+        site_participants: '4',
+        land_history_count: '2',
+        site_assoc_count: '1',
+        site_subdiv_count: '0',
+      },
+    ];
+
+    it('should return site insights with counts', async () => {
+      jest.spyOn(siteRepository, 'query').mockResolvedValue(mockQueryResult);
+
+      const result = await siteService.getSiteInsights('123');
+
+      expect(result.eventCount).toBe(5);
+      expect(result.siteDocCount).toBe(3);
+      expect(result.eventParticCount).toBe(10);
+      expect(result.landHistoryCount).toBe(2);
+      expect(result.siteAssocCount).toBe(1);
+      expect(result.siteSubdivCount).toBe(0);
+    });
+
+    it('should include sr_action filter for non-pending (public) view', async () => {
+      jest.spyOn(siteRepository, 'query').mockResolvedValue(mockQueryResult);
+
+      await siteService.getSiteInsights('123', false);
+
+      expect(siteRepository.query).toHaveBeenCalledWith(
+        expect.stringContaining("sr_action != 'pending'"),
+        ['123'],
+      );
+    });
+
+    it('should not include sr_action filter for pending view (returns all)', async () => {
+      jest.spyOn(siteRepository, 'query').mockResolvedValue(mockQueryResult);
+
+      await siteService.getSiteInsights('123', true);
+
+      expect(siteRepository.query).toHaveBeenCalledWith(
+        expect.not.stringContaining('sr_action'),
+        ['123'],
+      );
+    });
+
+    it('should return null when query returns empty result', async () => {
+      jest.spyOn(siteRepository, 'query').mockResolvedValue([]);
+
+      const result = await siteService.getSiteInsights('999');
+
+      expect(result).toBeNull();
     });
   });
 

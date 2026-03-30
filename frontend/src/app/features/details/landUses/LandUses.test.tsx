@@ -1,47 +1,72 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { Provider, useSelector } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
 import LandUses from './LandUses';
 import { UserRoleType } from '../../../helpers/utility';
 
+/* =========================
+   Mocks
+========================= */
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({ id: '123' }),
 }));
 
-/* =========================
-   MOCK react-redux
-========================= */
+jest.mock('../../../helpers/utility', () => ({
+  ...jest.requireActual('../../../helpers/utility'),
+  isUserOfType: jest.fn(),
+}));
+
 jest.mock('react-redux', () => ({
-  useDispatch: () => jest.fn(),
-  useSelector: () => ({
+  ...jest.requireActual('react-redux'),
+  useSelector: jest.fn(),
+}));
+
+/* =========================
+   Stable Redux State
+========================= */
+
+const mockReduxState = {
+  landUses: {
     landUses: [],
     landUseCodes: [],
-    landUsesFetchRequestStatus: 'idle',
-    landUseCodesFetchRequestStatus: 'idle',
-  }),
-}));
-
-/* =========================
-   MOCK utilities
-========================= */
-jest.mock('../../../helpers/utility', () => ({
-  getUser: jest.fn(() => ({ id: 'test-user' })),
-  isUserOfType: jest.fn(),
-  UserRoleType: {
-    INTERNAL: 'INTERNAL',
-    CLIENT: 'CLIENT',
-    PUBLIC: 'PUBLIC',
+    landUsesFetchRequestStatus: 'SUCCESS',
+    landUseCodesFetchRequestStatus: 'SUCCESS',
   },
-}));
-
+  sites: {
+    siteDetailsMode: 'VIEW',
+    siteDetails: {},
+    changeTracker: {},
+    resetSiteDetails: false,
+    siteInsights: {},
+  },
+};
 
 /* =========================
-   TESTS
+   Dummy Store
 ========================= */
+
+const store = configureStore({
+  reducer: {
+    dummy: (state = {}) => state,
+  },
+});
+
+/* =========================
+   Tests
+========================= */
+
 const { isUserOfType } = jest.requireMock('../../../helpers/utility');
 
 describe('LandUses – SR column visibility', () => {
+  beforeEach(() => {
+    (useSelector as jest.Mock).mockImplementation(selector =>
+      selector(mockReduxState)
+    );
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -51,7 +76,11 @@ describe('LandUses – SR column visibility', () => {
       (role: string) => role === UserRoleType.INTERNAL
     );
 
-    render(<LandUses />);
+    render(
+      <Provider store={store}>
+        <LandUses />
+      </Provider>
+    );
 
     expect(await screen.findByText('SR')).toBeInTheDocument();
   });

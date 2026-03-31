@@ -2627,20 +2627,32 @@ export class SiteService {
     }
   }
 
-  async getSiteInsights(siteId: string): Promise<SiteInsightsDto> {
+  async getSiteInsights(
+    siteId: string,
+    showPending?: boolean,
+  ): Promise<SiteInsightsDto> {
     try {
+      const srFilter = showPending
+        ? ''
+        : `AND (sr_action IS NULL OR sr_action != '${SRApprovalStatusEnum.PENDING}')`;
+
+      const sdSrFilter = showPending
+        ? ''
+        : `AND (sd.sr_action IS NULL OR sd.sr_action != '${SRApprovalStatusEnum.PENDING}')`;
+
       const result = await this.siteRepository.query(
         `
         SELECT
-          (SELECT COUNT(id) FROM sites.events WHERE site_id = $1) AS event_count,
+          (SELECT COUNT(id) FROM sites.events WHERE site_id = $1 ${srFilter}) AS event_count,
           (SELECT COUNT(sd.id) FROM sites.site_docs sd
-		  join sites.site_doc_partics  spr on sdoc_id = sd.id
-		  where site_id = $1) AS site_doc_count,
+		  join sites.site_doc_partics spr on sdoc_id = sd.id
+		  where site_id = $1 ${sdSrFilter}) AS site_doc_count,
           (SELECT COUNT(id) FROM sites.event_partics WHERE event_id IN (
-              SELECT id FROM sites.events WHERE site_id = $1
+              SELECT id FROM sites.events WHERE site_id = $1 ${srFilter}
           )) AS event_partic_count,
-          (SELECT COUNT(Lut_code) FROM sites.land_histories WHERE site_id = $1) AS land_history_count,
-          (SELECT COUNT(id) FROM sites.site_assocs WHERE site_id = $1) AS site_assoc_count,
+           (SELECT COUNT(id) FROM sites.site_partics WHERE site_id = $1 ${srFilter}) AS site_participants,
+          (SELECT COUNT(Lut_code) FROM sites.land_histories WHERE site_id = $1 ${srFilter}) AS land_history_count,
+          (SELECT COUNT(id) FROM sites.site_assocs WHERE site_id = $1 ${srFilter}) AS site_assoc_count,
           (SELECT COUNT(subdiv_id) FROM sites.site_subdivisions WHERE site_id = $1) AS site_subdiv_count
         `,
         [siteId],
@@ -2658,6 +2670,7 @@ export class SiteService {
         landHistoryCount: Number(raw.land_history_count),
         siteAssocCount: Number(raw.site_assoc_count),
         siteSubdivCount: Number(raw.site_subdiv_count),
+        siteParticsCount: Number(raw.site_participants),
       };
 
       return dto;

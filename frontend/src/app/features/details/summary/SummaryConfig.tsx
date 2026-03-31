@@ -413,12 +413,12 @@ export const GetSummaryConfig = () => {
       id: 5,
       displayName: 'Participants',
       active: true,
-      graphQLPropertyName: 'eventParticCount',
+      graphQLPropertyName: 'siteParticsCount',
       displayType: {
         type: FormFieldType.Text,
         label: 'Site ID',
         placeholder: 'Separate IDs by a comma (",")',
-        graphQLPropertyName: 'eventParticCount',
+        graphQLPropertyName: 'siteParticsCount',
         value: '',
         validation: {
           pattern: /^[0-9,\s]*$/,

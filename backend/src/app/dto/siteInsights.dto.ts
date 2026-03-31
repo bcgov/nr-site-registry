@@ -19,4 +19,7 @@ export class SiteInsightsDto {
 
   @Field(() => Int)
   siteSubdivCount: number;
+
+  @Field(() => Int)
+  siteParticsCount: number;
 }

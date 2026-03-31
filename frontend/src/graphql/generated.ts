@@ -898,6 +898,7 @@ export type QueryGetSiteDocumentsBySiteIdArgs = {
 
 
 export type QueryGetSiteInsightsArgs = {
+  pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
 
@@ -1171,6 +1172,7 @@ export type SiteInsightsDto = {
   landHistoryCount: Scalars['Int']['output'];
   siteAssocCount: Scalars['Int']['output'];
   siteDocCount: Scalars['Int']['output'];
+  siteParticsCount: Scalars['Int']['output'];
   siteSubdivCount: Scalars['Int']['output'];
 };
 

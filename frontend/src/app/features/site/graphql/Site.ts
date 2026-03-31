@@ -93,6 +93,7 @@ query searchSitesForAuthenticatedUsers($searchParam: String!,  $page: Int!, $pag
         whenCreated
         whenCreated
         consultantSubmitted
+        addrType
        }
        count
        page
@@ -126,6 +127,7 @@ export const graphqlSiteDetailsQuery = () => {
           siteRiskCode
           whenUpdated
           srAction
+          addrType
         }
         httpStatusCode
       }
@@ -211,8 +213,8 @@ export const bulkAproveRejectChangesQL = () => gql`
 `;
 
 export const getSiteInsightsQL = () => gql`
-  query getSiteInsights($siteId: String!) {
-    getSiteInsights(siteId: $siteId) {
+  query getSiteInsights($siteId: String!, $pending: Boolean) {
+    getSiteInsights(siteId: $siteId, pending: $pending) {
       data {
         eventCount
         eventParticCount
@@ -220,6 +222,7 @@ export const getSiteInsightsQL = () => gql`
         siteDocCount
         siteSubdivCount
         siteAssocCount
+        siteParticsCount
       }
     }
   }

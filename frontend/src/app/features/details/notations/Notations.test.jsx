@@ -4,7 +4,6 @@ import { Provider, useSelector, useDispatch } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { GetNotationConfig } from './NotationsConfig';
-import { mock } from 'node:test';
 
 const mockWidget = jest.fn();
 

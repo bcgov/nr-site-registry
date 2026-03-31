@@ -5,6 +5,18 @@ import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { GetNotationConfig } from './NotationsConfig';
 
+
+jest.mock('../../../components/widget/Widget', () => {
+  return ({ isRequired, title }: any) => (
+    <div
+      data-testid="mock-widget"
+      data-is-required={isRequired}
+    >
+      {title}
+    </div>
+  );
+});
+
 // Example of a Jest mock for GetNotationConfig
 jest.mock('./NotationsConfig', () => ({
   GetNotationConfig: jest.fn(() => {
@@ -1331,6 +1343,39 @@ describe('Notations component', () => {
     );
     const notationsComponent = screen.getByTestId('notations-component');
     expect(notationsComponent).toBeInTheDocument();
+  });
+
+  it('sets Widget isRequired=true in Edit mode', () => {
+    render(
+      <Provider store={store}>
+        <Notations showPending={false} />
+      </Provider>,
+    );
+
+    const widget = screen.getByTestId('mock-widget');
+    expect(widget).toHaveAttribute('data-is-required', 'true');
+  });
+
+  it('sets Widget isRequired=false when not in Edit mode', () => {
+    useSelector.mockImplementationOnce((callback) =>
+      callback({
+        ...useSelector.mock.results[0].value,
+        sites: {
+          siteDetailsMode: 'sr', // anything other than 'edit'
+          userType: 'Internal',
+          resetSiteDetails: false,
+        },
+      }),
+    );
+
+    render(
+      <Provider store={store}>
+        <Notations showPending={false} />
+      </Provider>,
+    );
+
+    const widget = screen.getByTestId('mock-widget');
+    expect(widget).toHaveAttribute('data-is-required', 'false');
   });
 
   it('search functionality works correctly', () => {

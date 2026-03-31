@@ -5,564 +5,19 @@ import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { GetNotationConfig } from './NotationsConfig';
 
-
-jest.mock('../../../components/widget/Widget', () => {
-  return ({ isRequired, title }: any) => (
-    <div
-      data-testid="mock-widget"
-      data-is-required={isRequired}
-    >
-      {title}
-    </div>
-  );
-});
-
 // Example of a Jest mock for GetNotationConfig
 jest.mock('./NotationsConfig', () => ({
-  GetNotationConfig: jest.fn(() => {
-    return {
-      notationFormRowsInternal: [
-        [
-          {
-            type: 'dropdown',
-            label: 'Notation Type',
-            placeholder: 'Notation Type',
-            graphQLPropertyName: 'etypCode',
-            options: [
-              {
-                metaData: 'ADM',
-                dropdownDto: [{ key: 'SREC', value: 'SREC' }],
-              },
-            ],
-            value: '',
-            colSize: 'col-lg-5 col-md-7 col-sm-11 col-10',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-          {
-            type: 'date',
-            label: 'Initiated Date',
-            placeholder: 'MM/DD/YY',
-            graphQLPropertyName: 'requirementReceivedDate',
-            value: '',
-            colSize: 'col-lg-3 col-md-4 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss:
-              'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
-          },
-          {
-            type: 'date',
-            label: 'Completed Date',
-            placeholder: 'MM/DD/YY',
-            graphQLPropertyName: 'completionDate',
-            value: '',
-            colSize: 'col-lg-3 col-md-12 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss:
-              'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
-          },
-        ],
-
-        [
-          {
-            type: 'dropdown',
-            label: 'Notation Class',
-            placeholder: 'Notation Class',
-            graphQLPropertyName: 'eclsCode',
-            options: [{ key: 'ADM', value: 'ADM' }],
-            value: '',
-            colSize: 'col-lg-5 col-md-6 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-          {
-            type: 'date',
-            label: 'Required Date',
-            placeholder: 'MM/DD/YY',
-            graphQLPropertyName: 'requirementDueDate',
-            value: '',
-            colSize: 'col-lg-3 col-md-6 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-dateInput',
-          },
-          {
-            type: 'dropdown',
-            label: 'Ministry Contact',
-            placeholder: 'Ministry Contact',
-            graphQLPropertyName: 'psnorgId',
-            options: [{ key: '1', value: 'ABC' }],
-            value: '',
-            isImage: true,
-            colSize: 'col-lg-4 col-md-12 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-        ],
-
-        [
-          {
-            type: 'text',
-            label: 'Required Actions',
-            placeholder: 'Required Actions',
-            graphQLPropertyName: 'requiredAction',
-            value: '',
-            colSize: 'col-lg-12 col-md-12 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-        ],
-
-        [
-          {
-            type: 'text',
-            label: 'Note',
-            placeholder: 'Note',
-            graphQLPropertyName: 'note',
-            value: '',
-            colSize: 'col-lg-12 col-md-12 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-        ],
-      ],
-      notationFormRowEditMode: [
-        [
-          {
-            type: 'dropdown',
-            label: 'Notation Type',
-            placeholder: 'Notation Type',
-            graphQLPropertyName: 'etypCode',
-            options: [
-              {
-                metaData: 'ADM',
-                dropdownDto: [{ key: 'SREC', value: 'SREC' }],
-              },
-            ],
-            value: '',
-            colSize: 'col-lg-11 col-md-11 col-sm-11 col-10',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-        ],
-        [
-          {
-            type: 'dropdown',
-            label: 'Notation Class',
-            placeholder: 'Notation Class',
-            graphQLPropertyName: 'eclsCode',
-            options: [{ key: 'ADM', value: 'ADM' }],
-            value: '',
-            colSize: 'col-lg-12 col-md-12 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-        ],
-        [
-          {
-            type: 'date',
-            label: 'Initiated Date',
-            placeholder: 'MM/DD/YY',
-            graphQLPropertyName: 'requirementReceivedDate',
-            value: '',
-            colSize: 'col-lg-4 col-md-4 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss:
-              'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
-          },
-          {
-            type: 'date',
-            label: 'Required Date',
-            placeholder: 'MM/DD/YY',
-            graphQLPropertyName: 'requirementDueDate',
-            value: '',
-            colSize: 'col-lg-4 col-md-4 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss:
-              'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
-          },
-          {
-            type: 'date',
-            label: 'Completed Date',
-            placeholder: 'MM/DD/YY',
-            graphQLPropertyName: 'completionDate',
-            value: '',
-            colSize: 'col-lg-4 col-md-4 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss:
-              'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
-          },
-        ],
-        [
-          {
-            type: 'text',
-            label: 'Required Actions',
-            placeholder: 'Required Actions',
-            graphQLPropertyName: 'requiredAction',
-            value: '',
-            colSize: 'col-lg-12 col-md-12 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-        ],
-        [
-          {
-            type: 'text',
-            label: 'Note',
-            placeholder: 'Note',
-            graphQLPropertyName: 'note',
-            value: '',
-            colSize: 'col-lg-12 col-md-12 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-        ],
-        [
-          {
-            type: 'dropdown',
-            label: 'Ministry Contact',
-            placeholder: 'Ministry Contact',
-            graphQLPropertyName: 'psnorgId',
-            options: [{ key: '1', value: 'ABC' }],
-            value: '',
-            isImage: true,
-            colSize: 'col-lg-12 col-md-12 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-        ],
-      ],
-      notationFormRowExternal: [
-        [
-          {
-            type: 'dropdown',
-            label: 'Notation Type',
-            placeholder: 'Notation Type',
-            graphQLPropertyName: 'etypCode',
-            options: [
-              {
-                metaData: 'ADM',
-                dropdownDto: [{ key: 'SREC', value: 'SREC' }],
-              },
-            ],
-            value: '',
-            colSize:
-              'col-xxl-11 col-xl-11 col-lg-11 col-md-11 col-sm-11 col-xs-11',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-        ],
-
-        [
-          {
-            type: 'dropdown',
-            label: 'Notation Class',
-            placeholder: 'Notation Class',
-            graphQLPropertyName: 'eclsCode',
-            options: [{ key: 'ADM', value: 'ADM' }],
-            value: '',
-            colSize:
-              'col-xxl-6 col-xl-6 col-lg-12 col-md-12 col-sm-12 col-xs-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-          {
-            type: 'date',
-            label: 'Initiated Date',
-            placeholder: 'MM/DD/YY',
-            graphQLPropertyName: 'requirementReceivedDate',
-            value: [],
-            colSize: 'col-xxl-2 col-xl-2 col-lg-4 col-md-4 col-sm-6 col-xs-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss:
-              'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
-          },
-          {
-            type: 'date',
-            label: 'Required Date',
-            placeholder: 'MM/DD/YY',
-            graphQLPropertyName: 'requirementDueDate',
-            value: [],
-            colSize: 'col-xxl-2 col-xl-2 col-lg-4 col-md-4 col-sm-6 col-xs-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss:
-              'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
-          },
-          {
-            type: 'date',
-            label: 'Completed Date',
-            placeholder: 'MM/DD/YY',
-            graphQLPropertyName: 'completionDate',
-            value: [],
-            colSize: 'col-xxl-2 col-xl-2 col-lg-4 col-md-4 col-sm-12 col-xs-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss:
-              'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
-          },
-        ],
-
-        [
-          {
-            type: 'text',
-            label: 'Required Actions',
-            placeholder: 'Required Actions',
-            graphQLPropertyName: 'requiredAction',
-            value: '',
-            colSize: 'col-lg-12 col-md-12 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-        ],
-
-        [
-          {
-            type: 'text',
-            label: 'Note',
-            placeholder: 'Note',
-            graphQLPropertyName: 'note',
-            value: '',
-            colSize: 'col-lg-12 col-md-12 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-        ],
-        [
-          {
-            type: 'dropdown',
-            label: 'Ministry Contact',
-            placeholder: 'Ministry Contact',
-            graphQLPropertyName: 'psnorgId',
-            options: [{ key: '1', value: 'ABC' }],
-            value: '',
-            isImage: true,
-            colSize: 'col-lg-4 col-md-6 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-        ],
-      ],
-      notationFormRowsFirstChild: [
-        [
-          {
-            type: 'dropdown',
-            label: 'Notation Type',
-            placeholder: 'Notation Type',
-            graphQLPropertyName: 'etypCode',
-            options: [
-              {
-                metaData: 'ADM',
-                dropdownDto: [{ key: 'SREC', value: 'SREC' }],
-              },
-            ],
-            value: '',
-            colSize: 'col-xxl-5 col-xl-5 col-lg-8 col-md-6 col-sm-12',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss: 'custom-notation-edit-input',
-          },
-          {
-            type: 'date',
-            label: 'Initiated Date',
-            placeholder: 'MM/DD/YY',
-            graphQLPropertyName: 'requirementReceivedDate',
-            value: [],
-            colSize:
-              'col-lg-3 col-md-6 col-sm-12 d-none d-xl-block d-xxl-block',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss:
-              'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
-          },
-          {
-            type: 'date',
-            label: 'Completed Date',
-            placeholder: 'MM/DD/YY',
-            graphQLPropertyName: 'completionDate',
-            value: [],
-            colSize:
-              'col-lg-4 col-md-6 col-sm-12 d-none d-xl-block d-xxl-block d-lg-block d-md-block',
-            customLabelCss: 'custom-notation-lbl-text',
-            customInputTextCss: 'custom-notation-input-text',
-            customEditLabelCss: 'custom-notation-edit-label',
-            customEditInputTextCss:
-              'custom-notation-edit-dateInput .rs-input .rs-input-group-addon',
-          },
-        ],
-      ],
-      notationColumnInternal: [
-        {
-          id: 1,
-          displayName: 'Role',
-          active: true,
-          graphQLPropertyName: 'eprCode',
-          displayType: {
-            type: 'dropdown',
-            label: 'Text',
-            graphQLPropertyName: 'eprCode',
-            value: '',
-            options: [],
-            allowNumbersOnly: true,
-            colSize: 'col-lg-6 col-md-6 col-sm-12',
-            customInputTextCss: 'custom-notation-participant-input-text',
-            customEditInputTextCss: 'custom-notation-participant-input-text',
-            tableMode: true,
-            placeholder: 'Please select the role',
-          },
-          columnSize: 0,
-        },
-        {
-          id: 2,
-          displayName: 'Participant Name',
-          active: true,
-          graphQLPropertyName: 'psnorgId',
-          columnSize: 3,
-          displayType: {
-            type: 'dropdownWithSearch',
-            label: '',
-            isLabel: false,
-            graphQLPropertyName: 'psnorgId',
-            placeholder: 'Please enter participant name.',
-            value: '',
-            options: [],
-            colSize: 'col-lg-6 col-md-6 col-sm-12',
-            customInputTextCss: 'custom-notation-participant-input-text',
-            customEditInputTextCss: 'custom-notation-participant-input-text',
-            customPlaceholderCss: 'custom-notation-search-placeholder',
-            tableMode: true,
-            customMenuMessage: (
-              <span>Please select site participant name:</span>
-            ),
-            filteredOptions: [],
-            isLoading: 'idle',
-            handleSearch: () => {},
-          },
-        },
-        {
-          id: 3,
-          displayName: 'SR',
-          active: true,
-          graphQLPropertyName: 'srAction',
-          displayType: {
-            type: 'checkbox',
-            label: 'SR',
-            placeholder: '',
-            graphQLPropertyName: 'sr',
-            value: false,
-            tableMode: true,
-          },
-          columnSize: 0,
-        },
-      ],
-      notationColumnExternal: [
-        {
-          id: 1,
-          displayName: 'Role',
-          active: true,
-          graphQLPropertyName: 'eprCode',
-          displayType: {
-            type: 'dropdown',
-            label: 'Text',
-            graphQLPropertyName: 'eprCode',
-            value: '',
-            options: [],
-            allowNumbersOnly: true,
-            colSize: 'col-lg-6 col-md-6 col-sm-12',
-            customInputTextCss: 'custom-notation-participant-input-text',
-            customEditInputTextCss: 'custom-notation-participant-input-text',
-            tableMode: true,
-            placeholder: 'Please select the role',
-          },
-          columnSize: 0,
-        },
-        {
-          id: 2,
-          displayName: 'Participant Name',
-          active: true,
-          graphQLPropertyName: 'psnorgId',
-          columnSize: 3,
-          displayType: {
-            type: 'dropdownWithSearch',
-            label: '',
-            isLabel: false,
-            graphQLPropertyName: 'psnorgId',
-            placeholder: 'Please enter participant name.',
-            value: '',
-            options: [],
-            colSize: 'col-lg-6 col-md-6 col-sm-12',
-            customInputTextCss: 'custom-notation-participant-input-text',
-            customEditInputTextCss: 'custom-notation-participant-input-text',
-            customPlaceholderCss: 'custom-notation-search-placeholder',
-            tableMode: true,
-            customMenuMessage: (
-              <span>Please select site participant name:</span>
-            ),
-            filteredOptions: [],
-            isLoading: 'idle',
-          },
-        },
-      ],
-      srVisibilityConfig: [
-        {
-          label: 'Show on SR',
-          value: 'show',
-        },
-        {
-          label: 'Hide on SR',
-          value: 'hide',
-        },
-      ],
-    };
-  }),
+  GetNotationConfig: jest.fn(() => ({
+    notationFormRowsInternal: [],
+    notationFormRowEditMode: [],
+    notationFormRowExternal: [],
+    notationFormRowsFirstChild: [],
+    notationColumnInternal: [],
+    notationColumnExternal: [],
+    srVisibilityConfig: [],
+  })),
 }));
+
 
 jest.mock('react-redux', () => {
   const actualRedux = jest.requireActual('react-redux');
@@ -644,6 +99,37 @@ jest.mock('react-redux', () => {
 });
 
 const mockStore = configureStore([thunk]);
+
+const mockState = {
+  notationParticipant: {
+    siteNotation: [
+      {
+        id: '1',
+        siteId: '9',
+        notationParticipant: [
+          {
+            eventParticId: 'xxx',
+            displayName: 'Test User',
+          },
+        ],
+      },
+    ],
+    status: 'success',
+    error: '',
+  },
+  sites: {
+    siteDetailsMode: 'edit',
+    userType: 'Internal',
+    resetSiteDetails: false,
+  },
+  siteDetails: {
+    saveRequestStatus: 'success',
+  },
+  dropdown: {
+    dropdowns: {},
+  },
+};
+
 describe('Notations component', () => {
   let store;
   let dispatch;
@@ -1345,25 +831,26 @@ describe('Notations component', () => {
     expect(notationsComponent).toBeInTheDocument();
   });
 
-  it('sets Widget isRequired=true in Edit mode', () => {
+  it('passes isRequired=true to Widget in Edit mode', () => {
     render(
       <Provider store={store}>
         <Notations showPending={false} />
-      </Provider>,
+      </Provider>
     );
 
-    const widget = screen.getByTestId('mock-widget');
-    expect(widget).toHaveAttribute('data-is-required', 'true');
+    expect(widgetMock).toHaveBeenCalled();
+
+    const props = widgetMock.mock.calls[0][0];
+    expect(props.isRequired).toBe(true);
   });
 
-  it('sets Widget isRequired=false when not in Edit mode', () => {
-    useSelector.mockImplementationOnce((callback) =>
-      callback({
-        ...useSelector.mock.results[0].value,
+  it('passes isRequired=false to Widget when not in Edit mode', () => {
+    useSelector.mockImplementationOnce((selector) =>
+      selector({
+        ...mockState,
         sites: {
-          siteDetailsMode: 'sr', // anything other than 'edit'
-          userType: 'Internal',
-          resetSiteDetails: false,
+          ...mockState.sites,
+          siteDetailsMode: 'sr',
         },
       }),
     );
@@ -1371,11 +858,13 @@ describe('Notations component', () => {
     render(
       <Provider store={store}>
         <Notations showPending={false} />
-      </Provider>,
+      </Provider>
     );
 
-    const widget = screen.getByTestId('mock-widget');
-    expect(widget).toHaveAttribute('data-is-required', 'false');
+    expect(widgetMock).toHaveBeenCalled();
+
+    const props = widgetMock.mock.calls[0][0];
+    expect(props.isRequired).toBe(false);
   });
 
   it('search functionality works correctly', () => {

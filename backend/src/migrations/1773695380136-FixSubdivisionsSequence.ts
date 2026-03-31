@@ -18,13 +18,14 @@ export class FixSubdivisionsSequence1773695380136
         OWNED BY sites.subdivisions.id;
     `);
 
+    // Resync the sequence so the next ID is valid
     await queryRunner.query(`
-        SELECT setval(
-          'sites.subdivision_id_seq',
-          GREATEST((SELECT COALESCE(MAX(id), 0) FROM sites.subdivisions), 1),
-          (SELECT COUNT(*) > 0 FROM sites.subdivisions)
-        );
-      `);
+      SELECT setval(
+        'sites.subdivision_id_seq',
+        GREATEST((SELECT COALESCE(MAX(id), 0) FROM sites.subdivisions), 1),
+        (SELECT COUNT(*) > 0 FROM sites.subdivisions)
+      );
+    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

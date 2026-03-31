@@ -1,4 +1,4 @@
-global:  # Trigger a db deploy.
+global:
   config:
     dbName: site #test
 crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single postgres

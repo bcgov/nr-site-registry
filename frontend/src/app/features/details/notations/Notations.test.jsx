@@ -831,6 +831,65 @@ describe('Notations component', () => {
     expect(notationsComponent).toBeInTheDocument();
   });
 
+  it('renders Notations in SR mode (new lines coverage)', () => {
+    useSelector.mockImplementationOnce((selector) =>
+      selector({
+        ...mockState,
+        sites: {
+          ...mockState.sites,
+          siteDetailsMode: 'sr',
+          userType: 'Internal',
+        },
+      }),
+    );
+    render(
+      <Provider store={store}>
+        <Notations showPending={false} />
+      </Provider>,
+    );
+  });
+
+  it('renders archived notation branch', () => {
+    useSelector.mockImplementationOnce((selector) =>
+      selector({
+        ...mockState,
+        notationParticipant: {
+          ...mockState.notationParticipant,
+          siteNotation: [
+            {
+              ...mockState.notationParticipant.siteNotation[0],
+              isArchived: true,
+            },
+          ],
+        },
+      }),
+    );
+
+    render(
+      <Provider store={store}>
+        <Notations showPending={false} />
+      </Provider>,
+    );
+  });
+
+  it('renders Notations for external user', () => {
+    useSelector.mockImplementationOnce((selector) =>
+      selector({
+        ...mockState,
+        sites: {
+          ...mockState.sites,
+          userType: 'External',
+        },
+      }),
+    );
+
+    render(
+      <Provider store={store}>
+        <Notations showPending={false} />
+      </Provider>,
+    );
+  });
+  
   it('renders Notations in non-edit mode (for isRequired=false coverage)', () => {
     useSelector.mockImplementationOnce((selector) =>
       selector({

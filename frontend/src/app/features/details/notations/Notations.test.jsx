@@ -5,6 +5,15 @@ import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { GetNotationConfig } from './NotationsConfig';
 
+
+const widgetMock = jest.fn();
+
+jest.mock('../../../../components/widget/Widget', () => (props) => {
+  widgetMock(props);
+  return null;
+});
+
+
 // Example of a Jest mock for GetNotationConfig
 jest.mock('./NotationsConfig', () => ({
   GetNotationConfig: jest.fn(() => ({

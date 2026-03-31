@@ -8,11 +8,6 @@ import { mock } from 'node:test';
 
 const mockWidget = jest.fn();
 
-jest.mock('../../../../components/widget/Widget', () => (props) => {
-  mockWidget(props);
-  return null;
-});
-
 // Example of a Jest mock for GetNotationConfig
 jest.mock('./NotationsConfig', () => ({
   GetNotationConfig: jest.fn(() => ({

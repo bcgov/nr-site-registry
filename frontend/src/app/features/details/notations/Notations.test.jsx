@@ -4,15 +4,14 @@ import { Provider, useSelector, useDispatch } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { GetNotationConfig } from './NotationsConfig';
+import { mock } from 'node:test';
 
-
-const widgetMock = jest.fn();
+const mockWidget = jest.fn();
 
 jest.mock('../../../../components/widget/Widget', () => (props) => {
-  widgetMock(props);
+  mockWidget(props);
   return null;
 });
-
 
 // Example of a Jest mock for GetNotationConfig
 jest.mock('./NotationsConfig', () => ({
@@ -847,9 +846,9 @@ describe('Notations component', () => {
       </Provider>
     );
 
-    expect(widgetMock).toHaveBeenCalled();
+    expect(mockWidget).toHaveBeenCalled();
 
-    const props = widgetMock.mock.calls[0][0];
+    const props = mockWidget.mock.calls[0][0];
     expect(props.isRequired).toBe(true);
   });
 
@@ -870,9 +869,9 @@ describe('Notations component', () => {
       </Provider>
     );
 
-    expect(widgetMock).toHaveBeenCalled();
+    expect(mockWidget).toHaveBeenCalled();
 
-    const props = widgetMock.mock.calls[0][0];
+    const props = mockWidget.mock.calls[0][0];
     expect(props.isRequired).toBe(false);
   });
 

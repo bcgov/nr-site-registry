@@ -1,10 +1,4 @@
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  act,
-} from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import SiteDetails from './SiteDetails';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import configureStore from 'redux-mock-store';

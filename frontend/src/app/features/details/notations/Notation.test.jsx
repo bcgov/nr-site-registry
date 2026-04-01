@@ -13,7 +13,7 @@ import { UserType } from '../../../helpers/requests/userType';
 jest.mock('../../../components/widget/Widget', () => {
   const PropTypes = require('prop-types');
 
-  function MockWidget(props: any) {
+  function MockWidget(props) {
     return (
       <div
         data-testid="mock-widget"
@@ -24,11 +24,11 @@ jest.mock('../../../components/widget/Widget', () => {
 
   MockWidget.propTypes = {
     isRequired: PropTypes.bool.isRequired,
-    children: PropTypes.node,
   };
 
   return MockWidget;
 });
+
 
 /**
  * ✅ Mock all heavy UI dependencies

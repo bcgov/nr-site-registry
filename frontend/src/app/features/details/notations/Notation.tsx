@@ -156,7 +156,7 @@ const Notation: React.FC<INotationProps> = ({
             aria-label="Sort Notation Form"
           />
           <Widget
-            isRequired={viewMode === SiteDetailsMode.EditMode && true}
+            isRequired={viewMode === SiteDetailsMode.EditMode}
             changeHandler={(event) => handleTableChange(notation.id, event)}
             handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
             title={'Notation Participants'}

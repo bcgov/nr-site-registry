@@ -554,6 +554,8 @@ jest.mock('./NotationsConfig', () => ({
 }));
 
 jest.mock('./Notation', () => {
+  const PropTypes = require('prop-types'); // ✅ inside scope
+
   function MockNotation(props) {
     return (
       <div

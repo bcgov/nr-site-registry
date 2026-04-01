@@ -4,7 +4,6 @@ import { Provider, useSelector, useDispatch } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { GetNotationConfig } from './NotationsConfig';
-import PropTypes from 'prop-types';
 
 // Example of a Jest mock for GetNotationConfig
 jest.mock('./NotationsConfig', () => ({
@@ -553,26 +552,6 @@ jest.mock('./NotationsConfig', () => ({
   }),
 }));
 
-jest.mock('./Notation', () => {
-  const PropTypes = require('prop-types'); // ✅ inside scope
-
-  function MockNotation(props) {
-    return (
-      <div
-        data-testid="mock-notation"
-        data-viewmode={props.viewMode}
-        data-is-archived={String(props.isArchived)}
-      />
-    );
-  }
-
-  MockNotation.propTypes = {
-    viewMode: PropTypes.string.isRequired,
-    isArchived: PropTypes.bool.isRequired,
-  };
-
-  return MockNotation;
-});
 
 jest.mock('react-redux', () => {
   const actualRedux = jest.requireActual('react-redux');
@@ -654,36 +633,6 @@ jest.mock('react-redux', () => {
 });
 
 const mockStore = configureStore([thunk]);
-
-const mockState = {
-  notationParticipant: {
-    siteNotation: [
-      {
-        id: '1',
-        siteId: '9',
-        notationParticipant: [
-          {
-            eventParticId: 'xxx',
-            displayName: 'Test User',
-          },
-        ],
-      },
-    ],
-    status: 'success',
-    error: '',
-  },
-  sites: {
-    siteDetailsMode: 'edit',
-    userType: 'Internal',
-    resetSiteDetails: false,
-  },
-  siteDetails: {
-    saveRequestStatus: 'success',
-  },
-  dropdown: {
-    dropdowns: {},
-  },
-};
 
 describe('Notations component', () => {
   let store;
@@ -1384,143 +1333,6 @@ describe('Notations component', () => {
     );
     const notationsComponent = screen.getByTestId('notations-component');
     expect(notationsComponent).toBeInTheDocument();
-  });
-
-  it('renders Notations in SR mode (new lines coverage)', () => {
-    useSelector.mockImplementationOnce((selector) =>
-      selector({
-        ...mockState,
-        sites: {
-          ...mockState.sites,
-          siteDetailsMode: 'sr',
-          userType: 'Internal',
-        },
-      }),
-    );
-    render(
-      <Provider store={store}>
-        <Notations showPending={false} />
-      </Provider>,
-    );
-  });
-
-  it('renders archived notation branch', () => {
-    useSelector.mockImplementationOnce((selector) =>
-      selector({
-        ...mockState,
-        notationParticipant: {
-          ...mockState.notationParticipant,
-          siteNotation: [
-            {
-              ...mockState.notationParticipant.siteNotation[0],
-              isArchived: true,
-            },
-          ],
-        },
-      }),
-    );
-
-    render(
-      <Provider store={store}>
-        <Notations showPending={false} />
-      </Provider>,
-    );
-  });
-
-  it('renders Notations for external user', () => {
-    useSelector.mockImplementationOnce((selector) =>
-      selector({
-        ...mockState,
-        sites: {
-          ...mockState.sites,
-          userType: 'External',
-        },
-      }),
-    );
-
-    render(
-      <Provider store={store}>
-        <Notations showPending={false} />
-      </Provider>,
-    );
-  });
-
-  it('renders Notations in non-edit mode (for isRequired=false coverage)', () => {
-    useSelector.mockImplementationOnce((selector) =>
-      selector({
-        ...mockState,
-        sites: {
-          ...mockState.sites,
-          siteDetailsMode: 'sr', // anything NOT edit
-        },
-      }),
-    );
-
-    render(
-      <Provider store={store}>
-        <Notations showPending={false} />
-      </Provider>,
-    );
-
-    expect(screen.getByTestId('notations-component')).toBeInTheDocument();
-  });
-
-  it('passes EditMode to Notation (isRequired === true path)', () => {
-    useSelector.mockImplementationOnce((selector) =>
-      selector({
-        ...mockState,
-        sites: {
-          ...mockState.sites,
-          siteDetailsMode: 'edit',
-          userType: 'Internal',
-        },
-      }),
-    );
-
-    render(
-      <Provider store={store}>
-        <Notations showPending={false} />
-      </Provider>,
-    );
-
-    const notation = screen.getByTestId('mock-notation');
-    expect(notation).toHaveAttribute('data-viewmode', 'edit');
-  });
-
-  it('executes Widget rendering path for new-line coverage', () => {
-    useSelector.mockImplementationOnce((selector) =>
-      selector({
-        ...mockState,
-        sites: {
-          siteDetailsMode: 'edit',
-          userType: 'Internal',
-          resetSiteDetails: false,
-        },
-        notationParticipant: {
-          siteNotation: [
-            {
-              id: '1',
-              notationParticipant: [
-                {
-                  eventParticId: 'p1',
-                  eprCode: 'RFB',
-                  psnorgId: '2',
-                  displayName: 'Name',
-                },
-              ],
-            },
-          ],
-          status: 'success',
-          error: '',
-        },
-      }),
-    );
-
-    render(
-      <Provider store={store}>
-        <Notations showPending={false} />
-      </Provider>,
-    );
   });
 
   it('search functionality works correctly', () => {

@@ -119,7 +119,7 @@ const Notation: React.FC<INotationProps> = ({
   return (
     <PanelWithUpDown
       firstChild={
-        <div className="w-100" key={notation?.id}>
+        <div className="w-100" key={`notation-first-${notation?.id}`}>
           <Form
             formRows={handleNotationFormRowFirstChild(notation)}
             formData={notation}
@@ -136,7 +136,7 @@ const Notation: React.FC<INotationProps> = ({
         </div>
       }
       secondChild={
-        <div className="w-100" key={notation?.id}>
+        <div className="w-100" key={`notation-first-${notation?.id}`}>
           <Form
             formRows={
               userType === UserType.External

@@ -889,7 +889,7 @@ describe('Notations component', () => {
       </Provider>,
     );
   });
-  
+
   it('renders Notations in non-edit mode (for isRequired=false coverage)', () => {
     useSelector.mockImplementationOnce((selector) =>
       selector({
@@ -908,6 +908,42 @@ describe('Notations component', () => {
     );
 
     expect(screen.getByTestId('notations-component')).toBeInTheDocument();
+  });
+
+  it('executes Widget rendering path for new-line coverage', () => {
+    useSelector.mockImplementationOnce((selector) =>
+      selector({
+        ...mockState,
+        sites: {
+          siteDetailsMode: 'edit',
+          userType: 'Internal',
+          resetSiteDetails: false,
+        },
+        notationParticipant: {
+          siteNotation: [
+            {
+              id: '1',
+              notationParticipant: [
+                {
+                  eventParticId: 'p1',
+                  eprCode: 'RFB',
+                  psnorgId: '2',
+                  displayName: 'Name',
+                },
+              ],
+            },
+          ],
+          status: 'success',
+          error: '',
+        },
+      }),
+    );
+
+    render(
+      <Provider store={store}>
+        <Notations showPending={false} />
+      </Provider>,
+    );
   });
 
   it('search functionality works correctly', () => {

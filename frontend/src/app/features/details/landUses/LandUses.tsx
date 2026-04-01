@@ -88,7 +88,6 @@ const loggedInUser = getUser();
     
   }, [loggedInUser]);
 
-
   const tableColumns = useMemo(() => {
     return getLandUseColumns(
       landUseCodes,

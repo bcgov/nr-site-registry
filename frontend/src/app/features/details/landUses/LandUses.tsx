@@ -96,7 +96,6 @@ const loggedInUser = getUser();
     );
   }, [editModeEnabled, landUseCodes, viewMode, userType]);
 
-
   useEffect(() => {
     if (siteId) {
       dispatch(fetchLandUses({ siteId, showPending: false }));

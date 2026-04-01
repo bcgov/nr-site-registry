@@ -553,6 +553,19 @@ jest.mock('./NotationsConfig', () => ({
 }));
 
 
+jest.mock('./Notation', () => {
+  return function MockNotation(props) {
+    return (
+      <div
+        data-testid="mock-notation"
+        data-viewmode={props.viewMode}
+        data-is-archived={String(props.isArchived)}
+      />
+    );
+  };
+});
+
+
 jest.mock('react-redux', () => {
   const actualRedux = jest.requireActual('react-redux');
   const initialState = {
@@ -1442,6 +1455,28 @@ describe('Notations component', () => {
     );
 
     expect(screen.getByTestId('notations-component')).toBeInTheDocument();
+  });
+
+  it('passes EditMode to Notation (isRequired === true path)', () => {
+    useSelector.mockImplementationOnce((selector) =>
+      selector({
+        ...mockState,
+        sites: {
+          ...mockState.sites,
+          siteDetailsMode: 'edit',
+          userType: 'Internal',
+        },
+      }),
+    );
+
+    render(
+      <Provider store={store}>
+        <Notations showPending={false} />
+      </Provider>,
+    );
+
+    const notation = screen.getByTestId('mock-notation');
+    expect(notation).toHaveAttribute('data-viewmode', 'edit');
   });
 
   it('executes Widget rendering path for new-line coverage', () => {

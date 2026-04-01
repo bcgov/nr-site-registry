@@ -62,6 +62,7 @@ import {
 import {
   fetchSiteDisclosure,
   updateSiteDisclosure,
+  siteDisclosure as siteDisclosureSelector,
 } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
@@ -94,7 +95,6 @@ import BannerDetails from '../../components/banners/BannerDetails';
 import {
   getParentBucket,
   getSiteAssociated,
-  getSiteDisclosure,
   getSiteDocuments,
   getSiteNoatations,
   getSiteParticipants,
@@ -188,7 +188,9 @@ const SiteDetails = () => {
   const savedChanges = useSelector(trackedChanges);
   const siteNotation = useSelector(getSiteNoatations);
   const siteSummary = useSelector(getSiteSummary);
-  const disclosure = useSelector(getSiteDisclosure);
+  const disclosureSourceOfTruth = useSelector(
+    siteDisclosureSelector,
+  )?.siteDisclosure;
   const sitePartics = useSelector(getSiteParticipants);
   const siteAssocs = useSelector(getSiteAssociated);
   const siteDocuments = useSelector(getSiteDocuments);
@@ -773,30 +775,27 @@ const SiteDetails = () => {
 
   const validateSiteDisclosureForm = async () => {
     try {
+      const disclosureData = disclosureSourceOfTruth;
       if (
-        disclosure &&
-        typeof disclosure === 'object' &&
-        Object.keys(disclosure).length > 0
+        disclosureData &&
+        typeof disclosureData === 'object' &&
+        Object.keys(disclosureData).length > 0
       ) {
         const siteDisclosureErrors: any[] = [];
-        let updatedSiteDisclosure = deepFilterByUserAction(disclosure, [
-          ...userActions,
-          UserActionEnum.deleted,
-        ]);
+
+        // Validate against the disclosure slice (source of truth) — always has full field values
         const errors = validateForm(
           disclosureStatementConfigEditMode,
-          updatedSiteDisclosure,
+          disclosureData,
           'Site Disclosure',
         );
         if (errors?.length > 0) {
           siteDisclosureErrors.push(...errors);
         }
-        const { siteRegDateRecd, dateCompleted } = disclosure;
+
+        const { siteRegDateRecd, dateCompleted } = disclosureData;
         if (!!siteRegDateRecd && !!dateCompleted) {
-          if (
-            new Date(disclosure?.dateCompleted) <
-            new Date(disclosure?.siteRegDateRecd)
-          ) {
+          if (new Date(dateCompleted) < new Date(siteRegDateRecd)) {
             siteDisclosureErrors.push({
               label: 'Site Disclosure',
               errorMessage: `Site Disclosure Date Completed is always equal or greater than Date Received.`,
@@ -807,6 +806,10 @@ const SiteDetails = () => {
         if (siteDisclosureErrors?.length > 0) {
           return siteDisclosureErrors;
         } else {
+          let updatedSiteDisclosure = deepFilterByUserAction(disclosureData, [
+            ...userActions,
+            UserActionEnum.deleted,
+          ]);
           updatedSiteDisclosure = removeProperty(
             updatedSiteDisclosure,
             'position',

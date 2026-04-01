@@ -18,6 +18,8 @@ import { ApproveRejectButtons } from '../../../components/approve/ApproveReject'
 import { Button } from '../../../components/button/Button';
 import { formatDate, parseDate } from '../../../helpers/utility';
 
+// sonar-new-code-anchor
+
 interface INotationProps {
   index?: number;
   notation: {

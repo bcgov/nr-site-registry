@@ -40,7 +40,7 @@ jest.mock('../../../components/form/Form', () => () => <div />);
 jest.mock('../../../components/simple/PanelWithUpDown', () => {
   const PropTypes = require('prop-types');
 
-  function MockPanelWithUpDown({ firstChild, secondChild }: any) {
+  function MockPanelWithUpDown({ firstChild, secondChild }) {
     return (
       <div>
         <div>{firstChild}</div>
@@ -65,7 +65,7 @@ jest.mock('../../../components/approve/ApproveReject', () => ({
 jest.mock('../../../components/button/Button', () => {
   const PropTypes = require('prop-types');
 
-  function MockButton({ children }: any) {
+  function MockButton({ children }) {
     return <button>{children}</button>;
   }
 

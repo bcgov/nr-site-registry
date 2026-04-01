@@ -4,6 +4,7 @@ import { Provider, useSelector, useDispatch } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { GetNotationConfig } from './NotationsConfig';
+import PropTypes from 'prop-types';
 
 // Example of a Jest mock for GetNotationConfig
 jest.mock('./NotationsConfig', () => ({
@@ -471,7 +472,7 @@ jest.mock('./NotationsConfig', () => ({
             ),
             filteredOptions: [],
             isLoading: 'idle',
-            handleSearch: () => {},
+            handleSearch: () => { },
           },
         },
         {
@@ -552,9 +553,8 @@ jest.mock('./NotationsConfig', () => ({
   }),
 }));
 
-
 jest.mock('./Notation', () => {
-  return function MockNotation(props) {
+  function MockNotation(props) {
     return (
       <div
         data-testid="mock-notation"
@@ -562,9 +562,15 @@ jest.mock('./Notation', () => {
         data-is-archived={String(props.isArchived)}
       />
     );
-  };
-});
+  }
 
+  MockNotation.propTypes = {
+    viewMode: PropTypes.string.isRequired,
+    isArchived: PropTypes.bool.isRequired,
+  };
+
+  return MockNotation;
+});
 
 jest.mock('react-redux', () => {
   const actualRedux = jest.requireActual('react-redux');
@@ -1216,7 +1222,7 @@ describe('Notations component', () => {
             ),
             filteredOptions: [],
             isLoading: 'idle',
-            handleSearch: () => {},
+            handleSearch: () => { },
           },
         },
         {

@@ -18,6 +18,8 @@ import { ApproveRejectButtons } from '../../../components/approve/ApproveReject'
 import { Button } from '../../../components/button/Button';
 import { formatDate, parseDate } from '../../../helpers/utility';
 
+// sonar-new-code-anchor
+
 interface INotationProps {
   index?: number;
   notation: {
@@ -119,7 +121,7 @@ const Notation: React.FC<INotationProps> = ({
   return (
     <PanelWithUpDown
       firstChild={
-        <div className="w-100" key={notation?.id}>
+        <div className="w-100" key={`notation-first-${notation?.id}`}>
           <Form
             formRows={handleNotationFormRowFirstChild(notation)}
             formData={notation}
@@ -136,7 +138,7 @@ const Notation: React.FC<INotationProps> = ({
         </div>
       }
       secondChild={
-        <div className="w-100" key={notation?.id}>
+        <div className="w-100" key={`notation-first-${notation?.id}`}>
           <Form
             formRows={
               userType === UserType.External
@@ -156,7 +158,7 @@ const Notation: React.FC<INotationProps> = ({
             aria-label="Sort Notation Form"
           />
           <Widget
-            isRequired={true}
+            isRequired={viewMode === SiteDetailsMode.EditMode}
             changeHandler={(event) => handleTableChange(notation.id, event)}
             handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
             title={'Notation Participants'}

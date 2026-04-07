@@ -742,8 +742,8 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
       <Alert variant={hasDocuments ? 'info' : 'warning'} data-testid="no-site">
         {hasDocuments
           ? userType === UserType.Internal ?
-            'No documents found for this site. To inquire about documents, submit a Site Information Request form, or contact Advisor.SiteInformation@gov.bc.ca' :
-            'No documents found for this site. Please add documents to it.'
+            'No documents found for this site.' :
+            'No documents found for this site. To inquire about documents, submit a Site Information Request form, or contact Advisor.SiteInformation@gov.bc.ca'
             : 'Please create a site before adding documents. Once the site is created, you can add documents to it.'
         }
       </Alert>

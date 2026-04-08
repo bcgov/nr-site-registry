@@ -48,6 +48,22 @@ import { schedule2ReferenceCdDrpdown } from '../dropdowns/DropdownSlice';
 import { siteDisclosureConfig } from './DisclosureConfig';
 
 const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
+  const initialState = {
+    id: '',
+    siteId: '',
+    dateCompleted: '',
+    rwmDateDecision: '',
+    localAuthDateRecd: '',
+    siteRegDateEntered: '',
+    siteRegDateRecd: '',
+    govDocumentsComment: '',
+    siteDisclosureComment: '',
+    plannedActivityComment: '',
+    srAction: '',
+    whenCreated: '',
+    whenUpdated: '',
+    siteProfileSchedule2Refs: [],
+  };
   const schedule2Ref = useSelector(schedule2ReferenceCdDrpdown);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const {
@@ -70,7 +86,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const [formData, setFormData] = useState<{
     [key: string]: any | [Date, Date];
-  }>(disclosureData ?? {});
+  }>(disclosureData ?? initialState);
   const [selectedRows, setSelectedRows] = useState<
     { disclosureId: any; scheduleId: any }[]
   >([]);
@@ -157,6 +173,9 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     setViewMode(mode);
   }, [mode]);
 
+  useEffect(() => {
+    fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending });
+  }, [siteId]);
   // Search internal contact effect with debounce
   // Commenting the below method because I am not sure which dropdown type
   // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
@@ -209,7 +228,11 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Update form data when notations change
 
   useEffect(() => {
-    if (status === RequestStatus.success && disclosureData) {
+    if (
+      status === RequestStatus.success &&
+      disclosureData &&
+      disclosureData?.siteId === siteId
+    ) {
       // Commenting the below method because I am not sure which dropdown type
       // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
 
@@ -281,6 +304,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       resetDetails ||
       saveSiteDetailsRequestStatus === RequestStatus.success
     ) {
+      setFormData(initialState);
       dispatch(
         fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending }),
       );

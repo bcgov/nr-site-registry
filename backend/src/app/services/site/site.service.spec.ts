@@ -877,6 +877,108 @@ describe('SiteService', () => {
 
         expect(result.totalRecords).toBeLessThanOrEqual(1);
       });
+
+      it('returns empty result when query returns no data', async () => {
+        jest.spyOn(siteRepository.manager, 'query').mockResolvedValue([]);
+
+        const result = await siteService.getSiteDetailsPendingSRApproval(
+          null,
+          1,
+          5,
+        );
+
+        expect(result.totalRecords).toBe(0);
+        expect(result.data).toEqual([]);
+      });
+
+      it('filters by site id when searchParam.id is provided', async () => {
+        const data = [
+          {
+            site_id: '100',
+            who_updated: 'User1',
+            latest_update: new Date(),
+            changes: 'summary',
+            addr_line_1: 'Addr1',
+            addr_line_2: '',
+            addr_line_3: '',
+          },
+          {
+            site_id: '200',
+            who_updated: 'User2',
+            latest_update: new Date(),
+            changes: 'notation',
+            addr_line_1: 'Addr2',
+            addr_line_2: '',
+            addr_line_3: '',
+          },
+        ];
+        jest.spyOn(siteRepository.manager, 'query').mockResolvedValue(data);
+
+        const result = await siteService.getSiteDetailsPendingSRApproval(
+          { id: '100' },
+          1,
+          10,
+        );
+
+        expect(result.totalRecords).toBe(1);
+        expect(result.data[0].siteId).toBe('100');
+      });
+
+      it('filters by address when searchParam.addrLine is provided', async () => {
+        const data = [
+          {
+            site_id: '1',
+            who_updated: 'User1',
+            latest_update: new Date(),
+            changes: 'summary',
+            addr_line_1: '123 Main St',
+            addr_line_2: '',
+            addr_line_3: '',
+          },
+          {
+            site_id: '2',
+            who_updated: 'User2',
+            latest_update: new Date(),
+            changes: 'notation',
+            addr_line_1: '456 Oak Ave',
+            addr_line_2: '',
+            addr_line_3: '',
+          },
+        ];
+        jest.spyOn(siteRepository.manager, 'query').mockResolvedValue(data);
+
+        const result = await siteService.getSiteDetailsPendingSRApproval(
+          { addrLine: 'Main' },
+          1,
+          10,
+        );
+
+        expect(result.totalRecords).toBe(1);
+        expect(result.data[0].address).toContain('Main');
+      });
+
+      it('handles null address fields', async () => {
+        const data = [
+          {
+            site_id: '1',
+            who_updated: 'User',
+            latest_update: new Date(),
+            changes: 'summary',
+            addr_line_1: '123 Main',
+            addr_line_2: null,
+            addr_line_3: null,
+          },
+        ];
+        jest.spyOn(siteRepository.manager, 'query').mockResolvedValue(data);
+
+        const result = await siteService.getSiteDetailsPendingSRApproval(
+          null,
+          1,
+          10,
+        );
+
+        expect(result.data[0].address).toBe('123 Main');
+      });
     });
 
     describe('Bulk Update For SR', () => {

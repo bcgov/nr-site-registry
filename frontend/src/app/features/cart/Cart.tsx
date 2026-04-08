@@ -161,7 +161,11 @@ const Cart = () => {
                 deleteCartItem([
                   { cartId: cartIdToDelte, userId: user?.profile.sub ?? '' },
                 ]),
-              ).unwrap();
+              )
+                .unwrap()
+                .then(() => {
+                  dispatch(fetchCartItems());
+                });
             }
             setDeleteConfirm(false);
           }}

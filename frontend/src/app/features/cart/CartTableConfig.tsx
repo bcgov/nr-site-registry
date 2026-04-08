@@ -114,7 +114,7 @@ export const CartTableColumns: TableColumn[] = [
     graphQLPropertyName: 'id',
     dynamicColumn: true,
     displayType: {
-      type: FormFieldType.IconButton,
+      type: FormFieldType.DeleteIcon,
       label: '',
       graphQLPropertyName: 'id',
       value: '',

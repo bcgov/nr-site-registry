@@ -403,10 +403,12 @@ export class SiteService {
     searchTerm,
     polygon,
     circle,
+    userInfo,
   }: {
     searchTerm?: string;
     polygon?: LatLngTuple[];
     circle?: RadiusSearchParams;
+    userInfo?: any;
   }) {
     this.sitesLogger.log('SiteService.mapSearch() start');
 
@@ -507,12 +509,14 @@ export class SiteService {
       );
     }
 
+    this.applyPublicVisibilityFilterForNonIdirUsers(query, userInfo);
+
     const [result] = await query.getManyAndCount();
     this.sitesLogger.log('SiteService.mapSearch() end');
     return result;
   }
 
-  async findSitesAndPlaces(searchTerm = '', limit = 3) {
+  async findSitesAndPlaces(searchTerm = '', limit = 3, userInfo?: any) {
     this.sitesLogger.log('SiteService.findSitesAndPlaces() start');
 
     const searchTermClean = searchTerm.toLowerCase().trim();
@@ -543,6 +547,8 @@ export class SiteService {
         'ASC',
       )
       .addOrderBy('sites.id', 'ASC');
+
+    this.applyPublicVisibilityFilterForNonIdirUsers(sitesQuery, userInfo);
     placesQuery
       .where('LOWER(places.name) LIKE LOWER(:searchTerm)', {
         searchTerm: `%${searchTermClean}%`,
@@ -556,6 +562,19 @@ export class SiteService {
 
     this.sitesLogger.log('SiteService.findSitesAndPlaces() end');
     return { sites, places };
+  }
+
+  private applyPublicVisibilityFilterForNonIdirUsers(
+    query: any,
+    userInfo?: any,
+  ) {
+    // `sr_action` is a disclosure/visibility flag. Non-IDIR users must never receive non-public sites
+    // (e.g., private sites) from "list-style" endpoints like map pins or autocomplete.
+    if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR) {
+      query.andWhere('sites.srAction = :srAction', {
+        srAction: SRApprovalStatusEnum.PUBLIC,
+      });
+    }
   }
 
   /**

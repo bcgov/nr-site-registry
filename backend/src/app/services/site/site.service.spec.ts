@@ -1560,10 +1560,11 @@ describe('SiteService', () => {
   });
 
   describe('mapSearch', () => {
-    it('should fetch all sites if no search term is passed', () => {
+    it('should fetch all sites if no search term is passed for IDIR users', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         getManyAndCount: jest.fn().mockReturnValue([]),
       };
 
@@ -1571,16 +1572,38 @@ describe('SiteService', () => {
         .spyOn(siteRepository, 'createQueryBuilder')
         .mockImplementation(() => mockQueryBuilder);
 
-      siteService.mapSearch({});
+      siteService.mapSearch({ userInfo: { identity_provider: 'idir' } });
 
       expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
       expect(mockQueryBuilder.where).not.toHaveBeenCalled();
+      expect(mockQueryBuilder.andWhere).not.toHaveBeenCalled();
+    });
+
+    it('should apply public-only visibility filter for non-IDIR users', () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      siteService.mapSearch({ userInfo: { identity_provider: 'bceid' } });
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sites.srAction = :srAction',
+        { srAction: 'public' },
+      );
     });
 
     it('should filter sites by trimmed lower-cased search term if provided', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         getManyAndCount: jest.fn().mockReturnValue([]),
       };
 
@@ -1589,7 +1612,10 @@ describe('SiteService', () => {
         .mockImplementation(() => mockQueryBuilder);
 
       // Padding spaces are intentional here, do not remove
-      siteService.mapSearch({ searchTerm: '   TeSt   ' });
+      siteService.mapSearch({
+        searchTerm: '   TeSt   ',
+        userInfo: { identity_provider: 'idir' },
+      });
 
       expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
       expect(mockQueryBuilder.where).toHaveBeenCalledTimes(1);
@@ -1612,6 +1638,7 @@ describe('SiteService', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         getManyAndCount: jest.fn().mockReturnValue([]),
       };
 
@@ -1625,6 +1652,7 @@ describe('SiteService', () => {
           [10, 20],
           [100, 200],
         ],
+        userInfo: { identity_provider: 'idir' },
       });
       expect(mockQueryBuilder.where).toHaveBeenCalledTimes(1);
       expect(mockQueryBuilder.where).toHaveBeenCalledWith(
@@ -1720,6 +1748,7 @@ describe('SiteService', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         getManyAndCount: jest.fn().mockReturnValue([]),
       };
 
@@ -1732,7 +1761,10 @@ describe('SiteService', () => {
         radius: 1000,
       };
 
-      siteService.mapSearch({ circle });
+      siteService.mapSearch({
+        circle,
+        userInfo: { identity_provider: 'idir' },
+      });
 
       expect(mockQueryBuilder.where).toHaveBeenCalledTimes(1);
       expect(mockQueryBuilder.where).toHaveBeenCalledWith(
@@ -1746,6 +1778,7 @@ describe('SiteService', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         limit: jest.fn().mockImplementation(() => mockQueryBuilder),
         orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
         addOrderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
@@ -1760,7 +1793,9 @@ describe('SiteService', () => {
         .spyOn(placesRepo, 'createQueryBuilder')
         .mockImplementation(() => mockQueryBuilder);
 
-      await siteService.findSitesAndPlaces('test', 20);
+      await siteService.findSitesAndPlaces('test', 20, {
+        identity_provider: 'idir',
+      });
 
       expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalledTimes(2);
       expect(mockQueryBuilder.where).toHaveBeenCalledWith(expect.anything(), {
@@ -1769,10 +1804,40 @@ describe('SiteService', () => {
       expect(mockQueryBuilder.limit).toHaveBeenCalledWith(20);
     });
 
+    it('should apply public-only visibility filter for non-IDIR users (sites only)', async () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        limit: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        addOrderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      jest
+        .spyOn(placesRepo, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      await siteService.findSitesAndPlaces('test', 20, {
+        identity_provider: 'bceid',
+      });
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sites.srAction = :srAction',
+        { srAction: 'public' },
+      );
+    });
+
     it('should bypass DB calls if no search term provided', async () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         limit: jest.fn().mockImplementation(() => mockQueryBuilder),
         orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
         getManyAndCount: jest.fn().mockReturnValue([]),

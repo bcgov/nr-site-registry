@@ -1599,6 +1599,26 @@ describe('SiteService', () => {
       );
     });
 
+    it('should apply public-only visibility filter when userInfo is missing (anonymous)', () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      siteService.mapSearch({});
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sites.srAction = :srAction',
+        { srAction: 'public' },
+      );
+    });
+
     it('should filter sites by trimmed lower-cased search term if provided', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
@@ -1826,6 +1846,33 @@ describe('SiteService', () => {
       await siteService.findSitesAndPlaces('test', 20, {
         identity_provider: 'bceid',
       });
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sites.srAction = :srAction',
+        { srAction: 'public' },
+      );
+    });
+
+    it('should apply public-only visibility filter when userInfo is missing (anonymous) (sites only)', async () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        limit: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        addOrderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      jest
+        .spyOn(placesRepo, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      await siteService.findSitesAndPlaces('test', 20);
 
       expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         'sites.srAction = :srAction',

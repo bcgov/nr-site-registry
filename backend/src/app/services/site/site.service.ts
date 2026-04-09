@@ -2016,7 +2016,7 @@ export class SiteService {
               
               SELECT sp.site_id, sp.when_Updated , sp.who_updated 
               FROM sites.site_profiles sp
-              INNER JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
+              LEFT JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
               WHERE sp.sr_action = 'pending' or sp.user_action = 'updated' or sp2r.sr_action = 'pending' or sp2r.user_action = 'updated'
           ) AS updates
           GROUP BY site_id, who_updated
@@ -2076,9 +2076,9 @@ export class SiteService {
           
           UNION ALL
           
-          SELECT site_id, 'site profiles' AS Change, sp.when_Updated, sp.who_updated ,  '' , '', '' 
+          SELECT site_id, 'site disclosure' AS Change, sp.when_Updated, sp.who_updated ,  '' , '', '' 
           FROM sites.site_profiles sp
-          INNER JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
+          LEFT JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
           WHERE sp.sr_action = 'pending' or sp.user_action = 'updated' or sp2r.sr_action = 'pending' or sp2r.user_action = 'updated'
       ) AS c
       GROUP BY c.site_id,c.who_updated) Final

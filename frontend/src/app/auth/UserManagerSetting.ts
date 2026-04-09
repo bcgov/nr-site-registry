@@ -1,4 +1,4 @@
-import { UserManagerSettings } from 'oidc-client-ts';
+import { UserManagerSettings, WebStorageStateStore } from 'oidc-client-ts';
 
 export function getClientSettings(): UserManagerSettings {
   return {
@@ -31,6 +31,7 @@ export function getClientSettings(): UserManagerSettings {
       process.env.REACT_APP_AUTH_SCOPE ||
       ((window as any)._env_ && (window as any)._env_.REACT_APP_AUTH_SCOPE) ||
       '',
+    userStore: new WebStorageStateStore({ store: window.localStorage }),
     filterProtocolClaims:
       process.env.REACT_APP_AUTH_FILTER_PROTOCOL_CLAIMS === 'true' ||
       ((window as any)._env_ &&

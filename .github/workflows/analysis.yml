@@ -62,11 +62,7 @@ jobs:
              -Dsonar.projectKey=bcgov-sonarcloud_nr-site-registry-${{ matrix.dir }}
              -Dsonar.sources=src
              -Dsonar.tests.inclusions=**/*spec.ts
-<<<<<<< bolny/banish_sonarqube_coverage
              ${{ matrix.sonar_coverage_arg }}
-=======
-             -Dsonar.javascript.lcov.reportPaths=./src/coverage/lcov.info,./coverage/lcov.info
->>>>>>> dev
              -Dsonar.cpd.exclusions=**/migrations/**
           sonar_token: ${{ secrets[matrix.token] }}
           

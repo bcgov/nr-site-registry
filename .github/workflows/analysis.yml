@@ -40,7 +40,7 @@ jobs:
           - dir: backend
             token: SONAR_TOKEN_BACKEND
             test_command: npm run test:cov
-            sonar_coverage_arg: -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
+            sonar_coverage_arg: -Dsonar.javascript.lcov.reportPaths=./src/coverage/lcov.info,./coverage/lcov.info
           - dir: frontend
             token: SONAR_TOKEN_FRONTEND
             test_command: CI=true npm test -- --watchAll=false

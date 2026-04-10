@@ -130,7 +130,7 @@ export const flattenFormRows = (arr: IFormField[][]): IFormField[] => {
 export function getUser() {
   const { authority, client_id } = getClientSettings();
   const storageKey = `oidc.user:${authority}:${client_id}`;
-  const oidcStorage = sessionStorage.getItem(storageKey);
+  const oidcStorage = localStorage.getItem(storageKey);
   if (!oidcStorage) {
     return null;
   }

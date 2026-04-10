@@ -403,10 +403,12 @@ export class SiteService {
     searchTerm,
     polygon,
     circle,
+    userInfo,
   }: {
     searchTerm?: string;
     polygon?: LatLngTuple[];
     circle?: RadiusSearchParams;
+    userInfo?: any;
   }) {
     this.sitesLogger.log('SiteService.mapSearch() start');
 
@@ -507,12 +509,14 @@ export class SiteService {
       );
     }
 
+    this.applyPublicVisibilityFilterForNonIdirUsers(query, userInfo);
+
     const [result] = await query.getManyAndCount();
     this.sitesLogger.log('SiteService.mapSearch() end');
     return result;
   }
 
-  async findSitesAndPlaces(searchTerm = '', limit = 3) {
+  async findSitesAndPlaces(searchTerm = '', limit = 3, userInfo?: any) {
     this.sitesLogger.log('SiteService.findSitesAndPlaces() start');
 
     const searchTermClean = searchTerm.toLowerCase().trim();
@@ -543,6 +547,8 @@ export class SiteService {
         'ASC',
       )
       .addOrderBy('sites.id', 'ASC');
+
+    this.applyPublicVisibilityFilterForNonIdirUsers(sitesQuery, userInfo);
     placesQuery
       .where('LOWER(places.name) LIKE LOWER(:searchTerm)', {
         searchTerm: `%${searchTermClean}%`,
@@ -556,6 +562,19 @@ export class SiteService {
 
     this.sitesLogger.log('SiteService.findSitesAndPlaces() end');
     return { sites, places };
+  }
+
+  private applyPublicVisibilityFilterForNonIdirUsers(
+    query: any,
+    userInfo?: any,
+  ) {
+    // `sr_action` is a disclosure/visibility flag. Non-IDIR users must never receive non-public sites
+    // (e.g., private sites) from "list-style" endpoints like map pins or autocomplete.
+    if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR) {
+      query.andWhere('sites.srAction = :srAction', {
+        srAction: SRApprovalStatusEnum.PUBLIC,
+      });
+    }
   }
 
   /**
@@ -1997,7 +2016,7 @@ export class SiteService {
               
               SELECT sp.site_id, sp.when_Updated , sp.who_updated 
               FROM sites.site_profiles sp
-              INNER JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
+              LEFT JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
               WHERE sp.sr_action = 'pending' or sp.user_action = 'updated' or sp2r.sr_action = 'pending' or sp2r.user_action = 'updated'
           ) AS updates
           GROUP BY site_id, who_updated
@@ -2057,9 +2076,9 @@ export class SiteService {
           
           UNION ALL
           
-          SELECT site_id, 'site profiles' AS Change, sp.when_Updated, sp.who_updated ,  '' , '', '' 
+          SELECT site_id, 'site disclosure' AS Change, sp.when_Updated, sp.who_updated ,  '' , '', '' 
           FROM sites.site_profiles sp
-          INNER JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
+          LEFT JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
           WHERE sp.sr_action = 'pending' or sp.user_action = 'updated' or sp2r.sr_action = 'pending' or sp2r.user_action = 'updated'
       ) AS c
       GROUP BY c.site_id,c.who_updated) Final

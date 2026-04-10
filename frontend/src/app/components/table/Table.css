@@ -235,3 +235,6 @@ table td {
 .w50 {
   width: 50px;
 }
+.delete-icon-pointer {
+  cursor: pointer;
+}

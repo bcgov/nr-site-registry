@@ -9,7 +9,30 @@ import { graphQLSiteDisclosureBySiteId } from '../../site/graphql/Disclosure';
 
 // Define the initial state
 const initialState: IDisclosureState = {
-  siteDisclosure: {},
+  siteDisclosure: {
+    id: '',
+    siteId: '',
+    dateCompleted: '',
+    rwmDateDecision: '',
+    localAuthDateRecd: '',
+    siteRegDateEntered: '',
+    siteRegDateRecd: '',
+    govDocumentsComment: '',
+    siteDisclosureComment: '',
+    plannedActivityComment: '',
+    srAction: '',
+    whenCreated: '',
+    whenUpdated: '',
+    siteProfileSchedule2Refs: [
+      {
+        id: '',
+        profileId: '',
+        schedule2ReferenceCode: '',
+        srAction: '',
+        srValue: false,
+      },
+    ],
+  },
   status: RequestStatus.idle,
   error: '',
 };
@@ -17,8 +40,12 @@ const initialState: IDisclosureState = {
 // Define the asynchronous thunk to fetch site participants from the backend
 export const fetchSiteDisclosure = createAsyncThunk(
   'siteDisclosure/fetchSiteDisclosure',
-  async ({ siteId, showPending }: { siteId: string; showPending: boolean }) => {
+  async (
+    { siteId, showPending }: { siteId: string; showPending: boolean },
+    { dispatch },
+  ) => {
     try {
+      dispatch(clearSiteDisclosure());
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphQLSiteDisclosureBySiteId()),
         variables: {
@@ -32,9 +59,9 @@ export const fetchSiteDisclosure = createAsyncThunk(
 
       const res = response.data.data.getSiteDisclosureBySiteId.data[0];
       if (res) {
-        return res;
+        return res ?? initialState.siteDisclosure;
       }
-      return [{}];
+      return initialState.siteDisclosure;
     } catch (error) {
       throw error;
     }
@@ -49,6 +76,13 @@ const siteDisclosureSlice = createSlice({
     updateSiteDisclosure: (state, action) => {
       state.siteDisclosure = action.payload;
       state.status = RequestStatus.success;
+    },
+    clearSiteDisclosure: (state) => {
+      return {
+        ...state,
+        siteDisclosure: { ...initialState.siteDisclosure },
+        status: RequestStatus.idle,
+      };
     },
   },
   extraReducers: (builder) => {
@@ -68,6 +102,7 @@ const siteDisclosureSlice = createSlice({
 });
 
 export const siteDisclosure = (state: any) => state.siteDisclosure;
-export const { updateSiteDisclosure } = siteDisclosureSlice.actions;
+export const { updateSiteDisclosure, clearSiteDisclosure } =
+  siteDisclosureSlice.actions;
 
 export default siteDisclosureSlice.reducer;

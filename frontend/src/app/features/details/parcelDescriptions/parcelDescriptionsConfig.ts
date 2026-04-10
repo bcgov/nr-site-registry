@@ -128,6 +128,7 @@ const DeleteColumn: TableColumn = {
     graphQLPropertyName: 'deleteIcon',
     value: '',
     tableMode: true,
+    customContainerCss: 'delete-icon-pointer',
   },
   dynamicColumn: true,
   columnSize: ColumnSize.XtraSmall,

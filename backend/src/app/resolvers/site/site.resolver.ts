@@ -250,6 +250,7 @@ export class SiteResolver {
   })
   @Query(() => FindSitesAndPlacesResponse, { name: 'findSitesAndPlaces' })
   async findSitesAndPlaces(
+    @AuthenticatedUser() userInfo: any,
     @Args('searchParam', { type: () => String })
     searchParam: string,
     @Args('limit', { type: () => Int, nullable: true })
@@ -260,6 +261,7 @@ export class SiteResolver {
       const data = await this.siteService.findSitesAndPlaces(
         searchParam,
         limit,
+        userInfo,
       );
 
       return this.sitesAndPlacesResponseProvider.createResponse(

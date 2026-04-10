@@ -183,6 +183,7 @@ export class SitePublicResolver {
 
   @Query(() => MapSearchResponse, { name: 'mapSearch' })
   async mapSearch(
+    @AuthenticatedUser() userInfo,
     @Args('searchParam', { type: () => String, nullable: true })
     searchParam: string,
     @Args('polygon', { type: () => [LatLngTupleScalar], nullable: true })
@@ -196,6 +197,7 @@ export class SitePublicResolver {
         searchTerm: searchParam,
         polygon,
         circle,
+        userInfo,
       });
       return this.mapSearchGenericResponseProvider.createResponse(
         'Successfully fetched sites for map',

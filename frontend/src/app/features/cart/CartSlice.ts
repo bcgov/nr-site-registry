@@ -92,7 +92,7 @@ const cartSlice = createSlice({
       const newState = {
         ...state,
       };
-      newState.deleteRequestStatus = RequestStatus.pending;
+      newState.deleteRequestStatus = RequestStatus.idle;
       return newState;
     },
   },
@@ -102,11 +102,13 @@ const cartSlice = createSlice({
         state.fetchRequestStatus = RequestStatus.loading;
       })
       .addCase(fetchCartItems.fulfilled, (state, action) => {
+        const response = action?.payload?.data?.getCartItemsForUser;
         if (
-          action?.payload?.data?.getCartItemsForUser?.httpStatusCode === 200
+          response?.httpStatusCode === 200 ||
+          response?.httpStatusCode === 404
         ) {
           state.fetchRequestStatus = RequestStatus.success;
-          state.cartItems = action.payload.data.getCartItemsForUser.data;
+          state.cartItems = response?.data ?? [];
         } else {
           state.fetchRequestStatus = RequestStatus.failed;
         }

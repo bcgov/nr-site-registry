@@ -17,7 +17,11 @@ import {
   resetCartItemDeleteStatus,
 } from './CartSlice';
 import { useAuth } from 'react-oidc-context';
-import { getUser, showNotification } from '../../helpers/utility';
+import {
+  getUser,
+  showNotification,
+  sortTableData,
+} from '../../helpers/utility';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import { AngleRight } from '../../components/common/icon';
 import {
@@ -120,16 +124,7 @@ const Cart = () => {
     });
 
     if (!sortColumn) return mapped;
-
-    const field = sortColumn.split(',')[0];
-    return [...mapped].sort((a, b) => {
-      const aVal = a[field] ?? '';
-      const bVal = b[field] ?? '';
-      const comparison = String(aVal).localeCompare(String(bVal), undefined, {
-        numeric: true,
-      });
-      return sortAsc ? comparison : -comparison;
-    });
+    return sortTableData(mapped, sortColumn, sortAsc);
   };
 
   return (

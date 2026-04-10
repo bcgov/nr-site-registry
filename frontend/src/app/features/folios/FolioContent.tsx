@@ -5,7 +5,11 @@ import Table from '../../components/table/Table';
 import { RequestStatus } from '../../helpers/requests/status';
 import { FolioContentTableColumns } from './FolioContentTableConfig';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getUser, showNotification } from '../../helpers/utility';
+import {
+  getUser,
+  showNotification,
+  sortTableData,
+} from '../../helpers/utility';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../Store';
 import {
@@ -172,20 +176,8 @@ const FolioContents = () => {
       };
     });
     if (!sortColumn) return mapped;
-    const field = sortColumn.split(',')[0];
-    const dateFields = ['whenUpdated'];
-    return [...mapped].sort((a: any, b: any) => {
-      if (dateFields.includes(field)) {
-        const aTime = new Date(a._rawWhenUpdated || 0).getTime();
-        const bTime = new Date(b._rawWhenUpdated || 0).getTime();
-        return sortAsc ? aTime - bTime : bTime - aTime;
-      }
-      const aVal = a[field] ?? '';
-      const bVal = b[field] ?? '';
-      const comparison = String(aVal).localeCompare(String(bVal), undefined, {
-        numeric: true,
-      });
-      return sortAsc ? comparison : -comparison;
+    return sortTableData(mapped, sortColumn, sortAsc, ['whenUpdated'], {
+      whenUpdated: '_rawWhenUpdated',
     });
   };
 

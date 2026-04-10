@@ -26,6 +26,7 @@ import {
   resetCreateSnapshotForSitesStatus,
 } from '../details/snapshot/SnapshotSlice';
 import { CreateSnapshotInputDto } from '../details/snapshot/ISnapshotState';
+import { TableColumn } from '../../components/table/TableColumn';
 
 const Cart = () => {
   const auth = useAuth();
@@ -34,6 +35,8 @@ const Cart = () => {
 
   const [delteConfirm, setDeleteConfirm] = useState(false);
   const [cartIdToDelte, setCartIdToDelete] = useState('');
+  const [sortColumn, setSortColumn] = useState<string>('');
+  const [sortAsc, setSortAsc] = useState<boolean>(true);
 
   const cartItemsArr = useSelector(cartItems);
   const deleteStatus = useSelector(deleteRequestStatus);
@@ -101,6 +104,34 @@ const Cart = () => {
     dispatch(createSnapshotForSites(inputDto)).unwrap();
   };
 
+  const handleSortChange = (column: TableColumn, ascSort: boolean) => {
+    setSortColumn(column.graphQLPropertyName);
+    setSortAsc(ascSort);
+  };
+
+  const getSortedCartData = () => {
+    const mapped = cartItemsArr.map((x: any) => {
+      const {
+        site: { id, ...siteWithoutId },
+        ...xWithoutSite
+      } = x;
+      const mergedObject = { ...xWithoutSite, ...siteWithoutId };
+      return { ...mergedObject, price: `$ ${x.price}` };
+    });
+
+    if (!sortColumn) return mapped;
+
+    const field = sortColumn.split(',')[0];
+    return [...mapped].sort((a, b) => {
+      const aVal = a[field] ?? '';
+      const bVal = b[field] ?? '';
+      const comparison = String(aVal).localeCompare(String(bVal), undefined, {
+        numeric: true,
+      });
+      return sortAsc ? comparison : -comparison;
+    });
+  };
+
   return (
     <PageContainer role="cart">
       <div>
@@ -111,15 +142,7 @@ const Cart = () => {
           label="Cart"
           isLoading={RequestStatus.success}
           columns={CartTableColumns}
-          data={cartItemsArr.map((x: any) => {
-            const {
-              site: { id, ...siteWithoutId },
-              ...xWithoutSite
-            } = x;
-            const mergedObject = { ...xWithoutSite, ...siteWithoutId };
-
-            return { ...mergedObject, price: `$ ${x.price}` };
-          })}
+          data={getSortedCartData()}
           totalResults={[].length}
           allowRowsSelect={false}
           showPageOptions={false}
@@ -129,6 +152,7 @@ const Cart = () => {
           deleteHandler={(event) => {
             handleCartItemDelete(event.row.id);
           }}
+          sortHandler={handleSortChange}
         />
       </div>
       {cartItemsArr.length > 0 && (

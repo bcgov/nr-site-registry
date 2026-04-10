@@ -33,6 +33,7 @@ import {
 import { useAuth } from 'react-oidc-context';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import { Button } from '../../components/button/Button';
+import { TableColumn } from '../../components/table/TableColumn';
 
 const FolioContents = () => {
   const { id } = useParams();
@@ -57,6 +58,9 @@ const FolioContents = () => {
   const sitesDeleteStatus = useSelector(deleteSiteInFolioStatus);
 
   const [showDeleteConfirmModal, SetShowDeleteConfirmModal] = useState(false);
+
+  const [sortColumn, setSortColumn] = useState<string>('');
+  const [sortAsc, setSortAsc] = useState<boolean>(true);
 
   useEffect(() => {
     const dto = { id: parseInt(id ?? '0') };
@@ -152,6 +156,39 @@ const FolioContents = () => {
     }
   };
 
+  const handleSortChange = (column: TableColumn, ascSort: boolean) => {
+    setSortColumn(column.graphQLPropertyName);
+    setSortAsc(ascSort);
+  };
+
+  const getSortedFolioContent = () => {
+    const mapped = sitesInFolioArr.map((x) => {
+      const merged = { ...x, ...x.site };
+      const rawDate = merged.whenUpdated || (x as any).whenUpdated;
+      return {
+        ...merged,
+        _rawWhenUpdated: rawDate,
+        whenUpdated: rawDate ? new Date(rawDate).toLocaleString() : '',
+      };
+    });
+    if (!sortColumn) return mapped;
+    const field = sortColumn.split(',')[0];
+    const dateFields = ['whenUpdated'];
+    return [...mapped].sort((a: any, b: any) => {
+      if (dateFields.includes(field)) {
+        const aTime = new Date(a._rawWhenUpdated || 0).getTime();
+        const bTime = new Date(b._rawWhenUpdated || 0).getTime();
+        return sortAsc ? aTime - bTime : bTime - aTime;
+      }
+      const aVal = a[field] ?? '';
+      const bVal = b[field] ?? '';
+      const comparison = String(aVal).localeCompare(String(bVal), undefined, {
+        numeric: true,
+      });
+      return sortAsc ? comparison : -comparison;
+    });
+  };
+
   return (
     <PageContainer role="Folio Contents">
       <div className="d-flex folio-actions folio-actions-gap">
@@ -177,13 +214,17 @@ const FolioContents = () => {
           <CustomLabel label="Folio Contents" labelType="b-h1" />
         </div>
         <div className="folio-content-actions">
-          <Button onClick={handleAddToShoppingCart}>
+          <Button
+            onClick={handleAddToShoppingCart}
+            disabled={selectedRows.length === 0}
+          >
             <ShoppingCartIcon />
             Add Selected To Cart
           </Button>
 
           <Button
             variant="secondary"
+            disabled={selectedRows.length === 0}
             onClick={() => {
               SetShowDeleteConfirmModal(true);
             }}
@@ -197,14 +238,7 @@ const FolioContents = () => {
             label="Folios"
             isLoading={RequestStatus.success}
             columns={FolioContentTableColumns}
-            data={sitesInFolioArr.map((x) => {
-              let combinedObject = {
-                ...x,
-                ...x.site,
-              };
-
-              return combinedObject;
-            })}
+            data={getSortedFolioContent()}
             totalResults={[].length}
             allowRowsSelect={true}
             showPageOptions={false}
@@ -214,6 +248,7 @@ const FolioContents = () => {
             editMode={false}
             idColumnName="id"
             deleteHandler={() => {}}
+            sortHandler={handleSortChange}
           />
         </div>
       </div>

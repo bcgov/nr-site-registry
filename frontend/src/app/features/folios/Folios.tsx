@@ -36,6 +36,7 @@ import { useAuth } from 'react-oidc-context';
 
 import { notifyError, notifySuccess } from '../../components/alert/Alert';
 import { Button } from '../../components/button/Button';
+import { TableColumn } from '../../components/table/TableColumn';
 
 const Folios = () => {
   let blocker = useBlocker(
@@ -57,6 +58,9 @@ const Folios = () => {
   const [showUpdatesConfirmModal, SetShowUpdatesConfirmModal] = useState(false);
 
   const [showDeleteConfirmModal, SetShowDeleteConfirmModal] = useState(false);
+
+  const [sortColumn, setSortColumn] = useState<string>('');
+  const [sortAsc, setSortAsc] = useState<boolean>(true);
 
   const addStatus = useSelector(addFolioItemRequestStatus);
 
@@ -152,6 +156,37 @@ const Folios = () => {
     SetShowUpdatesConfirmModal(true);
   };
 
+  const handleSortChange = (column: TableColumn, ascSort: boolean) => {
+    setSortColumn(column.graphQLPropertyName);
+    setSortAsc(ascSort);
+  };
+
+  const getSortedData = () => {
+    const formatted = tempArr.map((item: any) => ({
+      ...item,
+      _rawWhenUpdated: item.whenUpdated,
+      whenUpdated: item.whenUpdated
+        ? new Date(item.whenUpdated).toLocaleString()
+        : '',
+    }));
+    if (!sortColumn) return formatted;
+    const field = sortColumn.split(',')[0];
+    const dateFields = ['whenUpdated'];
+    return [...formatted].sort((a: any, b: any) => {
+      if (dateFields.includes(field)) {
+        const aTime = new Date(a._rawWhenUpdated || 0).getTime();
+        const bTime = new Date(b._rawWhenUpdated || 0).getTime();
+        return sortAsc ? aTime - bTime : bTime - aTime;
+      }
+      const aVal = a[field] ?? '';
+      const bVal = b[field] ?? '';
+      const comparison = String(aVal).localeCompare(String(bVal), undefined, {
+        numeric: true,
+      });
+      return sortAsc ? comparison : -comparison;
+    });
+  };
+
   return (
     <PageContainer role="Folios">
       <div>
@@ -198,7 +233,7 @@ const Folios = () => {
           label="Folios"
           isLoading={RequestStatus.success}
           columns={getFolioTableColumnsBasedOnMode(editMode)}
-          data={tempArr}
+          data={getSortedData()}
           totalResults={tempArr.length}
           allowRowsSelect={false}
           showPageOptions={false}
@@ -211,6 +246,7 @@ const Folios = () => {
             SetShowDeleteConfirmModal(true);
             SetDeleteRow(event.row);
           }}
+          sortHandler={handleSortChange}
         />
       </div>
 

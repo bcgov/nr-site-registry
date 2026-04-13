@@ -232,7 +232,9 @@ const SiteDetails = () => {
     if (
       isUserOfType(UserRoleType.SR) &&
       !hasNoPendingUpdatesFromState &&
-      viewMode !== SiteDetailsMode.EditMode
+      viewMode !== SiteDetailsMode.EditMode &&
+      (!isUserOfType(UserRoleType.INTERNAL) ||
+        viewMode === SiteDetailsMode.SRMode)
     ) {
       SetNavComponents(getNavComponents(true));
     } else {
@@ -372,7 +374,8 @@ const SiteDetails = () => {
     if (
       isUserOfType(UserRoleType.SR) &&
       !hasNoPendingUpdatesFromState &&
-      mode !== SiteDetailsMode.EditMode
+      mode !== SiteDetailsMode.EditMode &&
+      (!isUserOfType(UserRoleType.INTERNAL) || mode === SiteDetailsMode.SRMode)
     ) {
       SetNavComponents(getNavComponents(true));
     } else {

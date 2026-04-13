@@ -55,6 +55,7 @@ function MapView() {
     center,
     radius,
     selectedSiteId,
+    setQuery,
   } = useMapSearchContext();
 
   const mapRef = useRef<Map>(null);
@@ -81,11 +82,18 @@ function MapView() {
   const [isLocationVisible, setLocationVisible] = useState(false);
   const clearSites = () => setSites([]);
 
-  const { data: selectedSiteData } = useMapSearch_FindSiteBySiteIdQuery({
-    variables: { siteId: selectedSiteId ?? '' },
-    skip: !selectedSiteId,
-  });
+  const { data: selectedSiteData, loading: selectedSiteLoading } =
+    useMapSearch_FindSiteBySiteIdQuery({
+      variables: { siteId: selectedSiteId ?? '' },
+      skip: !selectedSiteId,
+    });
   const selectedSite = selectedSiteData?.findSiteBySiteId?.data;
+
+  useEffect(() => {
+    if (!selectedSiteId || selectedSiteLoading) return;
+    if (selectedSite) return;
+    setQuery({ site: undefined }, 'replace');
+  }, [selectedSiteId, selectedSiteLoading, selectedSite, setQuery]);
 
   const sitesToShow = buildSitesToShow(
     sites,

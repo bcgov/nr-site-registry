@@ -607,6 +607,7 @@ export class SiteService {
     }
 
     if (!snapShot) {
+      const isIdir = userInfo?.identity_provider === UserTypeEum.IDIR;
       if (pending) {
         const result = await this.siteRepository.findOne({
           where: { id: siteId, srAction: SRApprovalStatusEnum.PENDING },
@@ -614,8 +615,11 @@ export class SiteService {
         });
         response.data = result ? result : null;
       } else {
+        const whereClause = isIdir
+          ? { id: siteId }
+          : { id: siteId, srAction: SRApprovalStatusEnum.PUBLIC };
         const result = await this.siteRepository.findOne({
-          where: { id: siteId },
+          where: whereClause,
           relations: ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'],
         });
         response.data = result ? result : null;

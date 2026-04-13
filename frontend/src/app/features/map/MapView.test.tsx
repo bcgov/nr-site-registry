@@ -157,6 +157,7 @@ describe('MapView', () => {
       center: null,
       radius: 1000,
       selectedSiteId: null,
+      setQuery: jest.fn(),
     });
 
     // Sanity check: the mocked GraphQL hook must return the shape that
@@ -219,6 +220,7 @@ describe('MapView', () => {
       center: null,
       radius: 1000,
       selectedSiteId: null,
+      setQuery: jest.fn(),
     });
 
     render(<MapView />);

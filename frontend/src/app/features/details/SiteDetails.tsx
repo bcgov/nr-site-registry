@@ -17,6 +17,8 @@ import {
 import {
   fetchSitesDetails,
   selectSiteDetails,
+  selectSiteDetailsFetchStatus,
+  selectSiteDetailsLastFetchedSiteId,
   trackedChanges,
   clearTrackChanges,
   siteDetailsMode,
@@ -179,6 +181,10 @@ const SiteDetails = () => {
 
   const mode = useSelector(siteDetailsMode);
   const details = useSelector(selectSiteDetails);
+  const siteDetailsFetchStatus = useSelector(selectSiteDetailsFetchStatus);
+  const siteDetailsLastFetchedSiteId = useSelector(
+    selectSiteDetailsLastFetchedSiteId,
+  );
   const bulkApproveRejectStatus = useSelector(bulkUpdateApproveRejectStatus);
   const hasNoPendingUpdatesFromState = useSelector(hasNoPendingUpdates);
   const srUpdates = useSelector(selectAllSites);
@@ -368,6 +374,33 @@ const SiteDetails = () => {
       setUserType(UserType.Internal);
     }
   }, [loggedInUser]);
+
+  useEffect(() => {
+    if (!id?.trim()) return;
+    if (siteDetailsFetchStatus !== RequestStatus.success) return;
+    if (siteDetailsLastFetchedSiteId !== id) return;
+    if (details) return;
+
+    const shouldRedirectExternalOrAnonymous =
+      userType === UserType.External ||
+      (auth.user === null && userType !== UserType.Internal);
+
+    if (!shouldRedirectExternalOrAnonymous) return;
+
+    // Cart details: do not auto-redirect (user can use back / cart UI).
+    if (location.pathname.includes('/site/cart/site/details/')) return;
+
+    navigate('/search', { replace: true });
+  }, [
+    id,
+    details,
+    siteDetailsFetchStatus,
+    siteDetailsLastFetchedSiteId,
+    userType,
+    auth.user,
+    location.pathname,
+    navigate,
+  ]);
 
   useEffect(() => {
     setViewMode(mode);

@@ -825,7 +825,6 @@ export const TextAreaInput: React.FC<InputProps> = ({
   const cols = textAreaColoum ?? undefined;
   const rows = textAreaRow ?? undefined;
   const [error, setError] = useState<string | null>(null);
-  const [currentValue, setCurrentValue] = useState(value ?? '');
 
   const validateInput = (inputValue: string) => {
     if (validation) {
@@ -845,7 +844,6 @@ export const TextAreaInput: React.FC<InputProps> = ({
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const inputValue = e.target.value;
-    setCurrentValue(inputValue);
     onChange(inputValue);
 
     if (allowNumbersOnly || (inputValue && !validateInput(inputValue))) {
@@ -877,7 +875,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
             customEditInputTextCss ?? 'custom-input-text'
           } ${error && 'error'}`}
           placeholder={placeholder}
-          value={currentValue}
+          value={value}
           onChange={handleTextAreaChange}
           aria-label={label}
           rows={rows}

@@ -100,3 +100,67 @@
 .SITE-Button.btn-icon.btn-active:hover {
   background: var(--surface-color-primary-default);
 }
+
+/* Intent - Danger */
+.SITE-Button.primary.danger {
+  background-color: var(--surface-color-primary-danger-button-default);
+  border-color: var(--surface-color-primary-danger-button-default);
+  color: var(--typography-color-primary-invert);
+}
+.SITE-Button.primary.danger:disabled {
+  background-color: var(--surface-color-primary-danger-button-disabled);
+  border-color: var(--surface-color-primary-danger-button-disabled);
+  color: var(--typography-color-disabled);
+}
+.SITE-Button.primary.danger:hover:not(:disabled),
+.SITE-Button.primary.danger:focus {
+  background-color: var(--surface-color-primary-danger-button-hover);
+  border-color: var(--surface-color-primary-danger-button-hover);
+}
+
+.SITE-Button.secondary.danger {
+  border-color: var(--support-border-color-danger);
+  color: var(--typography-color-danger);
+}
+.SITE-Button.secondary.danger:hover:not(:disabled) {
+  background-color: var(--support-surface-color-danger);
+}
+
+.SITE-Button.tertiary.danger {
+  color: var(--typography-color-danger);
+}
+.SITE-Button.tertiary.danger:hover:not(:disabled) {
+  background-color: var(--support-surface-color-danger);
+}
+
+/* Intent - Success */
+.SITE-Button.primary.success {
+  background-color: var(--support-border-color-success);
+  border-color: var(--support-border-color-success);
+  color: var(--typography-color-primary-invert);
+}
+.SITE-Button.primary.success:disabled {
+  background-color: var(--surface-color-primary-disabled);
+  border-color: var(--surface-color-primary-disabled);
+  color: var(--typography-color-disabled);
+}
+.SITE-Button.primary.success:hover:not(:disabled),
+.SITE-Button.primary.success:focus {
+  background-color: #35673c; /* ~20% darker than --support-border-color-success (#42814A) */
+  border-color: #35673c;
+}
+
+.SITE-Button.secondary.success {
+  border-color: var(--support-border-color-success);
+  color: var(--icons-color-success);
+}
+.SITE-Button.secondary.success:hover:not(:disabled) {
+  background-color: var(--support-surface-color-success);
+}
+
+.SITE-Button.tertiary.success {
+  color: var(--icons-color-success);
+}
+.SITE-Button.tertiary.success:hover:not(:disabled) {
+  background-color: var(--support-surface-color-success);
+}

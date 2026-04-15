@@ -24,7 +24,7 @@ import { Sites } from '../../entities/sites.entity';
 import { SiteService } from '../../services/site/site.service';
 import { DropdownDto, DropdownResponse } from '../../dto/dropdown.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
-import { HttpStatus, UsePipes } from '@nestjs/common';
+import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { CustomRoles } from '../../common/role';
@@ -40,6 +40,8 @@ import {
   FindSitesAndPlaces,
   FindSitesAndPlacesResponse,
 } from '../../dto/mapSearch.dto';
+import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
+import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
 
 /**
  * Resolver for Region
@@ -122,7 +124,11 @@ export class SiteResolver {
   })
   @Mutation(() => SaveSiteDetailsResponse, { name: 'updateSiteDetails' })
   async updateSiteDetails(
-    @Args('siteDetailsDTO', { type: () => SaveSiteDetailsDTO })
+    @Args(
+      'siteDetailsDTO',
+      { type: () => SaveSiteDetailsDTO },
+      new ValidationPipe(),
+    )
     siteDetailsDTO: SaveSiteDetailsDTO,
     @AuthenticatedUser()
     user: any,
@@ -166,6 +172,10 @@ export class SiteResolver {
     searchParam: SearchParams,
     @Args('page', { type: () => String }) page: number,
     @Args('pageSize', { type: () => String }) pageSize: number,
+    @Args({ name: 'sortBy', type: () => SiteSortBy, nullable: true })
+    sortBy: SiteSortBy = SiteSortBy.ID,
+    @Args({ name: 'sortByDir', type: () => SortByDirection, nullable: true })
+    sortByDir: SortByDirection = SortByDirection.ASC,
   ) {
     this.sitesLogger.log(
       'SiteResolver.getPendingSiteForSRApproval() start dto:' +
@@ -181,6 +191,8 @@ export class SiteResolver {
       searchParam,
       page,
       pageSize,
+      sortBy,
+      sortByDir,
     );
 
     return this.siteApprovalResponseProvider.createResponse(
@@ -238,6 +250,7 @@ export class SiteResolver {
   })
   @Query(() => FindSitesAndPlacesResponse, { name: 'findSitesAndPlaces' })
   async findSitesAndPlaces(
+    @AuthenticatedUser() userInfo: any,
     @Args('searchParam', { type: () => String })
     searchParam: string,
     @Args('limit', { type: () => Int, nullable: true })
@@ -248,6 +261,7 @@ export class SiteResolver {
       const data = await this.siteService.findSitesAndPlaces(
         searchParam,
         limit,
+        userInfo,
       );
 
       return this.sitesAndPlacesResponseProvider.createResponse(

@@ -2,7 +2,12 @@ import React from 'react';
 import PanelWithUpDown from '../../../components/simple/PanelWithUpDown';
 import Form from '../../../components/form/Form';
 import Widget from '../../../components/widget/Widget';
-import { UserMinus, UserPlus } from '../../../components/common/icon';
+import {
+  UserMinus,
+  UserPlus,
+  Minus,
+  Plus,
+} from '../../../components/common/icon';
 import Actions from '../../../components/action/Actions';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { UserType } from '../../../helpers/requests/userType';
@@ -12,6 +17,8 @@ import { DropdownItem } from '../../../components/action/IActions';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
 import { Button } from '../../../components/button/Button';
 import { formatDate, parseDate } from '../../../helpers/utility';
+
+// sonar-new-code-anchor
 
 interface INotationProps {
   index?: number;
@@ -41,10 +48,13 @@ interface INotationProps {
     currNotation: any,
     particIsDelete?: boolean,
   ) => void;
+  handleDeleteNotation: (notationId: string) => void;
+  handleRestoreNotation: (notationId: string) => void;
   srVisibilityConfig: DropdownItem[];
   handleItemClick: (value: string) => void;
   approveRejectHandler?: (value: boolean) => void;
   showApproveRejectSection?: boolean;
+  isArchived?: boolean;
 }
 
 const Notation: React.FC<INotationProps> = ({
@@ -65,10 +75,13 @@ const Notation: React.FC<INotationProps> = ({
   handleAddParticipant,
   isAnyParticipantSelected,
   handleRemoveParticipant,
+  handleDeleteNotation,
+  handleRestoreNotation,
   srVisibilityConfig,
   handleItemClick,
   approveRejectHandler,
   showApproveRejectSection,
+  isArchived = false,
 }) => {
   showApproveRejectSection = showApproveRejectSection ?? false;
 
@@ -108,7 +121,7 @@ const Notation: React.FC<INotationProps> = ({
   return (
     <PanelWithUpDown
       firstChild={
-        <div className="w-100" key={notation?.id}>
+        <div className="w-100" key={`notation-first-${notation?.id}`}>
           <Form
             formRows={handleNotationFormRowFirstChild(notation)}
             formData={notation}
@@ -125,7 +138,7 @@ const Notation: React.FC<INotationProps> = ({
         </div>
       }
       secondChild={
-        <div className="w-100" key={notation?.id}>
+        <div className="w-100" key={`notation-first-${notation?.id}`}>
           <Form
             formRows={
               userType === UserType.External
@@ -145,7 +158,7 @@ const Notation: React.FC<INotationProps> = ({
             aria-label="Sort Notation Form"
           />
           <Widget
-            isRequired={true}
+            isRequired={viewMode === SiteDetailsMode.EditMode}
             changeHandler={(event) => handleTableChange(notation.id, event)}
             handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
             title={'Notation Participants'}
@@ -210,6 +223,26 @@ const Notation: React.FC<INotationProps> = ({
                 />
               )}
           </Widget>
+          {viewMode === SiteDetailsMode.EditMode &&
+            userType === UserType.Internal &&
+            !isArchived && (
+              <div>
+                <Button onClick={() => handleDeleteNotation(notation.id)}>
+                  <Minus />
+                  Archive Notation
+                </Button>
+              </div>
+            )}
+          {viewMode === SiteDetailsMode.EditMode &&
+            userType === UserType.Internal &&
+            isArchived && (
+              <div>
+                <Button onClick={() => handleRestoreNotation(notation.id)}>
+                  <Plus />
+                  Restore Notation
+                </Button>
+              </div>
+            )}
           {userType === UserType.Internal && srTimeStamp && (
             <p className="sr-time-stamp">{srTimeStamp}</p>
           )}

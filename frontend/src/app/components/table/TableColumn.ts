@@ -6,6 +6,11 @@ export enum ColumnSize {
   XtraSmall,
   Double,
   Triple,
+  w400,
+  w300,
+  w200,
+  w100,
+  w50,
 }
 
 export class TableColumn {

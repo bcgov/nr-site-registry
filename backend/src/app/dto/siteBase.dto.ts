@@ -1,5 +1,10 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { Transform } from 'class-transformer';
+import { IsIn, IsOptional, IsString } from 'class-validator';
 import { ChangeAuditType } from './changeAuditEntity.dto';
+
+// Keep this in sync with the frontend SummaryConfig addrType options.
+export const VALID_ADDR_TYPES = ['CIVIC', 'MAILING', 'LEGAL', 'RA'] as const;
 
 @InputType({ isAbstract: true })
 @ObjectType({ isAbstract: true })
@@ -16,7 +21,14 @@ export class SiteBaseDto extends ChangeAuditType {
   @Field({ nullable: true })
   commonName: string;
 
-  @Field({ nullable: true })
+  @Field()
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.trim().toUpperCase() : value,
+  )
+  @IsString()
+  @IsIn(VALID_ADDR_TYPES, {
+    message: `addrType must be one of ${VALID_ADDR_TYPES.join(', ')}`,
+  })
   addrType: string;
 
   @Field()

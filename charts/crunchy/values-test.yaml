@@ -26,3 +26,6 @@ crunchy: # enable it for TEST and PROD, for PR based pipelines simply use single
       incrementalBackupSchedule: 0 0/4 * * * # every four hours
     pvc:
       enabled: true
+
+pgbackrestLogRotator:
+  enabled: true

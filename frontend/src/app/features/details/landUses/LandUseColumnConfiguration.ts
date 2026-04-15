@@ -4,6 +4,7 @@ import { ColumnSize } from '../../../components/table/TableColumn';
 export const getLandUseColumns = (
   landUseCodes: any[] = [],
   editMode = false,
+  isInternalUser = false,
 ) => {
   const landUseCodeColumns = editMode
     ? {
@@ -77,5 +78,7 @@ export const getLandUseColumns = (
     stickyCol: true,
   };
 
-  return [landUseCodeColumns, noteColumn, srColumn];
+  return isInternalUser
+    ? [landUseCodeColumns, noteColumn, srColumn]
+    : [landUseCodeColumns, noteColumn];
 };

@@ -76,4 +76,6 @@ export interface IFormField {
   textAreaRow?: number;
   textAreaColoum?: number;
   handleSearch?: (event: any) => void;
+  componentName?: string;
+  componentPath?: string;
 }

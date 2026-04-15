@@ -24,6 +24,7 @@ export const GetSummaryConfig = () => {
       placeholder: 'Please enter site ID...',
       graphQLPropertyName: 'id',
       value: '',
+      isDisabled: true,
       validation: {
         pattern: /^[0-9,\s]*$/,
         customMessage: 'Site ID can only contain numbers and commas',
@@ -183,10 +184,17 @@ export const GetSummaryConfig = () => {
       },
     },
     addrType: {
-      type: FormFieldType.Text,
+      type: FormFieldType.DropDown,
       label: 'Address Type',
-      placeholder: 'Please enter address type...',
+      placeholder: 'Please select address type...',
       graphQLPropertyName: 'addrType',
+      // Keep this list in sync with the backend VALID_ADDR_TYPES constant.
+      options: [
+        { key: 'CIVIC', value: 'Civic' },
+        { key: 'MAILING', value: 'Mailing' },
+        { key: 'LEGAL', value: 'Legal' },
+        { key: 'RA', value: 'RA' },
+      ],
       value: '',
       customLabelCss: 'custom-summary-lbl-text',
       customInputTextCss: 'custom-summary-input-text',
@@ -203,18 +211,13 @@ export const GetSummaryConfig = () => {
       label: 'Province',
       placeholder: 'Please enter Province abbreviation...',
       graphQLPropertyName: 'provState',
-      value: '',
+      isDisabled: true,
+      value: 'BC',
       customLabelCss: 'custom-summary-lbl-text',
       customInputTextCss: 'custom-summary-input-text',
       customEditInputTextCss: 'custom-summary-edit-input',
       customEditLabelCss: 'custom-summary-lbl-text',
       colSize: 'col-lg-3 col-md-3 col-sm-12',
-      validation: {
-        required: true,
-        pattern: /^[A-Za-z]{2}$/, // Two-letter province code
-        customMessage: 'Province abbreviation must be two letters',
-        maxLength: 2,
-      },
     },
     city: {
       type: FormFieldType.Text,
@@ -230,6 +233,7 @@ export const GetSummaryConfig = () => {
       validation: {
         required: true,
         customMessage: 'City is required',
+        maxLength: 30,
       },
     },
     postalCode: {
@@ -329,6 +333,7 @@ export const GetSummaryConfig = () => {
       validation: {
         required: true,
         customMessage: 'Common Name is required',
+        maxLength: 40,
       },
     },
   };
@@ -345,6 +350,9 @@ export const GetSummaryConfig = () => {
       customEditInputTextCss: 'custom-summary-edit-input',
       customEditLabelCss: 'custom-summary-lbl-text',
       colSize: 'col-lg-12 col-md-12 col-sm-12',
+      validation: {
+        maxLength: 255,
+      },
     },
   ];
 
@@ -410,12 +418,12 @@ export const GetSummaryConfig = () => {
       id: 5,
       displayName: 'Participants',
       active: true,
-      graphQLPropertyName: 'eventParticCount',
+      graphQLPropertyName: 'siteParticsCount',
       displayType: {
         type: FormFieldType.Text,
         label: 'Site ID',
         placeholder: 'Separate IDs by a comma (",")',
-        graphQLPropertyName: 'eventParticCount',
+        graphQLPropertyName: 'siteParticsCount',
         value: '',
         validation: {
           pattern: /^[0-9,\s]*$/,

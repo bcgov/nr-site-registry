@@ -18,8 +18,7 @@ jobs:
 
   tests:
     name: Unit Tests
-    # TODO - Re-enable below before submitting PR, jsut have it disabled while I work via draft.
-    # if: ${{ ! github.event.pull_request.draft }}
+    if: ${{ ! github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     services:
@@ -59,7 +58,7 @@ jobs:
              -Dsonar.projectKey=bcgov-sonarcloud_nr-site-registry-${{ matrix.dir }}
              -Dsonar.sources=src
              -Dsonar.tests.inclusions=**/*spec.ts
-             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
+             -Dsonar.javascript.lcov.reportPaths=./src/coverage/lcov.info,./coverage/lcov.info
              -Dsonar.cpd.exclusions=**/migrations/**
           sonar_token: ${{ secrets[matrix.token] }}
           

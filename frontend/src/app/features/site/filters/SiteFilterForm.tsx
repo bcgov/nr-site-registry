@@ -52,7 +52,7 @@ const SiteFilterForm: React.FC<SiteFilterProps> = ({
               data-testid="Submit"
               disabled={Object.keys(formData).length === 0}
             >
-              Submit
+              Apply
             </Button>
             <Button
               variant="tertiary"

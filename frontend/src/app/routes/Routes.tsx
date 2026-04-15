@@ -1,6 +1,4 @@
-import React, { useEffect } from 'react';
-// import Landing from "../features/landing/Landing"
-import { Routes, Route, createBrowserRouter } from 'react-router-dom';
+import { Navigate, createBrowserRouter } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
@@ -11,17 +9,18 @@ import Cart from '../features/cart/Cart';
 import Folios from '../features/folios/Folios';
 import FolioContents from '../features/folios/FolioContent';
 import App from '../../App';
-import {
-  getLoggedInUserType,
-  getUser,
-  isUserOfType,
-  UserRoleType,
-} from '../helpers/utility';
 import MapView from '../features/map/MapView';
 import SRUpdatesTables from '../features/details/srUpdates/srUpdatesTables';
+import { UserRoleType } from '../helpers/utility';
 
-const roleBasedRoutes: any = {
-  client: [
+type AppRoute = {
+  path: string;
+  element: JSX.Element;
+  children?: AppRoute[];
+};
+
+export const roleBasedRoutes: Record<UserRoleType, AppRoute[]> = {
+  [UserRoleType.CLIENT]: [
     { path: '/', element: <Search /> },
     { path: '/dashboard', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
@@ -36,8 +35,8 @@ const roleBasedRoutes: any = {
     { path: '/review', element: <SRUpdatesTables /> },
     { path: '/site/cart/site/details/:id', element: <SiteDetails /> },
   ],
-  internal: [
-    { path: '/', element: <Search /> },
+  [UserRoleType.INTERNAL]: [
+    { path: '/', element: <Navigate to="/dashboard" replace /> },
     { path: '/dashboard', element: <Dashboard /> },
     { path: '/search', element: <Search /> },
     { path: '/dashboard/site/create', element: <SiteDetails /> },
@@ -48,8 +47,8 @@ const roleBasedRoutes: any = {
     { path: '/map/:id', element: <MapView /> },
     { path: '/review', element: <SRUpdatesTables /> },
   ],
-  sr: [
-    { path: '/', element: <Search /> },
+  [UserRoleType.SR]: [
+    { path: '/', element: <Navigate to="/dashboard" replace /> },
     { path: '/search', element: <Search /> },
     { path: '/site/details/:id', element: <SiteDetails /> },
     { path: '/search/site/details/:id', element: <SiteDetails /> },
@@ -60,7 +59,7 @@ const roleBasedRoutes: any = {
     { path: '/dashboard/site/create', element: <SiteDetails /> },
     { path: '/dashboard/site/details/:id', element: <SiteDetails /> },
   ],
-  public: [
+  [UserRoleType.PUBLIC]: [
     { path: '/', element: <Search /> },
     { path: '/search', element: <Search /> },
     { path: '/site/details/:id', element: <SiteDetails /> },
@@ -72,7 +71,7 @@ const roleBasedRoutes: any = {
 };
 
 // Create routes based on the user's role
-const createRoutesForRole = (role: string) => [
+const createRoutesForRole = (role: UserRoleType) => [
   {
     element: (
       <QueryParamProvider adapter={ReactRouter6Adapter}>
@@ -80,7 +79,7 @@ const createRoutesForRole = (role: string) => [
       </QueryParamProvider>
     ),
     errorElement: <h1>Page not found</h1>,
-    children: roleBasedRoutes[role]?.map((route: any) => ({
+    children: roleBasedRoutes[role].map((route: AppRoute) => ({
       path: route.path,
       element: route.element,
       children: route.children,
@@ -88,7 +87,7 @@ const createRoutesForRole = (role: string) => [
   },
 ];
 
-const siteRouter = (userType: string) => {
+const siteRouter = (userType: UserRoleType) => {
   return createBrowserRouter(createRoutesForRole(userType));
 };
 export default siteRouter;

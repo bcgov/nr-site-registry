@@ -8,6 +8,10 @@ import {
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
+import {
+  getFieldLabel,
+  ChangeContext,
+} from '../../../helpers/fieldLabelMapper';
 import './Disclosure.css';
 import { RequestStatus } from '../../../helpers/requests/status';
 import {
@@ -44,6 +48,22 @@ import { schedule2ReferenceCdDrpdown } from '../dropdowns/DropdownSlice';
 import { siteDisclosureConfig } from './DisclosureConfig';
 
 const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
+  const initialState = {
+    id: '',
+    siteId: '',
+    dateCompleted: '',
+    rwmDateDecision: '',
+    localAuthDateRecd: '',
+    siteRegDateEntered: '',
+    siteRegDateRecd: '',
+    govDocumentsComment: '',
+    siteDisclosureComment: '',
+    plannedActivityComment: '',
+    srAction: '',
+    whenCreated: '',
+    whenUpdated: '',
+    siteProfileSchedule2Refs: [],
+  };
   const schedule2Ref = useSelector(schedule2ReferenceCdDrpdown);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const {
@@ -66,7 +86,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   const [formData, setFormData] = useState<{
     [key: string]: any | [Date, Date];
-  }>(disclosureData ?? {});
+  }>(disclosureData ?? initialState);
   const [selectedRows, setSelectedRows] = useState<
     { disclosureId: any; scheduleId: any }[]
   >([]);
@@ -153,6 +173,9 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     setViewMode(mode);
   }, [mode]);
 
+  useEffect(() => {
+    fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending });
+  }, [siteId]);
   // Search internal contact effect with debounce
   // Commenting the below method because I am not sure which dropdown type
   // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
@@ -205,7 +228,11 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Update form data when notations change
 
   useEffect(() => {
-    if (status === RequestStatus.success && disclosureData) {
+    if (
+      status === RequestStatus.success &&
+      disclosureData &&
+      disclosureData?.siteId === siteId
+    ) {
       // Commenting the below method because I am not sure which dropdown type
       // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
 
@@ -277,6 +304,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       resetDetails ||
       saveSiteDetailsRequestStatus === RequestStatus.success
     ) {
+      setFormData(initialState);
       dispatch(
         fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending }),
       );
@@ -344,17 +372,30 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       viewMode === SiteDetailsMode.SRMode &&
       graphQLPropertyName === 'srCheckbox'
     ) {
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Site Disclosure: SR Status',
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      if (updatedFormData?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel('srValue'),
+          ChangeContext.DISCLOSURE,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     } else {
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Site Disclosure: ' + currLabel?.label,
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      if (updatedFormData?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel(graphQLPropertyName),
+          ChangeContext.DISCLOSURE,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      } else if (updatedFormData?.apiAction === UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Added,
+          getFieldLabel(graphQLPropertyName),
+          ChangeContext.DISCLOSURE,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     }
   };
 
@@ -436,11 +477,14 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
         disclosureScheduleInternalConfig.find(
           (row) => row.graphQLPropertyName === event.property,
         );
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Site Disclosure Schedule' + currLabel?.displayName,
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      if (event.row?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel(event.property),
+          ChangeContext.DISCLOSURE_SCHEDULE,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     }
   };
 
@@ -498,7 +542,8 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
     const tracker = new ChangeTracker(
       IChangeType.Added,
-      'Site Dosclosure Schedule',
+      getFieldLabel('schedule2ReferenceCode'),
+      ChangeContext.DISCLOSURE_SCHEDULE,
     );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
@@ -573,7 +618,8 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       setIsDelete(false);
       const tracker = new ChangeTracker(
         IChangeType.Deleted,
-        'Site Disclosure Schedule',
+        getFieldLabel('schedule2ReferenceCode'),
+        ChangeContext.DISCLOSURE_SCHEDULE,
       );
       dispatch(trackChanges(tracker.toPlainObject()));
     } else {

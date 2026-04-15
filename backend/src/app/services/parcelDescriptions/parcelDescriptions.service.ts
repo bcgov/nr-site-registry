@@ -300,6 +300,13 @@ export class ParcelDescriptionsService {
       },
     );
 
+    await transactionalEntityManager.query(`
+      SELECT setval(
+        pg_get_serial_sequence('sites.subdivisions', 'id'),
+        (SELECT COALESCE(MAX(id), 0) FROM sites.subdivisions)
+      )
+    `);
+
     // Insert the new subdivisions into the database.
     let insertResult: InsertResult;
     try {
@@ -431,7 +438,11 @@ export class ParcelDescriptionsService {
           : null;
       subdivision.dateNoted = parcelDescription.dateNoted;
       subdivision.srAction = parcelDescription.srAction;
-      subdivision.userAction = parcelDescription.srAction === SRApprovalStatusEnum.PUBLIC || parcelDescription.srAction === SRApprovalStatusEnum.PRIVATE ? UserActionEnum.DEFAULT : UserActionEnum.UPDATED;
+      subdivision.userAction =
+        parcelDescription.srAction === SRApprovalStatusEnum.PUBLIC ||
+        parcelDescription.srAction === SRApprovalStatusEnum.PRIVATE
+          ? UserActionEnum.DEFAULT
+          : UserActionEnum.UPDATED;
       subdivision.whoUpdated = userInfo?.givenName;
       subdivision.whenUpdated = now;
       // Note: the user is never able to update the subdivision's legal/land

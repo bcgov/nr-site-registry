@@ -11,6 +11,7 @@ import {
   getPendingSiteForSRApprovalQL,
 } from '../../../site/graphql/Site';
 import { GRAPHQL } from '../../../../helpers/endpoints';
+import { SiteSortBy, SortByDirection } from '../../../../../graphql/generated';
 
 const initialState: SRReviewListState = {
   sites: [],
@@ -22,11 +23,19 @@ const initialState: SRReviewListState = {
   resultsCount: 0,
   updateStatus: RequestStatus.idle,
   searchParam: null,
+  sortBy: SiteSortBy.Id,
+  sortByDir: SortByDirection.Asc,
 };
 
 export const fetchPendingSiteForSRApproval = createAsyncThunk(
   'sites/getPendingSiteForSRApproval',
-  async (args: { searchParam: any; page: number; pageSize: number }) => {
+  async (args: {
+    searchParam: any;
+    page: number;
+    pageSize: number;
+    sortBy?: SiteSortBy;
+    sortByDir?: SortByDirection;
+  }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(getPendingSiteForSRApprovalQL()),
@@ -34,6 +43,8 @@ export const fetchPendingSiteForSRApproval = createAsyncThunk(
           searchParam: args.searchParam,
           pageSize: args.pageSize.toString(),
           page: args.page.toString(),
+          sortBy: args.sortBy ?? SiteSortBy.Id,
+          sortByDir: args.sortByDir ?? SortByDirection.Asc,
         },
       });
       return response.data;
@@ -115,6 +126,14 @@ const srReviewSlice = createSlice({
       })
       .addCase(fetchPendingSiteForSRApproval.fulfilled, (state, action) => {
         const newState = { ...state };
+
+        const args = action.meta.arg;
+        if (args.sortBy !== undefined) {
+          newState.sortBy = args.sortBy;
+        }
+        if (args.sortByDir !== undefined) {
+          newState.sortByDir = args.sortByDir;
+        }
         if (
           action.payload &&
           action.payload.data &&
@@ -164,6 +183,8 @@ export const getTotalRecords = (state: any) => state.srReview.resultsCount;
 export const bulkUpdateApproveRejectStatus = (state: any) =>
   state.srReview.updateStatus;
 export const getSearchParam = (state: any) => state.srReview.searchParam;
+export const getSortBy = (state: any) => state.srReview.sortBy;
+export const getSortByDir = (state: any) => state.srReview.sortByDir;
 
 export const {
   resetSites,

@@ -54,12 +54,18 @@ export const Link: React.FC<InputProps> = ({
   stickyCol,
   href,
   customContainerCss,
+  componentName,
+  componentPath,
 }) => {
   return renderTableCell(
     <RouterLink
       to={href + value}
       className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
       aria-label={`${label + ' ' + value}`}
+      state={{
+        fromPath: componentPath ?? '',
+        fromLabel: componentName ?? '',
+      }}
     >
       {customIcon && customIcon}{' '}
       <span className="ps-1">{customLinkValue ?? value}</span>
@@ -148,17 +154,18 @@ export const TextInput: React.FC<InputProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const validateInput = (inputValue: string) => {
-    if (validation) {
-      if (validation.required && !inputValue.trim()) {
-        setError(validation.customMessage || ' ');
-        return false;
-      }
-      if (validation?.pattern && !validation.pattern?.test(inputValue)) {
-        setError(validation.customMessage || '');
-        return false;
-      }
+    if (validation?.required && !inputValue.trim()) {
+      setError(validation.customMessage || ' ');
+      return false;
     }
-
+    if (validation?.pattern && !validation.pattern?.test(inputValue)) {
+      setError(validation.customMessage || '');
+      return false;
+    }
+    if (validation?.maxLength && inputValue.length > validation.maxLength) {
+      setError(`Maximum ${validation.maxLength} characters allowed`);
+      return false;
+    }
     setError(null);
     return true;
   };
@@ -171,9 +178,7 @@ export const TextInput: React.FC<InputProps> = ({
       return;
     }
 
-    if (validation?.required) {
-      validateInput(inputValue);
-    }
+    validateInput(inputValue);
   };
 
   // Replace any spaces in the label with underscores to create a valid id
@@ -208,9 +213,6 @@ export const TextInput: React.FC<InputProps> = ({
           aria-label={label} // Accessibility
           required={error ? true : false}
           disabled={isDisabled ?? false}
-          {...(validation?.maxLength
-            ? { maxLength: validation.maxLength }
-            : {})}
           {...(validation?.minLength
             ? { minLength: validation.minLength }
             : {})}
@@ -702,6 +704,7 @@ export const DateInput: React.FC<InputProps> = ({
           value={parsedDate ?? null}
           onChange={handleDateChange}
           oneTap
+          disabled={isDisabled}
           readOnly={isDisabled}
         />
       ) : (

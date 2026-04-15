@@ -632,6 +632,7 @@ jest.mock('react-redux', () => {
 });
 
 const mockStore = configureStore([thunk]);
+
 describe('Notations component', () => {
   let store;
   let dispatch;

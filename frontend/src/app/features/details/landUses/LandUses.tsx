@@ -18,6 +18,10 @@ import {
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
+import {
+  getFieldLabel,
+  ChangeContext,
+} from '../../../helpers/fieldLabelMapper';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { Plus, Minus } from '../../../components/common/icon';
 import { v4 } from 'uuid';
@@ -32,6 +36,8 @@ import { UserActionEnum } from '../../../common/userActionEnum';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import LandUseTable from './LandUseTable';
 import { getLandUseColumns } from './LandUseColumnConfiguration';
+import { UserType } from '../../../helpers/requests/userType';
+import { getUser, isUserOfType, UserRoleType } from '../../../helpers/utility';
 
 type createdAtSortDirection = 'newToOld' | 'oldTonew';
 
@@ -66,9 +72,28 @@ const LandUses: FC = () => {
   );
 
   const editModeEnabled = viewMode === SiteDetailsMode.EditMode;
+
+  const [userType, setUserType] = useState<UserType>(UserType.External);
+  const loggedInUser = getUser();
+
+  useEffect(() => {
+    if (
+      isUserOfType(UserRoleType.CLIENT) ||
+      isUserOfType(UserRoleType.PUBLIC)
+    ) {
+      setUserType(UserType.External);
+    } else if (isUserOfType(UserRoleType.INTERNAL)) {
+      setUserType(UserType.Internal);
+    }
+  }, [loggedInUser]);
+
   const tableColumns = useMemo(() => {
-    return getLandUseColumns(landUseCodes, editModeEnabled);
-  }, [editModeEnabled, landUseCodes]);
+    return getLandUseColumns(
+      landUseCodes,
+      editModeEnabled,
+      userType === UserType.Internal,
+    );
+  }, [editModeEnabled, landUseCodes, viewMode, userType]);
 
   useEffect(() => {
     if (siteId) {
@@ -166,17 +191,25 @@ const LandUses: FC = () => {
     });
 
     const tableColumn = tableColumns.find(
-      (column) => column.graphQLPropertyName === event.property,
+      (column: { graphQLPropertyName: any }) =>
+        column.graphQLPropertyName === event.property,
     );
-    const propertyLabel = tableColumn?.displayName || '';
+    const propertyLabel = getFieldLabel(event.property);
 
     const description =
       viewMode === SiteDetailsMode.SRMode && event.property === 'srValue'
-        ? 'Suspect Land Uses: SR Status'
-        : 'Suspect Land Uses: ' + propertyLabel;
+        ? getFieldLabel('srValue')
+        : propertyLabel;
 
-    const tracker = new ChangeTracker(IChangeType.Modified, description);
-    dispatch(trackChanges(tracker.toPlainObject()));
+    const currentRecord = landUsesData[editedRowId];
+    const tracker = new ChangeTracker(
+      IChangeType.Modified,
+      description,
+      ChangeContext.LAND_USES,
+    );
+    if (existingLandUse.siteId !== undefined) {
+      dispatch(trackChanges(tracker.toPlainObject()));
+    }
     dispatch(updateLandUses(updatedLandUses));
     setTableData(updatedLandUses);
   };
@@ -203,7 +236,11 @@ const LandUses: FC = () => {
       dispatch(updateLandUses(newData));
       return newData;
     });
-    const tracker = new ChangeTracker(IChangeType.Added, 'New Land Use');
+    const tracker = new ChangeTracker(
+      IChangeType.Added,
+      getFieldLabel('landUse'),
+      ChangeContext.LAND_USES,
+    );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
@@ -239,7 +276,11 @@ const LandUses: FC = () => {
 
     setSelectedRowIds(new Set());
 
-    const tracker = new ChangeTracker(IChangeType.Deleted, 'Land Use');
+    const tracker = new ChangeTracker(
+      IChangeType.Deleted,
+      getFieldLabel('landUse'),
+      ChangeContext.LAND_USES,
+    );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 

@@ -607,7 +607,7 @@ describe('SiteService', () => {
   describe('findSiteBySiteId', () => {
     const relations = ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'];
 
-    it('anonymous user without snapshot loads non-pending site by id and public srAction only', async () => {
+    it('unauthenticated user without snapshot loads non-pending site by id and public srAction only', async () => {
       const siteId = '999';
       (siteRepository.findOne as jest.Mock).mockResolvedValue({
         id: siteId,
@@ -1719,7 +1719,7 @@ describe('SiteService', () => {
       );
     });
 
-    it('should apply public-only visibility filter when userInfo is missing (anonymous)', () => {
+    it('should apply public-only visibility filter when userInfo is missing (unauthenticated)', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
@@ -1973,7 +1973,7 @@ describe('SiteService', () => {
       );
     });
 
-    it('should apply public-only visibility filter when userInfo is missing (anonymous) (sites only)', async () => {
+    it('should apply public-only visibility filter when userInfo is missing (unauthenticated) (sites only)', async () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),

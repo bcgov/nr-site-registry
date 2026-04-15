@@ -162,6 +162,7 @@ const SiteDetails = () => {
     useSelector(schedule2ReferenceCdDrpdown)?.data,
   );
   const auth = useAuth();
+  const isUnauthenticated = auth?.user == null;
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -381,11 +382,11 @@ const SiteDetails = () => {
     if (siteDetailsLastFetchedSiteId !== id) return;
     if (details) return;
 
-    const shouldRedirectExternalOrAnonymous =
+    const shouldRedirectExternalOrUnauthenticated =
       userType === UserType.External ||
-      (auth.user === null && userType !== UserType.Internal);
+      (isUnauthenticated && userType !== UserType.Internal);
 
-    if (!shouldRedirectExternalOrAnonymous) return;
+    if (!shouldRedirectExternalOrUnauthenticated) return;
 
     // Cart details: do not auto-redirect (user can use back / cart UI).
     if (location.pathname.includes('/site/cart/site/details/')) return;
@@ -397,7 +398,7 @@ const SiteDetails = () => {
     siteDetailsFetchStatus,
     siteDetailsLastFetchedSiteId,
     userType,
-    auth.user,
+    isUnauthenticated,
     location.pathname,
     navigate,
   ]);

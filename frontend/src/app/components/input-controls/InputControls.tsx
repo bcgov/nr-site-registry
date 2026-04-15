@@ -154,17 +154,21 @@ export const TextInput: React.FC<InputProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const validateInput = (inputValue: string) => {
-    if (validation) {
-      if (validation.required && !inputValue.trim()) {
-        setError(validation.customMessage || ' ');
-        return false;
-      }
-      if (validation?.pattern && !validation.pattern?.test(inputValue)) {
-        setError(validation.customMessage || '');
-        return false;
-      }
+    if (validation?.required && !inputValue.trim()) {
+      setError(validation.customMessage || ' ');
+      return false;
     }
-
+    if (validation?.pattern && !validation.pattern?.test(inputValue)) {
+      setError(validation.customMessage || '');
+      return false;
+    }
+    if (
+      validation?.maxLength &&
+      inputValue.length > validation.maxLength
+    ) {
+      setError(`Maximum ${validation.maxLength} characters allowed`);
+      return false;
+    }
     setError(null);
     return true;
   };
@@ -172,14 +176,12 @@ export const TextInput: React.FC<InputProps> = ({
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     onChange(inputValue);
-
+    
     if (allowNumbersOnly || (inputValue && !validateInput(inputValue))) {
       return;
     }
 
-    if (validation?.required) {
-      validateInput(inputValue);
-    }
+    validateInput(inputValue);
   };
 
   // Replace any spaces in the label with underscores to create a valid id
@@ -214,9 +216,6 @@ export const TextInput: React.FC<InputProps> = ({
           aria-label={label} // Accessibility
           required={error ? true : false}
           disabled={isDisabled ?? false}
-          {...(validation?.maxLength
-            ? { maxLength: validation.maxLength }
-            : {})}
           {...(validation?.minLength
             ? { minLength: validation.minLength }
             : {})}

@@ -84,11 +84,23 @@ jest.mock('../../../graphql/generated', () => {
         loading: false,
       };
     },
-    useMapSearch_FindSiteBySiteIdQuery: () => ({
-      data: undefined,
-    }),
   };
 });
+
+jest.mock('@apollo/client', () => ({
+  __esModule: true,
+  gql: (literals: any, ...placeholders: any[]) =>
+    literals?.raw?.[0] ?? literals?.[0] ?? '',
+  useQuery: () => ({
+    data: undefined,
+    loading: false,
+  }),
+}));
+
+jest.mock('react-oidc-context', () => ({
+  __esModule: true,
+  useAuth: () => ({ user: null }),
+}));
 
 jest.mock('./useFlyToSelectedSite', () => ({
   __esModule: true,

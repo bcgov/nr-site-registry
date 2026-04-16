@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Map } from 'leaflet';
 import {
-  useMapSearch_FindSiteBySiteIdQuery,
   MapSearch_FindSiteBySiteIdQuery,
   useMapSearch_AddCartItemMutation,
 } from '../../../../graphql/generated';
+import { gql, useQuery } from '@apollo/client';
 import {
   MagnifyingGlassPlusIcon,
   ShoppingCartIcon,
@@ -69,11 +69,62 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const auth = useAuth();
 
-  const { data, loading: siteDetailsLoading } =
-    useMapSearch_FindSiteBySiteIdQuery({
-      variables: { siteId: selectedSiteId || '' },
-      skip: !selectedSiteId,
-    });
+  const isAuthenticated = auth?.user != null;
+
+  const siteDetailsQuery = isAuthenticated
+    ? gql`
+        query SiteDetailsDrawer_findSiteBySiteId_loggedIn($siteId: String!) {
+          findSiteBySiteIdLoggedInUser(siteId: $siteId) {
+            data {
+              id
+              addrLine_1
+              addrLine_2
+              addrLine_3
+              addrLine_4
+              city
+              latdeg
+              longdeg
+              latDegrees
+              latMinutes
+              latSeconds
+              longDegrees
+              longMinutes
+              longSeconds
+              generalDescription
+              siteRiskCode
+            }
+          }
+        }
+      `
+    : gql`
+        query SiteDetailsDrawer_findSiteBySiteId_public($siteId: String!) {
+          findSiteBySiteId(siteId: $siteId) {
+            data {
+              id
+              addrLine_1
+              addrLine_2
+              addrLine_3
+              addrLine_4
+              city
+              latdeg
+              longdeg
+              latDegrees
+              latMinutes
+              latSeconds
+              longDegrees
+              longMinutes
+              longSeconds
+              generalDescription
+              siteRiskCode
+            }
+          }
+        }
+      `;
+
+  const { data, loading: siteDetailsLoading } = useQuery(siteDetailsQuery, {
+    variables: { siteId: selectedSiteId || '' },
+    skip: !selectedSiteId,
+  });
 
   const [addCartItem, { loading: addCartItemLoading }] =
     useMapSearch_AddCartItemMutation({
@@ -100,7 +151,9 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
     });
   };
 
-  const siteData = data?.findSiteBySiteId.data;
+  const siteData = isAuthenticated
+    ? data?.findSiteBySiteIdLoggedInUser?.data
+    : data?.findSiteBySiteId?.data;
 
   const zoomToSite = () => {
     if (!mapRef.current || !siteData || !siteData.latdeg || !siteData.longdeg)

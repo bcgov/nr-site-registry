@@ -4,7 +4,6 @@ import { MapContainer, TileLayer } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import clsx from 'clsx';
-import { gql, useQuery } from '@apollo/client';
 import { useAuth } from 'react-oidc-context';
 
 import { MyLocationMarker } from './MyLocationMarker'; // Import the MyLocationMarker component
@@ -12,7 +11,12 @@ import { MyLocationMarker } from './MyLocationMarker'; // Import the MyLocationM
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 import { MapSearch } from './MapSearch';
-import { MapSearchQuery, useMapSearchQuery } from '../../../graphql/generated';
+import {
+  MapSearchQuery,
+  useMapSearchQuery,
+  useMapSearch_FindSiteBySiteIdLoggedInUserQuery,
+  useMapSearch_FindSiteBySiteIdQuery,
+} from '../../../graphql/generated';
 import { SiteMarkers } from './siteMarkers/SiteMarkers';
 import { MapControls } from './MapControls';
 import {
@@ -36,32 +40,6 @@ import { buildMapSearchQueryVariables } from './mapSearchVariables';
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
 
 export type Site = MapSearchQuery['mapSearch']['data'][number];
-
-const MAP_VIEW_FIND_SITE_BY_SITE_ID_PUBLIC = gql`
-  query MapView_findSiteBySiteId_public($siteId: String!) {
-    findSiteBySiteId(siteId: $siteId) {
-      data {
-        id
-        addrLine_1
-        latdeg
-        longdeg
-      }
-    }
-  }
-`;
-
-const MAP_VIEW_FIND_SITE_BY_SITE_ID_LOGGED_IN = gql`
-  query MapView_findSiteBySiteId_loggedIn($siteId: String!) {
-    findSiteBySiteIdLoggedInUser(siteId: $siteId) {
-      data {
-        id
-        addrLine_1
-        latdeg
-        longdeg
-      }
-    }
-  }
-`;
 
 /**
  * Renders a map with a marker at the supplied location
@@ -108,21 +86,25 @@ function MapView() {
   const clearSites = () => setSites([]);
 
   const isAuthenticated = auth?.user != null;
-  const selectedSiteQuery = isAuthenticated
-    ? MAP_VIEW_FIND_SITE_BY_SITE_ID_LOGGED_IN
-    : MAP_VIEW_FIND_SITE_BY_SITE_ID_PUBLIC;
-
-  const { data: selectedSiteData, loading: selectedSiteLoading } = useQuery(
-    selectedSiteQuery,
-    {
+  const { data: publicSelectedSiteData, loading: publicSelectedSiteLoading } =
+    useMapSearch_FindSiteBySiteIdQuery({
       variables: { siteId: selectedSiteId ?? '' },
-      skip: !selectedSiteId,
-    },
-  );
+      skip: !selectedSiteId || isAuthenticated,
+    });
+  const {
+    data: loggedInSelectedSiteData,
+    loading: loggedInSelectedSiteLoading,
+  } = useMapSearch_FindSiteBySiteIdLoggedInUserQuery({
+    variables: { siteId: selectedSiteId ?? '' },
+    skip: !selectedSiteId || !isAuthenticated,
+  });
 
+  const selectedSiteLoading = isAuthenticated
+    ? loggedInSelectedSiteLoading
+    : publicSelectedSiteLoading;
   const selectedSite = isAuthenticated
-    ? selectedSiteData?.findSiteBySiteIdLoggedInUser?.data
-    : selectedSiteData?.findSiteBySiteId?.data;
+    ? loggedInSelectedSiteData?.findSiteBySiteIdLoggedInUser?.data
+    : publicSelectedSiteData?.findSiteBySiteId?.data;
 
   useEffect(() => {
     if (!selectedSiteId || selectedSiteLoading) return;

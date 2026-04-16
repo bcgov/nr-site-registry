@@ -122,6 +122,7 @@ export const CartTableColumns: TableColumn[] = [
       customInputTextCss: 'custom-cart-input-txt text-danger',
       tableMode: true,
       customIcon: <TrashCanIcon />,
+      customContainerCss: 'delete-icon-pointer',
     },
     customHeaderCss: 'custom-cart-table-header',
   },

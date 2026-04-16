@@ -103,7 +103,7 @@ export const DeleteIcon: React.FC<InputProps> = ({
   return renderTableCell(
     <div onClick={onChange}>
       <TrashCanIcon title="Remove" />
-      <span aria-label={label}>&nbsp;Remove</span>
+      <span aria-label={label}>Remove</span>
     </div>,
     stickyCol,
     customContainerCss,

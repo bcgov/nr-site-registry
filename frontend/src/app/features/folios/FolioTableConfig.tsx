@@ -129,6 +129,7 @@ export const getFolioTableColumnsBasedOnMode = (editMode: boolean) => {
           customLabelCss: 'link-for-table',
           customInputTextCss: 'link-for-table',
           tableMode: true,
+          customContainerCss: 'delete-icon-pointer',
         },
         'site/details/',
         true,

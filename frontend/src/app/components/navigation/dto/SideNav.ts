@@ -82,7 +82,7 @@ const roleBasedSideBarList: Record<string, SideNav[]> = {
     // ]),
     createSideNav('Account', true, null, '/', [
       createSideNav('Folios', false, icons.folios, '/folios'),
-      // createSideNav('Purchases', false, icons.purchases, '/purchases'),
+      createSideNav('Purchases', false, icons.purchases, '/purchases'),
     ]),
     createSideNav('Cart', false, icons.cart, '/site/cart', [], true),
   ],

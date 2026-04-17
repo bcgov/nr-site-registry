@@ -55,6 +55,7 @@ const Cart = () => {
   useEffect(() => {
     if (createSnapshotRequestStatus === RequestStatus.success) {
       showNotification(createSnapshotRequestStatus, 'Payment Successful');
+      dispatch(fetchCartItems());
       dispatch(resetCreateSnapshotForSitesStatus(null));
     } else {
       showNotification(

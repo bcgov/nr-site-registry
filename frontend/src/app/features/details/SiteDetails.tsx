@@ -1109,6 +1109,7 @@ const SiteDetails = () => {
     dispatch(
       setupSiteSummaryForSaving({
         ...details,
+        apiAction: UserActionEnum.updated,
         userAction: UserActionEnum.updated,
         srAction:
           event?.target?.checked === true

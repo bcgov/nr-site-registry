@@ -31,6 +31,7 @@ import {
 } from '../details/snapshot/SnapshotSlice';
 import { CreateSnapshotInputDto } from '../details/snapshot/ISnapshotState';
 import { TableColumn } from '../../components/table/TableColumn';
+import { Button } from '../../components/button/Button';
 
 const Cart = () => {
   const auth = useAuth();
@@ -55,6 +56,7 @@ const Cart = () => {
   useEffect(() => {
     if (createSnapshotRequestStatus === RequestStatus.success) {
       showNotification(createSnapshotRequestStatus, 'Payment Successful');
+      dispatch(fetchCartItems());
       dispatch(resetCreateSnapshotForSitesStatus(null));
     } else {
       showNotification(
@@ -153,10 +155,10 @@ const Cart = () => {
       {cartItemsArr.length > 0 && (
         <div className="cart-actions">
           <div className="continue-payment">
-            <span className="payment-text" onClick={() => handlePayment()}>
+            <Button onClick={handlePayment} className="payment-text">
               Continue to Payment
               <AngleRight />
-            </span>
+            </Button>
           </div>
           <div className="cart-total">
             <span className="cart-total-text">Subtotal</span>

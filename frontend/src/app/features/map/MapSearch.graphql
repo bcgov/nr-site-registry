@@ -32,6 +32,29 @@ query MapSearch_findSiteBySiteId($siteId: String!) {
   }
 }
 
+query MapSearch_findSiteBySiteIdLoggedInUser($siteId: String!) {
+  findSiteBySiteIdLoggedInUser(siteId: $siteId) {
+    data {
+      id
+      addrLine_1
+      addrLine_2
+      addrLine_3
+      addrLine_4
+      city
+      latdeg
+      longdeg
+      latDegrees
+      latMinutes
+      latSeconds
+      longDegrees
+      longMinutes
+      longSeconds
+      generalDescription
+      siteRiskCode
+    }
+  }
+}
+
 query MapSearch_filterSearchResults(
   $page: Int!
   $pageSize: Int!

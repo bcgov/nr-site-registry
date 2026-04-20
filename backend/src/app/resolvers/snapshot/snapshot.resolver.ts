@@ -7,6 +7,7 @@ import {
 } from 'nest-keycloak-connect';
 import { CreateSnapshotDto, SnapshotResponse } from '../../dto/snapshot.dto';
 import { BannerTypeResponse } from '../../dto/response/bannerTypeResponse';
+import { PurchasedSitesResponse } from '../../dto/purchasedSite.dto';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { SnapshotsService } from '../../services/snapshot/snapshot.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
@@ -222,6 +223,61 @@ export class SnapshotsResolver {
         HttpStatus.BAD_REQUEST,
         false,
       );
+    }
+  }
+
+  @Roles({
+    roles: [CustomRoles.External],
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => PurchasedSitesResponse, { name: 'getPurchasedSites' })
+  async getPurchasedSites(
+    @AuthenticatedUser() user: any,
+    @Args('page', { type: () => Int, nullable: true, defaultValue: 1 })
+    page: number,
+    @Args('pageSize', { type: () => Int, nullable: true, defaultValue: 10 })
+    pageSize: number,
+    @Args('sortBy', {
+      type: () => String,
+      nullable: true,
+      defaultValue: 'purchaseDate',
+    })
+    sortBy: string,
+    @Args('sortByDir', {
+      type: () => String,
+      nullable: true,
+      defaultValue: 'DESC',
+    })
+    sortByDir: string,
+  ) {
+    this.sitesLogger.log(
+      'SnapshotsResolver.getPurchasedSites() start userId: ' + user?.sub,
+    );
+    const result = await this.snapshotsService.getPurchasedSitesForUser(
+      user?.sub,
+      page,
+      pageSize,
+      sortBy,
+      sortByDir,
+    );
+    if (result?.data?.length > 0) {
+      this.sitesLogger.log('SnapshotsResolver.getPurchasedSites() RES:200 end');
+      return {
+        message: 'Purchased sites fetched successfully.',
+        httpStatusCode: HttpStatus.OK,
+        success: true,
+        data: result.data,
+        totalRecords: result.totalRecords,
+      };
+    } else {
+      this.sitesLogger.log('SnapshotsResolver.getPurchasedSites() RES:404 end');
+      return {
+        message: 'No purchased sites found.',
+        httpStatusCode: HttpStatus.NOT_FOUND,
+        success: true,
+        data: [],
+        totalRecords: 0,
+      };
     }
   }
 

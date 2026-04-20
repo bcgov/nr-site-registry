@@ -38,3 +38,30 @@ export const graphQLGetBannerType = () => {
     }
   `;
 };
+
+export const getPurchasedSitesQL = () => gql`
+  query getPurchasedSites(
+    $page: Int
+    $pageSize: Int
+    $sortBy: String
+    $sortByDir: String
+  ) {
+    getPurchasedSites(
+      page: $page
+      pageSize: $pageSize
+      sortBy: $sortBy
+      sortByDir: $sortByDir
+    ) {
+      httpStatusCode
+      message
+      totalRecords
+      data {
+        siteId
+        address
+        city
+        purchaseDate
+        status
+      }
+    }
+  }
+`;

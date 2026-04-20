@@ -1514,9 +1514,13 @@ export class SiteService {
             ...new Events(),
             ...eventData,
           };
-          const dbEvent = await this.eventsRepositoryRepo.findOneByOrFail({
-            id: notationId,
-          });
+          const dbEvent =
+            apiAction === UserActionEnum.DELETED ||
+            apiAction === UserActionEnum.RESTORED
+              ? await this.eventsRepositoryRepo.findOneByOrFail({
+                  id: notationId,
+                })
+              : null;
           switch (apiAction) {
             case UserActionEnum.ADDED:
               // Get the ID of the newly created event

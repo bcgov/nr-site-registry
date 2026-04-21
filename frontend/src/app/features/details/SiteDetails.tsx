@@ -69,6 +69,7 @@ import {
 } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
+import { notifyInfo } from '../../components/alert/Alert';
 import {
   fetchNotationParticipants,
   updateSiteNotation,
@@ -176,6 +177,7 @@ const SiteDetails = () => {
   const fromScreen = location.state?.fromLabel || 'Search'; // Default to "Unknown Screen" if no state is passed
   const fromPathRef = useRef(fromPath);
   const fromScreenRef = useRef(fromScreen);
+  const lastUnavailableToastSiteIdRef = useRef<string | null>(null);
   const loggedInUser = getUser();
   // TODO: this is for future use when we support automatic flow of creating new site for specific application.
   // We need applicationid and newly created siteId to fill cats db  in order to keep both application in sync.
@@ -400,6 +402,13 @@ const SiteDetails = () => {
     // Cart details: do not auto-redirect (user can use back / cart UI).
     if (location.pathname.includes('/site/cart/site/details/')) return;
 
+    if (lastUnavailableToastSiteIdRef.current !== id) {
+      notifyInfo(
+        'This site is private or unavailable. You have been returned to Search.',
+        'Site unavailable',
+      );
+      lastUnavailableToastSiteIdRef.current = id;
+    }
     navigate('/search', { replace: true });
   }, [
     id,

@@ -5,6 +5,7 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import clsx from 'clsx';
 import { useAuth } from 'react-oidc-context';
+import { notifyInfo } from '../../components/alert/Alert';
 
 import { MyLocationMarker } from './MyLocationMarker'; // Import the MyLocationMarker component
 
@@ -46,6 +47,7 @@ export type Site = MapSearchQuery['mapSearch']['data'][number];
  */
 function MapView() {
   const auth = useAuth();
+  const lastUnavailableToastSiteIdRef = useRef<string | null>(null);
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
   // Feature flag for turning OpenStreetMap tiles gray
@@ -109,6 +111,13 @@ function MapView() {
   useEffect(() => {
     if (!selectedSiteId || selectedSiteLoading) return;
     if (selectedSite) return;
+    if (lastUnavailableToastSiteIdRef.current !== selectedSiteId) {
+      notifyInfo(
+        'This site is private or unavailable. The map selection has been cleared.',
+        'Site unavailable',
+      );
+      lastUnavailableToastSiteIdRef.current = selectedSiteId;
+    }
     setQuery({ site: undefined }, 'replace');
   }, [selectedSiteId, selectedSiteLoading, selectedSite, setQuery]);
 

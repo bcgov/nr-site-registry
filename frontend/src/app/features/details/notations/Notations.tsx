@@ -234,12 +234,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Update form data when notations change
   useEffect(() => {
     if (status === RequestStatus.success && notations) {
-      const sourceNotations = mergeFetchedAndTrackedNotations(
-        notations,
-        trackNotation,
-      );
-
-      const psnOrgs = sourceNotations.flatMap((item: any) =>
+      const psnOrgs = notations.flatMap((item: any) =>
         Array.isArray(item.notationParticipant)
           ? item.notationParticipant.map((participant: any) => ({
               key: participant.psnorgId,
@@ -284,8 +279,8 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         );
       }
 
-      const unarchivedNotations = getUnarchivedNotations(sourceNotations);
-      const archivedNotations = getArchivedNotations(sourceNotations);
+      const unarchivedNotations = getUnarchivedNotations(notations);
+      const archivedNotations = getArchivedNotations(notations);
 
       setFormData((prev) =>
         areNotationsEqual(prev as any[], unarchivedNotations)
@@ -298,7 +293,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
           : archivedNotations,
       );
     }
-  }, [notations, status, trackNotation]);
+  }, [notations, status]);
 
   // Handle user type based on username
   useEffect(() => {
@@ -874,7 +869,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         true,
       );
       setFormData(getUnarchivedNotations(updateNotationParticipant));
-      dispatch(updateSiteNotation(updateNotationParticipant));
+      //dispatch(updateSiteNotation(updateNotationParticipant));
+      dispatch(
+        updateSiteNotation(getUnarchivedNotations(updateNotationParticipant)),
+      );
       // Update trackNotation without parameters
       const trackNotatn = updateParticipants(
         trackNotation ?? formData,

@@ -901,8 +901,7 @@ const SiteDetails = () => {
       // Run both validations in parallel and wait for them to finish
       if (siteNotation?.length > 0) {
         let updatedSiteNotations = deepFilterByUserAction(siteNotation, [
-          UserActionEnum.added,
-          UserActionEnum.updated,
+          ...userActions,
           UserActionEnum.deleted,
           UserActionEnum.restored,
         ]);
@@ -980,9 +979,9 @@ const SiteDetails = () => {
             participantIndex,
             notationParticipant,
           ] of notation.notationParticipant.entries()) {
-            if (notationParticipant?.apiAction === UserActionEnum.deleted) {
-              continue;
-            }
+            // if (notationParticipant?.apiAction === UserActionEnum.deleted) {
+            //   continue;
+            // }
             // Validate and accumulate errors for each notation participant
             const errors = validateForm(
               notationParticipantTable,

@@ -217,6 +217,8 @@ describe('SnapshotService', () => {
     whoUpdated: 'editor',
     whenCreated: new Date('2024-01-01T00:00:00Z'),
     whenUpdated: new Date('2024-01-01T00:00:00Z'),
+    whoDeleted: null,
+    whenDeleted: null,
     rwmFlag: 1,
     rwmGeneralDescFlag: 1,
     consultantSubmitted: 'Y',

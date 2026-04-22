@@ -1,0 +1,43 @@
+.delete-site-modal-content {
+  padding: 1rem 0;
+}
+
+.delete-site-modal-header {
+  color: var(--color-error, #d13438) !important;
+  font-weight: 600;
+}
+
+.delete-warning-text {
+  color: var(--color-error, #d13438);
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.delete-items-list {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--typography-color-primary, #313132);
+}
+
+.delete-items-list li {
+  margin-bottom: 0.5rem;
+}
+
+.delete-confirmation-instruction {
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  color: var(--typography-color-primary, #313132);
+}
+
+.delete-confirmation-input {
+  margin-bottom: 0.5rem;
+}
+
+.delete-confirmation-input.is-invalid {
+  border-color: var(--color-error, #d13438);
+}
+
+.delete-confirmation-input:focus {
+  border-color: var(--color-error, #d13438);
+  box-shadow: 0 0 0 0.2rem rgba(209, 52, 56, 0.25);
+}

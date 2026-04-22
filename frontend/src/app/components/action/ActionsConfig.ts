@@ -13,18 +13,26 @@ export const ActionItems: DropdownItem[] = [
     label: 'SR Mode',
     value: SiteDetailsMode.SRMode,
   },
-  {
-    label: 'Delete',
-    value: SiteDetailsMode.ViewOnlyMode,
-  },
 ];
 
 export const getActionItems = (
-  inlcudeSRApprovalOptions: boolean,
+  includeSRApprovalOptions: boolean,
+  isSRUser: boolean = false,
 ): DropdownItem[] => {
-  if (inlcudeSRApprovalOptions) {
-    return [
-      ...ActionItems,
+  let items = [...ActionItems];
+
+  // Add Delete Site option only for SR users
+  if (isSRUser) {
+    items.push({
+      label: 'Delete Site',
+      value: SiteActionBtn.DELETE_SITE,
+      danger: true,
+    });
+  }
+
+  // Add SR approval actions if needed
+  if (includeSRApprovalOptions) {
+    items.push(
       {
         label: 'Public All Changes',
         value: SiteActionBtn.ApproveAll,
@@ -33,8 +41,8 @@ export const getActionItems = (
         label: 'Private All Changes',
         value: SiteActionBtn.RejectAll,
       },
-    ];
-  } else {
-    return ActionItems;
+    );
   }
+
+  return items;
 };

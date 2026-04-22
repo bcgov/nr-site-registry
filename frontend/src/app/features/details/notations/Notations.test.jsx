@@ -471,7 +471,7 @@ jest.mock('./NotationsConfig', () => ({
             ),
             filteredOptions: [],
             isLoading: 'idle',
-            handleSearch: () => { },
+            handleSearch: () => {},
           },
         },
         {
@@ -551,7 +551,6 @@ jest.mock('./NotationsConfig', () => ({
     };
   }),
 }));
-
 
 jest.mock('react-redux', () => {
   const actualRedux = jest.requireActual('react-redux');
@@ -1173,7 +1172,7 @@ describe('Notations component', () => {
             ),
             filteredOptions: [],
             isLoading: 'idle',
-            handleSearch: () => { },
+            handleSearch: () => {},
           },
         },
         {

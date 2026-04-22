@@ -62,8 +62,8 @@ const { isUserOfType } = jest.requireMock('../../../helpers/utility');
 
 describe('LandUses – SR column visibility', () => {
   beforeEach(() => {
-    (useSelector as jest.Mock).mockImplementation(selector =>
-      selector(mockReduxState)
+    (useSelector as jest.Mock).mockImplementation((selector) =>
+      selector(mockReduxState),
     );
   });
 
@@ -73,13 +73,13 @@ describe('LandUses – SR column visibility', () => {
 
   it('shows SR column for internal users', async () => {
     isUserOfType.mockImplementation(
-      (role: string) => role === UserRoleType.INTERNAL
+      (role: string) => role === UserRoleType.INTERNAL,
     );
 
     render(
       <Provider store={store}>
         <LandUses />
-      </Provider>
+      </Provider>,
     );
 
     expect(await screen.findByText('SR')).toBeInTheDocument();

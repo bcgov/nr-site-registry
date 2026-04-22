@@ -832,6 +832,40 @@
                                     </td>
                                     <td></td>
                                 </tr>
+                                <tr>
+                                    <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="who_deleted">who_deleted</span></td>
+                                    <td>varchar</td>
+                                    <td>255</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>NULL::character varying</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="when_deleted">when_deleted</span></td>
+                                    <td>timestamp</td>
+                                    <td>29,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td></td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -867,6 +901,18 @@
                                     <td>Primary key</td>
                                     <td><span title='Ascending'>Asc</span></td>
                                     <td>id</td>
+                                </tr>
+                                <tr>
+                                    <td title='Indexed'>idx_sites_when_deleted</td>
+                                    <td>Performance</td>
+                                    <td><span title='Ascending'>Asc</span></td>
+                                    <td>when_deleted</td>
+                                </tr>
+                                <tr>
+                                    <td title='Indexed'>idx_sites_who_deleted</td>
+                                    <td>Performance</td>
+                                    <td><span title='Ascending'>Asc</span></td>
+                                    <td>who_deleted</td>
                                 </tr>
                                 <tr>
                                     <td title='Indexed'>site_bco</td>
@@ -948,7 +994,7 @@
                                     <div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">
                                         <map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
 <area shape="rect" id="node1" href="cart.html" target="_top" title="cart" alt="" coords="782,925,949,1101">
-<area shape="rect" id="node2" href="sites.html" target="_top" title="sites" alt="" coords="259,1485,659,2640">
+<area shape="rect" id="node2" href="sites.html" target="_top" title="sites" alt="" coords="259,1485,659,2699">
 <area shape="rect" id="node7" href="bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="15,1411,205,1528">
 <area shape="rect" id="node15" href="classification_cd.html" target="_top" title="classification_cd" alt="" coords="5,1957,215,2075">
 <area shape="rect" id="node16" href="site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="25,2456,195,2573">
@@ -970,49 +1016,49 @@
                                     </div>
                                     <div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">
                                         <map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
-<area shape="rect" id="node1" href="cart.html" target="_top" title="cart" alt="" coords="782,1355,949,1531">
-<area shape="rect" id="node2" href="sites.html" target="_top" title="sites" alt="" coords="259,1176,659,2331">
-<area shape="rect" id="node4" href="bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="15,605,205,693">
-<area shape="rect" id="node10" href="site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="15,956,205,1073">
-<area shape="rect" id="node29" href="classification_cd.html" target="_top" title="classification_cd" alt="" coords="5,1648,215,1765">
-<area shape="rect" id="node30" href="site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="25,2147,195,2264">
-<area shape="rect" id="node3" href="city_regions.html" target="_top" title="city_regions" alt="" coords="371,233,546,321">
+<area shape="rect" id="node1" href="cart.html" target="_top" title="cart" alt="" coords="782,2111,949,2287">
+<area shape="rect" id="node2" href="sites.html" target="_top" title="sites" alt="" coords="259,1159,659,2372">
+<area shape="rect" id="node4" href="bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="15,400,205,488">
+<area shape="rect" id="node10" href="site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="15,836,205,953">
+<area shape="rect" id="node29" href="classification_cd.html" target="_top" title="classification_cd" alt="" coords="5,1631,215,1748">
+<area shape="rect" id="node30" href="site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="25,2129,195,2247">
+<area shape="rect" id="node3" href="city_regions.html" target="_top" title="city_regions" alt="" coords="371,140,546,228">
 <area shape="rect" id="node5" href="conditions_text.html" target="_top" title="conditions_text" alt="" coords="1129,8,1332,96">
 <area shape="rect" id="node6" href="events.html" target="_top" title="events" alt="" coords="731,5,999,328">
-<area shape="rect" id="node9" href="event_type_cd.html" target="_top" title="event_type_cd" alt="" coords="363,339,555,427">
-<area shape="rect" id="node7" href="event_partics.html" target="_top" title="event_partics" alt="" coords="1137,196,1324,284">
-<area shape="rect" id="node8" href="people_orgs.html" target="_top" title="people_orgs" alt="" coords="371,568,546,656">
+<area shape="rect" id="node9" href="event_type_cd.html" target="_top" title="event_type_cd" alt="" coords="363,245,555,333">
+<area shape="rect" id="node7" href="event_partics.html" target="_top" title="event_partics" alt="" coords="1137,264,1324,352">
+<area shape="rect" id="node8" href="people_orgs.html" target="_top" title="people_orgs" alt="" coords="371,441,546,529">
 <area shape="rect" id="node11" href="folio_contents.html" target="_top" title="folio_contents" alt="" coords="769,2304,961,2480">
-<area shape="rect" id="node12" href="folio.html" target="_top" title="folio" alt="" coords="401,2365,516,2453">
+<area shape="rect" id="node12" href="folio.html" target="_top" title="folio" alt="" coords="401,2389,516,2477">
 <area shape="rect" id="node13" href="land_histories.html" target="_top" title="land_histories" alt="" coords="756,2497,975,2703">
 <area shape="rect" id="node14" href="land_use_cd.html" target="_top" title="land_use_cd" alt="" coords="372,2529,545,2617">
-<area shape="rect" id="node15" href="mailout.html" target="_top" title="mailout" alt="" coords="795,640,936,728">
-<area shape="rect" id="node16" href="recent_views.html" target="_top" title="recent_views" alt="" coords="763,1829,968,2035">
-<area shape="rect" id="node17" href="site_assocs.html" target="_top" title="site_assocs" alt="" coords="749,2052,982,2287">
+<area shape="rect" id="node15" href="mailout.html" target="_top" title="mailout" alt="" coords="795,345,936,433">
+<area shape="rect" id="node16" href="recent_views.html" target="_top" title="recent_views" alt="" coords="763,939,968,1144">
+<area shape="rect" id="node17" href="site_assocs.html" target="_top" title="site_assocs" alt="" coords="749,1161,982,1396">
 <area shape="rect" id="node18" href="site_contamination_class_xref.html" target="_top" title="site_contamination_class_xref" alt="" coords="1072,748,1389,836">
 <area shape="rect" id="node19" href="site_crown_land_contaminated.html" target="_top" title="site_crown_land_contaminated" alt="" coords="703,745,1028,921">
 <area shape="rect" id="node20" href="site_crown_land_status_cd.html" target="_top" title="site_crown_land_status_cd" alt="" coords="315,807,603,895">
-<area shape="rect" id="node21" href="site_doc_partics.html" target="_top" title="site_doc_partics" alt="" coords="1128,604,1333,692">
-<area shape="rect" id="node22" href="site_docs.html" target="_top" title="site_docs" alt="" coords="775,939,956,1115">
-<area shape="rect" id="node23" href="site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="1127,384,1335,472">
-<area shape="rect" id="node24" href="site_partics.html" target="_top" title="site_partics" alt="" coords="780,381,951,587">
-<area shape="rect" id="node25" href="site_profile_schedule2_ref.html" target="_top" title="site_profile_schedule2_ref" alt="" coords="1089,1697,1373,1785">
-<area shape="rect" id="node26" href="site_profiles.html" target="_top" title="site_profiles" alt="" coords="728,1548,1003,1812">
+<area shape="rect" id="node21" href="site_doc_partics.html" target="_top" title="site_doc_partics" alt="" coords="1128,636,1333,724">
+<area shape="rect" id="node22" href="site_docs.html" target="_top" title="site_docs" alt="" coords="775,1413,956,1589">
+<area shape="rect" id="node23" href="site_partic_roles.html" target="_top" title="site_partic_roles" alt="" coords="1127,525,1335,613">
+<area shape="rect" id="node24" href="site_partics.html" target="_top" title="site_partics" alt="" coords="780,523,951,728">
+<area shape="rect" id="node25" href="site_profile_schedule2_ref.html" target="_top" title="site_profile_schedule2_ref" alt="" coords="1089,1756,1373,1844">
+<area shape="rect" id="node26" href="site_profiles.html" target="_top" title="site_profiles" alt="" coords="728,1607,1003,1871">
 <area shape="rect" id="node27" href="site_subdivisions.html" target="_top" title="site_subdivisions" alt="" coords="753,2720,977,2925">
 <area shape="rect" id="node28" href="subdivisions.html" target="_top" title="subdivisions" alt="" coords="369,2752,548,2840">
-<area shape="rect" id="node31" href="snapshots.html" target="_top" title="snapshots" alt="" coords="782,1132,949,1337">
+<area shape="rect" id="node31" href="snapshots.html" target="_top" title="snapshots" alt="" coords="782,1888,949,2093">
 </map>
                                         <a name='diagram'><img id="twodegreesDegreeImg" src="../diagrams/tables/sites.2degrees.png" usemap="#twoDegreesRelationshipsDiagram" class="diagram" border="0" align="left"></a>
                                     </div>
                                     <div class="chart tab-pane " id="oneimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
                                         <map id="oneDegreeRelationshipsDiagramImplied" name="oneDegreeRelationshipsDiagramImplied">
 <area shape="rect" id="node1" href="cart.html" target="_top" title="cart" alt="" coords="1015,2068,1182,2244">
-<area shape="rect" id="node2" href="sites.html" target="_top" title="sites" alt="" coords="492,1427,892,2581">
-<area shape="rect" id="node3" href="city_regions.html" target="_top" title="city_regions" alt="" coords="256,2559,431,2681">
-<area shape="rect" id="node4" href="bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="5,2588,195,2705">
-<area shape="rect" id="node16" href="classification_cd.html" target="_top" title="classification_cd" alt="" coords="239,1899,448,2016">
-<area shape="rect" id="node17" href="site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="258,2397,429,2515">
-<area shape="rect" id="node18" href="site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="248,1535,439,1652">
+<area shape="rect" id="node2" href="sites.html" target="_top" title="sites" alt="" coords="492,1375,892,2588">
+<area shape="rect" id="node3" href="city_regions.html" target="_top" title="city_regions" alt="" coords="256,2565,431,2688">
+<area shape="rect" id="node4" href="bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="5,2595,195,2712">
+<area shape="rect" id="node16" href="classification_cd.html" target="_top" title="classification_cd" alt="" coords="239,1847,448,1964">
+<area shape="rect" id="node17" href="site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="258,2345,429,2463">
+<area shape="rect" id="node18" href="site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="248,1483,439,1600">
 <area shape="rect" id="node5" href="events.html" target="_top" title="events" alt="" coords="965,5,1233,328">
 <area shape="rect" id="node6" href="folio_contents.html" target="_top" title="folio_contents" alt="" coords="1003,345,1195,521">
 <area shape="rect" id="node7" href="land_histories.html" target="_top" title="land_histories" alt="" coords="989,539,1208,744">
@@ -1031,17 +1077,17 @@
                                     <div class="chart tab-pane " id="twoimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
                                         <map id="twoDegreesRelationshipsDiagramImplied" name="twoDegreesRelationshipsDiagramImplied">
 <area shape="rect" id="node1" href="cart.html" target="_top" title="cart" alt="" coords="1015,761,1182,937">
-<area shape="rect" id="node2" href="sites.html" target="_top" title="sites" alt="" coords="492,967,892,2121">
-<area shape="rect" id="node3" href="city_regions.html" target="_top" title="city_regions" alt="" coords="256,2209,431,2297">
-<area shape="rect" id="node4" href="bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="5,2245,195,2333">
-<area shape="rect" id="node10" href="site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="248,1052,439,1169">
-<area shape="rect" id="node30" href="classification_cd.html" target="_top" title="classification_cd" alt="" coords="239,1439,448,1556">
-<area shape="rect" id="node31" href="site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="258,1937,429,2055">
+<area shape="rect" id="node2" href="sites.html" target="_top" title="sites" alt="" coords="492,945,892,2159">
+<area shape="rect" id="node3" href="city_regions.html" target="_top" title="city_regions" alt="" coords="256,2247,431,2335">
+<area shape="rect" id="node4" href="bce_region_cd.html" target="_top" title="bce_region_cd" alt="" coords="5,2283,195,2371">
+<area shape="rect" id="node10" href="site_status_cd.html" target="_top" title="site_status_cd" alt="" coords="248,1031,439,1148">
+<area shape="rect" id="node30" href="classification_cd.html" target="_top" title="classification_cd" alt="" coords="239,1417,448,1535">
+<area shape="rect" id="node31" href="site_risk_cd.html" target="_top" title="site_risk_cd" alt="" coords="258,1916,429,2033">
 <area shape="rect" id="node5" href="conditions_text.html" target="_top" title="conditions_text" alt="" coords="1363,8,1565,96">
 <area shape="rect" id="node6" href="events.html" target="_top" title="events" alt="" coords="965,5,1233,328">
 <area shape="rect" id="node9" href="event_type_cd.html" target="_top" title="event_type_cd" alt="" coords="596,213,788,301">
 <area shape="rect" id="node7" href="event_partics.html" target="_top" title="event_partics" alt="" coords="1371,977,1557,1065">
-<area shape="rect" id="node8" href="people_orgs.html" target="_top" title="people_orgs" alt="" coords="605,2352,779,2440">
+<area shape="rect" id="node8" href="people_orgs.html" target="_top" title="people_orgs" alt="" coords="605,2389,779,2477">
 <area shape="rect" id="node11" href="folio_contents.html" target="_top" title="folio_contents" alt="" coords="1003,345,1195,521">
 <area shape="rect" id="node12" href="folio.html" target="_top" title="folio" alt="" coords="635,407,749,495">
 <area shape="rect" id="node13" href="land_histories.html" target="_top" title="land_histories" alt="" coords="989,539,1208,744">
@@ -1060,7 +1106,7 @@
 <area shape="rect" id="node26" href="site_profile_schedule2_ref.html" target="_top" title="site_profile_schedule2_ref" alt="" coords="1322,1948,1606,2036">
 <area shape="rect" id="node27" href="site_profiles.html" target="_top" title="site_profiles" alt="" coords="1011,1951,1187,2039">
 <area shape="rect" id="node28" href="site_subdivisions.html" target="_top" title="site_subdivisions" alt="" coords="987,1623,1211,1828">
-<area shape="rect" id="node29" href="subdivisions.html" target="_top" title="subdivisions" alt="" coords="603,2139,781,2227">
+<area shape="rect" id="node29" href="subdivisions.html" target="_top" title="subdivisions" alt="" coords="603,2176,781,2264">
 <area shape="rect" id="node32" href="snapshots.html" target="_top" title="snapshots" alt="" coords="1015,1207,1182,1412">
 </map>
                                         <a name='diagram'><img id="twoimpliedDegreeImg" src="../diagrams/tables/sites.implied2degrees.png" usemap="#twoDegreesRelationshipsDiagramImplied" class="diagram" border="0" align="left"></a>

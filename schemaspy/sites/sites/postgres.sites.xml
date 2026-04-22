@@ -1415,9 +1415,17 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="34" name="geometry" nullable="true" remarks="" size="2147483647" type="geometry" typeCode="1111"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="35" name="user_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="36" name="sr_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="NULL::character varying" digits="0" id="37" name="who_deleted" nullable="true" remarks="" size="255" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="38" name="when_deleted" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
          <primaryKey column="id" sequenceNumberInPK="1"/>
          <index name="PK_4f5eccb1dfde10c9170502595a7" unique="true">
             <column ascending="true" name="id"/>
+         </index>
+         <index name="idx_sites_when_deleted" unique="false">
+            <column ascending="true" name="when_deleted"/>
+         </index>
+         <index name="idx_sites_who_deleted" unique="false">
+            <column ascending="true" name="who_deleted"/>
          </index>
          <index name="site_bco" unique="false">
             <column ascending="true" name="bcer_code"/>

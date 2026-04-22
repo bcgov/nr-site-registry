@@ -17,6 +17,7 @@ import { DropdownItem } from '../../../components/action/IActions';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
 import { Button } from '../../../components/button/Button';
 import { formatDate, parseDate } from '../../../helpers/utility';
+import StatusBanner from '../../../components/status/StatusBanner';
 
 // sonar-new-code-anchor
 
@@ -55,6 +56,7 @@ interface INotationProps {
   approveRejectHandler?: (value: boolean) => void;
   showApproveRejectSection?: boolean;
   isArchived?: boolean;
+  isRestored?: boolean;
 }
 
 const Notation: React.FC<INotationProps> = ({
@@ -82,6 +84,7 @@ const Notation: React.FC<INotationProps> = ({
   approveRejectHandler,
   showApproveRejectSection,
   isArchived = false,
+  isRestored = false,
 }) => {
   showApproveRejectSection = showApproveRejectSection ?? false;
 
@@ -122,6 +125,12 @@ const Notation: React.FC<INotationProps> = ({
     <PanelWithUpDown
       firstChild={
         <div className="w-100" key={`notation-first-${notation?.id}`}>
+          {isArchived && showApproveRejectSection && (
+            <StatusBanner variant="archived" />
+          )}
+          {isRestored && showApproveRejectSection && (
+            <StatusBanner variant="restored" />
+          )}
           <Form
             formRows={handleNotationFormRowFirstChild(notation)}
             formData={notation}
@@ -139,6 +148,12 @@ const Notation: React.FC<INotationProps> = ({
       }
       secondChild={
         <div className="w-100" key={`notation-first-${notation?.id}`}>
+          {isArchived && showApproveRejectSection && (
+            <StatusBanner variant="archived" />
+          )}
+          {isRestored && showApproveRejectSection && (
+            <StatusBanner variant="restored" />
+          )}
           <Form
             formRows={
               userType === UserType.External

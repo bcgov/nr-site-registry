@@ -725,6 +725,11 @@ const SRUpdates = () => {
                 approveRejectHandler={(value) =>
                   handleNotationApproveRejectHandler(notation, value)
                 }
+                isArchived={notation?.whenDeleted != null}
+                isRestored={
+                  notation?.whenRestored != null &&
+                  notation?.whenDeleted == null
+                }
               />
             </ApproveReject>
           );

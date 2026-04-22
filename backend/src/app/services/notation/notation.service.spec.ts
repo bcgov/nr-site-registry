@@ -631,7 +631,7 @@ describe('NotationService', () => {
       await service.getSiteNotationBySiteId(siteId, true, user, false);
 
       expect(notationRepository.find).toHaveBeenCalledWith({
-        where: { siteId, srAction: 'pending', whenDeleted: null },
+        where: { siteId, srAction: 'pending' },
       });
     });
   });

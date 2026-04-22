@@ -17,6 +17,7 @@ import associatedSitesReducer from './features/details/associates/AssociateSlice
 import parcelDescriptionsReducer from './features/details/parcelDescriptions/parcelDescriptionsSlice';
 import srUpdatesReducer from './features/details/srUpdates/srUpdatesSlice';
 import srReviewReducer from './features/details/srUpdates/state/srUpdatesTableSlice';
+import purchasesReducer from './features/purchases/PurchasesSlice';
 import siteSerchReducer from './features/site/SiteSearchSlice';
 
 const persistedStore: any = loadFromLocalStorage();
@@ -40,6 +41,7 @@ export const store = configureStore({
     parcelDescriptions: parcelDescriptionsReducer,
     srUpdates: srUpdatesReducer,
     srReview: srReviewReducer,
+    purchases: purchasesReducer,
     siteSearch: siteSerchReducer,
   },
   middleware: (getDefaultMiddleware) =>

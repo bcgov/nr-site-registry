@@ -593,6 +593,43 @@ export class SiteService {
     }
   }
 
+  async getMostRecentSnapshotForUser(
+    siteId: string,
+    userInfo: any,
+  ): Promise<Snapshots | null> {
+    if (!userInfo) {
+      this.sitesLogger.log('SiteService.findSiteBySiteId() user not logged in');
+      return null;
+    }
+
+    if (userInfo?.identity_provider === UserTypeEum.IDIR) {
+      this.sitesLogger.log(
+        'SiteService.findSiteBySiteId() idir user - no snapshot',
+      );
+      return null;
+    }
+
+    return await this.snapShotService.getMostRecentSnapshot(
+      siteId,
+      userInfo.sub,
+    );
+  }
+
+  buildFindSiteBySiteIdWhereClause(
+    siteId: string,
+    pending: boolean,
+    userInfo: any,
+  ) {
+    if (pending) {
+      return { id: siteId, srAction: SRApprovalStatusEnum.PENDING };
+    }
+
+    const isIdir = userInfo?.identity_provider === UserTypeEum.IDIR;
+    return isIdir
+      ? { id: siteId }
+      : { id: siteId, srAction: SRApprovalStatusEnum.PUBLIC };
+  }
+
   /**
    * Find sites by its ID
    * @param siteId site Id
@@ -619,47 +656,24 @@ export class SiteService {
       return response;
     }
 
-    let snapShot: Snapshots = null;
-
-    if (!userInfo) {
-      this.sitesLogger.log('SiteService.findSiteBySiteId() user not logged in');
-
-      snapShot = null;
-    } else if (userInfo?.identity_provider === 'idir') {
-      this.sitesLogger.log(
-        'SiteService.findSiteBySiteId() idir user - no snapshot',
-      );
-    } else {
-      snapShot = await this.snapShotService.getMostRecentSnapshot(
-        siteId,
-        userInfo.sub,
-      );
-    }
-
-    if (!snapShot) {
-      if (pending) {
-        const result = await this.siteRepository.findOne({
-          where: {
-            id: siteId,
-            srAction: SRApprovalStatusEnum.PENDING,
-            whoDeleted: IsNull(),
-          },
-          relations: ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'],
-        });
-        response.data = result ? result : null;
-      } else {
-        const result = await this.siteRepository.findOne({
-          where: {
-            id: siteId,
-            whoDeleted: IsNull(),
-          },
-          relations: ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'],
-        });
-        response.data = result ? result : null;
-      }
-    } else {
+    const snapShot = await this.getMostRecentSnapshotForUser(siteId, userInfo);
+    if (snapShot) {
       response.data = snapShot.snapshotData?.sitesSummary;
+      this.sitesLogger.log('SiteService.findSiteBySiteId() end');
+      this.sitesLogger.debug('SiteService.findSiteBySiteId() end');
+      return response;
     }
+
+    const whereClause = this.buildFindSiteBySiteIdWhereClause(
+      siteId,
+      pending,
+      userInfo,
+    );
+    const result = await this.siteRepository.findOne({
+      where: whereClause,
+      relations: ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'],
+    });
+    response.data = result ? result : null;
 
     this.sitesLogger.log('SiteService.findSiteBySiteId() end');
     this.sitesLogger.debug('SiteService.findSiteBySiteId() end');
@@ -1552,9 +1566,13 @@ export class SiteService {
             ...new Events(),
             ...eventData,
           };
-          const dbEvent = await this.eventsRepositoryRepo.findOneByOrFail({
-            id: notationId,
-          });
+          const dbEvent =
+            apiAction === UserActionEnum.DELETED ||
+            apiAction === UserActionEnum.RESTORED
+              ? await this.eventsRepositoryRepo.findOneByOrFail({
+                  id: notationId,
+                })
+              : null;
           switch (apiAction) {
             case UserActionEnum.ADDED:
               // Get the ID of the newly created event

@@ -4,7 +4,6 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { Brackets, EntityManager, FindOneOptions, Repository } from 'typeorm';
 import { SiteService, sortSRReviewTableResults } from './site.service';
 import { Sites } from '../../entities/sites.entity';
-import { FetchSiteDetail } from '../../dto/response/genericResponse';
 import { sampleSites } from '../../mockData/site.mockData';
 import { EventPartics } from '../../entities/eventPartics.entity';
 import { SitePartics } from '../../entities/sitePartics.entity';
@@ -64,7 +63,9 @@ describe('SiteService', () => {
         SiteService,
         {
           provide: SnapshotsService,
-          useValue: {},
+          useValue: {
+            getMostRecentSnapshot: jest.fn().mockResolvedValue(null),
+          },
         },
         {
           provide: LandHistoryService,
@@ -98,7 +99,7 @@ describe('SiteService', () => {
             findOneOrFail: jest.fn(() => {
               return { id: '123', region_name: 'victoria' };
             }),
-            findOne: jest.fn(),
+            findOne: jest.fn().mockResolvedValue(null),
             save: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
@@ -609,39 +610,58 @@ describe('SiteService', () => {
     });
   });
 
-  describe.skip('findSiteBySiteId', () => {
-    it('should call findOneOrFail method of the repository with the provided siteId', async () => {
-      const siteId = '123';
+  describe('findSiteBySiteId', () => {
+    const relations = ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'];
+
+    it('unauthenticated user without snapshot loads non-pending site by id and public srAction only', async () => {
+      const siteId = '999';
+      (siteRepository.findOne as jest.Mock).mockResolvedValue({
+        id: siteId,
+        srAction: SRApprovalStatusEnum.PUBLIC,
+      });
+
       await siteService.findSiteBySiteId(siteId, false, null);
-      expect(siteRepository.findOneOrFail).toHaveBeenCalledWith({
-        where: { id: siteId },
+
+      expect(siteRepository.findOne).toHaveBeenCalledWith({
+        where: { id: siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        relations,
       });
     });
 
-    it('should return the site when findOneOrFail method of the repository resolves', async () => {
-      const siteId = '123';
-      const expectedResult: FetchSiteDetail = {
-        httpStatusCode: 200,
-        data: sampleSites[0],
-      };
-      (siteRepository.findOneOrFail as jest.Mock).mockResolvedValue(
-        expectedResult,
-      );
+    it('non-IDIR user without snapshot loads non-pending site by id and public srAction only', async () => {
+      const siteId = '888';
+      // First call is the deletion-check (select id + whoDeleted); second is the actual site lookup
+      (siteRepository.findOne as jest.Mock)
+        .mockResolvedValueOnce({ id: siteId, whoDeleted: null })
+        .mockResolvedValueOnce(null);
 
-      const result = await siteService.findSiteBySiteId(siteId, false, null);
+      await siteService.findSiteBySiteId(siteId, false, {
+        sub: 'user-1',
+        identity_provider: 'bceid',
+      });
 
-      expect(result).toBeInstanceOf(FetchSiteDetail);
-      expect(result.httpStatusCode).toBe(200);
-      expect(result.data).toEqual(expectedResult);
+      expect(siteRepository.findOne).toHaveBeenCalledWith({
+        where: { id: siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        relations,
+      });
     });
 
-    it('should throw an error when findOneOrFail method of the repository rejects', async () => {
-      const siteId = '111';
-      const error = new Error('Site not found');
-      (siteRepository.findOneOrFail as jest.Mock).mockRejectedValue(error);
-      await expect(
-        siteService.findSiteBySiteId(siteId, false, null),
-      ).rejects.toThrowError(error);
+    it('IDIR user without snapshot loads non-pending site by id without srAction filter', async () => {
+      const siteId = '777';
+      (siteRepository.findOne as jest.Mock).mockResolvedValue({
+        id: siteId,
+        srAction: SRApprovalStatusEnum.PRIVATE,
+      });
+
+      await siteService.findSiteBySiteId(siteId, false, {
+        sub: 'idir-user',
+        identity_provider: 'idir',
+      });
+
+      expect(siteRepository.findOne).toHaveBeenCalledWith({
+        where: { id: siteId },
+        relations,
+      });
     });
   });
 
@@ -1710,7 +1730,7 @@ describe('SiteService', () => {
       );
     });
 
-    it('should apply public-only visibility filter when userInfo is missing (anonymous)', () => {
+    it('should apply public-only visibility filter when userInfo is missing (unauthenticated)', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
@@ -1964,7 +1984,7 @@ describe('SiteService', () => {
       );
     });
 
-    it('should apply public-only visibility filter when userInfo is missing (anonymous) (sites only)', async () => {
+    it('should apply public-only visibility filter when userInfo is missing (unauthenticated) (sites only)', async () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),

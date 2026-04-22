@@ -8,6 +8,7 @@ import Dashboard from '../features/dashboard/Dashboard';
 import Cart from '../features/cart/Cart';
 import Folios from '../features/folios/Folios';
 import FolioContents from '../features/folios/FolioContent';
+import Purchases from '../features/purchases/Purchases';
 import App from '../../App';
 import MapView from '../features/map/MapView';
 import SRUpdatesTables from '../features/details/srUpdates/srUpdatesTables';
@@ -32,6 +33,7 @@ export const roleBasedRoutes: Record<UserRoleType, AppRoute[]> = {
     { path: '/map', element: <MapView /> },
     { path: '/map/:id', element: <MapView /> },
     { path: '/site/cart', element: <Cart /> },
+    { path: '/purchases', element: <Purchases /> },
     { path: '/review', element: <SRUpdatesTables /> },
     { path: '/site/cart/site/details/:id', element: <SiteDetails /> },
   ],

@@ -1,21 +1,21 @@
 .status-banner {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .status-banner-text {
-    padding: 0.5rem;
-    border-radius: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
 }
 
 .status-banner--archived .status-banner-text {
-    background-color: var(--typography-color-danger);
-    color: var(--typography-color-primary-invert);
+  background-color: var(--typography-color-danger);
+  color: var(--typography-color-primary-invert);
 }
 
 .status-banner--restored .status-banner-text {
-    background-color: var(--typography-color-secondary-invert);
-    color: var(--typography-color-link);
+  background-color: var(--typography-color-secondary-invert);
+  color: var(--typography-color-link);
 }

@@ -33,7 +33,6 @@ import { Button } from '../../components/button/Button';
 const Search = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchText, setSearchText] = useState('');
-  const [noUserAction, setUserAction] = useState(true);
   const debouncedSearchText = useDebouncedValue(searchText);
   const columns = getSiteSearchResultsColumns();
   const [columnsToDisplay, setColumnsToDisplay] = useState<TableColumn[]>([
@@ -100,7 +99,6 @@ const Search = () => {
 
   const handleClearSearch = () => {
     setSearchText('');
-    setUserAction(true);
     dispatch(resetSiteSearch());
   };
 
@@ -130,7 +128,6 @@ const Search = () => {
   const handleTextChange = (event: any) => {
     const value = event.target.value;
     setSearchText(value);
-    setUserAction(false);
 
     if (value.length === 0) {
       dispatch(resetSiteSearch());
@@ -351,6 +348,9 @@ const Search = () => {
     }
     setPanelToShow(panel);
   };
+
+  const noUserAction = sites.length === 0 && searchText.length === 0;
+
   return (
     <PageContainer role="Search" aria-label="Search">
       <div className="search-container">

@@ -86,9 +86,19 @@ jest.mock('../../../graphql/generated', () => {
     },
     useMapSearch_FindSiteBySiteIdQuery: () => ({
       data: undefined,
+      loading: false,
+    }),
+    useMapSearch_FindSiteBySiteIdLoggedInUserQuery: () => ({
+      data: undefined,
+      loading: false,
     }),
   };
 });
+
+jest.mock('react-oidc-context', () => ({
+  __esModule: true,
+  useAuth: () => ({ user: null }),
+}));
 
 jest.mock('./useFlyToSelectedSite', () => ({
   __esModule: true,
@@ -157,6 +167,7 @@ describe('MapView', () => {
       center: null,
       radius: 1000,
       selectedSiteId: null,
+      setQuery: jest.fn(),
     });
 
     // Sanity check: the mocked GraphQL hook must return the shape that
@@ -219,6 +230,7 @@ describe('MapView', () => {
       center: null,
       radius: 1000,
       selectedSiteId: null,
+      setQuery: jest.fn(),
     });
 
     render(<MapView />);

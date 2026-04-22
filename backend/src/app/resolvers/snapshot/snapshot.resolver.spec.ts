@@ -27,6 +27,7 @@ describe('SnapshotResolver', () => {
             getSnapshotsById: jest.fn(),
             createSnapshotForSites: jest.fn(),
             getBannerType: jest.fn(),
+            getPurchasedSitesForUser: jest.fn(),
           },
         },
         {
@@ -524,6 +525,99 @@ describe('SnapshotResolver', () => {
       const result = await resolver.getBannerType(siteId, userId);
 
       expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getPurchasedSites', () => {
+    const mockUser = { sub: 'user-123' };
+
+    it('should return purchased sites with HTTP status 200', async () => {
+      const mockResult = {
+        data: [
+          {
+            siteId: '100',
+            address: '123 Main St',
+            city: 'Victoria',
+            purchaseDate: new Date('2026-01-15'),
+            status: 'current',
+          },
+        ],
+        totalRecords: 1,
+      };
+
+      jest
+        .spyOn(service, 'getPurchasedSitesForUser')
+        .mockResolvedValueOnce(mockResult);
+
+      const result = await resolver.getPurchasedSites(
+        mockUser,
+        1,
+        10,
+        'purchaseDate',
+        'DESC',
+      );
+
+      expect(result.httpStatusCode).toEqual(200);
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual(mockResult.data);
+      expect(result.totalRecords).toEqual(1);
+      expect(service.getPurchasedSitesForUser).toHaveBeenCalledWith(
+        'user-123',
+        1,
+        10,
+        'purchaseDate',
+        'DESC',
+      );
+    });
+
+    it('should return 404 when no purchased sites found', async () => {
+      const mockResult = { data: [], totalRecords: 0 };
+
+      jest
+        .spyOn(service, 'getPurchasedSitesForUser')
+        .mockResolvedValueOnce(mockResult);
+
+      const result = await resolver.getPurchasedSites(
+        mockUser,
+        1,
+        10,
+        'purchaseDate',
+        'DESC',
+      );
+
+      expect(result.httpStatusCode).toEqual(404);
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual([]);
+      expect(result.totalRecords).toEqual(0);
+    });
+
+    it('should pass custom pagination and sort params to service', async () => {
+      const mockResult = {
+        data: [
+          {
+            siteId: '200',
+            address: '456 Oak Ave',
+            city: 'Vancouver',
+            purchaseDate: new Date('2026-03-01'),
+            status: 'outdated',
+          },
+        ],
+        totalRecords: 1,
+      };
+
+      jest
+        .spyOn(service, 'getPurchasedSitesForUser')
+        .mockResolvedValueOnce(mockResult);
+
+      await resolver.getPurchasedSites(mockUser, 2, 5, 'siteId', 'ASC');
+
+      expect(service.getPurchasedSitesForUser).toHaveBeenCalledWith(
+        'user-123',
+        2,
+        5,
+        'siteId',
+        'ASC',
+      );
     });
   });
 });

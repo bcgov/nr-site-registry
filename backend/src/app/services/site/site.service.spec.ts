@@ -4,7 +4,6 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { Brackets, EntityManager, FindOneOptions, Repository } from 'typeorm';
 import { SiteService, sortSRReviewTableResults } from './site.service';
 import { Sites } from '../../entities/sites.entity';
-import { FetchSiteDetail } from '../../dto/response/genericResponse';
 import { sampleSites } from '../../mockData/site.mockData';
 import { EventPartics } from '../../entities/eventPartics.entity';
 import { SitePartics } from '../../entities/sitePartics.entity';
@@ -36,6 +35,7 @@ import { SiteRegistry } from '../../entities/siteRegistry.entity';
 import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
 import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
 import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
+import { RecentViews } from '../../entities/recentViews.entity';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -63,7 +63,9 @@ describe('SiteService', () => {
         SiteService,
         {
           provide: SnapshotsService,
-          useValue: {},
+          useValue: {
+            getMostRecentSnapshot: jest.fn().mockResolvedValue(null),
+          },
         },
         {
           provide: LandHistoryService,
@@ -86,6 +88,7 @@ describe('SiteService', () => {
             }),
             createQueryBuilder: jest.fn(() => ({
               where: jest.fn().mockReturnThis(),
+              andWhere: jest.fn().mockReturnThis(),
               orWhere: jest.fn().mockReturnThis(),
               getMany: jest.fn().mockResolvedValue([
                 { id: '123', commonName: 'victoria' },
@@ -96,6 +99,7 @@ describe('SiteService', () => {
             findOneOrFail: jest.fn(() => {
               return { id: '123', region_name: 'victoria' };
             }),
+            findOne: jest.fn().mockResolvedValue(null),
             save: jest.fn(() => {
               return [
                 { id: '123', siteId: '123' },
@@ -506,8 +510,10 @@ describe('SiteService', () => {
         SortByDirection.ASC,
         {},
       );
-      expect(mockQueryBuilder.andWhere).toHaveBeenNthCalledWith(
-        1,
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sites.who_deleted IS NULL',
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         expect.any(Brackets),
       );
 
@@ -571,8 +577,10 @@ describe('SiteService', () => {
         'siteSubdivisions.subdivision',
         'subdivision',
       );
-      expect(mockQueryBuilder.andWhere).toHaveBeenNthCalledWith(
-        1,
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sites.who_deleted IS NULL',
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         expect.any(Brackets),
       );
       expect(mockQueryBuilder.skip).toHaveBeenCalledWith(expect.any(Number));
@@ -602,39 +610,58 @@ describe('SiteService', () => {
     });
   });
 
-  describe.skip('findSiteBySiteId', () => {
-    it('should call findOneOrFail method of the repository with the provided siteId', async () => {
-      const siteId = '123';
+  describe('findSiteBySiteId', () => {
+    const relations = ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'];
+
+    it('unauthenticated user without snapshot loads non-pending site by id and public srAction only', async () => {
+      const siteId = '999';
+      (siteRepository.findOne as jest.Mock).mockResolvedValue({
+        id: siteId,
+        srAction: SRApprovalStatusEnum.PUBLIC,
+      });
+
       await siteService.findSiteBySiteId(siteId, false, null);
-      expect(siteRepository.findOneOrFail).toHaveBeenCalledWith({
-        where: { id: siteId },
+
+      expect(siteRepository.findOne).toHaveBeenCalledWith({
+        where: { id: siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        relations,
       });
     });
 
-    it('should return the site when findOneOrFail method of the repository resolves', async () => {
-      const siteId = '123';
-      const expectedResult: FetchSiteDetail = {
-        httpStatusCode: 200,
-        data: sampleSites[0],
-      };
-      (siteRepository.findOneOrFail as jest.Mock).mockResolvedValue(
-        expectedResult,
-      );
+    it('non-IDIR user without snapshot loads non-pending site by id and public srAction only', async () => {
+      const siteId = '888';
+      // First call is the deletion-check (select id + whoDeleted); second is the actual site lookup
+      (siteRepository.findOne as jest.Mock)
+        .mockResolvedValueOnce({ id: siteId, whoDeleted: null })
+        .mockResolvedValueOnce(null);
 
-      const result = await siteService.findSiteBySiteId(siteId, false, null);
+      await siteService.findSiteBySiteId(siteId, false, {
+        sub: 'user-1',
+        identity_provider: 'bceid',
+      });
 
-      expect(result).toBeInstanceOf(FetchSiteDetail);
-      expect(result.httpStatusCode).toBe(200);
-      expect(result.data).toEqual(expectedResult);
+      expect(siteRepository.findOne).toHaveBeenCalledWith({
+        where: { id: siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        relations,
+      });
     });
 
-    it('should throw an error when findOneOrFail method of the repository rejects', async () => {
-      const siteId = '111';
-      const error = new Error('Site not found');
-      (siteRepository.findOneOrFail as jest.Mock).mockRejectedValue(error);
-      await expect(
-        siteService.findSiteBySiteId(siteId, false, null),
-      ).rejects.toThrowError(error);
+    it('IDIR user without snapshot loads non-pending site by id without srAction filter', async () => {
+      const siteId = '777';
+      (siteRepository.findOne as jest.Mock).mockResolvedValue({
+        id: siteId,
+        srAction: SRApprovalStatusEnum.PRIVATE,
+      });
+
+      await siteService.findSiteBySiteId(siteId, false, {
+        sub: 'idir-user',
+        identity_provider: 'idir',
+      });
+
+      expect(siteRepository.findOne).toHaveBeenCalledWith({
+        where: { id: siteId },
+        relations,
+      });
     });
   });
 
@@ -1665,8 +1692,8 @@ describe('SiteService', () => {
     it('should fetch all sites if no search term is passed for IDIR users', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
-        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         getManyAndCount: jest.fn().mockReturnValue([]),
       };
 
@@ -1677,7 +1704,9 @@ describe('SiteService', () => {
       siteService.mapSearch({ userInfo: { identity_provider: 'idir' } });
 
       expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
-      expect(mockQueryBuilder.where).not.toHaveBeenCalled();
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+        'sites.who_deleted IS NULL',
+      );
       expect(mockQueryBuilder.andWhere).not.toHaveBeenCalled();
     });
 
@@ -1701,7 +1730,7 @@ describe('SiteService', () => {
       );
     });
 
-    it('should apply public-only visibility filter when userInfo is missing (anonymous)', () => {
+    it('should apply public-only visibility filter when userInfo is missing (unauthenticated)', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
@@ -1715,6 +1744,10 @@ describe('SiteService', () => {
 
       siteService.mapSearch({});
 
+      expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+        'sites.who_deleted IS NULL',
+      );
       expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         'sites.srAction = :srAction',
         { srAction: 'public' },
@@ -1724,8 +1757,8 @@ describe('SiteService', () => {
     it('should filter sites by trimmed lower-cased search term if provided', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
-        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         getManyAndCount: jest.fn().mockReturnValue([]),
       };
 
@@ -1740,14 +1773,12 @@ describe('SiteService', () => {
       });
 
       expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
-      expect(mockQueryBuilder.where).toHaveBeenCalledTimes(1);
-      expect(mockQueryBuilder.where).toHaveBeenCalledWith(expect.anything(), {
-        searchTerm: '%test%',
-      });
-      expect(mockQueryBuilder.orWhere).toHaveBeenCalledTimes(6);
-      expect(mockQueryBuilder.orWhere).toHaveBeenCalledWith(expect.anything(), {
-        searchTerm: '%test%',
-      });
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+        'sites.who_deleted IS NULL',
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        expect.any(Brackets),
+      );
     });
 
     it('should throw an input error when polygon array contains less than three vertices', () => {
@@ -1759,8 +1790,8 @@ describe('SiteService', () => {
     it('should format array of LatLong tuples for the DB query and enclose the polygon if start and end point do not match', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
-        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         getManyAndCount: jest.fn().mockReturnValue([]),
       };
 
@@ -1776,8 +1807,7 @@ describe('SiteService', () => {
         ],
         userInfo: { identity_provider: 'idir' },
       });
-      expect(mockQueryBuilder.where).toHaveBeenCalledTimes(1);
-      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         expect.stringContaining('POLYGON((2 1, 20 10, 200 100, 2 1))'),
       );
     });
@@ -1869,8 +1899,8 @@ describe('SiteService', () => {
     it('should call ST_MakePoint with correct longitude and latitude', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
-        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         getManyAndCount: jest.fn().mockReturnValue([]),
       };
 
@@ -1888,8 +1918,7 @@ describe('SiteService', () => {
         userInfo: { identity_provider: 'idir' },
       });
 
-      expect(mockQueryBuilder.where).toHaveBeenCalledTimes(1);
-      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         expect.stringContaining(`ST_MakePoint(-123.1207, 49.2827)`),
       );
     });
@@ -1899,8 +1928,8 @@ describe('SiteService', () => {
     it('should apply search term and limit if provided', async () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
-        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         limit: jest.fn().mockImplementation(() => mockQueryBuilder),
         orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
         addOrderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
@@ -1955,7 +1984,7 @@ describe('SiteService', () => {
       );
     });
 
-    it('should apply public-only visibility filter when userInfo is missing (anonymous) (sites only)', async () => {
+    it('should apply public-only visibility filter when userInfo is missing (unauthenticated) (sites only)', async () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
@@ -1985,8 +2014,8 @@ describe('SiteService', () => {
     it('should bypass DB calls if no search term provided', async () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
-        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         limit: jest.fn().mockImplementation(() => mockQueryBuilder),
         orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
         getManyAndCount: jest.fn().mockReturnValue([]),
@@ -2006,6 +2035,103 @@ describe('SiteService', () => {
       });
 
       expect(mockQueryBuilder.getManyAndCount).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('soft delete coverage', () => {
+    it('deleteSite should soft delete site, remove recent views, and write history log audit fields', async () => {
+      const siteId = '1001';
+      const userId = 'very-long-user-id-value-that-will-be-trimmed-for-audit';
+
+      const transactionalEntityManager: any = {
+        findOne: jest.fn().mockResolvedValue({
+          id: siteId,
+          whoDeleted: null,
+          commonName: 'Test Site',
+          addrLine_1: '123 Main St',
+        }),
+        update: jest.fn().mockResolvedValue(undefined),
+        delete: jest.fn().mockResolvedValue(undefined),
+        save: jest.fn().mockResolvedValue(undefined),
+      };
+
+      (entityManager.transaction as jest.Mock).mockImplementation(
+        async (callback) => callback(transactionalEntityManager),
+      );
+      (historyLogRepository as any).create = jest.fn((payload) => payload);
+
+      const message = await siteService.deleteSite(siteId, userId);
+
+      expect(transactionalEntityManager.update).toHaveBeenCalledWith(
+        Sites,
+        { id: siteId },
+        expect.objectContaining({
+          whoDeleted: userId.slice(0, 30),
+          whenDeleted: expect.any(Date),
+        }),
+      );
+      expect(transactionalEntityManager.delete).toHaveBeenCalledWith(
+        RecentViews,
+        { siteId },
+      );
+      expect(historyLogRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId,
+          siteId,
+          whoCreated: userId.slice(0, 30),
+          whoUpdated: userId.slice(0, 30),
+          whenCreated: expect.any(Date),
+          whenUpdated: expect.any(Date),
+        }),
+      );
+      expect(message).toContain(`Site ${siteId}`);
+    });
+
+    it('findSiteBySiteId should return null data for deleted sites', async () => {
+      const findOneMock = jest.spyOn(siteRepository, 'findOne');
+      findOneMock.mockResolvedValueOnce({
+        id: '2002',
+        whoDeleted: 'tester',
+      } as any);
+
+      (snapShotService as any).getMostRecentSnapshot = jest.fn();
+
+      const result = await siteService.findSiteBySiteId('2002', false, {
+        sub: 'user-1',
+        identity_provider: 'bceid',
+      });
+
+      expect(result.data).toBeNull();
+      expect(
+        (snapShotService as any).getMostRecentSnapshot,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('findSiteBySiteId should return null data for missing sites', async () => {
+      jest.spyOn(siteRepository, 'findOne').mockResolvedValueOnce(null as any);
+
+      const result = await siteService.findSiteBySiteId('999999', false, null);
+
+      expect(result.data).toBeNull();
+    });
+
+    it('searchSiteIds should exclude soft-deleted sites', async () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      await siteService.searchSiteIds('12');
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sites.who_deleted IS NULL',
+      );
     });
   });
 

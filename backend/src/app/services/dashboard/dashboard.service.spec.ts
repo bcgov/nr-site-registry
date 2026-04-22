@@ -63,34 +63,68 @@ describe('DashboardService', () => {
         },
       ];
 
+      const mockQueryBuilder = {
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getMany: jest
+          .fn()
+          .mockResolvedValue(expectedRecentViews as RecentViews[]),
+      };
+
       jest
-        .spyOn(recentViewsRepository, 'find')
-        .mockResolvedValueOnce(expectedRecentViews as RecentViews[]);
+        .spyOn(recentViewsRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any);
 
       const recentViews = await service.getRecentViewsByUserId(userId);
 
       expect(recentViews).toEqual(expectedRecentViews);
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'site.who_deleted IS NULL',
+      );
     });
 
     it('should return an empty array if no recent views are found for a given user id', async () => {
       const userId = '2';
       const expectedRecentViews: RecentViews[] = [];
 
+      const mockQueryBuilder = {
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(expectedRecentViews),
+      };
+
       jest
-        .spyOn(recentViewsRepository, 'find')
-        .mockResolvedValueOnce(expectedRecentViews);
+        .spyOn(recentViewsRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any);
 
       const recentViews = await service.getRecentViewsByUserId(userId);
 
       expect(recentViews).toEqual(expectedRecentViews);
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'site.who_deleted IS NULL',
+      );
     });
 
     it('should throw an error if repository throws an error', async () => {
       const userId = '1';
 
+      const mockQueryBuilder = {
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getMany: jest
+          .fn()
+          .mockRejectedValue(new Error('Database connection error')),
+      };
+
       jest
-        .spyOn(recentViewsRepository, 'find')
-        .mockRejectedValueOnce(new Error('Database connection error'));
+        .spyOn(recentViewsRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any);
 
       await expect(service.getRecentViewsByUserId(userId)).rejects.toThrow(
         `Failed to retrieve recent views for userId ${userId}`,

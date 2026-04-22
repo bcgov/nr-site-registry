@@ -17,6 +17,8 @@ import {
 import {
   fetchSitesDetails,
   selectSiteDetails,
+  selectSiteDetailsFetchStatus,
+  selectSiteDetailsLastFetchedSiteId,
   trackedChanges,
   clearTrackChanges,
   siteDetailsMode,
@@ -154,12 +156,18 @@ import {
 import { HttpStatusCode } from '../../common/httpStatusCode';
 import { GetSummaryConfig } from './summary/SummaryConfig';
 import { siteDisclosureConfig } from './disclosure/DisclosureConfig';
+import DeleteSiteModal from './DeleteSiteModal';
+import { getAxiosInstance } from '../../helpers/utility';
+import { GRAPHQL } from '../../helpers/endpoints';
+import { print } from 'graphql';
+import { DELETE_SITE_MUTATION } from '../site/graphql/DeleteSite';
 
 const SiteDetails = () => {
   const { disclosureStatementConfigEditMode } = siteDisclosureConfig(
     useSelector(schedule2ReferenceCdDrpdown)?.data,
   );
   const auth = useAuth();
+  const isUnauthenticated = auth?.user == null;
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -179,6 +187,10 @@ const SiteDetails = () => {
 
   const mode = useSelector(siteDetailsMode);
   const details = useSelector(selectSiteDetails);
+  const siteDetailsFetchStatus = useSelector(selectSiteDetailsFetchStatus);
+  const siteDetailsLastFetchedSiteId = useSelector(
+    selectSiteDetailsLastFetchedSiteId,
+  );
   const bulkApproveRejectStatus = useSelector(bulkUpdateApproveRejectStatus);
   const hasNoPendingUpdatesFromState = useSelector(hasNoPendingUpdates);
   const srUpdates = useSelector(selectAllSites);
@@ -209,6 +221,7 @@ const SiteDetails = () => {
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
     null,
   );
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [navComponents, SetNavComponents] = useState<any[]>();
   const [isVisible, setIsVisible] = useState(false);
   const [edit, setEdit] = useState(false);
@@ -364,10 +377,40 @@ const SiteDetails = () => {
       isUserOfType(UserRoleType.PUBLIC)
     ) {
       setUserType(UserType.External);
-    } else if (isUserOfType(UserRoleType.INTERNAL)) {
+    } else if (
+      isUserOfType(UserRoleType.INTERNAL) ||
+      isUserOfType(UserRoleType.SR)
+    ) {
       setUserType(UserType.Internal);
     }
   }, [loggedInUser]);
+
+  useEffect(() => {
+    if (!id?.trim()) return;
+    if (siteDetailsFetchStatus !== RequestStatus.success) return;
+    if (siteDetailsLastFetchedSiteId !== id) return;
+    if (details) return;
+
+    const shouldRedirectExternalOrUnauthenticated =
+      userType === UserType.External ||
+      (isUnauthenticated && userType !== UserType.Internal);
+
+    if (!shouldRedirectExternalOrUnauthenticated) return;
+
+    // Cart details: do not auto-redirect (user can use back / cart UI).
+    if (location.pathname.includes('/site/cart/site/details/')) return;
+
+    navigate('/search', { replace: true });
+  }, [
+    id,
+    details,
+    siteDetailsFetchStatus,
+    siteDetailsLastFetchedSiteId,
+    userType,
+    isUnauthenticated,
+    location.pathname,
+    navigate,
+  ]);
 
   useEffect(() => {
     setViewMode(mode);
@@ -400,6 +443,7 @@ const SiteDetails = () => {
   useEffect(() => {
     setIsLoading(true); // Set loading state to true before starting API calls
     dispatch(resetSaveSiteDetails(null));
+    dispatch(updateSiteDetail(null));
     fetchAllDropdownDetails();
     if (!!id?.trim()) {
       checkForRecordsPendingReview(id);
@@ -459,6 +503,22 @@ const SiteDetails = () => {
       }
     }
   }, [id, userType]);
+
+  useEffect(() => {
+    if (!id?.trim() || isLoading) {
+      return;
+    }
+
+    if (!details) {
+      showNotification(
+        RequestStatus.failed,
+        '',
+        `Site ${id} was not found or has been deleted.`,
+        'Site Not Found',
+      );
+      navigate('/search');
+    }
+  }, [id, isLoading, details, navigate]);
 
   useEffect(() => {
     if (srUpdateRequestStatus === RequestStatus.success) {
@@ -597,6 +657,9 @@ const SiteDetails = () => {
       case SiteActionBtn.RejectAll:
         setEdit(false);
         SetConfirmSiteReview(false);
+        break;
+      case SiteActionBtn.DELETE_SITE:
+        setShowDeleteModal(true);
         break;
       case SiteActionBtn.SAVE:
         const errors = await validateSiteForms();
@@ -988,13 +1051,51 @@ const SiteDetails = () => {
     }
   };
 
+  const handleDeleteSite = async () => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(DELETE_SITE_MUTATION),
+        variables: {
+          input: {
+            siteId: id,
+          },
+        },
+      });
+
+      const result = response.data?.data?.deleteSite;
+
+      if (result?.success) {
+        showNotification(
+          RequestStatus.success,
+          `Site ${id} has been successfully deleted`,
+          '',
+        );
+        setShowDeleteModal(false);
+        navigate('/search');
+      } else {
+        showNotification(
+          RequestStatus.failed,
+          'Failed to delete site',
+          result?.message || 'An error occurred while deleting the site',
+        );
+      }
+    } catch (error: any) {
+      console.error('Error deleting site:', error);
+      showNotification(
+        RequestStatus.failed,
+        'Failed to delete site',
+        error?.message || 'An unexpected error occurred',
+      );
+    }
+  };
+
   const getActionItemsToRender = () => {
     let userTypeSR: boolean = isUserOfType(UserRoleType.SR) ?? false;
     let includeSRApprovalActions =
       userTypeSR &&
       !hasNoPendingUpdatesFromState &&
       viewMode !== SiteDetailsMode.EditMode;
-    return getActionItems(includeSRApprovalActions);
+    return getActionItems(includeSRApprovalActions, userTypeSR);
   };
 
   if (id && (isLoading || snapshot.status === RequestStatus.loading)) {
@@ -1075,6 +1176,7 @@ const SiteDetails = () => {
     dispatch(
       setupSiteSummaryForSaving({
         ...details,
+        apiAction: UserActionEnum.updated,
         userAction: UserActionEnum.updated,
         srAction:
           event?.target?.checked === true
@@ -1583,6 +1685,16 @@ const SiteDetails = () => {
               !(savedChanges?.length > 0))
           }
         />
+
+        {/* Delete Site Modal */}
+        {id && (
+          <DeleteSiteModal
+            isOpen={showDeleteModal}
+            siteId={id}
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={handleDeleteSite}
+          />
+        )}
       </PageContainer>
     </>
   );

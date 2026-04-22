@@ -11,6 +11,7 @@ export enum SiteActionBtn {
   RejectAll = 'reject_all',
   SAVE = 'save',
   CANCEL = 'cancel',
+  DELETE_SITE = 'delete_site',
 }
 
 export interface SaveSiteDetails {

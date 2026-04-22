@@ -72,9 +72,9 @@ const LandUses: FC = () => {
   );
 
   const editModeEnabled = viewMode === SiteDetailsMode.EditMode;
-  
-const [userType, setUserType] = useState<UserType>(UserType.External);
-const loggedInUser = getUser();
+
+  const [userType, setUserType] = useState<UserType>(UserType.External);
+  const loggedInUser = getUser();
 
   useEffect(() => {
     if (
@@ -85,14 +85,13 @@ const loggedInUser = getUser();
     } else if (isUserOfType(UserRoleType.INTERNAL)) {
       setUserType(UserType.Internal);
     }
-    
   }, [loggedInUser]);
 
   const tableColumns = useMemo(() => {
     return getLandUseColumns(
       landUseCodes,
       editModeEnabled,
-      userType === UserType.Internal
+      userType === UserType.Internal,
     );
   }, [editModeEnabled, landUseCodes, viewMode, userType]);
 
@@ -120,7 +119,7 @@ const loggedInUser = getUser();
 
   const tableLoading =
     landUseCodesFetchRequestStatus === RequestStatus.loading ||
-      landUsesFetchRequestStatus === RequestStatus.loading
+    landUsesFetchRequestStatus === RequestStatus.loading
       ? RequestStatus.loading
       : RequestStatus.idle;
 
@@ -192,7 +191,8 @@ const loggedInUser = getUser();
     });
 
     const tableColumn = tableColumns.find(
-      (column: { graphQLPropertyName: any; }) => column.graphQLPropertyName === event.property,
+      (column: { graphQLPropertyName: any }) =>
+        column.graphQLPropertyName === event.property,
     );
     const propertyLabel = getFieldLabel(event.property);
 
@@ -332,12 +332,12 @@ const loggedInUser = getUser();
   const dataWithTextSearchApplied = !searchTerm
     ? tableData
     : tableData.filter((rowData) => {
-      const term = searchTerm.toLowerCase().trim();
-      return (
-        rowData.note?.toLowerCase().includes(term) ||
-        rowData.landUse?.description?.toLowerCase().includes(term)
-      );
-    });
+        const term = searchTerm.toLowerCase().trim();
+        return (
+          rowData.note?.toLowerCase().includes(term) ||
+          rowData.landUse?.description?.toLowerCase().includes(term)
+        );
+      });
 
   return (
     <div>

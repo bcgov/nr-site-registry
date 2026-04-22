@@ -23,6 +23,15 @@
   color: var(--typography-color-secondary, #474543) !important;
 }
 
+.custom-action-item-danger {
+  color: var(--color-error, #d13438) !important;
+}
+
+.custom-action-item-danger:hover {
+  background: rgba(209, 52, 56, 0.1) !important;
+  color: var(--color-error, #d13438) !important;
+}
+
 @media screen and (max-width: 992px) {
   .custom-action-menu {
     width: auto; /* Width for large screens */

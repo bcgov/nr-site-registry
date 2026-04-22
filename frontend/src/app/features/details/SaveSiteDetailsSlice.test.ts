@@ -4,16 +4,13 @@ import reducer, { resetSaveSiteDetails } from './SaveSiteDetailsSlice';
 
 describe('siteDetailsSlice', () => {
   describe('resetSaveSiteDetails', () => {
-
     describe('parcelDescriptions normalization on save', () => {
       it('deletes rows correctly', () => {
         const initialState: any = {
           parcelDescriptionsData: [],
         };
 
-        const payload = [
-          { id: 5, apiAction: UserActionEnum.deleted },
-        ];
+        const payload = [{ id: 5, apiAction: UserActionEnum.deleted }];
 
         const action = {
           type: 'siteDetails/setupParcelDescriptionsDataForSaving',
@@ -22,8 +19,9 @@ describe('siteDetailsSlice', () => {
 
         const result = reducer(initialState, action);
 
-        expect(result.parcelDescriptionsData[0].apiAction)
-          .toBe(UserActionEnum.deleted);
+        expect(result.parcelDescriptionsData[0].apiAction).toBe(
+          UserActionEnum.deleted,
+        );
       });
 
       it('updates existing rows', () => {
@@ -31,9 +29,7 @@ describe('siteDetailsSlice', () => {
           parcelDescriptionsData: [],
         };
 
-        const payload = [
-          { id: 10 },
-        ];
+        const payload = [{ id: 10 }];
 
         const action = {
           type: 'siteDetails/setupParcelDescriptionsDataForSaving',
@@ -42,8 +38,9 @@ describe('siteDetailsSlice', () => {
 
         const result = reducer(initialState, action);
 
-        expect(result.parcelDescriptionsData[0].apiAction)
-          .toBe(UserActionEnum.updated);
+        expect(result.parcelDescriptionsData[0].apiAction).toBe(
+          UserActionEnum.updated,
+        );
       });
 
       it('adds new rows', () => {
@@ -51,9 +48,7 @@ describe('siteDetailsSlice', () => {
           parcelDescriptionsData: [],
         };
 
-        const payload = [
-          { id: -1 },
-        ];
+        const payload = [{ id: -1 }];
 
         const action = {
           type: 'siteDetails/setupParcelDescriptionsDataForSaving',
@@ -62,8 +57,9 @@ describe('siteDetailsSlice', () => {
 
         const result = reducer(initialState, action);
 
-        expect(result.parcelDescriptionsData[0].apiAction)
-          .toBe(UserActionEnum.added);
+        expect(result.parcelDescriptionsData[0].apiAction).toBe(
+          UserActionEnum.added,
+        );
       });
     });
 
@@ -137,4 +133,3 @@ describe('siteDetailsSlice', () => {
     });
   });
 });
-

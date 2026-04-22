@@ -69,7 +69,7 @@ jest.mock('../../../components/simple/PanelWithUpDown', () => {
       'div',
       null,
       React.createElement('div', null, props.firstChild),
-      React.createElement('div', null, props.secondChild)
+      React.createElement('div', null, props.secondChild),
     );
   };
 });
@@ -107,11 +107,13 @@ describe('Notation – Widget isRequired logic', () => {
       React.createElement(Notation, {
         ...baseProps,
         viewMode: SiteDetailsMode.EditMode,
-      })
+      }),
     );
 
-    expect(screen.getByTestId('mock-widget'))
-      .toHaveAttribute('data-isrequired', 'true');
+    expect(screen.getByTestId('mock-widget')).toHaveAttribute(
+      'data-isrequired',
+      'true',
+    );
   });
 
   it('sets isRequired=false when viewMode is not EditMode', () => {
@@ -119,10 +121,12 @@ describe('Notation – Widget isRequired logic', () => {
       React.createElement(Notation, {
         ...baseProps,
         viewMode: SiteDetailsMode.SRMode,
-      })
+      }),
     );
 
-    expect(screen.getByTestId('mock-widget'))
-      .toHaveAttribute('data-isrequired', 'false');
+    expect(screen.getByTestId('mock-widget')).toHaveAttribute(
+      'data-isrequired',
+      'false',
+    );
   });
 });

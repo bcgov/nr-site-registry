@@ -37,11 +37,14 @@ const Actions: React.FC<IActions> = ({
       >
         {items?.map((item, index) => {
           if (!isValidElement(item) && 'value' in item) {
+            const isDangerAction = item.danger === true;
+            const itemClassName = `disable w-100 ${customCssMenuItem ?? 'custom-action-item'} ${isDangerAction ? 'custom-action-item-danger' : ''}`;
+
             return (
               <Dropdown.Item
                 key={index}
                 onClick={() => onItemClick(item.value, index)}
-                className={`disable w-100 ${customCssMenuItem ?? 'custom-action-item'}`}
+                className={itemClassName}
               >
                 {item.label}
               </Dropdown.Item>

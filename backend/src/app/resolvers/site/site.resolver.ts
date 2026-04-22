@@ -311,10 +311,10 @@ export class SiteResolver {
   }
 
   /**
-   * Soft delete a site - Only accessible by Site Registrar users
+   * Soft delete a site
    */
   @Roles({
-    roles: [CustomRoles.SiteRegistrar, CustomRoles.External],
+    roles: [CustomRoles.SiteRegistrar, CustomRoles.Internal],
     mode: RoleMatchingMode.ANY,
   })
   @Mutation(() => DeleteSiteResponse, { name: 'deleteSite' })

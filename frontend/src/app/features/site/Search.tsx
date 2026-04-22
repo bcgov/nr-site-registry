@@ -234,13 +234,6 @@ const Search = () => {
   }, []);
 
   useEffect(() => {
-    if (status === RequestStatus.success && sites.length > 0) {
-      setSearchText(searchParam);
-      setUserAction(false);
-    }
-  }, [searchParam, sites.length, status]);
-
-  useEffect(() => {
     dispatch(fetchSiteRiskCd());
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

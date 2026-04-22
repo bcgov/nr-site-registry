@@ -13,23 +13,23 @@ export const getLandHistoriesForSiteQuery = gql`
       sortDirection: $sortDirection
       pending: $pending
     ) {
-        message
-        httpStatusCode
-        success
-        timestamp
-        data {
-          guid
-          siteId
-          lutCode
-          note
-          whenCreated
-          srAction
-          srValue
-          landUse {
-            code
-            description
-          }
+      message
+      httpStatusCode
+      success
+      timestamp
+      data {
+        guid
+        siteId
+        lutCode
+        note
+        whenCreated
+        srAction
+        srValue
+        landUse {
+          code
+          description
         }
+      }
     }
   }
 `;

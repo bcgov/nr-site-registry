@@ -17,14 +17,14 @@ jobs:
           persist-credentials: false
 
       - name: Backend Prettify code
-        uses: creyD/prettier_action@v4.3
+        uses: creyD/prettier_action@v4.6
         with:
           prettier_options: --check ./backend/src/**/*.{js,ts,json} --ignore-path ./.prettierignore --config ./.prettierrc
           only_changed: True
           dry: True
 
       - name: Frontend Prettify code
-        uses: creyD/prettier_action@v4.3
+        uses: creyD/prettier_action@v4.6
         with:
           prettier_options: --check ./frontend/src/**/*.{js,ts,jsx,tsx,json,css} --ignore-path ./.prettierignore --config ./.prettierrc
           only_changed: True

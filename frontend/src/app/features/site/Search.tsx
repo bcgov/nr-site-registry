@@ -20,6 +20,7 @@ import { formRows } from './dto/SiteFilterConfig';
 import { SearchResultsFilters } from './searchResults/SearchResultsFilters';
 import { SearchResultsActions } from './searchResults/SearchResultsActions';
 import { debounce } from 'lodash';
+import useDebouncedValue from '../../helpers/useDebouncedValue';
 import Table from '../../components/table/Table';
 import { fetchSearchSites, getSites, resetSiteSearch } from './SiteSearchSlice';
 import { RequestStatus } from '../../helpers/requests/status';
@@ -32,7 +33,7 @@ import { Button } from '../../components/button/Button';
 const Search = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchText, setSearchText] = useState('');
-  const [noUserAction, setUserAction] = useState(true);
+  const debouncedSearchText = useDebouncedValue(searchText);
   const columns = getSiteSearchResultsColumns();
   const [columnsToDisplay, setColumnsToDisplay] = useState<TableColumn[]>([
     ...columns,
@@ -98,35 +99,38 @@ const Search = () => {
 
   const handleClearSearch = () => {
     setSearchText('');
-    setUserAction(true);
     dispatch(resetSiteSearch());
   };
 
-  const handleTextChange = (event: any) => {
-    const value = event.target.value;
-    setSearchText(value);
-    setUserAction(false);
-
-    // Clear search results if input is empty
-    if (value.length === 0) {
-      dispatch(resetSiteSearch());
+  useEffect(() => {
+    if (debouncedSearchText.length === 0) {
       return;
     }
-
-    // Trigger search for inputs with 3+ characters
-    if (value.length >= 3) {
+    if (debouncedSearchText.length >= 3) {
       const filterData: any = {};
       selectedFilters.forEach((filter: any) => {
         filterData[filter.key] = filter.value;
       });
-      debouncedSearch(
-        value,
-        1,
-        pageSize,
-        SiteSortBy.Id,
-        SortByDirection.Asc,
-        filterData,
+      setSelectedRows([]);
+      dispatch(
+        fetchSearchSites({
+          searchParam: debouncedSearchText,
+          page,
+          pageSize,
+          sortBy: SiteSortBy.Id,
+          sortByDir: SortByDirection.Asc,
+          filter: filterData,
+        }),
       );
+    }
+  }, [debouncedSearchText]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleTextChange = (event: any) => {
+    const value = event.target.value;
+    setSearchText(value);
+
+    if (value.length === 0) {
+      dispatch(resetSiteSearch());
     }
   };
 
@@ -227,15 +231,8 @@ const Search = () => {
   }, []);
 
   useEffect(() => {
-    if (status === RequestStatus.success && sites.length > 0) {
-      setSearchText(searchParam);
-      setUserAction(false);
-    }
-  }, [dispatch, searchParam, sites.length, status]);
-
-  useEffect(() => {
     dispatch(fetchSiteRiskCd());
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleRemoveFilter = (filter: any) => {
     setFormData((prevData) => {
@@ -351,6 +348,9 @@ const Search = () => {
     }
     setPanelToShow(panel);
   };
+
+  const noUserAction = sites.length === 0 && searchText.length === 0;
+
   return (
     <PageContainer role="Search" aria-label="Search">
       <div className="search-container">

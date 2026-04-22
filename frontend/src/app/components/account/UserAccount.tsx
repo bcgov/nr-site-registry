@@ -1,43 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import './UserAccount.css';
-import avatar from '../../images/avatar.png';
 import { DropdownIcon, DropdownUpIcon } from '../common/icon';
 import { useAuth } from 'react-oidc-context';
 import { getUser } from '../../helpers/utility';
 import Avatar from '../avatar/Avatar';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../Store';
-import { fetchRecentViews } from '../../features/dashboard/DashboardSlice';
 
 const UserAccount = (props: any) => {
-  const dispatch = useDispatch<AppDispatch>();
   const authRedirectUri =
     ((window as any)._env_ &&
       (window as any)._env_.REACT_APP_AUTH_LOGOUT_REDIRECT_URI) ||
     process.env.REACT_APP_AUTH_LOGOUT_REDIRECT_URI;
   const auth = useAuth();
   const loggedInUser = getUser();
-  // Sample user data
-  const userObj = {
+
+  const user = {
     firstname: loggedInUser?.profile.given_name,
     lastName: loggedInUser?.profile.family_name,
   };
 
-  const [user, setUser] = useState(userObj);
   const [dropdownArrow, setDropdownArrow] = useState(false);
   const toggleButton = (event: any) => {
     event.stopPropagation();
     setDropdownArrow(!dropdownArrow);
   };
-
-  useEffect(() => {
-    dispatch(fetchRecentViews(loggedInUser?.profile.preferred_username ?? ''));
-    setUser({
-      firstname: loggedInUser?.profile.given_name,
-      lastName: loggedInUser?.profile.family_name,
-    });
-  }, []);
 
   if (props.mobileView) {
     return (

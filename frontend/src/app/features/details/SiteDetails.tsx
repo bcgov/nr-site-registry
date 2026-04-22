@@ -156,6 +156,11 @@ import {
 import { HttpStatusCode } from '../../common/httpStatusCode';
 import { GetSummaryConfig } from './summary/SummaryConfig';
 import { siteDisclosureConfig } from './disclosure/DisclosureConfig';
+import DeleteSiteModal from './DeleteSiteModal';
+import { getAxiosInstance } from '../../helpers/utility';
+import { GRAPHQL } from '../../helpers/endpoints';
+import { print } from 'graphql';
+import { DELETE_SITE_MUTATION } from '../site/graphql/DeleteSite';
 
 const SiteDetails = () => {
   const { disclosureStatementConfigEditMode } = siteDisclosureConfig(
@@ -216,6 +221,7 @@ const SiteDetails = () => {
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
     null,
   );
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [navComponents, SetNavComponents] = useState<any[]>();
   const [isVisible, setIsVisible] = useState(false);
   const [edit, setEdit] = useState(false);
@@ -371,7 +377,10 @@ const SiteDetails = () => {
       isUserOfType(UserRoleType.PUBLIC)
     ) {
       setUserType(UserType.External);
-    } else if (isUserOfType(UserRoleType.INTERNAL)) {
+    } else if (
+      isUserOfType(UserRoleType.INTERNAL) ||
+      isUserOfType(UserRoleType.SR)
+    ) {
       setUserType(UserType.Internal);
     }
   }, [loggedInUser]);
@@ -434,6 +443,7 @@ const SiteDetails = () => {
   useEffect(() => {
     setIsLoading(true); // Set loading state to true before starting API calls
     dispatch(resetSaveSiteDetails(null));
+    dispatch(updateSiteDetail(null));
     fetchAllDropdownDetails();
     if (!!id?.trim()) {
       checkForRecordsPendingReview(id);
@@ -493,6 +503,22 @@ const SiteDetails = () => {
       }
     }
   }, [id, userType]);
+
+  useEffect(() => {
+    if (!id?.trim() || isLoading) {
+      return;
+    }
+
+    if (!details) {
+      showNotification(
+        RequestStatus.failed,
+        '',
+        `Site ${id} was not found or has been deleted.`,
+        'Site Not Found',
+      );
+      navigate('/search');
+    }
+  }, [id, isLoading, details, navigate]);
 
   useEffect(() => {
     if (srUpdateRequestStatus === RequestStatus.success) {
@@ -631,6 +657,9 @@ const SiteDetails = () => {
       case SiteActionBtn.RejectAll:
         setEdit(false);
         SetConfirmSiteReview(false);
+        break;
+      case SiteActionBtn.DELETE_SITE:
+        setShowDeleteModal(true);
         break;
       case SiteActionBtn.SAVE:
         const errors = await validateSiteForms();
@@ -1022,13 +1051,51 @@ const SiteDetails = () => {
     }
   };
 
+  const handleDeleteSite = async () => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(DELETE_SITE_MUTATION),
+        variables: {
+          input: {
+            siteId: id,
+          },
+        },
+      });
+
+      const result = response.data?.data?.deleteSite;
+
+      if (result?.success) {
+        showNotification(
+          RequestStatus.success,
+          `Site ${id} has been successfully deleted`,
+          '',
+        );
+        setShowDeleteModal(false);
+        navigate('/search');
+      } else {
+        showNotification(
+          RequestStatus.failed,
+          'Failed to delete site',
+          result?.message || 'An error occurred while deleting the site',
+        );
+      }
+    } catch (error: any) {
+      console.error('Error deleting site:', error);
+      showNotification(
+        RequestStatus.failed,
+        'Failed to delete site',
+        error?.message || 'An unexpected error occurred',
+      );
+    }
+  };
+
   const getActionItemsToRender = () => {
     let userTypeSR: boolean = isUserOfType(UserRoleType.SR) ?? false;
     let includeSRApprovalActions =
       userTypeSR &&
       !hasNoPendingUpdatesFromState &&
       viewMode !== SiteDetailsMode.EditMode;
-    return getActionItems(includeSRApprovalActions);
+    return getActionItems(includeSRApprovalActions, userTypeSR);
   };
 
   if (id && (isLoading || snapshot.status === RequestStatus.loading)) {
@@ -1618,6 +1685,16 @@ const SiteDetails = () => {
               !(savedChanges?.length > 0))
           }
         />
+
+        {/* Delete Site Modal */}
+        {id && (
+          <DeleteSiteModal
+            isOpen={showDeleteModal}
+            siteId={id}
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={handleDeleteSite}
+          />
+        )}
       </PageContainer>
     </>
   );

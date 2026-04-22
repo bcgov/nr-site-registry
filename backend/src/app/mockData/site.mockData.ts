@@ -230,6 +230,8 @@ sampleSites = [
     folioContents: folio,
     srAction: '',
     userAction: '',
+    whenDeleted: null,
+    whoDeleted: null,
   },
   {
     id: '222',
@@ -287,6 +289,8 @@ sampleSites = [
     folioContents: folio,
     srAction: 'public',
     userAction: '',
+    whenDeleted: null,
+    whoDeleted: null,
   },
 ];
 

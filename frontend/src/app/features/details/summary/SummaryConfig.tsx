@@ -351,7 +351,7 @@ export const GetSummaryConfig = () => {
       customEditLabelCss: 'custom-summary-lbl-text',
       colSize: 'col-lg-12 col-md-12 col-sm-12',
       validation: {
-        maxLength: 255
+        maxLength: 255,
       },
     },
   ];

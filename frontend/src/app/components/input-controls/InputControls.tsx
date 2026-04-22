@@ -162,10 +162,7 @@ export const TextInput: React.FC<InputProps> = ({
       setError(validation.customMessage || '');
       return false;
     }
-    if (
-      validation?.maxLength &&
-      inputValue.length > validation.maxLength
-    ) {
+    if (validation?.maxLength && inputValue.length > validation.maxLength) {
       setError(`Maximum ${validation.maxLength} characters allowed`);
       return false;
     }
@@ -176,7 +173,7 @@ export const TextInput: React.FC<InputProps> = ({
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     onChange(inputValue);
-    
+
     if (allowNumbersOnly || (inputValue && !validateInput(inputValue))) {
       return;
     }

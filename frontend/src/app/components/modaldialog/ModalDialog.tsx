@@ -1,6 +1,6 @@
-import React, { Children, ReactNode, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import './ModalDialog.css';
-import { XmarkIcon, FloppyDisk } from '../common/icon';
+import { XmarkIcon } from '../common/icon';
 import {
   CancelButton,
   DiscardButton,
@@ -18,6 +18,7 @@ interface ModalDialogCloseHandlerProps {
   customHeaderCss?: string;
   discardOption?: boolean;
   errorOption?: boolean;
+  disableSaveButton?: boolean;
 }
 
 const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
@@ -31,6 +32,7 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
   errorOption,
   headerLabel,
   customHeaderCss,
+  disableSaveButton,
 }) => {
   saveBtnLabel = saveBtnLabel ?? '';
   cancelBtnLabel = cancelBtnLabel ?? '';
@@ -79,7 +81,11 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
                 clickHandler={handleClose}
                 label={cancelBtnLabel}
               />
-              <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
+              <SaveButton
+                clickHandler={handleSave}
+                label={saveBtnLabel}
+                isDisabled={disableSaveButton}
+              />
             </div>
           )}
           {discardOption && (
@@ -94,7 +100,11 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
                 label={dicardBtnLabel}
                 showIcon={false}
               />
-              <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
+              <SaveButton
+                clickHandler={handleSave}
+                label={saveBtnLabel}
+                isDisabled={disableSaveButton}
+              />
             </div>
           )}
           {errorOption && (

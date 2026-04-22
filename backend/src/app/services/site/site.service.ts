@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { Brackets, EntityManager, In, Repository } from 'typeorm';
+import { Brackets, EntityManager, In, IsNull, Repository } from 'typeorm';
 import {
   FetchSiteDetail,
   FetchSiteDetailsResponse,
@@ -60,6 +60,7 @@ import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
 import { SiteInsightsDto } from '../../dto/siteInsights.dto';
 import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
 import { SiteProfileSchedule2Ref } from '../../entities/siteProfileSchedule2Ref';
+import { RecentViews } from '../../entities/recentViews.entity';
 
 /**
  * Nestjs Service For Region Entity
@@ -116,7 +117,9 @@ export class SiteService {
 
     response.httpStatusCode = 200;
 
-    response.data = await this.siteRepository.find();
+    response.data = await this.siteRepository.find({
+      where: { whoDeleted: IsNull() },
+    });
 
     this.sitesLogger.log('SiteService.findAll() end');
     this.sitesLogger.debug('SiteService.findAll() end');
@@ -172,6 +175,9 @@ export class SiteService {
       return response;
     } else {
       const query = this.siteRepository.createQueryBuilder('sites');
+
+      // Exclude soft-deleted sites from search results.
+      query.andWhere('sites.who_deleted IS NULL');
 
       if (siteIds && siteIds.length === 0) {
         throw new HttpException(
@@ -422,29 +428,35 @@ export class SiteService {
     const searchTermClean = (searchTerm ?? '').toLowerCase().trim();
     const query = this.siteRepository.createQueryBuilder('sites');
 
+    // Always exclude soft-deleted sites on map views
+    query.where('sites.who_deleted IS NULL');
+
     if (searchTermClean.length) {
-      query
-        .where('LOWER(sites.addr_line_1) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        })
-        .orWhere('LOWER(sites.addr_line_2) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        })
-        .orWhere('LOWER(sites.addr_line_3) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        })
-        .orWhere('LOWER(sites.addr_line_4) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        })
-        .orWhere('LOWER(sites.city) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        })
-        .orWhere('LOWER(sites.provState) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        })
-        .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        });
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('LOWER(sites.addr_line_1) LIKE LOWER(:searchTerm)', {
+            searchTerm: `%${searchTermClean}%`,
+          })
+            .orWhere('LOWER(sites.addr_line_2) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${searchTermClean}%`,
+            })
+            .orWhere('LOWER(sites.addr_line_3) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${searchTermClean}%`,
+            })
+            .orWhere('LOWER(sites.addr_line_4) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${searchTermClean}%`,
+            })
+            .orWhere('LOWER(sites.city) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${searchTermClean}%`,
+            })
+            .orWhere('LOWER(sites.provState) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${searchTermClean}%`,
+            })
+            .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${searchTermClean}%`,
+            });
+        }),
+      );
     }
 
     if (polygon) {
@@ -459,7 +471,7 @@ export class SiteService {
         .map(([lat, long]) => `${long} ${lat}`)
         .join(', ');
 
-      query.where(
+      query.andWhere(
         `ST_Within(
           ST_Transform(sites.geometry, ${BC_ALBERS}), 
           ST_Transform(ST_GeomFromText('POLYGON((${polygonString}))', ${WGS_84}), ${BC_ALBERS})
@@ -500,7 +512,7 @@ export class SiteService {
       const { center, radius } = circle;
       const [latitude, longitude] = center;
 
-      query.where(
+      query.andWhere(
         `ST_DWithin(
           ST_Transform(sites.geometry, ${BC_ALBERS}),
           ST_Transform(ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}),${WGS_84}), ${BC_ALBERS}),
@@ -531,12 +543,16 @@ export class SiteService {
     }
 
     sitesQuery
-      .where('CAST(sites.id AS TEXT) = :searchTermId', {
-        searchTermId: searchTermClean,
-      })
-      .orWhere('LOWER(sites.common_name) LIKE LOWER(:searchTermName)', {
-        searchTermName: `%${searchTermClean}%`,
-      })
+      .where('sites.who_deleted IS NULL')
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('CAST(sites.id AS TEXT) = :searchTermId', {
+            searchTermId: searchTermClean,
+          }).orWhere('LOWER(sites.common_name) LIKE LOWER(:searchTermName)', {
+            searchTermName: `%${searchTermClean}%`,
+          });
+        }),
+      )
       .limit(limit)
       // This makes sure that sites found by ID match appear first on the list, sites found by common_name match follow
       .orderBy(
@@ -626,6 +642,20 @@ export class SiteService {
 
     response.httpStatusCode = 200;
 
+    const siteStatus = await this.siteRepository.findOne({
+      where: { id: siteId },
+      select: ['id', 'whoDeleted'],
+    });
+
+    if (!siteStatus || siteStatus.whoDeleted) {
+      response.data = null;
+      this.sitesLogger.log(
+        `SiteService.findSiteBySiteId() blocked deleted/missing site: ${siteId}`,
+      );
+      this.sitesLogger.debug('SiteService.findSiteBySiteId() end');
+      return response;
+    }
+
     const snapShot = await this.getMostRecentSnapshotForUser(siteId, userInfo);
     if (snapShot) {
       response.data = snapShot.snapshotData?.sitesSummary;
@@ -661,6 +691,7 @@ export class SiteService {
         .where('CAST(sites.id AS TEXT) LIKE :searchParam', {
           searchParam: `%${searchParam}%`,
         })
+        .andWhere('sites.who_deleted IS NULL')
         .orderBy('sites.id', 'ASC'); // Ordering by 'id' in ascending order;
       const result = await queryBuilder.getMany();
       if (result) {
@@ -2730,6 +2761,87 @@ export class SiteService {
       );
       throw new InternalServerErrorException('Failed to fetch site counts');
     }
+  }
+
+  /**
+   * Soft deletes a site and all its related entities
+   * @param siteId - The ID of the site to delete
+   * @param userId - The ID of the user performing the deletion
+   * @returns Success message or throws an exception
+   */
+  async deleteSite(siteId: string, userId: string): Promise<string> {
+    this.sitesLogger.log(`SiteService.deleteSite() start siteId: ${siteId}`);
+
+    return await this.entityManager.transaction(
+      async (transactionalEntityManager) => {
+        try {
+          const site = await transactionalEntityManager.findOne(Sites, {
+            where: { id: siteId },
+          });
+
+          if (!site) {
+            throw new HttpException(
+              `Site with ID ${siteId} not found`,
+              HttpStatus.NOT_FOUND,
+            );
+          }
+
+          if (site.whoDeleted) {
+            throw new HttpException(
+              `Site with ID ${siteId} is already deleted`,
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+
+          const deletionTimestamp = new Date();
+          const auditUser = (userId || 'SYSTEM').toString().slice(0, 30);
+
+          // Soft delete the main site only
+          // Related entities (participants, documents, events) will remain but won't be accessible
+          // since they're accessed through the site which is now soft-deleted
+          await transactionalEntityManager.update(
+            Sites,
+            { id: siteId },
+            {
+              whoDeleted: auditUser,
+              whenDeleted: deletionTimestamp,
+            },
+          );
+
+          // Remove stale dashboard records for this site
+          await transactionalEntityManager.delete(RecentViews, { siteId });
+
+          // Log the deletion in history log
+          const historyLogEntry = this.historyLogRepository.create({
+            userId: userId,
+            siteId: siteId,
+            content: {
+              action: 'SITE_DELETED',
+              deletedAt: deletionTimestamp.toISOString(),
+              siteName: site.commonName,
+              siteAddress: site.addrLine_1,
+            },
+            whoCreated: auditUser,
+            whenCreated: deletionTimestamp,
+            whoUpdated: auditUser,
+            whenUpdated: deletionTimestamp,
+          });
+          await transactionalEntityManager.save(HistoryLog, historyLogEntry);
+
+          this.sitesLogger.log(
+            `SiteService.deleteSite() end - successfully deleted site ${siteId}`,
+          );
+
+          return `Site ${siteId} and all related entities have been successfully deleted`;
+        } catch (error) {
+          this.sitesLogger.error(
+            `SiteService.deleteSite() error for siteId ${siteId}:`,
+            error,
+          );
+          throw error;
+        }
+      },
+    );
   }
 }
 

@@ -166,11 +166,13 @@ export class SitePublicResolver {
   @Query(() => FetchSiteInsights, { name: 'getSiteInsights' })
   async getSiteInsights(
     @Args('siteId', { type: () => String }) siteId: string,
+    @Args('pending', { type: () => Boolean, nullable: true })
+    showPending: boolean,
   ) {
     this.sitesLogger.log(
       'SiteResolver.getSiteInsights() start siteId:' + ' ' + siteId,
     );
-    const result = await this.siteService.getSiteInsights(siteId);
+    const result = await this.siteService.getSiteInsights(siteId, showPending);
     return this.genericResponseProviderForInsights.createResponse(
       'Success',
       200,
@@ -181,6 +183,7 @@ export class SitePublicResolver {
 
   @Query(() => MapSearchResponse, { name: 'mapSearch' })
   async mapSearch(
+    @AuthenticatedUser() userInfo,
     @Args('searchParam', { type: () => String, nullable: true })
     searchParam: string,
     @Args('polygon', { type: () => [LatLngTupleScalar], nullable: true })
@@ -194,6 +197,7 @@ export class SitePublicResolver {
         searchTerm: searchParam,
         polygon,
         circle,
+        userInfo,
       });
       return this.mapSearchGenericResponseProvider.createResponse(
         'Successfully fetched sites for map',

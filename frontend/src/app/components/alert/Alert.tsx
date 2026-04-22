@@ -49,7 +49,7 @@ const SuccessMsg: React.FC<SuccessMsgProps> = ({ customMessage }: any) => (
   <div className=" custom" role="alert">
     <div className="custom">
       <span className="error-text">
-        {customMessage ? customMessage : 'Chagnes saved successfully.'}
+        {customMessage ? customMessage : 'Changes saved successfully.'}
       </span>
     </div>
   </div>

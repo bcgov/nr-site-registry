@@ -1,4 +1,4 @@
-import reducer, { fetchSearchSites } from './SiteSearchSlice';
+import siteSearchReducer, { fetchSearchSites } from './SiteSearchSlice';
 import { RequestStatus } from '../../helpers/requests/status';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
@@ -21,17 +21,21 @@ describe('siteSearchSlice', () => {
     status: RequestStatus.idle,
   };
 
+  beforeEach(() => {
+    mock.reset();
+  });
+
   afterEach(() => {
     mock.reset();
   });
 
   it('should return the initial state', () => {
-    expect(reducer(undefined, { type: '' })).toEqual(initialState);
+    expect(siteSearchReducer(undefined, { type: '' })).toEqual(initialState);
   });
 
   it('should handle fetchSearchSites.pending', () => {
     const action = { type: fetchSearchSites.pending.type };
-    const state = reducer(initialState, action);
+    const state = siteSearchReducer(initialState, action);
     expect(state.status).toEqual(RequestStatus.loading);
   });
 
@@ -47,7 +51,7 @@ describe('siteSearchSlice', () => {
       payload,
       meta: { arg: { searchParam: 'test', filter: {} } },
     };
-    const state = reducer(initialState, action);
+    const state = siteSearchReducer(initialState, action);
     expect(state.status).toEqual(RequestStatus.success);
     expect(state.sites).toEqual(payload.sites);
     expect(state.count).toBe(1);
@@ -59,7 +63,7 @@ describe('siteSearchSlice', () => {
       type: fetchSearchSites.rejected.type,
       error: { message: 'Request failed' },
     };
-    const state = reducer(initialState, action);
+    const state = siteSearchReducer(initialState, action);
     expect(state.status).toEqual(RequestStatus.failed);
     expect(state.error).toEqual('Request failed');
   });
@@ -107,6 +111,84 @@ describe('siteSearchSlice', () => {
     );
     expect(dispatch).toHaveBeenCalledWith(
       expect.objectContaining({ type: fetchSearchSites.rejected.type }),
+    );
+  });
+
+  it('should handle search param with 3 or more blank spaces by returning empty results', async () => {
+    const dispatch = jest.fn();
+    const thunk = fetchSearchSites({ searchParam: '   ' }); // 3 spaces
+    await thunk(dispatch, () => ({}), undefined);
+
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({ type: fetchSearchSites.pending.type }),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: fetchSearchSites.fulfilled.type,
+        payload: {
+          sites: [],
+          count: 0,
+          page: 1,
+          pageSize: 5,
+        },
+      }),
+    );
+  });
+
+  it('should handle search param with multiple blank spaces by returning empty results', async () => {
+    const dispatch = jest.fn();
+    const thunk = fetchSearchSites({ searchParam: '     ' }); // 5 spaces
+    await thunk(dispatch, () => ({}), undefined);
+
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({ type: fetchSearchSites.pending.type }),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: fetchSearchSites.fulfilled.type,
+        payload: {
+          sites: [],
+          count: 0,
+          page: 1,
+          pageSize: 5,
+        },
+      }),
+    );
+  });
+
+  it('should trim search param with leading and trailing spaces before making API call', async () => {
+    const mockResponse = {
+      data: {
+        data: {
+          searchSites: {
+            sites: [{ id: 456, name: 'Trimmed Site' }],
+            count: 1,
+            page: 1,
+            pageSize: 5,
+          },
+        },
+      },
+    };
+
+    mock.onPost(GRAPHQL).reply((config) => {
+      const requestData = JSON.parse(config.data);
+      // Verify that the searchParam was trimmed
+      expect(requestData.variables.searchParam).toBe('test');
+      return [200, mockResponse.data];
+    });
+
+    const dispatch = jest.fn();
+    const thunk = fetchSearchSites({ searchParam: '  test  ' }); // spaces around 'test'
+    await thunk(dispatch, () => ({}), undefined);
+
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({ type: fetchSearchSites.pending.type }),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: fetchSearchSites.fulfilled.type,
+        payload: mockResponse.data.data.searchSites,
+      }),
     );
   });
 });

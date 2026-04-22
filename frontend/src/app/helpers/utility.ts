@@ -130,7 +130,7 @@ export const flattenFormRows = (arr: IFormField[][]): IFormField[] => {
 export function getUser() {
   const { authority, client_id } = getClientSettings();
   const storageKey = `oidc.user:${authority}:${client_id}`;
-  const oidcStorage = sessionStorage.getItem(storageKey);
+  const oidcStorage = localStorage.getItem(storageKey);
   if (!oidcStorage) {
     return null;
   }
@@ -602,4 +602,37 @@ export const removeProperty = (obj: any, propertyName: string): any => {
 export const safeParseFloat = (value: any): number | null => {
   const parsed = parseFloat(value);
   return isNaN(parsed) ? null : parsed;
+};
+
+/**
+ * Sorts an array of objects by a given field name.
+ *
+ * @param data - The array to sort.
+ * @param field - The property name to sort by. For multi-field columns use the first field (split on comma).
+ * @param ascending - Sort direction.
+ * @param dateFields - Set of field names that should be compared as dates.
+ * @param rawDateFieldMap - Map of display field name to raw ISO date field name for date comparison.
+ */
+export const sortTableData = <T extends Record<string, any>>(
+  data: T[],
+  field: string,
+  ascending: boolean,
+  dateFields: string[] = [],
+  rawDateFieldMap: Record<string, string> = {},
+): T[] => {
+  const sortField = field.split(',')[0];
+  return [...data].sort((a, b) => {
+    if (dateFields.includes(sortField)) {
+      const rawKey = rawDateFieldMap[sortField] || sortField;
+      const aTime = new Date(a[rawKey] || 0).getTime();
+      const bTime = new Date(b[rawKey] || 0).getTime();
+      return ascending ? aTime - bTime : bTime - aTime;
+    }
+    const aVal = a[sortField] ?? '';
+    const bVal = b[sortField] ?? '';
+    const comparison = String(aVal).localeCompare(String(bVal), undefined, {
+      numeric: true,
+    });
+    return ascending ? comparison : -comparison;
+  });
 };

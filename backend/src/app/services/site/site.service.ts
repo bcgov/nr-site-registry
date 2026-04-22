@@ -163,228 +163,258 @@ export class SiteService {
     } = filters;
 
     this.sitesLogger.log('SiteService.searchSites() start');
+
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
 
-    const query = this.siteRepository.createQueryBuilder('sites');
+    if (!searchParam?.trim() && (!siteIds || siteIds.length === 0)) {
+      response.sites = [];
+      response.count = 0;
+      response.page = page;
+      response.pageSize = pageSize;
+      return response;
+    } else {
+      const query = this.siteRepository.createQueryBuilder('sites');
 
-    // Exclude soft-deleted sites
-    query.andWhere('sites.who_deleted IS NULL');
+      // Exclude soft-deleted sites from search results.
+      query.andWhere('sites.who_deleted IS NULL');
 
-    if (siteIds && siteIds.length === 0) {
-      throw new HttpException(
-        `If provided, siteIds filter array must not be empty`,
-        HttpStatus.BAD_REQUEST,
-      );
-    } else if (siteIds && siteIds.length > 0) {
-      query.whereInIds(siteIds);
+      if (siteIds && siteIds.length === 0) {
+        throw new HttpException(
+          `If provided, siteIds filter array must not be empty`,
+          HttpStatus.BAD_REQUEST,
+        );
+      } else if (siteIds && siteIds.length > 0) {
+        query.whereInIds(siteIds);
+      }
+
+      let pid;
+      if (searchParam?.length === 11 || searchParam?.length === 9) {
+        pid = searchParam.replace(/-/g, '');
+      }
+
+      if (pid) {
+        query
+          .innerJoin('sites.siteSubdivisions', 'siteSubdivisions')
+          .innerJoin('siteSubdivisions.subdivision', 'subdivision');
+      }
+
+      if (searchParam?.trim()) {
+        const keywords = searchParam.trim().toLowerCase().split(/\s+/);
+        query.andWhere(
+          new Brackets((qb) => {
+            for (const word of keywords) {
+              qb.andWhere(
+                new Brackets((subQb) => {
+                  subQb
+                    .orWhere('LOWER(sites.addr_line_1) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.addr_line_2) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.addr_line_3) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.addr_line_4) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.city) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.common_name) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.provState) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.postalCode) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('CAST(sites.id AS TEXT) LIKE :word', {
+                      word: `%${word}%`,
+                    });
+                }),
+              );
+            }
+            if (pid) {
+              qb.orWhere('subdivision.pid = :pid', { pid });
+              qb.orWhere('subdivision.pin = :pin', { pin: pid });
+            }
+          }),
+        );
+      }
+
+      if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR) {
+        query.andWhere('sites.srAction = :srAction', {
+          srAction: SRApprovalStatusEnum.PUBLIC,
+        });
+      }
+
+      if (id) {
+        const ids = id.split(',').map((v) => v.trim());
+        this.sitesLogger.log(`Applying id filter: ${JSON.stringify(ids)}`);
+        // Build OR conditions for each ID
+        query.andWhere(
+          new Brackets((qb) => {
+            ids.forEach((siteId, index) => {
+              if (index === 0) {
+                qb.where(`CAST(sites.id AS TEXT) = :id${index}`, {
+                  [`id${index}`]: siteId,
+                });
+              } else {
+                qb.orWhere(`CAST(sites.id AS TEXT) = :id${index}`, {
+                  [`id${index}`]: siteId,
+                });
+              }
+            });
+          }),
+        );
+      }
+
+      if (srStatus) {
+        query.andWhere('sites.srStatus = :srStatus', { srStatus: srStatus });
+      }
+
+      if (siteRiskCode) {
+        query.andWhere('sites.site_risk_code = :siteRiskCode', {
+          siteRiskCode: siteRiskCode,
+        });
+      }
+
+      if (commonName) {
+        query.andWhere('sites.common_name = :commonName', {
+          commonName: commonName,
+        });
+      }
+
+      if (addrLine_1) {
+        const cleanedAddress = siteUtil.removeSpecialCharacters(addrLine_1);
+        query.andWhere(
+          `regexp_replace(concat_ws('', sites.addr_line_1, sites.addr_line_2, sites.addr_line_3, sites.addr_line_4), '[^a-zA-Z0-9]', '', 'g') LIKE :cleanedAddress`,
+          { cleanedAddress: `%${cleanedAddress}%` },
+        );
+      }
+
+      if (city) query.andWhere('sites.city = :city', { city });
+      if (whoCreated)
+        query.andWhere('sites.who_created = :whoCreated', { whoCreated });
+      if (latlongReliabilityFlag)
+        query.andWhere(
+          'sites.latlong_reliability_flag = :latlongReliabilityFlag',
+          { latlongReliabilityFlag },
+        );
+
+      if (latdeg) query.andWhere('sites.latdeg = :latdeg', { latdeg });
+      if (latDegrees)
+        query.andWhere('sites.lat_degrees = :latDegrees', { latDegrees });
+      if (latMinutes)
+        query.andWhere('sites.lat_minutes = :latMinutes', { latMinutes });
+      if (latSeconds)
+        query.andWhere('sites.lat_seconds = :latSeconds', { latSeconds });
+      if (longdeg) query.andWhere('sites.longdeg = :longdeg', { longdeg });
+      if (longDegrees)
+        query.andWhere('sites.long_degrees = :longDeg', {
+          longDeg: longDegrees,
+        });
+      if (longMinutes)
+        query.andWhere('sites.long_minutes = :longMinutes', { longMinutes });
+      if (longSeconds)
+        query.andWhere('sites.long_seconds = :longSeconds', { longSeconds });
+
+      if (
+        whenCreated?.length === 2 &&
+        whenCreated.every((date) => date instanceof Date)
+      ) {
+        query.andWhere('sites.whenCreated BETWEEN :start AND :end', {
+          start: whenCreated[0],
+          end: whenCreated[1],
+        });
+      }
+
+      if (
+        whenUpdated?.length === 2 &&
+        whenUpdated.every((date) => date instanceof Date)
+      ) {
+        query.andWhere('sites.whenUpdated BETWEEN :start AND :end', {
+          start: whenUpdated[0],
+          end: whenUpdated[1],
+        });
+      }
+
+      const sortFieldMap: Record<SiteSortBy, string> = {
+        [SiteSortBy.ID]: 'sites.id',
+        [SiteSortBy.SR_STATUS]: 'sites.srStatus',
+        [SiteSortBy.SITE_RISK_CODE]: 'sites.site_risk_code',
+        [SiteSortBy.COMMON_NAME]: 'sites.common_name',
+        [SiteSortBy.CITY]: 'sites.city',
+        [SiteSortBy.SITE_ADDRESS]: `
+        CASE
+          WHEN sites.addr_line_1 IS NOT NULL THEN sites.addr_line_1
+          WHEN sites.addr_line_2 IS NOT NULL THEN sites.addr_line_2
+          WHEN sites.addr_line_3 IS NOT NULL THEN sites.addr_line_3
+          ELSE ''
+        END
+      `,
+        [SiteSortBy.WHO_CREATED]: 'sites.who_created',
+        [SiteSortBy.LAT_DEGREES_MINUTES_SECONDS]: `
+        CASE
+          WHEN sites.lat_degrees IS NOT NULL THEN sites.lat_degrees
+          WHEN sites.lat_minutes IS NOT NULL THEN sites.lat_minutes
+          WHEN sites.lat_seconds IS NOT NULL THEN sites.lat_seconds
+          ELSE NULL
+        END
+      `,
+        [SiteSortBy.LONG_DEGREES_MINUTES_SECONDS]: `
+        CASE
+          WHEN sites.long_degrees IS NOT NULL THEN sites.long_degrees
+          WHEN sites.long_minutes IS NOT NULL THEN sites.long_minutes
+          WHEN sites.long_seconds IS NOT NULL THEN sites.long_seconds
+          ELSE NULL
+        END
+      `,
+        [SiteSortBy.WHEN_CREATED]: 'sites.whenCreated',
+        [SiteSortBy.WHEN_UPDATED]: 'sites.whenUpdated',
+        [SiteSortBy.GENERAL_DESCRIPTION]: 'sites.general_description',
+        [SiteSortBy.LAT_LONG_RELIABILITY_FLAG]:
+          'sites.latlong_reliability_flag',
+        [SiteSortBy.LAT_DEG]: 'sites.latdeg',
+        [SiteSortBy.LONG_DEG]: 'sites.longdeg',
+        [SiteSortBy.CONSULTANT_SUBMITTED]: 'sites.consultant_submitted',
+      };
+
+      if (sortBy && sortFieldMap[sortBy]) {
+        query.orderBy(
+          sortFieldMap[sortBy],
+          sortByDir === SortByDirection.DESC ? 'DESC' : 'ASC',
+        );
+      }
+
+      const result = await query
+        .skip((page - 1) * pageSize)
+        .take(pageSize)
+        .getManyAndCount();
+
+      response.sites = result[0] || [];
+      response.count = result[1] || 0;
+      response.page = page;
+      response.pageSize = pageSize;
+
+      this.sitesLogger.log('SiteService.searchSites() end');
+      return response;
     }
-
-    let pid;
-    if (searchParam?.length === 11 || searchParam?.length === 9) {
-      pid = searchParam.replace(/-/g, '');
-    }
-
-    if (pid) {
-      query
-        .innerJoin('sites.siteSubdivisions', 'siteSubdivisions')
-        .innerJoin('siteSubdivisions.subdivision', 'subdivision');
-    }
-
-    if (searchParam?.trim()) {
-      const keywords = searchParam.trim().toLowerCase().split(/\s+/);
-      query.andWhere(
-        new Brackets((qb) => {
-          for (const word of keywords) {
-            qb.andWhere(
-              new Brackets((subQb) => {
-                subQb
-                  .orWhere('LOWER(sites.addr_line_1) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.addr_line_2) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.addr_line_3) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.addr_line_4) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.city) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.common_name) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.provState) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.postalCode) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('CAST(sites.id AS TEXT) LIKE :word', {
-                    word: `%${word}%`,
-                  });
-              }),
-            );
-          }
-          if (pid) {
-            qb.orWhere('subdivision.pid = :pid', { pid });
-            qb.orWhere('subdivision.pin = :pin', { pin: pid });
-          }
-        }),
-      );
-    }
-
-    if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR) {
-      query.andWhere('sites.srAction = :srAction', {
-        srAction: SRApprovalStatusEnum.PUBLIC,
-      });
-    }
-
-    if (id) {
-      const ids = id.split(',').map((v) => v.trim());
-      query.andWhere('sites.id IN (:...ids)', { ids });
-    }
-
-    if (srStatus) {
-      query.andWhere('sites.srStatus = :srStatus', { srStatus: srStatus });
-    }
-
-    if (siteRiskCode) {
-      query.andWhere('sites.site_risk_code = :siteRiskCode', {
-        siteRiskCode: siteRiskCode,
-      });
-    }
-
-    if (commonName) {
-      query.andWhere('sites.common_name = :commonName', {
-        commonName: commonName,
-      });
-    }
-
-    if (addrLine_1) {
-      const cleanedAddress = siteUtil.removeSpecialCharacters(addrLine_1);
-      query.andWhere(
-        `regexp_replace(concat_ws('', sites.addr_line_1, sites.addr_line_2, sites.addr_line_3, sites.addr_line_4), '[^a-zA-Z0-9]', '', 'g') LIKE :cleanedAddress`,
-        { cleanedAddress: `%${cleanedAddress}%` },
-      );
-    }
-
-    if (city) query.andWhere('sites.city = :city', { city });
-    if (whoCreated)
-      query.andWhere('sites.who_created = :whoCreated', { whoCreated });
-    if (latlongReliabilityFlag)
-      query.andWhere(
-        'sites.latlong_reliability_flag = :latlongReliabilityFlag',
-        { latlongReliabilityFlag },
-      );
-
-    if (latdeg) query.andWhere('sites.latdeg = :latdeg', { latdeg });
-    if (latDegrees)
-      query.andWhere('sites.lat_degrees = :latDegrees', { latDegrees });
-    if (latMinutes)
-      query.andWhere('sites.lat_minutes = :latMinutes', { latMinutes });
-    if (latSeconds)
-      query.andWhere('sites.lat_seconds = :latSeconds', { latSeconds });
-    if (longdeg) query.andWhere('sites.longdeg = :longdeg', { longdeg });
-    if (longDegrees)
-      query.andWhere('sites.long_degrees = :longDeg', { longDeg: longDegrees });
-    if (longMinutes)
-      query.andWhere('sites.long_minutes = :longMinutes', { longMinutes });
-    if (longSeconds)
-      query.andWhere('sites.long_seconds = :longSeconds', { longSeconds });
-
-    if (
-      whenCreated?.length === 2 &&
-      whenCreated.every((date) => date instanceof Date)
-    ) {
-      query.andWhere('sites.whenCreated BETWEEN :start AND :end', {
-        start: whenCreated[0],
-        end: whenCreated[1],
-      });
-    }
-
-    if (
-      whenUpdated?.length === 2 &&
-      whenUpdated.every((date) => date instanceof Date)
-    ) {
-      query.andWhere('sites.whenUpdated BETWEEN :start AND :end', {
-        start: whenUpdated[0],
-        end: whenUpdated[1],
-      });
-    }
-
-    const sortFieldMap: Record<SiteSortBy, string> = {
-      [SiteSortBy.ID]: 'sites.id',
-      [SiteSortBy.SR_STATUS]: 'sites.srStatus',
-      [SiteSortBy.SITE_RISK_CODE]: 'sites.site_risk_code',
-      [SiteSortBy.COMMON_NAME]: 'sites.common_name',
-      [SiteSortBy.CITY]: 'sites.city',
-      [SiteSortBy.SITE_ADDRESS]: `
-      CASE
-        WHEN sites.addr_line_1 IS NOT NULL THEN sites.addr_line_1
-        WHEN sites.addr_line_2 IS NOT NULL THEN sites.addr_line_2
-        WHEN sites.addr_line_3 IS NOT NULL THEN sites.addr_line_3
-        ELSE ''
-      END
-    `,
-      [SiteSortBy.WHO_CREATED]: 'sites.who_created',
-      [SiteSortBy.LAT_DEGREES_MINUTES_SECONDS]: `
-      CASE
-        WHEN sites.lat_degrees IS NOT NULL THEN sites.lat_degrees
-        WHEN sites.lat_minutes IS NOT NULL THEN sites.lat_minutes
-        WHEN sites.lat_seconds IS NOT NULL THEN sites.lat_seconds
-        ELSE NULL
-      END
-    `,
-      [SiteSortBy.LONG_DEGREES_MINUTES_SECONDS]: `
-      CASE
-        WHEN sites.long_degrees IS NOT NULL THEN sites.long_degrees
-        WHEN sites.long_minutes IS NOT NULL THEN sites.long_minutes
-        WHEN sites.long_seconds IS NOT NULL THEN sites.long_seconds
-        ELSE NULL
-      END
-    `,
-      [SiteSortBy.WHEN_CREATED]: 'sites.whenCreated',
-      [SiteSortBy.WHEN_UPDATED]: 'sites.whenUpdated',
-      [SiteSortBy.GENERAL_DESCRIPTION]: 'sites.general_description',
-      [SiteSortBy.LAT_LONG_RELIABILITY_FLAG]: 'sites.latlong_reliability_flag',
-      [SiteSortBy.LAT_DEG]: 'sites.latdeg',
-      [SiteSortBy.LONG_DEG]: 'sites.longdeg',
-      [SiteSortBy.CONSULTANT_SUBMITTED]: 'sites.consultant_submitted',
-    };
-
-    if (sortBy && sortFieldMap[sortBy]) {
-      query.orderBy(
-        sortFieldMap[sortBy],
-        sortByDir === SortByDirection.DESC ? 'DESC' : 'ASC',
-      );
-    }
-
-    const result = await query
-      .skip((page - 1) * pageSize)
-      .take(pageSize)
-      .getManyAndCount();
-
-    response.sites = result[0] || [];
-    response.count = result[1] || 0;
-    response.page = page;
-    response.pageSize = pageSize;
-
-    this.sitesLogger.log('SiteService.searchSites() end');
-    return response;
   }
 
   async mapSearch({
     searchTerm,
     polygon,
     circle,
+    userInfo,
   }: {
     searchTerm?: string;
     polygon?: LatLngTuple[];
     circle?: RadiusSearchParams;
+    userInfo?: any;
   }) {
     this.sitesLogger.log('SiteService.mapSearch() start');
 
@@ -491,12 +521,14 @@ export class SiteService {
       );
     }
 
+    this.applyPublicVisibilityFilterForNonIdirUsers(query, userInfo);
+
     const [result] = await query.getManyAndCount();
     this.sitesLogger.log('SiteService.mapSearch() end');
     return result;
   }
 
-  async findSitesAndPlaces(searchTerm = '', limit = 3) {
+  async findSitesAndPlaces(searchTerm = '', limit = 3, userInfo?: any) {
     this.sitesLogger.log('SiteService.findSitesAndPlaces() start');
 
     const searchTermClean = searchTerm.toLowerCase().trim();
@@ -531,6 +563,8 @@ export class SiteService {
         'ASC',
       )
       .addOrderBy('sites.id', 'ASC');
+
+    this.applyPublicVisibilityFilterForNonIdirUsers(sitesQuery, userInfo);
     placesQuery
       .where('LOWER(places.name) LIKE LOWER(:searchTerm)', {
         searchTerm: `%${searchTermClean}%`,
@@ -544,6 +578,19 @@ export class SiteService {
 
     this.sitesLogger.log('SiteService.findSitesAndPlaces() end');
     return { sites, places };
+  }
+
+  private applyPublicVisibilityFilterForNonIdirUsers(
+    query: any,
+    userInfo?: any,
+  ) {
+    // `sr_action` is a disclosure/visibility flag. Non-IDIR users must never receive non-public sites
+    // (e.g., private sites) from "list-style" endpoints like map pins or autocomplete.
+    if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR) {
+      query.andWhere('sites.srAction = :srAction', {
+        srAction: SRApprovalStatusEnum.PUBLIC,
+      });
+    }
   }
 
   /**
@@ -1505,6 +1552,9 @@ export class SiteService {
             ...new Events(),
             ...eventData,
           };
+          const dbEvent = await this.eventsRepositoryRepo.findOneByOrFail({
+            id: notationId,
+          });
           switch (apiAction) {
             case UserActionEnum.ADDED:
               // Get the ID of the newly created event
@@ -1554,9 +1604,47 @@ export class SiteService {
               break;
 
             case UserActionEnum.DELETED:
-              // Handle deletion if necessary
+              if (dbEvent) {
+                // Deleting is just a special form of updating, so it's safe to push.
+                updatedEvents.push({
+                  id: notation.id,
+                  changes: {
+                    ...new Events(),
+                    ...dbEvent,
+                    ...event,
+                    whoDeleted: userInfo ? userInfo.givenName : '',
+                    whenDeleted: new Date(),
+                    whoRestored: null,
+                    whenRestored: null,
+                  },
+                });
+              } else {
+                this.sitesLogger.log(
+                  `SiteService.processEvents(): Event with id ${notation.id} not found for deletion`,
+                );
+              }
               break;
-
+            case UserActionEnum.RESTORED:
+              if (dbEvent) {
+                // Restoring is just a special form of updating, so it's safe to push.
+                updatedEvents.push({
+                  id: notation.id,
+                  changes: {
+                    ...new Events(),
+                    ...dbEvent,
+                    ...event,
+                    whoRestored: userInfo ? userInfo.givenName : '',
+                    whenRestored: new Date(),
+                    whoDeleted: null,
+                    whenDeleted: null,
+                  },
+                });
+              } else {
+                this.sitesLogger.log(
+                  `SiteService.processEvents(): Event with id ${notation.id} not found for restoration`,
+                );
+              }
+              break;
             default:
               this.sitesLogger.warn(
                 'SiteService.processEvents Unknown action for event',
@@ -1897,6 +1985,8 @@ export class SiteService {
     searchParam: SearchParams,
     page: number,
     pageSize: number,
+    sortBy: SiteSortBy = SiteSortBy.ID,
+    sortByDir: SortByDirection = SortByDirection.ASC,
   ): Promise<QueryResultForPendingSites> {
     try {
       this.sitesLogger.log(
@@ -1964,7 +2054,7 @@ export class SiteService {
               
               SELECT sp.site_id, sp.when_Updated , sp.who_updated 
               FROM sites.site_profiles sp
-              INNER JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
+              LEFT JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
               WHERE sp.sr_action = 'pending' or sp.user_action = 'updated' or sp2r.sr_action = 'pending' or sp2r.user_action = 'updated'
           ) AS updates
           GROUP BY site_id, who_updated
@@ -2024,9 +2114,9 @@ export class SiteService {
           
           UNION ALL
           
-          SELECT site_id, 'site profiles' AS Change, sp.when_Updated, sp.who_updated ,  '' , '', '' 
+          SELECT site_id, 'site disclosure' AS Change, sp.when_Updated, sp.who_updated ,  '' , '', '' 
           FROM sites.site_profiles sp
-          INNER JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
+          LEFT JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
           WHERE sp.sr_action = 'pending' or sp.user_action = 'updated' or sp2r.sr_action = 'pending' or sp2r.user_action = 'updated'
       ) AS c
       GROUP BY c.site_id,c.who_updated) Final
@@ -2103,6 +2193,8 @@ export class SiteService {
       }
 
       const startIndex = (page - 1) * pageSize;
+
+      result = sortSRReviewTableResults(result, sortBy, sortByDir);
 
       const paginatedRecords = result.slice(startIndex, startIndex + pageSize);
 
@@ -2592,20 +2684,32 @@ export class SiteService {
     }
   }
 
-  async getSiteInsights(siteId: string): Promise<SiteInsightsDto> {
+  async getSiteInsights(
+    siteId: string,
+    showPending?: boolean,
+  ): Promise<SiteInsightsDto> {
     try {
+      const srFilter = showPending
+        ? ''
+        : `AND (sr_action IS NULL OR sr_action != '${SRApprovalStatusEnum.PENDING}')`;
+
+      const sdSrFilter = showPending
+        ? ''
+        : `AND (sd.sr_action IS NULL OR sd.sr_action != '${SRApprovalStatusEnum.PENDING}')`;
+
       const result = await this.siteRepository.query(
         `
         SELECT
-          (SELECT COUNT(id) FROM sites.events WHERE site_id = $1) AS event_count,
+          (SELECT COUNT(id) FROM sites.events WHERE site_id = $1 ${srFilter}) AS event_count,
           (SELECT COUNT(sd.id) FROM sites.site_docs sd
-		  join sites.site_doc_partics  spr on sdoc_id = sd.id
-		  where site_id = $1) AS site_doc_count,
+		  join sites.site_doc_partics spr on sdoc_id = sd.id
+		  where site_id = $1 ${sdSrFilter}) AS site_doc_count,
           (SELECT COUNT(id) FROM sites.event_partics WHERE event_id IN (
-              SELECT id FROM sites.events WHERE site_id = $1
+              SELECT id FROM sites.events WHERE site_id = $1 ${srFilter}
           )) AS event_partic_count,
-          (SELECT COUNT(Lut_code) FROM sites.land_histories WHERE site_id = $1) AS land_history_count,
-          (SELECT COUNT(id) FROM sites.site_assocs WHERE site_id = $1) AS site_assoc_count,
+           (SELECT COUNT(id) FROM sites.site_partics WHERE site_id = $1 ${srFilter}) AS site_participants,
+          (SELECT COUNT(Lut_code) FROM sites.land_histories WHERE site_id = $1 ${srFilter}) AS land_history_count,
+          (SELECT COUNT(id) FROM sites.site_assocs WHERE site_id = $1 ${srFilter}) AS site_assoc_count,
           (SELECT COUNT(subdiv_id) FROM sites.site_subdivisions WHERE site_id = $1) AS site_subdiv_count
         `,
         [siteId],
@@ -2623,6 +2727,7 @@ export class SiteService {
         landHistoryCount: Number(raw.land_history_count),
         siteAssocCount: Number(raw.site_assoc_count),
         siteSubdivCount: Number(raw.site_subdiv_count),
+        siteParticsCount: Number(raw.site_participants),
       };
 
       return dto;
@@ -2716,4 +2821,34 @@ export class SiteService {
       },
     );
   }
+}
+
+export function sortSRReviewTableResults(
+  results: any[],
+  sortBy: SiteSortBy = SiteSortBy.ID,
+  sortByDir: SortByDirection = SortByDirection.ASC,
+): any[] {
+  const pendingSortFieldMap: Record<string, string> = {
+    [SiteSortBy.ID]: 'siteId',
+    [SiteSortBy.WHEN_UPDATED]: 'whenUpdated',
+    [SiteSortBy.WHO_CREATED]: 'whoUpdated',
+    [SiteSortBy.SITE_ADDRESS]: 'address',
+  };
+
+  const sortField = pendingSortFieldMap[sortBy] || 'siteId';
+  const dateFields = new Set(['whenUpdated']);
+
+  return [...results].sort((a, b) => {
+    const aVal = a[sortField] ?? '';
+    const bVal = b[sortField] ?? '';
+    let comparison: number;
+    if (dateFields.has(sortField)) {
+      comparison = new Date(aVal).getTime() - new Date(bVal).getTime();
+    } else {
+      comparison = String(aVal).localeCompare(String(bVal), undefined, {
+        numeric: true,
+      });
+    }
+    return sortByDir === SortByDirection.DESC ? -comparison : comparison;
+  });
 }

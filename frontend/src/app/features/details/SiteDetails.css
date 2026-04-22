@@ -209,3 +209,27 @@
   gap: 10px;
   margin-bottom: 10px;
 }
+
+.change-group-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.change-group-item {
+  margin-bottom: 8px;
+}
+
+.change-group-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.change-group-header--expandable {
+  cursor: pointer;
+}
+
+.change-group-details {
+  margin-top: 4px;
+  padding-left: 20px;
+}

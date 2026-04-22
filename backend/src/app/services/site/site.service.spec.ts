@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Brackets, EntityManager, FindOneOptions, Repository } from 'typeorm';
-import { SiteService } from './site.service';
+import { SiteService, sortSRReviewTableResults } from './site.service';
 import { Sites } from '../../entities/sites.entity';
 import { FetchSiteDetail } from '../../dto/response/genericResponse';
 import { sampleSites } from '../../mockData/site.mockData';
@@ -34,6 +34,7 @@ import { Place } from '../../entities/placeEntity';
 
 import { SiteRegistry } from '../../entities/siteRegistry.entity';
 import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
+import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
 import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
 import { RecentViews } from '../../entities/recentViews.entity';
 
@@ -76,6 +77,7 @@ describe('SiteService', () => {
         {
           provide: getRepositoryToken(Sites),
           useValue: {
+            query: jest.fn(),
             find: jest.fn(() => {
               return [
                 { id: '123', commonName: 'victoria' },
@@ -737,6 +739,8 @@ describe('SiteService', () => {
               srValue: true,
               whenCreated: new Date(),
               whenUpdated: new Date(),
+              whenDeleted: null,
+              whenRestored: null,
               notationParticipant: [
                 {
                   apiAction: UserActionEnum.ADDED,
@@ -879,6 +883,108 @@ describe('SiteService', () => {
         );
 
         expect(result.totalRecords).toBeLessThanOrEqual(1);
+      });
+
+      it('returns empty result when query returns no data', async () => {
+        jest.spyOn(siteRepository.manager, 'query').mockResolvedValue([]);
+
+        const result = await siteService.getSiteDetailsPendingSRApproval(
+          null,
+          1,
+          5,
+        );
+
+        expect(result.totalRecords).toBe(0);
+        expect(result.data).toEqual([]);
+      });
+
+      it('filters by site id when searchParam.id is provided', async () => {
+        const data = [
+          {
+            site_id: '100',
+            who_updated: 'User1',
+            latest_update: new Date(),
+            changes: 'summary',
+            addr_line_1: 'Addr1',
+            addr_line_2: '',
+            addr_line_3: '',
+          },
+          {
+            site_id: '200',
+            who_updated: 'User2',
+            latest_update: new Date(),
+            changes: 'notation',
+            addr_line_1: 'Addr2',
+            addr_line_2: '',
+            addr_line_3: '',
+          },
+        ];
+        jest.spyOn(siteRepository.manager, 'query').mockResolvedValue(data);
+
+        const result = await siteService.getSiteDetailsPendingSRApproval(
+          { id: '100' },
+          1,
+          10,
+        );
+
+        expect(result.totalRecords).toBe(1);
+        expect(result.data[0].siteId).toBe('100');
+      });
+
+      it('filters by address when searchParam.addrLine is provided', async () => {
+        const data = [
+          {
+            site_id: '1',
+            who_updated: 'User1',
+            latest_update: new Date(),
+            changes: 'summary',
+            addr_line_1: '123 Main St',
+            addr_line_2: '',
+            addr_line_3: '',
+          },
+          {
+            site_id: '2',
+            who_updated: 'User2',
+            latest_update: new Date(),
+            changes: 'notation',
+            addr_line_1: '456 Oak Ave',
+            addr_line_2: '',
+            addr_line_3: '',
+          },
+        ];
+        jest.spyOn(siteRepository.manager, 'query').mockResolvedValue(data);
+
+        const result = await siteService.getSiteDetailsPendingSRApproval(
+          { addrLine: 'Main' },
+          1,
+          10,
+        );
+
+        expect(result.totalRecords).toBe(1);
+        expect(result.data[0].address).toContain('Main');
+      });
+
+      it('handles null address fields', async () => {
+        const data = [
+          {
+            site_id: '1',
+            who_updated: 'User',
+            latest_update: new Date(),
+            changes: 'summary',
+            addr_line_1: '123 Main',
+            addr_line_2: null,
+            addr_line_3: null,
+          },
+        ];
+        jest.spyOn(siteRepository.manager, 'query').mockResolvedValue(data);
+
+        const result = await siteService.getSiteDetailsPendingSRApproval(
+          null,
+          1,
+          10,
+        );
+
+        expect(result.data[0].address).toBe('123 Main');
       });
     });
 
@@ -1300,14 +1406,19 @@ describe('SiteService', () => {
           id: '1',
           siteId: '1',
           psnorgId: '1',
-          completionDate: '2004-06-16T07:00:00.000Z',
-          requirementDueDate: '1970-01-01T00:00:00.000Z',
-          requirementReceivedDate: '1970-01-01T00:00:00.000Z',
+          completionDate: new Date('2004-06-16T07:00:00.000Z'),
+          requirementDueDate: new Date('1970-01-01T00:00:00.000Z'),
+          requirementReceivedDate: new Date('1970-01-01T00:00:00.000Z'),
           requiredAction: null,
           note: null,
           etypCode: 'CMI',
           eclsCode: 'ADM',
           srAction: 'false',
+          userAction: UserActionEnum.ADDED,
+          whenCreated: new Date(),
+          whenUpdated: new Date(),
+          whenDeleted: null,
+          whenRestored: null,
           notationParticipant: [
             {
               apiAction: UserActionEnum.ADDED,
@@ -1317,6 +1428,11 @@ describe('SiteService', () => {
               psnorgId: '1',
               displayName: 'SAGER, J.',
               srAction: 'false',
+              userAction: UserActionEnum.ADDED,
+              whenCreated: new Date(),
+              whenUpdated: new Date(),
+              whenDeleted: null,
+              whenRestored: null,
             },
           ],
         },
@@ -1345,6 +1461,10 @@ describe('SiteService', () => {
           id: '1',
           etypCode: 'type',
           eclsCode: 'class',
+          whenCreated: new Date(),
+          whenUpdated: new Date(),
+          whenDeleted: null,
+          whenRestored: null,
           notationParticipant: [
             {
               apiAction: UserActionEnum.ADDED,
@@ -1354,6 +1474,11 @@ describe('SiteService', () => {
               psnorgId: '1',
               displayName: 'SAGER, J.',
               srAction: 'false',
+              userAction: UserActionEnum.ADDED,
+              whenCreated: new Date(),
+              whenUpdated: new Date(),
+              whenDeleted: null,
+              whenRestored: null,
             },
           ],
         },
@@ -1375,10 +1500,18 @@ describe('SiteService', () => {
       const events = [
         {
           id: '1',
+          whenCreated: new Date(),
+          whenUpdated: new Date(),
+          whenDeleted: null,
+          whenRestored: null,
           notationParticipant: [
             {
               apiAction: UserActionEnum.DELETED,
               eventParticId: 'xxx-xxx',
+              whenCreated: new Date(),
+              whenUpdated: new Date(),
+              whenDeleted: null,
+              whenRestored: null,
             },
           ],
         },
@@ -1391,14 +1524,197 @@ describe('SiteService', () => {
         id: 'xxx-xxx',
       });
     });
+
+    it('should soft delete notation when action is DELETED', async () => {
+      const existingEvent = {
+        id: '1',
+        siteId: '1',
+        note: 'existing notation',
+        whoDeleted: null,
+        whenDeleted: null,
+        whoRestored: null,
+        whenRestored: null,
+      };
+      jest
+        .spyOn(eventsRepository, 'findOneByOrFail')
+        .mockResolvedValueOnce(existingEvent as any);
+
+      const events = [
+        {
+          apiAction: UserActionEnum.DELETED,
+          id: '1',
+          notationParticipant: [
+            {
+              apiAction: UserActionEnum.ADDED,
+              eventParticId: 'ep-1',
+              eventId: '1',
+              eprCode: 'RVB',
+              psnorgId: '1',
+              displayName: 'Participant',
+              srAction: SRApprovalStatusEnum.PENDING,
+            },
+          ],
+        },
+      ];
+
+      await siteService.processEvents(
+        events,
+        { givenName: 'Deleter User' },
+        entityManager,
+        '1',
+      );
+
+      // Verify that update was called once for the event
+      expect(entityManager.update).toHaveBeenCalledWith(
+        Events,
+        { id: '1' },
+        expect.objectContaining({
+          id: '1',
+          siteId: '1',
+          note: 'existing notation',
+          whoDeleted: 'Deleter User',
+          whoRestored: null,
+          whenRestored: null,
+        }),
+      );
+
+      // Validate the complete updatedEvents array content via the update call
+      const updateCall = (entityManager.update as jest.Mock).mock.calls.find(
+        (call) => call[0] === Events && call[1]?.id === '1',
+      );
+      expect(updateCall).toBeDefined();
+      expect(updateCall[1]).toEqual({ id: '1' });
+
+      const deletedEvent = updateCall[2];
+      expect(deletedEvent).toBeDefined();
+      expect(deletedEvent.id).toBe('1');
+      expect(deletedEvent.siteId).toBe('1');
+      expect(deletedEvent.note).toBe('existing notation');
+      expect(deletedEvent.whoDeleted).toBe('Deleter User');
+      expect(deletedEvent.whenDeleted).toBeInstanceOf(Date);
+      expect(deletedEvent.whoRestored).toBeNull();
+      expect(deletedEvent.whenRestored).toBeNull();
+    });
+
+    it('should restore notation when action is RESTORED', async () => {
+      const existingEvent = {
+        id: '1',
+        siteId: '1',
+        note: 'deleted notation',
+        whoDeleted: 'Old User',
+        whenDeleted: new Date('2024-01-01T00:00:00.000Z'),
+        whoRestored: null,
+        whenRestored: null,
+      };
+      jest
+        .spyOn(eventsRepository, 'findOneByOrFail')
+        .mockResolvedValueOnce(existingEvent as any);
+
+      const events = [
+        {
+          apiAction: UserActionEnum.RESTORED,
+          id: '1',
+          notationParticipant: [
+            {
+              apiAction: UserActionEnum.ADDED,
+              eventParticId: 'ep-2',
+              eventId: '1',
+              eprCode: 'RVB',
+              psnorgId: '1',
+              displayName: 'Participant',
+              srAction: SRApprovalStatusEnum.PENDING,
+            },
+          ],
+        },
+      ];
+
+      await siteService.processEvents(
+        events,
+        { givenName: 'Restorer User' },
+        entityManager,
+        '1',
+      );
+
+      // Verify that update was called once for the event
+      expect(entityManager.update).toHaveBeenCalledWith(
+        Events,
+        { id: '1' },
+        expect.objectContaining({
+          id: '1',
+          siteId: '1',
+          note: 'deleted notation',
+          whoRestored: 'Restorer User',
+          whoDeleted: null,
+          whenDeleted: null,
+        }),
+      );
+
+      // Validate the complete updatedEvents array content via the update call
+      const updateCall = (entityManager.update as jest.Mock).mock.calls.find(
+        (call) => call[0] === Events && call[1]?.id === '1',
+      );
+      expect(updateCall).toBeDefined();
+      expect(updateCall[1]).toEqual({ id: '1' });
+
+      const restoredEvent = updateCall[2];
+      expect(restoredEvent).toBeDefined();
+      expect(restoredEvent.id).toBe('1');
+      expect(restoredEvent.siteId).toBe('1');
+      expect(restoredEvent.note).toBe('deleted notation');
+      expect(restoredEvent.whoRestored).toBe('Restorer User');
+      expect(restoredEvent.whenRestored).toBeInstanceOf(Date);
+      expect(restoredEvent.whoDeleted).toBeNull();
+      expect(restoredEvent.whenDeleted).toBeNull();
+    });
   });
 
   describe('mapSearch', () => {
-    it('should fetch all sites if no search term is passed', () => {
+    it('should fetch all sites if no search term is passed for IDIR users', () => {
       const mockQueryBuilder: any = {
         where: jest.fn().mockImplementation(() => mockQueryBuilder),
         andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      siteService.mapSearch({ userInfo: { identity_provider: 'idir' } });
+
+      expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+        'sites.who_deleted IS NULL',
+      );
+      expect(mockQueryBuilder.andWhere).not.toHaveBeenCalled();
+    });
+
+    it('should apply public-only visibility filter for non-IDIR users', () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      siteService.mapSearch({ userInfo: { identity_provider: 'bceid' } });
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sites.srAction = :srAction',
+        { srAction: 'public' },
+      );
+    });
+
+    it('should apply public-only visibility filter when userInfo is missing (anonymous)', () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
         getManyAndCount: jest.fn().mockReturnValue([]),
       };
 
@@ -1411,6 +1727,10 @@ describe('SiteService', () => {
       expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
       expect(mockQueryBuilder.where).toHaveBeenCalledWith(
         'sites.who_deleted IS NULL',
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sites.srAction = :srAction',
+        { srAction: 'public' },
       );
     });
 
@@ -1427,7 +1747,10 @@ describe('SiteService', () => {
         .mockImplementation(() => mockQueryBuilder);
 
       // Padding spaces are intentional here, do not remove
-      siteService.mapSearch({ searchTerm: '   TeSt   ' });
+      siteService.mapSearch({
+        searchTerm: '   TeSt   ',
+        userInfo: { identity_provider: 'idir' },
+      });
 
       expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalled();
       expect(mockQueryBuilder.where).toHaveBeenCalledWith(
@@ -1462,6 +1785,7 @@ describe('SiteService', () => {
           [10, 20],
           [100, 200],
         ],
+        userInfo: { identity_provider: 'idir' },
       });
       expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         expect.stringContaining('POLYGON((2 1, 20 10, 200 100, 2 1))'),
@@ -1569,7 +1893,10 @@ describe('SiteService', () => {
         radius: 1000,
       };
 
-      siteService.mapSearch({ circle });
+      siteService.mapSearch({
+        circle,
+        userInfo: { identity_provider: 'idir' },
+      });
 
       expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         expect.stringContaining(`ST_MakePoint(-123.1207, 49.2827)`),
@@ -1597,13 +1924,71 @@ describe('SiteService', () => {
         .spyOn(placesRepo, 'createQueryBuilder')
         .mockImplementation(() => mockQueryBuilder);
 
-      await siteService.findSitesAndPlaces('test', 20);
+      await siteService.findSitesAndPlaces('test', 20, {
+        identity_provider: 'idir',
+      });
 
       expect(mockQueryBuilder.getManyAndCount).toHaveBeenCalledTimes(2);
       expect(mockQueryBuilder.where).toHaveBeenCalledWith(expect.anything(), {
         searchTerm: '%test%',
       });
       expect(mockQueryBuilder.limit).toHaveBeenCalledWith(20);
+    });
+
+    it('should apply public-only visibility filter for non-IDIR users (sites only)', async () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        limit: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        addOrderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      jest
+        .spyOn(placesRepo, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      await siteService.findSitesAndPlaces('test', 20, {
+        identity_provider: 'bceid',
+      });
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sites.srAction = :srAction',
+        { srAction: 'public' },
+      );
+    });
+
+    it('should apply public-only visibility filter when userInfo is missing (anonymous) (sites only)', async () => {
+      const mockQueryBuilder: any = {
+        where: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        andWhere: jest.fn().mockImplementation(() => mockQueryBuilder),
+        limit: jest.fn().mockImplementation(() => mockQueryBuilder),
+        orderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        addOrderBy: jest.fn().mockImplementation(() => mockQueryBuilder),
+        getManyAndCount: jest.fn().mockReturnValue([]),
+      };
+
+      jest
+        .spyOn(siteRepository, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      jest
+        .spyOn(placesRepo, 'createQueryBuilder')
+        .mockImplementation(() => mockQueryBuilder);
+
+      await siteService.findSitesAndPlaces('test', 20);
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sites.srAction = :srAction',
+        { srAction: 'public' },
+      );
     });
 
     it('should bypass DB calls if no search term provided', async () => {
@@ -1727,6 +2112,186 @@ describe('SiteService', () => {
       expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         'sites.who_deleted IS NULL',
       );
+    });
+  });
+
+  describe('getSiteInsights', () => {
+    const mockQueryResult = [
+      {
+        event_count: '5',
+        site_doc_count: '3',
+        event_partic_count: '10',
+        site_participants: '4',
+        land_history_count: '2',
+        site_assoc_count: '1',
+        site_subdiv_count: '0',
+      },
+    ];
+
+    it('should return site insights with counts', async () => {
+      jest.spyOn(siteRepository, 'query').mockResolvedValue(mockQueryResult);
+
+      const result = await siteService.getSiteInsights('123');
+
+      expect(result.eventCount).toBe(5);
+      expect(result.siteDocCount).toBe(3);
+      expect(result.eventParticCount).toBe(10);
+      expect(result.landHistoryCount).toBe(2);
+      expect(result.siteAssocCount).toBe(1);
+      expect(result.siteSubdivCount).toBe(0);
+    });
+
+    it('should include sr_action filter for non-pending (public) view', async () => {
+      jest.spyOn(siteRepository, 'query').mockResolvedValue(mockQueryResult);
+
+      await siteService.getSiteInsights('123', false);
+
+      expect(siteRepository.query).toHaveBeenCalledWith(
+        expect.stringContaining("sr_action != 'pending'"),
+        ['123'],
+      );
+    });
+
+    it('should not include sr_action filter for pending view (returns all)', async () => {
+      jest.spyOn(siteRepository, 'query').mockResolvedValue(mockQueryResult);
+
+      await siteService.getSiteInsights('123', true);
+
+      expect(siteRepository.query).toHaveBeenCalledWith(
+        expect.not.stringContaining('sr_action'),
+        ['123'],
+      );
+    });
+
+    it('should return null when query returns empty result', async () => {
+      jest.spyOn(siteRepository, 'query').mockResolvedValue([]);
+
+      const result = await siteService.getSiteInsights('999');
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('sortPendingResults', () => {
+    const mockData = [
+      {
+        siteId: '3',
+        whoUpdated: 'Charlie',
+        whenUpdated: '2026-03-19',
+        address: '789 Oak St',
+      },
+      {
+        siteId: '1',
+        whoUpdated: 'Alice',
+        whenUpdated: '2025-07-28',
+        address: '123 Main St',
+      },
+      {
+        siteId: '2',
+        whoUpdated: 'Bob',
+        whenUpdated: '2026-03-11',
+        address: '456 Elm St',
+      },
+    ];
+
+    it('should sort by siteId ascending by default', () => {
+      const result = sortSRReviewTableResults(mockData);
+      expect(result.map((r) => r.siteId)).toEqual(['1', '2', '3']);
+    });
+
+    it('should sort by siteId descending', () => {
+      const result = sortSRReviewTableResults(
+        mockData,
+        SiteSortBy.ID,
+        SortByDirection.DESC,
+      );
+      expect(result.map((r) => r.siteId)).toEqual(['3', '2', '1']);
+    });
+
+    it('should sort by whenUpdated ascending (date comparison)', () => {
+      const result = sortSRReviewTableResults(
+        mockData,
+        SiteSortBy.WHEN_UPDATED,
+        SortByDirection.ASC,
+      );
+      expect(result.map((r) => r.whenUpdated)).toEqual([
+        '2025-07-28',
+        '2026-03-11',
+        '2026-03-19',
+      ]);
+    });
+
+    it('should sort by whenUpdated descending (date comparison)', () => {
+      const result = sortSRReviewTableResults(
+        mockData,
+        SiteSortBy.WHEN_UPDATED,
+        SortByDirection.DESC,
+      );
+      expect(result.map((r) => r.whenUpdated)).toEqual([
+        '2026-03-19',
+        '2026-03-11',
+        '2025-07-28',
+      ]);
+    });
+
+    it('should sort by whoUpdated ascending', () => {
+      const result = sortSRReviewTableResults(
+        mockData,
+        SiteSortBy.WHO_CREATED,
+        SortByDirection.ASC,
+      );
+      expect(result.map((r) => r.whoUpdated)).toEqual([
+        'Alice',
+        'Bob',
+        'Charlie',
+      ]);
+    });
+
+    it('should sort by address descending', () => {
+      const result = sortSRReviewTableResults(
+        mockData,
+        SiteSortBy.SITE_ADDRESS,
+        SortByDirection.DESC,
+      );
+      expect(result.map((r) => r.address)).toEqual([
+        '789 Oak St',
+        '456 Elm St',
+        '123 Main St',
+      ]);
+    });
+
+    it('should not mutate the original array', () => {
+      const original = [...mockData];
+      sortSRReviewTableResults(mockData, SiteSortBy.ID, SortByDirection.DESC);
+      expect(mockData).toEqual(original);
+    });
+
+    it('should handle null/undefined values gracefully', () => {
+      const dataWithNulls = [
+        {
+          siteId: '2',
+          whoUpdated: 'Bob',
+          whenUpdated: null,
+          address: '456 Elm St',
+        },
+        {
+          siteId: '1',
+          whoUpdated: 'Alice',
+          whenUpdated: '2026-03-11',
+          address: '123 Main St',
+        },
+      ];
+      const result = sortSRReviewTableResults(
+        dataWithNulls,
+        SiteSortBy.WHEN_UPDATED,
+        SortByDirection.ASC,
+      );
+      expect(result).toHaveLength(2);
+    });
+
+    it('should return empty array when given empty input', () => {
+      const result = sortSRReviewTableResults([]);
+      expect(result).toEqual([]);
     });
   });
 });

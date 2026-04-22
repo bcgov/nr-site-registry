@@ -160,7 +160,7 @@ export class CartService {
           .createQueryBuilder()
           .delete()
           .from(Cart)
-          .where('siteId IN (:...cartIds)', { siteIds })
+          .where('siteId IN (:...siteIds)', { siteIds })
           .andWhere('userId = :userId', { userId: userId })
           .execute();
 

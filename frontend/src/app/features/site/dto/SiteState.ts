@@ -6,6 +6,8 @@ import { SiteInsightsDto, SiteResultDto, Sites } from './Site';
 
 export class SiteState {
   siteDetails?: Sites | null = null;
+  /** Site id from the last completed fetchSitesDetails (fulfilled); used to avoid redirecting on stale success+null before a new fetch runs. */
+  siteDetailsLastFetchedSiteId: string | null = null;
   siteDetailsFetchStatus: string = RequestStatus.idle;
   siteDetailsDeleteStatus: string = RequestStatus.idle;
   siteDetailsAddedStatus: string = RequestStatus.idle;

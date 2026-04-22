@@ -17,6 +17,8 @@ import {
 import {
   fetchSitesDetails,
   selectSiteDetails,
+  selectSiteDetailsFetchStatus,
+  selectSiteDetailsLastFetchedSiteId,
   trackedChanges,
   clearTrackChanges,
   siteDetailsMode,
@@ -160,6 +162,7 @@ const SiteDetails = () => {
     useSelector(schedule2ReferenceCdDrpdown)?.data,
   );
   const auth = useAuth();
+  const isUnauthenticated = auth?.user == null;
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -179,6 +182,10 @@ const SiteDetails = () => {
 
   const mode = useSelector(siteDetailsMode);
   const details = useSelector(selectSiteDetails);
+  const siteDetailsFetchStatus = useSelector(selectSiteDetailsFetchStatus);
+  const siteDetailsLastFetchedSiteId = useSelector(
+    selectSiteDetailsLastFetchedSiteId,
+  );
   const bulkApproveRejectStatus = useSelector(bulkUpdateApproveRejectStatus);
   const hasNoPendingUpdatesFromState = useSelector(hasNoPendingUpdates);
   const srUpdates = useSelector(selectAllSites);
@@ -368,6 +375,33 @@ const SiteDetails = () => {
       setUserType(UserType.Internal);
     }
   }, [loggedInUser]);
+
+  useEffect(() => {
+    if (!id?.trim()) return;
+    if (siteDetailsFetchStatus !== RequestStatus.success) return;
+    if (siteDetailsLastFetchedSiteId !== id) return;
+    if (details) return;
+
+    const shouldRedirectExternalOrUnauthenticated =
+      userType === UserType.External ||
+      (isUnauthenticated && userType !== UserType.Internal);
+
+    if (!shouldRedirectExternalOrUnauthenticated) return;
+
+    // Cart details: do not auto-redirect (user can use back / cart UI).
+    if (location.pathname.includes('/site/cart/site/details/')) return;
+
+    navigate('/search', { replace: true });
+  }, [
+    id,
+    details,
+    siteDetailsFetchStatus,
+    siteDetailsLastFetchedSiteId,
+    userType,
+    isUnauthenticated,
+    location.pathname,
+    navigate,
+  ]);
 
   useEffect(() => {
     setViewMode(mode);
@@ -1075,6 +1109,7 @@ const SiteDetails = () => {
     dispatch(
       setupSiteSummaryForSaving({
         ...details,
+        apiAction: UserActionEnum.updated,
         userAction: UserActionEnum.updated,
         srAction:
           event?.target?.checked === true

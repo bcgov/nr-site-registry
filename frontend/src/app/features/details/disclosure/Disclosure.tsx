@@ -51,17 +51,17 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const initialState = {
     id: '',
     siteId: '',
-    dateCompleted: '',
-    rwmDateDecision: '',
-    localAuthDateRecd: '',
-    siteRegDateEntered: '',
-    siteRegDateRecd: '',
+    dateCompleted: null,
+    rwmDateDecision: null,
+    localAuthDateRecd: null,
+    siteRegDateEntered: null,
+    siteRegDateRecd: null,
     govDocumentsComment: '',
     siteDisclosureComment: '',
     plannedActivityComment: '',
-    srAction: '',
-    whenCreated: '',
-    whenUpdated: '',
+    srAction: SRApprovalStatusEnum.Pending,
+    whenCreated: null,
+    whenUpdated: null,
     siteProfileSchedule2Refs: [],
   };
   const schedule2Ref = useSelector(schedule2ReferenceCdDrpdown);
@@ -174,7 +174,9 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   }, [mode]);
 
   useEffect(() => {
-    fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending });
+    dispatch(
+      fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending }),
+    );
   }, [siteId]);
   // Search internal contact effect with debounce
   // Commenting the below method because I am not sure which dropdown type
@@ -228,52 +230,18 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   // Update form data when notations change
 
   useEffect(() => {
-    if (
-      status === RequestStatus.success &&
-      disclosureData &&
-      disclosureData?.siteId === siteId
-    ) {
-      // Commenting the below method because I am not sure which dropdown type
-      // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
-
-      // const uniquePsnOrgs: any = Array.from(
-      //   new Map(
-      //     [disclosureData].map((item: any) => [
-      //       item.psnorgId,
-      //       { key: item.psnorgId, value: item.displayName },
-      //     ]),
-      //   ).values(),
-      // );
-      // setOptions(uniquePsnOrgs);
-      // setInternalRow((prev) =>
-      //   updateFields(prev, {
-      //     indexToUpdate: prev.findIndex((row) =>
-      //       row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-      //     ),
-      //     updates: {
-      //       isLoading: RequestStatus.loading,
-      //       options: uniquePsnOrgs,
-      //       filteredOptions: [],
-      //       handleSearch,
-      //       customInfoMessage: <></>,
-      //     },
-      //   }),
-      // );
-
-      setFormData((prev) => {
-        return {
-          ...prev,
-          ...disclosureData,
-          siteProfileSchedule2Refs:
-            disclosureData?.siteProfileSchedule2Refs?.map((item: any) => {
-              return {
-                ...item,
-                description: schedule2Ref?.data?.find(
-                  (ref: any) => ref.key === item.schedule2ReferenceCode,
-                )?.metaData,
-              };
-            }) ?? [],
-        };
+    if (status === RequestStatus.success && disclosureData) {
+      setFormData({
+        ...disclosureData,
+        siteProfileSchedule2Refs:
+          disclosureData?.siteProfileSchedule2Refs?.map((item: any) => {
+            return {
+              ...item,
+              description: schedule2Ref?.data?.find(
+                (ref: any) => ref.key === item.schedule2ReferenceCode,
+              )?.metaData,
+            };
+          }) ?? [],
       });
     }
 
@@ -305,6 +273,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       saveSiteDetailsRequestStatus === RequestStatus.success
     ) {
       setFormData(initialState);
+      setSelectedRows([]);
       dispatch(
         fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending }),
       );
@@ -524,7 +493,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
         ...disclosure,
         siteProfileSchedule2Refs: [
           newDisclosureSchedule,
-          ...disclosure.siteProfileSchedule2Refs,
+          ...(disclosure.siteProfileSchedule2Refs ?? []),
         ],
       };
     };

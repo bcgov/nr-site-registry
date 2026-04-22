@@ -147,6 +147,18 @@ export type CreateSnapshotDto = {
   siteId: Scalars['String']['input'];
 };
 
+export type DeleteSiteInput = {
+  siteId: Scalars['String']['input'];
+};
+
+export type DeleteSiteResponse = {
+  __typename?: 'DeleteSiteResponse';
+  httpStatusCode?: Maybe<Scalars['Float']['output']>;
+  message: Scalars['String']['output'];
+  success: Scalars['Boolean']['output'];
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
 export type DisclosureResponse = {
   __typename?: 'DisclosureResponse';
   data?: Maybe<Array<SiteProfilesDto>>;
@@ -545,6 +557,7 @@ export type Mutation = {
   deleteCartItem: CartResponse;
   deleteCartItemWithSiteId: CartResponse;
   deleteFolioItem: FolioResponse;
+  deleteSite: DeleteSiteResponse;
   deleteSitesInFolio: FolioResponse;
   updateFolioItem: FolioResponse;
   updateSiteDetails: SaveSiteDetailsResponse;
@@ -599,6 +612,11 @@ export type MutationDeleteCartItemWithSiteIdArgs = {
 
 export type MutationDeleteFolioItemArgs = {
   folioId: Scalars['Float']['input'];
+};
+
+
+export type MutationDeleteSiteArgs = {
+  input: DeleteSiteInput;
 };
 
 
@@ -775,6 +793,25 @@ export type Place = {
   name: Scalars['String']['output'];
 };
 
+export type PurchasedSiteDto = {
+  __typename?: 'PurchasedSiteDto';
+  address?: Maybe<Scalars['String']['output']>;
+  city?: Maybe<Scalars['String']['output']>;
+  purchaseDate?: Maybe<Scalars['DateTime']['output']>;
+  siteId: Scalars['String']['output'];
+  status?: Maybe<Scalars['String']['output']>;
+};
+
+export type PurchasedSitesResponse = {
+  __typename?: 'PurchasedSitesResponse';
+  data?: Maybe<Array<PurchasedSiteDto>>;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+  totalRecords?: Maybe<Scalars['Float']['output']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   _service: _Service;
@@ -796,6 +833,7 @@ export type Query = {
   getParticipantRoleCd: DropdownResponse;
   getPendingSiteForSRApproval: QueryResultForPendingSitesResponse;
   getPeopleOrgsCd: DropdownResponse;
+  getPurchasedSites: PurchasedSitesResponse;
   getRecentViewsByUserId: RecentViewResponse;
   getSchedule2Ref: DropdownResponse;
   getSiteDisclosureBySiteId: DisclosureResponse;
@@ -877,6 +915,14 @@ export type QueryGetPendingSiteForSrApprovalArgs = {
 export type QueryGetPeopleOrgsCdArgs = {
   entityType?: InputMaybe<Scalars['String']['input']>;
   searchParam?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGetPurchasedSitesArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortByDir?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1560,8 +1606,10 @@ export type Sites = {
   userAction?: Maybe<Scalars['String']['output']>;
   victoriaFileNo?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
+  whenDeleted?: Maybe<Scalars['DateTime']['output']>;
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
+  whoDeleted?: Maybe<Scalars['String']['output']>;
   whoUpdated?: Maybe<Scalars['String']['output']>;
 };
 

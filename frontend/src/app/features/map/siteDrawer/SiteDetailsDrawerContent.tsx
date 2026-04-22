@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Map } from 'leaflet';
 import {
-  useMapSearch_FindSiteBySiteIdQuery,
   MapSearch_FindSiteBySiteIdQuery,
+  useMapSearch_FindSiteBySiteIdLoggedInUserQuery,
+  useMapSearch_FindSiteBySiteIdQuery,
   useMapSearch_AddCartItemMutation,
 } from '../../../../graphql/generated';
 import {
@@ -69,11 +70,20 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const auth = useAuth();
 
-  const { data, loading: siteDetailsLoading } =
+  const isAuthenticated = auth?.user != null;
+
+  const { data: publicData, loading: publicLoading } =
     useMapSearch_FindSiteBySiteIdQuery({
       variables: { siteId: selectedSiteId || '' },
-      skip: !selectedSiteId,
+      skip: !selectedSiteId || isAuthenticated,
     });
+  const { data: loggedInData, loading: loggedInLoading } =
+    useMapSearch_FindSiteBySiteIdLoggedInUserQuery({
+      variables: { siteId: selectedSiteId || '' },
+      skip: !selectedSiteId || !isAuthenticated,
+    });
+
+  const siteDetailsLoading = isAuthenticated ? loggedInLoading : publicLoading;
 
   const [addCartItem, { loading: addCartItemLoading }] =
     useMapSearch_AddCartItemMutation({
@@ -100,7 +110,9 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
     });
   };
 
-  const siteData = data?.findSiteBySiteId.data;
+  const siteData = isAuthenticated
+    ? loggedInData?.findSiteBySiteIdLoggedInUser?.data
+    : publicData?.findSiteBySiteId?.data;
 
   const zoomToSite = () => {
     if (!mapRef.current || !siteData || !siteData.latdeg || !siteData.longdeg)

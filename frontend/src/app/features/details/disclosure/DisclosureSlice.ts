@@ -9,30 +9,7 @@ import { graphQLSiteDisclosureBySiteId } from '../../site/graphql/Disclosure';
 
 // Define the initial state
 const initialState: IDisclosureState = {
-  siteDisclosure: {
-    id: '',
-    siteId: '',
-    dateCompleted: '',
-    rwmDateDecision: '',
-    localAuthDateRecd: '',
-    siteRegDateEntered: '',
-    siteRegDateRecd: '',
-    govDocumentsComment: '',
-    siteDisclosureComment: '',
-    plannedActivityComment: '',
-    srAction: '',
-    whenCreated: '',
-    whenUpdated: '',
-    siteProfileSchedule2Refs: [
-      {
-        id: '',
-        profileId: '',
-        schedule2ReferenceCode: '',
-        srAction: '',
-        srValue: false,
-      },
-    ],
-  },
+  siteDisclosure: {},
   status: RequestStatus.idle,
   error: '',
 };

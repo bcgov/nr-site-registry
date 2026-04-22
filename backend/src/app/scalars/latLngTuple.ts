@@ -2,9 +2,10 @@ import { CustomScalar, Scalar } from '@nestjs/graphql';
 import { FloatValueNode, Kind, ValueNode } from 'graphql';
 
 @Scalar('LatLngTuple')
-export class LatLngTupleScalar
-  implements CustomScalar<number[], [number, number, number?]>
-{
+export class LatLngTupleScalar implements CustomScalar<
+  number[],
+  [number, number, number?]
+> {
   description =
     'A tuple of two or three numbers representing latitude, longitude, and optionally altitude';
 

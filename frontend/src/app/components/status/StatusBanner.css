@@ -1,0 +1,21 @@
+.status-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.status-banner-text {
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.status-banner--archived .status-banner-text {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+.status-banner--restored .status-banner-text {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}

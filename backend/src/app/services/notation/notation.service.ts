@@ -48,9 +48,6 @@ export class NotationService {
             siteId,
             srAction: SRApprovalStatusEnum.PENDING,
           };
-          if (!includeDeleted) {
-            whereClause.whenDeleted = null;
-          }
           events = await this.notationRepository.find({
             where: whereClause,
           });

@@ -11,11 +11,11 @@
 }
 
 .status-banner--archived .status-banner-text {
-    background-color: #f8d7da;
-    color: #842029;
+    background-color: var(--typography-color-danger);
+    color: var(--typography-color-primary-invert);
 }
 
 .status-banner--restored .status-banner-text {
-    background-color: #d1e7dd;
-    color: #0f5132;
+    background-color: var(--typography-color-secondary-invert);
+    color: var(--typography-color-link);
 }

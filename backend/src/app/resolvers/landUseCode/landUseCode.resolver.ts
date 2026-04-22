@@ -19,13 +19,13 @@ export class LandUseCodeResolver {
   ) {}
 
   @Roles({
-      roles: [
-        CustomRoles.External,
-        CustomRoles.Internal,
-        CustomRoles.SiteRegistrar,
-      ],
-      mode: RoleMatchingMode.ANY,
-    })
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
+  })
   @Query(() => LandUseCodeResponse, { name: 'getLandUseCodes' })
   async getLandUseCodes() {
     this.sitesLogger.log('LandUseCodeResolver.getLandUseCodes() start ');

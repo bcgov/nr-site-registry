@@ -969,32 +969,32 @@ const SiteDetails = () => {
 
       //Pre-map siteNotation for quick access in loop
       const siteNotationMap = new Map(
-        (siteNotation ?? []).map((n: any) => [n.id, n])
+        (siteNotation ?? []).map((n: any) => [n.id, n]),
       );
 
-      for (const [index, notation] of updatedSiteNotations?.entries())  {
-
+      for (const [index, notation] of updatedSiteNotations?.entries()) {
         const originalNotation: any = siteNotationMap.get(notation.id);
 
-        const originalParticipants = originalNotation?.notationParticipant || [];
+        const originalParticipants =
+          originalNotation?.notationParticipant || [];
         const updatedParticipants = notation?.notationParticipant || [];
 
         //Build lookup sets
         const deletedIds = new Set(
           updatedParticipants
             .filter((p: any) => p.apiAction === UserActionEnum.deleted)
-            .map((p: any) => p.eventParticId)
+            .map((p: any) => p.eventParticId),
         );
 
         const addedCount = updatedParticipants.filter(
-          (p: any) => p.apiAction === UserActionEnum.added
+          (p: any) => p.apiAction === UserActionEnum.added,
         ).length;
 
         // Count remaining
         const remainingCount = originalParticipants.reduce(
           (count: number, orig: any) =>
             deletedIds.has(orig.eventParticId) ? count : count + 1,
-          0
+          0,
         );
 
         const numOfNotationParticipants = remainingCount + addedCount;
@@ -1010,7 +1010,6 @@ const SiteDetails = () => {
         //Validation loop (unchanged logic, just faster access)
         if (updatedParticipants.length > 0) {
           for (const notationParticipant of updatedParticipants) {
-
             if (notationParticipant?.apiAction === UserActionEnum.deleted) {
               continue;
             }
@@ -1032,7 +1031,7 @@ const SiteDetails = () => {
       return [];
     }
   };
-  
+
   const handleCancelButton = () => {
     dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
     dispatch(clearTrackChanges({}));

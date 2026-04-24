@@ -55,7 +55,7 @@ import {
   showNotification,
   UserRoleType,
   validateForm,
-  getAxiosInstance 
+  getAxiosInstance,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import {

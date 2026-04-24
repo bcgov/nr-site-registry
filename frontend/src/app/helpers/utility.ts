@@ -55,14 +55,14 @@ export const formatDateRange = (range: [Date, Date]) => {
   }
 
   // If both dates are valid, format them
-  const formattedStartDate = format(startDate, 'MMMM do, yyyy');
-  const formattedEndDate = format(endDate, 'MMMM do, yyyy');
+  const formattedStartDate = format(startDate, 'MMMM d, yyyy');
+  const formattedEndDate = format(endDate, 'MMMM d, yyyy');
 
   return `${formattedStartDate} - ${formattedEndDate}`;
 };
 
 /**
- * Formats a date as "March 2nd, 2025" without timezone shift
+ * Formats a date as "March 2, 2025" without timezone shift
  */
 export const formatDate = (input: Date | string | null): string => {
   let date: Date;
@@ -72,7 +72,7 @@ export const formatDate = (input: Date | string | null): string => {
   }
 
   date = parseDate(input) || new Date();
-  return format(date, 'MMMM do, yyyy');
+  return format(date, 'MMMM d, yyyy');
 };
 
 export const parseDate = (value: Date | string | null): Date | null => {

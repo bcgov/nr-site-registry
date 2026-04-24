@@ -377,7 +377,7 @@ describe('convertSelectedColumnsToCSV', () => {
   it('should export only selected data columns with friendly names and formatted values', () => {
     const expectedCSV =
       'Site ID,Site Address,General Description,Last Updated\n' +
-      '411,7477 6TH STREET,"LOCATION DERIVED BY BC ENVIRONMENT, NAD 83 ""ORTHO""","April 26th, 1995"';
+      '411,7477 6TH STREET,"LOCATION DERIVED BY BC ENVIRONMENT, NAD 83 ""ORTHO""","April 26, 1995"';
 
     expect(convertSelectedColumnsToCSV(selectedRows, selectedColumns)).toBe(
       expectedCSV,

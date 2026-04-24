@@ -52,7 +52,7 @@ export const fieldLabelMap: { [key: string]: string } = {
   siteRegDateRecd: 'Date Received',
   dateCompleted: 'Date Completed',
   localAuthDateRecd: 'Local Authority Received',
-  rwmDateDecision: 'Date Registrar',
+  rwmDateDecision: 'Date Registrar Received',
   siteRegDateEntered: 'Date Entered',
   schedule2ReferenceCode: 'Schedule 2 Reference',
   description: 'Description',

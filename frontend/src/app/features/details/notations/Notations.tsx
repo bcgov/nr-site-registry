@@ -869,7 +869,6 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         true,
       );
       setFormData(getUnarchivedNotations(updateNotationParticipant));
-      //dispatch(updateSiteNotation(updateNotationParticipant));
       dispatch(
         updateSiteNotation(getUnarchivedNotations(updateNotationParticipant)),
       );

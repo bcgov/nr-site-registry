@@ -62,7 +62,7 @@ export const siteDisclosureConfig = (
       },
       {
         type: FormFieldType.Date,
-        label: 'Date Registrar',
+        label: 'Date Registrar Received',
         placeholder: 'MM/DD/YY',
         graphQLPropertyName: 'rwmDateDecision',
         value: '',
@@ -163,7 +163,7 @@ export const siteDisclosureConfig = (
       },
       {
         type: FormFieldType.Date,
-        label: 'Date Registrar',
+        label: 'Date Registrar Received',
         placeholder: 'MM/DD/YY',
         graphQLPropertyName: 'rwmDateDecision',
         value: '',

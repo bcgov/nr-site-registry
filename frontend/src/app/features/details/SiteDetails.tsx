@@ -55,6 +55,7 @@ import {
   showNotification,
   UserRoleType,
   validateForm,
+  getAxiosInstance,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import {
@@ -157,7 +158,6 @@ import { HttpStatusCode } from '../../common/httpStatusCode';
 import { GetSummaryConfig } from './summary/SummaryConfig';
 import { siteDisclosureConfig } from './disclosure/DisclosureConfig';
 import DeleteSiteModal from './DeleteSiteModal';
-import { getAxiosInstance } from '../../helpers/utility';
 import { GRAPHQL } from '../../helpers/endpoints';
 import { print } from 'graphql';
 import { DELETE_SITE_MUTATION } from '../site/graphql/DeleteSite';
@@ -901,8 +901,7 @@ const SiteDetails = () => {
       // Run both validations in parallel and wait for them to finish
       if (siteNotation?.length > 0) {
         let updatedSiteNotations = deepFilterByUserAction(siteNotation, [
-          UserActionEnum.added,
-          UserActionEnum.updated,
+          ...userActions,
           UserActionEnum.deleted,
           UserActionEnum.restored,
         ]);
@@ -967,39 +966,65 @@ const SiteDetails = () => {
       ];
 
       const notationParticipantErrors: any[] = [];
-      // Loop through siteNotation and their notationParticipants
+
+      //Pre-map siteNotation for quick access in loop
+      const siteNotationMap = new Map(
+        (siteNotation ?? []).map((n: any) => [n.id, n]),
+      );
+
       for (const [index, notation] of updatedSiteNotations?.entries()) {
-        if (notation?.apiAction === UserActionEnum.deleted) {
-          continue;
+        const originalNotation: any = siteNotationMap.get(notation.id);
+
+        const originalParticipants =
+          originalNotation?.notationParticipant || [];
+        const updatedParticipants = notation?.notationParticipant || [];
+
+        //Build lookup sets
+        const deletedIds = new Set(
+          updatedParticipants
+            .filter((p: any) => p.apiAction === UserActionEnum.deleted)
+            .map((p: any) => p.eventParticId),
+        );
+
+        const addedCount = updatedParticipants.filter(
+          (p: any) => p.apiAction === UserActionEnum.added,
+        ).length;
+
+        // Count remaining
+        const remainingCount = originalParticipants.reduce(
+          (count: number, orig: any) =>
+            deletedIds.has(orig.eventParticId) ? count : count + 1,
+          0,
+        );
+
+        const numOfNotationParticipants = remainingCount + addedCount;
+
+        // Must have at least one
+        if (numOfNotationParticipants === 0) {
+          notationParticipantErrors.push({
+            label: `Notation Participants`,
+            errorMessage: `Notation [${notation?.position + 1}] Atleast one Notation Participant is required.`,
+          });
         }
-        if (
-          notation?.notationParticipant &&
-          notation?.notationParticipant?.length > 0
-        ) {
-          for (const [
-            participantIndex,
-            notationParticipant,
-          ] of notation.notationParticipant.entries()) {
+
+        //Validation loop (unchanged logic, just faster access)
+        if (updatedParticipants.length > 0) {
+          for (const notationParticipant of updatedParticipants) {
             if (notationParticipant?.apiAction === UserActionEnum.deleted) {
               continue;
             }
-            // Validate and accumulate errors for each notation participant
+
             const errors = validateForm(
               notationParticipantTable,
               notationParticipant,
               `Notation [${notation?.position + 1}] Notation Participant [${notationParticipant?.position + 1}]`,
             );
+
             notationParticipantErrors.push(...errors);
           }
-        } else if (notation?.apiAction !== UserActionEnum.deleted) {
-          notationParticipantErrors.push({
-            label: 'Notation Participants',
-            errorMessage: `Notation [${notation?.position + 1}] Atleast one  Notation Participant is required.`,
-          });
         }
       }
 
-      // Return the accumulated errors
       return notationParticipantErrors;
     } catch (error) {
       console.error(error);

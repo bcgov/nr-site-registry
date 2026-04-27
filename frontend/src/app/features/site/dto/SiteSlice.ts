@@ -16,6 +16,7 @@ import { UserType } from '../../../helpers/requests/userType';
 
 const initialState: SiteState = {
   siteDetails: null,
+  siteDetailsLastFetchedSiteId: null,
   siteDetailsFetchStatus: RequestStatus.idle,
   siteDetailsDeleteStatus: RequestStatus.idle,
   siteDetailsAddedStatus: RequestStatus.idle,
@@ -136,12 +137,14 @@ const siteSlice = createSlice({
       .addCase(fetchSitesDetails.pending, (state, action) => {
         const newState = { ...state };
         newState.siteDetailsFetchStatus = RequestStatus.loading;
+        newState.siteDetailsLastFetchedSiteId = null;
         return newState;
       })
       .addCase(fetchSitesDetails.fulfilled, (state, action) => {
         const newState = { ...state };
         newState.siteDetails = action.payload;
         newState.siteDetailsFetchStatus = RequestStatus.success;
+        newState.siteDetailsLastFetchedSiteId = action.meta.arg.siteId;
         return newState;
       })
       .addCase(fetchSitesDetails.rejected, (state, action) => {
@@ -167,6 +170,10 @@ export const resultsCount = (state: any) => state.sites.resultsCount;
 export const siteDetailsLoadingState = (state: any) =>
   state.sites.fetchSitesDetails;
 export const selectSiteDetails = (state: any) => state.sites.siteDetails;
+export const selectSiteDetailsFetchStatus = (state: any) =>
+  state.sites.siteDetailsFetchStatus;
+export const selectSiteDetailsLastFetchedSiteId = (state: any) =>
+  state.sites.siteDetailsLastFetchedSiteId ?? null;
 export const trackedChanges = (state: any) => state.sites.changeTracker;
 export const siteDetailsMode = (state: any) => state.sites.siteDetailsMode;
 export const resetSiteDetails = (state: any) => state.sites.resetSiteDetails;

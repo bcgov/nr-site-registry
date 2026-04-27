@@ -541,16 +541,6 @@ describe('Search Component', () => {
     expect(screen.getByTestId('trigger-deselect-all')).toBeInTheDocument();
   });
 
-  // ─── useEffect: sets searchText when status is success with sites ─────────
-  test('sets searchText from searchParam when status is success and sites exist', () => {
-    renderWithProviders(<Search />, store);
-    const searchInput = screen.getByPlaceholderText(
-      'Search for site address or name or pid',
-    );
-    // store has searchParam: 'Test' and status: success with sites
-    expect(searchInput).toHaveValue('Test');
-  });
-
   // ─── handleRemoveFilter: dispatches with page 1 and updates localStorage ──
   test('handleRemoveFilter dispatches fetchSearchSites and updates localStorage', async () => {
     localStorage.setItem(

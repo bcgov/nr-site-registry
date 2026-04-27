@@ -5,7 +5,11 @@ import Table from '../../components/table/Table';
 import { RequestStatus } from '../../helpers/requests/status';
 import { FolioContentTableColumns } from './FolioContentTableConfig';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getUser, showNotification } from '../../helpers/utility';
+import {
+  getUser,
+  showNotification,
+  sortTableData,
+} from '../../helpers/utility';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../Store';
 import {
@@ -33,6 +37,7 @@ import {
 import { useAuth } from 'react-oidc-context';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import { Button } from '../../components/button/Button';
+import { TableColumn } from '../../components/table/TableColumn';
 
 const FolioContents = () => {
   const { id } = useParams();
@@ -57,6 +62,9 @@ const FolioContents = () => {
   const sitesDeleteStatus = useSelector(deleteSiteInFolioStatus);
 
   const [showDeleteConfirmModal, SetShowDeleteConfirmModal] = useState(false);
+
+  const [sortColumn, setSortColumn] = useState<string>('');
+  const [sortAsc, setSortAsc] = useState<boolean>(true);
 
   useEffect(() => {
     const dto = { id: parseInt(id ?? '0') };
@@ -152,6 +160,27 @@ const FolioContents = () => {
     }
   };
 
+  const handleSortChange = (column: TableColumn, ascSort: boolean) => {
+    setSortColumn(column.graphQLPropertyName);
+    setSortAsc(ascSort);
+  };
+
+  const getSortedFolioContent = () => {
+    const mapped = sitesInFolioArr.map((x) => {
+      const merged = { ...x, ...x.site };
+      const rawDate = merged.whenUpdated || (x as any).whenUpdated;
+      return {
+        ...merged,
+        _rawWhenUpdated: rawDate,
+        whenUpdated: rawDate ? new Date(rawDate).toLocaleString() : '',
+      };
+    });
+    if (!sortColumn) return mapped;
+    return sortTableData(mapped, sortColumn, sortAsc, ['whenUpdated'], {
+      whenUpdated: '_rawWhenUpdated',
+    });
+  };
+
   return (
     <PageContainer role="Folio Contents">
       <div className="d-flex folio-actions folio-actions-gap">
@@ -177,13 +206,17 @@ const FolioContents = () => {
           <CustomLabel label="Folio Contents" labelType="b-h1" />
         </div>
         <div className="folio-content-actions">
-          <Button onClick={handleAddToShoppingCart}>
+          <Button
+            onClick={handleAddToShoppingCart}
+            disabled={selectedRows.length === 0}
+          >
             <ShoppingCartIcon />
             Add Selected To Cart
           </Button>
 
           <Button
             variant="secondary"
+            disabled={selectedRows.length === 0}
             onClick={() => {
               SetShowDeleteConfirmModal(true);
             }}
@@ -197,14 +230,7 @@ const FolioContents = () => {
             label="Folios"
             isLoading={RequestStatus.success}
             columns={FolioContentTableColumns}
-            data={sitesInFolioArr.map((x) => {
-              let combinedObject = {
-                ...x,
-                ...x.site,
-              };
-
-              return combinedObject;
-            })}
+            data={getSortedFolioContent()}
             totalResults={[].length}
             allowRowsSelect={true}
             showPageOptions={false}
@@ -214,6 +240,7 @@ const FolioContents = () => {
             editMode={false}
             idColumnName="id"
             deleteHandler={() => {}}
+            sortHandler={handleSortChange}
           />
         </div>
       </div>

@@ -19,7 +19,12 @@ import {
   updateRequestStatus,
 } from './redux/FolioSlice';
 import { Folio } from './dto/Folio';
-import { deepSearch, getUser, showNotification } from '../../helpers/utility';
+import {
+  deepSearch,
+  getUser,
+  showNotification,
+  sortTableData,
+} from '../../helpers/utility';
 import { AppDispatch } from '../../Store';
 import './Folios.css';
 import {
@@ -36,6 +41,7 @@ import { useAuth } from 'react-oidc-context';
 
 import { notifyError, notifySuccess } from '../../components/alert/Alert';
 import { Button } from '../../components/button/Button';
+import { TableColumn } from '../../components/table/TableColumn';
 
 const Folios = () => {
   let blocker = useBlocker(
@@ -57,6 +63,9 @@ const Folios = () => {
   const [showUpdatesConfirmModal, SetShowUpdatesConfirmModal] = useState(false);
 
   const [showDeleteConfirmModal, SetShowDeleteConfirmModal] = useState(false);
+
+  const [sortColumn, setSortColumn] = useState<string>('');
+  const [sortAsc, setSortAsc] = useState<boolean>(true);
 
   const addStatus = useSelector(addFolioItemRequestStatus);
 
@@ -152,6 +161,25 @@ const Folios = () => {
     SetShowUpdatesConfirmModal(true);
   };
 
+  const handleSortChange = (column: TableColumn, ascSort: boolean) => {
+    setSortColumn(column.graphQLPropertyName);
+    setSortAsc(ascSort);
+  };
+
+  const getSortedData = () => {
+    const formatted = tempArr.map((item: any) => ({
+      ...item,
+      _rawWhenUpdated: item.whenUpdated,
+      whenUpdated: item.whenUpdated
+        ? new Date(item.whenUpdated).toLocaleString()
+        : '',
+    }));
+    if (!sortColumn) return formatted;
+    return sortTableData(formatted, sortColumn, sortAsc, ['whenUpdated'], {
+      whenUpdated: '_rawWhenUpdated',
+    });
+  };
+
   return (
     <PageContainer role="Folios">
       <div>
@@ -198,7 +226,7 @@ const Folios = () => {
           label="Folios"
           isLoading={RequestStatus.success}
           columns={getFolioTableColumnsBasedOnMode(editMode)}
-          data={tempArr}
+          data={getSortedData()}
           totalResults={tempArr.length}
           allowRowsSelect={false}
           showPageOptions={false}
@@ -211,6 +239,7 @@ const Folios = () => {
             SetShowDeleteConfirmModal(true);
             SetDeleteRow(event.row);
           }}
+          sortHandler={handleSortChange}
         />
       </div>
 

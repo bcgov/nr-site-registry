@@ -4,46 +4,46 @@ import { ColumnSize } from '../../../components/table/TableColumn';
 export const getLandUseColumns = (
   landUseCodes: any[] = [],
   editMode = false,
-  isInternalUser = false
+  isInternalUser = false,
 ) => {
   const landUseCodeColumns = editMode
     ? {
-      id: 1,
-      displayName: 'Land Use',
-      active: true,
-      graphQLPropertyName: 'landUse.code',
-      displayType: {
-        type: FormFieldType.DropDown,
-        label: 'Land Use',
-        options: landUseCodes.map(({ description, code }) => {
-          return { value: description, key: code };
-        }),
+        id: 1,
+        displayName: 'Land Use',
+        active: true,
         graphQLPropertyName: 'landUse.code',
-        tableMode: true,
-        placeholder: 'Please enter land use',
-        customLabelCss: 'custom-landuses-lbl-text',
-        customInputTextCss: 'custom-landuses-input-text',
-        customEditLabelCss: 'custom-landuses-edit-label',
-        customEditInputTextCss: 'custom-landuses-edit-input',
-      },
-    }
+        displayType: {
+          type: FormFieldType.DropDown,
+          label: 'Land Use',
+          options: landUseCodes.map(({ description, code }) => {
+            return { value: description, key: code };
+          }),
+          graphQLPropertyName: 'landUse.code',
+          tableMode: true,
+          placeholder: 'Please enter land use',
+          customLabelCss: 'custom-landuses-lbl-text',
+          customInputTextCss: 'custom-landuses-input-text',
+          customEditLabelCss: 'custom-landuses-edit-label',
+          customEditInputTextCss: 'custom-landuses-edit-input',
+        },
+      }
     : {
-      id: 1,
-      displayName: 'Land Use',
-      active: true,
-      graphQLPropertyName: 'landUse.description',
-      displayType: {
-        type: FormFieldType.Text,
-        label: 'Land Use',
-        graphQLPropertyName: 'landUse.code',
-        tableMode: true,
-        placeholder: 'Please enter land use note.',
-        customLabelCss: 'custom-landuses-lbl-text',
-        customInputTextCss: 'custom-landuses-input-text',
-        customEditLabelCss: 'custom-landuses-edit-label',
-        customEditInputTextCss: 'custom-landuses-edit-input',
-      },
-    };
+        id: 1,
+        displayName: 'Land Use',
+        active: true,
+        graphQLPropertyName: 'landUse.description',
+        displayType: {
+          type: FormFieldType.Text,
+          label: 'Land Use',
+          graphQLPropertyName: 'landUse.code',
+          tableMode: true,
+          placeholder: 'Please enter land use note.',
+          customLabelCss: 'custom-landuses-lbl-text',
+          customInputTextCss: 'custom-landuses-input-text',
+          customEditLabelCss: 'custom-landuses-edit-label',
+          customEditInputTextCss: 'custom-landuses-edit-input',
+        },
+      };
 
   const noteColumn = {
     id: 2,
@@ -81,5 +81,4 @@ export const getLandUseColumns = (
   return isInternalUser
     ? [landUseCodeColumns, noteColumn, srColumn]
     : [landUseCodeColumns, noteColumn];
-
 };

@@ -6,6 +6,10 @@
   width: 100%;
 }
 
+.toast-info {
+  width: 500px;
+}
+
 .Toastify__toast-container--bottom-right {
   right: 5em;
 }

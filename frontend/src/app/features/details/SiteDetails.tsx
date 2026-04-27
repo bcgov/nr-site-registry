@@ -17,6 +17,8 @@ import {
 import {
   fetchSitesDetails,
   selectSiteDetails,
+  selectSiteDetailsFetchStatus,
+  selectSiteDetailsLastFetchedSiteId,
   trackedChanges,
   clearTrackChanges,
   siteDetailsMode,
@@ -53,6 +55,7 @@ import {
   showNotification,
   UserRoleType,
   validateForm,
+  getAxiosInstance,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import {
@@ -66,6 +69,7 @@ import {
 } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
+import { notifyInfo } from '../../components/alert/Alert';
 import {
   fetchNotationParticipants,
   updateSiteNotation,
@@ -154,12 +158,17 @@ import {
 import { HttpStatusCode } from '../../common/httpStatusCode';
 import { GetSummaryConfig } from './summary/SummaryConfig';
 import { siteDisclosureConfig } from './disclosure/DisclosureConfig';
+import DeleteSiteModal from './DeleteSiteModal';
+import { GRAPHQL } from '../../helpers/endpoints';
+import { print } from 'graphql';
+import { DELETE_SITE_MUTATION } from '../site/graphql/DeleteSite';
 
 const SiteDetails = () => {
   const { disclosureStatementConfigEditMode } = siteDisclosureConfig(
     useSelector(schedule2ReferenceCdDrpdown)?.data,
   );
   const auth = useAuth();
+  const isUnauthenticated = auth?.user == null;
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -168,6 +177,7 @@ const SiteDetails = () => {
   const fromScreen = location.state?.fromLabel || 'Search'; // Default to "Unknown Screen" if no state is passed
   const fromPathRef = useRef(fromPath);
   const fromScreenRef = useRef(fromScreen);
+  const lastUnavailableToastSiteIdRef = useRef<string | null>(null);
   const loggedInUser = getUser();
   // TODO: this is for future use when we support automatic flow of creating new site for specific application.
   // We need applicationid and newly created siteId to fill cats db  in order to keep both application in sync.
@@ -179,6 +189,10 @@ const SiteDetails = () => {
 
   const mode = useSelector(siteDetailsMode);
   const details = useSelector(selectSiteDetails);
+  const siteDetailsFetchStatus = useSelector(selectSiteDetailsFetchStatus);
+  const siteDetailsLastFetchedSiteId = useSelector(
+    selectSiteDetailsLastFetchedSiteId,
+  );
   const bulkApproveRejectStatus = useSelector(bulkUpdateApproveRejectStatus);
   const hasNoPendingUpdatesFromState = useSelector(hasNoPendingUpdates);
   const srUpdates = useSelector(selectAllSites);
@@ -209,6 +223,7 @@ const SiteDetails = () => {
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
     null,
   );
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [navComponents, SetNavComponents] = useState<any[]>();
   const [isVisible, setIsVisible] = useState(false);
   const [edit, setEdit] = useState(false);
@@ -232,7 +247,9 @@ const SiteDetails = () => {
     if (
       isUserOfType(UserRoleType.SR) &&
       !hasNoPendingUpdatesFromState &&
-      viewMode !== SiteDetailsMode.EditMode
+      viewMode !== SiteDetailsMode.EditMode &&
+      (!isUserOfType(UserRoleType.INTERNAL) ||
+        viewMode === SiteDetailsMode.SRMode)
     ) {
       SetNavComponents(getNavComponents(true));
     } else {
@@ -362,17 +379,55 @@ const SiteDetails = () => {
       isUserOfType(UserRoleType.PUBLIC)
     ) {
       setUserType(UserType.External);
-    } else if (isUserOfType(UserRoleType.INTERNAL)) {
+    } else if (
+      isUserOfType(UserRoleType.INTERNAL) ||
+      isUserOfType(UserRoleType.SR)
+    ) {
       setUserType(UserType.Internal);
     }
   }, [loggedInUser]);
+
+  useEffect(() => {
+    if (!id?.trim()) return;
+    if (siteDetailsFetchStatus !== RequestStatus.success) return;
+    if (siteDetailsLastFetchedSiteId !== id) return;
+    if (details) return;
+
+    const shouldRedirectExternalOrUnauthenticated =
+      userType === UserType.External ||
+      (isUnauthenticated && userType !== UserType.Internal);
+
+    if (!shouldRedirectExternalOrUnauthenticated) return;
+
+    // Cart details: do not auto-redirect (user can use back / cart UI).
+    if (location.pathname.includes('/site/cart/site/details/')) return;
+
+    if (lastUnavailableToastSiteIdRef.current !== id) {
+      notifyInfo(
+        'This site is private or unavailable. You have been returned to Search.',
+        'Site unavailable',
+      );
+      lastUnavailableToastSiteIdRef.current = id;
+    }
+    navigate('/search', { replace: true });
+  }, [
+    id,
+    details,
+    siteDetailsFetchStatus,
+    siteDetailsLastFetchedSiteId,
+    userType,
+    isUnauthenticated,
+    location.pathname,
+    navigate,
+  ]);
 
   useEffect(() => {
     setViewMode(mode);
     if (
       isUserOfType(UserRoleType.SR) &&
       !hasNoPendingUpdatesFromState &&
-      mode !== SiteDetailsMode.EditMode
+      mode !== SiteDetailsMode.EditMode &&
+      (!isUserOfType(UserRoleType.INTERNAL) || mode === SiteDetailsMode.SRMode)
     ) {
       SetNavComponents(getNavComponents(true));
     } else {
@@ -397,6 +452,7 @@ const SiteDetails = () => {
   useEffect(() => {
     setIsLoading(true); // Set loading state to true before starting API calls
     dispatch(resetSaveSiteDetails(null));
+    dispatch(updateSiteDetail(null));
     fetchAllDropdownDetails();
     if (!!id?.trim()) {
       checkForRecordsPendingReview(id);
@@ -456,6 +512,22 @@ const SiteDetails = () => {
       }
     }
   }, [id, userType]);
+
+  useEffect(() => {
+    if (!id?.trim() || isLoading) {
+      return;
+    }
+
+    if (!details) {
+      showNotification(
+        RequestStatus.failed,
+        '',
+        `Site ${id} was not found or has been deleted.`,
+        'Site Not Found',
+      );
+      navigate('/search');
+    }
+  }, [id, isLoading, details, navigate]);
 
   useEffect(() => {
     if (srUpdateRequestStatus === RequestStatus.success) {
@@ -594,6 +666,9 @@ const SiteDetails = () => {
       case SiteActionBtn.RejectAll:
         setEdit(false);
         SetConfirmSiteReview(false);
+        break;
+      case SiteActionBtn.DELETE_SITE:
+        setShowDeleteModal(true);
         break;
       case SiteActionBtn.SAVE:
         const errors = await validateSiteForms();
@@ -835,8 +910,7 @@ const SiteDetails = () => {
       // Run both validations in parallel and wait for them to finish
       if (siteNotation?.length > 0) {
         let updatedSiteNotations = deepFilterByUserAction(siteNotation, [
-          UserActionEnum.added,
-          UserActionEnum.updated,
+          ...userActions,
           UserActionEnum.deleted,
           UserActionEnum.restored,
         ]);
@@ -901,39 +975,65 @@ const SiteDetails = () => {
       ];
 
       const notationParticipantErrors: any[] = [];
-      // Loop through siteNotation and their notationParticipants
+
+      //Pre-map siteNotation for quick access in loop
+      const siteNotationMap = new Map(
+        (siteNotation ?? []).map((n: any) => [n.id, n]),
+      );
+
       for (const [index, notation] of updatedSiteNotations?.entries()) {
-        if (notation?.apiAction === UserActionEnum.deleted) {
-          continue;
+        const originalNotation: any = siteNotationMap.get(notation.id);
+
+        const originalParticipants =
+          originalNotation?.notationParticipant || [];
+        const updatedParticipants = notation?.notationParticipant || [];
+
+        //Build lookup sets
+        const deletedIds = new Set(
+          updatedParticipants
+            .filter((p: any) => p.apiAction === UserActionEnum.deleted)
+            .map((p: any) => p.eventParticId),
+        );
+
+        const addedCount = updatedParticipants.filter(
+          (p: any) => p.apiAction === UserActionEnum.added,
+        ).length;
+
+        // Count remaining
+        const remainingCount = originalParticipants.reduce(
+          (count: number, orig: any) =>
+            deletedIds.has(orig.eventParticId) ? count : count + 1,
+          0,
+        );
+
+        const numOfNotationParticipants = remainingCount + addedCount;
+
+        // Must have at least one
+        if (numOfNotationParticipants === 0) {
+          notationParticipantErrors.push({
+            label: `Notation Participants`,
+            errorMessage: `Notation [${notation?.position + 1}] Atleast one Notation Participant is required.`,
+          });
         }
-        if (
-          notation?.notationParticipant &&
-          notation?.notationParticipant?.length > 0
-        ) {
-          for (const [
-            participantIndex,
-            notationParticipant,
-          ] of notation.notationParticipant.entries()) {
+
+        //Validation loop (unchanged logic, just faster access)
+        if (updatedParticipants.length > 0) {
+          for (const notationParticipant of updatedParticipants) {
             if (notationParticipant?.apiAction === UserActionEnum.deleted) {
               continue;
             }
-            // Validate and accumulate errors for each notation participant
+
             const errors = validateForm(
               notationParticipantTable,
               notationParticipant,
               `Notation [${notation?.position + 1}] Notation Participant [${notationParticipant?.position + 1}]`,
             );
+
             notationParticipantErrors.push(...errors);
           }
-        } else if (notation?.apiAction !== UserActionEnum.deleted) {
-          notationParticipantErrors.push({
-            label: 'Notation Participants',
-            errorMessage: `Notation [${notation?.position + 1}] Atleast one  Notation Participant is required.`,
-          });
         }
       }
 
-      // Return the accumulated errors
       return notationParticipantErrors;
     } catch (error) {
       console.error(error);
@@ -985,13 +1085,51 @@ const SiteDetails = () => {
     }
   };
 
+  const handleDeleteSite = async () => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        query: print(DELETE_SITE_MUTATION),
+        variables: {
+          input: {
+            siteId: id,
+          },
+        },
+      });
+
+      const result = response.data?.data?.deleteSite;
+
+      if (result?.success) {
+        showNotification(
+          RequestStatus.success,
+          `Site ${id} has been successfully deleted`,
+          '',
+        );
+        setShowDeleteModal(false);
+        navigate('/search');
+      } else {
+        showNotification(
+          RequestStatus.failed,
+          'Failed to delete site',
+          result?.message || 'An error occurred while deleting the site',
+        );
+      }
+    } catch (error: any) {
+      console.error('Error deleting site:', error);
+      showNotification(
+        RequestStatus.failed,
+        'Failed to delete site',
+        error?.message || 'An unexpected error occurred',
+      );
+    }
+  };
+
   const getActionItemsToRender = () => {
     let userTypeSR: boolean = isUserOfType(UserRoleType.SR) ?? false;
     let includeSRApprovalActions =
       userTypeSR &&
       !hasNoPendingUpdatesFromState &&
       viewMode !== SiteDetailsMode.EditMode;
-    return getActionItems(includeSRApprovalActions);
+    return getActionItems(includeSRApprovalActions, userTypeSR);
   };
 
   if (id && (isLoading || snapshot.status === RequestStatus.loading)) {
@@ -1072,6 +1210,7 @@ const SiteDetails = () => {
     dispatch(
       setupSiteSummaryForSaving({
         ...details,
+        apiAction: UserActionEnum.updated,
         userAction: UserActionEnum.updated,
         srAction:
           event?.target?.checked === true
@@ -1580,6 +1719,16 @@ const SiteDetails = () => {
               !(savedChanges?.length > 0))
           }
         />
+
+        {/* Delete Site Modal */}
+        {id && (
+          <DeleteSiteModal
+            isOpen={showDeleteModal}
+            siteId={id}
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={handleDeleteSite}
+          />
+        )}
       </PageContainer>
     </>
   );

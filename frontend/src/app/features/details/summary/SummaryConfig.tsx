@@ -233,6 +233,7 @@ export const GetSummaryConfig = () => {
       validation: {
         required: true,
         customMessage: 'City is required',
+        maxLength: 30,
       },
     },
     postalCode: {
@@ -332,6 +333,7 @@ export const GetSummaryConfig = () => {
       validation: {
         required: true,
         customMessage: 'Common Name is required',
+        maxLength: 40,
       },
     },
   };
@@ -348,6 +350,9 @@ export const GetSummaryConfig = () => {
       customEditInputTextCss: 'custom-summary-edit-input',
       customEditLabelCss: 'custom-summary-lbl-text',
       colSize: 'col-lg-12 col-md-12 col-sm-12',
+      validation: {
+        maxLength: 255,
+      },
     },
   ];
 

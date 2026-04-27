@@ -103,7 +103,7 @@ export const DeleteIcon: React.FC<InputProps> = ({
   return renderTableCell(
     <div onClick={onChange}>
       <TrashCanIcon title="Remove" />
-      <span aria-label={label}>&nbsp;Remove</span>
+      <span aria-label={label}>Remove</span>
     </div>,
     stickyCol,
     customContainerCss,
@@ -154,17 +154,18 @@ export const TextInput: React.FC<InputProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const validateInput = (inputValue: string) => {
-    if (validation) {
-      if (validation.required && !inputValue.trim()) {
-        setError(validation.customMessage || ' ');
-        return false;
-      }
-      if (validation?.pattern && !validation.pattern?.test(inputValue)) {
-        setError(validation.customMessage || '');
-        return false;
-      }
+    if (validation?.required && !inputValue.trim()) {
+      setError(validation.customMessage || ' ');
+      return false;
     }
-
+    if (validation?.pattern && !validation.pattern?.test(inputValue)) {
+      setError(validation.customMessage || '');
+      return false;
+    }
+    if (validation?.maxLength && inputValue.length > validation.maxLength) {
+      setError(`Maximum ${validation.maxLength} characters allowed`);
+      return false;
+    }
     setError(null);
     return true;
   };
@@ -177,9 +178,7 @@ export const TextInput: React.FC<InputProps> = ({
       return;
     }
 
-    if (validation?.required) {
-      validateInput(inputValue);
-    }
+    validateInput(inputValue);
   };
 
   // Replace any spaces in the label with underscores to create a valid id
@@ -214,9 +213,6 @@ export const TextInput: React.FC<InputProps> = ({
           aria-label={label} // Accessibility
           required={error ? true : false}
           disabled={isDisabled ?? false}
-          {...(validation?.maxLength
-            ? { maxLength: validation.maxLength }
-            : {})}
           {...(validation?.minLength
             ? { minLength: validation.minLength }
             : {})}
@@ -825,7 +821,6 @@ export const TextAreaInput: React.FC<InputProps> = ({
   const cols = textAreaColoum ?? undefined;
   const rows = textAreaRow ?? undefined;
   const [error, setError] = useState<string | null>(null);
-  const [currentValue, setCurrentValue] = useState(value ?? '');
 
   const validateInput = (inputValue: string) => {
     if (validation) {
@@ -845,7 +840,6 @@ export const TextAreaInput: React.FC<InputProps> = ({
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const inputValue = e.target.value;
-    setCurrentValue(inputValue);
     onChange(inputValue);
 
     if (allowNumbersOnly || (inputValue && !validateInput(inputValue))) {
@@ -877,7 +871,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
             customEditInputTextCss ?? 'custom-input-text'
           } ${error && 'error'}`}
           placeholder={placeholder}
-          value={currentValue}
+          value={value}
           onChange={handleTextAreaChange}
           aria-label={label}
           rows={rows}

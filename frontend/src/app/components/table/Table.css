@@ -235,6 +235,19 @@ table td {
 .w50 {
   width: 50px;
 }
+
 .delete-icon-pointer {
   cursor: pointer;
+}
+
+.delete-icon-pointer div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  text-decoration: none;
+  color: var(--surface-color-primary-default, #053662);
+  padding: 0;
 }

@@ -75,8 +75,7 @@ export class LandHistoryService {
         'LandHistoryService.getLandHistoriesForSite() end',
       );
 
-      if(!result.length)
-      {
+      if (!result.length) {
         return [];
       }
 

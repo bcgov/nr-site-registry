@@ -17,7 +17,11 @@ import {
   resetCartItemDeleteStatus,
 } from './CartSlice';
 import { useAuth } from 'react-oidc-context';
-import { getUser, showNotification } from '../../helpers/utility';
+import {
+  getUser,
+  showNotification,
+  sortTableData,
+} from '../../helpers/utility';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import { AngleRight } from '../../components/common/icon';
 import {
@@ -26,6 +30,8 @@ import {
   resetCreateSnapshotForSitesStatus,
 } from '../details/snapshot/SnapshotSlice';
 import { CreateSnapshotInputDto } from '../details/snapshot/ISnapshotState';
+import { TableColumn } from '../../components/table/TableColumn';
+import { Button } from '../../components/button/Button';
 
 const Cart = () => {
   const auth = useAuth();
@@ -34,6 +40,8 @@ const Cart = () => {
 
   const [delteConfirm, setDeleteConfirm] = useState(false);
   const [cartIdToDelte, setCartIdToDelete] = useState('');
+  const [sortColumn, setSortColumn] = useState<string>('');
+  const [sortAsc, setSortAsc] = useState<boolean>(true);
 
   const cartItemsArr = useSelector(cartItems);
   const deleteStatus = useSelector(deleteRequestStatus);
@@ -48,6 +56,7 @@ const Cart = () => {
   useEffect(() => {
     if (createSnapshotRequestStatus === RequestStatus.success) {
       showNotification(createSnapshotRequestStatus, 'Payment Successful');
+      dispatch(fetchCartItems());
       dispatch(resetCreateSnapshotForSitesStatus(null));
     } else {
       showNotification(
@@ -101,6 +110,25 @@ const Cart = () => {
     dispatch(createSnapshotForSites(inputDto)).unwrap();
   };
 
+  const handleSortChange = (column: TableColumn, ascSort: boolean) => {
+    setSortColumn(column.graphQLPropertyName);
+    setSortAsc(ascSort);
+  };
+
+  const getSortedCartData = () => {
+    const mapped = cartItemsArr.map((x: any) => {
+      const {
+        site: { id, ...siteWithoutId },
+        ...xWithoutSite
+      } = x;
+      const mergedObject = { ...xWithoutSite, ...siteWithoutId };
+      return { ...mergedObject, price: `$ ${x.price}` };
+    });
+
+    if (!sortColumn) return mapped;
+    return sortTableData(mapped, sortColumn, sortAsc);
+  };
+
   return (
     <PageContainer role="cart">
       <div>
@@ -111,15 +139,7 @@ const Cart = () => {
           label="Cart"
           isLoading={RequestStatus.success}
           columns={CartTableColumns}
-          data={cartItemsArr.map((x: any) => {
-            const {
-              site: { id, ...siteWithoutId },
-              ...xWithoutSite
-            } = x;
-            const mergedObject = { ...xWithoutSite, ...siteWithoutId };
-
-            return { ...mergedObject, price: `$ ${x.price}` };
-          })}
+          data={getSortedCartData()}
           totalResults={[].length}
           allowRowsSelect={false}
           showPageOptions={false}
@@ -129,15 +149,16 @@ const Cart = () => {
           deleteHandler={(event) => {
             handleCartItemDelete(event.row.id);
           }}
+          sortHandler={handleSortChange}
         />
       </div>
       {cartItemsArr.length > 0 && (
         <div className="cart-actions">
           <div className="continue-payment">
-            <span className="payment-text" onClick={() => handlePayment()}>
+            <Button onClick={handlePayment} className="payment-text">
               Continue to Payment
               <AngleRight />
-            </span>
+            </Button>
           </div>
           <div className="cart-total">
             <span className="cart-total-text">Subtotal</span>

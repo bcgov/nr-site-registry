@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './ApproveReject.css';
 import { CaretRightIcon, DropdownIcon } from '../common/icon';
 import { Link } from 'react-router-dom';
+import { Button } from '../button/Button';
 
 export interface IApproveReject {
   name: string;
@@ -59,7 +60,6 @@ export interface IApproveRejectButtons {
   rejectLabel?: string;
   approveRejectHandler: (approved: boolean) => void;
 }
-
 export const ApproveRejectButtons: React.FC<IApproveRejectButtons> = ({
   approveLabel,
   rejectLabel,
@@ -73,22 +73,20 @@ export const ApproveRejectButtons: React.FC<IApproveRejectButtons> = ({
       className="approve-reject-actions"
       data-testid="approve-reject-actions-div"
     >
-      <div
-        className="not-public-btn"
+      <Button
+        intent="danger"
         data-testid="not-public-btn"
         onClick={() => approveRejectHandler(false)}
       >
-        {' '}
         {rejectLabel}
-      </div>
-      <div
-        className="approve-btn"
+      </Button>
+      <Button
+        intent="success"
         data-testid="approve-btn"
         onClick={() => approveRejectHandler(true)}
       >
-        {' '}
         {approveLabel}
-      </div>
+      </Button>
     </div>
   );
 };

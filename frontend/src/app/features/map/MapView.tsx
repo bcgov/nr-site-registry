@@ -4,6 +4,8 @@ import { MapContainer, TileLayer } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import clsx from 'clsx';
+import { useAuth } from 'react-oidc-context';
+import { notifyInfo } from '../../components/alert/Alert';
 
 import { MyLocationMarker } from './MyLocationMarker'; // Import the MyLocationMarker component
 
@@ -13,6 +15,7 @@ import { MapSearch } from './MapSearch';
 import {
   MapSearchQuery,
   useMapSearchQuery,
+  useMapSearch_FindSiteBySiteIdLoggedInUserQuery,
   useMapSearch_FindSiteBySiteIdQuery,
 } from '../../../graphql/generated';
 import { SiteMarkers } from './siteMarkers/SiteMarkers';
@@ -43,6 +46,8 @@ export type Site = MapSearchQuery['mapSearch']['data'][number];
  * Renders a map with a marker at the supplied location
  */
 function MapView() {
+  const auth = useAuth();
+  const lastUnavailableToastSiteIdRef = useRef<string | null>(null);
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
   // Feature flag for turning OpenStreetMap tiles gray
@@ -55,6 +60,7 @@ function MapView() {
     center,
     radius,
     selectedSiteId,
+    setQuery,
   } = useMapSearchContext();
 
   const mapRef = useRef<Map>(null);
@@ -81,11 +87,39 @@ function MapView() {
   const [isLocationVisible, setLocationVisible] = useState(false);
   const clearSites = () => setSites([]);
 
-  const { data: selectedSiteData } = useMapSearch_FindSiteBySiteIdQuery({
+  const isAuthenticated = auth?.user != null;
+  const { data: publicSelectedSiteData, loading: publicSelectedSiteLoading } =
+    useMapSearch_FindSiteBySiteIdQuery({
+      variables: { siteId: selectedSiteId ?? '' },
+      skip: !selectedSiteId || isAuthenticated,
+    });
+  const {
+    data: loggedInSelectedSiteData,
+    loading: loggedInSelectedSiteLoading,
+  } = useMapSearch_FindSiteBySiteIdLoggedInUserQuery({
     variables: { siteId: selectedSiteId ?? '' },
-    skip: !selectedSiteId,
+    skip: !selectedSiteId || !isAuthenticated,
   });
-  const selectedSite = selectedSiteData?.findSiteBySiteId?.data;
+
+  const selectedSiteLoading = isAuthenticated
+    ? loggedInSelectedSiteLoading
+    : publicSelectedSiteLoading;
+  const selectedSite = isAuthenticated
+    ? loggedInSelectedSiteData?.findSiteBySiteIdLoggedInUser?.data
+    : publicSelectedSiteData?.findSiteBySiteId?.data;
+
+  useEffect(() => {
+    if (!selectedSiteId || selectedSiteLoading) return;
+    if (selectedSite) return;
+    if (lastUnavailableToastSiteIdRef.current !== selectedSiteId) {
+      notifyInfo(
+        'This site is private or unavailable. The map selection has been cleared.',
+        'Site unavailable',
+      );
+      lastUnavailableToastSiteIdRef.current = selectedSiteId;
+    }
+    setQuery({ site: undefined }, 'replace');
+  }, [selectedSiteId, selectedSiteLoading, selectedSite, setQuery]);
 
   const sitesToShow = buildSitesToShow(
     sites,

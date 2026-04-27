@@ -23,7 +23,7 @@
     "leaflet": "^1.9.3",
     "lodash": "^4.17.21",
     "oidc-client-ts": "^2.1.0",
-    "prettier": "^3.3.3",
+    "prettier": "3.8.3",
     "react": "^18.2.0",
     "react-bootstrap": "2.10.2",
     "react-dom": "^18.2.0",
@@ -50,7 +50,8 @@
     "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!@react-parcelmap-bc)/\"  ",
     "eject": "react-scripts eject",
     "test:cov": "npm test -- --coverage",
-    "codegen": "graphql-codegen"
+    "codegen": "graphql-codegen",
+    "format": "prettier --write \"src/**/*.{js,ts,jsx,tsx,json,css}\" --ignore-path ../.prettierignore --config ../.prettierrc"
   },
   "eslintConfig": {
     "extends": [

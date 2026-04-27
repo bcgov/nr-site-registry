@@ -1,8 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class FixSubdivisionsSequence1773695380136
-  implements MigrationInterface
-{
+export class FixSubdivisionsSequence1773695380136 implements MigrationInterface {
   name = 'FixSubdivisionsSequence1773695380136';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

@@ -58,7 +58,7 @@ services:
       start_period: 40s
 
   frontend:
-    container_name: frontend
+    container_name: site-frontend
     entrypoint:
       - "sh"
       - "-c"

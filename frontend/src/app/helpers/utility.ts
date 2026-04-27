@@ -55,14 +55,14 @@ export const formatDateRange = (range: [Date, Date]) => {
   }
 
   // If both dates are valid, format them
-  const formattedStartDate = format(startDate, 'MMMM do, yyyy');
-  const formattedEndDate = format(endDate, 'MMMM do, yyyy');
+  const formattedStartDate = format(startDate, 'MMMM d, yyyy');
+  const formattedEndDate = format(endDate, 'MMMM d, yyyy');
 
   return `${formattedStartDate} - ${formattedEndDate}`;
 };
 
 /**
- * Formats a date as "March 2nd, 2025" without timezone shift
+ * Formats a date as "March 2, 2025" without timezone shift
  */
 export const formatDate = (input: Date | string | null): string => {
   let date: Date;
@@ -72,7 +72,7 @@ export const formatDate = (input: Date | string | null): string => {
   }
 
   date = parseDate(input) || new Date();
-  return format(date, 'MMMM do, yyyy');
+  return format(date, 'MMMM d, yyyy');
 };
 
 export const parseDate = (value: Date | string | null): Date | null => {
@@ -602,4 +602,37 @@ export const removeProperty = (obj: any, propertyName: string): any => {
 export const safeParseFloat = (value: any): number | null => {
   const parsed = parseFloat(value);
   return isNaN(parsed) ? null : parsed;
+};
+
+/**
+ * Sorts an array of objects by a given field name.
+ *
+ * @param data - The array to sort.
+ * @param field - The property name to sort by. For multi-field columns use the first field (split on comma).
+ * @param ascending - Sort direction.
+ * @param dateFields - Set of field names that should be compared as dates.
+ * @param rawDateFieldMap - Map of display field name to raw ISO date field name for date comparison.
+ */
+export const sortTableData = <T extends Record<string, any>>(
+  data: T[],
+  field: string,
+  ascending: boolean,
+  dateFields: string[] = [],
+  rawDateFieldMap: Record<string, string> = {},
+): T[] => {
+  const sortField = field.split(',')[0];
+  return [...data].sort((a, b) => {
+    if (dateFields.includes(sortField)) {
+      const rawKey = rawDateFieldMap[sortField] || sortField;
+      const aTime = new Date(a[rawKey] || 0).getTime();
+      const bTime = new Date(b[rawKey] || 0).getTime();
+      return ascending ? aTime - bTime : bTime - aTime;
+    }
+    const aVal = a[sortField] ?? '';
+    const bVal = b[sortField] ?? '';
+    const comparison = String(aVal).localeCompare(String(bVal), undefined, {
+      numeric: true,
+    });
+    return ascending ? comparison : -comparison;
+  });
 };

@@ -37,7 +37,10 @@ export const saveSiteDetails = createAsyncThunk(
   },
 );
 
-function normalizeParcelDescription(dto: { id: any; apiAction: UserActionEnum; }) {
+function normalizeParcelDescription(dto: {
+  id: any;
+  apiAction: UserActionEnum;
+}) {
   const isExisting = Number(dto.id) > 0;
 
   // Deleted rows
@@ -129,8 +132,9 @@ const siteDetailsSlice = createSlice({
       const newState = { ...state };
 
       // ⭐ Normalize all parcel description actions before saving
-      const normalized = action.payload.map((dto: { id: any; apiAction: UserActionEnum; }) =>
-        normalizeParcelDescription(dto)
+      const normalized = action.payload.map(
+        (dto: { id: any; apiAction: UserActionEnum }) =>
+          normalizeParcelDescription(dto),
       );
 
       newState.parcelDescriptionsData = normalized;

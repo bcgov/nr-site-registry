@@ -147,6 +147,18 @@ export type CreateSnapshotDto = {
   siteId: Scalars['String']['input'];
 };
 
+export type DeleteSiteInput = {
+  siteId: Scalars['String']['input'];
+};
+
+export type DeleteSiteResponse = {
+  __typename?: 'DeleteSiteResponse';
+  httpStatusCode?: Maybe<Scalars['Float']['output']>;
+  message: Scalars['String']['output'];
+  success: Scalars['Boolean']['output'];
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
 export type DisclosureResponse = {
   __typename?: 'DisclosureResponse';
   data?: Maybe<Array<SiteProfilesDto>>;
@@ -545,6 +557,7 @@ export type Mutation = {
   deleteCartItem: CartResponse;
   deleteCartItemWithSiteId: CartResponse;
   deleteFolioItem: FolioResponse;
+  deleteSite: DeleteSiteResponse;
   deleteSitesInFolio: FolioResponse;
   updateFolioItem: FolioResponse;
   updateSiteDetails: SaveSiteDetailsResponse;
@@ -599,6 +612,11 @@ export type MutationDeleteCartItemWithSiteIdArgs = {
 
 export type MutationDeleteFolioItemArgs = {
   folioId: Scalars['Float']['input'];
+};
+
+
+export type MutationDeleteSiteArgs = {
+  input: DeleteSiteInput;
 };
 
 
@@ -775,6 +793,25 @@ export type Place = {
   name: Scalars['String']['output'];
 };
 
+export type PurchasedSiteDto = {
+  __typename?: 'PurchasedSiteDto';
+  address?: Maybe<Scalars['String']['output']>;
+  city?: Maybe<Scalars['String']['output']>;
+  purchaseDate?: Maybe<Scalars['DateTime']['output']>;
+  siteId: Scalars['String']['output'];
+  status?: Maybe<Scalars['String']['output']>;
+};
+
+export type PurchasedSitesResponse = {
+  __typename?: 'PurchasedSitesResponse';
+  data?: Maybe<Array<PurchasedSiteDto>>;
+  httpStatusCode?: Maybe<Scalars['Int']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+  totalRecords?: Maybe<Scalars['Float']['output']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   _service: _Service;
@@ -796,6 +833,7 @@ export type Query = {
   getParticipantRoleCd: DropdownResponse;
   getPendingSiteForSRApproval: QueryResultForPendingSitesResponse;
   getPeopleOrgsCd: DropdownResponse;
+  getPurchasedSites: PurchasedSitesResponse;
   getRecentViewsByUserId: RecentViewResponse;
   getSchedule2Ref: DropdownResponse;
   getSiteDisclosureBySiteId: DisclosureResponse;
@@ -877,6 +915,14 @@ export type QueryGetPendingSiteForSrApprovalArgs = {
 export type QueryGetPeopleOrgsCdArgs = {
   entityType?: InputMaybe<Scalars['String']['input']>;
   searchParam?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGetPurchasedSitesArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  pageSize?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortByDir?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1560,8 +1606,10 @@ export type Sites = {
   userAction?: Maybe<Scalars['String']['output']>;
   victoriaFileNo?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
+  whenDeleted?: Maybe<Scalars['DateTime']['output']>;
   whenUpdated?: Maybe<Scalars['DateTime']['output']>;
   whoCreated: Scalars['String']['output'];
+  whoDeleted?: Maybe<Scalars['String']['output']>;
   whoUpdated?: Maybe<Scalars['String']['output']>;
 };
 
@@ -1638,6 +1686,13 @@ export type MapSearch_FindSiteBySiteIdQueryVariables = Exact<{
 
 
 export type MapSearch_FindSiteBySiteIdQuery = { __typename?: 'Query', findSiteBySiteId: { __typename?: 'FetchSiteDetailsResponse', data?: { __typename?: 'Sites', id: string, addrLine_1: string, addrLine_2?: string | null, addrLine_3?: string | null, addrLine_4?: string | null, city: string, latdeg?: number | null, longdeg?: number | null, latDegrees?: number | null, latMinutes?: number | null, latSeconds?: number | null, longDegrees?: number | null, longMinutes?: number | null, longSeconds?: number | null, generalDescription?: string | null, siteRiskCode: string } | null } };
+
+export type MapSearch_FindSiteBySiteIdLoggedInUserQueryVariables = Exact<{
+  siteId: Scalars['String']['input'];
+}>;
+
+
+export type MapSearch_FindSiteBySiteIdLoggedInUserQuery = { __typename?: 'Query', findSiteBySiteIdLoggedInUser: { __typename?: 'FetchSiteDetail', data?: { __typename?: 'Sites', id: string, addrLine_1: string, addrLine_2?: string | null, addrLine_3?: string | null, addrLine_4?: string | null, city: string, latdeg?: number | null, longdeg?: number | null, latDegrees?: number | null, latMinutes?: number | null, latSeconds?: number | null, longDegrees?: number | null, longMinutes?: number | null, longSeconds?: number | null, generalDescription?: string | null, siteRiskCode: string } | null } };
 
 export type MapSearch_FilterSearchResultsQueryVariables = Exact<{
   page: Scalars['Int']['input'];
@@ -1888,6 +1943,63 @@ export type MapSearch_FindSiteBySiteIdQueryHookResult = ReturnType<typeof useMap
 export type MapSearch_FindSiteBySiteIdLazyQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdLazyQuery>;
 export type MapSearch_FindSiteBySiteIdSuspenseQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdSuspenseQuery>;
 export type MapSearch_FindSiteBySiteIdQueryResult = Apollo.QueryResult<MapSearch_FindSiteBySiteIdQuery, MapSearch_FindSiteBySiteIdQueryVariables>;
+export const MapSearch_FindSiteBySiteIdLoggedInUserDocument = gql`
+    query MapSearch_findSiteBySiteIdLoggedInUser($siteId: String!) {
+  findSiteBySiteIdLoggedInUser(siteId: $siteId) {
+    data {
+      id
+      addrLine_1
+      addrLine_2
+      addrLine_3
+      addrLine_4
+      city
+      latdeg
+      longdeg
+      latDegrees
+      latMinutes
+      latSeconds
+      longDegrees
+      longMinutes
+      longSeconds
+      generalDescription
+      siteRiskCode
+    }
+  }
+}
+    `;
+
+/**
+ * __useMapSearch_FindSiteBySiteIdLoggedInUserQuery__
+ *
+ * To run a query within a React component, call `useMapSearch_FindSiteBySiteIdLoggedInUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMapSearch_FindSiteBySiteIdLoggedInUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMapSearch_FindSiteBySiteIdLoggedInUserQuery({
+ *   variables: {
+ *      siteId: // value for 'siteId'
+ *   },
+ * });
+ */
+export function useMapSearch_FindSiteBySiteIdLoggedInUserQuery(baseOptions: Apollo.QueryHookOptions<MapSearch_FindSiteBySiteIdLoggedInUserQuery, MapSearch_FindSiteBySiteIdLoggedInUserQueryVariables> & ({ variables: MapSearch_FindSiteBySiteIdLoggedInUserQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MapSearch_FindSiteBySiteIdLoggedInUserQuery, MapSearch_FindSiteBySiteIdLoggedInUserQueryVariables>(MapSearch_FindSiteBySiteIdLoggedInUserDocument, options);
+      }
+export function useMapSearch_FindSiteBySiteIdLoggedInUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MapSearch_FindSiteBySiteIdLoggedInUserQuery, MapSearch_FindSiteBySiteIdLoggedInUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MapSearch_FindSiteBySiteIdLoggedInUserQuery, MapSearch_FindSiteBySiteIdLoggedInUserQueryVariables>(MapSearch_FindSiteBySiteIdLoggedInUserDocument, options);
+        }
+export function useMapSearch_FindSiteBySiteIdLoggedInUserSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<MapSearch_FindSiteBySiteIdLoggedInUserQuery, MapSearch_FindSiteBySiteIdLoggedInUserQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<MapSearch_FindSiteBySiteIdLoggedInUserQuery, MapSearch_FindSiteBySiteIdLoggedInUserQueryVariables>(MapSearch_FindSiteBySiteIdLoggedInUserDocument, options);
+        }
+export type MapSearch_FindSiteBySiteIdLoggedInUserQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdLoggedInUserQuery>;
+export type MapSearch_FindSiteBySiteIdLoggedInUserLazyQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdLoggedInUserLazyQuery>;
+export type MapSearch_FindSiteBySiteIdLoggedInUserSuspenseQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdLoggedInUserSuspenseQuery>;
+export type MapSearch_FindSiteBySiteIdLoggedInUserQueryResult = Apollo.QueryResult<MapSearch_FindSiteBySiteIdLoggedInUserQuery, MapSearch_FindSiteBySiteIdLoggedInUserQueryVariables>;
 export const MapSearch_FilterSearchResultsDocument = gql`
     query MapSearch_filterSearchResults($page: Int!, $pageSize: Int!, $filters: SiteFilters!) {
   searchSites(

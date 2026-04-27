@@ -34,11 +34,11 @@ export const getActionItems = (
   if (includeSRApprovalOptions) {
     items.push(
       {
-        label: 'Public All Changes',
+        label: 'Make Changes Public',
         value: SiteActionBtn.ApproveAll,
       },
       {
-        label: 'Private All Changes',
+        label: 'Make Changes Private',
         value: SiteActionBtn.RejectAll,
       },
     );

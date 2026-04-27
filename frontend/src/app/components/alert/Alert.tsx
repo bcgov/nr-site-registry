@@ -9,11 +9,14 @@ interface ErrorMsgProps {
   customFooterMessage?: string;
 }
 
-const createToastOptions = (type: 'error' | 'success'): ToastOptions => ({
+const createToastOptions = (
+  type: 'error' | 'success' | 'info',
+): ToastOptions => ({
   className: `toast-${type}`,
   type,
   closeButton: true,
   position: 'top-center',
+  autoClose: type === 'info' ? 2500 : undefined,
 });
 
 const ErrorMsg: React.FC<ErrorMsgProps> = ({
@@ -55,6 +58,20 @@ const SuccessMsg: React.FC<SuccessMsgProps> = ({ customMessage }: any) => (
   </div>
 );
 
+interface InfoMsgProps {
+  customMessage?: string;
+  customHeading?: string;
+}
+
+const InfoMsg: React.FC<InfoMsgProps> = ({ customMessage, customHeading }) => (
+  <div className="custom" role="alert">
+    {customHeading ? (
+      <span className="error-heading">{customHeading}</span>
+    ) : null}
+    <span className="error-text">{customMessage ?? ''}</span>
+  </div>
+);
+
 export const notifyError = (
   message?: string,
   headerText?: string,
@@ -72,4 +89,11 @@ export const notifyError = (
 
 export const notifySuccess = (message?: string) => {
   toast(<SuccessMsg customMessage={message} />, createToastOptions('success'));
+};
+
+export const notifyInfo = (message?: string, heading?: string) => {
+  toast(
+    <InfoMsg customMessage={message} customHeading={heading} />,
+    createToastOptions('info'),
+  );
 };

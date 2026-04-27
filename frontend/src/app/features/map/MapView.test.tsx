@@ -100,6 +100,12 @@ jest.mock('react-oidc-context', () => ({
   useAuth: () => ({ user: null }),
 }));
 
+jest.mock('../../components/alert/Alert', () => ({
+  __esModule: true,
+  notifyInfo: jest.fn(),
+  notifySuccess: jest.fn(),
+}));
+
 jest.mock('./useFlyToSelectedSite', () => ({
   __esModule: true,
   useFlyToSelectedSite: jest.fn(),
@@ -241,5 +247,39 @@ describe('MapView', () => {
     });
 
     expect(screen.getByTestId('site-markers').textContent).toBe('1');
+  });
+
+  it('clears selected site query and notifies when site not found', async () => {
+    const { default: MapView } = require('./MapView') as {
+      default: React.ComponentType;
+    };
+    const { useMapSearchContext } =
+      require('./mapSearchContext/MapSearchContext') as {
+        useMapSearchContext: jest.Mock;
+      };
+    const { notifyInfo } = require('../../components/alert/Alert') as {
+      notifyInfo: jest.Mock;
+    };
+
+    const setQuery = jest.fn();
+    (useMapSearchContext as jest.Mock).mockReturnValue({
+      searchTerm: null,
+      activeTool: null,
+      polygonVertices: [] as LatLngTuple[],
+      center: null,
+      radius: 1000,
+      selectedSiteId: '77',
+      setQuery,
+    });
+
+    render(<MapView />);
+
+    await waitFor(() => {
+      expect(setQuery).toHaveBeenCalledWith({ site: undefined }, 'replace');
+    });
+    expect(notifyInfo).toHaveBeenCalledWith(
+      'This site is private or unavailable. The map selection has been cleared.',
+      'Site unavailable',
+    );
   });
 });

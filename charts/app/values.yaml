@@ -68,7 +68,7 @@ backend:
       route.openshift.io/termination: "edge"
   pdb:
     # Temporarily disabled until we can come up with a strategy for database seeding with multiple pods. See SRS-1559.
-    enabled: false # enable it in PRODUCTION for having pod disruption budget.
+    enabled: false
     minAvailable: 1 # the minimum number of pods that must be available during the disruption budget.
 frontend:
   # -- enable or disable a component deployment.

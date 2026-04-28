@@ -9,8 +9,9 @@ global:
 
 backend:
   pdb:
-    enabled: true
-    # Trying to force replicaCount to 1 during deployment so we only run the seed data scripts once.
+    # Temporarily disabled until we can come up with a strategy for database seeding with multiple pods. See SRS-1559.
+    enabled: false
+
 
   # Temporarily going for 1 pod max, so that we only run the SEED_DATA import scripts once, instead of twice concurrently.
   replicaCount: 1

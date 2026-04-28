@@ -1425,7 +1425,11 @@ const SiteDetails = () => {
         {confirmSiteReview != null &&
           (confirmSiteReview === false || confirmSiteReview === true) && (
             <ModalDialog
-              label={`Are you sure to proceed`}
+              label={
+                confirmSiteReview
+                  ? 'Are you sure you want to make these changes public?'
+                  : 'Are you sure you want to make these changes private?'
+              }
               closeHandler={(response) => {
                 if (response) {
                   if (confirmSiteReview) {
@@ -1454,7 +1458,20 @@ const SiteDetails = () => {
                 }
                 SetConfirmSiteReview(null);
               }}
-            />
+            >
+              {confirmSiteReview && (
+                <p>
+                  Saving these changes will allow others to see them on the Site
+                  Registry.
+                </p>
+              )}
+              {!confirmSiteReview && (
+                <p>
+                  Saving these changes will hide your changes from others. They
+                  will not see them on the Site Registry.
+                </p>
+              )}
+            </ModalDialog>
           )}
 
         {(save || hasError) && (

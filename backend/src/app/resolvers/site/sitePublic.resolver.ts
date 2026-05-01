@@ -147,21 +147,12 @@ export class SitePublicResolver {
   }
 
   @Query(() => FetchSiteDetailsResponse, { name: 'findSiteBySiteId' })
-  findSiteBySiteId(
-    @AuthenticatedUser() userInfo,
-    @Args('siteId', { type: () => String }) siteId: string,
-    @Args('pending', { type: () => Boolean, nullable: true })
-    showPending: boolean,
-  ) {
+  findSiteBySiteId(@Args('siteId', { type: () => String }) siteId: string) {
     this.sitesLogger.log(
-      'SiteResolver.findSiteBySiteId() start siteId:' +
-        ' ' +
-        siteId +
-        ' showPending = ' +
-        showPending,
+      'SiteResolver.findSiteBySiteId() start siteId:' + ' ' + siteId,
     );
 
-    return this.siteService.findSiteBySiteId(siteId, showPending, userInfo);
+    return this.siteService.findSiteBySiteId(siteId, false, null);
   }
 
   @Query(() => FetchSiteInsights, { name: 'getSiteInsights' })

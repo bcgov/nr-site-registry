@@ -148,6 +148,7 @@ export class SitePublicResolver {
 
   @Query(() => FetchSiteDetailsResponse, { name: 'findSiteBySiteId' })
   findSiteBySiteId(
+    @AuthenticatedUser() userInfo,
     @Args('siteId', { type: () => String }) siteId: string,
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
@@ -160,7 +161,7 @@ export class SitePublicResolver {
         showPending,
     );
 
-    return this.siteService.findSiteBySiteId(siteId, showPending, null);
+    return this.siteService.findSiteBySiteId(siteId, showPending, userInfo);
   }
 
   @Query(() => FetchSiteInsights, { name: 'getSiteInsights' })

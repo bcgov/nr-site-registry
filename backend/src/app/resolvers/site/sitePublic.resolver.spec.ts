@@ -91,33 +91,36 @@ describe('SiteResolver', () => {
   describe('findSiteBySiteId', () => {
     it('should call siteService.findSiteBySiteId with the provided siteId', () => {
       const siteId = '123';
-      siteResolver.findSiteBySiteId(siteId, false);
+      const userInfo = { sub: 'user', identity_provider: 'bceid' };
+      siteResolver.findSiteBySiteId(userInfo, siteId, false);
       expect(siteService.findSiteBySiteId).toHaveBeenCalledWith(
         siteId,
         false,
-        null,
+        userInfo,
       );
     });
 
     it('finds a matching site id', async () => {
       const expectedResult = [sampleSites[0]];
       const siteId = '123';
+      const userInfo = { sub: 'user', identity_provider: 'bceid' };
 
       (siteService.findSiteBySiteId as jest.Mock).mockResolvedValue(
         expectedResult,
       );
-      const result = await siteResolver.findSiteBySiteId(siteId, false);
+      const result = await siteResolver.findSiteBySiteId(userInfo, siteId, false);
       expect(result).toEqual(expectedResult);
     });
 
     it('has no matches with the site Id parameter', async () => {
       const expectedResult = undefined;
       const siteId = '111';
+      const userInfo = { sub: 'user', identity_provider: 'bceid' };
 
       (siteService.findSiteBySiteId as jest.Mock).mockResolvedValue(
         expectedResult,
       );
-      const result = await siteResolver.findSiteBySiteId(siteId, false);
+      const result = await siteResolver.findSiteBySiteId(userInfo, siteId, false);
       expect(result).toEqual(expectedResult);
     });
   });

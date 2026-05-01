@@ -97,12 +97,16 @@ export const FolioTableColumns: TableColumn[] = [
       graphQLPropertyName: 'id',
       value: '',
       customLinkValue: 'View',
-      customInputTextCss: 'custom-dashboard-link',
+      customInputTextCss:
+        'custom-dashboard-link d-flex align-items-center justify-content-center pt-1  gap-1',
       tableMode: true,
       href: '',
-      customIcon: <FillEye />,
+      customIcon: <FillEye title="View" />,
     },
     linkRedirectionURL: '',
+    dynamicColumn: true,
+    customHeaderCss: 'text-center',
+    columnSize: ColumnSize.Small,
   },
 ];
 
@@ -127,12 +131,13 @@ export const getFolioTableColumnsBasedOnMode = (editMode: boolean) => {
           graphQLPropertyName: 'id',
           value: '',
           customLabelCss: 'link-for-table',
-          customInputTextCss: 'link-for-table',
+          customInputTextCss:
+            'link-for-table d-flex align-items-center justify-content-center pt-1 gap-1',
           tableMode: true,
-          customContainerCss: 'delete-icon-pointer',
         },
         'site/details/',
         true,
+        'text-center',
       ),
     ];
 };

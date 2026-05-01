@@ -113,14 +113,14 @@ export const CartTableColumns: TableColumn[] = [
     active: true,
     graphQLPropertyName: 'id',
     dynamicColumn: true,
-    displayType:
-    {
+    displayType: {
       type: FormFieldType.DeleteIcon,
       label: '',
       graphQLPropertyName: 'id',
       value: '',
       customLabelCss: 'link-for-table',
-      customInputTextCss: 'link-for-table d-flex align-items-center justify-content-center pt-1  gap-1',
+      customInputTextCss:
+        'link-for-table d-flex align-items-center justify-content-center pt-1  gap-1',
       tableMode: true,
     },
     customHeaderCss: 'custom-cart-table-header text-center',

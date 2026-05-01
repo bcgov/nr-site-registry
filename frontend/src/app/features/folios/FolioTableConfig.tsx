@@ -97,10 +97,11 @@ export const FolioTableColumns: TableColumn[] = [
       graphQLPropertyName: 'id',
       value: '',
       customLinkValue: 'View',
-      customInputTextCss: 'custom-dashboard-link d-flex align-items-center justify-content-center pt-1  gap-1',
+      customInputTextCss:
+        'custom-dashboard-link d-flex align-items-center justify-content-center pt-1  gap-1',
       tableMode: true,
       href: '',
-      customIcon: <FillEye  title="View" />,
+      customIcon: <FillEye title="View" />,
     },
     linkRedirectionURL: '',
     dynamicColumn: true,
@@ -130,7 +131,8 @@ export const getFolioTableColumnsBasedOnMode = (editMode: boolean) => {
           graphQLPropertyName: 'id',
           value: '',
           customLabelCss: 'link-for-table',
-          customInputTextCss: 'link-for-table d-flex align-items-center justify-content-center pt-1 gap-1',
+          customInputTextCss:
+            'link-for-table d-flex align-items-center justify-content-center pt-1 gap-1',
           tableMode: true,
         },
         'site/details/',

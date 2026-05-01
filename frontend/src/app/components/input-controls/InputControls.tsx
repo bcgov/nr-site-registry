@@ -102,7 +102,11 @@ export const DeleteIcon: React.FC<InputProps> = ({
   customContainerCss,
 }) => {
   return renderTableCell(
-    <RouterLink to="#" className={`${customInputTextCss ?? ''}`}  onClick={onChange}>
+    <RouterLink
+      to="#"
+      className={`${customInputTextCss ?? ''}`}
+      onClick={onChange}
+    >
       <TrashCanIcon title="Remove" />
       <span aria-label={label}>Remove</span>
     </RouterLink>,

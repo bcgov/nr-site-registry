@@ -129,7 +129,8 @@ const DeleteColumn: TableColumn = {
     value: '',
     tableMode: true,
     customLabelCss: 'link-for-table',
-    customInputTextCss: 'link-for-table d-flex align-items-center justify-content-center pt-1 gap-1',
+    customInputTextCss:
+      'link-for-table d-flex align-items-center justify-content-center pt-1 gap-1',
   },
   dynamicColumn: true,
   columnSize: ColumnSize.XtraSmall,

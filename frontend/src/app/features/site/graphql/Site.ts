@@ -105,8 +105,8 @@ query searchSitesForAuthenticatedUsers($searchParam: String!,  $page: Int!, $pag
 
 export const graphqlSiteDetailsQuery = () => {
   return gql`
-    query findSiteBySiteId($siteId: String!, $pending: Boolean) {
-      findSiteBySiteId(siteId: $siteId, pending: $pending) {
+    query findSiteBySiteId($siteId: String!) {
+      findSiteBySiteId(siteId: $siteId) {
         data {
           id
           commonName

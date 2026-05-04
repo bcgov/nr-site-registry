@@ -536,6 +536,53 @@ export const validateForm = (
             });
           }
 
+          if (
+            row.validation?.maxLength &&
+            typeof fieldValue === 'string' &&
+            fieldValue.length > row.validation.maxLength
+          ) {
+            const errorLabel = parentIndex
+              ? `${parentLabel} [${parseInt(parentIndex, 10) + 1}] ${row.label} exceeds maximum ${row.validation.maxLength} characters`
+              : `${parentLabel} ${row.label} exceeds maximum ${row.validation.maxLength} characters`;
+
+            errors.push({
+              label: row.label,
+              errorMessage: errorLabel,
+            });
+          }
+
+          if (
+            row.validation?.minLength &&
+            typeof fieldValue === 'string' &&
+            fieldValue.length > 0 &&
+            fieldValue.length < row.validation.minLength
+          ) {
+            const errorLabel = parentIndex
+              ? `${parentLabel} [${parseInt(parentIndex, 10) + 1}] ${row.label} must be at least ${row.validation.minLength} characters`
+              : `${parentLabel} ${row.label} must be at least ${row.validation.minLength} characters`;
+
+            errors.push({
+              label: row.label,
+              errorMessage: errorLabel,
+            });
+          }
+
+          if (
+            row.validation?.pattern &&
+            typeof fieldValue === 'string' &&
+            fieldValue.length > 0 &&
+            !row.validation.pattern.test(fieldValue)
+          ) {
+            const errorLabel = parentIndex
+              ? `${parentLabel} [${parseInt(parentIndex, 10) + 1}] ${row.validation.customMessage || `${row.label} has invalid format`}`
+              : `${parentLabel} ${row.validation.customMessage || `${row.label} has invalid format`}`;
+
+            errors.push({
+              label: row.label,
+              errorMessage: errorLabel,
+            });
+          }
+
           // Recursively handle children
           if (row.children && Array.isArray(data[propertyName])) {
             const childData = data[propertyName];

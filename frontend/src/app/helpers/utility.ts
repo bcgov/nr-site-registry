@@ -503,12 +503,92 @@ export function formatDistance(meters: number, kmDigits = 2): string {
   return `${kms} km`;
 }
 
+const buildErrorLabel = (
+  parentLabel: string,
+  parentIndex: string,
+  message: string,
+): string => {
+  if (!parentIndex) return `${parentLabel} ${message}`;
+  return `${parentLabel} [${Number.parseInt(parentIndex, 10) + 1}] ${message}`;
+};
+
+const validateField = (
+  row: IFormField,
+  fieldValue: any,
+  parentLabel: string,
+  parentIndex: string,
+): { label: string; errorMessage: string }[] => {
+  const errors: { label: string; errorMessage: string }[] = [];
+  const { validation, label } = row;
+
+  if (validation?.required && !fieldValue) {
+    errors.push({
+      label,
+      errorMessage: buildErrorLabel(
+        parentLabel,
+        parentIndex,
+        validation.customMessage ?? '',
+      ),
+    });
+  }
+
+  if (
+    validation?.maxLength &&
+    typeof fieldValue === 'string' &&
+    fieldValue.length > validation.maxLength
+  ) {
+    errors.push({
+      label,
+      errorMessage: buildErrorLabel(
+        parentLabel,
+        parentIndex,
+        `${label} exceeds maximum ${validation.maxLength} characters`,
+      ),
+    });
+  }
+
+  if (
+    validation?.minLength &&
+    typeof fieldValue === 'string' &&
+    fieldValue.length > 0 &&
+    fieldValue.length < validation.minLength
+  ) {
+    errors.push({
+      label,
+      errorMessage: buildErrorLabel(
+        parentLabel,
+        parentIndex,
+        `${label} must be at least ${validation.minLength} characters`,
+      ),
+    });
+  }
+
+  if (
+    validation?.pattern &&
+    typeof fieldValue === 'string' &&
+    fieldValue.length > 0 &&
+    !validation.pattern.test(fieldValue)
+  ) {
+    errors.push({
+      label,
+      errorMessage: buildErrorLabel(
+        parentLabel,
+        parentIndex,
+        validation.customMessage ?? `${label} has invalid format`,
+      ),
+    });
+  }
+
+  return errors;
+};
+
 export const validateForm = (
   formRows: IFormField[][],
   formData: any,
   source: string,
 ) => {
   const errors: any[] = [];
+
   const traverse = (
     rows: IFormField[][],
     data: any,
@@ -518,91 +598,29 @@ export const validateForm = (
     rows.forEach((items) => {
       items.forEach((row) => {
         const propertyName = row.graphQLPropertyName;
+        if (!propertyName) return;
 
-        // Ensure graphQLPropertyName exists
-        if (propertyName) {
-          const fieldValue = data[propertyName];
+        const fieldValue = data[propertyName];
+        errors.push(
+          ...validateField(row, fieldValue, parentLabel, parentIndex),
+        );
 
-          // Validate the current field
-          if (row.validation?.required && !fieldValue) {
-            // Building the error label with index
-            const errorLabel = parentIndex
-              ? `${parentLabel} [${parseInt(parentIndex, 10) + 1}] ${row?.validation.customMessage}`
-              : `${parentLabel} ${row?.validation.customMessage}`;
-
-            errors.push({
-              label: row.label,
-              errorMessage: errorLabel,
-            });
-          }
-
-          if (
-            row.validation?.maxLength &&
-            typeof fieldValue === 'string' &&
-            fieldValue.length > row.validation.maxLength
-          ) {
-            const errorLabel = parentIndex
-              ? `${parentLabel} [${parseInt(parentIndex, 10) + 1}] ${row.label} exceeds maximum ${row.validation.maxLength} characters`
-              : `${parentLabel} ${row.label} exceeds maximum ${row.validation.maxLength} characters`;
-
-            errors.push({
-              label: row.label,
-              errorMessage: errorLabel,
-            });
-          }
-
-          if (
-            row.validation?.minLength &&
-            typeof fieldValue === 'string' &&
-            fieldValue.length > 0 &&
-            fieldValue.length < row.validation.minLength
-          ) {
-            const errorLabel = parentIndex
-              ? `${parentLabel} [${parseInt(parentIndex, 10) + 1}] ${row.label} must be at least ${row.validation.minLength} characters`
-              : `${parentLabel} ${row.label} must be at least ${row.validation.minLength} characters`;
-
-            errors.push({
-              label: row.label,
-              errorMessage: errorLabel,
-            });
-          }
-
-          if (
-            row.validation?.pattern &&
-            typeof fieldValue === 'string' &&
-            fieldValue.length > 0 &&
-            !row.validation.pattern.test(fieldValue)
-          ) {
-            const errorLabel = parentIndex
-              ? `${parentLabel} [${parseInt(parentIndex, 10) + 1}] ${row.validation.customMessage || `${row.label} has invalid format`}`
-              : `${parentLabel} ${row.validation.customMessage || `${row.label} has invalid format`}`;
-
-            errors.push({
-              label: row.label,
-              errorMessage: errorLabel,
-            });
-          }
-
-          // Recursively handle children
-          if (row.children && Array.isArray(data[propertyName])) {
-            const childData = data[propertyName];
-            childData.forEach((child: any, index: number) => {
-              traverse(
-                row.children as any,
-                child,
-                `${parentLabel} [${parentIndex}] ${row.label}`,
-                `${index + 1}`,
-              );
-            });
-          }
+        if (row.children && Array.isArray(fieldValue)) {
+          fieldValue.forEach((child: any, index: number) => {
+            traverse(
+              row.children as any,
+              child,
+              `${parentLabel} [${parentIndex}] ${row.label}`,
+              `${index + 1}`,
+            );
+          });
         }
       });
     });
   };
 
-  // Handle both arrays and single objects
   if (Array.isArray(formData)) {
-    formData.forEach((item, index) =>
+    formData.forEach((item) =>
       traverse(formRows, item, source, `${item.position}`),
     );
   } else {

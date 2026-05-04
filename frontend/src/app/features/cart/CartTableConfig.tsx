@@ -1,7 +1,6 @@
 import {
   FillEye,
   FillPinMapFill,
-  TrashCanIcon,
 } from '../../components/common/icon';
 import { FormFieldType } from '../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../components/table/TableColumn';

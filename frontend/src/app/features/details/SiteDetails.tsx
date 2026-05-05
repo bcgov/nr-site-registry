@@ -850,10 +850,10 @@ const SiteDetails = () => {
 
   const validateSiteDisclosureForm = async () => {
     try {
-      let updatedSiteDisclosure = deepFilterByUserAction(disclosureSourceOfTruth, [
-            ...userActions,
-            UserActionEnum.deleted,
-          ]);
+      let updatedSiteDisclosure = deepFilterByUserAction(
+        disclosureSourceOfTruth,
+        [...userActions, UserActionEnum.deleted],
+      );
       if (
         updatedSiteDisclosure &&
         typeof updatedSiteDisclosure === 'object' &&
@@ -909,7 +909,7 @@ const SiteDetails = () => {
       // Run both validations in parallel and wait for them to finish
       if (siteNotation?.length > 0) {
         // First filter the notations based on user actions to get the updated notations
-        // We want to include notations that are added, updated, deleted, or restored 
+        // We want to include notations that are added, updated, deleted, or restored
         // in the validation process, but we will handle the deleted notations differently in the validation functions.
         let updatedSiteNotations = deepFilterByUserAction(siteNotation, [
           ...userActions,
@@ -961,14 +961,14 @@ const SiteDetails = () => {
         'Notation',
         // Pass the additional parameter to exclude deleted notations from validation
         // and keep them for saving. We can pass the single parameter or multiple parameters
-        // as needed for different contexts. In this case, we want to exclude deleted notations from validation, 
-        // but we still want to include them in the data sent for saving, so we pass the UserActionEnum.deleted 
-        // as a parameter to indicate that notations with this userAction should be excluded from validation 
-        // but included in saving. 
+        // as needed for different contexts. In this case, we want to exclude deleted notations from validation,
+        // but we still want to include them in the data sent for saving, so we pass the UserActionEnum.deleted
+        // as a parameter to indicate that notations with this userAction should be excluded from validation
+        // but included in saving.
         {
-          fields: "apiAction",
-          values: [UserActionEnum.deleted, UserActionEnum.restored]
-        }
+          fields: 'apiAction',
+          values: [UserActionEnum.deleted, UserActionEnum.restored],
+        },
       );
     } catch (error) {
       console.error(error);
@@ -1024,12 +1024,17 @@ const SiteDetails = () => {
 
         const numOfNotationParticipants = remainingCount + addedCount;
 
-        // Skip participant validation for deleted or restored notations since they can be in any state (including having zero participants) and it's not a requirement for them to have participants to be valid. 
-        // We will still validate participants for notations that are being added or updated, and we will validate all participants for those notations, including any that are marked for deletion, 
+        // Skip participant validation for deleted or restored notations since they can be in any state (including having zero participants) and it's not a requirement for them to have participants to be valid.
+        // We will still validate participants for notations that are being added or updated, and we will validate all participants for those notations, including any that are marked for deletion,
         // because we want to ensure that the data is valid even if the user has marked it for deletion (in case they change their mind and restore it, or in case of accidental deletion).
-        const skipAtLeastOneParticipantValidation = notation?.apiAction === UserActionEnum.deleted || notation?.apiAction === UserActionEnum.restored;
+        const skipAtLeastOneParticipantValidation =
+          notation?.apiAction === UserActionEnum.deleted ||
+          notation?.apiAction === UserActionEnum.restored;
         // Must have at least one
-        if (numOfNotationParticipants === 0 && !skipAtLeastOneParticipantValidation) {
+        if (
+          numOfNotationParticipants === 0 &&
+          !skipAtLeastOneParticipantValidation
+        ) {
           notationParticipantErrors.push({
             label: `Notation Participants`,
             errorMessage: `Notation [${notation?.position + 1}] Atleast one Notation Participant is required.`,
@@ -1044,8 +1049,8 @@ const SiteDetails = () => {
               notationParticipant,
               `Notation [${notation?.position + 1}] Notation Participant [${notationParticipant?.position + 1}]`,
               {
-                fields: "apiAction",
-                values: [UserActionEnum.deleted, UserActionEnum.restored]
+                fields: 'apiAction',
+                values: [UserActionEnum.deleted, UserActionEnum.restored],
               },
             );
 

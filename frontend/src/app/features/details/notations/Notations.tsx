@@ -1473,6 +1473,10 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         <ModalDialog
           key={v4()}
           label="Delete notation?"
+          cancelBtnLabel="Cancel"
+          saveBtnLabel="Archive"
+          confirmBtnIntent="danger"
+          confirmBtnShowIcon={false}
           children={
             'Are you sure you want to delete this notation? Once deleted, it will be archived.'
           }

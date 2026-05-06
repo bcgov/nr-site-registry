@@ -59,7 +59,8 @@ const Document: React.FC<IDocumentProps> = ({
 
   approveRejectHandler = approveRejectHandler ?? (() => {});
 
-  const documentAvailable =Boolean(document?.objectId) || Boolean(document?.file);
+  const documentAvailable =
+    Boolean(document?.objectId) || Boolean(document?.file);
 
   const renderDocumentAction = (
     button: React.ReactElement,
@@ -110,29 +111,35 @@ const Document: React.FC<IDocumentProps> = ({
             className="d-flex py-2 mb-3 gap-2 flex-wrap flex-column flex-sm-row"
             key={document?.id}
           >
-              {renderDocumentAction(
-                <Button
-                  onClick={handleViewOnline}
-                  disabled={!documentAvailable}
-                  aria-label={!documentAvailable ? DOCUMENT_UNAVAILABLE_LABEL : undefined}
-                >
-                  <ViewOnlyIcon />
-                  View Document
-                </Button>,
-                `view-document-tooltip-${document?.id ?? uniqueId}`,
-              )}
-              {renderDocumentAction(
-                <Button
-                  variant="secondary"
-                  onClick={handleDownload}
-                  disabled={viewMode === SiteDetailsMode.SRMode || !documentAvailable}
-                  aria-label={!documentAvailable ? DOCUMENT_UNAVAILABLE_LABEL : undefined}
-                >
-                  <DownloadPdfIcon />
-                  Download (PDF)
-                </Button>,
-                `download-document-tooltip-${document?.id ?? uniqueId}`,
-              )}
+            {renderDocumentAction(
+              <Button
+                onClick={handleViewOnline}
+                disabled={!documentAvailable}
+                aria-label={
+                  !documentAvailable ? DOCUMENT_UNAVAILABLE_LABEL : undefined
+                }
+              >
+                <ViewOnlyIcon />
+                View Document
+              </Button>,
+              `view-document-tooltip-${document?.id ?? uniqueId}`,
+            )}
+            {renderDocumentAction(
+              <Button
+                variant="secondary"
+                onClick={handleDownload}
+                disabled={
+                  viewMode === SiteDetailsMode.SRMode || !documentAvailable
+                }
+                aria-label={
+                  !documentAvailable ? DOCUMENT_UNAVAILABLE_LABEL : undefined
+                }
+              >
+                <DownloadPdfIcon />
+                Download (PDF)
+              </Button>,
+              `download-document-tooltip-${document?.id ?? uniqueId}`,
+            )}
             {viewMode === SiteDetailsMode.EditMode &&
               userType === UserType.Internal && (
                 <>

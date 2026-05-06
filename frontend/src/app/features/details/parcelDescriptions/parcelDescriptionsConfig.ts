@@ -128,11 +128,14 @@ const DeleteColumn: TableColumn = {
     graphQLPropertyName: 'deleteIcon',
     value: '',
     tableMode: true,
-    customContainerCss: 'delete-icon-pointer',
+    customLabelCss: 'link-for-table',
+    customInputTextCss:
+      'link-for-table d-flex align-items-center justify-content-center pt-1 gap-1',
   },
   dynamicColumn: true,
   columnSize: ColumnSize.XtraSmall,
   stickyCol: true,
+  customHeaderCss: 'text-center',
 };
 
 export const getAddDeleteParcelDescriptionTableColumns = () => {

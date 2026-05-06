@@ -620,11 +620,11 @@ export class SiteService {
     pending: boolean,
     userInfo: any,
   ) {
-    if (pending) {
+    const isIdir = userInfo?.identity_provider === UserTypeEum.IDIR;
+    if (pending && isIdir) {
       return { id: siteId, srAction: SRApprovalStatusEnum.PENDING };
     }
 
-    const isIdir = userInfo?.identity_provider === UserTypeEum.IDIR;
     return isIdir
       ? { id: siteId }
       : { id: siteId, srAction: SRApprovalStatusEnum.PUBLIC };

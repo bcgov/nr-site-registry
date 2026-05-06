@@ -33,77 +33,6 @@ export class SnapshotsResolver {
     ],
     mode: RoleMatchingMode.ANY,
   })
-  @Query(() => SnapshotResponse, { name: 'getSnapshots' })
-  async getSnapshots() {
-    this.sitesLogger.log('SnapshotsResolver.getSnapshots() start');
-    const result = await this.snapshotsService.getSnapshots();
-    if (result && result.length > 0) {
-      this.sitesLogger.log('SnapshotsResolver.getSnapshots() RES:200 end');
-      return this.genericResponseProvider.createResponse(
-        'Snapshot fetched successfully.',
-        HttpStatus.OK,
-        true,
-        result,
-      );
-    } else {
-      this.sitesLogger.log('SnapshotsResolver.getSnapshots() RES:404 end');
-      return this.genericResponseProvider.createResponse(
-        `Snapshot not found.`,
-        HttpStatus.NOT_FOUND,
-        false,
-        null,
-      );
-    }
-  }
-
-  @Roles({
-    roles: [
-      CustomRoles.External,
-      CustomRoles.Internal,
-      CustomRoles.SiteRegistrar,
-    ],
-    mode: RoleMatchingMode.ANY,
-  })
-  @Query(() => SnapshotResponse, { name: 'getSnapshotsByUserId' })
-  @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
-  async getSnapshotsByUserId(
-    @Args('userId', { type: () => String }) userId: string,
-  ) {
-    this.sitesLogger.log(
-      'SnapshotsResolver.getSnapshotsByUserId() start userId:' + ' ' + userId,
-    );
-    const result = await this.snapshotsService.getSnapshotsByUserId(userId);
-    if (result && result.length > 0) {
-      this.sitesLogger.log(
-        'SnapshotsResolver.getSnapshotsByUserId() RES:200 end',
-      );
-      return this.genericResponseProvider.createResponse(
-        'Snapshot fetched successfully.',
-        HttpStatus.OK,
-        true,
-        result,
-      );
-    } else {
-      this.sitesLogger.log(
-        'SnapshotsResolver.getSnapshotsByUserId() RES:404 end',
-      );
-      return this.genericResponseProvider.createResponse(
-        `Snapshot not found for user id: ${userId}`,
-        HttpStatus.NOT_FOUND,
-        false,
-        null,
-      );
-    }
-  }
-
-  @Roles({
-    roles: [
-      CustomRoles.External,
-      CustomRoles.Internal,
-      CustomRoles.SiteRegistrar,
-    ],
-    mode: RoleMatchingMode.ANY,
-  })
   @Query(() => SnapshotResponse, { name: 'getSnapshotsBySiteId' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSnapshotsBySiteId(
@@ -134,40 +63,6 @@ export class SnapshotsResolver {
       );
       return this.genericResponseProvider.createResponse(
         `Snapshot not found for site id ${siteId}`,
-        HttpStatus.NOT_FOUND,
-        false,
-        null,
-      );
-    }
-  }
-
-  @Roles({
-    roles: [
-      CustomRoles.External,
-      CustomRoles.Internal,
-      CustomRoles.SiteRegistrar,
-    ],
-    mode: RoleMatchingMode.ANY,
-  })
-  @Query(() => SnapshotResponse, { name: 'getSnapshotsById' })
-  @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
-  async getSnapshotsById(@Args('id', { type: () => Int }) id: number) {
-    this.sitesLogger.log(
-      'SnapshotsResolver.getSnapshotsById() start snapshotId:' + ' ' + id,
-    );
-    const result = await this.snapshotsService.getSnapshotsById(id);
-    if (result && result.length > 0) {
-      this.sitesLogger.log('SnapshotsResolver.getSnapshotsById() RES:200 end');
-      return this.genericResponseProvider.createResponse(
-        'Snapshot fetched successfully.',
-        HttpStatus.OK,
-        true,
-        result,
-      );
-    } else {
-      this.sitesLogger.log('SnapshotsResolver.getSnapshotsById() RES:404 end');
-      return this.genericResponseProvider.createResponse(
-        `Snapshot not found for snapshot id: ${id}`,
         HttpStatus.NOT_FOUND,
         false,
         null,

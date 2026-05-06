@@ -663,6 +663,24 @@ describe('SiteService', () => {
         relations,
       });
     });
+
+    it('non-IDIR user cannot load pending site details (pending flag is ignored)', async () => {
+      const siteId = '8002';
+      // First call is the deletion-check; second is the actual site lookup
+      (siteRepository.findOne as jest.Mock)
+        .mockResolvedValueOnce({ id: siteId, whoDeleted: null })
+        .mockResolvedValueOnce(null);
+
+      await siteService.findSiteBySiteId(siteId, true, {
+        sub: 'external-user',
+        identity_provider: 'bceid',
+      });
+
+      expect(siteRepository.findOne).toHaveBeenCalledWith({
+        where: { id: siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        relations,
+      });
+    });
   });
 
   describe('updateSiteRegistryRecord', () => {

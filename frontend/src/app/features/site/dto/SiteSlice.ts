@@ -41,10 +41,12 @@ export const fetchSitesDetails = createAsyncThunk(
             ? graphqlSiteDetailsQueryForLoggedIn()
             : graphqlSiteDetailsQuery(),
         ),
-        variables: {
-          siteId: args.siteId,
-          pending: args.showPending,
-        },
+        variables: user
+          ? {
+              siteId: args.siteId,
+              pending: args.showPending,
+            }
+          : { siteId: args.siteId },
       });
       return user
         ? response.data?.data?.findSiteBySiteIdLoggedInUser?.data

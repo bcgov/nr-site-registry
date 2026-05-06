@@ -486,7 +486,6 @@ const SiteDetails = () => {
           // should be based on condition for External and Internal User.
           dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
 
-          // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
         ])
           .then(() => {
             setIsLoading(false); // Set loading state to false after all API calls are resolved
@@ -917,13 +916,6 @@ const SiteDetails = () => {
           UserActionEnum.restored,
         ]);
 
-        // Exclude deleted notations from validation, but keep them for saving
-        // const notationsForValidation = Array.isArray(updatedSiteNotations)
-        //   ? updatedSiteNotations.filter(
-        //       (notation: any) =>
-        //         notation?.userAction !== UserActionEnum.deleted,
-        //     )
-        //   : updatedSiteNotations;
         const [notationErrors, notationParticipantErrors] = await Promise.all([
           validateNotations(updatedSiteNotations), // Async function handling Notation validation
           validateNotationParticipants(updatedSiteNotations), // Async function handling Notation Participant validation

@@ -485,7 +485,6 @@ const SiteDetails = () => {
           ),
           // should be based on condition for External and Internal User.
           dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
-
         ])
           .then(() => {
             setIsLoading(false); // Set loading state to false after all API calls are resolved

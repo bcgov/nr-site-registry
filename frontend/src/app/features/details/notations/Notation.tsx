@@ -2,11 +2,7 @@ import React from 'react';
 import PanelWithUpDown from '../../../components/simple/PanelWithUpDown';
 import Form from '../../../components/form/Form';
 import Widget from '../../../components/widget/Widget';
-import {
-  UserMinus,
-  UserPlus,
-  Plus,
-} from '../../../components/common/icon';
+import { UserMinus, UserPlus, Plus } from '../../../components/common/icon';
 import Actions from '../../../components/action/Actions';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { UserType } from '../../../helpers/requests/userType';

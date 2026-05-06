@@ -1675,7 +1675,10 @@ export class SiteService {
           }
 
           // Process related participants regardless of event action, except when event is deleted (archived)
-          if (apiAction === UserActionEnum.DELETED || apiAction === UserActionEnum.RESTORED) {
+          if (
+            apiAction === UserActionEnum.DELETED ||
+            apiAction === UserActionEnum.RESTORED
+          ) {
             // If event is deleted (archived), we won't process participants as they are also considered archived and there is no UI to manage participants of an archived event.
             // If event is restored, we also won't process participants as part of restore action, as there is no UI to restore participants separately from event restoration.
             // Participants will be restored as part of event restoration and there is no need to process them separately in the restore action.
@@ -1683,14 +1686,11 @@ export class SiteService {
               `SiteService.processEvents(): Skipping participant processing for event with id ${notation.id} due to event action ${apiAction === UserActionEnum.DELETED ? 'Archived' : 'Restored'}.`,
             );
             return;
-          }
-          else
-          {
+          } else {
             // Process related participants regardless of event action
-            if (notationParticipant?.length > 0 ) {
+            if (notationParticipant?.length > 0) {
               await processParticipants(notationId, notationParticipant);
-            } 
-            else {
+            } else {
               this.sitesLogger.warn(
                 `SiteService.processEvents(): There is no notation participants. Atleast every notation should have one notation participant.`,
               );

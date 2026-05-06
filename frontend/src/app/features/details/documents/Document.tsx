@@ -59,11 +59,7 @@ const Document: React.FC<IDocumentProps> = ({
 
   approveRejectHandler = approveRejectHandler ?? (() => {});
 
-  const documentAvailable =
-    document?.objectId !== null && document?.objectId !== undefined
-      ? true
-      : Boolean(document?.file);
-
+  const documentAvailable =Boolean(document?.objectId) || Boolean(document?.file);
 
   const renderDocumentAction = (
     button: React.ReactElement,

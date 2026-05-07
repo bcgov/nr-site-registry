@@ -88,6 +88,9 @@ export const GetAssociateConfig = () => {
         customEditLabelCss: 'custom-associate-edit-label',
         customEditInputTextCss: 'custom-associate-edit-input',
         tableMode: true,
+        validation: {
+          maxLength: 255,
+        }
       },
     },
     {
@@ -181,6 +184,9 @@ export const GetAssociateConfig = () => {
         customEditLabelCss: 'custom-associate-edit-label',
         customEditInputTextCss: 'custom-associate-edit-input',
         tableMode: true,
+        validation: {
+          maxLength: 255,
+        }
       },
     },
     {

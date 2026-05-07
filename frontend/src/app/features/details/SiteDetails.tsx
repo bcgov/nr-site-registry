@@ -164,7 +164,7 @@ import { print } from 'graphql';
 import { DELETE_SITE_MUTATION } from '../site/graphql/DeleteSite';
 
 const SiteDetails = () => {
-  const { disclosureStatementConfigEditMode } = siteDisclosureConfig(
+  const { disclosureStatementConfigEditMode, disclosureCommentsConfig } = siteDisclosureConfig(
     useSelector(schedule2ReferenceCdDrpdown)?.data,
   );
   const auth = useAuth();
@@ -861,7 +861,7 @@ const SiteDetails = () => {
 
         // Validate against the disclosure slice (source of truth) — always has full field values
         const errors = validateForm(
-          disclosureStatementConfigEditMode,
+          [...disclosureStatementConfigEditMode, ...disclosureCommentsConfig],
           updatedSiteDisclosure,
           'Site Disclosure',
         );

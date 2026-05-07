@@ -868,8 +868,11 @@ const SiteDetails = () => {
         if (errors?.length > 0) {
           siteDisclosureErrors.push(...errors);
         }
-
-        const { siteRegDateRecd, dateCompleted } = updatedSiteDisclosure[0];
+        const { siteRegDateRecd, dateCompleted } =
+          (Array.isArray(updatedSiteDisclosure) &&
+            updatedSiteDisclosure.length > 0 &&
+            updatedSiteDisclosure[0]) ||
+          {};
         if (!!siteRegDateRecd && !!dateCompleted) {
           if (new Date(dateCompleted) < new Date(siteRegDateRecd)) {
             siteDisclosureErrors.push({

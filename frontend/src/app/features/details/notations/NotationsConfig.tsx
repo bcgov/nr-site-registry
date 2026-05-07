@@ -247,6 +247,7 @@ export const GetNotationConfig = () => {
         validation: {
           required: true,
           customMessage: 'Required Actions is required.',
+          maxLength: 500,
         },
       },
     ],
@@ -265,6 +266,7 @@ export const GetNotationConfig = () => {
         validation: {
           required: true,
           customMessage: 'Note is required.',
+          maxLength: 500,
         },
       },
     ],

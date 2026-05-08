@@ -2,12 +2,7 @@ import React from 'react';
 import PanelWithUpDown from '../../../components/simple/PanelWithUpDown';
 import Form from '../../../components/form/Form';
 import Widget from '../../../components/widget/Widget';
-import {
-  UserMinus,
-  UserPlus,
-  Minus,
-  Plus,
-} from '../../../components/common/icon';
+import { UserMinus, UserPlus, Plus } from '../../../components/common/icon';
 import Actions from '../../../components/action/Actions';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { UserType } from '../../../helpers/requests/userType';
@@ -241,9 +236,11 @@ const Notation: React.FC<INotationProps> = ({
           {viewMode === SiteDetailsMode.EditMode &&
             userType === UserType.Internal &&
             !isArchived && (
-              <div>
-                <Button onClick={() => handleDeleteNotation(notation.id)}>
-                  <Minus />
+              <div className="d-flex justify-content-end">
+                <Button
+                  intent="danger"
+                  onClick={() => handleDeleteNotation(notation.id)}
+                >
                   Archive Notation
                 </Button>
               </div>

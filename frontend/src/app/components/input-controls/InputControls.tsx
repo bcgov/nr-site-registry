@@ -158,6 +158,11 @@ export const TextInput: React.FC<InputProps> = ({
   const ContainerElement = tableMode ? 'td' : 'div';
   const [error, setError] = useState<string | null>(null);
 
+  // Reset error when toggling between edit and view modes
+  useEffect(() => {
+    setError(null);
+  }, [isEditing]);
+
   const validateInput = (inputValue: string) => {
     if (validation?.required && !inputValue.trim()) {
       setError(validation.customMessage || ' ');

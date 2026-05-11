@@ -59,6 +59,9 @@ export const getLandUseColumns = (
       customInputTextCss: 'custom-landuses-input-text',
       customEditLabelCss: 'custom-landuses-edit-label',
       customEditInputTextCss: 'custom-landuses-edit-input',
+      validation: {
+        maxLength: 225,
+      },
     },
   };
 

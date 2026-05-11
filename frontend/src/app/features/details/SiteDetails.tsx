@@ -164,9 +164,8 @@ import { print } from 'graphql';
 import { DELETE_SITE_MUTATION } from '../site/graphql/DeleteSite';
 
 const SiteDetails = () => {
-  const { disclosureStatementConfigEditMode, disclosureCommentsConfig } = siteDisclosureConfig(
-    useSelector(schedule2ReferenceCdDrpdown)?.data,
-  );
+  const { disclosureStatementConfigEditMode, disclosureCommentsConfig } =
+    siteDisclosureConfig(useSelector(schedule2ReferenceCdDrpdown)?.data);
   const auth = useAuth();
   const isUnauthenticated = auth?.user == null;
   const { id } = useParams();

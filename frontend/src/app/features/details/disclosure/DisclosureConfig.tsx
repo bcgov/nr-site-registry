@@ -374,7 +374,7 @@ export const siteDisclosureConfig = (
         textAreaRow: 1,
         validation: {
           maxLength: 2000,
-        }
+        },
       },
     ],
   ];

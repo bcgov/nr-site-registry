@@ -166,24 +166,18 @@ export const TextInput: React.FC<InputProps> = ({
   const validateInput = (inputValue: string) => {
     if (validation?.required && !inputValue?.trim()) {
       setError(validation?.customMessage || ' ');
-    if (validation?.required && !inputValue?.trim()) {
-      setError(validation?.customMessage || ' ');
       return false;
     }
-    if (validation?.pattern && !validation?.pattern?.test(inputValue)) {
-      setError(validation?.customMessage || '');
     if (validation?.pattern && !validation?.pattern?.test(inputValue)) {
       setError(validation?.customMessage || '');
       return false;
     }
     if (validation?.maxLength && inputValue?.length > validation?.maxLength) {
       setError(`Maximum ${validation?.maxLength} characters allowed`);
-    if (validation?.maxLength && inputValue?.length > validation?.maxLength) {
-      setError(`Maximum ${validation?.maxLength} characters allowed`);
       return false;
     }
-    
-    if(allowNumbersOnly && /\D/.test(inputValue)) {
+
+    if (allowNumbersOnly && /\D/.test(inputValue)) {
       setError(validation?.customMessage || ' ');
       return false;
     }
@@ -194,17 +188,13 @@ export const TextInput: React.FC<InputProps> = ({
 
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let inputValue = e.target.value;
-    let inputValue = e.target.value;
 
     validateInput(inputValue);
-    if (allowNumbersOnly) {
-      inputValue = inputValue.replace(/\D/g, '');
-    validateInput(inputValue);
+
     if (allowNumbersOnly) {
       inputValue = inputValue.replace(/\D/g, '');
     }
 
-    onChange(inputValue);
     onChange(inputValue);
   };
 
@@ -259,7 +249,6 @@ export const TextInput: React.FC<InputProps> = ({
       )}
     </ContainerElement>
   );
-  // }
 };
 
 export const DropdownInput: React.FC<InputProps> = ({
@@ -866,24 +855,24 @@ export const TextAreaInput: React.FC<InputProps> = ({
       setError(`Maximum ${validation?.maxLength} characters allowed`);
       return false;
     }
-    
-    if(allowNumbersOnly && /\D/.test(inputValue)) {
+
+    if (allowNumbersOnly && /\D/.test(inputValue)) {
       setError(validation?.customMessage || ' ');
       return false;
     }
-    
+
     setError(null);
     return true;
   };
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     let inputValue = e.target.value;
-    
+
     validateInput(inputValue);
     if (allowNumbersOnly) {
       inputValue = inputValue.replace(/\D/g, '');
     }
-    
+
     onChange(inputValue);
   };
 
@@ -913,7 +902,6 @@ export const TextAreaInput: React.FC<InputProps> = ({
           placeholder={placeholder}
           value={value}
           onChange={handleTextAreaChange}
-          
           aria-label={label}
           rows={rows}
           cols={cols}

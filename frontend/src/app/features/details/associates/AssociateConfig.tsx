@@ -90,7 +90,7 @@ export const GetAssociateConfig = () => {
         tableMode: true,
         validation: {
           maxLength: 255,
-        }
+        },
       },
     },
     {
@@ -186,7 +186,7 @@ export const GetAssociateConfig = () => {
         tableMode: true,
         validation: {
           maxLength: 255,
-        }
+        },
       },
     },
     {

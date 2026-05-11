@@ -100,6 +100,7 @@ import {
   getParentBucket,
   getSiteAssociated,
   getSiteDocuments,
+  getSiteLandHistories,
   getSiteNoatations,
   getSiteParticipants,
   getSiteSummary,
@@ -108,6 +109,7 @@ import {
   saveRequestStatus,
   saveSiteDetails,
   setupDocumentsDataForSaving,
+  setupLandHistoriesDataForSaving,
   setupNotationDataForSaving,
   setupSiteAssociationDataForSaving,
   setupSiteDisclosureDataForSaving,
@@ -162,6 +164,7 @@ import DeleteSiteModal from './DeleteSiteModal';
 import { GRAPHQL } from '../../helpers/endpoints';
 import { print } from 'graphql';
 import { DELETE_SITE_MUTATION } from '../site/graphql/DeleteSite';
+import { getLandUseColumns } from './landUses/LandUseColumnConfiguration';
 
 const SiteDetails = () => {
   const { disclosureStatementConfigEditMode, disclosureCommentsConfig } =
@@ -201,6 +204,7 @@ const SiteDetails = () => {
   const savedChanges = useSelector(trackedChanges);
   const siteNotation = useSelector(getSiteNoatations);
   const siteSummary = useSelector(getSiteSummary);
+  const siteLandUses = useSelector(getSiteLandHistories);
   const disclosureSourceOfTruth = useSelector(
     siteDisclosureSelector,
   )?.siteDisclosure;
@@ -217,6 +221,7 @@ const SiteDetails = () => {
   const { associateColumnInternal } = GetAssociateConfig();
   const { documentFormRowsEditMode } = GetDocumentsConfig();
   const { createSiteFormRows, summaryFormRows } = GetSummaryConfig();
+  const landUseFormRows = getLandUseColumns();
 
   const [errorList, setErrorList] = useState<any[]>([]);
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
@@ -701,6 +706,7 @@ const SiteDetails = () => {
         siteAssocErrors,
         siteDisclosureErrors,
         siteSummaryErrors,
+        siteLandUsesErrors
       ] = await Promise.all([
         validateNotationsForm(),
         validateSiteParticipantForm(),
@@ -708,6 +714,7 @@ const SiteDetails = () => {
         validateAssociatedSitesForm(),
         validateSiteDisclosureForm(),
         validateSiteSummaryForm(),
+        validateSiteLandUsesForm(),
       ]);
 
       // Combine all errors into one list
@@ -718,11 +725,42 @@ const SiteDetails = () => {
         ...siteAssocErrors,
         ...siteDisclosureErrors,
         ...siteSummaryErrors,
+        ...siteLandUsesErrors,
       ];
       // You can now use `allErrors` for further processing
       return errors;
     } catch (error) {
       return []; // Return empty array in case of error to avoid breaking further logic
+    }
+  };
+
+  const validateSiteLandUsesForm = async () => {
+    try {
+      debugger;
+      if (siteLandUses?.length > 0) {
+        const landUseTable: IFormField[][] = [
+          landUseFormRows
+             .map((column) => column.displayType)
+            .filter(
+              (displayType): displayType is IFormField =>
+                displayType !== undefined,
+            ),
+        ];
+        let updatedSiteLandUses = deepFilterByUserAction(siteLandUses, userActions);
+        const errors = validateForm(landUseTable, updatedSiteLandUses, 'Land Uses');
+        if (errors?.length > 0) {
+          return errors;
+        } else {
+          updatedSiteLandUses = removeProperty(updatedSiteLandUses, 'position');
+          dispatch(setupLandHistoriesDataForSaving(updatedSiteLandUses));
+          return [];
+        }
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error(error);
+      return [];
     }
   };
 

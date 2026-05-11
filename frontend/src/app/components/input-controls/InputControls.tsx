@@ -164,31 +164,37 @@ export const TextInput: React.FC<InputProps> = ({
   }, [isEditing]);
 
   const validateInput = (inputValue: string) => {
-    if (validation?.required && !inputValue.trim()) {
-      setError(validation.customMessage || ' ');
+    if (validation?.required && !inputValue?.trim()) {
+      setError(validation?.customMessage || ' ');
       return false;
     }
-    if (validation?.pattern && !validation.pattern?.test(inputValue)) {
-      setError(validation.customMessage || '');
+    if (validation?.pattern && !validation?.pattern?.test(inputValue)) {
+      setError(validation?.customMessage || '');
       return false;
     }
-    if (validation?.maxLength && inputValue.length > validation.maxLength) {
-      setError(`Maximum ${validation.maxLength} characters allowed`);
+    if (validation?.maxLength && inputValue?.length > validation?.maxLength) {
+      setError(`Maximum ${validation?.maxLength} characters allowed`);
       return false;
     }
+
+    if (allowNumbersOnly && /\D/.test(inputValue)) {
+      setError(validation?.customMessage || ' ');
+      return false;
+    }
+
     setError(null);
     return true;
   };
 
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    onChange(inputValue);
-
-    if (allowNumbersOnly || (inputValue && !validateInput(inputValue))) {
-      return;
-    }
+    let inputValue = e.target.value;
 
     validateInput(inputValue);
+    if (allowNumbersOnly) {
+      inputValue = inputValue.replace(/\D/g, '');
+    }
+
+    onChange(inputValue);
   };
 
   // Replace any spaces in the label with underscores to create a valid id
@@ -832,16 +838,27 @@ export const TextAreaInput: React.FC<InputProps> = ({
   const rows = textAreaRow ?? undefined;
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    setError(null);
+  }, [isEditing]);
+
   const validateInput = (inputValue: string) => {
-    if (validation) {
-      if (validation?.pattern && !validation.pattern?.test(inputValue)) {
-        setError(validation.customMessage || ' ');
-        return false;
-      }
-      if (validation.required && !inputValue.trim()) {
-        setError(validation.customMessage || ' ');
-        return false;
-      }
+    if (validation?.required && !inputValue?.trim()) {
+      setError(validation?.customMessage || ' ');
+      return false;
+    }
+    if (validation?.pattern && !validation?.pattern?.test(inputValue)) {
+      setError(validation?.customMessage || '');
+      return false;
+    }
+    if (validation?.maxLength && inputValue?.length > validation?.maxLength) {
+      setError(`Maximum ${validation?.maxLength} characters allowed`);
+      return false;
+    }
+
+    if (allowNumbersOnly && /\D/.test(inputValue)) {
+      setError(validation?.customMessage || ' ');
+      return false;
     }
 
     setError(null);
@@ -849,12 +866,14 @@ export const TextAreaInput: React.FC<InputProps> = ({
   };
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const inputValue = e.target.value;
-    onChange(inputValue);
+    let inputValue = e.target.value;
 
-    if (allowNumbersOnly || (inputValue && !validateInput(inputValue))) {
-      return;
+    validateInput(inputValue);
+    if (allowNumbersOnly) {
+      inputValue = inputValue.replace(/\D/g, '');
     }
+
+    onChange(inputValue);
   };
 
   return (

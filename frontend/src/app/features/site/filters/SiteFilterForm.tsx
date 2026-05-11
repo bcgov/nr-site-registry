@@ -31,6 +31,7 @@ const SiteFilterForm: React.FC<SiteFilterProps> = ({
           formRows={formRows}
           formData={formData}
           handleInputChange={onInputChange}
+          editMode={true}
         />
         <div className="d-flex flex-wrap justify-content-between w-100 mt-3">
           <div>

@@ -117,7 +117,7 @@ export const GetConfig = () => {
       columnSize: ColumnSize.Triple,
       displayType: {
         type: FormFieldType.Text,
-        label: '',
+        label: 'Note',
         placeholder: 'Note',
         graphQLPropertyName: 'note',
         value: '',
@@ -127,6 +127,9 @@ export const GetConfig = () => {
         customEditLabelCss: 'custom-participant-edit-label',
         customEditInputTextCss: 'custom-participant-edit-input',
         tableMode: true,
+        validation: {
+          maxLength: 255, // Set a maximum length for the note
+        },
       },
     },
     {

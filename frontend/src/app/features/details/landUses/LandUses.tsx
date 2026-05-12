@@ -88,7 +88,6 @@ const LandUses: FC = () => {
   }, [loggedInUser]);
 
   const tableColumns = useMemo(() => {
-    console.log('Generating table columns with editModeEnabled:', editModeEnabled);
     return getLandUseColumns(
       landUseCodes,
       editModeEnabled,
@@ -185,7 +184,7 @@ const LandUses: FC = () => {
       data.set(editedRowId, {
         ...(data.get(editedRowId) ?? {}),
         ...landUseUpdateInput,
-        apiAction: UserActionEnum.updated,
+        userAction: UserActionEnum.updated,
         srAction: srActionValue,
       });
       return data;
@@ -259,7 +258,7 @@ const LandUses: FC = () => {
             ? existingLandUse.landUse.code
             : null,
           shouldDelete: true,
-          apiAction: UserActionEnum.deleted,
+          userAction: UserActionEnum.deleted,
           srAction: SRApprovalStatusEnum.Pending,
         });
       });

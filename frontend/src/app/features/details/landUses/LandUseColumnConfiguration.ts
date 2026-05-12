@@ -59,13 +59,12 @@ export const getLandUseColumns = (
       customInputTextCss: 'custom-landuses-input-text',
       customEditLabelCss: 'custom-landuses-edit-label',
       customEditInputTextCss: 'custom-landuses-edit-input',
-      validation: editMode ? {
+      validation: {
         maxLength: 225,
-      } : undefined,
+      },
     },
   };
 
-  console.log('noteColumn, editMode: ', noteColumn, editMode);
   const srColumn = {
     id: 3,
     displayName: 'SR',

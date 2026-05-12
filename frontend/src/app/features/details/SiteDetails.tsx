@@ -746,7 +746,7 @@ const SiteDetails = () => {
                 displayType !== undefined,
             ),
         ];
-        let updatedSiteLandUses = deepFilterByUserAction(siteLandUses, userActions);
+        let updatedSiteLandUses = deepFilterByUserAction(siteLandUses, userActions, 'userAction');
         const errors = validateForm(landUseTable, updatedSiteLandUses, 'Land Uses');
         if (errors?.length > 0) {
           return errors;

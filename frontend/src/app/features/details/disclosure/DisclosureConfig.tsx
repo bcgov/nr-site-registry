@@ -334,6 +334,9 @@ export const siteDisclosureConfig = (
         customEditLabelCss: 'custom-disclosure-edit-label',
         customEditInputTextCss: 'custom-disclosure-edit-input',
         textAreaRow: 3,
+        validation: {
+          maxLength: 2000,
+        },
       },
     ],
     [
@@ -350,6 +353,9 @@ export const siteDisclosureConfig = (
         customEditLabelCss: 'custom-disclosure-edit-label',
         customEditInputTextCss: 'custom-disclosure-edit-input',
         textAreaRow: 4,
+        validation: {
+          maxLength: 2000,
+        },
       },
     ],
     [
@@ -366,6 +372,9 @@ export const siteDisclosureConfig = (
         customEditLabelCss: 'custom-disclosure-edit-label',
         customEditInputTextCss: 'custom-disclosure-edit-input',
         textAreaRow: 1,
+        validation: {
+          maxLength: 2000,
+        },
       },
     ],
   ];

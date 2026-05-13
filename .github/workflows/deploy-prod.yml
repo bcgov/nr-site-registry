@@ -1,12 +1,8 @@
 name: Deploy to PROD
 
-# Merges into the dev branch will deploy to prod. 
-# Currently this also deploys to test, so test and prod should be in sync.
+# PROD deploys are manual only. Automatic deploys to TEST happen on push to `dev`
+# via merge-dev.yml — not this workflow.
 on:
-  push:
-    branches:
-      - dev
-      - dev-to-prod # another temp deploy branch, after squashing to new branch due to messy history.
   workflow_dispatch:
     inputs:
       tag:
@@ -22,7 +18,7 @@ jobs:
 
 
   get-pr-info:
-    if: github.ref_name == 'dev' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     outputs:
       pr: ${{ steps.set-pr.outputs.pr }}
@@ -83,9 +79,7 @@ jobs:
           triggers: ('${{ matrix.package }}/')
           build_file: ${{ matrix.build_file }}
           build_context: ${{ matrix.build_context }}
-  ## Prod Deploy
-  ## Curently trigering on merge to dev, we can change if desired
-  ## So now, test and prod are identical from a code/commit perspective (differ in envs, db params, etc)
+  ## Prod deploy (manual trigger only)
 
   deploy_db_prod:
     name: Deploys Database

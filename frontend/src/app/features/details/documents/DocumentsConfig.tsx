@@ -21,7 +21,8 @@ export const GetDocumentsConfig = () => {
         customEditInputTextCss: 'custom-document-edit-input-text ',
         validation: {
           required: true,
-          customMessage: '',
+          maxLength: 150,
+          customMessage: 'Document Title is required.',
         },
       },
       {
@@ -212,6 +213,7 @@ export const GetDocumentsConfig = () => {
         customEditInputTextCss: 'custom-document-edit-input-text',
         validation: {
           required: true,
+          maxLength: 150,
           customMessage: 'Document Title is required.',
         },
       },

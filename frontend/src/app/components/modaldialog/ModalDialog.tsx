@@ -6,6 +6,7 @@ import {
   DiscardButton,
   SaveButton,
 } from '../simple/CustomButtons';
+import { ButtonIntent } from '../button/Button';
 
 interface ModalDialogCloseHandlerProps {
   closeHandler: (save: any) => void;
@@ -19,6 +20,8 @@ interface ModalDialogCloseHandlerProps {
   discardOption?: boolean;
   errorOption?: boolean;
   disableSaveButton?: boolean;
+  confirmBtnIntent?: ButtonIntent;
+  confirmBtnShowIcon?: boolean;
 }
 
 const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
@@ -33,10 +36,13 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
   headerLabel,
   customHeaderCss,
   disableSaveButton,
+  confirmBtnIntent,
+  confirmBtnShowIcon,
 }) => {
   saveBtnLabel = saveBtnLabel ?? '';
   cancelBtnLabel = cancelBtnLabel ?? '';
   dicardBtnLabel = dicardBtnLabel ?? '';
+  confirmBtnShowIcon = confirmBtnShowIcon ?? true;
 
   const [open, setOpen] = useState<boolean>(true);
   const displayLabel =
@@ -84,6 +90,8 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
               <SaveButton
                 clickHandler={handleSave}
                 label={saveBtnLabel}
+                intent={confirmBtnIntent}
+                showIcon={confirmBtnShowIcon}
                 isDisabled={disableSaveButton}
               />
             </div>

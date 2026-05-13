@@ -503,6 +503,29 @@ export function formatDistance(meters: number, kmDigits = 2): string {
   return `${kms} km`;
 }
 
+// Type for the configuration object that determines which user actions to filter by.
+type SkipConfig = {
+  fields: string | string[]; // one or many fields
+  values: any | any[]; // one or many values
+};
+
+// Helper function to determine if validation should be skipped based on the skipConfig
+const shouldSkip = (data: any, skipConfig?: SkipConfig): boolean => {
+  if (!skipConfig) return false;
+
+  // Normalize to arrays
+  const fields = Array.isArray(skipConfig.fields)
+    ? skipConfig.fields
+    : [skipConfig.fields];
+
+  const values = Array.isArray(skipConfig.values)
+    ? skipConfig.values
+    : [skipConfig.values];
+
+  // Check: any field matches any value
+  return fields.some((field) => values.includes(data?.[field]));
+};
+
 const buildErrorLabel = (
   parentLabel: string,
   parentIndex: string,
@@ -586,6 +609,7 @@ export const validateForm = (
   formRows: IFormField[][],
   formData: any,
   source: string,
+  skipConfig?: SkipConfig, // Optional configuration to skip validation based on a field's value
 ) => {
   const errors: any[] = [];
 
@@ -595,6 +619,10 @@ export const validateForm = (
     parentLabel: string = source,
     parentIndex: string = '',
   ) => {
+    // Skip validation if the data matches the skipConfig criteria
+    if (shouldSkip(data, skipConfig)) return;
+
+    // Iterate through the rows and validate each field
     rows.forEach((items) => {
       items.forEach((row) => {
         const propertyName = row.graphQLPropertyName;

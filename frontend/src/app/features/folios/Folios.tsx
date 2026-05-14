@@ -245,7 +245,7 @@ const Folios = () => {
 
       {addFolioConfirm && (
         <ModalDialog
-          label="Are you sure to create a new folio ?"
+          label="Are you sure you want to create a new folio?"
           closeHandler={(response) => {
             if (response) {
               const folio: Folio = {
@@ -293,7 +293,7 @@ const Folios = () => {
 
       {showDeleteConfirmModal && (
         <ModalDialog
-          label="Are you sure you to delete the folio?"
+          label="Are you sure you want to delete the folio?"
           closeHandler={(response) => {
             if (response) {
               dispatch(resetFolioItemDeleteStatus(null));
@@ -310,7 +310,7 @@ const Folios = () => {
 
       {blocker.state === 'blocked' ? (
         <ModalDialog
-          label="Are you sure you proceed?"
+          label="Are you sure you want to proceed?"
           saveBtnLabel="Save"
           cancelBtnLabel="Cancel"
           dicardBtnLabel="Discard Changes"

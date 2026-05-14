@@ -706,7 +706,7 @@ const SiteDetails = () => {
         siteAssocErrors,
         siteDisclosureErrors,
         siteSummaryErrors,
-        siteLandUsesErrors
+        siteLandUsesErrors,
       ] = await Promise.all([
         validateNotationsForm(),
         validateSiteParticipantForm(),
@@ -740,14 +740,22 @@ const SiteDetails = () => {
       if (siteLandUses?.length > 0) {
         const landUseTable: IFormField[][] = [
           landUseFormRows
-             .map((column) => column.displayType)
+            .map((column) => column.displayType)
             .filter(
               (displayType): displayType is IFormField =>
                 displayType !== undefined,
             ),
         ];
-        let updatedSiteLandUses = deepFilterByUserAction(siteLandUses, userActions, 'userAction');
-        const errors = validateForm(landUseTable, updatedSiteLandUses, 'Land Uses');
+        let updatedSiteLandUses = deepFilterByUserAction(
+          siteLandUses,
+          userActions,
+          'userAction',
+        );
+        const errors = validateForm(
+          landUseTable,
+          updatedSiteLandUses,
+          'Land Uses',
+        );
         if (errors?.length > 0) {
           return errors;
         } else {

@@ -341,7 +341,7 @@ type UserAction = UserActionEnum;
 export const deepFilterByUserAction = (
   data: any,
   actions: UserAction[], // actions is an array of user actions to filter by
-  actionProperty = 'apiAction', // default property to filter by if not specified in the objects 
+  actionProperty = 'apiAction', // default property to filter by if not specified in the objects
 ): any[] => {
   const filterRecursive = (item: any, position: number): any => {
     // If the item is an array, apply recursive filtering to each element
@@ -372,9 +372,7 @@ export const deepFilterByUserAction = (
       const actionValue = item[actionProperty];
 
       // Check if the current object has a `apiAction` property  and whether it matches one of the user actions
-      // const hasUserAction = item.apiAction && actions.includes(item.apiAction);
-      const hasUserAction =
-        actionValue && actions.includes(actionValue);
+      const hasUserAction = actionValue && actions.includes(actionValue);
 
       // Include index information in the object if it has valid properties or matching user action
       return Object.keys(filteredObject).length > 0 || hasUserAction

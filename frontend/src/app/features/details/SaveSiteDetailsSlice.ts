@@ -231,6 +231,9 @@ export const getParentBucket = (state: any) => state.siteDetails.parentBucket;
 
 export const getSiteSummary = (state: any) => state.siteDetails.sitesSummary;
 
+export const getSiteLandHistories = (state: any) =>
+  state.siteDetails.landHistoriesData;
+
 export const {
   resetSaveSiteDetailsRequestStatus,
   resetSaveSiteDetails,

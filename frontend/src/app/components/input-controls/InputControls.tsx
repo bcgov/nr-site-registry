@@ -190,6 +190,7 @@ export const TextInput: React.FC<InputProps> = ({
     let inputValue = e.target.value;
 
     validateInput(inputValue);
+
     if (allowNumbersOnly) {
       inputValue = inputValue.replace(/\D/g, '');
     }
@@ -248,7 +249,6 @@ export const TextInput: React.FC<InputProps> = ({
       )}
     </ContainerElement>
   );
-  // }
 };
 
 export const DropdownInput: React.FC<InputProps> = ({

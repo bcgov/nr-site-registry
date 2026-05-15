@@ -188,6 +188,7 @@ export const getSiteDetailsToBeSaved = (state: any) => {
     sitesSummary: state?.siteDetails?.sitesSummary
       ? {
           ...state.siteDetails.sitesSummary,
+          bcerCode2: undefined,
           latDegrees: safeParseFloat(
             state.siteDetails?.sitesSummary?.latDegrees,
           ),

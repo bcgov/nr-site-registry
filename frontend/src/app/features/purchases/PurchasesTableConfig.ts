@@ -13,7 +13,7 @@ export const PurchasesTableColumns: TableColumn[] = [
       graphQLPropertyName: 'siteId',
       value: '',
       tableMode: true,
-      href: '/site/details/',
+      href: '/purchases/site/details/',
     },
     columnSize: ColumnSize.Small,
   },

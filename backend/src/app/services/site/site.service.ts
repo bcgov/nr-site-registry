@@ -671,7 +671,11 @@ export class SiteService {
     );
     const result = await this.siteRepository.findOne({
       where: whereClause,
-      relations: ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'],
+      relations: [
+        'siteAssocs',
+        'siteAssocs.siteIdAssociatedWith2',
+        'bcerCode2',
+      ],
     });
     response.data = result ? result : null;
 

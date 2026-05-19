@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { SRUpdatesState } from './srUpdatesState';
 import { getAxiosInstance } from '../../../helpers/utility';
 import { GRAPHQL } from '../../../helpers/endpoints';
-import { graphqlSiteDetailsQuery } from '../../site/graphql/Site';
+import { graphqlSiteDetailsQueryForLoggedIn } from '../../site/graphql/Site';
 import { print } from 'graphql';
 import { updateSiteDetails } from '../graphql/SaveSiteDetails';
 import { RequestStatus } from '../../../helpers/requests/status';
@@ -188,13 +188,13 @@ export const fetchPendingSitesDetailsForApproval = createAsyncThunk(
   async (args: { siteId: string; showPending: Boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
-        query: print(graphqlSiteDetailsQuery()),
+        query: print(graphqlSiteDetailsQueryForLoggedIn()),
         variables: {
           siteId: args.siteId,
           pending: args.showPending,
         },
       });
-      return response.data.data.findSiteBySiteId;
+      return response.data.data.findSiteBySiteIdLoggedInUser;
     } catch (error) {
       throw error;
     }

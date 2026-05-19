@@ -348,6 +348,7 @@ type UserAction = UserActionEnum;
 export const deepFilterByUserAction = (
   data: any,
   actions: UserAction[], // actions is an array of user actions to filter by
+  actionProperty = 'apiAction', // default property to filter by if not specified in the objects
 ): any[] => {
   const filterRecursive = (item: any, position: number): any => {
     // If the item is an array, apply recursive filtering to each element
@@ -374,8 +375,11 @@ export const deepFilterByUserAction = (
         {}, // Start with an empty object for accumulating filtered values
       );
 
-      // Check if the current object has a `apiAction` property and whether it matches one of the user actions
-      const hasUserAction = item.apiAction && actions.includes(item.apiAction);
+      // Get the value of the specified property from the current object to check against user actions
+      const actionValue = item[actionProperty];
+
+      // Check if the current object has a `apiAction` property  and whether it matches one of the user actions
+      const hasUserAction = actionValue && actions.includes(actionValue);
 
       // Include index information in the object if it has valid properties or matching user action
       return Object.keys(filteredObject).length > 0 || hasUserAction
@@ -510,59 +514,152 @@ export function formatDistance(meters: number, kmDigits = 2): string {
   return `${kms} km`;
 }
 
+// Type for the configuration object that determines which user actions to filter by.
+type SkipConfig = {
+  fields: string | string[]; // one or many fields
+  values: any | any[]; // one or many values
+};
+
+// Helper function to determine if validation should be skipped based on the skipConfig
+const shouldSkip = (data: any, skipConfig?: SkipConfig): boolean => {
+  if (!skipConfig) return false;
+
+  // Normalize to arrays
+  const fields = Array.isArray(skipConfig.fields)
+    ? skipConfig.fields
+    : [skipConfig.fields];
+
+  const values = Array.isArray(skipConfig.values)
+    ? skipConfig.values
+    : [skipConfig.values];
+
+  // Check: any field matches any value
+  return fields.some((field) => values.includes(data?.[field]));
+};
+
+const buildErrorLabel = (
+  parentLabel: string,
+  parentIndex: string,
+  message: string,
+): string => {
+  if (!parentIndex) return `${parentLabel} ${message}`;
+  return `${parentLabel} [${Number.parseInt(parentIndex, 10) + 1}] ${message}`;
+};
+
+const validateField = (
+  row: IFormField,
+  fieldValue: any,
+  parentLabel: string,
+  parentIndex: string,
+): { label: string; errorMessage: string }[] => {
+  const errors: { label: string; errorMessage: string }[] = [];
+  const { validation, label } = row;
+
+  if (validation?.required && !fieldValue) {
+    errors.push({
+      label,
+      errorMessage: buildErrorLabel(
+        parentLabel,
+        parentIndex,
+        validation.customMessage ?? '',
+      ),
+    });
+  }
+
+  if (
+    validation?.maxLength &&
+    typeof fieldValue === 'string' &&
+    fieldValue.length > validation.maxLength
+  ) {
+    errors.push({
+      label,
+      errorMessage: buildErrorLabel(
+        parentLabel,
+        parentIndex,
+        `${label} exceeds maximum ${validation.maxLength} characters`,
+      ),
+    });
+  }
+
+  if (
+    validation?.minLength &&
+    typeof fieldValue === 'string' &&
+    fieldValue.length > 0 &&
+    fieldValue.length < validation.minLength
+  ) {
+    errors.push({
+      label,
+      errorMessage: buildErrorLabel(
+        parentLabel,
+        parentIndex,
+        `${label} must be at least ${validation.minLength} characters`,
+      ),
+    });
+  }
+
+  if (
+    validation?.pattern &&
+    typeof fieldValue === 'string' &&
+    fieldValue.length > 0 &&
+    !validation.pattern.test(fieldValue)
+  ) {
+    errors.push({
+      label,
+      errorMessage: buildErrorLabel(
+        parentLabel,
+        parentIndex,
+        validation.customMessage ?? `${label} has invalid format`,
+      ),
+    });
+  }
+
+  return errors;
+};
+
 export const validateForm = (
   formRows: IFormField[][],
   formData: any,
   source: string,
+  skipConfig?: SkipConfig, // Optional configuration to skip validation based on a field's value
 ) => {
   const errors: any[] = [];
+
   const traverse = (
     rows: IFormField[][],
     data: any,
     parentLabel: string = source,
     parentIndex: string = '',
   ) => {
+    // Skip validation if the data matches the skipConfig criteria
+    if (shouldSkip(data, skipConfig)) return;
+
+    // Iterate through the rows and validate each field
     rows.forEach((items) => {
       items.forEach((row) => {
         const propertyName = row.graphQLPropertyName;
+        if (!propertyName) return;
 
-        // Ensure graphQLPropertyName exists
-        if (propertyName) {
-          const fieldValue = data[propertyName];
+        const fieldValue = data[propertyName];
+        errors.push(
+          ...validateField(row, fieldValue, parentLabel, parentIndex),
+        );
 
-          // Validate the current field
-          if (row.validation?.required && !fieldValue) {
-            // Building the error label with index
-            const errorLabel = parentIndex
-              ? `${parentLabel} [${parseInt(parentIndex, 10) + 1}] ${row?.validation.customMessage}`
-              : `${parentLabel} ${row?.validation.customMessage}`;
-
-            errors.push({
-              label: row.label,
-              errorMessage: errorLabel,
-            });
-          }
-
-          // Recursively handle children
-          if (row.children && Array.isArray(data[propertyName])) {
-            const childData = data[propertyName];
-            childData.forEach((child: any, index: number) => {
-              traverse(
-                row.children as any,
-                child,
-                `${parentLabel} [${parentIndex}] ${row.label}`,
-                `${index + 1}`,
-              );
-            });
-          }
+        if (row.children && Array.isArray(fieldValue)) {
+          fieldValue.forEach((child: any, index: number) => {
+            traverse(
+              row.children as any,
+              child,
+              `${parentLabel} [${parentIndex}] ${row.label}`,
+              `${index + 1}`,
+            );
+          });
         }
       });
     });
   };
 
-  // Handle both arrays and single objects
   if (Array.isArray(formData)) {
-    formData.forEach((item, index) =>
+    formData.forEach((item) =>
       traverse(formRows, item, source, `${item.position}`),
     );
   } else {

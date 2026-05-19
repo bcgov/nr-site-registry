@@ -12,6 +12,7 @@ import {
 } from '../../../components/common/icon';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
 import { Button } from '../../../components/button/Button';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 interface IDocumentProps {
   userType: UserType;
@@ -34,6 +35,8 @@ interface IDocumentProps {
   showApproveRejectSection?: boolean;
 }
 
+const DOCUMENT_UNAVAILABLE_LABEL = 'Document is unavailable';
+
 const Document: React.FC<IDocumentProps> = ({
   userType,
   mode,
@@ -55,6 +58,27 @@ const Document: React.FC<IDocumentProps> = ({
   showApproveRejectSection = showApproveRejectSection ?? false;
 
   approveRejectHandler = approveRejectHandler ?? (() => {});
+
+  const documentAvailable =
+    Boolean(document?.objectId) || Boolean(document?.file);
+
+  const renderDocumentAction = (
+    button: React.ReactElement,
+    tooltipId: string,
+  ) => {
+    if (documentAvailable) {
+      return button;
+    }
+
+    return (
+      <OverlayTrigger
+        placement="top"
+        overlay={<Tooltip id={tooltipId}>{DOCUMENT_UNAVAILABLE_LABEL}</Tooltip>}
+      >
+        <span className="d-inline-flex">{button}</span>
+      </OverlayTrigger>
+    );
+  };
 
   return (
     <PanelWithUpDown
@@ -87,18 +111,35 @@ const Document: React.FC<IDocumentProps> = ({
             className="d-flex py-2 mb-3 gap-2 flex-wrap flex-column flex-sm-row"
             key={document?.id}
           >
-            <Button onClick={handleViewOnline}>
-              <ViewOnlyIcon />
-              View Document
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handleDownload}
-              disabled={viewMode === SiteDetailsMode.SRMode}
-            >
-              <DownloadPdfIcon />
-              Download (PDF)
-            </Button>
+            {renderDocumentAction(
+              <Button
+                onClick={handleViewOnline}
+                disabled={!documentAvailable}
+                aria-label={
+                  !documentAvailable ? DOCUMENT_UNAVAILABLE_LABEL : undefined
+                }
+              >
+                <ViewOnlyIcon />
+                View Document
+              </Button>,
+              `view-document-tooltip-${document?.id ?? uniqueId}`,
+            )}
+            {renderDocumentAction(
+              <Button
+                variant="secondary"
+                onClick={handleDownload}
+                disabled={
+                  viewMode === SiteDetailsMode.SRMode || !documentAvailable
+                }
+                aria-label={
+                  !documentAvailable ? DOCUMENT_UNAVAILABLE_LABEL : undefined
+                }
+              >
+                <DownloadPdfIcon />
+                Download (PDF)
+              </Button>,
+              `download-document-tooltip-${document?.id ?? uniqueId}`,
+            )}
             {viewMode === SiteDetailsMode.EditMode &&
               userType === UserType.Internal && (
                 <>

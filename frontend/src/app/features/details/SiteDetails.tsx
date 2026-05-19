@@ -105,6 +105,7 @@ import {
   getParentBucket,
   getSiteAssociated,
   getSiteDocuments,
+  getSiteLandHistories,
   getSiteNoatations,
   getSiteParticipants,
   getSiteSummary,
@@ -113,6 +114,7 @@ import {
   saveRequestStatus,
   saveSiteDetails,
   setupDocumentsDataForSaving,
+  setupLandHistoriesDataForSaving,
   setupNotationDataForSaving,
   setupSiteAssociationDataForSaving,
   setupSiteDisclosureDataForSaving,
@@ -167,11 +169,11 @@ import DeleteSiteModal from './DeleteSiteModal';
 import { GRAPHQL } from '../../helpers/endpoints';
 import { print } from 'graphql';
 import { DELETE_SITE_MUTATION } from '../site/graphql/DeleteSite';
+import { getLandUseColumns } from './landUses/LandUseColumnConfiguration';
 
 const SiteDetails = () => {
-  const { disclosureStatementConfigEditMode } = siteDisclosureConfig(
-    useSelector(schedule2ReferenceCdDrpdown)?.data,
-  );
+  const { disclosureStatementConfigEditMode, disclosureCommentsConfig } =
+    siteDisclosureConfig(useSelector(schedule2ReferenceCdDrpdown)?.data);
   const auth = useAuth();
   const isUnauthenticated = auth?.user == null;
   const { id } = useParams();
@@ -207,6 +209,7 @@ const SiteDetails = () => {
   const savedChanges = useSelector(trackedChanges);
   const siteNotation = useSelector(getSiteNoatations);
   const siteSummary = useSelector(getSiteSummary);
+  const siteLandUses = useSelector(getSiteLandHistories);
   const disclosureSourceOfTruth = useSelector(
     siteDisclosureSelector,
   )?.siteDisclosure;
@@ -223,6 +226,7 @@ const SiteDetails = () => {
   const { associateColumnInternal } = GetAssociateConfig();
   const { documentFormRowsEditMode } = GetDocumentsConfig();
   const { createSiteFormRows, summaryFormRows } = GetSummaryConfig();
+  const landUseFormRows = getLandUseColumns();
 
   const [errorList, setErrorList] = useState<any[]>([]);
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
@@ -495,8 +499,6 @@ const SiteDetails = () => {
           ),
           // should be based on condition for External and Internal User.
           dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
-
-          // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
         ])
           .then(() => {
             setIsLoading(false); // Set loading state to false after all API calls are resolved
@@ -717,6 +719,7 @@ const SiteDetails = () => {
         siteAssocErrors,
         siteDisclosureErrors,
         siteSummaryErrors,
+        siteLandUsesErrors,
       ] = await Promise.all([
         validateNotationsForm(),
         validateSiteParticipantForm(),
@@ -724,6 +727,7 @@ const SiteDetails = () => {
         validateAssociatedSitesForm(),
         validateSiteDisclosureForm(),
         validateSiteSummaryForm(),
+        validateSiteLandUsesForm(),
       ]);
 
       // Combine all errors into one list
@@ -734,11 +738,50 @@ const SiteDetails = () => {
         ...siteAssocErrors,
         ...siteDisclosureErrors,
         ...siteSummaryErrors,
+        ...siteLandUsesErrors,
       ];
       // You can now use `allErrors` for further processing
       return errors;
     } catch (error) {
       return []; // Return empty array in case of error to avoid breaking further logic
+    }
+  };
+
+  const validateSiteLandUsesForm = async () => {
+    try {
+      debugger;
+      if (siteLandUses?.length > 0) {
+        const landUseTable: IFormField[][] = [
+          landUseFormRows
+            .map((column) => column.displayType)
+            .filter(
+              (displayType): displayType is IFormField =>
+                displayType !== undefined,
+            ),
+        ];
+        let updatedSiteLandUses = deepFilterByUserAction(
+          siteLandUses,
+          userActions,
+          'userAction',
+        );
+        const errors = validateForm(
+          landUseTable,
+          updatedSiteLandUses,
+          'Land Uses',
+        );
+        if (errors?.length > 0) {
+          return errors;
+        } else {
+          updatedSiteLandUses = removeProperty(updatedSiteLandUses, 'position');
+          dispatch(setupLandHistoriesDataForSaving(updatedSiteLandUses));
+          return [];
+        }
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error(error);
+      return [];
     }
   };
 
@@ -863,25 +906,31 @@ const SiteDetails = () => {
 
   const validateSiteDisclosureForm = async () => {
     try {
-      const disclosureData = disclosureSourceOfTruth;
+      let updatedSiteDisclosure = deepFilterByUserAction(
+        disclosureSourceOfTruth,
+        [...userActions, UserActionEnum.deleted],
+      );
       if (
-        disclosureData &&
-        typeof disclosureData === 'object' &&
-        Object.keys(disclosureData).length > 0
+        updatedSiteDisclosure &&
+        typeof updatedSiteDisclosure === 'object' &&
+        Object.keys(updatedSiteDisclosure).length > 0
       ) {
         const siteDisclosureErrors: any[] = [];
 
         // Validate against the disclosure slice (source of truth) — always has full field values
         const errors = validateForm(
-          disclosureStatementConfigEditMode,
-          disclosureData,
+          [...disclosureStatementConfigEditMode, ...disclosureCommentsConfig],
+          updatedSiteDisclosure,
           'Site Disclosure',
         );
         if (errors?.length > 0) {
           siteDisclosureErrors.push(...errors);
         }
-
-        const { siteRegDateRecd, dateCompleted } = disclosureData;
+        const { siteRegDateRecd, dateCompleted } =
+          (Array.isArray(updatedSiteDisclosure) &&
+            updatedSiteDisclosure.length > 0 &&
+            updatedSiteDisclosure[0]) ||
+          {};
         if (!!siteRegDateRecd && !!dateCompleted) {
           if (new Date(dateCompleted) < new Date(siteRegDateRecd)) {
             siteDisclosureErrors.push({
@@ -894,10 +943,6 @@ const SiteDetails = () => {
         if (siteDisclosureErrors?.length > 0) {
           return siteDisclosureErrors;
         } else {
-          let updatedSiteDisclosure = deepFilterByUserAction(disclosureData, [
-            ...userActions,
-            UserActionEnum.deleted,
-          ]);
           updatedSiteDisclosure = removeProperty(
             updatedSiteDisclosure,
             'position',
@@ -922,20 +967,17 @@ const SiteDetails = () => {
     try {
       // Run both validations in parallel and wait for them to finish
       if (siteNotation?.length > 0) {
+        // First filter the notations based on user actions to get the updated notations
+        // We want to include notations that are added, updated, deleted, or restored
+        // in the validation process, but we will handle the deleted notations differently in the validation functions.
         let updatedSiteNotations = deepFilterByUserAction(siteNotation, [
           ...userActions,
           UserActionEnum.deleted,
           UserActionEnum.restored,
         ]);
-        // Exclude deleted notations from validation, but keep them for saving
-        const notationsForValidation = Array.isArray(updatedSiteNotations)
-          ? updatedSiteNotations.filter(
-              (notation: any) =>
-                notation?.userAction !== UserActionEnum.deleted,
-            )
-          : updatedSiteNotations;
+
         const [notationErrors, notationParticipantErrors] = await Promise.all([
-          validateNotations(notationsForValidation), // Async function handling Notation validation
+          validateNotations(updatedSiteNotations), // Async function handling Notation validation
           validateNotationParticipants(updatedSiteNotations), // Async function handling Notation Participant validation
         ]);
         // Combine and return the errors from both functions
@@ -969,6 +1011,16 @@ const SiteDetails = () => {
         notationFormRowEditMode,
         updatedSiteNotations,
         'Notation',
+        // Pass the additional parameter to exclude deleted notations from validation
+        // and keep them for saving. We can pass the single parameter or multiple parameters
+        // as needed for different contexts. In this case, we want to exclude deleted notations from validation,
+        // but we still want to include them in the data sent for saving, so we pass the UserActionEnum.deleted
+        // as a parameter to indicate that notations with this userAction should be excluded from validation
+        // but included in saving.
+        {
+          fields: 'apiAction',
+          values: [UserActionEnum.deleted, UserActionEnum.restored],
+        },
       );
     } catch (error) {
       console.error(error);
@@ -996,6 +1048,9 @@ const SiteDetails = () => {
 
       for (const [index, notation] of updatedSiteNotations?.entries()) {
         const originalNotation: any = siteNotationMap.get(notation.id);
+        if (originalNotation?.apiAction === UserActionEnum.deleted) {
+          continue; // Skip deleted notations
+        }
 
         const originalParticipants =
           originalNotation?.notationParticipant || [];
@@ -1021,8 +1076,17 @@ const SiteDetails = () => {
 
         const numOfNotationParticipants = remainingCount + addedCount;
 
+        // Skip participant validation for deleted or restored notations since they can be in any state (including having zero participants) and it's not a requirement for them to have participants to be valid.
+        // We will still validate participants for notations that are being added or updated, and we will validate all participants for those notations, including any that are marked for deletion,
+        // because we want to ensure that the data is valid even if the user has marked it for deletion (in case they change their mind and restore it, or in case of accidental deletion).
+        const skipAtLeastOneParticipantValidation =
+          notation?.apiAction === UserActionEnum.deleted ||
+          notation?.apiAction === UserActionEnum.restored;
         // Must have at least one
-        if (numOfNotationParticipants === 0) {
+        if (
+          numOfNotationParticipants === 0 &&
+          !skipAtLeastOneParticipantValidation
+        ) {
           notationParticipantErrors.push({
             label: `Notation Participants`,
             errorMessage: `Notation [${notation?.position + 1}] Atleast one Notation Participant is required.`,
@@ -1032,14 +1096,14 @@ const SiteDetails = () => {
         //Validation loop (unchanged logic, just faster access)
         if (updatedParticipants.length > 0) {
           for (const notationParticipant of updatedParticipants) {
-            if (notationParticipant?.apiAction === UserActionEnum.deleted) {
-              continue;
-            }
-
             const errors = validateForm(
               notationParticipantTable,
               notationParticipant,
               `Notation [${notation?.position + 1}] Notation Participant [${notationParticipant?.position + 1}]`,
+              {
+                fields: 'apiAction',
+                values: [UserActionEnum.deleted, UserActionEnum.restored],
+              },
             );
 
             notationParticipantErrors.push(...errors);

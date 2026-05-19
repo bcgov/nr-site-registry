@@ -854,7 +854,6 @@ export type Query = {
 
 
 export type QueryFindSiteBySiteIdArgs = {
-  pending?: InputMaybe<Scalars['Boolean']['input']>;
   siteId: Scalars['String']['input'];
 };
 

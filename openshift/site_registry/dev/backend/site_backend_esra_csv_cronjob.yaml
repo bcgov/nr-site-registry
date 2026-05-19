@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: site-backend-esra-csv-cronjob
+  labels:
+    app.kubernetes.io/name: site-backend
+spec:
+  schedule: '0 0 * * *' # Run at midnight every day
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: curl
+              image: curlimages/curl:latest
+              env:
+                - name: CSV_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: site-backend
+                      key: CSV_SECRET
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  URL="https://site-backend.apps.silver.devops.gov.bc.ca/csv/generate"
+                  API_SECRET="$CSV_SECRET"
+                  echo "Targetting URL: $URL"
+                  curl -f -H "x-api-secret: $API_SECRET" "$URL"
+          restartPolicy: OnFailure

@@ -6,14 +6,12 @@ on:
     branches:
       - dev # this is the default branch and not main
 
-
 concurrency:
   # Cancel in progress for PR open and close
   group: ${{ github.event.number }}
   cancel-in-progress: true
 
 jobs:
-  # https://github.com/bcgov-nr/action-builder-ghcr
   builds:
     name: Builds
     runs-on: ubuntu-24.04
@@ -32,40 +30,17 @@ jobs:
             build_context: frontend
     timeout-minutes: 10
     steps:
-      - uses: bcgov-nr/action-builder-ghcr@v2.2.0
-        with:
-          package: ${{ matrix.package }}
-          tag: ${{ github.event.number }}
-          tag_fallback: latest
-          triggers: ('${{ matrix.package }}/')
-          build_file: ${{ matrix.build_file }}
-          build_context: ${{ matrix.build_context }}
-
-  deploy_db:
-    name: Deploys Database
-    if: ${{ ! github.event.pull_request.draft }}
-    uses: ./.github/workflows/.dbdeployer.yml
-    secrets: inherit
-    with:
-      triggers: ('charts/crunchy/' '.github/workflows/', '.github/workflows/pr-open.yml')
-      values: 'values-dev.yaml'
-      app_values:  'values-pr.yaml' # PR specific values file.
-    # https://github.com/bcgov/quickstart-openshift-helpers
-  deploys:
-    name: Deploys
-    if: ${{ ! github.event.pull_request.draft }}
-    needs: [builds, deploy_db]
-    uses: ./.github/workflows/.deployer.yml
-    secrets: inherit
-    with:
-      triggers: ('backend/' 'frontend/' 'charts/' '.github/workflows/')
-      values: 'values-pr.yaml' # PR specific values file.
-      db_user: site-${{ github.event.number }}
-      timeout-minutes: 60
+      - uses: actions/checkout@v4
+      - name: Build ${{ matrix.package }} image
+        run: |
+          docker build \
+            --file ${{ matrix.build_file }} \
+            --tag local/${{ matrix.package }}:${{ github.sha }} \
+            ${{ matrix.build_context }}
 
   results:
     name: PR Results
-    needs: [builds, deploys]
+    needs: [builds]
     if: always()
     runs-on: ubuntu-24.04
     steps:

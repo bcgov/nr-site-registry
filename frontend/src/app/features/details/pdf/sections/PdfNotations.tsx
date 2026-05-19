@@ -36,13 +36,8 @@ const getParticipantColumns = (
   },
 ];
 
-// NotationDto from codegen does not include eventDate — it is added by the backend service mapping
-interface PdfNotation extends NotationDto {
-  eventDate?: string;
-}
-
 interface PdfNotationsProps {
-  notations: PdfNotation[];
+  notations: NotationDto[];
   notationTypeData: NotationDropdownDto[];
   notationClassData: any[];
   ministryContactData: any[];
@@ -87,7 +82,7 @@ const PdfNotations: React.FC<PdfNotationsProps> = ({
     isEmpty={!notations?.length}
     emptyMessage="No notations found."
   >
-    {notations.map((notation: PdfNotation, index: number) => (
+    {notations.map((notation: NotationDto, index: number) => (
       <View key={notation.id ?? index} style={{ marginBottom: 10 }}>
         <Text style={pdfStyles.subSectionTitle}>
           Notation {index + 1} — {notation.etypCode ?? ''}

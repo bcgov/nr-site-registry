@@ -27,6 +27,9 @@ export class NotationDto extends ChangeAuditObjectTypeDTO {
   siteId: string;
 
   @Field({ nullable: true })
+  eventDate: Date | null;
+
+  @Field({ nullable: true })
   completionDate: Date | null;
 
   @Field()

@@ -78,7 +78,7 @@ const createStore = (overrides: any = {}) =>
   });
 
 const wrapper = ({ children }: { children: React.ReactNode }) =>
-  React.createElement(Provider, { store: createStore() }, children);
+  React.createElement(Provider, { store: createStore(), children });
 
 describe('useSiteDetailsPdfData', () => {
   test('returns isSiteReady true when site details exist', () => {
@@ -89,7 +89,7 @@ describe('useSiteDetailsPdfData', () => {
   test('returns isSiteReady false when site details are null', () => {
     const store = createStore({ sites: { siteDetails: null } });
     const nullWrapper = ({ children }: { children: React.ReactNode }) =>
-      React.createElement(Provider, { store }, children);
+      React.createElement(Provider, { store, children });
     const { result } = renderHook(() => useSiteDetailsPdfData(), {
       wrapper: nullWrapper,
     });

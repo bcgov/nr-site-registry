@@ -438,7 +438,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       if (
         key === 'completionDate' ||
         key === 'requirementDueDate' ||
-        key === 'requirementReceivedDate'
+        key === 'eventDate'
       ) {
         const date = new Date(value);
         const formattedDate = date
@@ -914,16 +914,14 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       case 'newToOld':
         sorted.sort(
           (a, b) =>
-            new Date(b.requirementReceivedDate).getTime() -
-            new Date(a.requirementReceivedDate).getTime(),
+            new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime(),
         ); // Sorting by date from new to old
         break;
       case 'oldTonew':
         sorted.sort(
           (a, b) =>
-            new Date(a.requirementReceivedDate).getTime() -
-            new Date(b.requirementReceivedDate).getTime(),
-        ); // Sorting by date from new to old
+            new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime(),
+        ); // Sorting by date from old to new
         break;
       // Add more cases for additional sorting options
       default:
@@ -937,7 +935,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       id: v4(), // Generate a unique ID for the new notation
       siteId: siteId,
       etypCode: '', // Default values for other properties
-      requirementReceivedDate: new Date(),
+      eventDate: new Date(),
       completionDate: null,
       eclsCode: '',
       requirementDueDate: null,

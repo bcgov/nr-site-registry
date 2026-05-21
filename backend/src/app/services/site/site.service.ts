@@ -1587,7 +1587,7 @@ export class SiteService {
                 ...event,
                 id: notationId,
                 siteId: siteId,
-                eventDate: new Date(),
+                eventDate: event.eventDate || new Date(),
                 userAction: UserActionEnum.ADDED,
                 whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',

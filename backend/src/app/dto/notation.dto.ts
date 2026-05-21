@@ -81,6 +81,9 @@ export class NotationIputDTO extends ChangeAuditEntityDTO {
   siteId?: string | null;
 
   @Field({ nullable: true })
+  eventDate: Date | null;
+
+  @Field({ nullable: true })
   completionDate: Date | null;
 
   @Field()

@@ -669,6 +669,7 @@ export type NotationIputDto = {
   completionDate?: InputMaybe<Scalars['DateTime']['input']>;
   eclsCode: Scalars['String']['input'];
   etypCode: Scalars['String']['input'];
+  eventDate?: InputMaybe<Scalars['DateTime']['input']>;
   id: Scalars['String']['input'];
   notationParticipant?: InputMaybe<Array<NotationParticipantInputDto>>;
   note?: InputMaybe<Scalars['String']['input']>;

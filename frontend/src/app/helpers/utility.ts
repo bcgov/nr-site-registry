@@ -99,6 +99,13 @@ export const parseDate = (value: Date | string | null): Date | null => {
   return null;
 };
 
+export const formatDateTime = (input: Date | string | null): string => {
+  if (!input) return '';
+  const date = typeof input === 'string' ? new Date(input) : input;
+  if (isNaN(date.getTime())) return '';
+  return format(date, 'yyyy-MM-dd HH:mm');
+};
+
 /*
 Currently new Date() returns date in this format eg Fri Aug 16 2024 09:12:54 GMT-0700 (Pacific Daylight Time)
 In our design we did not wanted to show the timezone name at the end thus this function helps to remove the timezone name present at the end

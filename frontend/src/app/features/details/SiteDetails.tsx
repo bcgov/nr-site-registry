@@ -31,6 +31,10 @@ import { AppDispatch } from '../../Store';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
 import { getNavComponents } from './navigation/NavigationPillsConfig';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
+import DownloadSitePdfButton from './pdf/DownloadSitePdfButton';
+import { useSiteDetailsPdfData } from './pdf/useSiteDetailsPdfData';
+import { pdf } from '@react-pdf/renderer';
+import SiteDetailsPdf from './pdf/SiteDetailsPdf';
 import {
   CancelButton,
   SaveButton,
@@ -56,6 +60,7 @@ import {
   UserRoleType,
   validateForm,
   getAxiosInstance,
+  formatDateTime,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import {
@@ -69,7 +74,7 @@ import {
 } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
-import { notifyInfo } from '../../components/alert/Alert';
+import { notifyInfo, notifyError } from '../../components/alert/Alert';
 import {
   fetchNotationParticipants,
   updateSiteNotation,
@@ -241,6 +246,8 @@ const SiteDetails = () => {
     new Set(),
   );
 
+  const { fetchForPdf, isSiteReady } = useSiteDetailsPdfData();
+
   const userActions = [UserActionEnum.added, UserActionEnum.updated];
 
   useEffect(() => {
@@ -403,8 +410,11 @@ const SiteDetails = () => {
 
     if (!shouldRedirectExternalOrUnauthenticated) return;
 
-    // Cart details: do not auto-redirect (user can use back / cart UI).
-    if (location.pathname.includes('/site/cart/site/details/')) return;
+    // Cart and purchases details: do not auto-redirect (user can use back / cart / purchases UI).
+    const isPurchasedSiteView =
+      location.pathname.includes('/site/cart/site/details/') ||
+      location.pathname.includes('/purchases/site/details/');
+    if (isPurchasedSiteView) return;
 
     if (lastUnavailableToastSiteIdRef.current !== id) {
       notifyInfo(
@@ -671,6 +681,9 @@ const SiteDetails = () => {
         break;
       case SiteActionBtn.DELETE_SITE:
         setShowDeleteModal(true);
+        break;
+      case SiteActionBtn.DOWNLOAD_PDF:
+        handleDownloadPdf();
         break;
       case SiteActionBtn.SAVE:
         const errors = await validateSiteForms();
@@ -1193,7 +1206,8 @@ const SiteDetails = () => {
       userTypeSR &&
       !hasNoPendingUpdatesFromState &&
       viewMode !== SiteDetailsMode.EditMode;
-    return getActionItems(includeSRApprovalActions, userTypeSR);
+    const canDownloadPdf = isSiteReady && !!id;
+    return getActionItems(includeSRApprovalActions, userTypeSR, canDownloadPdf);
   };
 
   if (id && (isLoading || snapshot.status === RequestStatus.loading)) {
@@ -1208,6 +1222,22 @@ const SiteDetails = () => {
 
   if (snapshot.status === RequestStatus.failed)
     return <div>Error: {snapshot.error || 'Failed to load data'}</div>;
+
+  const handleDownloadPdf = async () => {
+    notifyInfo('Please wait generating PDF report', 'PDF');
+    try {
+      const data = await fetchForPdf();
+      const blob = await pdf(<SiteDetailsPdf data={data} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `site-${data.site?.id ?? 'details'}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      notifyError('Failed to generate PDF. Please try again.', 'PDF Error');
+    }
+  };
 
   const renderOptionsForExternalUser = () => {
     if (
@@ -1429,7 +1459,6 @@ const SiteDetails = () => {
                   onItemClick={handleItemClick}
                 />
               )}
-
             {/* For Edit / SR Dropdown*/}
             <div className="gap-3 align-items-center d-none d-md-flex d-lg-flex d-xl-flex">
               {edit && userType === UserType.Internal && (
@@ -1480,6 +1509,7 @@ const SiteDetails = () => {
                     <ShoppingCartIcon />
                     Add to Cart
                   </Button>
+                  {isSiteReady && id && <DownloadSitePdfButton />}
                 </>
               )}
           </div>
@@ -1705,6 +1735,7 @@ const SiteDetails = () => {
                       <ShoppingCartIcon />
                       Add to Cart
                     </Button>
+                    {isSiteReady && id && <DownloadSitePdfButton />}
                   </>
                 )}
             </div>
@@ -1719,7 +1750,7 @@ const SiteDetails = () => {
                 snapshotDate={
                   snapshot.status === RequestStatus.success &&
                   snapshot.snapshot.data !== null
-                    ? `Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`
+                    ? `Snapshot Taken: ${formatDateTime(new Date(snapshotTakenDate))}`
                     : ''
                 }
               />

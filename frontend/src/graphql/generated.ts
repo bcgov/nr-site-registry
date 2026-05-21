@@ -646,6 +646,7 @@ export type NotationDto = {
   completionDate?: Maybe<Scalars['DateTime']['output']>;
   eclsCode: Scalars['String']['output'];
   etypCode: Scalars['String']['output'];
+  eventDate?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['String']['output'];
   notationParticipant?: Maybe<Array<NotationParticipantDto>>;
   note?: Maybe<Scalars['String']['output']>;
@@ -844,10 +845,7 @@ export type Query = {
   getSiteRiskCd: DropdownResponse;
   getSiteStatusCd: DropdownResponse;
   getSitesForFolio: FolioContentResponse;
-  getSnapshots: SnapshotResponse;
-  getSnapshotsById: SnapshotResponse;
   getSnapshotsBySiteId: SnapshotResponse;
-  getSnapshotsByUserId: SnapshotResponse;
   mapSearch: MapSearchResponse;
   searchSiteIds: DropdownResponse;
   searchSites: SearchSiteResponse;
@@ -966,18 +964,8 @@ export type QueryGetSitesForFolioArgs = {
 };
 
 
-export type QueryGetSnapshotsByIdArgs = {
-  id: Scalars['Int']['input'];
-};
-
-
 export type QueryGetSnapshotsBySiteIdArgs = {
   siteId: Scalars['String']['input'];
-};
-
-
-export type QueryGetSnapshotsByUserIdArgs = {
-  userId: Scalars['String']['input'];
 };
 
 
@@ -1560,7 +1548,7 @@ export type Sites = {
   addrLine_4?: Maybe<Scalars['String']['output']>;
   addrType: Scalars['String']['output'];
   bcerCode: Scalars['String']['output'];
-  bcerCode2: BceRegionCd;
+  bcerCode2?: Maybe<BceRegionCd>;
   cart?: Maybe<Array<Cart>>;
   city: Scalars['String']['output'];
   classCode?: Maybe<Scalars['String']['output']>;

@@ -80,9 +80,9 @@ describe('Purchases Component', () => {
     });
   });
 
-  test('renders the Purchased Sites heading', () => {
+  test('renders the Site Details heading', () => {
     renderWithProviders(store);
-    expect(screen.getByText('Purchased Sites')).toBeInTheDocument();
+    expect(screen.getByText('Site Details')).toBeInTheDocument();
   });
 
   test('dispatches fetchPurchasedSites on mount', async () => {
@@ -121,7 +121,7 @@ describe('Purchases Component', () => {
     });
 
     renderWithProviders(store);
-    expect(screen.getByText('Purchased Sites')).toBeInTheDocument();
+    expect(screen.getByText('Site Details')).toBeInTheDocument();
     expect(screen.queryByText('100')).not.toBeInTheDocument();
   });
 

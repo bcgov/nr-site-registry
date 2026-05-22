@@ -2,10 +2,7 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { DisclosureService } from '../../services/disclosure/disclosure.service';
 import { DisclosureResolver } from './disclosure.resolver';
 import { Test } from '@nestjs/testing';
-import {
-  DisclosureResponse,
-  SiteProfilesDTO,
-} from '../../dto/disclosure.dto';
+import { DisclosureResponse, SiteProfilesDTO } from '../../dto/disclosure.dto';
 import { LoggerService } from '../../logger/logger.service';
 import { UserTypeEum } from '../../common/userType';
 

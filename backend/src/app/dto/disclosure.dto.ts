@@ -134,7 +134,7 @@ export class SiteProfilesInputDTO extends ChangeAuditEntityDTO {
 // Backed by SiteProfileLandUses table; schedule2ReferenceCode maps to lutCode.
 @InputType()
 export class SiteProfileSchedule2RefInputDTO extends ChangeAuditEntityDTO {
-  @Field({ nullable: true})
+  @Field({ nullable: true })
   id?: string;
 
   @Field({ nullable: true })

@@ -49,7 +49,7 @@ export class SiteProfileLandUses extends ChangeAuditEntity {
     nullable: true,
   })
   whenUpdated: Date | null;
-  
+
   @ManyToOne(() => LandUseCd, (landUseCd) => landUseCd.siteProfileLandUses)
   @JoinColumn([{ name: 'lut_code', referencedColumnName: 'code' }])
   lutCode2: LandUseCd;

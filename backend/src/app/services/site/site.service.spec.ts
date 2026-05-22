@@ -1186,7 +1186,11 @@ describe('SiteService', () => {
       ];
       const userInfo = { givenName: 'Test User' };
 
-      const savedProfile = { id: 'profile-uuid', siteId: '456', dateCompleted: profileDate };
+      const savedProfile = {
+        id: 'profile-uuid',
+        siteId: '456',
+        dateCompleted: profileDate,
+      };
       const mockCreate = jest.fn((_entity, data) => ({ ...data }));
       const mockSave = jest.fn(async (_entity, data) => {
         if (_entity === SiteProfiles) return savedProfile;
@@ -1218,7 +1222,11 @@ describe('SiteService', () => {
     it('should delete a land use when action is DELETED and schedule2ReferenceCode exists', async () => {
       const profileDate = new Date('2020-01-01');
       // existingLandUse is keyed by lutCode in the currentMap
-      const existingLandUse = { siteId: '456', sprofDateCompleted: profileDate, lutCode: 'AG' };
+      const existingLandUse = {
+        siteId: '456',
+        sprofDateCompleted: profileDate,
+        lutCode: 'AG',
+      };
       const siteDisclosure = [
         {
           apiAction: UserActionEnum.UPDATED,
@@ -1236,12 +1244,18 @@ describe('SiteService', () => {
       ];
       const userInfo = { givenName: 'Test User' };
 
-      const existingProfile = { id: 'profile-uuid', siteId: '456', dateCompleted: profileDate };
+      const existingProfile = {
+        id: 'profile-uuid',
+        siteId: '456',
+        dateCompleted: profileDate,
+      };
 
       siteProfilesRepo.findOne = jest.fn().mockResolvedValue(existingProfile);
 
       // save must return the profile so siteProfile.id is set and processSchedule2Refs runs
-      (entityManager.save as jest.Mock) = jest.fn().mockResolvedValue(existingProfile);
+      (entityManager.save as jest.Mock) = jest
+        .fn()
+        .mockResolvedValue(existingProfile);
 
       const mockFind = jest.fn().mockResolvedValue([existingLandUse]);
       const mockRemove = jest.fn().mockResolvedValue([]);
@@ -1255,10 +1269,9 @@ describe('SiteService', () => {
         '456',
       );
 
-      expect(mockRemove).toHaveBeenCalledWith(
-        SiteProfileLandUses,
-        [existingLandUse],
-      );
+      expect(mockRemove).toHaveBeenCalledWith(SiteProfileLandUses, [
+        existingLandUse,
+      ]);
     });
   });
 

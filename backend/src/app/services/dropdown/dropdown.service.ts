@@ -379,17 +379,21 @@ export class DropdownService {
     this.sitesLogger.log('DropdownService.getSchedule2Ref() start');
     try {
       const result = await this.landUseCdRepository
-                      .createQueryBuilder('landUse')
-                      .orderBy(`LEFT(landUse.code, 1)`, 'ASC')
-                      .addOrderBy(`CAST(SUBSTRING(landUse.code FROM 2) AS INTEGER)`, 'ASC')
-                      .getMany();
-                      
+        .createQueryBuilder('landUse')
+        .orderBy(`LEFT(landUse.code, 1)`, 'ASC')
+        .addOrderBy(`CAST(SUBSTRING(landUse.code FROM 2) AS INTEGER)`, 'ASC')
+        .getMany();
+
       if (result?.length > 0) {
         this.sitesLogger.log('DropdownService.getSchedule2Ref() end');
         return result.map((obj: any) => ({
           key: obj.code,
           value: obj.code.toUpperCase(),
-          metaData: obj.code + ' . ' + obj.description.charAt(0).toUpperCase() + obj.description.slice(1).toLowerCase(),
+          metaData:
+            obj.code +
+            ' . ' +
+            obj.description.charAt(0).toUpperCase() +
+            obj.description.slice(1).toLowerCase(),
         }));
       } else {
         this.sitesLogger.log('DropdownService.getSchedule2Ref() end');

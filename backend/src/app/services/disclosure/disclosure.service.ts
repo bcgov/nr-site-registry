@@ -79,19 +79,17 @@ export class DisclosureService {
           return {
             ...res,
             srAction: res.srAction === SRApprovalStatusEnum.PUBLIC,
-            siteProfileSchedule2Refs: res?.siteProfileLandUses?.map(
-              (ref) => {
-                return {
-                  ...ref,
-                  // id format: "<siteId>-<lutCode>" — parsed in processSchedule2Refs to recover oldLutCode on UPDATE
-                  id: res.siteId + '-' + ref.lutCode,
-                  schedule2ReferenceCode: ref.lutCode,
-                  userAction: ref.userAction ?? UserActionEnum.DEFAULT,
-                  srValue: ref.srAction === SRApprovalStatusEnum.PUBLIC,
-                  srAction: ref.srAction,
-                };
-              },
-            ),
+            siteProfileSchedule2Refs: res?.siteProfileLandUses?.map((ref) => {
+              return {
+                ...ref,
+                // id format: "<siteId>-<lutCode>" — parsed in processSchedule2Refs to recover oldLutCode on UPDATE
+                id: res.siteId + '-' + ref.lutCode,
+                schedule2ReferenceCode: ref.lutCode,
+                userAction: ref.userAction ?? UserActionEnum.DEFAULT,
+                srValue: ref.srAction === SRApprovalStatusEnum.PUBLIC,
+                srAction: ref.srAction,
+              };
+            }),
           };
         });
         this.sitesLogger.log(

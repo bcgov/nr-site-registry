@@ -768,6 +768,7 @@ describe('SiteService', () => {
               id: '1',
               psnorgId: '1',
               siteId: '1',
+              eventDate: new Date(),
               completionDate: new Date(),
               etypCode: '1',
               eclsCode: '1',

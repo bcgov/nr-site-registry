@@ -671,7 +671,11 @@ export class SiteService {
     );
     const result = await this.siteRepository.findOne({
       where: whereClause,
-      relations: ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'],
+      relations: [
+        'siteAssocs',
+        'siteAssocs.siteIdAssociatedWith2',
+        'bcerCode2',
+      ],
     });
     response.data = result ? result : null;
 
@@ -1583,7 +1587,7 @@ export class SiteService {
                 ...event,
                 id: notationId,
                 siteId: siteId,
-                eventDate: new Date(),
+                eventDate: event.eventDate || new Date(),
                 userAction: UserActionEnum.ADDED,
                 whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',

@@ -67,6 +67,7 @@ describe('NotationResolver', () => {
         id: '1',
         psnorgId: 'PSNORG123',
         siteId: 'SITE456',
+        eventDate: new Date('2024-07-01'),
         completionDate: new Date('2024-07-17'),
         etypCode: 'ETYP001',
         eclsCode: 'ECLS002',

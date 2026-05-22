@@ -612,7 +612,11 @@ describe('SiteService', () => {
   });
 
   describe('findSiteBySiteId', () => {
-    const relations = ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'];
+    const relations = [
+      'siteAssocs',
+      'siteAssocs.siteIdAssociatedWith2',
+      'bcerCode2',
+    ];
 
     it('unauthenticated user without snapshot loads non-pending site by id and public srAction only', async () => {
       const siteId = '999';
@@ -765,6 +769,7 @@ describe('SiteService', () => {
               id: '1',
               psnorgId: '1',
               siteId: '1',
+              eventDate: new Date(),
               completionDate: new Date(),
               etypCode: '1',
               eclsCode: '1',

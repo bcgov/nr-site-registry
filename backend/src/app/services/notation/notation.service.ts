@@ -118,6 +118,8 @@ export class NotationService {
             id: event.id,
             siteId: event.siteId,
             psnorgId: event.psnorgId,
+            eventDate:
+              event.eventDate && new Date(event.eventDate).toISOString(),
             completionDate:
               event.completionDate &&
               new Date(event.completionDate).toISOString(),

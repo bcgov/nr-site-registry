@@ -123,11 +123,18 @@ export const graphqlSiteDetailsQuery = () => {
           latdeg
           longdeg
           city
+          provState
+          postalCode
           generalDescription
           siteRiskCode
+          whenCreated
           whenUpdated
           srAction
           addrType
+          bcerCode
+          bcerCode2 {
+            description
+          }
         }
         httpStatusCode
       }
@@ -155,11 +162,18 @@ export const graphqlSiteDetailsQueryForLoggedIn = () => {
           latdeg
           longdeg
           city
+          provState
+          postalCode
           generalDescription
           siteRiskCode
+          whenCreated
           whenUpdated
           srAction
           addrType
+          bcerCode
+          bcerCode2 {
+            description
+          }
         }
         httpStatusCode
       }

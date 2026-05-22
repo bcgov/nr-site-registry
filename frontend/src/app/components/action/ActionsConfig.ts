@@ -18,8 +18,16 @@ export const ActionItems: DropdownItem[] = [
 export const getActionItems = (
   includeSRApprovalOptions: boolean,
   isSRUser: boolean = false,
+  canDownloadPdf: boolean = false,
 ): DropdownItem[] => {
   let items = [...ActionItems];
+
+  if (canDownloadPdf) {
+    items.push({
+      label: 'Download PDF',
+      value: SiteActionBtn.DOWNLOAD_PDF,
+    });
+  }
 
   // Add Delete Site option only for SR users
   if (isSRUser) {

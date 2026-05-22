@@ -306,10 +306,10 @@ export class Sites extends ChangeAuditEntity {
   )
   siteSubdivisions: SiteSubdivisions[];
 
-  @Field(() => BceRegionCd)
+  @Field(() => BceRegionCd, { nullable: true })
   @ManyToOne(() => BceRegionCd, (bceRegionCd) => bceRegionCd.sites)
   @JoinColumn([{ name: 'bcer_code', referencedColumnName: 'code' }])
-  bcerCode2: BceRegionCd;
+  bcerCode2: BceRegionCd | null;
 
   @Field(() => ClassificationCd)
   @ManyToOne(

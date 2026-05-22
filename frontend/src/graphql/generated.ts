@@ -646,6 +646,7 @@ export type NotationDto = {
   completionDate?: Maybe<Scalars['DateTime']['output']>;
   eclsCode: Scalars['String']['output'];
   etypCode: Scalars['String']['output'];
+  eventDate?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['String']['output'];
   notationParticipant?: Maybe<Array<NotationParticipantDto>>;
   note?: Maybe<Scalars['String']['output']>;
@@ -668,6 +669,7 @@ export type NotationIputDto = {
   completionDate?: InputMaybe<Scalars['DateTime']['input']>;
   eclsCode: Scalars['String']['input'];
   etypCode: Scalars['String']['input'];
+  eventDate?: InputMaybe<Scalars['DateTime']['input']>;
   id: Scalars['String']['input'];
   notationParticipant?: InputMaybe<Array<NotationParticipantInputDto>>;
   note?: InputMaybe<Scalars['String']['input']>;
@@ -1545,7 +1547,7 @@ export type Sites = {
   addrLine_4?: Maybe<Scalars['String']['output']>;
   addrType: Scalars['String']['output'];
   bcerCode: Scalars['String']['output'];
-  bcerCode2: BceRegionCd;
+  bcerCode2?: Maybe<BceRegionCd>;
   cart?: Maybe<Array<Cart>>;
   city: Scalars['String']['output'];
   classCode?: Maybe<Scalars['String']['output']>;

@@ -40,13 +40,14 @@ export class DisclosureService {
       if (user?.identity_provider === UserTypeEum.IDIR) {
         result = await this.disclosureRepository.find({
           where: { siteId },
+          relations: ['siteProfileLandUses'],
         });
 
         if (showPending) {
           result = result.filter(
             (profile) =>
               profile.srAction === SRApprovalStatusEnum.PENDING ||
-              profile.siteProfileSchedule2Refs?.some(
+              profile.siteProfileLandUses?.some(
                 (ref) => ref.srAction === SRApprovalStatusEnum.PENDING,
               ),
           );
@@ -78,10 +79,13 @@ export class DisclosureService {
           return {
             ...res,
             srAction: res.srAction === SRApprovalStatusEnum.PUBLIC,
-            siteProfileSchedule2Refs: res?.siteProfileSchedule2Refs?.map(
+            siteProfileSchedule2Refs: res?.siteProfileLandUses?.map(
               (ref) => {
                 return {
                   ...ref,
+                  // id format: "<siteId>-<lutCode>" — parsed in processSchedule2Refs to recover oldLutCode on UPDATE
+                  id: res.siteId + '-' + ref.lutCode,
+                  schedule2ReferenceCode: ref.lutCode,
                   userAction: ref.userAction ?? UserActionEnum.DEFAULT,
                   srValue: ref.srAction === SRApprovalStatusEnum.PUBLIC,
                   srAction: ref.srAction,

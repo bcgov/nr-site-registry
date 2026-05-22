@@ -23,9 +23,9 @@ import { SiteDocPartics } from '../../entities/siteDocPartics.entity';
 import {
   BulkApproveRejectChangesDTO,
   SearchParams,
-} from 'src/app/dto/sitesPendingReview.dto';
+} from '../../dto/sitesPendingReview.dto';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
-import { ParcelDescriptionInputDTO } from 'src/app/dto/parcelDescriptionInput.dto';
+import { ParcelDescriptionInputDTO } from '../../dto/parcelDescriptionInput.dto';
 import { ParcelDescriptionsService } from '../parcelDescriptions/parcelDescriptions.service';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { SnapshotsService } from '../snapshot/snapshot.service';
@@ -36,6 +36,7 @@ import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
 import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
 import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
 import { RecentViews } from '../../entities/recentViews.entity';
+import { SiteProfileLandUses } from '../../entities/siteProfileLandUses.entity';
 
 describe('SiteService', () => {
   let siteService: SiteService;
@@ -305,7 +306,7 @@ describe('SiteService', () => {
                 dateCompleted: new Date(),
                 whenCreated: new Date(),
                 whoCreated: 'Test User',
-                SiteProfileSchedule2Refs: [],
+                siteProfileSchedule2Refs: [],
               };
             }),
             save: jest.fn(),
@@ -316,7 +317,7 @@ describe('SiteService', () => {
                 dateCompleted: new Date(),
                 whenCreated: new Date(),
                 whoCreated: 'Test User',
-                SiteProfileSchedule2Refs: [],
+                siteProfileSchedule2Refs: [],
               };
             }),
           },
@@ -1160,6 +1161,99 @@ describe('SiteService', () => {
       expect(updatedProfile.whenUpdated).toBeInstanceOf(Date);
       expect(updatedProfile.siteId).toBe('456');
       expect(updatedProfile.whoUpdated).toBe('Updated User');
+    });
+  });
+
+  describe('processProfileLandUses (via processSiteDisclosure)', () => {
+    it('should add a new land use when action is ADDED and lutCode does not exist', async () => {
+      const profileDate = new Date('2020-01-01');
+      const siteDisclosure = [
+        {
+          apiAction: UserActionEnum.ADDED,
+          id: null,
+          siteId: '456',
+          dateCompleted: profileDate,
+          // service reads schedule2ReferenceCode and maps it to lutCode
+          siteProfileSchedule2Refs: [
+            { apiAction: UserActionEnum.ADDED, schedule2ReferenceCode: 'AG' },
+          ],
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      const savedProfile = { id: 'profile-uuid', siteId: '456', dateCompleted: profileDate };
+      const mockCreate = jest.fn((_entity, data) => ({ ...data }));
+      const mockSave = jest.fn(async (_entity, data) => {
+        if (_entity === SiteProfiles) return savedProfile;
+        return data;
+      });
+      const mockFind = jest.fn().mockResolvedValue([]); // no existing land uses
+
+      (entityManager.create as jest.Mock) = mockCreate;
+      (entityManager.save as jest.Mock) = mockSave;
+      (entityManager.find as jest.Mock) = mockFind;
+
+      await siteService.processSiteDisclosure(
+        siteDisclosure,
+        userInfo,
+        entityManager,
+        '456',
+      );
+
+      // First save = profile, second save = land uses
+      expect(mockSave).toHaveBeenCalledTimes(2);
+      const landUseSaveCall = mockSave.mock.calls[1];
+      expect(landUseSaveCall[0]).toBe(SiteProfileLandUses);
+      const savedLandUses = landUseSaveCall[1];
+      expect(savedLandUses[0].lutCode).toBe('AG');
+      expect(savedLandUses[0].whoCreated).toBe('Test User');
+      expect(savedLandUses[0].whenCreated).toBeInstanceOf(Date);
+    });
+
+    it('should delete a land use when action is DELETED and schedule2ReferenceCode exists', async () => {
+      const profileDate = new Date('2020-01-01');
+      // existingLandUse is keyed by lutCode in the currentMap
+      const existingLandUse = { siteId: '456', sprofDateCompleted: profileDate, lutCode: 'AG' };
+      const siteDisclosure = [
+        {
+          apiAction: UserActionEnum.UPDATED,
+          id: 'profile-uuid',
+          siteId: '456',
+          dateCompleted: profileDate,
+          siteProfileSchedule2Refs: [
+            {
+              apiAction: UserActionEnum.DELETED,
+              // service reads schedule2ReferenceCode for DELETED case
+              schedule2ReferenceCode: 'AG',
+            },
+          ],
+        },
+      ];
+      const userInfo = { givenName: 'Test User' };
+
+      const existingProfile = { id: 'profile-uuid', siteId: '456', dateCompleted: profileDate };
+
+      siteProfilesRepo.findOne = jest.fn().mockResolvedValue(existingProfile);
+
+      // save must return the profile so siteProfile.id is set and processSchedule2Refs runs
+      (entityManager.save as jest.Mock) = jest.fn().mockResolvedValue(existingProfile);
+
+      const mockFind = jest.fn().mockResolvedValue([existingLandUse]);
+      const mockRemove = jest.fn().mockResolvedValue([]);
+      (entityManager.find as jest.Mock) = mockFind;
+      (entityManager.remove as jest.Mock) = mockRemove;
+
+      await siteService.processSiteDisclosure(
+        siteDisclosure,
+        userInfo,
+        entityManager,
+        '456',
+      );
+
+      expect(mockRemove).toHaveBeenCalledWith(
+        SiteProfileLandUses,
+        [existingLandUse],
+      );
     });
   });
 

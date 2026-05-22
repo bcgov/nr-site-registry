@@ -233,7 +233,8 @@ export const getSiteSummary = (state: any) => state.siteDetails.sitesSummary;
 
 export const getSiteLandHistories = (state: any) =>
   state.siteDetails.landHistoriesData;
-
+export const getSiteDisclosures = (state: any) =>
+  state.siteDetails.profilesData;
 export const {
   resetSaveSiteDetailsRequestStatus,
   resetSaveSiteDetails,

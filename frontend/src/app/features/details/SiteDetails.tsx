@@ -891,10 +891,10 @@ const SiteDetails = () => {
 
   const validateSiteDisclosureForm = async () => {
     try {
-      let updatedSiteDisclosure = deepFilterByUserAction(
-        siteDisclosure,
-        [...userActions, UserActionEnum.deleted],
-      );
+      let updatedSiteDisclosure = deepFilterByUserAction(siteDisclosure, [
+        ...userActions,
+        UserActionEnum.deleted,
+      ]);
       if (
         updatedSiteDisclosure &&
         typeof updatedSiteDisclosure === 'object' &&

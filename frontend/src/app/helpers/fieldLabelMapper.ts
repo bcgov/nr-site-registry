@@ -62,7 +62,8 @@ export const fieldLabelMap: { [key: string]: string } = {
 
   etypCode: 'Notation Type',
   eclsCode: 'Notation Class',
-  requirementReceivedDate: 'Initiated Date',
+  eventDate: 'Initiated Date',
+  requirementReceivedDate: 'Requirement Received Date',
   requirementDueDate: 'Required Date',
   completionDate: 'Completed Date',
   requiredAction: 'Required Actions',

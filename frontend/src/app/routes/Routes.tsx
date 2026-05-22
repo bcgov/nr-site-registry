@@ -34,6 +34,7 @@ export const roleBasedRoutes: Record<UserRoleType, AppRoute[]> = {
     { path: '/map/:id', element: <MapView /> },
     { path: '/site/cart', element: <Cart /> },
     { path: '/purchases', element: <Purchases /> },
+    { path: '/purchases/site/details/:id', element: <SiteDetails /> },
     { path: '/review', element: <SRUpdatesTables /> },
     { path: '/site/cart/site/details/:id', element: <SiteDetails /> },
   ],

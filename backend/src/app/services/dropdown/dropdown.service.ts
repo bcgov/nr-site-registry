@@ -378,12 +378,7 @@ export class DropdownService {
   async getSchedule2Ref() {
     this.sitesLogger.log('DropdownService.getSchedule2Ref() start');
     try {
-      const result = await this.landUseCdRepository
-        .createQueryBuilder('landUse')
-        .orderBy(`LEFT(landUse.code, 1)`, 'ASC')
-        .addOrderBy(`CAST(SUBSTRING(landUse.code FROM 2) AS INTEGER)`, 'ASC')
-        .getMany();
-
+      const result = await this.landUseCdRepository.find();
       if (result?.length > 0) {
         this.sitesLogger.log('DropdownService.getSchedule2Ref() end');
         return result.map((obj: any) => ({

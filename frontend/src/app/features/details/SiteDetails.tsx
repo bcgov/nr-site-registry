@@ -412,7 +412,7 @@ const SiteDetails = () => {
     // Cart and purchases details: do not auto-redirect (user can use back / cart / purchases UI).
     const isPurchasedSiteView =
       location.pathname.includes('/site/cart/site/details/') ||
-      location.pathname.includes('/purchases/site/details/');
+      location.pathname.includes('/site-details/site/details/');
     if (isPurchasedSiteView) return;
 
     if (lastUnavailableToastSiteIdRef.current !== id) {

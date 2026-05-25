@@ -1,5 +1,5 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import { AuthenticatedUser, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { LandHistories } from '../../entities/landHistories.entity';
 import { LandHistoryResponse } from '../../dto/landHistory.dto';
@@ -40,6 +40,7 @@ export class LandHistoryResolver {
 
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
+    @AuthenticatedUser() user: any,
   ) {
     this.sitesLogger.log(
       'LandHistoryResolver.getLandHistoriesForSite() start siteId:' +
@@ -58,6 +59,7 @@ export class LandHistoryResolver {
       searchTerm,
       sortDirection,
       showPending,
+      user,
     );
     this.sitesLogger.log(
       `LandHistoryResolver.getLandHistoriesForSite() result: ${JSON.stringify(result)}`,

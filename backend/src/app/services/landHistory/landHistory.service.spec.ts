@@ -7,10 +7,12 @@ import { LandHistoriesInputDTO } from '../../dto/landHistoriesInput.dto';
 import { TransactionManagerService } from '../transactionManager/transactionManager.service';
 import { REQUEST } from '@nestjs/core';
 import { LoggerService } from '../../logger/logger.service';
+import { SnapshotsService } from '../snapshot/snapshot.service';
 
 describe('LandHistoryService', () => {
   let landHistoryService: LandHistoryService;
   let loggerServive: LoggerService;
+  let snapshotService: SnapshotsService;
 
   let entityManagerMock: {
     save: jest.Mock;
@@ -52,6 +54,12 @@ describe('LandHistoryService', () => {
           },
         },
         {
+          provide: SnapshotsService,
+          useValue: {
+            getMostRecentSnapshot: jest.fn(),
+          },
+        },
+        {
           provide: REQUEST,
           useValue: { req: { user: mockUser } },
         },
@@ -61,6 +69,7 @@ describe('LandHistoryService', () => {
 
     landHistoryService = moduleRef.get<LandHistoryService>(LandHistoryService);
     loggerServive = moduleRef.get<LoggerService>(LoggerService);
+    snapshotService = moduleRef.get<SnapshotsService>(SnapshotsService);
   });
 
   afterEach(() => {
@@ -75,16 +84,76 @@ describe('LandHistoryService', () => {
     it('should call LandHistories repository with correct data', async () => {
       const siteId = 'site123';
       const showPending = false;
+      const idirUser = { identity_provider: 'idir', sub: 'idir-user-1' };
       await landHistoryService.getLandHistoriesForSite(
         siteId,
         '',
         'ASC',
         showPending,
+        idirUser,
       );
 
       expect(whereMock).toHaveBeenCalledWith('site_id = :siteId', {
         siteId,
       });
+    });
+
+    it('should return snapshot landHistories for external user with a valid snapshot', async () => {
+      const siteId = 'site123';
+      const externalUser = { identity_provider: 'bceidbusiness', sub: 'ext-user-1' };
+      const mockLandHistories = [{ ...new LandHistories() }];
+      jest
+        .spyOn(snapshotService, 'getMostRecentSnapshot')
+        .mockResolvedValueOnce({
+          snapshotData: { landHistories: mockLandHistories },
+        } as any);
+
+      const result = await landHistoryService.getLandHistoriesForSite(
+        siteId,
+        '',
+        'ASC',
+        false,
+        externalUser,
+      );
+
+      expect(result).toEqual(mockLandHistories);
+      expect(snapshotService.getMostRecentSnapshot).toHaveBeenCalledWith(
+        siteId,
+        externalUser.sub,
+      );
+    });
+
+    it('should return [] for external user with no snapshot', async () => {
+      const siteId = 'site123';
+      const externalUser = { identity_provider: 'bceidbusiness', sub: 'ext-user-2' };
+      jest
+        .spyOn(snapshotService, 'getMostRecentSnapshot')
+        .mockResolvedValueOnce(null);
+
+      const result = await landHistoryService.getLandHistoriesForSite(
+        siteId,
+        '',
+        'ASC',
+        false,
+        externalUser,
+      );
+
+      expect(result).toEqual([]);
+    });
+
+    it('should return [] for external user with missing sub', async () => {
+      const siteId = 'site123';
+      const externalUser = { identity_provider: 'bceidbusiness' };
+
+      const result = await landHistoryService.getLandHistoriesForSite(
+        siteId,
+        '',
+        'ASC',
+        false,
+        externalUser,
+      );
+
+      expect(result).toEqual([]);
     });
   });
 

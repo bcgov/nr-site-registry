@@ -70,7 +70,6 @@ import {
 import {
   fetchSiteDisclosure,
   updateSiteDisclosure,
-  siteDisclosure as siteDisclosureSelector,
 } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';

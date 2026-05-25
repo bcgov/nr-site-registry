@@ -45,7 +45,7 @@ export class DropdownService {
     private siteStatusCdRepository: Repository<SiteStatusCd>,
 
     @InjectRepository(LandUseCd)
-    private landUseCdRepository: Repository<LandUseCd>,
+    private readonly landUseCdRepository: Repository<LandUseCd>,
 
     private readonly sitesLogger: LoggerService,
   ) {}

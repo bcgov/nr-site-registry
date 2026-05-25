@@ -1431,7 +1431,7 @@ describe('SnapshotService', () => {
       expect((await notations).length).toBe(1);
     });
 
-    it('getSubDivisionsForSnapshotCreation should be called with SRAction equals not PRIVATE OR PENDING', async () => {
+    it('getSubDivisionsForSnapshotCreation should be called with SRAction equals PUBLIC OR NULL', async () => {
       jest
         .spyOn(siteSubdivisionsRepository, 'find')
         .mockResolvedValue(sampleSiteSubDivions);

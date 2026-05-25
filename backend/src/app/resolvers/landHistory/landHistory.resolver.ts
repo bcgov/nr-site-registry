@@ -1,5 +1,9 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { AuthenticatedUser, RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import {
+  AuthenticatedUser,
+  RoleMatchingMode,
+  Roles,
+} from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { LandHistories } from '../../entities/landHistories.entity';
 import { LandHistoryResponse } from '../../dto/landHistory.dto';

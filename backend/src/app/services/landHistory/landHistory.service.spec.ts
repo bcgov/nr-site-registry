@@ -100,7 +100,10 @@ describe('LandHistoryService', () => {
 
     it('should return snapshot landHistories for external user with a valid snapshot', async () => {
       const siteId = 'site123';
-      const externalUser = { identity_provider: 'bceidbusiness', sub: 'ext-user-1' };
+      const externalUser = {
+        identity_provider: 'bceidbusiness',
+        sub: 'ext-user-1',
+      };
       const mockLandHistories = [{ ...new LandHistories() }];
       jest
         .spyOn(snapshotService, 'getMostRecentSnapshot')
@@ -125,7 +128,10 @@ describe('LandHistoryService', () => {
 
     it('should return [] for external user with no snapshot', async () => {
       const siteId = 'site123';
-      const externalUser = { identity_provider: 'bceidbusiness', sub: 'ext-user-2' };
+      const externalUser = {
+        identity_provider: 'bceidbusiness',
+        sub: 'ext-user-2',
+      };
       jest
         .spyOn(snapshotService, 'getMostRecentSnapshot')
         .mockResolvedValueOnce(null);

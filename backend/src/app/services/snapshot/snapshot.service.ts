@@ -339,7 +339,10 @@ export class SnapshotsService {
         'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
       );
       return await this.siteSubDivisionsRepo.find({
-        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        where: [
+          { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+          { siteId, srAction: IsNull() },
+        ],
       });
     } catch (error) {
       this.sitesLogger.log(

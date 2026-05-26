@@ -6,7 +6,6 @@
       <sequence increment="1" name="lto_prev_download_id_seq" startValue="1"/>
       <sequence increment="1" name="migrations_id_seq" startValue="1"/>
       <sequence increment="1" name="recent_views_id_seq" startValue="1"/>
-      <sequence increment="1" name="schedule2_reference_id_seq" startValue="1"/>
       <sequence increment="1" name="site_subdivision_site_subdiv_id_seq" startValue="1"/>
       <sequence increment="1" name="site_subdivisions_site_subdiv_id_seq" startValue="1"/>
       <sequence increment="1" name="snapshots_id_seq" startValue="1"/>
@@ -488,7 +487,7 @@
             <column ascending="true" name="site_id"/>
          </index>
       </table>
-      <table name="migrations" numRows="63" remarks="" schema="sites" type="TABLE">
+      <table name="migrations" remarks="" schema="sites" type="TABLE">
          <column autoUpdated="true" defaultValue="nextval('sites.migrations_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="timestamp" nullable="false" remarks="" size="19" type="int8" typeCode="-5"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="name" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
@@ -548,7 +547,7 @@
             <column ascending="true" name="bcer_code"/>
          </index>
       </table>
-      <table name="places" numRows="3266" remarks="" schema="sites" type="TABLE">
+      <table name="places" remarks="" schema="sites" type="TABLE">
          <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="0" name="id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="name" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="17" id="2" name="latdeg" nullable="false" remarks="" size="17" type="float8" typeCode="8"/>
@@ -721,23 +720,6 @@
          <index name="idx_user_id_site_id" unique="true">
             <column ascending="true" name="user_id"/>
             <column ascending="true" name="site_id"/>
-         </index>
-      </table>
-      <table name="schedule2_reference" numRows="87" remarks="" schema="sites" type="TABLE">
-         <column autoUpdated="true" defaultValue="nextval('sites.schedule2_reference_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="code" nullable="false" remarks="" size="10" type="varchar" typeCode="12">
-            <child column="schedule2_reference_code" foreignKey="FK_28b192cbd0ff2fe4539b80318a9" implied="false" onDeleteCascade="false" schema="sites" table="site_profile_schedule2_ref"/>
-         </column>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="description" nullable="false" remarks="" size="255" type="varchar" typeCode="12"/>
-         <primaryKey column="id" sequenceNumberInPK="1"/>
-         <index name="PK_83b739b48fb8ce0d6331359b517" unique="true">
-            <column ascending="true" name="id"/>
-         </index>
-         <index name="schedule2_reference_code" unique="true">
-            <column ascending="true" name="code"/>
-         </index>
-         <index name="UQ_2286ef31505e45f5bd3832456e1" unique="true">
-            <column ascending="true" name="code"/>
          </index>
       </table>
       <table name="sis_addresses" remarks="" schema="sites" type="TABLE">
@@ -1048,6 +1030,10 @@
          </column>
          <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="who_created" nullable="false" remarks="" size="16" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="when_created" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="user_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="sr_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="7" name="who_updated" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="8" name="when_updated" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
          <primaryKey column="site_id" sequenceNumberInPK="1"/>
          <primaryKey column="sprof_date_completed" sequenceNumberInPK="2"/>
          <primaryKey column="lut_code" sequenceNumberInPK="3"/>
@@ -1087,29 +1073,6 @@
          <index name="spown_sprof_fk_i" unique="false">
             <column ascending="true" name="date_completed"/>
             <column ascending="true" name="site_id"/>
-         </index>
-      </table>
-      <table name="site_profile_schedule2_ref" remarks="" schema="sites" type="TABLE">
-         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="user_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="sr_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
-         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="2" name="id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="schedule2_reference_code" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12">
-            <parent column="code" foreignKey="FK_28b192cbd0ff2fe4539b80318a9" implied="false" onDeleteCascade="false" schema="sites" table="schedule2_reference"/>
-         </column>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="site_profile_id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111">
-            <parent column="id" foreignKey="FK_c31ff7a5fc49fc6d87797b09d44" implied="false" onDeleteCascade="true" schema="sites" table="site_profiles"/>
-         </column>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="who_created" nullable="false" remarks="" size="30" type="varchar" typeCode="12"/>
-         <column autoUpdated="false" defaultValue="null" digits="0" id="6" name="who_updated" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
-         <column autoUpdated="false" defaultValue="null" digits="6" id="7" name="when_created" nullable="false" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <column autoUpdated="false" defaultValue="null" digits="6" id="8" name="when_updated" nullable="true" remarks="" size="29" type="timestamp" typeCode="93"/>
-         <primaryKey column="id" sequenceNumberInPK="1"/>
-         <index name="PK_ba4fdaeb12d4490b91f56b88888" unique="true">
-            <column ascending="true" name="id"/>
-         </index>
-         <index name="UQ_d8de6d5606fe23339be1580a80e" unique="true">
-            <column ascending="true" name="site_profile_id"/>
-            <column ascending="true" name="schedule2_reference_code"/>
          </index>
       </table>
       <table name="site_profiles" remarks="" schema="sites" type="TABLE">
@@ -1164,9 +1127,7 @@
          <column autoUpdated="false" defaultValue="null" digits="0" id="44" name="gov_documents_comment" nullable="true" remarks="" size="2000" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="45" name="user_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="46" name="sr_action" nullable="true" remarks="" size="30" type="varchar" typeCode="12"/>
-         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="47" name="id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111">
-            <child column="site_profile_id" foreignKey="FK_c31ff7a5fc49fc6d87797b09d44" implied="false" onDeleteCascade="true" schema="sites" table="site_profile_schedule2_ref"/>
-         </column>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="47" name="id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="48" name="completor_partic_id" nullable="true" remarks="" size="19" type="int8" typeCode="-5"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="49" name="contact_partic_id" nullable="true" remarks="" size="19" type="int8" typeCode="-5"/>
          <primaryKey column="id" sequenceNumberInPK="1"/>

@@ -13,7 +13,7 @@ site_doc_partics
 mailout
 event_partics
 site_subdivisions
-site_profile_schedule2_ref
+site_profiles
 site_partic_roles
 site_contamination_class_xref
 site_assocs
@@ -29,7 +29,6 @@ profile_answers
 conditions_text
 cart
 site_crown_land_contaminated
-site_profiles
 site_partics
 subdivisions
 site_docs
@@ -42,7 +41,6 @@ people_orgs
 submission_cd
 site_risk_cd
 site_crown_land_status_cd
-schedule2_reference
 profile_categories
 partic_role_cd
 folio

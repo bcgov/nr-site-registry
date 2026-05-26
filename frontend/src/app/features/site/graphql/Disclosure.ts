@@ -24,7 +24,6 @@ export const graphQLSiteDisclosureBySiteId = () => {
           whenUpdated
           siteProfileSchedule2Refs {
             id
-            profileId
             schedule2ReferenceCode
             srAction
             srValue

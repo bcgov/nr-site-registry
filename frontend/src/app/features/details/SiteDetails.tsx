@@ -70,7 +70,6 @@ import {
 import {
   fetchSiteDisclosure,
   updateSiteDisclosure,
-  siteDisclosure as siteDisclosureSelector,
 } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
@@ -104,6 +103,7 @@ import BannerDetails from '../../components/banners/BannerDetails';
 import {
   getParentBucket,
   getSiteAssociated,
+  getSiteDisclosures,
   getSiteDocuments,
   getSiteLandHistories,
   getSiteNoatations,
@@ -210,9 +210,7 @@ const SiteDetails = () => {
   const siteNotation = useSelector(getSiteNoatations);
   const siteSummary = useSelector(getSiteSummary);
   const siteLandUses = useSelector(getSiteLandHistories);
-  const disclosureSourceOfTruth = useSelector(
-    siteDisclosureSelector,
-  )?.siteDisclosure;
+  const siteDisclosure = useSelector(getSiteDisclosures);
   const sitePartics = useSelector(getSiteParticipants);
   const siteAssocs = useSelector(getSiteAssociated);
   const siteDocuments = useSelector(getSiteDocuments);
@@ -749,7 +747,6 @@ const SiteDetails = () => {
 
   const validateSiteLandUsesForm = async () => {
     try {
-      debugger;
       if (siteLandUses?.length > 0) {
         const landUseTable: IFormField[][] = [
           landUseFormRows
@@ -906,10 +903,10 @@ const SiteDetails = () => {
 
   const validateSiteDisclosureForm = async () => {
     try {
-      let updatedSiteDisclosure = deepFilterByUserAction(
-        disclosureSourceOfTruth,
-        [...userActions, UserActionEnum.deleted],
-      );
+      let updatedSiteDisclosure = deepFilterByUserAction(siteDisclosure, [
+        ...userActions,
+        UserActionEnum.deleted,
+      ]);
       if (
         updatedSiteDisclosure &&
         typeof updatedSiteDisclosure === 'object' &&

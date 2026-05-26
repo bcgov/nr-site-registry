@@ -283,7 +283,6 @@ describe('Disclosure Component', () => {
         siteProfileSchedule2Refs: [
           {
             id: 'ref-1',
-            profileId: mockDisclosure.id,
             schedule2ReferenceCode: 'S2-1',
             srAction: 'false',
             srValue: false,

@@ -180,11 +180,18 @@ const LandUses: FC = () => {
 
     setEditLandUsesData((prev) => {
       const data = new Map(prev);
+      const existing = data.get(editedRowId);
+      const preservedOriginalCode =
+        existing !== undefined
+          ? existing.originalLandUseCode
+          : landUseUpdateInput.originalLandUseCode;
+      const isNewRow = !preservedOriginalCode;
 
       data.set(editedRowId, {
-        ...(data.get(editedRowId) ?? {}),
+        ...(existing ?? {}),
         ...landUseUpdateInput,
-        userAction: UserActionEnum.updated,
+        originalLandUseCode: preservedOriginalCode,
+        userAction: isNewRow ? UserActionEnum.added : UserActionEnum.updated,
         srAction: srActionValue,
       });
       return data;

@@ -12,7 +12,7 @@ import { DropdownDto } from '../../dto/dropdown.dto';
 import { SiteRiskCd } from '../../entities/siteRiskCd.entity';
 import { BceRegionCd } from '../../entities/bceRegionCd.entity';
 import { SiteStatusCd } from '../../entities/siteStatusCd.entity';
-import { Schedule2Reference } from '../../entities/schedule2Reference';
+import { LandUseCd } from '../../entities/landUseCd.entity';
 
 @Injectable()
 export class DropdownService {
@@ -44,8 +44,8 @@ export class DropdownService {
     @InjectRepository(SiteStatusCd)
     private siteStatusCdRepository: Repository<SiteStatusCd>,
 
-    @InjectRepository(Schedule2Reference)
-    private schedule2ReferenceRepository: Repository<Schedule2Reference>,
+    @InjectRepository(LandUseCd)
+    private readonly landUseCdRepository: Repository<LandUseCd>,
 
     private readonly sitesLogger: LoggerService,
   ) {}
@@ -378,13 +378,17 @@ export class DropdownService {
   async getSchedule2Ref() {
     this.sitesLogger.log('DropdownService.getSchedule2Ref() start');
     try {
-      const result = await this.schedule2ReferenceRepository.find();
+      const result = await this.landUseCdRepository.find();
       if (result?.length > 0) {
         this.sitesLogger.log('DropdownService.getSchedule2Ref() end');
         return result.map((obj: any) => ({
           key: obj.code,
           value: obj.code.toUpperCase(),
-          metaData: obj.description,
+          metaData:
+            obj.code +
+            ' . ' +
+            obj.description.charAt(0).toUpperCase() +
+            obj.description.slice(1).toLowerCase(),
         }));
       } else {
         this.sitesLogger.log('DropdownService.getSchedule2Ref() end');

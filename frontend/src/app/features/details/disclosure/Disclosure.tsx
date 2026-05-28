@@ -481,7 +481,6 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const handleAddDisclosureSchedule = (disclosureId: any) => {
     const newDisclosureSchedule = {
       id: v4(),
-      profileId: disclosureId ?? '',
       schedule2ReferenceCode: '',
       description: '',
       apiAction: UserActionEnum.added,
@@ -552,10 +551,8 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
           siteProfileSchedule2Refs: updatedDisclosureSchedule,
         };
       };
-
       // Update both formData and trackParticipant
       const updatedFormData = updateReferences(formData);
-
       const updatedTrackDisclosure = updateReferences(
         trackSiteDisclosure ?? formData,
       );

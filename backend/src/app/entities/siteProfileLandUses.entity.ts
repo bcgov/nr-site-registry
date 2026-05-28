@@ -2,6 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { LandUseCd } from './landUseCd.entity';
 import { SiteProfiles } from './siteProfiles.entity';
+import { ChangeAuditEntity } from './changeAuditEntity';
 
 @ObjectType()
 @Index(
@@ -10,7 +11,7 @@ import { SiteProfiles } from './siteProfiles.entity';
   { unique: true },
 )
 @Entity('site_profile_land_uses')
-export class SiteProfileLandUses {
+export class SiteProfileLandUses extends ChangeAuditEntity {
   @Field()
   @Column('bigint', { primary: true, name: 'site_id' })
   siteId: string;
@@ -34,17 +35,32 @@ export class SiteProfileLandUses {
   @Column('timestamp without time zone', { name: 'when_created' })
   whenCreated: Date;
 
+  @Field({ nullable: true })
+  @Column('character varying', {
+    name: 'who_updated',
+    nullable: true,
+    length: 30,
+  })
+  whoUpdated: string | null;
+
+  @Field({ nullable: true })
+  @Column('timestamp without time zone', {
+    name: 'when_updated',
+    nullable: true,
+  })
+  whenUpdated: Date | null;
+
   @ManyToOne(() => LandUseCd, (landUseCd) => landUseCd.siteProfileLandUses)
   @JoinColumn([{ name: 'lut_code', referencedColumnName: 'code' }])
   lutCode2: LandUseCd;
 
-  // @ManyToOne(
-  //   () => SiteProfiles,
-  //   (siteProfiles) => siteProfiles.siteProfileLandUses,
-  // )
-  // @JoinColumn([
-  //   { name: 'site_id', referencedColumnName: 'siteId' },
-  //   { name: 'sprof_date_completed', referencedColumnName: 'dateCompleted' },
-  // ])
-  // siteProfiles: SiteProfiles;
+  @ManyToOne(
+    () => SiteProfiles,
+    (siteProfiles) => siteProfiles.siteProfileLandUses,
+  )
+  @JoinColumn([
+    { name: 'site_id', referencedColumnName: 'siteId' },
+    { name: 'sprof_date_completed', referencedColumnName: 'dateCompleted' },
+  ])
+  siteProfiles: SiteProfiles;
 }

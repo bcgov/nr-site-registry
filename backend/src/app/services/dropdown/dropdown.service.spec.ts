@@ -12,7 +12,7 @@ import { User } from '../../entities/user.entity';
 import { SiteRiskCd } from '../../entities/siteRiskCd.entity';
 import { BceRegionCd } from '../../entities/bceRegionCd.entity';
 import { SiteStatusCd } from '../../entities/siteStatusCd.entity';
-import { Schedule2Reference } from '../../entities/schedule2Reference';
+import { LandUseCd } from '../../entities/landUseCd.entity';
 
 // Mock particRoleCd and peopleOrgs entities and their methods
 jest.mock('../../entities/particRoleCd.entity');
@@ -27,6 +27,10 @@ describe('DropdownService', () => {
   let eventParticRoleCdRepository: Repository<EventParticRoleCd>;
   let sitesLogger: LoggerService;
   let userRepository: Repository<User>;
+  let siteRiskCdRepository: Repository<SiteRiskCd>;
+  let bceRegionRepository: Repository<BceRegionCd>;
+  let siteStatusCdRepository: Repository<SiteStatusCd>;
+  let landUseCdRepository: Repository<LandUseCd>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -70,7 +74,7 @@ describe('DropdownService', () => {
           useClass: Repository,
         },
         {
-          provide: getRepositoryToken(Schedule2Reference),
+          provide: getRepositoryToken(LandUseCd),
           useClass: Repository,
         },
       ],
@@ -93,7 +97,21 @@ describe('DropdownService', () => {
     eventParticRoleCdRepository = module.get<Repository<EventParticRoleCd>>(
       getRepositoryToken(EventParticRoleCd),
     );
-
+    landUseCdRepository = module.get<Repository<LandUseCd>>(
+      getRepositoryToken(LandUseCd),
+    );
+    siteRiskCdRepository = module.get<Repository<SiteRiskCd>>(
+      getRepositoryToken(SiteRiskCd),
+    );
+    bceRegionRepository = module.get<Repository<BceRegionCd>>(
+      getRepositoryToken(BceRegionCd),
+    );
+    siteStatusCdRepository = module.get<Repository<SiteStatusCd>>(
+      getRepositoryToken(SiteStatusCd),
+    );
+    landUseCdRepository = module.get<Repository<LandUseCd>>(
+      getRepositoryToken(LandUseCd),
+    );
     userRepository = module.get<Repository<User>>(getRepositoryToken(User));
   });
 

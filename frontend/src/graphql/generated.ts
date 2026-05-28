@@ -1306,11 +1306,11 @@ export type SitePendingApprovalRecords = {
   whoUpdated: Scalars['String']['output'];
 };
 
-export type SiteProfileSchedule2Ref = {
-  __typename?: 'SiteProfileSchedule2Ref';
-  id: Scalars['String']['output'];
-  profileId: Scalars['String']['output'];
-  schedule2ReferenceCode: Scalars['String']['output'];
+export type SiteProfileLandUses = {
+  __typename?: 'SiteProfileLandUses';
+  lutCode: Scalars['String']['output'];
+  siteId: Scalars['String']['output'];
+  sprofDateCompleted: Scalars['DateTime']['output'];
   srAction?: Maybe<Scalars['String']['output']>;
   userAction?: Maybe<Scalars['String']['output']>;
   whenCreated: Scalars['DateTime']['output'];
@@ -1323,7 +1323,6 @@ export type SiteProfileSchedule2RefDto = {
   __typename?: 'SiteProfileSchedule2RefDTO';
   apiAction?: Maybe<Scalars['String']['output']>;
   id: Scalars['String']['output'];
-  profileId: Scalars['String']['output'];
   schedule2ReferenceCode: Scalars['String']['output'];
   srAction?: Maybe<Scalars['String']['output']>;
   srValue?: Maybe<Scalars['Boolean']['output']>;
@@ -1332,9 +1331,8 @@ export type SiteProfileSchedule2RefDto = {
 
 export type SiteProfileSchedule2RefInputDto = {
   apiAction?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['String']['input'];
-  profileId: Scalars['String']['input'];
-  schedule2ReferenceCode: Scalars['String']['input'];
+  id?: InputMaybe<Scalars['String']['input']>;
+  schedule2ReferenceCode?: InputMaybe<Scalars['String']['input']>;
   srAction?: InputMaybe<Scalars['String']['input']>;
   srValue?: InputMaybe<Scalars['Boolean']['input']>;
   userAction?: InputMaybe<Scalars['String']['input']>;
@@ -1383,7 +1381,7 @@ export type SiteProfiles = {
   siteDisclosureComment?: Maybe<Scalars['String']['output']>;
   siteId: Scalars['String']['output'];
   sitePostalCode?: Maybe<Scalars['String']['output']>;
-  siteProfileSchedule2Refs?: Maybe<Array<SiteProfileSchedule2Ref>>;
+  siteProfileLandUses?: Maybe<Array<SiteProfileLandUses>>;
   siteRegDateEntered?: Maybe<Scalars['DateTime']['output']>;
   siteRegDateRecd?: Maybe<Scalars['DateTime']['output']>;
   siteRegParticId?: Maybe<Scalars['String']['output']>;

@@ -60,7 +60,10 @@ describe('DisclosureService', () => {
       );
 
       expect(result[0].whenCreated).toEqual(mockSiteProfile[0].whenCreated);
-      expect(repository.find).toBeCalledWith({ where: { siteId } });
+      expect(repository.find).toBeCalledWith({
+        where: { siteId },
+        relations: ['siteProfileLandUses'],
+      });
     });
 
     it('should throw an error when repository find fails', async () => {

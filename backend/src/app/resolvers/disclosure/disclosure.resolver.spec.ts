@@ -1,17 +1,17 @@
-import { SiteProfiles } from '../../entities/siteProfiles.entity';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { DisclosureService } from '../../services/disclosure/disclosure.service';
 import { DisclosureResolver } from './disclosure.resolver';
 import { Test } from '@nestjs/testing';
-import { DisclosureResponse } from '../../dto/disclosure.dto';
+import { DisclosureResponse, SiteProfilesDTO } from '../../dto/disclosure.dto';
 import { LoggerService } from '../../logger/logger.service';
 import { UserTypeEum } from '../../common/userType';
 
 describe('DisclosureResolver', () => {
   let resolver: DisclosureResolver;
   let disclosureService: DisclosureService;
-  let genericResponseProvider: GenericResponseProvider<SiteProfiles[]>;
+  let genericResponseProvider: GenericResponseProvider<SiteProfilesDTO[]>;
   let loggerService: LoggerService;
+
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
@@ -39,7 +39,7 @@ describe('DisclosureResolver', () => {
                 message: string,
                 httpStatusCode: number,
                 success: boolean,
-                data?: SiteProfiles[],
+                data?: SiteProfilesDTO[],
               ) => ({
                 message,
                 httpStatusCode,
@@ -56,7 +56,7 @@ describe('DisclosureResolver', () => {
     disclosureService = module.get<DisclosureService>(DisclosureService);
     loggerService = module.get<LoggerService>(LoggerService);
     genericResponseProvider = module.get<
-      GenericResponseProvider<SiteProfiles[]>
+      GenericResponseProvider<SiteProfilesDTO[]>
     >(GenericResponseProvider);
   });
 
@@ -71,9 +71,7 @@ describe('DisclosureResolver', () => {
   describe('getSiteDisclosureBySiteId', () => {
     it('should return site disclosure when data is found', async () => {
       const siteId = '1';
-      const dateCompleted = new Date();
-
-      const mockSiteProfile = generateMockSiteProfile(siteId, dateCompleted);
+      const mockSiteProfile = generateMockSiteProfileDTO(siteId);
 
       const expectedResponse: DisclosureResponse = {
         message: 'Site Disclosure fetched successfully',
@@ -86,14 +84,9 @@ describe('DisclosureResolver', () => {
         .spyOn(disclosureService, 'getSiteDisclosureBySiteId')
         .mockResolvedValueOnce(mockSiteProfile);
 
-      const user = {
+      const result = await resolver.getSiteDisclosureBySiteId(siteId, false, {
         identity_provider: UserTypeEum.IDIR,
-      };
-      const result = await resolver.getSiteDisclosureBySiteId(
-        siteId,
-        false,
-        user,
-      );
+      });
 
       expect(result).toEqual(expectedResponse);
       expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
@@ -118,14 +111,9 @@ describe('DisclosureResolver', () => {
         .spyOn(disclosureService, 'getSiteDisclosureBySiteId')
         .mockResolvedValueOnce([]);
 
-      const user = {
+      const result = await resolver.getSiteDisclosureBySiteId(siteId, false, {
         identity_provider: UserTypeEum.IDIR,
-      };
-      const result = await resolver.getSiteDisclosureBySiteId(
-        siteId,
-        false,
-        user,
-      );
+      });
 
       expect(result).toEqual(expectedResponse);
       expect(genericResponseProvider.createResponse).toHaveBeenCalledWith(
@@ -138,19 +126,24 @@ describe('DisclosureResolver', () => {
   });
 });
 
-export function generateMockSiteProfile(siteId: string, dateCompleted: Date) {
-  const mockSiteProfile = new SiteProfiles();
-
-  mockSiteProfile.siteId = siteId;
-  mockSiteProfile.dateCompleted = dateCompleted;
-  mockSiteProfile.localAuthDateRecd = new Date(); // Example of setting a default value
-  mockSiteProfile.localAuthName = 'Local Auth Name';
-  mockSiteProfile.localAuthAgency = 'Local Auth Agency';
-  // Set other fields as needed
-
-  mockSiteProfile.whoCreated = 'Test User'; // Example of required field
-
-  // Populate other fields similarly
-
-  return [mockSiteProfile];
+function generateMockSiteProfileDTO(siteId: string): SiteProfilesDTO[] {
+  const dto = new SiteProfilesDTO();
+  dto.id = 'profile-uuid-1';
+  dto.siteId = siteId;
+  dto.dateCompleted = new Date();
+  dto.localAuthDateRecd = null;
+  dto.localAuthDateSubmitted = null;
+  dto.localAuthDateForwarded = null;
+  dto.rwmDateReceived = null;
+  dto.rwmDateDecision = null;
+  dto.siteRegDateRecd = null;
+  dto.siteRegDateEntered = null;
+  dto.rwmParticId = null;
+  dto.plannedActivityComment = null;
+  dto.siteDisclosureComment = null;
+  dto.govDocumentsComment = null;
+  dto.whenCreated = new Date();
+  dto.whenUpdated = null;
+  dto.siteProfileSchedule2Refs = [];
+  return [dto];
 }

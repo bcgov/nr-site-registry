@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import type { LatLngTuple, Map } from 'leaflet';
 
 const mockLeafletMap: Partial<Map> = {
@@ -154,6 +154,14 @@ jest.mock('./dataLayers/MapDataLayers', () => ({
 }));
 
 describe('MapView', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('renders and flies to text-search bounds onCompleted', async () => {
     const { default: MapView } = require('./MapView') as {
       default: React.ComponentType;
@@ -190,6 +198,11 @@ describe('MapView', () => {
     );
 
     render(<MapView />);
+
+    // Flush the setTimeout(0) in the useMapSearchQuery mock so onCompleted fires
+    await act(async () => {
+      jest.runAllTimers();
+    });
 
     await waitFor(() => {
       expect(flyToBoundsForTextSearch).toHaveBeenCalled();
@@ -241,6 +254,11 @@ describe('MapView', () => {
 
     render(<MapView />);
 
+    // Flush the setTimeout(0) in the useMapSearchQuery mock so onCompleted fires
+    await act(async () => {
+      jest.runAllTimers();
+    });
+
     await waitFor(() => {
       // onCompleted still runs and sets sites; this is about the useEffect guard branch.
       expect(flyToBoundsForTextSearch).toHaveBeenCalled();
@@ -273,6 +291,11 @@ describe('MapView', () => {
     });
 
     render(<MapView />);
+
+    // Flush the setTimeout(0) in the useMapSearchQuery mock so onCompleted fires
+    await act(async () => {
+      jest.runAllTimers();
+    });
 
     await waitFor(() => {
       expect(setQuery).toHaveBeenCalledWith({ site: undefined }, 'replace');

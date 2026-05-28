@@ -121,6 +121,8 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       resetDetails ||
       saveSiteDetailsRequestStatus === RequestStatus.success
     ) {
+      setFormData([]);
+      setSelectedRows([]);
       dispatch(
         fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending }),
       );

@@ -13,6 +13,7 @@ import { v4 } from 'uuid';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { formatDate } from '../../../helpers/utility';
 import PanelWithUpDown from '../../../components/simple/PanelWithUpDown';
+import { Alert } from 'react-bootstrap';
 
 interface IDisclosureComponent {
   viewMode: SiteDetailsMode;
@@ -201,22 +202,32 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                     handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
                     aria-label="Disclosure Widget"
                     >
-                    <div className="mt-3">  
-                        <div className='d-flex pb-2'>
-                            <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-lbl-text">Questions</div>
-                            <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-lbl-text">Categories</div>
-                        </div>
-                        {
-                            formData?.siteProfileQA?.map((qa: any, index: number) =>  (
-                                    <div className='d-flex' key={index}>
-                                        <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-input-text pb-2">{qa.question}</div>
-                                        <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-input-text">{qa.category}</div>
-                                    </div>
+                   {formData?.siteProfileQA?.length > 0 ? 
+                        <div className="mt-3">  
+                            <div className='d-flex pb-2'>
+                                <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-lbl-text">Questions</div>
+                                <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-lbl-text">Categories</div>
+                            </div>
+                            {
+                                formData?.siteProfileQA?.map((qa: any, index: number) =>  (
+                                        <div className='d-flex' key={index}>
+                                            <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-input-text pb-2">{qa.question}</div>
+                                            <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-input-text">{qa.category}</div>
+                                        </div>
+                                    )
+                                    
                                 )
-                                
-                            )
-                        }
-                    </div>
+                            }
+                        </div>
+                        :
+                        <Alert
+                            variant={'info'}
+                            className={'d-block'}
+                            data-testid="No_Questions_Categories_found"
+                        >
+                            There is no questions and categories found for this site disclosure.
+                        </Alert>
+                    }
                     </Widget>
                 }
                 </div>

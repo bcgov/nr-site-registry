@@ -479,7 +479,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
         <div
           className="row pe-2"
           id="disclosures-component"
-          data-testid="disclosures-component"
+          data-testid="disclosure-component"
         >
           {userType === UserType.Internal &&
             (viewMode === SiteDetailsMode.EditMode ||

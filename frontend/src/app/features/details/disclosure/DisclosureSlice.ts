@@ -16,9 +16,7 @@ const initialState: IDisclosureState = {
 // Define the asynchronous thunk to fetch site participants from the backend
 export const fetchSiteDisclosure = createAsyncThunk(
   'siteDisclosure/fetchSiteDisclosure',
-  async (
-    { siteId, showPending }: { siteId: string; showPending: boolean },
-  ) => {
+  async ({ siteId, showPending }: { siteId: string; showPending: boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
         query: print(graphQLSiteDisclosureBySiteId()),
@@ -31,7 +29,6 @@ export const fetchSiteDisclosure = createAsyncThunk(
       // Once get actual source of data for disclosure schedule, delete this line of code because it is just for sake of completing the functionality and demo purpose
       // const res = {...response.data.data.getSiteDisclosureBySiteId.data[0], disclosureSchedule:[]};
       return response.data.data.getSiteDisclosureBySiteId.data;
- 
     } catch (error) {
       throw error;
     }
@@ -65,8 +62,6 @@ const siteDisclosureSlice = createSlice({
 });
 
 export const siteDisclosure = (state: any) => state.siteDisclosure;
-export const { 
-  updateSiteDisclosure, 
-} = siteDisclosureSlice.actions;
+export const { updateSiteDisclosure } = siteDisclosureSlice.actions;
 
 export default siteDisclosureSlice.reducer;

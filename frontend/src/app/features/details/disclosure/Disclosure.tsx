@@ -59,7 +59,8 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     disclosureCommentsConfig,
     srVisibilityConfig,
   } = siteDisclosureConfig(schedule2Ref?.data || [], viewMode);
-  const { siteDisclosure: disclosureData, status } = useSelector(siteDisclosure);
+  const { siteDisclosure: disclosureData, status } =
+    useSelector(siteDisclosure);
   const dispatch = useDispatch<AppDispatch>();
   const mode = useSelector(siteDetailsMode);
   const resetDetails = useSelector(resetSiteDetails);
@@ -68,7 +69,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const loggedInUser = getUser();
   const { id: siteId } = useParams();
   const [formData, setFormData] = useState<
-  { [key: string]: any | [Date, Date] }[]
+    { [key: string]: any | [Date, Date] }[]
   >(disclosureData || []);
   const [selectedRows, setSelectedRows] = useState<
     { disclosureId: any; scheduleId: any }[]
@@ -113,7 +114,6 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       setFormData(updatedFormData);
     }
-
   }, [disclosureData, status, schedule2Ref]);
 
   useEffect(() => {
@@ -127,7 +127,13 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
         fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending }),
       );
     }
-  }, [resetDetails, saveSiteDetailsRequestStatus, dispatch, siteId, showPending]);
+  }, [
+    resetDetails,
+    saveSiteDetailsRequestStatus,
+    dispatch,
+    siteId,
+    showPending,
+  ]);
 
   const handleInputChange = (
     id: number,
@@ -138,17 +144,23 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     updatedDisclosure = (disclosures: any) => {
       return disclosures.map((disclosure: any) => {
         if (disclosure.id === id) {
-            const isChecked = viewMode === SiteDetailsMode.SRMode && graphQLPropertyName === 'srCheckbox';
-            return {
-              ...disclosure,
-              [graphQLPropertyName]: value,
-              apiAction: disclosure?.apiAction ?? UserActionEnum.updated,
-              srAction: isChecked ? value === 'checked' ? SRApprovalStatusEnum.Public : SRApprovalStatusEnum.Private : SRApprovalStatusEnum.Pending
-            }
-          }
-          return disclosure;
-        })
-      }
+          const isChecked =
+            viewMode === SiteDetailsMode.SRMode &&
+            graphQLPropertyName === 'srCheckbox';
+          return {
+            ...disclosure,
+            [graphQLPropertyName]: value,
+            apiAction: disclosure?.apiAction ?? UserActionEnum.updated,
+            srAction: isChecked
+              ? value === 'checked'
+                ? SRApprovalStatusEnum.Public
+                : SRApprovalStatusEnum.Private
+              : SRApprovalStatusEnum.Pending,
+          };
+        }
+        return disclosure;
+      });
+    };
 
     const updatedFormData = updatedDisclosure(formData);
     const updatedTrackDisclosure = updatedDisclosure(
@@ -156,7 +168,11 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     );
 
     setFormData(updatedFormData);
-    dispatch(updateSiteDisclosure(updatedFormData?.map((item: any) => serializeDate(item))));
+    dispatch(
+      updateSiteDisclosure(
+        updatedFormData?.map((item: any) => serializeDate(item)),
+      ),
+    );
     dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
 
     if (
@@ -225,29 +241,28 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       const updateReferences = (disclosures: any) => {
         return disclosures.map((disclosure: any) => {
           if (disclosure.id === disclosureId) {
-
-          const updatedDisclosureSchedule =
-            disclosure?.siteProfileSchedule2Refs?.map((schedule: any) => {
-              if (schedule.id === event.row.id) {
-                const isSRApproved =
-                  viewMode === SiteDetailsMode.SRMode &&
-                  event.property === 'srValue';
-                return {
-                  ...schedule,
-                  [event.property]: event.value,
-                  description: schedule2Ref?.data?.find(
-                    (ref: any) => ref.key === event.value,
-                  )?.metaData,
-                  apiAction: schedule?.apiAction ?? UserActionEnum.updated,
-                  srAction: isSRApproved
-                    ? event.value
-                      ? SRApprovalStatusEnum.Public
-                      : SRApprovalStatusEnum.Private
-                    : SRApprovalStatusEnum.Pending,
-                };
-              }
-              return schedule;
-            });
+            const updatedDisclosureSchedule =
+              disclosure?.siteProfileSchedule2Refs?.map((schedule: any) => {
+                if (schedule.id === event.row.id) {
+                  const isSRApproved =
+                    viewMode === SiteDetailsMode.SRMode &&
+                    event.property === 'srValue';
+                  return {
+                    ...schedule,
+                    [event.property]: event.value,
+                    description: schedule2Ref?.data?.find(
+                      (ref: any) => ref.key === event.value,
+                    )?.metaData,
+                    apiAction: schedule?.apiAction ?? UserActionEnum.updated,
+                    srAction: isSRApproved
+                      ? event.value
+                        ? SRApprovalStatusEnum.Public
+                        : SRApprovalStatusEnum.Private
+                      : SRApprovalStatusEnum.Pending,
+                  };
+                }
+                return schedule;
+              });
 
             // Return the updated disclosure object with the modified disclosureSchedule array
             return {
@@ -358,7 +373,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     if (referenceIsDeleted) {
       const updateReferences = (disclosures: any) => {
         return disclosures.map((disclosure: any) => {
-          if(disclosure.id === currDisclosure.id) {
+          if (disclosure.id === currDisclosure.id) {
             const updatedDisclosureSchedule =
               disclosure?.siteProfileSchedule2Refs?.map((schedule: any) => {
                 if (
@@ -399,18 +414,20 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       // Filter out participants based on selectedRows for formData
       const filteredDisclosure = updatedFormData?.map((disclosure: any) => {
-          return {
-            ...disclosure,
-            siteProfileSchedule2Refs: disclosure?.siteProfileSchedule2Refs?.filter((schedule: any) =>
-              !selectedRows.some(
-                (row: any) =>
-                  row.disclosureId === disclosure.id &&
-                  row.scheduleId === schedule?.id,
-              ),
+        return {
+          ...disclosure,
+          siteProfileSchedule2Refs:
+            disclosure?.siteProfileSchedule2Refs?.filter(
+              (schedule: any) =>
+                !selectedRows.some(
+                  (row: any) =>
+                    row.disclosureId === disclosure.id &&
+                    row.scheduleId === schedule?.id,
+                ),
             ),
-          };        
+        };
       });
-  
+
       setFormData(filteredDisclosure);
       dispatch(updateSiteDisclosure(filteredDisclosure));
 
@@ -477,7 +494,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   return (
     <div>
-        {!showPending && (
+      {!showPending && (
         <div
           className="row pe-2"
           id="disclosures-component"
@@ -498,36 +515,38 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
             )}
         </div>
       )}
-      {
-        formData && 
-          formData?.map((disclosure: any) => (
-            <div key={`active-${disclosure.id}`}>
-              <DisclosureComponent
-                viewMode={viewMode}
-                userType={userType}
-                handleWidgetCheckBox={handleWidgetCheckBox}
-                formData={disclosure}
-                disclosureStatementConfig={
-                  viewMode === SiteDetailsMode.EditMode
-                    ? disclosureStatementConfigEditMode
-                    : disclosureStatementConfig
-                }
-                handleInputChange={handleInputChange}
-                handleTableChange={handleTableChange}
-                disclosureScheduleInternalConfig={disclosureScheduleInternalConfig}
-                disclosureScheduleExternalConfig={disclosureScheduleExternalConfig}
-                loading={RequestStatus.loading}
-                handleTableSort={handleTableSort}
-                handleAddDisclosureSchedule={handleAddDisclosureSchedule}
-                isAnyDisclosureScheduleSelected={isAnyDisclosureScheduleSelected}
-                handleRemoveDisclosureSchedule={handleRemoveDisclosureSchedule}
-                srVisibilityConfig={srVisibilityConfig}
-                handleItemClick={handleItemClick}
-                disclosureCommentsConfig={disclosureCommentsConfig}
-              />
-            </div>
-          ))
-      }
+      {formData &&
+        formData?.map((disclosure: any) => (
+          <div key={`active-${disclosure.id}`}>
+            <DisclosureComponent
+              viewMode={viewMode}
+              userType={userType}
+              handleWidgetCheckBox={handleWidgetCheckBox}
+              formData={disclosure}
+              disclosureStatementConfig={
+                viewMode === SiteDetailsMode.EditMode
+                  ? disclosureStatementConfigEditMode
+                  : disclosureStatementConfig
+              }
+              handleInputChange={handleInputChange}
+              handleTableChange={handleTableChange}
+              disclosureScheduleInternalConfig={
+                disclosureScheduleInternalConfig
+              }
+              disclosureScheduleExternalConfig={
+                disclosureScheduleExternalConfig
+              }
+              loading={RequestStatus.loading}
+              handleTableSort={handleTableSort}
+              handleAddDisclosureSchedule={handleAddDisclosureSchedule}
+              isAnyDisclosureScheduleSelected={isAnyDisclosureScheduleSelected}
+              handleRemoveDisclosureSchedule={handleRemoveDisclosureSchedule}
+              srVisibilityConfig={srVisibilityConfig}
+              handleItemClick={handleItemClick}
+              disclosureCommentsConfig={disclosureCommentsConfig}
+            />
+          </div>
+        ))}
       {isDelete && (
         <ModalDialog
           key={v4()}

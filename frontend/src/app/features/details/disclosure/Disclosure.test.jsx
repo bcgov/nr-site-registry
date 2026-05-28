@@ -143,7 +143,9 @@ describe('Disclosure Component', () => {
 
   // Expand all collapsed PanelWithUpDown sections
   const expandAllSections = () => {
-    const expandButtons = screen.queryAllByRole('button', { name: /expand section/i });
+    const expandButtons = screen.queryAllByRole('button', {
+      name: /expand section/i,
+    });
     expandButtons.forEach((btn) => fireEvent.click(btn));
   };
 
@@ -174,7 +176,9 @@ describe('Disclosure Component', () => {
     renderDisclosure();
     // Use getAllByTestId since both Disclosure.tsx and DisclosureComponent.tsx
     // share the same data-testid="disclosure-component"
-    expect(screen.getAllByTestId('disclosure-component')[0]).toBeInTheDocument();
+    expect(
+      screen.getAllByTestId('disclosure-component')[0],
+    ).toBeInTheDocument();
   });
 
   it('renders with showPending=true without crashing', () => {
@@ -186,7 +190,9 @@ describe('Disclosure Component', () => {
   it('renders the Site Disclosure Statement widget title after expanding', () => {
     renderAndExpand();
     // "Site Disclosure Statement" appears as the short label in PanelWithUpDown firstChild
-    expect(screen.getAllByText('Site Disclosure Statement')[0]).toBeInTheDocument();
+    expect(
+      screen.getAllByText('Site Disclosure Statement')[0],
+    ).toBeInTheDocument();
   });
 
   it('renders the Schedule III widget title after expanding', () => {
@@ -211,14 +217,18 @@ describe('Disclosure Component', () => {
     // Source renders formData.map(...) — null/empty means no DisclosureComponent children.
     // There is no "No Results Found" text in the source.
     renderDisclosure({ disclosureData: null });
-    expect(screen.getAllByTestId('disclosure-component')[0]).toBeInTheDocument();
+    expect(
+      screen.getAllByTestId('disclosure-component')[0],
+    ).toBeInTheDocument();
     // No inner DisclosureComponent should have rendered
     expect(screen.queryAllByText('Site Disclosure Statement').length).toBe(0);
   });
 
   it('renders without crashing when disclosureData is null', () => {
     renderDisclosure({ disclosureData: null });
-    expect(screen.getAllByTestId('disclosure-component')[0]).toBeInTheDocument();
+    expect(
+      screen.getAllByTestId('disclosure-component')[0],
+    ).toBeInTheDocument();
   });
 
   // ── Disclosure data present ────────────────────────────────────────────────
@@ -268,7 +278,9 @@ describe('Disclosure Component', () => {
       siteDetailsMode: SiteDetailsMode.SRMode,
       userType: UserType.Internal,
     });
-    expect(screen.getAllByTestId('disclosure-component')[0]).toBeInTheDocument();
+    expect(
+      screen.getAllByTestId('disclosure-component')[0],
+    ).toBeInTheDocument();
   });
 
   it('does not render Add/Remove buttons in SRMode after expanding', () => {
@@ -285,19 +297,25 @@ describe('Disclosure Component', () => {
 
   it('renders in ViewOnlyMode without crashing', () => {
     renderDisclosure({ siteDetailsMode: SiteDetailsMode.ViewOnlyMode });
-    expect(screen.getAllByTestId('disclosure-component')[0]).toBeInTheDocument();
+    expect(
+      screen.getAllByTestId('disclosure-component')[0],
+    ).toBeInTheDocument();
   });
 
   // ── Request statuses ───────────────────────────────────────────────────────
 
   it('renders without crashing when status is loading', () => {
     renderDisclosure({ disclosureStatus: RequestStatus.loading });
-    expect(screen.getAllByTestId('disclosure-component')[0]).toBeInTheDocument();
+    expect(
+      screen.getAllByTestId('disclosure-component')[0],
+    ).toBeInTheDocument();
   });
 
   it('renders without crashing when status is failed', () => {
     renderDisclosure({ disclosureStatus: RequestStatus.failed });
-    expect(screen.getAllByTestId('disclosure-component')[0]).toBeInTheDocument();
+    expect(
+      screen.getAllByTestId('disclosure-component')[0],
+    ).toBeInTheDocument();
   });
 
   // ── Schedule refs ──────────────────────────────────────────────────────────
@@ -341,10 +359,15 @@ describe('Disclosure Component', () => {
 
   it('renders correctly when srAction is SRApprovalStatusEnum.Public', () => {
     renderDisclosure({
-      disclosureData: { ...mockDisclosure, srAction: SRApprovalStatusEnum.Public },
+      disclosureData: {
+        ...mockDisclosure,
+        srAction: SRApprovalStatusEnum.Public,
+      },
       disclosureStatus: RequestStatus.success,
     });
-    expect(screen.getAllByTestId('disclosure-component')[0]).toBeInTheDocument();
+    expect(
+      screen.getAllByTestId('disclosure-component')[0],
+    ).toBeInTheDocument();
   });
 
   it('renders correctly when srAction is "true"', () => {
@@ -352,7 +375,9 @@ describe('Disclosure Component', () => {
       disclosureData: { ...mockDisclosure, srAction: 'true' },
       disclosureStatus: RequestStatus.success,
     });
-    expect(screen.getAllByTestId('disclosure-component')[0]).toBeInTheDocument();
+    expect(
+      screen.getAllByTestId('disclosure-component')[0],
+    ).toBeInTheDocument();
   });
 
   // ── Timestamp fallbacks ────────────────────────────────────────────────────

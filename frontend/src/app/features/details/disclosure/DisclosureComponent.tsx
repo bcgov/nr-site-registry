@@ -65,220 +65,242 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
   approveRejectHandler = approveRejectHandler ?? (() => {});
   return (
     <PanelWithUpDown
-        firstChild = {
-            <div className="w-100">
-                <div className="custom-disclosure-widget-lbl w-100">Site Disclosure Statement</div>
-                <div className="custom-disclosure-boarder w-100 pt-3">
-                 {userType === UserType.Internal && (
-                    <p className="sr-time-stamp">
-                    {`Sent to SR on ${formatDate(formData?.whenUpdated ?? formData?.whenCreated ?? new Date())}`}
-                    </p>
+      firstChild={
+        <div className="w-100">
+          <div className="custom-disclosure-widget-lbl w-100">
+            Site Disclosure Statement
+          </div>
+          <div className="custom-disclosure-boarder w-100 pt-3">
+            {userType === UserType.Internal && (
+              <p className="sr-time-stamp">
+                {`Sent to SR on ${formatDate(formData?.whenUpdated ?? formData?.whenCreated ?? new Date())}`}
+              </p>
+            )}
+          </div>
+        </div>
+      }
+      secondChild={
+        <div
+          className="row"
+          id="disclosure-component"
+          data-testid="disclosure-component"
+        >
+          <div
+            className={`mb-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-5' : 'px-3'}`}
+          >
+            <Widget
+              title={'Site Disclosure Statement'}
+              hideTable={true}
+              hideTitle={false}
+              editMode={
+                viewMode === SiteDetailsMode.EditMode &&
+                userType === UserType.Internal
+              }
+              srMode={
+                viewMode === SiteDetailsMode.SRMode &&
+                userType === UserType.Internal
+              }
+              widgetIschecked={
+                formData?.srAction === 'true' ||
+                formData?.srAction === SRApprovalStatusEnum.Public
+              }
+              handleCheckBoxChange={(event) => {
+                handleInputChange(
+                  formData?.id,
+                  'srCheckbox',
+                  event === true ? 'checked' : 'unchecked',
+                );
+              }}
+              customLabelCss="custom-disclosure-widget-lbl"
+              aria-label="Disclosure Widget"
+            >
+              <div className={`mt-3`} key={v4()}>
+                {formData && (
+                  <Form
+                    formRows={disclosureStatementConfig}
+                    formData={formData}
+                    editMode={viewMode === SiteDetailsMode.EditMode}
+                    srMode={viewMode === SiteDetailsMode.SRMode}
+                    handleInputChange={(graphQLPropertyName, value) =>
+                      handleInputChange(formData.id, graphQLPropertyName, value)
+                    }
+                    aria-label="Site Disclosure Statement"
+                  />
                 )}
-                </div>
-            </div>
-        }
-        secondChild={
+              </div>
+            </Widget>
+          </div>
+          {/*  Not working yet as the actual source of table data is unknown.*/}
+          <div className={`mb-3 px-3}`}>
             <div
-            className="row"
-            id="disclosure-component"
-            data-testid="disclosure-component"
+              className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : 'p-0'}`}
             >
-            <div
-                className={`mb-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-5' : 'px-3'}`}
-            >
+              {formData && (
                 <Widget
-                title={'Site Disclosure Statement'}
-                hideTable={true}
-                hideTitle={false}
-                editMode={
+                  currentPage={1}
+                  changeHandler={(event) =>
+                    handleTableChange(formData.id, event)
+                  }
+                  handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
+                  title={
+                    'III Commercial and Industrial Purposes or Activities on Site'
+                  }
+                  tableColumns={
+                    userType === UserType.Internal
+                      ? disclosureScheduleInternalConfig
+                      : disclosureScheduleExternalConfig
+                  }
+                  tableData={formData?.siteProfileSchedule2Refs ?? []}
+                  tableIsLoading={
+                    formData?.siteProfileSchedule2Refs &&
+                    formData?.siteProfileSchedule2Refs?.length > 0
+                      ? loading
+                      : RequestStatus.idle
+                  }
+                  allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
+                  aria-label="Site Disclosure Schedule"
+                  hideTable={false}
+                  hideTitle={false}
+                  editMode={
                     viewMode === SiteDetailsMode.EditMode &&
                     userType === UserType.Internal
-                }
-                srMode={
-                    viewMode === SiteDetailsMode.SRMode &&
-                    userType === UserType.Internal
-                }
-                widgetIschecked={
-                    formData?.srAction === 'true' ||
-                    formData?.srAction === SRApprovalStatusEnum.Public
-                }
-                handleCheckBoxChange={(event) => {
-                    handleInputChange(
-                    formData?.id,
-                    'srCheckbox',
-                    event === true ? 'checked' : 'unchecked',
-                    );
-                }}
-                customLabelCss="custom-disclosure-widget-lbl"
-                aria-label="Disclosure Widget"
+                  }
+                  hideWidgetCheckbox={true}
+                  srMode={viewMode === SiteDetailsMode.SRMode}
+                  primaryKeycolumnName="id"
+                  sortHandler={(row, ascDir) => {
+                    handleTableSort(row, ascDir, formData.id);
+                  }}
                 >
-                <div className={`mt-3`} key={v4()}>
+                  {viewMode === SiteDetailsMode.EditMode &&
+                    userType === UserType.Internal && (
+                      <div className="d-flex gap-2" key={formData.id}>
+                        <Button
+                          variant="secondary"
+                          onClick={() =>
+                            handleAddDisclosureSchedule(formData.id)
+                          }
+                        >
+                          <Plus />
+                          Add
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          onClick={() =>
+                            handleRemoveDisclosureSchedule(formData)
+                          }
+                          disabled={
+                            !isAnyDisclosureScheduleSelected(formData.id)
+                          }
+                        >
+                          <Minus />
+                          Remove
+                        </Button>
+                      </div>
+                    )}
+                </Widget>
+              )}
+            </div>
+          </div>
+          <div className={`mb-3 px-3}`}>
+            <div
+              className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : 'p-0'}`}
+            >
+              {
+                <Widget
+                  title={'SITE DISCLOSURE QUESTIONS ANSWERED WITH (YES)'}
+                  hideTable={true}
+                  hideTitle={false}
+                  handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
+                  aria-label="Disclosure Widget"
+                >
+                  {formData?.siteProfileQA?.length > 0 ? (
+                    <div className="mt-3">
+                      <div className="d-flex pb-2">
+                        <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-lbl-text">
+                          Questions
+                        </div>
+                        <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-lbl-text">
+                          Categories
+                        </div>
+                      </div>
+                      {formData?.siteProfileQA?.map(
+                        (qa: any, index: number) => (
+                          <div className="d-flex" key={index}>
+                            <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-input-text pb-2">
+                              {qa.question}
+                            </div>
+                            <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-input-text">
+                              {qa.category}
+                            </div>
+                          </div>
+                        ),
+                      )}
+                    </div>
+                  ) : (
+                    <Alert
+                      variant={'info'}
+                      className={'d-block'}
+                      data-testid="No_Questions_Categories_found"
+                    >
+                      There is no questions and categories found for this site
+                      disclosure.
+                    </Alert>
+                  )}
+                </Widget>
+              }
+            </div>
+          </div>
+          <div className={`mb-3 px-3}`}>
+            <div
+              className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : 'p-0'}`}
+            >
+              {formData && (
+                <Widget
+                  title={'IV Additional Comments and Explanations'}
+                  hideTable={true}
+                  hideTitle={false}
+                  editMode={
+                    viewMode === SiteDetailsMode.EditMode &&
+                    userType === UserType.Internal
+                  }
+                  srMode={false}
+                  handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
+                  aria-label="Disclosure Widget"
+                >
+                  <div className="mt-3">
                     {formData && (
-                    <Form
-                        formRows={disclosureStatementConfig}
+                      <Form
+                        formRows={disclosureCommentsConfig}
                         formData={formData}
                         editMode={viewMode === SiteDetailsMode.EditMode}
                         srMode={viewMode === SiteDetailsMode.SRMode}
                         handleInputChange={(graphQLPropertyName, value) =>
-                        handleInputChange(formData.id, graphQLPropertyName, value)
+                          handleInputChange(
+                            formData.id,
+                            graphQLPropertyName,
+                            value,
+                          )
                         }
                         aria-label="Site Disclosure Statement"
-                    />
+                      />
                     )}
-                </div>
+                  </div>
                 </Widget>
+              )}
             </div>
-            {/*  Not working yet as the actual source of table data is unknown.*/}
-            <div className={`mb-3 px-3}`}>
-                <div
-                className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : 'p-0'}`}
-                >
-                {formData && (
-                    <Widget
-                    currentPage={1}
-                    changeHandler={(event) => handleTableChange(formData.id, event)}
-                    handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
-                    title={
-                        'III Commercial and Industrial Purposes or Activities on Site'
-                    }
-                    tableColumns={
-                        userType === UserType.Internal
-                        ? disclosureScheduleInternalConfig
-                        : disclosureScheduleExternalConfig
-                    }
-                    tableData={formData?.siteProfileSchedule2Refs ?? []}
-                    tableIsLoading={
-                        formData?.siteProfileSchedule2Refs &&
-                        formData?.siteProfileSchedule2Refs?.length > 0
-                        ? loading
-                        : RequestStatus.idle
-                    }
-                    allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
-                    aria-label="Site Disclosure Schedule"
-                    hideTable={false}
-                    hideTitle={false}
-                    editMode={
-                        viewMode === SiteDetailsMode.EditMode &&
-                        userType === UserType.Internal
-                    }
-                    hideWidgetCheckbox={true}
-                    srMode={viewMode === SiteDetailsMode.SRMode}
-                    primaryKeycolumnName="id"
-                    sortHandler={(row, ascDir) => {
-                        handleTableSort(row, ascDir, formData.id);
-                    }}
-                    >
-                    {viewMode === SiteDetailsMode.EditMode &&
-                        userType === UserType.Internal && (
-                        <div className="d-flex gap-2" key={formData.id}>
-                            <Button
-                            variant="secondary"
-                            onClick={() => handleAddDisclosureSchedule(formData.id)}
-                            >
-                            <Plus />
-                            Add
-                            </Button>
-                            <Button
-                            variant="secondary"
-                            onClick={() => handleRemoveDisclosureSchedule(formData)}
-                            disabled={!isAnyDisclosureScheduleSelected(formData.id)}
-                            >
-                            <Minus />
-                            Remove
-                            </Button>
-                        </div>
-                        )}
-                    </Widget>
-                )}
-                </div>
-            </div>
-            <div className={`mb-3 px-3}`}>
-                <div className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : 'p-0'}`}>
-                { 
-                    <Widget
-                    title={'SITE DISCLOSURE QUESTIONS ANSWERED WITH (YES)'}
-                    hideTable={true}
-                    hideTitle={false}
-                    handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
-                    aria-label="Disclosure Widget"
-                    >
-                   {formData?.siteProfileQA?.length > 0 ? 
-                        <div className="mt-3">  
-                            <div className='d-flex pb-2'>
-                                <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-lbl-text">Questions</div>
-                                <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-lbl-text">Categories</div>
-                            </div>
-                            {
-                                formData?.siteProfileQA?.map((qa: any, index: number) =>  (
-                                        <div className='d-flex' key={index}>
-                                            <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-input-text pb-2">{qa.question}</div>
-                                            <div className="col-lg-6 col-md-6 col-sm-6 custom-disclosure-input-text">{qa.category}</div>
-                                        </div>
-                                    )
-                                    
-                                )
-                            }
-                        </div>
-                        :
-                        <Alert
-                            variant={'info'}
-                            className={'d-block'}
-                            data-testid="No_Questions_Categories_found"
-                        >
-                            There is no questions and categories found for this site disclosure.
-                        </Alert>
-                    }
-                    </Widget>
-                }
-                </div>
-            </div>
-            <div className={`mb-3 px-3}`}>
-                <div
-                className={`mt-3 ${viewMode === SiteDetailsMode.SRMode ? 'px-4' : 'p-0'}`}
-                >
-                {formData && (
-                    <Widget
-                    title={'IV Additional Comments and Explanations'}
-                    hideTable={true}
-                    hideTitle={false}
-                    editMode={
-                        viewMode === SiteDetailsMode.EditMode &&
-                        userType === UserType.Internal
-                    }
-                    srMode={false}
-                    handleCheckBoxChange={(event) => handleWidgetCheckBox(event)}
-                    aria-label="Disclosure Widget"
-                    >
-                    <div className="mt-3">
-                        {formData && (
-                        <Form
-                            formRows={disclosureCommentsConfig}
-                            formData={formData}
-                            editMode={viewMode === SiteDetailsMode.EditMode}
-                            srMode={viewMode === SiteDetailsMode.SRMode}
-                            handleInputChange={(graphQLPropertyName, value) =>
-                            handleInputChange(formData.id, graphQLPropertyName, value)
-                            }
-                            aria-label="Site Disclosure Statement"
-                        />
-                        )}
-                    </div>
-                    </Widget>
-                )}
-                </div>
-            </div>
-            {userType === UserType.Internal && (
-                <p className="sr-time-stamp">
-                {`Sent to SR on ${formatDate(formData?.whenUpdated ?? formData?.whenCreated ?? new Date())}`}
-                </p>
-            )}
-            {showApproveRejectSection && (
-                <ApproveRejectButtons approveRejectHandler={approveRejectHandler} />
-            )}
-            </div>
-        }
+          </div>
+          {userType === UserType.Internal && (
+            <p className="sr-time-stamp">
+              {`Sent to SR on ${formatDate(formData?.whenUpdated ?? formData?.whenCreated ?? new Date())}`}
+            </p>
+          )}
+          {showApproveRejectSection && (
+            <ApproveRejectButtons approveRejectHandler={approveRejectHandler} />
+          )}
+        </div>
+      }
     />
-
   );
 };
 

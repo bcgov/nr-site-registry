@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
@@ -9,12 +9,15 @@ import { plainToInstance } from 'class-transformer';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { UserTypeEum } from '../../common/userType';
 import { SiteProfilesDTO } from '../../dto/disclosure.dto';
+import { ProfileQuestions } from '../../entities/profileQuestions.entity';
 
 @Injectable()
 export class DisclosureService {
   constructor(
     @InjectRepository(SiteProfiles)
     private readonly disclosureRepository: Repository<SiteProfiles>,
+    @InjectRepository(ProfileQuestions)
+    private readonly profileQuestionsRepository: Repository<ProfileQuestions>,
     private readonly sitesLogger: LoggerService,
     private snapshotService: SnapshotsService,
   ) {}
@@ -75,9 +78,22 @@ export class DisclosureService {
       if (!result?.length) {
         return [];
       } else {
-        const res = result?.map((res) => {
+        const res = result?.map(async (res) => {
+          const siteProfileQA =  await this.profileQuestionsRepository
+                                .createQueryBuilder('pq')
+                                .distinct(true)
+                                .innerJoin('pq.profileAnswers', 'pa')
+                                .innerJoin('pq.category', 'pc')
+                                .where('pa.siteId = :siteId AND pa.sprofDateCompleted= :sprofDateCompleted', { siteId, sprofDateCompleted: res.dateCompleted })
+                                .select([
+                                  'pq.description AS question',
+                                  'pc.description AS category',
+                                ])
+                                .getRawMany();
+                                
           return {
             ...res,
+            siteProfileQA: siteProfileQA,
             srAction: res.srAction === SRApprovalStatusEnum.PUBLIC,
             siteProfileSchedule2Refs: res?.siteProfileLandUses?.map((ref) => {
               return {

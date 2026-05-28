@@ -395,6 +395,8 @@ describe('SnapshotService', () => {
       completorParticId: '5001',
       contactParticId: '6001',
       siteProfileLandUses: [],
+      profileSubmissions:[],
+      profileAnswers:[],
     },
   ];
 

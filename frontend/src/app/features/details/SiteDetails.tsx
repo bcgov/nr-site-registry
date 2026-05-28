@@ -734,7 +734,7 @@ const SiteDetails = () => {
         ...siteParticErrors,
         ...siteDocErrors,
         ...siteAssocErrors,
-        ...siteDisclosureErrors,
+        ...(siteDisclosureErrors || []), // Type assertion if siteDisclosureErrors can be undefined
         ...siteSummaryErrors,
         ...siteLandUsesErrors,
       ];
@@ -901,20 +901,19 @@ const SiteDetails = () => {
     }
   };
 
-  const validateSiteDisclosureForm = async () => {
+ const validateSiteDisclosureForm = async () => {
     try {
-      let updatedSiteDisclosure = deepFilterByUserAction(siteDisclosure, [
-        ...userActions,
-        UserActionEnum.deleted,
-      ]);
-      if (
-        updatedSiteDisclosure &&
-        typeof updatedSiteDisclosure === 'object' &&
-        Object.keys(updatedSiteDisclosure).length > 0
-      ) {
-        const siteDisclosureErrors: any[] = [];
+      if (siteDisclosure.length > 0) {
+        let updatedSiteDisclosure = deepFilterByUserAction(siteDisclosure, [
+          ...userActions,
+          UserActionEnum.deleted,
+        ]);
 
-        // Validate against the disclosure slice (source of truth) — always has full field values
+        if (!updatedSiteDisclosure || Object.keys(updatedSiteDisclosure).length === 0) {
+          return [];
+        }
+
+        const siteDisclosureErrors: any[] = [];
         const errors = validateForm(
           [...disclosureStatementConfigEditMode, ...disclosureCommentsConfig],
           updatedSiteDisclosure,
@@ -923,43 +922,61 @@ const SiteDetails = () => {
         if (errors?.length > 0) {
           siteDisclosureErrors.push(...errors);
         }
-        const { siteRegDateRecd, dateCompleted } =
-          (Array.isArray(updatedSiteDisclosure) &&
-            updatedSiteDisclosure.length > 0 &&
-            updatedSiteDisclosure[0]) ||
-          {};
-        if (!!siteRegDateRecd && !!dateCompleted) {
-          if (new Date(dateCompleted) < new Date(siteRegDateRecd)) {
-            siteDisclosureErrors.push({
-              label: 'Site Disclosure',
-              errorMessage: `Site Disclosure Date Completed is always equal or greater than Date Received.`,
+
+        (updatedSiteDisclosure ?? []).forEach((disclosure: any, index: number) => {
+          const { dateCompleted, siteRegDateRecd, id } = disclosure ?? {};
+
+          // ── Existing: date range validation ──────────────────────────────
+          if (dateCompleted && siteRegDateRecd) {
+            if (new Date(dateCompleted) < new Date(siteRegDateRecd)) {
+              siteDisclosureErrors.push({
+                label: 'Site Disclosure',
+                errorMessage: `Site Disclosure [${index + 1}] Date Completed must be equal to or greater than Date Received.`,
+              });
+            }
+          }
+
+          // ── New: duplicate dateCompleted check against full original list ─
+          if (dateCompleted) {
+            const normalizedUpdatedDate = new Date(dateCompleted).toISOString().split('T')[0];
+
+            // Find where this item sits in the original list
+            const selfOriginalIndex = siteDisclosure.findIndex((d: any) => d?.id === id);
+
+            siteDisclosure.forEach((originalDisclosure: any, originalIndex: number) => {
+              // Skip itself and entries before it to avoid reporting A↔B and B↔A
+              if (originalIndex <= selfOriginalIndex) return;
+
+              const originalDateCompleted = originalDisclosure?.dateCompleted;
+              if (!originalDateCompleted) return;
+
+              const normalizedOriginalDate = new Date(originalDateCompleted).toISOString().split('T')[0];
+
+              if (normalizedUpdatedDate === normalizedOriginalDate) {
+                siteDisclosureErrors.push({
+                  label: 'Site Disclosure',
+                  errorMessage: `Site Disclosure [${selfOriginalIndex + 1}] has the same Date Completed as Site Disclosure [${originalIndex + 1}].`,
+                });
+              }
             });
           }
-        }
+        });
 
         if (siteDisclosureErrors?.length > 0) {
           return siteDisclosureErrors;
         } else {
-          updatedSiteDisclosure = removeProperty(
-            updatedSiteDisclosure,
-            'position',
-          );
-          updatedSiteDisclosure = removeProperty(
-            updatedSiteDisclosure,
-            'description',
-          );
+          updatedSiteDisclosure = removeProperty(updatedSiteDisclosure, 'position');
+          updatedSiteDisclosure = removeProperty(updatedSiteDisclosure, 'description');
+          updatedSiteDisclosure = removeProperty(updatedSiteDisclosure, 'siteProfileQA');
           dispatch(setupSiteDisclosureDataForSaving(updatedSiteDisclosure));
           return [];
         }
-      } else {
-        return [];
       }
     } catch (error) {
       console.error(error);
       return [];
     }
   };
-
   const validateNotationsForm = async () => {
     try {
       // Run both validations in parallel and wait for them to finish

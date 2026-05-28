@@ -22,8 +22,8 @@ const PanelWithUpDown: FC<PanelWithUpDownProps> = ({
       aria-label={typeof label === 'string' ? label || 'Section' : undefined}
     >
       {label && (
-        <div className="d-flex justify-content-between">
-          <div className="section-content-label">{label}</div>
+        <div className="d-flex align-items-start justify-content-between m-0 p-0">
+          <div className="section-content-label w-100">{label}</div>
           <button
             className="border-0 bg-transparent"
             onClick={() => setShowDetails(!showDetails)}
@@ -35,9 +35,9 @@ const PanelWithUpDown: FC<PanelWithUpDownProps> = ({
         </div>
       )}
       {!label && !showDetails && (
-        <div className="d-flex gap-2">
+        <div className="d-flex gap-2 position-relative">
           {firstChild}
-          <div className="m-0">
+          <div className="m-0 position-absolute end-0">
             <button
               className="border-0 bg-transparent"
               onClick={() => setShowDetails(!showDetails)}

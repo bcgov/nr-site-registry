@@ -103,3 +103,8 @@
 .custom-disclosure-search-placeholder:hover {
   color: var(--typography-color-disabled) !important;
 }
+
+.custom-disclosure-boarder{
+  padding: var(--layout-padding-small) 0px var(--layout-padding-small) 0px;
+  border-top: 1px solid var(--surface-border-light, #d8d8d8);
+}

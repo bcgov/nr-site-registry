@@ -361,30 +361,52 @@ export const deepFilterByUserAction = (
       return filteredArray.length > 0 ? filteredArray : undefined;
     }
 
-    // If the item is an object, recursively filter its properties
-    else if (item && typeof item === 'object') {
-      // Recursively filter nested objects and arrays
-      const filteredObject = Object.keys(item).reduce(
-        (acc: any, key: string) => {
-          const filteredValue = filterRecursive(item[key], position); // Pass index to recursive calls
-          if (filteredValue !== undefined) {
-            acc[key] = filteredValue; // Add the filtered value to the accumulator if it's valid
+    // ── OBJECT ─────────────────────────────────────────────────────────────
+    if (item && typeof item === 'object') {
+      const hasValidAction =
+        item[actionProperty] && actions.includes(item[actionProperty]);
+
+      // Recursively filter only object/array children to determine survival
+      const filteredObjectChildren: any = {};
+      let hasValidChildren = false;
+
+      Object.keys(item).forEach((key: string) => {
+        const child = item[key];
+
+        if (child && typeof child === 'object') {
+          const filteredChild = filterRecursive(child, position);
+
+          if (filteredChild !== undefined) {
+            // Child survived — mark that we have valid children
+            filteredObjectChildren[key] = filteredChild;
+            hasValidChildren = true;
+          } else if (hasValidAction) {
+            // Parent is valid but this child didn't survive:
+            // keep arrays as [] and drop non-matching objects
+            if (Array.isArray(child)) {
+              filteredObjectChildren[key] = [];
+            }
+            // object children that don't match are simply omitted
           }
-          return acc;
-        },
-        {}, // Start with an empty object for accumulating filtered values
-      );
+        }
+        // Primitives are NOT evaluated here — added later only if node survives
+      });
 
-      // Get the value of the specified property from the current object to check against user actions
-      const actionValue = item[actionProperty];
+      // ── Decision: keep this node? ────────────────────────────────────────
+      if (!hasValidAction && !hasValidChildren) {
+        return undefined; // Neither this node nor any descendant matched
+      }
 
-      // Check if the current object has a `apiAction` property  and whether it matches one of the user actions
-      const hasUserAction = actionValue && actions.includes(actionValue);
+      // Build the final object: primitives + surviving object/array children
+      const primitives = Object.keys(item).reduce((acc: any, key: string) => {
+        const child = item[key];
+        if (!child || typeof child !== 'object') {
+          acc[key] = child; // carry forward all primitive values
+        }
+        return acc;
+      }, {});
 
-      // Include index information in the object if it has valid properties or matching user action
-      return Object.keys(filteredObject).length > 0 || hasUserAction
-        ? { ...item, position, ...filteredObject }
-        : undefined; // Add the original index to the object
+      return { ...primitives, ...filteredObjectChildren, position };
     }
 
     // If the data is neither an object nor an array, return undefined

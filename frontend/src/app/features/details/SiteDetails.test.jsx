@@ -161,7 +161,7 @@ const buildState = (override = {}) => {
       sitesSummary: null,
     },
     siteDisclosure: {
-      siteDisclosure: { id: '1', siteId: '9' },
+      siteDisclosure: [{ id: '1', siteId: '9' }],
       status: RequestStatus.success,
       error: '',
     },

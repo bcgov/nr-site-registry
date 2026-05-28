@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Res } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';
@@ -78,41 +78,45 @@ export class DisclosureService {
       if (!result?.length) {
         return [];
       } else {
-        const res = result?.map(async (res) => {
-          const siteProfileQA =  await this.profileQuestionsRepository
-                                .createQueryBuilder('pq')
-                                .distinct(true)
-                                .innerJoin('pq.profileAnswers', 'pa')
-                                .innerJoin('pq.category', 'pc')
-                                .where('pa.siteId = :siteId AND pa.sprofDateCompleted= :sprofDateCompleted', { siteId, sprofDateCompleted: res.dateCompleted })
-                                .select([
-                                  'pq.description AS question',
-                                  'pc.description AS category',
-                                ])
-                                .getRawMany();
-                                
-          return {
-            ...res,
-            siteProfileQA: siteProfileQA,
-            srAction: res.srAction === SRApprovalStatusEnum.PUBLIC,
-            siteProfileSchedule2Refs: res?.siteProfileLandUses?.map((ref) => {
-              return {
-                ...ref,
-                // id format: "<siteId>-<lutCode>" — parsed in processSchedule2Refs to recover oldLutCode on UPDATE
-                id: res.siteId + '-' + ref.lutCode,
-                schedule2ReferenceCode: ref.lutCode,
-                userAction: ref.userAction ?? UserActionEnum.DEFAULT,
-                srValue: ref.srAction === SRApprovalStatusEnum.PUBLIC,
-                srAction: ref.srAction,
-              };
-            }),
-          };
-        });
+        const enrichedResults = await Promise.all(
+          result.map(async (profile) => {
+            const siteProfileQA = await this.profileQuestionsRepository
+              .createQueryBuilder('pq')
+              .distinct(true)
+              .innerJoin('pq.profileAnswers', 'pa')
+              .innerJoin('pq.category', 'pc')
+              .where(
+                'pa.siteId = :siteId AND pa.sprofDateCompleted = :sprofDateCompleted',
+                { siteId, sprofDateCompleted: profile.dateCompleted },
+              )
+              .select([
+                'pq.description AS question',
+                'pc.description AS category',
+              ])
+              .getRawMany();
+
+            return {
+              ...profile,
+              siteProfileQA,
+              srAction: profile.srAction === SRApprovalStatusEnum.PUBLIC,
+              siteProfileSchedule2Refs: profile?.siteProfileLandUses?.map(
+                (ref) => ({
+                  ...ref,
+                  id: profile.siteId + '-' + ref.lutCode,
+                  schedule2ReferenceCode: ref.lutCode,
+                  userAction: ref.userAction ?? UserActionEnum.DEFAULT,
+                  srValue: ref.srAction === SRApprovalStatusEnum.PUBLIC,
+                  srAction: ref.srAction,
+                }),
+              ),
+            };
+          }),
+        );
         this.sitesLogger.log(
           'DisclosureService.getSiteDisclosureBySiteId() end',
         );
         // Convert the transformed objects into DTOs
-        const disclosure = plainToInstance(SiteProfilesDTO, res);
+        const disclosure = plainToInstance(SiteProfilesDTO, enrichedResults);
         return disclosure;
       }
     } catch (error) {

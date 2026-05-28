@@ -29,15 +29,23 @@ describe('DisclosureService', () => {
 
   beforeEach(async () => {
     disclosureRepository = { find: jest.fn() };
-    profileQuestionsRepository = { createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder) };
+    profileQuestionsRepository = {
+      createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder),
+    };
     snapshotService = { getMostRecentSnapshot: jest.fn() };
     sitesLogger = { log: jest.fn(), error: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DisclosureService,
-        { provide: getRepositoryToken(SiteProfiles), useValue: disclosureRepository },
-        { provide: getRepositoryToken(ProfileQuestions), useValue: profileQuestionsRepository },
+        {
+          provide: getRepositoryToken(SiteProfiles),
+          useValue: disclosureRepository,
+        },
+        {
+          provide: getRepositoryToken(ProfileQuestions),
+          useValue: profileQuestionsRepository,
+        },
         { provide: SnapshotsService, useValue: snapshotService },
         { provide: LoggerService, useValue: sitesLogger },
       ],
@@ -51,7 +59,6 @@ describe('DisclosureService', () => {
   });
 
   describe('getSiteDisclosureBySiteId', () => {
-
     // ── IDIR user tests ────────────────────────────────────────────────────
 
     describe('IDIR user', () => {
@@ -60,7 +67,11 @@ describe('DisclosureService', () => {
       it('should return empty array when no profiles found', async () => {
         disclosureRepository.find.mockResolvedValueOnce([]);
 
-        const result = await service.getSiteDisclosureBySiteId('1', false, idirUser);
+        const result = await service.getSiteDisclosureBySiteId(
+          '1',
+          false,
+          idirUser,
+        );
 
         expect(result).toEqual([]);
         expect(disclosureRepository.find).toBeCalledWith({
@@ -76,11 +87,17 @@ describe('DisclosureService', () => {
 
         disclosureRepository.find.mockResolvedValueOnce(mockProfiles);
 
-        const result = await service.getSiteDisclosureBySiteId(siteId, false, idirUser);
+        const result = await service.getSiteDisclosureBySiteId(
+          siteId,
+          false,
+          idirUser,
+        );
 
         expect(result).toBeDefined();
         expect(result.length).toBe(1);
-        expect(profileQuestionsRepository.createQueryBuilder).toHaveBeenCalledWith('pq');
+        expect(
+          profileQuestionsRepository.createQueryBuilder,
+        ).toHaveBeenCalledWith('pq');
       });
 
       it('should filter by pending srAction when showPending is true', async () => {
@@ -88,13 +105,25 @@ describe('DisclosureService', () => {
         const dateCompleted = new Date();
 
         const mockProfiles = [
-          { ...generateMockSiteProfile(siteId, dateCompleted)[0], srAction: SRApprovalStatusEnum.PENDING, siteProfileLandUses: [] },
-          { ...generateMockSiteProfile(siteId, dateCompleted)[0], srAction: SRApprovalStatusEnum.PUBLIC, siteProfileLandUses: [] },
+          {
+            ...generateMockSiteProfile(siteId, dateCompleted)[0],
+            srAction: SRApprovalStatusEnum.PENDING,
+            siteProfileLandUses: [],
+          },
+          {
+            ...generateMockSiteProfile(siteId, dateCompleted)[0],
+            srAction: SRApprovalStatusEnum.PUBLIC,
+            siteProfileLandUses: [],
+          },
         ];
 
         disclosureRepository.find.mockResolvedValueOnce(mockProfiles);
 
-        const result = await service.getSiteDisclosureBySiteId(siteId, true, idirUser);
+        const result = await service.getSiteDisclosureBySiteId(
+          siteId,
+          true,
+          idirUser,
+        );
 
         // Only the PENDING profile should survive the filter
         expect(result.length).toBe(1);
@@ -130,10 +159,17 @@ describe('DisclosureService', () => {
       it('should return empty array when no snapshot found', async () => {
         snapshotService.getMostRecentSnapshot.mockResolvedValueOnce(null);
 
-        const result = await service.getSiteDisclosureBySiteId('1', false, externalUser);
+        const result = await service.getSiteDisclosureBySiteId(
+          '1',
+          false,
+          externalUser,
+        );
 
         expect(result).toEqual([]);
-        expect(snapshotService.getMostRecentSnapshot).toHaveBeenCalledWith('1', 'user-123');
+        expect(snapshotService.getMostRecentSnapshot).toHaveBeenCalledWith(
+          '1',
+          'user-123',
+        );
       });
 
       it('should return profiles from snapshot when snapshot exists', async () => {
@@ -145,10 +181,17 @@ describe('DisclosureService', () => {
           snapshotData: { profiles: mockProfiles },
         });
 
-        const result = await service.getSiteDisclosureBySiteId(siteId, false, externalUser);
+        const result = await service.getSiteDisclosureBySiteId(
+          siteId,
+          false,
+          externalUser,
+        );
 
         expect(result).toBeDefined();
-        expect(snapshotService.getMostRecentSnapshot).toHaveBeenCalledWith(siteId, 'user-123');
+        expect(snapshotService.getMostRecentSnapshot).toHaveBeenCalledWith(
+          siteId,
+          'user-123',
+        );
       });
     });
   });

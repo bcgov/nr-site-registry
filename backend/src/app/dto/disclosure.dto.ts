@@ -70,7 +70,6 @@ export class SiteProfilesDTO extends ChangeAuditObjectTypeDTO {
 
 @ObjectType()
 export class SiteProfileQADTO {
-  
   @Field({ nullable: true })
   question: string | null;
 

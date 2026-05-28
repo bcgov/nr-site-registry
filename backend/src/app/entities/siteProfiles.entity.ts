@@ -348,14 +348,14 @@ export class SiteProfiles extends ChangeAuditEntity {
   })
   govDocumentsComment: string | null;
 
-  @Field(() => [ProfileAnswers], { nullable: true})
+  @Field(() => [ProfileAnswers], { nullable: true })
   @OneToMany(
     () => ProfileAnswers,
     (profileAnswers) => profileAnswers.siteProfiles,
   )
   profileAnswers: ProfileAnswers[];
 
-  @Field(() => [ProfileSubmissions], { nullable: true})
+  @Field(() => [ProfileSubmissions], { nullable: true })
   @OneToMany(
     () => ProfileSubmissions,
     (profileSubmissions) => profileSubmissions.siteProfiles,

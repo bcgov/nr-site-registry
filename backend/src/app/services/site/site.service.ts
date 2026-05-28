@@ -1921,7 +1921,7 @@ export class SiteService {
                 existing,
               );
               break;
-          case UserActionEnum.DELETED:
+            case UserActionEnum.DELETED:
               if (!id) {
                 this.sitesLogger.warn(
                   'processSiteDisclosure: DELETE missing id',
@@ -1949,22 +1949,22 @@ export class SiteService {
               );
 
               break;
-            
+
             default:
-            // No parent action
-            // This can happen when only child refs changed
-            if (id) {
-              siteProfile = await transactionalEntityManager.findOne(
-                SiteProfiles,
-                {
-                  where: { id },
-                },
-              );
-            }
-            break;
+              // No parent action
+              // This can happen when only child refs changed
+              if (id) {
+                siteProfile = await transactionalEntityManager.findOne(
+                  SiteProfiles,
+                  {
+                    where: { id },
+                  },
+                );
+              }
+              break;
           }
 
-          if ( siteProfile && siteProfileSchedule2Refs.length > 0) {
+          if (siteProfile && siteProfileSchedule2Refs.length > 0) {
             await this.processSchedule2Refs(
               siteProfileSchedule2Refs,
               siteProfile.siteId ?? siteId,

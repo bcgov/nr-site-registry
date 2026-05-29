@@ -17,7 +17,6 @@ describe('DisclosureService', () => {
   let snapshotService: { getMostRecentSnapshot: jest.Mock };
   let sitesLogger: { log: jest.Mock; error: jest.Mock };
 
-  // ── Reusable mock query builder ──────────────────────────────────────────
   const mockQueryBuilder = {
     distinct: jest.fn().mockReturnThis(),
     innerJoin: jest.fn().mockReturnThis(),
@@ -59,7 +58,6 @@ describe('DisclosureService', () => {
   });
 
   describe('getSiteDisclosureBySiteId', () => {
-    // ── IDIR user tests ────────────────────────────────────────────────────
 
     describe('IDIR user', () => {
       const idirUser = { identity_provider: UserTypeEum.IDIR };
@@ -140,8 +138,6 @@ describe('DisclosureService', () => {
       });
     });
 
-    // ── Non-IDIR user tests ────────────────────────────────────────────────
-
     describe('Non-IDIR user', () => {
       const externalUser = { identity_provider: 'bceid', sub: 'user-123' };
 
@@ -197,7 +193,6 @@ describe('DisclosureService', () => {
   });
 });
 
-// ── Helper ─────────────────────────────────────────────────────────────────
 export function generateMockSiteProfile(siteId: string, dateCompleted: Date) {
   return [
     {

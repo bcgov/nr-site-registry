@@ -82,6 +82,7 @@ describe('LandHistoryResolver', () => {
         '',
         'ASC',
         showPending,
+        { identity_provider: 'idir', sub: 'user1' },
       );
 
       expect(result).toEqual(expectedResponse);
@@ -113,6 +114,7 @@ describe('LandHistoryResolver', () => {
         '',
         'ASC',
         showPending,
+        { identity_provider: 'idir', sub: 'user1' },
       );
 
       expect(result).toEqual(expectedResponse);

@@ -58,7 +58,6 @@ describe('DisclosureService', () => {
   });
 
   describe('getSiteDisclosureBySiteId', () => {
-
     describe('IDIR user', () => {
       const idirUser = { identity_provider: UserTypeEum.IDIR };
 

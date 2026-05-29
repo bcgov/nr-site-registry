@@ -10,11 +10,14 @@ import { LoggerService } from '../../logger/logger.service';
 import { UserActionEnum } from '../../common/userActionEnum';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { SnapshotsService } from '../snapshot/snapshot.service';
+import { UserTypeEum } from '../../common/userType';
 
 export class LandHistoryService {
   constructor(
     @InjectRepository(LandHistories)
     private landHistoryRepository: Repository<LandHistories>,
+    private snapshotService: SnapshotsService,
     private transactionManagerService: TransactionManagerService,
     private readonly sitesLogger: LoggerService,
   ) {}
@@ -24,12 +27,24 @@ export class LandHistoryService {
     searchTerm: string,
     sortDirection: 'ASC' | 'DESC',
     showPending: boolean,
+    user?: any,
   ): Promise<LandHistories[]> {
     this.sitesLogger.log('LandHistoryService.getLandHistoriesForSite() start');
     this.sitesLogger.debug(
       'LandHistoryService.getLandHistoriesForSite() start',
     );
     try {
+      if (user?.identity_provider !== UserTypeEum.IDIR) {
+        const userId: string = user?.sub ?? '';
+        if (!userId) return [];
+        const snapshot = await this.snapshotService.getMostRecentSnapshot(
+          siteId,
+          userId,
+        );
+        if (!snapshot) return [];
+        return snapshot.snapshotData?.landHistories ?? [];
+      }
+
       const query = this.landHistoryRepository
         .createQueryBuilder('landHistory')
         .innerJoinAndSelect(

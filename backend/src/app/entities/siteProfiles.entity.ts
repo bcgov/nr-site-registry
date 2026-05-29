@@ -11,6 +11,8 @@ import {
 import { SiteProfileLandUses } from './siteProfileLandUses.entity';
 import { Sites } from './sites.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
+import { ProfileAnswers } from './profileAnswers.entity';
+import { ProfileSubmissions } from './profileSubmissions.entity';
 
 @ObjectType()
 @Index('site_profiles_pkey', ['dateCompleted', 'siteId'], { unique: true })
@@ -346,17 +348,19 @@ export class SiteProfiles extends ChangeAuditEntity {
   })
   govDocumentsComment: string | null;
 
-  // @OneToMany(
-  //   () => ProfileAnswers,
-  //   (profileAnswers) => profileAnswers.siteProfiles,
-  // )
-  // profileAnswers: ProfileAnswers[];
+  @Field(() => [ProfileAnswers], { nullable: true })
+  @OneToMany(
+    () => ProfileAnswers,
+    (profileAnswers) => profileAnswers.siteProfiles,
+  )
+  profileAnswers: ProfileAnswers[];
 
-  // @OneToMany(
-  //   () => ProfileSubmissions,
-  //   (profileSubmissions) => profileSubmissions.siteProfiles,
-  // )
-  // profileSubmissions: ProfileSubmissions[];
+  @Field(() => [ProfileSubmissions], { nullable: true })
+  @OneToMany(
+    () => ProfileSubmissions,
+    (profileSubmissions) => profileSubmissions.siteProfiles,
+  )
+  profileSubmissions: ProfileSubmissions[];
 
   @Field(() => [SiteProfileLandUses], { nullable: true })
   @OneToMany(

@@ -1868,15 +1868,10 @@ export class SiteService {
             siteProfileSchedule2Refs = [],
             ...disclosureData
           } = disclosure;
-          let siteProfile: SiteProfiles = {
-            ...new SiteProfiles(),
-            id,
-            ...disclosureData,
-          };
-
+          const currentDate = new Date();
+          let siteProfile: SiteProfiles | null = null;
           switch (apiAction) {
             case UserActionEnum.ADDED:
-              const currentDate = new Date();
               siteProfile = transactionalEntityManager.create(SiteProfiles, {
                 ...disclosureData,
                 siteId,
@@ -1893,6 +1888,13 @@ export class SiteService {
               );
               break;
             case UserActionEnum.UPDATED:
+              if (!id) {
+                this.sitesLogger.warn(
+                  'processSiteDisclosure: UPDATE missing id',
+                );
+                return;
+              }
+
               const existing = await this.siteProfilesRepo.findOne({
                 where: { id },
                 relations: ['siteProfileLandUses'],
@@ -1910,7 +1912,7 @@ export class SiteService {
                   disclosure.srAction === SRApprovalStatusEnum.PRIVATE
                     ? UserActionEnum.DEFAULT
                     : UserActionEnum.UPDATED,
-                whenUpdated: new Date(),
+                whenUpdated: currentDate,
                 whoUpdated: userInfo?.givenName || '',
               });
 
@@ -1919,12 +1921,50 @@ export class SiteService {
                 existing,
               );
               break;
+            case UserActionEnum.DELETED:
+              if (!id) {
+                this.sitesLogger.warn(
+                  'processSiteDisclosure: DELETE missing id',
+                );
+                return;
+              }
+
+              const existingToDelete = await transactionalEntityManager.findOne(
+                SiteProfiles,
+                {
+                  where: { id },
+                },
+              );
+
+              if (!existingToDelete) {
+                this.sitesLogger.warn(
+                  `No site profile found for delete id: ${id}`,
+                );
+                return;
+              }
+
+              await transactionalEntityManager.remove(
+                SiteProfiles,
+                existingToDelete,
+              );
+
+              break;
+
             default:
-              this.sitesLogger.warn(`Unknown apiAction: ${apiAction}`);
+              // No parent action
+              // This can happen when only child refs changed
+              if (id) {
+                siteProfile = await transactionalEntityManager.findOne(
+                  SiteProfiles,
+                  {
+                    where: { id },
+                  },
+                );
+              }
               break;
           }
 
-          if (siteProfile?.id && siteProfileSchedule2Refs.length > 0) {
+          if (siteProfile && siteProfileSchedule2Refs.length > 0) {
             await this.processSchedule2Refs(
               siteProfileSchedule2Refs,
               siteProfile.siteId ?? siteId,

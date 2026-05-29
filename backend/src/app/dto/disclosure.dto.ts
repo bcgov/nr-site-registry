@@ -63,6 +63,18 @@ export class SiteProfilesDTO extends ChangeAuditObjectTypeDTO {
 
   @Field(() => [SiteProfileSchedule2RefDTO], { nullable: true })
   siteProfileSchedule2Refs?: SiteProfileSchedule2RefDTO[] | null;
+
+  @Field(() => [SiteProfileQADTO], { nullable: true })
+  siteProfileQA?: SiteProfileQADTO[] | null;
+}
+
+@ObjectType()
+export class SiteProfileQADTO {
+  @Field({ nullable: true })
+  question: string | null;
+
+  @Field({ nullable: true })
+  category: string | null;
 }
 
 // Output DTO — keeps the original field names the frontend expects.

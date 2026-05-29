@@ -9,8 +9,6 @@ import { RequestStatus } from '../../../helpers/requests/status';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 
-// ─── Fixtures ────────────────────────────────────────────────────────────────
-
 const mockDisclosure = {
   id: '900bc9eb-46b4-4708-bb4c-bea32e59390a',
   siteId: '9',
@@ -26,8 +24,6 @@ const mockDisclosure = {
   siteProfileSchedule2Refs: [],
   siteProfileQA: [],
 };
-
-// ─── Mocks ───────────────────────────────────────────────────────────────────
 
 jest.mock('react-redux', () => {
   const actualRedux = jest.requireActual('react-redux');
@@ -53,8 +49,6 @@ jest.mock('../../../helpers/utility', () => ({
 const { isUserOfType } = require('../../../helpers/utility');
 
 const mockStore = configureStore([thunk]);
-
-// ─── State builder ────────────────────────────────────────────────────────────
 
 const buildState = ({
   siteDetailsMode = SiteDetailsMode.EditMode,
@@ -106,13 +100,9 @@ const buildState = ({
   },
 });
 
-// ─── Tests ───────────────────────────────────────────────────────────────────
-
 describe('Disclosure Component', () => {
   let store;
   let dispatch;
-
-  // ── Render helpers ─────────────────────────────────────────────────────────
 
   const renderDisclosure = (
     stateOverride = {},
@@ -121,7 +111,6 @@ describe('Disclosure Component', () => {
   ) => {
     const state = buildState(stateOverride);
 
-    // .jsx file — no TypeScript casting, call mock methods directly
     useSelector.mockImplementation((cb) => cb(state));
     isUserOfType.mockImplementation((roleType) =>
       isInternal ? roleType === 'internal' : false,
@@ -170,8 +159,6 @@ describe('Disclosure Component', () => {
     jest.clearAllMocks();
   });
 
-  // ── Basic rendering ────────────────────────────────────────────────────────
-
   it('renders Disclosure component', () => {
     renderDisclosure();
     // Use getAllByTestId since both Disclosure.tsx and DisclosureComponent.tsx
@@ -211,8 +198,6 @@ describe('Disclosure Component', () => {
     ).toBeInTheDocument();
   });
 
-  // ── No data ────────────────────────────────────────────────────────────────
-
   it('renders empty state when disclosureData is null — no inner panels rendered', () => {
     // Source renders formData.map(...) — null/empty means no DisclosureComponent children.
     // There is no "No Results Found" text in the source.
@@ -231,8 +216,6 @@ describe('Disclosure Component', () => {
     ).toBeInTheDocument();
   });
 
-  // ── Disclosure data present ────────────────────────────────────────────────
-
   it('displays disclosure comment data when available after expanding', async () => {
     renderAndExpand({ disclosureStatus: RequestStatus.success });
     // govDocumentsComment, siteDisclosureComment, plannedActivityComment all equal 'Test'
@@ -241,8 +224,6 @@ describe('Disclosure Component', () => {
     );
     expect(elements.length).toBeGreaterThanOrEqual(3);
   });
-
-  // ── Internal user ──────────────────────────────────────────────────────────
 
   it('does not render Add/Remove schedule buttons for external user', () => {
     renderAndExpand({
@@ -271,8 +252,6 @@ describe('Disclosure Component', () => {
     ).not.toBeInTheDocument();
   });
 
-  // ── SR Mode ────────────────────────────────────────────────────────────────
-
   it('renders in SRMode without crashing', () => {
     renderDisclosure({
       siteDetailsMode: SiteDetailsMode.SRMode,
@@ -293,16 +272,12 @@ describe('Disclosure Component', () => {
     expect(screen.queryByText('Remove')).not.toBeInTheDocument();
   });
 
-  // ── ViewOnlyMode ───────────────────────────────────────────────────────────
-
   it('renders in ViewOnlyMode without crashing', () => {
     renderDisclosure({ siteDetailsMode: SiteDetailsMode.ViewOnlyMode });
     expect(
       screen.getAllByTestId('disclosure-component')[0],
     ).toBeInTheDocument();
   });
-
-  // ── Request statuses ───────────────────────────────────────────────────────
 
   it('renders without crashing when status is loading', () => {
     renderDisclosure({ disclosureStatus: RequestStatus.loading });
@@ -317,8 +292,6 @@ describe('Disclosure Component', () => {
       screen.getAllByTestId('disclosure-component')[0],
     ).toBeInTheDocument();
   });
-
-  // ── Schedule refs ──────────────────────────────────────────────────────────
 
   it('renders disclosure with siteProfileSchedule2Refs after expanding', () => {
     renderAndExpand({
@@ -343,8 +316,6 @@ describe('Disclosure Component', () => {
     expect(components[0]).toBeInTheDocument();
   });
 
-  // ── Side-effects / dispatch ────────────────────────────────────────────────
-
   it('dispatches fetch when saveRequestStatus is success', () => {
     renderDisclosure({ saveRequestStatus: RequestStatus.success });
     expect(dispatch).toHaveBeenCalled();
@@ -354,8 +325,6 @@ describe('Disclosure Component', () => {
     renderDisclosure({ resetSiteDetails: true });
     expect(dispatch).toHaveBeenCalled();
   });
-
-  // ── srAction variants ──────────────────────────────────────────────────────
 
   it('renders correctly when srAction is SRApprovalStatusEnum.Public', () => {
     renderDisclosure({
@@ -379,8 +348,6 @@ describe('Disclosure Component', () => {
       screen.getAllByTestId('disclosure-component')[0],
     ).toBeInTheDocument();
   });
-
-  // ── Timestamp fallbacks ────────────────────────────────────────────────────
 
   it('shows whenUpdated date in SR timestamp for internal user', () => {
     renderAndExpand(

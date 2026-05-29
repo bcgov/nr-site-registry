@@ -361,7 +361,6 @@ export const deepFilterByUserAction = (
       return filteredArray.length > 0 ? filteredArray : undefined;
     }
 
-    // ── OBJECT ─────────────────────────────────────────────────────────────
     if (item && typeof item === 'object') {
       const hasValidAction =
         item[actionProperty] && actions.includes(item[actionProperty]);
@@ -392,7 +391,7 @@ export const deepFilterByUserAction = (
         // Primitives are NOT evaluated here — added later only if node survives
       });
 
-      // ── Decision: keep this node? ────────────────────────────────────────
+      // Decision: keep this node?
       if (!hasValidAction && !hasValidChildren) {
         return undefined; // Neither this node nor any descendant matched
       }

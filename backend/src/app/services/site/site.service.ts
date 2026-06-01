@@ -59,7 +59,7 @@ import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
 import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
 import { SiteInsightsDto } from '../../dto/siteInsights.dto';
 import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
-import { SiteProfileSchedule2Ref } from '../../entities/siteProfileSchedule2Ref';
+import { SiteProfileLandUses } from '../../entities/siteProfileLandUses.entity';
 import { RecentViews } from '../../entities/recentViews.entity';
 
 /**
@@ -671,7 +671,11 @@ export class SiteService {
     );
     const result = await this.siteRepository.findOne({
       where: whereClause,
-      relations: ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'],
+      relations: [
+        'siteAssocs',
+        'siteAssocs.siteIdAssociatedWith2',
+        'bcerCode2',
+      ],
     });
     response.data = result ? result : null;
 
@@ -1583,7 +1587,7 @@ export class SiteService {
                 ...event,
                 id: notationId,
                 siteId: siteId,
-                eventDate: new Date(),
+                eventDate: event.eventDate || new Date(),
                 userAction: UserActionEnum.ADDED,
                 whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
@@ -1860,18 +1864,14 @@ export class SiteService {
           const {
             apiAction,
             id,
+            // siteProfileSchedule2Refs backed by SiteProfileLandUses table
             siteProfileSchedule2Refs = [],
             ...disclosureData
           } = disclosure;
-          let siteProfile: SiteProfiles = {
-            ...new SiteProfiles(),
-            id,
-            ...disclosureData,
-          };
-
+          const currentDate = new Date();
+          let siteProfile: SiteProfiles | null = null;
           switch (apiAction) {
             case UserActionEnum.ADDED:
-              const currentDate = new Date();
               siteProfile = transactionalEntityManager.create(SiteProfiles, {
                 ...disclosureData,
                 siteId,
@@ -1888,9 +1888,16 @@ export class SiteService {
               );
               break;
             case UserActionEnum.UPDATED:
+              if (!id) {
+                this.sitesLogger.warn(
+                  'processSiteDisclosure: UPDATE missing id',
+                );
+                return;
+              }
+
               const existing = await this.siteProfilesRepo.findOne({
                 where: { id },
-                relations: ['siteProfileSchedule2Refs'],
+                relations: ['siteProfileLandUses'],
               });
 
               if (!existing) {
@@ -1905,7 +1912,7 @@ export class SiteService {
                   disclosure.srAction === SRApprovalStatusEnum.PRIVATE
                     ? UserActionEnum.DEFAULT
                     : UserActionEnum.UPDATED,
-                whenUpdated: new Date(),
+                whenUpdated: currentDate,
                 whoUpdated: userInfo?.givenName || '',
               });
 
@@ -1914,22 +1921,61 @@ export class SiteService {
                 existing,
               );
               break;
+            case UserActionEnum.DELETED:
+              if (!id) {
+                this.sitesLogger.warn(
+                  'processSiteDisclosure: DELETE missing id',
+                );
+                return;
+              }
+
+              const existingToDelete = await transactionalEntityManager.findOne(
+                SiteProfiles,
+                {
+                  where: { id },
+                },
+              );
+
+              if (!existingToDelete) {
+                this.sitesLogger.warn(
+                  `No site profile found for delete id: ${id}`,
+                );
+                return;
+              }
+
+              await transactionalEntityManager.remove(
+                SiteProfiles,
+                existingToDelete,
+              );
+
+              break;
+
             default:
-              this.sitesLogger.warn(`Unknown apiAction: ${apiAction}`);
+              // No parent action
+              // This can happen when only child refs changed
+              if (id) {
+                siteProfile = await transactionalEntityManager.findOne(
+                  SiteProfiles,
+                  {
+                    where: { id },
+                  },
+                );
+              }
               break;
           }
 
-          if (siteProfile?.id && siteProfileSchedule2Refs.length > 0) {
+          if (siteProfile && siteProfileSchedule2Refs.length > 0) {
             await this.processSchedule2Refs(
               siteProfileSchedule2Refs,
-              siteProfile.id,
+              siteProfile.siteId ?? siteId,
+              siteProfile.dateCompleted,
               userInfo,
               transactionalEntityManager,
             );
           }
         });
 
-        // Handle schedule2Ref (ADD, UPDATE, DELETE)
+        // Handle siteProfileSchedule2Refs (backed by SiteProfileLandUses)
         await Promise.all(disclosurePromises);
       }
     } catch (error) {
@@ -1940,81 +1986,185 @@ export class SiteService {
     }
   }
 
+  /**
+   * Processes site profile land uses (ADD / UPDATE / DELETE).
+   *
+   * Field mapping (frontend → DB):
+   *   schedule2ReferenceCode → lutCode  (composite PK column)
+   *   id                     → used only to carry the original lutCode back on
+   *                            UPDATE/DELETE via the GET response field "id"
+   *
+   * Action rules:
+   *   ADDED   — id is a client-side v4() UUID, not a DB key. Use schedule2ReferenceCode directly.
+   *   UPDATED — id is "<profileSiteId>-<originalLutCode>" set by the GET mapping.
+   *             lutCode is part of the composite PK so a code change = delete old + insert new.
+   *   DELETED — id is the same "<profileSiteId>-<originalLutCode>" format.
+   *             schedule2ReferenceCode holds the code to delete.
+   */
   private async processSchedule2Refs(
     refs: any[],
-    profileId: string,
+    siteId: string,
+    sprofDateCompleted: Date,
     userInfo: any,
     transactionalEntityManager: EntityManager,
   ) {
-    // Get current DB state
     const currentRefs = await transactionalEntityManager.find(
-      SiteProfileSchedule2Ref,
-      {
-        where: { profileId },
-      },
+      SiteProfileLandUses,
+      { where: { siteId, sprofDateCompleted } },
     );
 
-    const currentMap = new Map(currentRefs.map((r) => [r.id, r]));
+    const currentMap = new Map(currentRefs.map((r) => [r.lutCode, r]));
 
-    const toSave: SiteProfileSchedule2Ref[] = [];
-    const toDelete: SiteProfileSchedule2Ref[] = [];
+    const toSave: SiteProfileLandUses[] = [];
+    const toDelete: SiteProfileLandUses[] = [];
 
     for (const ref of refs) {
-      const { apiAction, id, schedule2ReferenceCode } = ref;
-      const existing = currentMap.get(id);
+      const { apiAction, schedule2ReferenceCode } = ref;
 
       switch (apiAction) {
-        case UserActionEnum.ADDED:
-          if (!existing) {
+        case UserActionEnum.ADDED: {
+          // id is a client-side v4() — never use it for DB lookups.
+          // schedule2ReferenceCode is the code the user selected.
+          if (!schedule2ReferenceCode) {
+            this.sitesLogger.warn(
+              'processSchedule2Refs: ADDED ref has no schedule2ReferenceCode — skipping',
+            );
+            break;
+          }
+          if (currentMap.has(schedule2ReferenceCode)) {
+            this.sitesLogger.warn(
+              `processSchedule2Refs: lutCode=${schedule2ReferenceCode} already exists — skipping duplicate ADD`,
+            );
+            break;
+          }
+          toSave.push(
+            transactionalEntityManager.create(SiteProfileLandUses, {
+              lutCode: schedule2ReferenceCode,
+              siteId,
+              sprofDateCompleted,
+              srAction: ref.srAction,
+              userAction: UserActionEnum.ADDED,
+              whoCreated: userInfo?.givenName || '',
+              whenCreated: new Date(),
+              whoUpdated: userInfo?.givenName || '',
+              whenUpdated: new Date(),
+            }),
+          );
+          break;
+        }
+
+        case UserActionEnum.UPDATED: {
+          // schedule2ReferenceCode is the NEW code the user selected.
+          // The original code (before the edit) is what's stored in the DB —
+          // find it by looking up the current map with the new code first,
+          // then fall back to finding any row whose lutCode matches the old value
+          // carried in the ref's original schedule2ReferenceCode before the edit.
+          // The safest approach: the GET sets id = "<siteId>-<originalLutCode>".
+          // Since siteId is always a numeric bigint (no hyphens), we can safely
+          // extract originalLutCode as everything after the first "-".
+          if (!schedule2ReferenceCode) {
+            this.sitesLogger.warn(
+              'processSchedule2Refs: UPDATED ref has no schedule2ReferenceCode — skipping',
+            );
+            break;
+          }
+
+          const originalLutCode = this.extractOriginalLutCode(ref.id, siteId);
+          const existingRow = currentMap.get(originalLutCode);
+
+          if (!existingRow) {
+            this.sitesLogger.warn(
+              `processSchedule2Refs: no DB row found for originalLutCode=${originalLutCode} on UPDATE — skipping`,
+            );
+            break;
+          }
+
+          const resolvedUserAction =
+            ref.srAction === SRApprovalStatusEnum.PUBLIC ||
+            ref.srAction === SRApprovalStatusEnum.PRIVATE
+              ? UserActionEnum.DEFAULT
+              : UserActionEnum.UPDATED;
+
+          if (originalLutCode !== schedule2ReferenceCode) {
+            // Code changed — composite PK cannot be updated in-place.
+            // Delete the old row and insert a new one preserving audit origin.
+            toDelete.push(existingRow);
             toSave.push(
-              transactionalEntityManager.create(SiteProfileSchedule2Ref, {
-                schedule2ReferenceCode,
-                profileId,
+              transactionalEntityManager.create(SiteProfileLandUses, {
+                lutCode: schedule2ReferenceCode,
+                siteId,
+                sprofDateCompleted,
                 srAction: ref.srAction,
-                userAction: UserActionEnum.ADDED,
-                whoCreated: userInfo?.givenName || '',
-                whenCreated: new Date(),
+                userAction: resolvedUserAction,
+                whoCreated: existingRow.whoCreated,
+                whenCreated: existingRow.whenCreated,
                 whoUpdated: userInfo?.givenName || '',
                 whenUpdated: new Date(),
               }),
             );
-          }
-          break;
-
-        case UserActionEnum.UPDATED:
-          if (existing) {
-            Object.assign(existing, {
-              ...ref,
-              userAction:
-                ref.srAction === SRApprovalStatusEnum.PUBLIC ||
-                ref.srAction === SRApprovalStatusEnum.PRIVATE
-                  ? UserActionEnum.DEFAULT
-                  : UserActionEnum.UPDATED,
+          } else {
+            // Same code — only audit fields change
+            Object.assign(existingRow, {
+              srAction: ref.srAction,
+              userAction: resolvedUserAction,
               whoUpdated: userInfo?.givenName || '',
               whenUpdated: new Date(),
             });
-            toSave.push(existing);
+            toSave.push(existingRow);
           }
           break;
+        }
 
-        case UserActionEnum.DELETED:
-          if (existing) {
-            toDelete.push(existing);
+        case UserActionEnum.DELETED: {
+          // schedule2ReferenceCode holds the code to delete.
+          if (!schedule2ReferenceCode) {
+            this.sitesLogger.warn(
+              'processSchedule2Refs: DELETED ref has no schedule2ReferenceCode — skipping',
+            );
+            break;
+          }
+          const rowToDelete = currentMap.get(schedule2ReferenceCode);
+          if (rowToDelete) {
+            toDelete.push(rowToDelete);
+          } else {
+            this.sitesLogger.warn(
+              `processSchedule2Refs: no DB row found for lutCode=${schedule2ReferenceCode} on DELETE — skipping`,
+            );
           }
           break;
+        }
+
+        default:
+          this.sitesLogger.warn(
+            `processSchedule2Refs: unknown apiAction="${apiAction}" — skipping`,
+          );
       }
     }
 
+    // Deletes must run before saves to avoid composite PK conflicts
     if (toDelete.length) {
-      await transactionalEntityManager.remove(
-        SiteProfileSchedule2Ref,
-        toDelete,
-      );
+      await transactionalEntityManager.remove(SiteProfileLandUses, toDelete);
     }
 
     if (toSave.length) {
-      await transactionalEntityManager.save(SiteProfileSchedule2Ref, toSave);
+      await transactionalEntityManager.save(SiteProfileLandUses, toSave);
     }
+  }
+
+  /**
+   * Extracts the original lutCode from the composite id set by the GET response.
+   * Format: "<siteId>-<lutCode>" where siteId is always a numeric bigint (no hyphens).
+   * Falls back to the current schedule2ReferenceCode if parsing fails.
+   */
+  private extractOriginalLutCode(refId: string, siteId: string): string {
+    if (!refId) return '';
+    const prefix = siteId + '-';
+    if (refId.startsWith(prefix)) {
+      return refId.slice(prefix.length);
+    }
+    // Fallback: take everything after the first '-'
+    const firstDash = refId.indexOf('-');
+    return firstDash !== -1 ? refId.slice(firstDash + 1) : refId;
   }
 
   async getSiteDetailsPendingSRApproval(

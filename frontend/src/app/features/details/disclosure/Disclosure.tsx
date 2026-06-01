@@ -19,7 +19,6 @@ import {
   IChangeType,
 } from '../../../components/common/IChangeType';
 import {
-  flattenFormRows,
   getUser,
   isUserOfType,
   serializeDate,
@@ -46,24 +45,10 @@ import ModalDialog from '../../../components/modaldialog/ModalDialog';
 import { v4 } from 'uuid';
 import { schedule2ReferenceCdDrpdown } from '../dropdowns/DropdownSlice';
 import { siteDisclosureConfig } from './DisclosureConfig';
+import { Button } from '../../../components/button/Button';
+import { Plus } from '../../../components/common/icon';
 
 const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
-  const initialState = {
-    id: '',
-    siteId: '',
-    dateCompleted: null,
-    rwmDateDecision: null,
-    localAuthDateRecd: null,
-    siteRegDateEntered: null,
-    siteRegDateRecd: null,
-    govDocumentsComment: '',
-    siteDisclosureComment: '',
-    plannedActivityComment: '',
-    srAction: SRApprovalStatusEnum.Pending,
-    whenCreated: null,
-    whenUpdated: null,
-    siteProfileSchedule2Refs: [],
-  };
   const schedule2Ref = useSelector(schedule2ReferenceCdDrpdown);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const {
@@ -74,88 +59,25 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     disclosureCommentsConfig,
     srVisibilityConfig,
   } = siteDisclosureConfig(schedule2Ref?.data || [], viewMode);
+  const { siteDisclosure: disclosureData, status } =
+    useSelector(siteDisclosure);
   const dispatch = useDispatch<AppDispatch>();
   const mode = useSelector(siteDetailsMode);
   const resetDetails = useSelector(resetSiteDetails);
   const trackSiteDisclosure = useSelector(getSiteDisclosure);
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
-  const { siteDisclosure: disclosureData, status } =
-    useSelector(siteDisclosure);
   const loggedInUser = getUser();
   const { id: siteId } = useParams();
-
-  const [formData, setFormData] = useState<{
-    [key: string]: any | [Date, Date];
-  }>(disclosureData ?? initialState);
+  const [formData, setFormData] = useState<
+    { [key: string]: any | [Date, Date] }[]
+  >(disclosureData || []);
   const [selectedRows, setSelectedRows] = useState<
     { disclosureId: any; scheduleId: any }[]
   >([]);
   const [userType, setUserType] = useState<UserType>(UserType.External);
-  const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 
-  const [searchInternalContact, setSearchInternalContact] = useState('');
-  const [options, setOptions] = useState<{ key: any; value: any }[]>([]);
-  const [internalRow, setInternalRow] = useState(
-    disclosureStatementConfigEditMode,
-  );
   const [isDelete, setIsDelete] = useState(false);
   const [currentDisclosure, setCurrenDisclosure] = useState({});
-
-  // Function to fetch internal contact
-  // Commenting the below method because I am not sure which dropdown type
-  // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
-
-  //  const fetchInternalContact = useCallback(async (searchParam: string) => {
-  //   if (searchParam.trim()) {
-  //     try {
-  //       // Check cache first
-  //       if (resultCache[searchParam]) {
-  //         return resultCache[searchParam];
-  //       }
-
-  //       const response = await getAxiosInstance().post(GRAPHQL, {
-  //         query: print(graphQLPeopleOrgsCd()),
-  //         variables: { searchParam,  entityType:'EMP' },
-  //       });
-
-  //       // Store result in cache if successful
-  //       if (response?.data?.data?.getPeopleOrgsCd?.success) {
-  //         resultCache[searchParam] = response.data.data.getPeopleOrgsCd.data;
-  //         return response.data.data.getPeopleOrgsCd;
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching notation participant:', error);
-  //       return [];
-  //     }
-  //   }
-  //   return [];
-  // }, []);
-
-  // Handle search action
-  // Commenting the below method because I am not sure which dropdown type
-  // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
-
-  // const handleSearch = useCallback(
-  //   (value: any) => {
-  //     setSearchInternalContact(value.trim());
-  //     setInternalRow((prev) =>
-  //       updateFields(prev, {
-  //         indexToUpdate: prev.findIndex((row) =>
-  //           row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-  //         ),
-  //         updates: {
-  //           isLoading: RequestStatus.loading,
-  //           filteredOptions: [],
-  //           handleSearch,
-  //           customInfoMessage: <></>,
-  //         },
-  //       }),
-  //     );
-  //   },
-  //   [options],
-  // );
-
-  // Handle user type based on username
 
   useEffect(() => {
     if (
@@ -174,168 +96,84 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   }, [mode]);
 
   useEffect(() => {
-    dispatch(
-      fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending }),
-    );
-  }, [siteId]);
-  // Search internal contact effect with debounce
-  // Commenting the below method because I am not sure which dropdown type
-  // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
-
-  // useEffect(() => {
-  //   if (searchInternalContact) {
-  //     const timeoutId = setTimeout(async () => {
-  //       const res = await fetchInternalContact(searchInternalContact);
-  //       const indexToUpdate = internalRow.findIndex((row) =>
-  //         row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-  //       );
-  //       const infoMsg = !res.success ? (
-  //         <div className="px-2">
-  //           <img
-  //             src={infoIcon}
-  //             alt="info"
-  //             aria-hidden="true"
-  //             role="img"
-  //             aria-label="User image"
-  //           />
-  //           <span
-  //             aria-label={'info-message'}
-  //             className="text-wrap px-2 custom-not-found"
-  //           >
-  //             No results found.
-  //           </span>
-  //         </div>
-  //       ) : (
-  //         <></>
-  //       );
-
-  //       setInternalRow((prev) =>
-  //         updateFields(prev, {
-  //           indexToUpdate,
-  //           updates: {
-  //             isLoading: RequestStatus.success,
-  //             options,
-  //             filteredOptions: res.data ?? resultCache[searchInternalContact] ?? [],
-  //             customInfoMessage: infoMsg,
-  //             handleSearch,
-  //           },
-  //         }),
-  //       );
-  //     }, 300);
-
-  //     return () => clearTimeout(timeoutId);
-  //   }
-  // }, [searchInternalContact, options]);
-
-  // Update form data when notations change
-
-  useEffect(() => {
     if (status === RequestStatus.success && disclosureData) {
-      setFormData({
-        ...disclosureData,
-        siteProfileSchedule2Refs:
-          disclosureData?.siteProfileSchedule2Refs?.map((item: any) => {
-            return {
-              ...item,
-              description: schedule2Ref?.data?.find(
-                (ref: any) => ref.key === item.schedule2ReferenceCode,
-              )?.metaData,
-            };
-          }) ?? [],
+      const updatedFormData = disclosureData?.map((disclosure: any) => {
+        return {
+          ...disclosure,
+          siteProfileSchedule2Refs:
+            disclosure?.siteProfileSchedule2Refs?.map((item: any) => {
+              return {
+                ...item,
+                description: schedule2Ref?.data?.find(
+                  (ref: any) => ref.key === item.schedule2ReferenceCode,
+                )?.metaData,
+              };
+            }) ?? [],
+        };
       });
+
+      setFormData(updatedFormData);
     }
-
-    // Commenting the below method because I am not sure which dropdown type
-    // we are going to use if it will be dropdown with search then uncomment the code otherwise delete it.
-
-    // else
-    // {
-    //   setInternalRow((prev) =>
-    //     updateFields(prev, {
-    //       indexToUpdate: prev.findIndex((row) =>
-    //         row.some((field) => field.graphQLPropertyName === 'psnorgId'),
-    //       ),
-    //       updates: {
-    //         isLoading: RequestStatus.loading,
-    //         options: [],
-    //         filteredOptions: [],
-    //         handleSearch,
-    //         customInfoMessage: <></>,
-    //       },
-    //     }),
-    //   );
-    // }
-  }, [disclosureData, status]);
+  }, [disclosureData, status, schedule2Ref]);
 
   useEffect(() => {
     if (
       resetDetails ||
       saveSiteDetailsRequestStatus === RequestStatus.success
     ) {
-      setFormData(initialState);
+      setFormData([]);
       setSelectedRows([]);
       dispatch(
         fetchSiteDisclosure({ siteId: siteId ?? '', showPending: showPending }),
       );
     }
-  }, [resetDetails, saveSiteDetailsRequestStatus]);
+  }, [
+    resetDetails,
+    saveSiteDetailsRequestStatus,
+    dispatch,
+    siteId,
+    showPending,
+  ]);
 
   const handleInputChange = (
     id: number,
     graphQLPropertyName: any,
     value: String | [Date, Date],
   ) => {
-    let updatedDisclosure = null;
-    if (
-      viewMode === SiteDetailsMode.SRMode &&
-      graphQLPropertyName === 'srCheckbox'
-    ) {
-      updatedDisclosure = (disclosure: any) => {
-        return {
-          ...disclosure,
-          id: disclosure.id ?? '',
-          siteId: disclosure.siteId ?? siteId,
-          apiAction:
-            disclosure.id === '' || disclosure.id === undefined
-              ? UserActionEnum.added
-              : UserActionEnum.updated,
-          srAction:
-            value === 'checked'
-              ? SRApprovalStatusEnum.Public
-              : SRApprovalStatusEnum.Private,
-        };
-      };
-    } else {
-      updatedDisclosure = (disclosure: any) => {
-        return {
-          ...disclosure,
-          [graphQLPropertyName]: value,
-          id: disclosure.id ?? '',
-          siteId: disclosure.siteId ?? siteId,
-          apiAction:
-            disclosure.id === '' || disclosure.id === undefined
-              ? UserActionEnum.added
-              : UserActionEnum.updated,
-          srAction: SRApprovalStatusEnum.Pending,
-        };
-      };
-    }
+    let updatedDisclosure: any = null;
+    updatedDisclosure = (disclosures: any) => {
+      return disclosures.map((disclosure: any) => {
+        if (disclosure.id === id) {
+          const isChecked =
+            viewMode === SiteDetailsMode.SRMode &&
+            graphQLPropertyName === 'srCheckbox';
+          return {
+            ...disclosure,
+            [graphQLPropertyName]: value,
+            apiAction: disclosure?.apiAction ?? UserActionEnum.updated,
+            srAction: isChecked
+              ? value === 'checked'
+                ? SRApprovalStatusEnum.Public
+                : SRApprovalStatusEnum.Private
+              : SRApprovalStatusEnum.Pending,
+          };
+        }
+        return disclosure;
+      });
+    };
 
     const updatedFormData = updatedDisclosure(formData);
     const updatedTrackDisclosure = updatedDisclosure(
       trackSiteDisclosure ?? formData,
     );
-    setFormData(updatedFormData);
-    dispatch(updateSiteDisclosure(serializeDate(updatedFormData)));
-    dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
 
-    const flattedArr = flattenFormRows([
-      ...disclosureStatementConfig,
-      ...disclosureCommentsConfig,
-    ]);
-    const currLabel =
-      flattedArr &&
-      flattedArr.find((row) => row.graphQLPropertyName === graphQLPropertyName);
+    setFormData(updatedFormData);
+    dispatch(
+      updateSiteDisclosure(
+        updatedFormData?.map((item: any) => serializeDate(item)),
+      ),
+    );
+    dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
 
     if (
       viewMode === SiteDetailsMode.SRMode &&
@@ -400,35 +238,40 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       }
     } else {
       // this need to be tracked and also change once get actual source of data.
-      const updateReferences = (disclosure: any) => {
-        const updatedDisclosureSchedule =
-          disclosure?.siteProfileSchedule2Refs?.map((schedule: any) => {
-            if (schedule.id === event.row.id) {
-              const isSRApproved =
-                viewMode === SiteDetailsMode.SRMode &&
-                event.property === 'srValue';
-              return {
-                ...schedule,
-                [event.property]: event.value,
-                description: schedule2Ref?.data?.find(
-                  (ref: any) => ref.key === event.value,
-                )?.metaData,
-                apiAction: schedule?.apiAction ?? UserActionEnum.updated,
-                srAction: isSRApproved
-                  ? event.value
-                    ? SRApprovalStatusEnum.Public
-                    : SRApprovalStatusEnum.Private
-                  : SRApprovalStatusEnum.Pending,
-              };
-            }
-            return schedule;
-          });
+      const updateReferences = (disclosures: any) => {
+        return disclosures.map((disclosure: any) => {
+          if (disclosure.id === disclosureId) {
+            const updatedDisclosureSchedule =
+              disclosure?.siteProfileSchedule2Refs?.map((schedule: any) => {
+                if (schedule.id === event.row.id) {
+                  const isSRApproved =
+                    viewMode === SiteDetailsMode.SRMode &&
+                    event.property === 'srValue';
+                  return {
+                    ...schedule,
+                    [event.property]: event.value,
+                    description: schedule2Ref?.data?.find(
+                      (ref: any) => ref.key === event.value,
+                    )?.metaData,
+                    apiAction: schedule?.apiAction ?? UserActionEnum.updated,
+                    srAction: isSRApproved
+                      ? event.value
+                        ? SRApprovalStatusEnum.Public
+                        : SRApprovalStatusEnum.Private
+                      : SRApprovalStatusEnum.Pending,
+                  };
+                }
+                return schedule;
+              });
 
-        // Return the updated disclosure object with the modified disclosureSchedule array
-        return {
-          ...disclosure,
-          siteProfileSchedule2Refs: updatedDisclosureSchedule,
-        };
+            // Return the updated disclosure object with the modified disclosureSchedule array
+            return {
+              ...disclosure,
+              siteProfileSchedule2Refs: updatedDisclosureSchedule,
+            };
+          }
+          return disclosure;
+        });
       };
 
       // Update both formData and trackParticipant
@@ -441,11 +284,6 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       );
       dispatch(setupSiteDisclosureDataForSaving(updatedTrackDisclosure));
 
-      const currLabel =
-        disclosureScheduleInternalConfig &&
-        disclosureScheduleInternalConfig.find(
-          (row) => row.graphQLPropertyName === event.property,
-        );
       if (event.row?.apiAction !== UserActionEnum.added) {
         const tracker = new ChangeTracker(
           IChangeType.Modified,
@@ -460,20 +298,26 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const handleTableSort = (row: any, ascDir: any, disclosureId: any) => {
     let property = row['graphQLPropertyName'];
     setFormData((prevData) => {
-      if (prevData.id === disclosureId) {
-        // Call the common sort function to sort the updatedParticipant array
-        const updatedDisclosureSchedule = sortArray(
-          [...prevData.siteProfileSchedule2Refs],
-          property,
-          ascDir,
-        );
+      return prevData.map((tempDisclosure) => {
+        if (disclosureId === tempDisclosure.id) {
+          // Filter out selected rows from disclosureParticipant array
+          let updatedSchedule2Refs = [
+            ...tempDisclosure.siteProfileSchedule2Refs,
+          ];
+          // Call the common sort function to sort the updatedParticipant array
+          updatedSchedule2Refs = sortArray(
+            updatedSchedule2Refs,
+            property,
+            ascDir,
+          );
 
-        // Return the sorted array
-        return {
-          ...prevData,
-          siteProfileSchedule2Refs: updatedDisclosureSchedule,
-        };
-      }
+          return {
+            ...tempDisclosure,
+            siteProfileSchedule2Refs: updatedSchedule2Refs,
+          };
+        }
+        return tempDisclosure;
+      });
     });
   };
 
@@ -481,21 +325,25 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
   const handleAddDisclosureSchedule = (disclosureId: any) => {
     const newDisclosureSchedule = {
       id: v4(),
-      profileId: disclosureId ?? '',
       schedule2ReferenceCode: '',
       description: '',
       apiAction: UserActionEnum.added,
       srAction: SRApprovalStatusEnum.Pending,
     };
 
-    const updateDisclosure = (disclosure: any) => {
-      return {
-        ...disclosure,
-        siteProfileSchedule2Refs: [
-          newDisclosureSchedule,
-          ...(disclosure.siteProfileSchedule2Refs ?? []),
-        ],
-      };
+    const updateDisclosure = (disclosures: any) => {
+      return disclosures.map((disclosure: any) => {
+        if (disclosure.id === disclosureId) {
+          return {
+            ...disclosure,
+            siteProfileSchedule2Refs: [
+              newDisclosureSchedule,
+              ...(disclosure.siteProfileSchedule2Refs ?? []),
+            ],
+          };
+        }
+        return disclosure;
+      });
     };
 
     const updatedFormData = updateDisclosure(formData);
@@ -519,60 +367,67 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
   // this need to be tracked and also change once get actual source of data.
   const handleRemoveDisclosureSchedule = (
-    disclosure: any,
+    currDisclosure: any,
     referenceIsDeleted: boolean = false,
   ) => {
     if (referenceIsDeleted) {
       const updateReferences = (disclosures: any) => {
-        const updatedDisclosureSchedule =
-          disclosures?.siteProfileSchedule2Refs?.map((schedule: any) => {
-            if (
-              selectedRows.some(
-                (row: any) =>
-                  row.disclosureId === disclosures.id &&
-                  row.scheduleId === schedule?.id,
-              )
-            ) {
-              // Modify the schedule as needed (marking as deleted and updating approval status)
-              return {
-                ...schedule,
-                apiAction:
-                  schedule?.apiAction === UserActionEnum.added
-                    ? UserActionEnum.default
-                    : UserActionEnum.deleted,
-                srAction: SRApprovalStatusEnum.Pending,
-              };
-            }
-            return schedule; // Return the unchanged schedule if conditions aren't met
-          });
+        return disclosures.map((disclosure: any) => {
+          if (disclosure.id === currDisclosure.id) {
+            const updatedDisclosureSchedule =
+              disclosure?.siteProfileSchedule2Refs?.map((schedule: any) => {
+                if (
+                  selectedRows.some(
+                    (row: any) =>
+                      row.disclosureId === disclosure.id &&
+                      row.scheduleId === schedule?.id,
+                  )
+                ) {
+                  // Modify the schedule as needed (marking as deleted and updating approval status)
+                  const apiAction =
+                    schedule?.apiAction === UserActionEnum.added
+                      ? UserActionEnum.default
+                      : UserActionEnum.deleted;
+                  return {
+                    ...schedule,
+                    apiAction: apiAction,
+                    srAction: SRApprovalStatusEnum.Pending,
+                  };
+                }
+                return schedule; // Return the unchanged schedule if conditions aren't met
+              });
 
-        // Return the updated disclosure object with the modified disclosureSchedule array
-        return {
-          ...disclosures,
-          siteProfileSchedule2Refs: updatedDisclosureSchedule,
-        };
+            // Return the updated disclosure object with the modified disclosureSchedule array
+            return {
+              ...disclosure,
+              siteProfileSchedule2Refs: updatedDisclosureSchedule,
+            };
+          }
+          return disclosure;
+        });
       };
-
       // Update both formData and trackParticipant
       const updatedFormData = updateReferences(formData);
-
       const updatedTrackDisclosure = updateReferences(
         trackSiteDisclosure ?? formData,
       );
 
       // Filter out participants based on selectedRows for formData
-      const filteredDisclosure = {
-        ...updatedFormData,
-        siteProfileSchedule2Refs:
-          updatedFormData.siteProfileSchedule2Refs.filter(
-            (schedule: any) =>
-              !selectedRows.some(
-                (selectedRow) =>
-                  selectedRow.disclosureId === disclosure.id &&
-                  selectedRow.scheduleId === schedule.id,
-              ),
-          ),
-      };
+      const filteredDisclosure = updatedFormData?.map((disclosure: any) => {
+        return {
+          ...disclosure,
+          siteProfileSchedule2Refs:
+            disclosure?.siteProfileSchedule2Refs?.filter(
+              (schedule: any) =>
+                !selectedRows.some(
+                  (row: any) =>
+                    row.disclosureId === disclosure.id &&
+                    row.scheduleId === schedule?.id,
+                ),
+            ),
+        };
+      });
+
       setFormData(filteredDisclosure);
       dispatch(updateSiteDisclosure(filteredDisclosure));
 
@@ -580,7 +435,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
 
       // Clear selectedRows state
       const updateSelectedRows = selectedRows.filter(
-        (row) => row.disclosureId !== disclosure.id,
+        (row) => row.disclosureId !== currDisclosure.id,
       );
       setSelectedRows(updateSelectedRows);
       setCurrenDisclosure({});
@@ -592,7 +447,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
       );
       dispatch(trackChanges(tracker.toPlainObject()));
     } else {
-      setCurrenDisclosure(disclosure);
+      setCurrenDisclosure(currDisclosure);
       setIsDelete(true);
     }
   };
@@ -618,31 +473,80 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     }
   };
 
+  const handleOnAddDisclosure = () => {
+    const newDisclosure = {
+      id: v4(),
+      siteId: siteId,
+      dateCompleted: null,
+      rwmDateDecision: null,
+      localAuthDateRecd: null,
+      siteRegDateEntered: null,
+      siteRegDateRecd: null,
+      govDocumentsComment: '',
+      siteDisclosureComment: '',
+      plannedActivityComment: '',
+      siteProfileSchedule2Refs: [],
+      srAction: SRApprovalStatusEnum.Pending,
+      apiAction: UserActionEnum.added,
+    };
+    setFormData([newDisclosure, ...formData]);
+  };
+
   return (
-    <>
-      <DisclosureComponent
-        viewMode={viewMode}
-        userType={userType}
-        handleWidgetCheckBox={handleWidgetCheckBox}
-        formData={formData}
-        disclosureStatementConfig={
-          viewMode === SiteDetailsMode.EditMode
-            ? internalRow
-            : disclosureStatementConfig
-        }
-        handleInputChange={handleInputChange}
-        handleTableChange={handleTableChange}
-        disclosureScheduleInternalConfig={disclosureScheduleInternalConfig}
-        disclosureScheduleExternalConfig={disclosureScheduleExternalConfig}
-        loading={loading}
-        handleTableSort={handleTableSort}
-        handleAddDisclosureSchedule={handleAddDisclosureSchedule}
-        isAnyDisclosureScheduleSelected={isAnyDisclosureScheduleSelected}
-        handleRemoveDisclosureSchedule={handleRemoveDisclosureSchedule}
-        srVisibilityConfig={srVisibilityConfig}
-        handleItemClick={handleItemClick}
-        disclosureCommentsConfig={disclosureCommentsConfig}
-      />
+    <div>
+      {!showPending && (
+        <div
+          className="row pe-2"
+          id="disclosures-component"
+          data-testid="disclosure-component"
+        >
+          {userType === UserType.Internal &&
+            (viewMode === SiteDetailsMode.EditMode ||
+              viewMode === SiteDetailsMode.SRMode) && (
+              <div className="col-lg-6 col-md-12 py-4">
+                <Button
+                  disabled={viewMode === SiteDetailsMode.SRMode}
+                  onClick={handleOnAddDisclosure}
+                >
+                  <Plus />
+                  Add Disclosure
+                </Button>
+              </div>
+            )}
+        </div>
+      )}
+      {formData &&
+        formData?.map((disclosure: any) => (
+          <div key={`active-${disclosure.id}`}>
+            <DisclosureComponent
+              viewMode={viewMode}
+              userType={userType}
+              handleWidgetCheckBox={handleWidgetCheckBox}
+              formData={disclosure}
+              disclosureStatementConfig={
+                viewMode === SiteDetailsMode.EditMode
+                  ? disclosureStatementConfigEditMode
+                  : disclosureStatementConfig
+              }
+              handleInputChange={handleInputChange}
+              handleTableChange={handleTableChange}
+              disclosureScheduleInternalConfig={
+                disclosureScheduleInternalConfig
+              }
+              disclosureScheduleExternalConfig={
+                disclosureScheduleExternalConfig
+              }
+              loading={RequestStatus.loading}
+              handleTableSort={handleTableSort}
+              handleAddDisclosureSchedule={handleAddDisclosureSchedule}
+              isAnyDisclosureScheduleSelected={isAnyDisclosureScheduleSelected}
+              handleRemoveDisclosureSchedule={handleRemoveDisclosureSchedule}
+              srVisibilityConfig={srVisibilityConfig}
+              handleItemClick={handleItemClick}
+              disclosureCommentsConfig={disclosureCommentsConfig}
+            />
+          </div>
+        ))}
       {isDelete && (
         <ModalDialog
           key={v4()}
@@ -658,7 +562,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
           }}
         />
       )}
-    </>
+    </div>
   );
 };
 

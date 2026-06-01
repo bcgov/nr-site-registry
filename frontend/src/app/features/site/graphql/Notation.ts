@@ -20,6 +20,7 @@ export const graphQLSiteNotationBySiteId = () => {
           id
           siteId
           psnorgId
+          eventDate
           completionDate
           requirementDueDate
           requirementReceivedDate

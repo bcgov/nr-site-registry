@@ -8,6 +8,30 @@ import { RequestStatus } from '../../helpers/requests/status';
 import { useAuth } from 'react-oidc-context';
 import * as utility from '../../helpers/utility';
 
+// ---- Module Mocks (must be before component mocks) ----
+jest.mock('@react-pdf/renderer', () => ({
+  pdf: jest.fn(() => ({ toBlob: jest.fn(() => Promise.resolve(new Blob())) })),
+  Document: ({ children }) => <>{children}</>,
+  Page: ({ children }) => <>{children}</>,
+  View: ({ children }) => <>{children}</>,
+  Text: ({ children }) => <>{children}</>,
+  StyleSheet: { create: (s) => s },
+}));
+jest.mock('./pdf/SiteDetailsPdf', () => ({
+  __esModule: true,
+  default: () => <div data-testid="site-details-pdf" />,
+}));
+jest.mock('./pdf/useSiteDetailsPdfData', () => ({
+  useSiteDetailsPdfData: () => ({
+    fetchForPdf: jest.fn(() => Promise.resolve()),
+    isSiteReady: true,
+  }),
+}));
+jest.mock('./pdf/DownloadSitePdfButton', () => ({
+  __esModule: true,
+  default: () => <button data-testid="download-pdf-btn">Download PDF</button>,
+}));
+
 // ---- Component Mocks ----
 jest.mock('../../components/simple/PageContainer', () => ({
   __esModule: true,
@@ -137,7 +161,7 @@ const buildState = (override = {}) => {
       sitesSummary: null,
     },
     siteDisclosure: {
-      siteDisclosure: { id: '1', siteId: '9' },
+      siteDisclosure: [{ id: '1', siteId: '9' }],
       status: RequestStatus.success,
       error: '',
     },

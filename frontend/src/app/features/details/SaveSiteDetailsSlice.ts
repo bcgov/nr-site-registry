@@ -188,6 +188,7 @@ export const getSiteDetailsToBeSaved = (state: any) => {
     sitesSummary: state?.siteDetails?.sitesSummary
       ? {
           ...state.siteDetails.sitesSummary,
+          bcerCode2: undefined,
           latDegrees: safeParseFloat(
             state.siteDetails?.sitesSummary?.latDegrees,
           ),
@@ -231,6 +232,10 @@ export const getParentBucket = (state: any) => state.siteDetails.parentBucket;
 
 export const getSiteSummary = (state: any) => state.siteDetails.sitesSummary;
 
+export const getSiteLandHistories = (state: any) =>
+  state.siteDetails.landHistoriesData;
+export const getSiteDisclosures = (state: any) =>
+  state.siteDetails.profilesData;
 export const {
   resetSaveSiteDetailsRequestStatus,
   resetSaveSiteDetails,

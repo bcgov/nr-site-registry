@@ -1,4 +1,4 @@
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, IsNull, Repository } from 'typeorm';
 import { SnapshotsService } from './snapshot.service';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -394,7 +394,9 @@ describe('SnapshotService', () => {
       // The two below have been added much later, unsure why required now, but was causing PR unit tests to fail.
       completorParticId: '5001',
       contactParticId: '6001',
-      siteProfileSchedule2Refs: [],
+      siteProfileLandUses: [],
+      profileSubmissions: [],
+      profileAnswers: [],
     },
   ];
 
@@ -1431,13 +1433,16 @@ describe('SnapshotService', () => {
       expect((await notations).length).toBe(1);
     });
 
-    it('getSubDivisionsForSnapshotCreation should be called with SRAction equals public', async () => {
+    it('getSubDivisionsForSnapshotCreation should be called with SRAction equals PUBLIC OR NULL', async () => {
       jest
         .spyOn(siteSubdivisionsRepository, 'find')
         .mockResolvedValue(sampleSiteSubDivions);
       service.getSubDivisionsForSnapshotCreation('1');
       expect(siteSubdivisionsRepository.find).toHaveBeenCalledWith({
-        where: { siteId: '1', srAction: SRApprovalStatusEnum.PUBLIC },
+        where: [
+          { siteId: '1', srAction: SRApprovalStatusEnum.PUBLIC },
+          { siteId: '1', srAction: IsNull() },
+        ],
       });
     });
 

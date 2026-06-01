@@ -22,9 +22,12 @@ export const graphQLSiteDisclosureBySiteId = () => {
           srAction
           whenCreated
           whenUpdated
+          siteProfileQA {
+            question
+            category
+          }
           siteProfileSchedule2Refs {
             id
-            profileId
             schedule2ReferenceCode
             srAction
             srValue

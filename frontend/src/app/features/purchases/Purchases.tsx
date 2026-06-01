@@ -79,12 +79,12 @@ const Purchases = () => {
   return (
     <PageContainer role="purchases">
       <div>
-        <CustomLabel label="Purchased Sites" labelType="b-h1" />
+        <CustomLabel label="Site Details" labelType="b-h1" />
       </div>
       <div className="col-12">
         <Table
           showPageOptions={true}
-          label="Purchased Sites"
+          label="Site Details"
           isLoading={RequestStatus.success}
           columns={PurchasesTableColumns}
           data={formattedData}

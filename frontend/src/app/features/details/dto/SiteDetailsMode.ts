@@ -12,6 +12,7 @@ export enum SiteActionBtn {
   SAVE = 'save',
   CANCEL = 'cancel',
   DELETE_SITE = 'delete_site',
+  DOWNLOAD_PDF = 'download_pdf',
 }
 
 export interface SaveSiteDetails {

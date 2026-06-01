@@ -31,6 +31,10 @@ import { AppDispatch } from '../../Store';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
 import { getNavComponents } from './navigation/NavigationPillsConfig';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
+import DownloadSitePdfButton from './pdf/DownloadSitePdfButton';
+import { useSiteDetailsPdfData } from './pdf/useSiteDetailsPdfData';
+import { pdf } from '@react-pdf/renderer';
+import SiteDetailsPdf from './pdf/SiteDetailsPdf';
 import {
   CancelButton,
   SaveButton,
@@ -56,6 +60,7 @@ import {
   UserRoleType,
   validateForm,
   getAxiosInstance,
+  formatDateTime,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import {
@@ -65,11 +70,10 @@ import {
 import {
   fetchSiteDisclosure,
   updateSiteDisclosure,
-  siteDisclosure as siteDisclosureSelector,
 } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
-import { notifyInfo } from '../../components/alert/Alert';
+import { notifyInfo, notifyError } from '../../components/alert/Alert';
 import {
   fetchNotationParticipants,
   updateSiteNotation,
@@ -99,7 +103,9 @@ import BannerDetails from '../../components/banners/BannerDetails';
 import {
   getParentBucket,
   getSiteAssociated,
+  getSiteDisclosures,
   getSiteDocuments,
+  getSiteLandHistories,
   getSiteNoatations,
   getSiteParticipants,
   getSiteSummary,
@@ -108,6 +114,7 @@ import {
   saveRequestStatus,
   saveSiteDetails,
   setupDocumentsDataForSaving,
+  setupLandHistoriesDataForSaving,
   setupNotationDataForSaving,
   setupSiteAssociationDataForSaving,
   setupSiteDisclosureDataForSaving,
@@ -162,11 +169,11 @@ import DeleteSiteModal from './DeleteSiteModal';
 import { GRAPHQL } from '../../helpers/endpoints';
 import { print } from 'graphql';
 import { DELETE_SITE_MUTATION } from '../site/graphql/DeleteSite';
+import { getLandUseColumns } from './landUses/LandUseColumnConfiguration';
 
 const SiteDetails = () => {
-  const { disclosureStatementConfigEditMode } = siteDisclosureConfig(
-    useSelector(schedule2ReferenceCdDrpdown)?.data,
-  );
+  const { disclosureStatementConfigEditMode, disclosureCommentsConfig } =
+    siteDisclosureConfig(useSelector(schedule2ReferenceCdDrpdown)?.data);
   const auth = useAuth();
   const isUnauthenticated = auth?.user == null;
   const { id } = useParams();
@@ -202,9 +209,8 @@ const SiteDetails = () => {
   const savedChanges = useSelector(trackedChanges);
   const siteNotation = useSelector(getSiteNoatations);
   const siteSummary = useSelector(getSiteSummary);
-  const disclosureSourceOfTruth = useSelector(
-    siteDisclosureSelector,
-  )?.siteDisclosure;
+  const siteLandUses = useSelector(getSiteLandHistories);
+  const siteDisclosure = useSelector(getSiteDisclosures);
   const sitePartics = useSelector(getSiteParticipants);
   const siteAssocs = useSelector(getSiteAssociated);
   const siteDocuments = useSelector(getSiteDocuments);
@@ -218,6 +224,7 @@ const SiteDetails = () => {
   const { associateColumnInternal } = GetAssociateConfig();
   const { documentFormRowsEditMode } = GetDocumentsConfig();
   const { createSiteFormRows, summaryFormRows } = GetSummaryConfig();
+  const landUseFormRows = getLandUseColumns();
 
   const [errorList, setErrorList] = useState<any[]>([]);
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
@@ -236,6 +243,8 @@ const SiteDetails = () => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(),
   );
+
+  const { fetchForPdf, isSiteReady } = useSiteDetailsPdfData();
 
   const userActions = [UserActionEnum.added, UserActionEnum.updated];
 
@@ -399,8 +408,11 @@ const SiteDetails = () => {
 
     if (!shouldRedirectExternalOrUnauthenticated) return;
 
-    // Cart details: do not auto-redirect (user can use back / cart UI).
-    if (location.pathname.includes('/site/cart/site/details/')) return;
+    // Cart and purchases details: do not auto-redirect (user can use back / cart / purchases UI).
+    const isPurchasedSiteView =
+      location.pathname.includes('/site/cart/site/details/') ||
+      location.pathname.includes('/site-details/site/details/');
+    if (isPurchasedSiteView) return;
 
     if (lastUnavailableToastSiteIdRef.current !== id) {
       notifyInfo(
@@ -668,6 +680,9 @@ const SiteDetails = () => {
       case SiteActionBtn.DELETE_SITE:
         setShowDeleteModal(true);
         break;
+      case SiteActionBtn.DOWNLOAD_PDF:
+        handleDownloadPdf();
+        break;
       case SiteActionBtn.SAVE:
         const errors = await validateSiteForms();
         if (errors.length > 0) {
@@ -702,6 +717,7 @@ const SiteDetails = () => {
         siteAssocErrors,
         siteDisclosureErrors,
         siteSummaryErrors,
+        siteLandUsesErrors,
       ] = await Promise.all([
         validateNotationsForm(),
         validateSiteParticipantForm(),
@@ -709,6 +725,7 @@ const SiteDetails = () => {
         validateAssociatedSitesForm(),
         validateSiteDisclosureForm(),
         validateSiteSummaryForm(),
+        validateSiteLandUsesForm(),
       ]);
 
       // Combine all errors into one list
@@ -717,13 +734,51 @@ const SiteDetails = () => {
         ...siteParticErrors,
         ...siteDocErrors,
         ...siteAssocErrors,
-        ...siteDisclosureErrors,
+        ...(siteDisclosureErrors || []), // Type assertion if siteDisclosureErrors can be undefined
         ...siteSummaryErrors,
+        ...siteLandUsesErrors,
       ];
       // You can now use `allErrors` for further processing
       return errors;
     } catch (error) {
       return []; // Return empty array in case of error to avoid breaking further logic
+    }
+  };
+
+  const validateSiteLandUsesForm = async () => {
+    try {
+      if (siteLandUses?.length > 0) {
+        const landUseTable: IFormField[][] = [
+          landUseFormRows
+            .map((column) => column.displayType)
+            .filter(
+              (displayType): displayType is IFormField =>
+                displayType !== undefined,
+            ),
+        ];
+        let updatedSiteLandUses = deepFilterByUserAction(
+          siteLandUses,
+          userActions,
+          'userAction',
+        );
+        const errors = validateForm(
+          landUseTable,
+          updatedSiteLandUses,
+          'Land Uses',
+        );
+        if (errors?.length > 0) {
+          return errors;
+        } else {
+          updatedSiteLandUses = removeProperty(updatedSiteLandUses, 'position');
+          dispatch(setupLandHistoriesDataForSaving(updatedSiteLandUses));
+          return [];
+        }
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error(error);
+      return [];
     }
   };
 
@@ -848,39 +903,78 @@ const SiteDetails = () => {
 
   const validateSiteDisclosureForm = async () => {
     try {
-      let updatedSiteDisclosure = deepFilterByUserAction(
-        disclosureSourceOfTruth,
-        [...userActions, UserActionEnum.deleted],
-      );
-      if (
-        updatedSiteDisclosure &&
-        typeof updatedSiteDisclosure === 'object' &&
-        Object.keys(updatedSiteDisclosure).length > 0
-      ) {
-        const siteDisclosureErrors: any[] = [];
+      if (siteDisclosure.length > 0) {
+        let updatedSiteDisclosure = deepFilterByUserAction(siteDisclosure, [
+          ...userActions,
+          UserActionEnum.deleted,
+        ]);
 
-        // Validate against the disclosure slice (source of truth) — always has full field values
+        if (
+          !updatedSiteDisclosure ||
+          Object.keys(updatedSiteDisclosure).length === 0
+        ) {
+          return [];
+        }
+
+        const siteDisclosureErrors: any[] = [];
         const errors = validateForm(
-          disclosureStatementConfigEditMode,
+          [...disclosureStatementConfigEditMode, ...disclosureCommentsConfig],
           updatedSiteDisclosure,
           'Site Disclosure',
         );
         if (errors?.length > 0) {
           siteDisclosureErrors.push(...errors);
         }
-        const { siteRegDateRecd, dateCompleted } =
-          (Array.isArray(updatedSiteDisclosure) &&
-            updatedSiteDisclosure.length > 0 &&
-            updatedSiteDisclosure[0]) ||
-          {};
-        if (!!siteRegDateRecd && !!dateCompleted) {
-          if (new Date(dateCompleted) < new Date(siteRegDateRecd)) {
-            siteDisclosureErrors.push({
-              label: 'Site Disclosure',
-              errorMessage: `Site Disclosure Date Completed is always equal or greater than Date Received.`,
-            });
-          }
-        }
+
+        (updatedSiteDisclosure ?? []).forEach(
+          (disclosure: any, index: number) => {
+            const { dateCompleted, siteRegDateRecd, id } = disclosure ?? {};
+
+            // ── Existing: date range validation ──────────────────────────────
+            if (dateCompleted && siteRegDateRecd) {
+              if (new Date(dateCompleted) < new Date(siteRegDateRecd)) {
+                siteDisclosureErrors.push({
+                  label: 'Site Disclosure',
+                  errorMessage: `Site Disclosure [${index + 1}] Date Completed must be equal to or greater than Date Received.`,
+                });
+              }
+            }
+
+            // ── New: duplicate dateCompleted check against full original list ─
+            if (dateCompleted) {
+              const normalizedUpdatedDate = new Date(dateCompleted)
+                .toISOString()
+                .split('T')[0];
+
+              // Find where this item sits in the original list
+              const selfOriginalIndex = siteDisclosure.findIndex(
+                (d: any) => d?.id === id,
+              );
+
+              siteDisclosure.forEach(
+                (originalDisclosure: any, originalIndex: number) => {
+                  // Skip itself and entries before it to avoid reporting A↔B and B↔A
+                  if (originalIndex <= selfOriginalIndex) return;
+
+                  const originalDateCompleted =
+                    originalDisclosure?.dateCompleted;
+                  if (!originalDateCompleted) return;
+
+                  const normalizedOriginalDate = new Date(originalDateCompleted)
+                    .toISOString()
+                    .split('T')[0];
+
+                  if (normalizedUpdatedDate === normalizedOriginalDate) {
+                    siteDisclosureErrors.push({
+                      label: 'Site Disclosure',
+                      errorMessage: `Site Disclosure [${selfOriginalIndex + 1}] has the same Date Completed as Site Disclosure [${originalIndex + 1}].`,
+                    });
+                  }
+                },
+              );
+            }
+          },
+        );
 
         if (siteDisclosureErrors?.length > 0) {
           return siteDisclosureErrors;
@@ -893,18 +987,19 @@ const SiteDetails = () => {
             updatedSiteDisclosure,
             'description',
           );
+          updatedSiteDisclosure = removeProperty(
+            updatedSiteDisclosure,
+            'siteProfileQA',
+          );
           dispatch(setupSiteDisclosureDataForSaving(updatedSiteDisclosure));
           return [];
         }
-      } else {
-        return [];
       }
     } catch (error) {
       console.error(error);
       return [];
     }
   };
-
   const validateNotationsForm = async () => {
     try {
       // Run both validations in parallel and wait for them to finish
@@ -1148,7 +1243,8 @@ const SiteDetails = () => {
       userTypeSR &&
       !hasNoPendingUpdatesFromState &&
       viewMode !== SiteDetailsMode.EditMode;
-    return getActionItems(includeSRApprovalActions, userTypeSR);
+    const canDownloadPdf = isSiteReady && !!id;
+    return getActionItems(includeSRApprovalActions, userTypeSR, canDownloadPdf);
   };
 
   if (id && (isLoading || snapshot.status === RequestStatus.loading)) {
@@ -1163,6 +1259,22 @@ const SiteDetails = () => {
 
   if (snapshot.status === RequestStatus.failed)
     return <div>Error: {snapshot.error || 'Failed to load data'}</div>;
+
+  const handleDownloadPdf = async () => {
+    notifyInfo('Please wait generating PDF report', 'PDF');
+    try {
+      const data = await fetchForPdf();
+      const blob = await pdf(<SiteDetailsPdf data={data} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `site-${data.site?.id ?? 'details'}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      notifyError('Failed to generate PDF. Please try again.', 'PDF Error');
+    }
+  };
 
   const renderOptionsForExternalUser = () => {
     if (
@@ -1384,7 +1496,6 @@ const SiteDetails = () => {
                   onItemClick={handleItemClick}
                 />
               )}
-
             {/* For Edit / SR Dropdown*/}
             <div className="gap-3 align-items-center d-none d-md-flex d-lg-flex d-xl-flex">
               {edit && userType === UserType.Internal && (
@@ -1435,6 +1546,7 @@ const SiteDetails = () => {
                     <ShoppingCartIcon />
                     Add to Cart
                   </Button>
+                  {isSiteReady && id && <DownloadSitePdfButton />}
                 </>
               )}
           </div>
@@ -1660,6 +1772,7 @@ const SiteDetails = () => {
                       <ShoppingCartIcon />
                       Add to Cart
                     </Button>
+                    {isSiteReady && id && <DownloadSitePdfButton />}
                   </>
                 )}
             </div>
@@ -1674,7 +1787,7 @@ const SiteDetails = () => {
                 snapshotDate={
                   snapshot.status === RequestStatus.success &&
                   snapshot.snapshot.data !== null
-                    ? `Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`
+                    ? `Snapshot Taken: ${formatDateTime(new Date(snapshotTakenDate))}`
                     : ''
                 }
               />

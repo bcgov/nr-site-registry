@@ -12,6 +12,7 @@
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@mui/material": "6.3.0",
+    "@react-pdf/renderer": "^4.5.1",
     "@reduxjs/toolkit": "^1.8.5",
     "axios": "^1.13.2",
     "bootstrap": "^5.2.2",
@@ -47,7 +48,7 @@
   "scripts": {
     "start": "concurrently \"react-scripts start\" \"graphql-codegen --watch\"",
     "build": "react-scripts build",
-    "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!@react-parcelmap-bc)/\"  ",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:cov": "npm test -- --coverage",
     "codegen": "graphql-codegen",
@@ -58,6 +59,14 @@
       "react-app",
       "react-app/jest"
     ]
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!@react-parcelmap-bc|axios)/"
+    ],
+    "moduleNameMapper": {
+      "@react-pdf/renderer": "<rootDir>/src/__mocks__/@react-pdf/renderer.js"
+    }
   },
   "overrides": {
     "nth-check": "^2.1.1",

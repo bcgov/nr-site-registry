@@ -1,6 +1,5 @@
 import { FC, ReactNode, useState } from 'react';
 import { ChevronDown, ChevronUp } from '../common/icon';
-import { ApproveRejectButtons } from '../approve/ApproveReject';
 
 interface PanelWithUpDownProps {
   label?: string | ReactNode; // Optional label for the panel
@@ -21,11 +20,10 @@ const PanelWithUpDown: FC<PanelWithUpDownProps> = ({
       className={`d-flex flex-column mb-3 section-container me-2`}
       role="region"
       aria-label={typeof label === 'string' ? label || 'Section' : undefined}
-      aria-expanded={showDetails}
     >
       {label && (
-        <div className="d-flex justify-content-between">
-          <div className="section-content-label">{label}</div>
+        <div className="d-flex align-items-start justify-content-between m-0 p-0">
+          <div className="section-content-label w-100">{label}</div>
           <button
             className="border-0 bg-transparent"
             onClick={() => setShowDetails(!showDetails)}
@@ -37,9 +35,9 @@ const PanelWithUpDown: FC<PanelWithUpDownProps> = ({
         </div>
       )}
       {!label && !showDetails && (
-        <div className="d-flex gap-2">
+        <div className="d-flex gap-2 position-relative">
           {firstChild}
-          <div className="m-0 py-4">
+          <div className="m-0 position-absolute end-0">
             <button
               className="border-0 bg-transparent"
               onClick={() => setShowDetails(!showDetails)}
@@ -55,8 +53,7 @@ const PanelWithUpDown: FC<PanelWithUpDownProps> = ({
         <div className="d-flex position-relative">
           {secondChild}
           {showDetails && !label && (
-            //  <div className="position-absolute end-0">
-            <div className="m-0 py-4 position-absolute end-0">
+            <div className="m-0 position-absolute end-0">
               <button
                 className="border-0 bg-transparent"
                 onClick={() => setShowDetails(!showDetails)}
@@ -66,7 +63,6 @@ const PanelWithUpDown: FC<PanelWithUpDownProps> = ({
                 <ChevronUp />
               </button>
             </div>
-            //  </div>
           )}
         </div>
       )}

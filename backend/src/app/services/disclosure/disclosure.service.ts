@@ -78,22 +78,35 @@ export class DisclosureService {
       if (!result?.length) {
         return [];
       } else {
+        const isExternalUser = user?.identity_provider !== UserTypeEum.IDIR;
+
         const enrichedResults = await Promise.all(
           result.map(async (profile) => {
-            const siteProfileQA = await this.profileQuestionsRepository
-              .createQueryBuilder('pq')
-              .distinct(true)
-              .innerJoin('pq.profileAnswers', 'pa')
-              .innerJoin('pq.category', 'pc')
-              .where(
-                'pa.siteId = :siteId AND pa.sprofDateCompleted = :sprofDateCompleted',
-                { siteId, sprofDateCompleted: profile.dateCompleted },
-              )
-              .select([
-                'pq.description AS question',
-                'pc.description AS category',
-              ])
-              .getRawMany();
+            let siteProfileQA: { question: string; category: string }[];
+
+            if (isExternalUser && profile.profileAnswers?.length) {
+              siteProfileQA = profile.profileAnswers
+                .filter((pa) => pa.question)
+                .map((pa) => ({
+                  question: pa.question?.description,
+                  category: pa.question?.category?.description,
+                }));
+            } else {
+              siteProfileQA = await this.profileQuestionsRepository
+                .createQueryBuilder('pq')
+                .distinct(true)
+                .innerJoin('pq.profileAnswers', 'pa')
+                .innerJoin('pq.category', 'pc')
+                .where(
+                  'pa.siteId = :siteId AND pa.sprofDateCompleted = :sprofDateCompleted',
+                  { siteId, sprofDateCompleted: profile.dateCompleted },
+                )
+                .select([
+                  'pq.description AS question',
+                  'pc.description AS category',
+                ])
+                .getRawMany();
+            }
 
             return {
               ...profile,

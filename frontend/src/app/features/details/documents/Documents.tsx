@@ -113,6 +113,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
         }
 
         const response = await getAxiosInstance().post(GRAPHQL, {
+          operationName: 'getPeopleOrgsCd',
           query: print(graphQLPeopleOrgsCd()),
           variables: { searchParam, entityType: 'ORG' },
         });

@@ -52,6 +52,7 @@ const fetchAllParcelDescriptions = async (
 ): Promise<any[]> => {
   try {
     const response = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'getParcelDescriptionBySiteId',
       query: print(graphQLParcelDescriptionBySiteId()),
       variables: {
         siteId: Number(siteId),
@@ -79,6 +80,7 @@ const fetchAllLandUses = async (
 ): Promise<any[]> => {
   try {
     const response = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'getLandHistoriesForSite',
       query: print(getLandHistoriesForSiteQuery),
       variables: { siteId, pending },
     });

@@ -19,6 +19,7 @@ export const fetchSiteParticipants = createAsyncThunk(
   async (args: { siteId: string; showPending: Boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSiteParticipantBySiteId',
         query: print(graphQLSiteParticipantsBySiteId()),
         variables: {
           siteId: args.siteId,

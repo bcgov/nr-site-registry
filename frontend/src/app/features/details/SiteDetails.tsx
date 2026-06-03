@@ -1202,6 +1202,7 @@ const SiteDetails = () => {
   const handleDeleteSite = async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'DeleteSite',
         query: print(DELETE_SITE_MUTATION),
         variables: {
           input: {

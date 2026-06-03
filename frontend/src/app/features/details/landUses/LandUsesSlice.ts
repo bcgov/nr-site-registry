@@ -30,6 +30,7 @@ export const fetchLandUses = createAsyncThunk(
   }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getLandHistoriesForSite',
         query: print(getLandHistoriesForSiteQuery),
         variables: { siteId, searchTerm, sortDirection, pending: showPending },
       });
@@ -46,6 +47,7 @@ export const fetchLandUseCodes = createAsyncThunk(
   async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getLandUseCodes',
         query: print(getLandUseCodesQuery),
       });
 

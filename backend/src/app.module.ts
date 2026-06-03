@@ -18,6 +18,8 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CustomExceptionFilter } from './app/filters/customExceptionFilters';
 import { LatLngTupleScalar } from './app/scalars/latLngTuple';
+import { MetricsModule } from './app/metrics/metrics.module';
+import { GraphqlMetricsPlugin } from './app/metrics/graphql-metrics.plugin';
 
 /**
  * Application Module Wrapping All Functionality For User Micro Service
@@ -36,6 +38,7 @@ import { LatLngTupleScalar } from './app/scalars/latLngTuple';
       // Secret key of the client taken from keycloak server
     }),
     SiteModule,
+    MetricsModule, // prom-client registry + GraphqlMetricsPlugin provider
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -51,14 +54,20 @@ import { LatLngTupleScalar } from './app/scalars/latLngTuple';
       }),
       // This changes the DB schema to match changes to entities, which we might not want.
     }),
-    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
-      // TODO - Experiment with using old files for localhsot if need be, and true for prod
-      autoSchemaFile: {
-        federation: 2,
-        path: process.env.GRAPHQL_SCHEMA_FILE_PATH || './schema.graphql',
-      },
-      context: () => {},
+      imports: [MetricsModule],
+      inject: [GraphqlMetricsPlugin],
+      // forRootAsync injects the plugin so every GraphQL operation is counted once on response.
+      useFactory: (graphqlMetricsPlugin: GraphqlMetricsPlugin) => ({
+        // TODO - Experiment with using old files for localhsot if need be, and true for prod
+        autoSchemaFile: {
+          federation: 2,
+          path: process.env.GRAPHQL_SCHEMA_FILE_PATH || './schema.graphql',
+        },
+        context: () => ({}),
+        plugins: [graphqlMetricsPlugin],
+      }),
     }),
   ],
   controllers: [AppController],

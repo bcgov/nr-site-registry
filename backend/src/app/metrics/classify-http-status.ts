@@ -1,4 +1,7 @@
-import type { GraphqlErrorClass, GraphqlOutcome } from './operational-metrics.service';
+import type {
+  GraphqlErrorClass,
+  GraphqlOutcome,
+} from './operational-metrics.service';
 
 /** Maps wire HTTP status codes to outcome/error_class for HTTP and GraphQL metrics. */
 

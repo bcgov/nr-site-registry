@@ -2,9 +2,9 @@ import { resolveGraphqlOperationName } from './resolve-graphql-operation-name';
 
 describe('resolveGraphqlOperationName', () => {
   it('uses client operationName when provided', () => {
-    expect(resolveGraphqlOperationName('searchSites', 'query other { x }')).toBe(
-      'searchSites',
-    );
+    expect(
+      resolveGraphqlOperationName('searchSites', 'query other { x }'),
+    ).toBe('searchSites');
   });
 
   it('parses operation name from query when operationName is missing', () => {

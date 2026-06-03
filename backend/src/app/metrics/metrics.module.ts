@@ -8,4 +8,3 @@ import { GraphqlMetricsPlugin } from './graphql-metrics.plugin';
   exports: [OperationalMetricsService, GraphqlMetricsPlugin],
 })
 export class MetricsModule {}
-

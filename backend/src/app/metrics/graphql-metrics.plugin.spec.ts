@@ -51,4 +51,3 @@ describe('GraphqlMetricsPlugin', () => {
     expect(output).toContain('error_class="unknown"');
   });
 });
-

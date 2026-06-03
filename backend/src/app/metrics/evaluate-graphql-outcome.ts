@@ -2,7 +2,10 @@ import {
   classifyHttpStatus,
   errorClassFromHttpStatus,
 } from './classify-http-status';
-import type { GraphqlErrorClass, GraphqlOutcome } from './operational-metrics.service';
+import type {
+  GraphqlErrorClass,
+  GraphqlOutcome,
+} from './operational-metrics.service';
 
 /**
  * Classifies GraphQL operation success/failure for metrics.

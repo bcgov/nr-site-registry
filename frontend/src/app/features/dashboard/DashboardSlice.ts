@@ -26,6 +26,7 @@ export const fetchRecentViews = createAsyncThunk(
   async (userId: string) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getRecentViewsByUserId',
         query: print(graphQLRecentViewsByUserId()),
         variables: {
           userId: userId,
@@ -50,6 +51,7 @@ export const addRecentView = createAsyncThunk(
   }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'addRecentView',
         query: print(graphQLAddRecentView()),
         variables: {
           recentViewDto: {

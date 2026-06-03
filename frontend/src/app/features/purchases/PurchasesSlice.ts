@@ -42,6 +42,7 @@ export const fetchPurchasedSites = createAsyncThunk(
     sortByDir?: string;
   }) => {
     const response = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'getPurchasedSites',
       query: print(getPurchasedSitesQL()),
       variables: {
         page: args.page,

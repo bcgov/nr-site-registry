@@ -5,7 +5,6 @@ import {
   getSiteInsightsQL,
   graphqlSiteDetailsQuery,
   graphqlSiteDetailsQueryForLoggedIn,
-  graphQlSiteQueryForAuthenticatedUsers,
 } from '../graphql/Site';
 import { SiteState } from './SiteState';
 import { RequestStatus } from '../../../helpers/requests/status';
@@ -36,6 +35,9 @@ export const fetchSitesDetails = createAsyncThunk(
       const { siteId } = args;
       const user = getUser();
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: user
+          ? 'findSiteBySiteIdLoggedInUser'
+          : 'findSiteBySiteId',
         query: print(
           user
             ? graphqlSiteDetailsQueryForLoggedIn()
@@ -62,6 +64,7 @@ export const fetchSitesInsights = createAsyncThunk(
   async (args: { siteId: string; showPending?: boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSiteInsights',
         query: print(getSiteInsightsQL()),
         variables: {
           siteId: args.siteId,

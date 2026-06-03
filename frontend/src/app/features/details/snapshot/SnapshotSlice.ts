@@ -26,6 +26,7 @@ export const fetchSnapshots = createAsyncThunk(
   async (siteId: string) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSnapshotsBySiteId',
         query: print(graphQLSnapshotBySiteId()),
         variables: {
           siteId: siteId,
@@ -43,6 +44,7 @@ export const createSnapshotForSites = createAsyncThunk(
   'snapshots/createSnapshotForSites',
   async (inputDto: CreateSnapshotInputDto[]) => {
     const response = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'createSnapshotForSites',
       query: print(createSnapshotForSitesQL()),
       variables: {
         inputDto: inputDto,
@@ -58,6 +60,7 @@ export const getBannerType = createAsyncThunk(
   async (siteId: string) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getBannerType',
         query: print(graphQLGetBannerType()),
         variables: {
           siteId: siteId,

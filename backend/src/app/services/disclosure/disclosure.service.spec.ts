@@ -188,6 +188,146 @@ describe('DisclosureService', () => {
           'user-123',
         );
       });
+
+      it('should use profileAnswers from snapshot instead of fetching from DB', async () => {
+        const mockProfiles = [
+          {
+            siteId: '1',
+            dateCompleted: new Date('2024-01-01'),
+            srAction: SRApprovalStatusEnum.PUBLIC,
+            whoCreated: 'Mid',
+            whenCreated: new Date('2024-01-01'),
+            siteProfileLandUses: [
+              {
+                lutCode: 'RES',
+                srAction: SRApprovalStatusEnum.PUBLIC,
+                whoCreated: 'Mid',
+                whenCreated: new Date('2024-01-01'),
+              },
+            ],
+            profileAnswers: [
+              {
+                questionId: '10',
+                siteId: '1',
+                sprofDateCompleted: new Date('2024-01-01'),
+                question: {
+                  id: '10',
+                  description: 'Was soil tested?',
+                  category: { id: '1', description: 'Soil' },
+                },
+              },
+              {
+                questionId: '20',
+                siteId: '1',
+                sprofDateCompleted: new Date('2024-01-01'),
+                question: {
+                  id: '20',
+                  description: 'Was water tested?',
+                  category: { id: '2', description: 'Water' },
+                },
+              },
+            ],
+          },
+        ];
+
+        snapshotService.getMostRecentSnapshot.mockResolvedValueOnce({
+          snapshotData: { profiles: mockProfiles },
+        });
+
+        const result = await service.getSiteDisclosureBySiteId(
+          '1',
+          false,
+          externalUser,
+        );
+
+        expect(
+          profileQuestionsRepository.createQueryBuilder,
+        ).not.toHaveBeenCalled();
+
+        expect(result).toBeDefined();
+        expect(result.length).toBe(1);
+        expect(result[0].siteProfileQA).toEqual([
+          { question: 'Was soil tested?', category: 'Soil' },
+          { question: 'Was water tested?', category: 'Water' },
+        ]);
+      });
+
+      it('should return schedule2 refs from snapshot siteProfileLandUses', async () => {
+        const mockProfiles = [
+          {
+            siteId: '1',
+            dateCompleted: new Date('2024-01-01'),
+            srAction: SRApprovalStatusEnum.PUBLIC,
+            whoCreated: 'Mid',
+            whenCreated: new Date('2024-01-01'),
+            siteProfileLandUses: [
+              {
+                lutCode: 'RES',
+                srAction: SRApprovalStatusEnum.PUBLIC,
+                whoCreated: 'Mid',
+                whenCreated: new Date('2024-01-01'),
+              },
+              {
+                lutCode: 'COM',
+                srAction: SRApprovalStatusEnum.PUBLIC,
+                whoCreated: 'Mid',
+                whenCreated: new Date('2024-01-01'),
+              },
+            ],
+            profileAnswers: [],
+          },
+        ];
+
+        snapshotService.getMostRecentSnapshot.mockResolvedValueOnce({
+          snapshotData: { profiles: mockProfiles },
+        });
+
+        const result = await service.getSiteDisclosureBySiteId(
+          '1',
+          false,
+          externalUser,
+        );
+
+        expect(result).toBeDefined();
+        expect(result[0].siteProfileSchedule2Refs).toHaveLength(2);
+        expect(result[0].siteProfileSchedule2Refs[0]).toMatchObject({
+          schedule2ReferenceCode: 'RES',
+          srValue: true,
+        });
+        expect(result[0].siteProfileSchedule2Refs[1]).toMatchObject({
+          schedule2ReferenceCode: 'COM',
+          srValue: true,
+        });
+      });
+
+      it('should fetch from DB when profileAnswers is empty in snapshot or is internal users', async () => {
+        const mockProfiles = [
+          {
+            siteId: '1',
+            dateCompleted: new Date('2024-01-01'),
+            srAction: SRApprovalStatusEnum.PUBLIC,
+            whoCreated: 'Mid',
+            whenCreated: new Date('2024-01-01'),
+            siteProfileLandUses: [],
+            profileAnswers: [],
+          },
+        ];
+
+        snapshotService.getMostRecentSnapshot.mockResolvedValueOnce({
+          snapshotData: { profiles: mockProfiles },
+        });
+
+        const result = await service.getSiteDisclosureBySiteId(
+          '1',
+          false,
+          externalUser,
+        );
+
+        expect(
+          profileQuestionsRepository.createQueryBuilder,
+        ).toHaveBeenCalledWith('pq');
+        expect(result).toBeDefined();
+      });
     });
   });
 });

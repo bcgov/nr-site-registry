@@ -35,7 +35,7 @@ export const getLandHistoriesForSiteQuery = gql`
 `;
 
 export const getLandUseCodesQuery = gql`
-  {
+  query getLandUseCodes {
     getLandUseCodes {
       data {
         description

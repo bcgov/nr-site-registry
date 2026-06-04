@@ -38,6 +38,7 @@ export const updateSiteDetailsForApproval = createAsyncThunk(
   async (siteDetailsDTO: any, { getState }) => {
     const saveDTO = siteDetailsDTO;
     const request = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'updateSiteDetails',
       query: print(updateSiteDetails()),
       variables: {
         siteDetailsDTO: saveDTO,
@@ -54,6 +55,7 @@ export const fetchParcelDescriptionsForApproval = createAsyncThunk(
     let response;
     try {
       response = await axios.post(GRAPHQL, {
+        operationName: 'getParcelDescriptionBySiteId',
         query: print(graphQLParcelDescriptionBySiteId()),
         variables: {
           siteId: params.siteId,
@@ -111,6 +113,7 @@ export const fetchPendingAssociatedSites = createAsyncThunk(
   async ({ siteId, showPending }: { siteId: string; showPending: boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getAssociatedSitesBySiteId',
         query: print(graphQLAssociatedSitesBySiteId()),
         variables: {
           siteId: siteId,
@@ -129,6 +132,7 @@ export const fetchPendingSiteDisclosure = createAsyncThunk(
   async ({ siteId, showPending }: { siteId: string; showPending: boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSiteDisclosureBySiteId',
         query: print(graphQLSiteDisclosureBySiteId()),
         variables: {
           siteId: siteId,
@@ -151,6 +155,7 @@ export const fetchPendingDocumentsForApproval = createAsyncThunk(
   async ({ siteId, showPending }: { siteId: string; showPending: boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSiteDocumentsBySiteId',
         query: print(graphQLSiteDocumentsBySiteId()),
         variables: {
           siteId: siteId,
@@ -169,6 +174,7 @@ export const fetchPendingSiteParticipantsForApproval = createAsyncThunk(
   async (args: { siteId: string; showPending: Boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSiteParticipantBySiteId',
         query: print(graphQLSiteParticipantsBySiteId()),
         variables: {
           siteId: args.siteId,
@@ -188,6 +194,7 @@ export const fetchPendingSitesDetailsForApproval = createAsyncThunk(
   async (args: { siteId: string; showPending: Boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'findSiteBySiteIdLoggedInUser',
         query: print(graphqlSiteDetailsQueryForLoggedIn()),
         variables: {
           siteId: args.siteId,
@@ -206,6 +213,7 @@ export const fetchPendingSiteNotationBySiteId = createAsyncThunk(
   async (args: { siteId: string; showPending: Boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSiteNotationBySiteId',
         query: print(graphQLSiteNotationBySiteId()),
         variables: {
           siteId: args.siteId,
@@ -234,6 +242,7 @@ export const fetchPendingLandUses = createAsyncThunk(
   }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getLandHistoriesForSite',
         query: print(getLandHistoriesForSiteQuery),
         variables: { siteId, searchTerm, sortDirection, pending: showPending },
       });

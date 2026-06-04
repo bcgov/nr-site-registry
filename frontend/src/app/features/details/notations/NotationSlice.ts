@@ -23,6 +23,7 @@ export const fetchNotationParticipants = createAsyncThunk(
   }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSiteNotationBySiteId',
         query: print(graphQLSiteNotationBySiteId()),
         variables: {
           siteId: args.siteId,

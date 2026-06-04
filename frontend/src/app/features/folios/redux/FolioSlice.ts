@@ -31,6 +31,7 @@ export const fetchFolioItems = createAsyncThunk(
   async (userId: string) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getFolioItemsForUser',
         query: print(getFolioItemsForUserQL()),
         variables: {
           userId: userId,
@@ -48,6 +49,7 @@ export const getSiteForFolio = createAsyncThunk(
   async (inputDTO: FolioMinDTO) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSitesForFolio',
         query: print(getSitesForFolioQL()),
         variables: {
           folioDTO: inputDTO,
@@ -66,6 +68,7 @@ export const addFolioItem = createAsyncThunk(
   'addFolioItem',
   async (FolioInputDTO: Folio) => {
     const request = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'addFolioItem',
       query: print(addFolioItemQL()),
       variables: {
         FolioDTO: FolioInputDTO,
@@ -79,6 +82,7 @@ export const addSiteToFolio = createAsyncThunk(
   'addSiteToFolio',
   async (FolioInputDTO: FolioContentDTO[]) => {
     const request = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'addSiteToFolio',
       query: print(addSiteToFolioQL()),
       variables: {
         folioDTO: FolioInputDTO,
@@ -92,6 +96,7 @@ export const deleteSitesInFolio = createAsyncThunk(
   'deleteSitesInFolio',
   async (FolioInputDTO: FolioContentDTO[]) => {
     const request = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'deleteSitesInFolio',
       query: print(deleteSitesInFolioQL()),
       variables: {
         folioDTO: FolioInputDTO,
@@ -105,6 +110,7 @@ export const updateFolioItem = createAsyncThunk(
   'updateFolioItem',
   async (FolioInputDTO: Folio[]) => {
     const request = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'updateFolioItem',
       query: print(updateFolioItemQL()),
       variables: {
         FolioDTO: FolioInputDTO,
@@ -118,6 +124,7 @@ export const deleteFolioItem = createAsyncThunk(
   'deleteFolioItem',
   async (FolioId: string) => {
     const request = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'deleteFolioItem',
       query: print(deleteFolioItemQL()),
       variables: {
         folioId: parseInt(FolioId),

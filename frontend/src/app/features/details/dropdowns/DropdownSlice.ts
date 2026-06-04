@@ -41,6 +41,7 @@ export const fetchPeopleOrgsCd = createAsyncThunk(
   async (args?: { searchParam?: string; entityType?: string }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getPeopleOrgsCd',
         query: print(graphQLPeopleOrgsCd()),
         variables: {
           searchParam: args?.searchParam ?? '',
@@ -59,6 +60,7 @@ export const fetchParticipantRoleCd = createAsyncThunk(
   async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getParticipantRoleCd',
         query: print(graphQLParticipantRoleCd()),
       });
       return response.data.data;
@@ -73,6 +75,7 @@ export const fetchNotationParticipantRoleCd = createAsyncThunk(
   async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getNotationParticipantRoleCd',
         query: print(graphQLNotationParticipantRoleCd()),
       });
       return response.data.data;
@@ -87,6 +90,7 @@ export const fetchNotationClassCd = createAsyncThunk(
   async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getNotationClassCd',
         query: print(graphQLNotationClassCd()),
       });
       return response.data.data;
@@ -101,6 +105,7 @@ export const fetchNotationTypeCd = createAsyncThunk(
   async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getNotationTypeCd',
         query: print(graphQLNotationTypeCd()),
       });
       return response.data.data;
@@ -115,6 +120,7 @@ export const fetchMinistryContact = createAsyncThunk(
   async (entityType: string) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getPeopleOrgsCd',
         query: print(graphQLPeopleOrgsCd()),
         variables: {
           entityType: entityType,
@@ -132,6 +138,7 @@ export const fetchInternalUserNameForDropdown = createAsyncThunk(
   async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getIDIRUserListForDropDown',
         query: print(getIDIRUserListForDropDownQL()),
       });
       return response.data;
@@ -146,6 +153,7 @@ export const fetchSiteRiskCd = createAsyncThunk(
   async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSiteRiskCd',
         query: print(graphQLSiteRiskCd()),
       });
       return response.data.data;
@@ -160,6 +168,7 @@ export const fetchBceRegionCd = createAsyncThunk(
   async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getBCeRegionCd',
         query: print(graphQLBCeRegionCd()),
       });
       return response.data.data;
@@ -174,6 +183,7 @@ export const fetchSiteStatusCd = createAsyncThunk(
   async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSiteStatusCd',
         query: print(graphQLSiteStatusCd()),
       });
       return response.data.data;
@@ -188,6 +198,7 @@ export const fetchSchedule2ReferenceCd = createAsyncThunk(
   async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSchedule2Ref',
         query: print(graphQLSchedule2Ref()),
       });
       return response.data.data;

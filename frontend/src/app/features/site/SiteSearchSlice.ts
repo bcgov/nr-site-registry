@@ -42,6 +42,7 @@ export const fetchSearchSites = createAsyncThunk(
         };
       }
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'searchSites',
         query: print(graphQlSiteQuery()),
         variables: {
           searchParam: args.searchParam?.trim(),

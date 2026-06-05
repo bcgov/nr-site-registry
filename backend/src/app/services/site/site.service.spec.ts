@@ -1090,6 +1090,42 @@ describe('SiteService', () => {
 
         expect(result).toBeTruthy();
       });
+
+      it('should approve site disclosure and schedule2 refs in bulk', async () => {
+        const site = {
+          id: '1',
+          siteId: '2',
+          whoUpdated: 'jane',
+          whenUpdated: new Date(),
+          changes: 'site disclosure',
+          address: '123 Main St',
+        };
+        const userInfo = { givenName: 'jane' };
+
+        const mockProfiles = [
+          { id: 'p1', siteId: '2', srAction: 'pending', userAction: '' },
+        ];
+        const mockLandUses = [
+          { siteId: '2', lutCode: 'RES', srAction: 'pending', userAction: '' },
+        ];
+
+        (entityManager.find as jest.Mock).mockImplementation((entity) => {
+          if (entity.name === 'SiteProfiles') return mockProfiles;
+          if (entity.name === 'SiteProfileLandUses') return mockLandUses;
+          return [];
+        });
+
+        const result = await siteService.processSRBulkUpdates(
+          entityManager,
+          site,
+          true,
+          true,
+          userInfo,
+        );
+
+        expect(result).toBeTruthy();
+        expect(entityManager.save).toHaveBeenCalled();
+      });
     });
   });
 
@@ -1166,6 +1202,85 @@ describe('SiteService', () => {
       expect(updatedProfile.whenUpdated).toBeInstanceOf(Date);
       expect(updatedProfile.siteId).toBe('456');
       expect(updatedProfile.whoUpdated).toBe('Updated User');
+    });
+
+    it('should only update srAction and userAction for SR approval (public)', async () => {
+      const siteDisclosure = [
+        {
+          apiAction: UserActionEnum.UPDATED,
+          id: '123',
+          siteId: '456',
+          dateCompleted: new Date('2024-06-01'),
+          srAction: SRApprovalStatusEnum.PUBLIC,
+          siteProfileSchedule2Refs: [],
+        },
+      ];
+      const userInfo = { givenName: 'SR User' };
+      const existingSiteProfile = {
+        id: '123',
+        siteId: '456',
+        dateCompleted: new Date('2024-01-01'),
+        srAction: SRApprovalStatusEnum.PENDING,
+        userAction: UserActionEnum.ADDED,
+        siteProfileLandUses: [],
+      };
+
+      siteProfilesRepo.findOne = jest
+        .fn()
+        .mockResolvedValue(existingSiteProfile);
+
+      await siteService.processSiteDisclosure(
+        siteDisclosure,
+        userInfo,
+        entityManager,
+        '456',
+      );
+
+      expect(entityManager.save).toHaveBeenCalled();
+      const savedProfile = (entityManager.save as jest.Mock).mock.calls[0][1];
+      expect(savedProfile.srAction).toBe(SRApprovalStatusEnum.PUBLIC);
+      expect(savedProfile.userAction).toBe(UserActionEnum.DEFAULT);
+      expect(savedProfile.dateCompleted).toEqual(new Date('2024-01-01'));
+      expect(savedProfile.whoUpdated).toBe('SR User');
+    });
+
+    it('should only update srAction and userAction for SR rejection (private)', async () => {
+      const siteDisclosure = [
+        {
+          apiAction: UserActionEnum.UPDATED,
+          id: '123',
+          siteId: '456',
+          dateCompleted: new Date('2024-06-01'),
+          srAction: SRApprovalStatusEnum.PRIVATE,
+          siteProfileSchedule2Refs: [],
+        },
+      ];
+      const userInfo = { givenName: 'SR User' };
+      const existingSiteProfile = {
+        id: '123',
+        siteId: '456',
+        dateCompleted: new Date('2024-01-01'),
+        srAction: SRApprovalStatusEnum.PENDING,
+        userAction: UserActionEnum.ADDED,
+        siteProfileLandUses: [],
+      };
+
+      siteProfilesRepo.findOne = jest
+        .fn()
+        .mockResolvedValue(existingSiteProfile);
+
+      await siteService.processSiteDisclosure(
+        siteDisclosure,
+        userInfo,
+        entityManager,
+        '456',
+      );
+
+      expect(entityManager.save).toHaveBeenCalled();
+      const savedProfile = (entityManager.save as jest.Mock).mock.calls[0][1];
+      expect(savedProfile.srAction).toBe(SRApprovalStatusEnum.PRIVATE);
+      expect(savedProfile.userAction).toBe(UserActionEnum.DEFAULT);
+      expect(savedProfile.dateCompleted).toEqual(new Date('2024-01-01'));
     });
   });
 

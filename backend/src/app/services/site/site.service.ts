@@ -1905,16 +1905,22 @@ export class SiteService {
                 return;
               }
 
-              Object.assign(existing, {
-                ...disclosureData,
-                userAction:
-                  disclosure.srAction === SRApprovalStatusEnum.PUBLIC ||
-                  disclosure.srAction === SRApprovalStatusEnum.PRIVATE
-                    ? UserActionEnum.DEFAULT
-                    : UserActionEnum.UPDATED,
-                whenUpdated: currentDate,
-                whoUpdated: userInfo?.givenName || '',
-              });
+              const isSrApproval =
+                disclosure.srAction === SRApprovalStatusEnum.PUBLIC ||
+                disclosure.srAction === SRApprovalStatusEnum.PRIVATE;
+
+              if (isSrApproval) {
+                existing.srAction = disclosure.srAction;
+                existing.userAction = UserActionEnum.DEFAULT;
+              } else {
+                Object.assign(existing, {
+                  ...disclosureData,
+                  userAction: UserActionEnum.UPDATED,
+                });
+              }
+
+              existing.whenUpdated = currentDate;
+              existing.whoUpdated = userInfo?.givenName || '';
 
               siteProfile = await transactionalEntityManager.save(
                 SiteProfiles,
@@ -2240,8 +2246,13 @@ export class SiteService {
               
               SELECT sp.site_id, sp.when_Updated , sp.who_updated 
               FROM sites.site_profiles sp
-              LEFT JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
-              WHERE sp.sr_action = 'pending' or sp.user_action = 'updated' or sp2r.sr_action = 'pending' or sp2r.user_action = 'updated'
+              WHERE sp.sr_action = 'pending' or sp.user_action = 'updated'
+              
+              UNION ALL
+              
+              SELECT splu.site_id, splu.when_Updated , COALESCE(splu.who_updated, splu.who_created) as who_updated 
+              FROM sites.site_profile_land_uses splu
+              WHERE splu.sr_action = 'pending' or splu.user_action = 'updated'
           ) AS updates
           GROUP BY site_id, who_updated
       )
@@ -2300,10 +2311,15 @@ export class SiteService {
           
           UNION ALL
           
-          SELECT site_id, 'site disclosure' AS Change, sp.when_Updated, sp.who_updated ,  '' , '', '' 
+          SELECT sp.site_id, 'site disclosure' AS Change, sp.when_Updated, sp.who_updated ,  '' , '', '' 
           FROM sites.site_profiles sp
-          LEFT JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
-          WHERE sp.sr_action = 'pending' or sp.user_action = 'updated' or sp2r.sr_action = 'pending' or sp2r.user_action = 'updated'
+          WHERE sp.sr_action = 'pending' or sp.user_action = 'updated'
+          
+          UNION ALL
+          
+          SELECT splu.site_id, 'site disclosure' AS Change, splu.when_Updated, COALESCE(splu.who_updated, splu.who_created) as who_updated ,  '' , '', '' 
+          FROM sites.site_profile_land_uses splu
+          WHERE splu.sr_action = 'pending' or splu.user_action = 'updated'
       ) AS c
       GROUP BY c.site_id,c.who_updated) Final
       JOIN LatestUpdates lu ON Final.site_id = lu.site_id and Final.who_updated = lu.who ) ResultInFo
@@ -2680,7 +2696,7 @@ export class SiteService {
         }
       }
 
-      if (site.changes.indexOf('site profiles') !== -1) {
+      if (site.changes.indexOf('site disclosure') !== -1) {
         const profiles = !fromSiteDetails
           ? await transactionalEntityManager.find(SiteProfiles, {
               where: {
@@ -2705,6 +2721,37 @@ export class SiteService {
         } else {
           this.sitesLogger.log(
             'SiteService.processSRBulkUpdates() no profiles to process.',
+          );
+        }
+
+        // Also approve/reject pending schedule2 references (SiteProfileLandUses)
+        const pendingLandUses = !fromSiteDetails
+          ? await transactionalEntityManager.find(SiteProfileLandUses, {
+              where: {
+                siteId: site.siteId,
+                whoUpdated: site.whoUpdated,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            })
+          : await transactionalEntityManager.find(SiteProfileLandUses, {
+              where: {
+                siteId: site.siteId,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            });
+
+        if (pendingLandUses?.length > 0) {
+          pendingLandUses.forEach((landUse) => {
+            this.setUpdatedStatus(landUse, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(
+            SiteProfileLandUses,
+            pendingLandUses,
+          );
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no pending schedule2 refs to process.',
           );
         }
       }

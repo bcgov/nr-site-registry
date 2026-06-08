@@ -2696,7 +2696,7 @@ export class SiteService {
         }
       }
 
-      if (site.changes.indexOf('site disclosure') !== -1) {
+      if (site.changes.includes('site disclosure')) {
         const profiles = !fromSiteDetails
           ? await transactionalEntityManager.find(SiteProfiles, {
               where: {

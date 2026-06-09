@@ -24,8 +24,8 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  URL="https://site-backend.apps.silver.devops.gov.bc.ca/csv/generate"
+                  URL="https://nr-site-registry-dev-backend.apps.silver.devops.gov.bc.ca/csv/generate"
                   API_SECRET="$CSV_SECRET"
-                  echo "Targetting URL: $URL"
+                  echo "Targeting URL: $URL"
                   curl -f -H "x-api-secret: $API_SECRET" "$URL"
           restartPolicy: OnFailure

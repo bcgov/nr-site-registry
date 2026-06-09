@@ -651,7 +651,7 @@ const SRUpdates = () => {
     isApproved: boolean,
   ) => {
     const updateDisclosureSchedule2Refs =
-      disclosure?.siteProfileSchedule2Refs.map((schedule: any) => {
+      disclosure?.siteProfileSchedule2Refs?.map((schedule: any) => {
         const updatedSchedule = getUpdateRecordForComponentTypes(
           schedule,
           isApproved,

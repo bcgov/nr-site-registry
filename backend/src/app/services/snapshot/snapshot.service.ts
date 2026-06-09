@@ -636,6 +636,9 @@ export class SnapshotsService {
             UNION ALL
             SELECT site_id, sr_action, when_updated FROM sites.site_profiles
             WHERE site_id = $1 AND sr_action <> 'private'
+            UNION ALL
+            SELECT site_id, sr_action, COALESCE(when_updated, when_created) as when_updated FROM sites.site_profile_land_uses
+            WHERE site_id = $1 AND sr_action <> 'private'
           ),
           PendingCheck AS (
             SELECT 'pending' AS bannertype

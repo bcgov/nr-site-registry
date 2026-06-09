@@ -142,6 +142,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
           return resultCache[searchParam];
         }
         const response = await getAxiosInstance().post(GRAPHQL, {
+          operationName: 'searchSiteIds',
           query: print(graphqlSearchSiteIdsQuery()),
           variables: { searchParam },
         });

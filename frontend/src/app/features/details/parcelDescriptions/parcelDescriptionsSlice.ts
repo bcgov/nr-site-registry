@@ -34,6 +34,7 @@ export const fetchParcelDescriptions = createAsyncThunk(
     let response;
     try {
       response = await axios.post(GRAPHQL, {
+        operationName: 'getParcelDescriptionBySiteId',
         query: print(graphQLParcelDescriptionBySiteId()),
         variables: {
           siteId: params.siteId,

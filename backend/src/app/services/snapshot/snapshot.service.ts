@@ -306,21 +306,27 @@ export class SnapshotsService {
 
   getDisclosureForSnapshotCreation = async (siteId: string) => {
     this.sitesLogger.log(
-      'SnapshotsService.getNotatioParticipantsForSnapshotCreation() start',
+      'SnapshotsService.getDisclosureForSnapshotCreation() start',
     );
     try {
       if (siteId === '' || siteId === null) {
         throw Error('site id cannot be empty');
       }
       this.sitesLogger.log(
-        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
+        'SnapshotsService.getDisclosureForSnapshotCreation() end',
       );
       return this.siteProfilesRepo.find({
         where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        relations: [
+          'siteProfileLandUses',
+          'profileAnswers',
+          'profileAnswers.question',
+          'profileAnswers.question.category',
+        ],
       });
     } catch (error) {
       this.sitesLogger.log(
-        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' +
+        'SnapshotsService.getDisclosureForSnapshotCreation() error' +
           JSON.stringify(error),
       );
       throw error;

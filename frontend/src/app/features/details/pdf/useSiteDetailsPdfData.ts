@@ -25,6 +25,7 @@ import {
   ministryContactDrpdown,
   notationParticipantRoleDrpdown,
   participantRoleDrpdown,
+  schedule2ReferenceCdDrpdown,
 } from '../dropdowns/DropdownSlice';
 
 export interface SiteDetailsPdfData {
@@ -32,7 +33,7 @@ export interface SiteDetailsPdfData {
   notations: any[];
   participants: any[];
   documents: any[];
-  disclosure: any;
+  disclosure: any[];
   associatedSites: any[];
   landUses: any[];
   parcelDescriptions: any[];
@@ -51,6 +52,7 @@ const fetchAllParcelDescriptions = async (
 ): Promise<any[]> => {
   try {
     const response = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'getParcelDescriptionBySiteId',
       query: print(graphQLParcelDescriptionBySiteId()),
       variables: {
         siteId: Number(siteId),
@@ -78,6 +80,7 @@ const fetchAllLandUses = async (
 ): Promise<any[]> => {
   try {
     const response = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'getLandHistoriesForSite',
       query: print(getLandHistoriesForSiteQuery),
       variables: { siteId, pending },
     });
@@ -109,6 +112,7 @@ export const useSiteDetailsPdfData = () => {
   const ministryContactState = useSelector(ministryContactDrpdown);
   const notationParticRoleState = useSelector(notationParticipantRoleDrpdown);
   const participantRoleState = useSelector(participantRoleDrpdown);
+  const schedule2RefState = useSelector(schedule2ReferenceCdDrpdown);
 
   const hasPurchasedSnapshot = useSelector(hasUserPurchasedSnapshot);
 
@@ -132,7 +136,7 @@ export const useSiteDetailsPdfData = () => {
       notations: notationState?.siteNotation ?? [],
       participants: participantState?.siteParticipants ?? [],
       documents: documentState?.siteDocuments ?? [],
-      disclosure: disclosureState?.siteDisclosure ?? {},
+      disclosure: disclosureState?.siteDisclosure ?? [],
       associatedSites: associateState?.siteAssociate ?? [],
       landUses: landUsesState?.landUses ?? [],
       parcelDescriptions: parcelState?.data ?? [],
@@ -153,10 +157,26 @@ export const useSiteDetailsPdfData = () => {
       fetchAllParcelDescriptions(siteId, false),
       fetchAllLandUses(siteId, false),
     ]);
+
+    const schedule2Refs = schedule2RefState?.data ?? [];
+    const rawDisclosures = disclosureState?.siteDisclosure ?? [];
+    const disclosureArray = Array.isArray(rawDisclosures) ? rawDisclosures : [];
+    const enrichedDisclosures = disclosureArray.map((item: any) => ({
+      ...item,
+      siteProfileSchedule2Refs:
+        item?.siteProfileSchedule2Refs?.map((ref: any) => ({
+          ...ref,
+          description:
+            schedule2Refs.find((s: any) => s.key === ref.schedule2ReferenceCode)
+              ?.metaData ?? null,
+        })) ?? [],
+    }));
+
     return {
       ...base,
       parcelDescriptions: allParcelDescriptions,
       landUses: allLandUses,
+      disclosure: enrichedDisclosures,
     };
   };
 

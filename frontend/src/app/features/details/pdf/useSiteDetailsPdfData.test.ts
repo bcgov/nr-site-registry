@@ -59,7 +59,7 @@ const createStore = (overrides: any = {}) =>
     notationParticipant: { siteNotation: [], status: RequestStatus.success },
     siteParticipant: { siteParticipants: [], status: RequestStatus.success },
     documents: { siteDocuments: [], status: RequestStatus.success },
-    siteDisclosure: { siteDisclosure: {}, status: RequestStatus.success },
+    siteDisclosure: { siteDisclosure: [], status: RequestStatus.success },
     associatedSites: { siteAssociate: [], status: RequestStatus.success },
     landUses: {
       landUses: [],
@@ -73,6 +73,7 @@ const createStore = (overrides: any = {}) =>
         ministryContact: { getPeopleOrgsCd: { data: [] } },
         notationParticipantRole: { getNotationParticipantRoleCd: { data: [] } },
         participantRoles: { getParticipantRoleCd: { data: [] } },
+        schedule2Ref: { getSchedule2Ref: { data: [] } },
       },
     },
   });

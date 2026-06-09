@@ -38,6 +38,7 @@ export const fetchPendingSiteForSRApproval = createAsyncThunk(
   }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getPendingSiteForSRApproval',
         query: print(getPendingSiteForSRApprovalQL()),
         variables: {
           searchParam: args.searchParam,
@@ -58,6 +59,7 @@ export const bulkAproveRejectChanges = createAsyncThunk(
   'sites/bulkAproveRejectChanges',
   async (approveRejectDTO: BulkApproveRejectChangesDTO) => {
     const request = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'bulkAproveRejectChanges',
       query: print(bulkAproveRejectChangesQL()),
       variables: {
         approveRejectDTO: approveRejectDTO,

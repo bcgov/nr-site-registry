@@ -158,7 +158,7 @@ export const graphQLSiteStatusCd = () => {
 
 export const graphQLSchedule2Ref = () => {
   return gql`
-    query {
+    query getSchedule2Ref {
       getSchedule2Ref {
         message
         httpStatusCode

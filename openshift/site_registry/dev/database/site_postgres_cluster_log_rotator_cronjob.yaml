@@ -11,7 +11,6 @@ spec:
     spec:
       template:
         spec:
-          serviceAccountName: site-postgres-cluster-log-rotator
           containers:
             - name: cleanup
               image: registry.redhat.io/openshift4/ose-cli:4.13

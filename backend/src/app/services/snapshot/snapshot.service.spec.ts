@@ -1390,6 +1390,12 @@ describe('SnapshotService', () => {
       service.getDisclosureForSnapshotCreation('1');
       expect(siteProfilesRepository.find).toHaveBeenCalledWith({
         where: { siteId: '1', srAction: SRApprovalStatusEnum.PUBLIC },
+        relations: [
+          'siteProfileLandUses',
+          'profileAnswers',
+          'profileAnswers.question',
+          'profileAnswers.question.category',
+        ],
       });
     });
 

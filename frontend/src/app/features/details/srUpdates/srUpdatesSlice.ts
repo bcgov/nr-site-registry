@@ -29,7 +29,7 @@ const initialState: SRUpdatesState = {
   landUsesData: null,
   documents: null,
   siteAssociations: null,
-  disclosure: null,
+  disclosure: [],
   parcelDescriptionData: null,
 };
 
@@ -376,8 +376,8 @@ const srUpdatesSlice = createSlice({
       .addCase(fetchPendingSiteDisclosure.fulfilled, (state, action) => {
         const newState = { ...state };
         if (action.payload.httpStatusCode === 200)
-          newState.disclosure = action.payload.data[0];
-        else newState.disclosure = null;
+          newState.disclosure = action.payload.data;
+        else newState.disclosure = [];
         return newState;
       })
       .addCase(fetchPendingSiteDisclosure.rejected, (state, action) => {
@@ -452,7 +452,7 @@ export const updateRequestStatus = (state: any) =>
 
 export const hasNoPendingUpdates = (state: any) => {
   return (
-    !state.srUpdates.disclosure &&
+    (!state.srUpdates.disclosure || state.srUpdates.disclosure.length === 0) &&
     (!state.srUpdates.parcelDescriptionData ||
       state.srUpdates.parcelDescriptionData?.data?.length === 0) &&
     (!state.srUpdates.landUsesData ||

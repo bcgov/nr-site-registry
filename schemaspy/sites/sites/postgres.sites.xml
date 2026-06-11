@@ -487,7 +487,7 @@
             <column ascending="true" name="site_id"/>
          </index>
       </table>
-      <table name="migrations" remarks="" schema="sites" type="TABLE">
+      <table name="migrations" numRows="66" remarks="" schema="sites" type="TABLE">
          <column autoUpdated="true" defaultValue="nextval('sites.migrations_id_seq'::regclass)" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="serial" typeCode="4"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="timestamp" nullable="false" remarks="" size="19" type="int8" typeCode="-5"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="name" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
@@ -547,7 +547,7 @@
             <column ascending="true" name="bcer_code"/>
          </index>
       </table>
-      <table name="places" remarks="" schema="sites" type="TABLE">
+      <table name="places" numRows="3266" remarks="" schema="sites" type="TABLE">
          <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="0" name="id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="name" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="17" id="2" name="latdeg" nullable="false" remarks="" size="17" type="float8" typeCode="8"/>

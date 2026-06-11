@@ -1,0 +1,12 @@
+apiVersion: porter.devops.gov.bc.ca/v1alpha1
+kind: TransportServerClaim
+metadata:
+  name: site-postgres-cluster-bcgw
+  namespace: c6a6e5-dev
+spec:
+  monitor:
+    interval: 10
+    timeout: 10
+    type: tcp
+  service: site-postgres-cluster-bcgw
+  servicePort: 5432

@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"site-backend:dev","namespace":"c6a6e5-tools"},"fieldPath":"spec.template.spec.containers[?(@.name==\"site-backend\")].image","paused":false}]'
   name: site-backend
   namespace: c6a6e5-dev
   labels:
@@ -26,7 +28,7 @@ spec:
     spec:
       initContainers: # The container that will do the initial migrations.
         - name: site-backend-init
-          image: "image-registry.openshift-image-registry.svc:5000/c6a6e5-tools/site-backend-init:latest"
+          image: "image-registry.openshift-image-registry.svc:5000/c6a6e5-tools/site-backend-init:dev"
           imagePullPolicy: Always
           env:
             - name: POSTGRES_HOST
@@ -65,7 +67,7 @@ spec:
               memory: 128Mi
       containers:
         - name: site-backend
-          image: "image-registry.openshift-image-registry.svc:5000/c6a6e5-tools/site-backend:latest"
+          image: "image-registry.openshift-image-registry.svc:5000/c6a6e5-tools/site-backend:dev"
           imagePullPolicy: Always
           envFrom:
             - secretRef:

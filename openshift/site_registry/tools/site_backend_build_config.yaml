@@ -19,12 +19,12 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: 'site-backend:latest'
+      name: 'site-backend:dev'
   triggers:
-    - type: ConfigChange
-    - type: GitHub
-      github:
-        secretReference:
-          name: site-webhook-secret
+    - type: ImageChange
+      imageChange:
+        from:
+          kind: ImageStreamTag
+          name: site-backend-init:dev
   successfulBuildsHistoryLimit: 5
   failedBuildsHistoryLimit: 5

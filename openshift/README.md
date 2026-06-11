@@ -501,12 +501,47 @@ configure this webhook, you need to apply and create the webhook secret:
 ```sh
 oc -n c6a6e5 -f ./openshift/site_registry/tools/site_webhook_secret.yaml
 # this is what I used to generate the secret:
-openssl rand -base64 24
+openssl rand -hex 24
 ```
 
 Now go to the GitHub repo settings and add the webhook with the generated
-secret. If you look at the BuildConfig in OpenShift, you can see the URL that
-will receive the webhook.
+secret. If you look at the BuildConfig in OpenShift, you can see, and copy, the
+URL that will receive the webhook.
+
+The automatic deploy procedure goes like this:
+
+1. Github issues a webhook to trigger the `site-backend-init` BuildConfig
+
+   1. The `site-backend-init` build completes, which triggers a new build of the
+      `site-backend` BuildConfig. See the `site-backend` BuildConfig for the
+      ImageStreamTag-based trigger.
+   2. The `site-backend` build completes, which triggers a new rollout of the
+      `site-backend` deployment. See the Deployment for the
+      `image.openshift.io/triggers`-based trigger. This annotation trigger
+      **must** be specified in a single line. A multi-line definition will fail.
+
+2. GitHub issues a webhook to trigger the `site-frontend` Buildconfig
+   1. The `site-frontend` build completes, which triggers a new rollout of the
+      `site-frontend` Deployment. It is configured in the same way as the
+      backend deployment mentioned above.
+
+```mermaid
+flowchart TD
+   github[GitHub]
+   backend-init-bc[Backend Init BuildConfig]
+   backend-bc[Backend BuildConfig]
+   frontend-bc[Frontend BuildConfig]
+   backend-rollout[Backend Rollout]
+   frontend-rollout[Frontend Rollout]
+
+   github --Sends Webhook--> backend-init-bc
+   github --Sends Webhook--> frontend-bc
+
+   backend-init-bc --Triggers--> backend-bc
+
+   backend-bc --Triggers--> backend-rollout
+   frontend-bc --Triggers--> frontend-rollout
+```
 
 ### Configuring Promotion From Dev to Test, and Test to Prod.
 

@@ -19,7 +19,7 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: 'site-frontend:latest'
+      name: 'site-frontend:dev'
   triggers:
     - type: ConfigChange
     - type: GitHub

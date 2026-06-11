@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: site-backend
+  namespace: c6a6e5-dev
+  labels:
+    app.kubernetes.io/name: site-backend
+  annotations:
+    route.openshift.io/termination: "edge"
+spec:
+  ingressClassName: openshift-default
+  rules:
+    - host: nr-site-registry-dev-backend.apps.silver.devops.gov.bc.ca
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: site-backend
+                port:
+                  number: 80

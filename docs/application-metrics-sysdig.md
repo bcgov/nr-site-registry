@@ -239,7 +239,7 @@ oc port-forward -n c6a6e5-test svc/nr-site-registry-test-backend 13000:3000
 curl -s http://127.0.0.1:13000/metrics | grep site_registry
 ```
 
-If metrics work on the pod but not in Sysdig after ~30–60 minutes, ask **#devops-sysdig** whether additional scrape config (e.g. ServiceMonitor) is required.
+If metrics work on the pod but not in Sysdig after ~30–60 minutes, ask the Teams channel **OpenShift-howto-sysdig** whether additional scrape config (e.g. ServiceMonitor) is required.
 
 ---
 
@@ -366,7 +366,7 @@ Full panel catalog with titles, types, PromQL, and how to read each panel:
 | Many `failure` / `client` on site-detail ops | Often expected (`success: false` in JSON when not authorized or missing data) |
 | Teammate can't see Sysdig team | Email in CR ≠ SSO login email; or CR not Reconciled |
 
-**Platform help:** Rocket.Chat **#devops-sysdig**
+**Platform help:** Microsoft Teams **OpenShift-howto-sysdig**
 
 ---
 
@@ -376,7 +376,7 @@ Full panel catalog with titles, types, PromQL, and how to read each panel:
 |------|--------|
 | Backend metrics + `/metrics` | App team |
 | Helm scrape annotations + test deploy | App / DevOps |
-| Confirm scrape in Sysdig | Platform / #devops-sysdig if stuck |
+| Confirm scrape in Sysdig | Platform / Teams **OpenShift-howto-sysdig** if stuck |
 | Dashboard panels | App team |
 | SysdigTeam / access | Already in `<license-plate>-tools` (edit users via CR only) |
 

@@ -547,7 +547,7 @@
             <column ascending="true" name="bcer_code"/>
          </index>
       </table>
-      <table name="places" numRows="3266" remarks="" schema="sites" type="TABLE">
+      <table name="places" remarks="" schema="sites" type="TABLE">
          <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="0" name="id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
          <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="name" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
          <column autoUpdated="false" defaultValue="null" digits="17" id="2" name="latdeg" nullable="false" remarks="" size="17" type="float8" typeCode="8"/>

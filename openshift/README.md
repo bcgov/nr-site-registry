@@ -555,3 +555,22 @@ The pipelines just tag the current `:dev` images with `:test` and `:test` images
 with `:prod` respectively. The deployments in each environment should have
 trigger annotations that look for these tags and automatically rebuild and
 rollout.
+
+There is a way to run the pipeline with the `oc` tool, but it involves writing
+a PipelineRun manifest in yaml, so I wouldn't bother because I'm never going to
+remember this.
+
+For reference, the command looks like:
+
+```sh
+oc create -f - <<EOF
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: promote-dev-to-test-run-$(date +%s)
+  namespace: c6a6e5-tools
+spec:
+  pipelineRef:
+    name: promote-dev-to-test
+EOF
+```

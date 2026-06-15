@@ -1008,6 +1008,37 @@ export class SiteService {
       );
     }
 
+    // Update the site's last modified date when SR mark as public or private any edits
+    const hasSrAction = (srAction: string) =>
+      srAction === SRApprovalStatusEnum.PUBLIC ||
+      srAction === SRApprovalStatusEnum.PRIVATE;
+
+    const hasSrApprovalOrRejection =
+      (sitesSummary?.srAction && hasSrAction(sitesSummary.srAction)) ||
+      events?.some(
+        (event) =>
+          hasSrAction(event.srAction) ||
+          event.notationParticipant?.some((p) => hasSrAction(p.srAction)),
+      ) ||
+      eventsParticipants?.some((p) => hasSrAction(p.srAction)) ||
+      siteParticipants?.some((p) => hasSrAction(p.srAction)) ||
+      documents?.some((doc) => hasSrAction(doc.srAction)) ||
+      siteAssociations?.some((assoc) => hasSrAction(assoc.srAction)) ||
+      parcelDescriptions?.some((parcel) => hasSrAction(parcel.srAction)) ||
+      landHistories?.some((history) => hasSrAction(history.srAction)) ||
+      profiles?.some((profile) => hasSrAction(profile.srAction));
+
+    if (hasSrApprovalOrRejection && !sitesSummary) {
+      await transactionalEntityManager.update(
+        Sites,
+        { id: siteId },
+        {
+          whenUpdated: new Date(),
+          whoUpdated: userInfo?.givenName || '',
+        },
+      );
+    }
+
     return true;
   }
 
@@ -2812,6 +2843,16 @@ export class SiteService {
           );
         }
       }
+
+      // Update the site's last modified date whenever any change is approved/rejected
+      await transactionalEntityManager.update(
+        Sites,
+        { id: site.siteId },
+        {
+          whenUpdated: new Date(),
+          whoUpdated: userInfo?.givenName || '',
+        },
+      );
 
       const historyLog: HistoryLog = {
         userId: userInfo ? userInfo.sub : '',

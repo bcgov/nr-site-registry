@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: site-backend-init-promote-dev-to-test
+  namespace: c6a6e5-tools
+spec:
+  tasks:
+    - name: promote-site-backend-init-dev-to-test
+      taskSpec:
+        steps:
+          - name: promote
+            image: 'image-registry.openshift-image-registry.svc:5000/openshift/cli:latest'
+            script: |
+              oc -n c6a6e5-tools tag site-backend-init:dev site-backend-init:test
+              oc -n c6a6e5-tools tag site-backend:dev site-backend:test
+              oc -n c6a6e5-tools tag site-frontend:dev site-frontend:test

@@ -1,0 +1,171 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"site-backend:test","namespace":"c6a6e5-tools"},"fieldPath":"spec.template.spec.containers[?(@.name==\"site-backend\")].image","paused":false}]'
+  name: site-backend
+  namespace: c6a6e5-test
+  labels:
+    app.kubernetes.io/name: site-backend
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: site-backend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: site-backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: '3000'
+        prometheus.io/path: "/metrics"
+    spec:
+      initContainers: # The container that will do the initial migrations.
+        - name: site-backend-init
+          image: "image-registry.openshift-image-registry.svc:5000/c6a6e5-tools/site-backend-init:test"
+          imagePullPolicy: Always
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: host
+                  name: site-postgres-cluster-pguser-site
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: port
+                  name: site-postgres-cluster-pguser-site
+            - name: POSTGRES_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: user
+                  name: site-postgres-cluster-pguser-site
+            - name: POSTGRES_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: site-postgres-cluster-pguser-site
+            - name: POSTGRES_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: dbname
+                  name: site-postgres-cluster-pguser-site
+            - name: POSTGRES_DB_SCHEMA
+              valueFrom:
+                secretKeyRef:
+                  name: site-postgres-cluster
+                  key: postgres_db_schema
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+      containers:
+        - name: site-backend
+          image: "image-registry.openshift-image-registry.svc:5000/c6a6e5-tools/site-backend:test"
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: site-backend
+          env:
+            - name: PORT
+              value: "3000"
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: host
+                  name: site-postgres-cluster-pguser-site
+            - name: POSTGRES_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: user
+                  name: site-postgres-cluster-pguser-site
+            - name: POSTGRES_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: site-postgres-cluster-pguser-site
+            - name: POSTGRES_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: dbname
+                  name: site-postgres-cluster-pguser-site
+            - name: POSTGRES_DB_SCHEMA
+              valueFrom:
+                secretKeyRef:
+                  name: site-postgres-cluster
+                  key: postgres_db_schema
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: port
+                  name: site-postgres-cluster-pguser-site
+            - name: POSTGRES_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: site-postgres-cluster-pguser-postgres
+            - name: POSTGRES_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: user
+                  name: site-postgres-cluster-pguser-postgres
+            - name: LOG_LEVEL
+              value: "info"
+            - name: LOG_FILE_LOCATION
+              value: "/logs/sites-%DATE%.log"
+            - name: LOG_FILE_MAX_SIZE
+              value: "25m"
+            - name: LOG_FILE_MAX_FILES
+              value: "7d"
+            - name: GRAPHQL_SCHEMA_FILE_PATH
+              value: "/graphql/schema.graphql"
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 2
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 30
+          livenessProbe:
+            successThreshold: 1
+            failureThreshold: 3
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          volumeMounts:
+            - mountPath: /logs
+              name: log-storage
+            - mountPath: /graphql
+              name: graphql-storage
+      volumes:
+        - name: log-storage
+          emptyDir: {}
+        - name: graphql-storage
+          emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "kubernetes.io/hostname"
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - site-backend

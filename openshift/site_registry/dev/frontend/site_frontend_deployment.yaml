@@ -1,6 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  annotations:
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"site-frontend:dev","namespace":"c6a6e5-tools"},"fieldPath":"spec.template.spec.containers[?(@.name==\"site-frontend\")].image","paused":false}]'
   name: site-frontend
   namespace: c6a6e5-dev
   labels:
@@ -22,7 +24,7 @@ spec:
     spec:
       containers:
         - name: site-frontend
-          image: 'image-registry.openshift-image-registry.svc:5000/c6a6e5-tools/site-frontend:latest'
+          image: 'image-registry.openshift-image-registry.svc:5000/c6a6e5-tools/site-frontend:dev'
           imagePullPolicy: Always
           env:
             - name: LOG_LEVEL

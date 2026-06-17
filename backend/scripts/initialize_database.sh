@@ -154,6 +154,13 @@ if [ "${existing_rows}" -eq 0 ]; then
         -f "${SEED_DATA_PATH}/data_migration.sql"
     echo "Seed data loaded successfully."
 
+    echo "Calculating RWM flags..."
+    PGPASSWORD="${POSTGRES_ADMIN_PASSWORD}" psql \
+        -v ON_ERROR_STOP=1 \
+        "${db_connection_string}" \
+        -f "${SEED_DATA_PATH}/rwmFlagLogic.sql"
+    echo "RWM flags calculated successfully."
+
     echo "Re-enabling constraints..."
     PGPASSWORD="${POSTGRES_ADMIN_PASSWORD}" psql \
         -v ON_ERROR_STOP=1 \

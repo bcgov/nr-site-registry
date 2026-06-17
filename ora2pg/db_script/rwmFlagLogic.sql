@@ -49,5 +49,4 @@ BEGIN
         END IF;
     END LOOP;
 END$$;
-
-commit;
+END;

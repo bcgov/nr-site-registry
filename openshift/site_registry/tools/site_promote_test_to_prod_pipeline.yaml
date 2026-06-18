@@ -1,11 +1,11 @@
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: site-backend-init-promote-test-to-prod
+  name: site-promote-test-to-prod
   namespace: c6a6e5-tools
 spec:
   tasks:
-    - name: promote-site-backend-init-test-to-prod
+    - name: promote-test-to-prod
       taskSpec:
         steps:
           - name: promote

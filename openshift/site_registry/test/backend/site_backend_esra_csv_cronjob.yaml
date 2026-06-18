@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: site-backend-esra-csv-cronjob
+  namespace: c6a6e5-test
   labels:
     app.kubernetes.io/name: site-backend
 spec:

@@ -2,6 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: site-postgres-cluster-db-init
+  namespace: c6a6e5-test
 spec:
   backoffLimit: 0
   template:

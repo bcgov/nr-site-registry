@@ -343,9 +343,9 @@ UUIDs
    the seed data._
 
    Apply the `site_postgres_cluster_init_pvc.yaml` file, and copy the `ora2pg`
-   files to it: `disable_constraints.sql`, `enable_constraints.sql`, and
-   `data_migration.sql`. See `ora2pg/README.md` for instructions on how to
-   generate `data_migration.sql`
+   files to it: `disable_constraints.sql`, `enable_constraints.sql`,
+   `rwmFlagLogic.sql` and `data_migration.sql`. See `ora2pg/README.md` for
+   instructions on how to generate `data_migration.sql`
 
    In order to do this you will need to mount the PVC to a pod. I usually do
    something like this:

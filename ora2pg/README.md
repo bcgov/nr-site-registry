@@ -39,4 +39,6 @@ docker compose up -d --build
 
 ```
 
-## Execute DB Script (Ora2pg/db_script/rwmFlagLogic.sql) after migrations and existing data is loaded into postgres db
+Once the SQL file has been generated, see the "Bootstrapping the Database"
+section in openshift/README.md for instructions on how to load the data into a
+fresh database.

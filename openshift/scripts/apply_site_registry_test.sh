@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# This script applies all of the site registry dev environment OpenShift
+# This script applies all of the site registry test environment OpenShift
 # manifests, **EXCEPT** for the secrets so that any existing secrets are not
 # overwritten.
 

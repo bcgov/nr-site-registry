@@ -15,11 +15,7 @@ export type GraphqlOutcome = 'success' | 'failure';
 export type GraphqlErrorClass = 'na' | 'client' | 'server' | 'unknown';
 export type AuthFailureReason = 'unauthorized' | 'forbidden';
 export type AuthFailureGuard =
-  | 'http'
-  | 'auth'
-  | 'resource'
-  | 'role'
-  | 'unknown';
+  'http' | 'auth' | 'resource' | 'role' | 'unknown';
 
 const GRAPHQL_DURATION_BUCKETS = [
   0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10,

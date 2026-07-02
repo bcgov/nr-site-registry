@@ -6,12 +6,14 @@ on:
     branches:
       - dev # this is the default branch and not main
 
+
 concurrency:
   # Cancel in progress for PR open and close
   group: ${{ github.event.number }}
   cancel-in-progress: true
 
 jobs:
+  # https://github.com/bcgov-nr/action-builder-ghcr
   builds:
     name: Builds
     runs-on: ubuntu-24.04
@@ -30,13 +32,14 @@ jobs:
             build_context: frontend
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - name: Build ${{ matrix.package }} image
-        run: |
-          docker build \
-            --file ${{ matrix.build_file }} \
-            --tag local/${{ matrix.package }}:${{ github.sha }} \
-            ${{ matrix.build_context }}
+      - uses: bcgov-nr/action-builder-ghcr@v2.2.0
+        with:
+          package: ${{ matrix.package }}
+          tag: ${{ github.event.number }}
+          tag_fallback: latest
+          triggers: ('${{ matrix.package }}/')
+          build_file: ${{ matrix.build_file }}
+          build_context: ${{ matrix.build_context }}
 
   results:
     name: PR Results

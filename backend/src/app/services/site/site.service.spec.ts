@@ -2559,4 +2559,85 @@ describe('SiteService', () => {
       expect(result).toEqual([]);
     });
   });
+
+  describe('processSRBulkUpdates - site whenUpdated/whoUpdated', () => {
+    it('should update site whenUpdated and whoUpdated on every bulk update', async () => {
+      const site = {
+        id: '1',
+        siteId: '10',
+        whoUpdated: 'tester',
+        whenUpdated: new Date(),
+        changes: 'notation',
+        address: '1 Main St',
+      };
+      const userInfo = { givenName: 'SRUser', sub: 'sr-1' };
+
+      (entityManager.find as jest.Mock).mockResolvedValue([]);
+      (entityManager.save as jest.Mock).mockResolvedValue(true);
+      (entityManager.update as jest.Mock).mockResolvedValue(undefined);
+
+      await siteService.processSRBulkUpdates(
+        entityManager,
+        site,
+        true,
+        false,
+        userInfo,
+      );
+
+      expect(entityManager.update).toHaveBeenCalledWith(
+        Sites,
+        { id: '10' },
+        expect.objectContaining({
+          whenUpdated: expect.any(Date),
+          whoUpdated: 'SRUser',
+        }),
+      );
+    });
+  });
+
+  describe('commitSiteDetails - hasSrApprovalOrRejection site update', () => {
+    beforeEach(() => {
+      entityManager.save = jest.fn().mockResolvedValue(true);
+      entityManager.update = jest.fn().mockResolvedValue(undefined);
+      entityManager.findOneOrFail = jest.fn().mockResolvedValue({
+        id: '1',
+        srAction: SRApprovalStatusEnum.PENDING,
+      });
+    });
+
+    it('should update site whenUpdated when SR approves events (no summary)', async () => {
+      const userInfo = { sub: 'sr-user', givenName: 'SRApprover' };
+      const inputDTO: SaveSiteDetailsDTO = {
+        siteId: '1',
+        siteParticipants: [
+          {
+            apiAction: UserActionEnum.UPDATED,
+            id: '1',
+            prCode: 'POWNR',
+            particRoleId: 'role-1',
+            srAction: SRApprovalStatusEnum.PUBLIC,
+          } as any,
+        ],
+      };
+
+      await siteService.commitSiteDetails(entityManager, inputDTO, userInfo);
+
+      const updateCalls = (entityManager.update as jest.Mock).mock.calls;
+      const siteUpdateCall = updateCalls.find(
+        (call) =>
+          call[0] === Sites &&
+          call[1]?.id === '1' &&
+          call[2]?.whenUpdated &&
+          call[2]?.whoUpdated === 'SRApprover' &&
+          !call[2]?.userAction,
+      );
+      expect(siteUpdateCall).toBeDefined();
+      expect(siteUpdateCall[2]).toEqual(
+        expect.objectContaining({
+          whenUpdated: expect.any(Date),
+          whoUpdated: 'SRApprover',
+        }),
+      );
+    });
+  });
 });

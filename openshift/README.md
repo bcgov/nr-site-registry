@@ -556,21 +556,39 @@ with `:prod` respectively. The deployments in each environment should have
 trigger annotations that look for these tags and automatically rebuild and
 rollout.
 
-There is a way to run the pipeline with the `oc` tool, but it involves writing
-a PipelineRun manifest in yaml, so I wouldn't bother because I'm never going to
-remember this.
+### Database Recovery
 
-For reference, the command looks like:
+The Postgres Crunchy cluster has built-in disaster recovery that is pretty easy
+to use. The relevant documentation is located here:
+https://access.crunchydata.com/documentation/postgres-operator/latest/tutorials/backups-disaster-recovery
 
-```sh
-oc create -f - <<EOF
-apiVersion: tekton.dev/v1beta1
-kind: PipelineRun
-metadata:
-  name: promote-dev-to-test-run-$(date +%s)
-  namespace: c6a6e5-tools
+In order to do an in place recovery all that needs to be done is adding the
+following to the postgrescluster yaml definition in OpenShift:
+
+```yaml
 spec:
-  pipelineRef:
-    name: promote-dev-to-test
-EOF
+  backups:
+    pgbackrest:
+      restore:
+        enabled: true
+        repoName: repo1
+        options:
+        - --type=time
+        - --target="2021-06-09 14:15:11-04" # Change this to whatever the last know good time was.
+```
+
+and then execute the recovery by adding the following notation to the postgrescluster:
+
+```bash
+oc annotate -n c6a6e5-prod postgrescluster site-postgres-cluster --overwrite postgres-operator.crunchydata.com/pgbackrest-restore="$(date)"
+```
+
+Once the database is recovered you can remove the restore tree from the manifest:
+
+```yaml
+spec:
+  backups:
+    pgbackrest:
+      restore:
+        enabled: false
 ```

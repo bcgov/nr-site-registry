@@ -139,6 +139,7 @@ UUIDs
 
    ```sh
    oc cp ./data_migration.sql pvc-inspect:/mnt/sql/data_migration.sql
+   oc cp ./ora2pg/db_script/rwmFlagLogic.sql pvc-inspect:/mnt/sql/rwmFlagLogic.sql
    ```
 
    Sometimes for large files this copy command will flake out. If that happens,

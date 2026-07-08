@@ -58,7 +58,7 @@ if [ -z "${SEED_DATA_PATH:-}" ]; then
 fi
 echo "Environment loaded successfully."
 
-# Check that the seed files exists.
+# Check that the necessary files exists.
 # TODO: Investigate making these all one file for simplicity.
 if [ ! -f "${SEED_DATA_PATH}/data_migration.sql" ]; then
     echo "Data migration file not found. Exiting..."
@@ -66,6 +66,10 @@ if [ ! -f "${SEED_DATA_PATH}/data_migration.sql" ]; then
 fi
 if [ ! -f "${SEED_DATA_PATH}/disable_constraints.sql" ]; then
     echo "Constraint disabling sql file not found. Exiting..."
+    exit 1
+fi
+if [ ! -f "${SEED_DATA_PATH}/rwmFlagLogic.sql" ]; then
+    echo "rwmFlagLogic.sql file not found. Exiting..."
     exit 1
 fi
 if [ ! -f "${SEED_DATA_PATH}/enable_constraints.sql" ]; then
@@ -154,12 +158,12 @@ if [ "${existing_rows}" -eq 0 ]; then
         -f "${SEED_DATA_PATH}/data_migration.sql"
     echo "Seed data loaded successfully."
 
-    echo "Calculating RWM flags..."
+    echo "Setting sr_action from rwm_flag..."
     PGPASSWORD="${POSTGRES_ADMIN_PASSWORD}" psql \
         -v ON_ERROR_STOP=1 \
         "${db_connection_string}" \
         -f "${SEED_DATA_PATH}/rwmFlagLogic.sql"
-    echo "RWM flags calculated successfully."
+    echo "sr_action updated successfully."
 
     echo "Re-enabling constraints..."
     PGPASSWORD="${POSTGRES_ADMIN_PASSWORD}" psql \

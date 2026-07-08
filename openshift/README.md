@@ -499,7 +499,7 @@ The BuildConfigs are set to trigger on a webhook from github. In order to
 configure this webhook, you need to apply and create the webhook secret:
 
 ```sh
-oc -n c6a6e5 -f ./openshift/site_registry/tools/site_webhook_secret.yaml
+oc -n c6a6e5 apply -f ./openshift/site_registry/tools/site_webhook_secret.yaml
 # this is what I used to generate the secret:
 openssl rand -hex 24
 ```
@@ -545,4 +545,13 @@ flowchart TD
 
 ### Configuring Promotion From Dev to Test, and Test to Prod.
 
-TODO
+There are two pipeline manifests in `openshift/site_registry/tools` named
+`site_promote_dev_to_test_pipeline.yaml` and
+`site_promote_test_to_prod_pipeline.yaml`. The easiest way to access these is
+through the OpenShift console in developer mode. It'll be in the main menu, and
+you can run the pipeline from there.
+
+The pipelines just tag the current `:dev` images with `:test` and `:test` images
+with `:prod` respectively. The deployments in each environment should have
+trigger annotations that look for these tags and automatically rebuild and
+rollout.

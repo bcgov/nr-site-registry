@@ -1,0 +1,21 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: site-postgres-cluster
+  namespace: c6a6e5-prod
+spec:
+  podSelector:
+    matchLabels:
+      postgres-operator.crunchydata.com/cluster: site-postgres-cluster
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              postgres-operator.crunchydata.com/cluster: site-postgres-cluster
+    - ports:
+        - protocol: TCP
+          port: 5432
+      from:
+        - namespaceSelector: {}
+  policyTypes:
+    - Ingress

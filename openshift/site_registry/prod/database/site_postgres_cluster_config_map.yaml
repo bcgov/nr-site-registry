@@ -1,0 +1,8 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: site-postgres-cluster-bootstrap
+  namespace: c6a6e5-prod
+data:
+  bootstrap.sql: |
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;

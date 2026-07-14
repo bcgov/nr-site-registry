@@ -1,173 +1,120 @@
 #!/bin/ksh
 
-# Usage: KEYCLOAK_CLIENT_SECRET=your-secret ./lto_dump.sh [type]
-# type: 1 or 2 (required)
+# Usage: OUTPUT_FILE=/absolute/path/file ./lto_dump.sh 1|2
 
-# Configuration - all environment variables are required
-API_URL="${API_URL}"
-OUTPUT_FILE="ltodump.lis"
+SCRIPT_DIR=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || exit 1
+. "$SCRIPT_DIR/ltsa_common.sh" || exit 1
 
-# Check if required environment variables are set
-if [[ -z "$API_URL" ]]; then
-    print "Error: API_URL environment variable is required"
-    print ""
-    print "Usage:"
-    print "  API_URL=http://your-api-url:port \\"
-    print "  KEYCLOAK_URL=https://your-keycloak-url/auth \\"
-    print "  KEYCLOAK_REALM=your-realm \\"
-    print "  KEYCLOAK_CLIENT_ID=your-client-id \\"
-    print "  KEYCLOAK_CLIENT_SECRET=your-secret \\"
-    print "  ./lto_dump.sh [type]"
-    print ""
-    print "Required environment variables:"
-    print "  API_URL - Site registry API URL"
-    print "  KEYCLOAK_URL - Keycloak server URL with /auth path"
-    print "  KEYCLOAK_REALM - Keycloak realm name"
-    print "  KEYCLOAK_CLIENT_ID - Keycloak client ID"
-    print "  KEYCLOAK_CLIENT_SECRET - Keycloak client secret"
-    print ""
-    print "Parameters:"
-    print "  type: 1 (PIDs < '025') or 2 (PIDs >= '025')"
+API_URL=${API_URL:-}
+TYPE=${1:-}
+OUTPUT_FILE=${OUTPUT_FILE:-"$PWD/ltodump.lis"}
+MAX_RETRIES=${LTSA_MAX_RETRIES:-5}
+CURL_CONNECT_TIMEOUT=${LTSA_CONNECT_TIMEOUT:-10}
+CURL_MAX_TIME=${LTSA_DUMP_MAX_TIME:-60}
+TOKEN_COMMAND=${LTSA_TOKEN_COMMAND:-"$SCRIPT_DIR/get_keycloak_token.sh"}
+
+if [ -z "$API_URL" ] || { [ "$TYPE" != 1 ] && [ "$TYPE" != 2 ]; }; then
+    ltsa_log "Usage: API_URL=... KEYCLOAK_... OUTPUT_FILE=... $0 1|2"
+    exit 1
+fi
+ltsa_require_command curl || exit 1
+ltsa_require_command jq || exit 1
+
+output_dir=$(dirname "$OUTPUT_FILE") || exit 1
+output_base=$(basename "$OUTPUT_FILE") || exit 1
+if [ ! -d "$output_dir" ]; then
+    ltsa_log "ERROR: output directory does not exist: $output_dir"
+    exit 1
+fi
+output_dir=$(cd "$output_dir" 2>/dev/null && pwd) || exit 1
+OUTPUT_FILE="$output_dir/$output_base"
+
+body_file="$output_dir/.${output_base}.$$.response"
+temp_output="$output_dir/.${output_base}.$$.tmp"
+trap 'rm -f "$body_file" "$temp_output"' 0 1 2 3 15
+
+ACCESS_TOKEN=$("$TOKEN_COMMAND")
+token_status=$?
+if [ "$token_status" -ne 0 ] || [ -z "$ACCESS_TOKEN" ]; then
+    ltsa_log "ERROR: failed to obtain access token"
     exit 1
 fi
 
-# Check if type parameter is provided
-if [[ $# -eq 0 ]]; then
-    print "Error: Type parameter is required"
-    print "Usage: ./lto_dump.sh [type]"
-    print " type: 1 (PIDs < '025') or 2 (PIDs >= '025')"
+attempt=1
+request_ok=no
+while [ "$attempt" -le "$MAX_RETRIES" ]; do
+    delay=$(ltsa_retry_delay "$attempt")
+    [ "$delay" -eq 0 ] || sleep "$delay"
+    : > "$body_file" || exit 1
+
+    http_status=$(curl -sS -o "$body_file" -w '%{http_code}' -X GET \
+        "${API_URL}/ltsa/dump?type=${TYPE}" \
+        -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+        -H "Accept: application/json" \
+        --connect-timeout "$CURL_CONNECT_TIMEOUT" \
+        --max-time "$CURL_MAX_TIME")
+    curl_status=$?
+
+    if [ "$curl_status" -ne 0 ] && ltsa_is_retryable_curl "$curl_status"; then
+        ltsa_log "Dump network failure (curl $curl_status, attempt $attempt/$MAX_RETRIES)"
+        retry=yes
+    elif [ "$curl_status" -ne 0 ]; then
+        ltsa_log "ERROR: dump failed with non-retryable curl exit $curl_status"
+        exit 1
+    elif ltsa_is_retryable_http "$http_status"; then
+        ltsa_log "Dump received retryable HTTP $http_status (attempt $attempt/$MAX_RETRIES)"
+        retry=yes
+    elif [ "$http_status" -lt 200 ] 2>/dev/null || [ "$http_status" -ge 300 ] 2>/dev/null; then
+        ltsa_log "ERROR: dump failed with non-retryable HTTP $http_status"
+        exit 1
+    else
+        request_ok=yes
+        break
+    fi
+
+    if [ "$retry" = yes ] && [ "$attempt" -lt "$MAX_RETRIES" ]; then
+        attempt=$((attempt + 1))
+        continue
+    fi
+    break
+done
+
+if [ "$request_ok" != yes ]; then
+    ltsa_log "ERROR: dump request exhausted $MAX_RETRIES attempts"
     exit 1
 fi
 
-TYPE=$1
-
-# Validate type parameter
-if [[ "$TYPE" != "1" ]] && [[ "$TYPE" != "2" ]]; then
-    print "Error: Type parameter must be 1 or 2"
-    print "  1: PIDs < '025'"
-    print "  2: PIDs >= '025'"
+api_status=$(jq -er '.status | select(type == "string")' "$body_file" 2>/dev/null)
+if [ $? -ne 0 ] || [ "$api_status" != success ]; then
+    ltsa_log "ERROR: dump response status was not success"
+    exit 1
+fi
+api_count=$(jq -er '.count | select(type == "number" and . >= 0)' "$body_file" 2>/dev/null)
+if [ $? -ne 0 ]; then
+    ltsa_log "ERROR: dump response has no valid count"
+    exit 1
+fi
+if ! jq -er '
+    .data
+    | type == "array"
+      and all(.[]; type == "string" and test("^[0-9]{9}$"))
+' "$body_file" >/dev/null 2>&1; then
+    ltsa_log "ERROR: dump response data must contain only nine-digit PID strings"
+    exit 1
+fi
+if ! jq -r '.data[]' "$body_file" > "$temp_output"; then
+    ltsa_log "ERROR: could not extract dump data"
+    exit 1
+fi
+written_count=$(wc -l < "$temp_output" | tr -d ' ')
+if [ "$written_count" != "$api_count" ]; then
+    ltsa_log "ERROR: dump count mismatch (API $api_count, file $written_count)"
+    exit 1
+fi
+if ! mv "$temp_output" "$OUTPUT_FILE"; then
+    ltsa_log "ERROR: could not atomically publish $OUTPUT_FILE"
     exit 1
 fi
 
-# Get the directory where this script is located
-SCRIPT_DIR=$(dirname "$0")
-
-print "API URL: $API_URL"
-print "Type: $TYPE"
-print "Output file: $OUTPUT_FILE"
-
-# Step 1: Get access token
-print "\nGetting access token..."
-ACCESS_TOKEN=$("$SCRIPT_DIR/get_keycloak_token.sh")
-
-# Check if token retrieval was successful
-if [[ $? -ne 0 ]] || [[ -z "$ACCESS_TOKEN" ]]; then
-    print "Failed to get access token"
-    exit 1
-fi
-
-print "\nCalling API endpoint..."
-
-# Retry configuration
-MAX_RETRIES=5
-RETRY_COUNT=0
-BASE_DELAY=1
-
-# Function to make API request with retry logic
-get_api_data_with_retry() {
-    while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
-        RETRY_COUNT=$((RETRY_COUNT + 1))
-        
-        if [[ $RETRY_COUNT -gt 1 ]]; then
-            # Calculate exponential backoff delay
-            case $RETRY_COUNT in
-                2) DELAY=$((BASE_DELAY * 1)) ;;  # 1s
-                3) DELAY=$((BASE_DELAY * 2)) ;;  # 2s
-                4) DELAY=$((BASE_DELAY * 4)) ;;  # 4s
-                5) DELAY=$((BASE_DELAY * 8)) ;;  # 8s
-                *) DELAY=$((BASE_DELAY * 8)) ;;  # fallback to max delay
-            esac
-            print "Retry attempt $RETRY_COUNT/$MAX_RETRIES after ${DELAY}s delay..."
-            sleep $DELAY
-        else
-            print "Making initial API request (attempt $RETRY_COUNT/$MAX_RETRIES)..."
-        fi
-
-        # Make API request
-        API_RESPONSE=$(curl -s -X GET \
-          "${API_URL}/ltsa/dump?type=${TYPE}" \
-          -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-          -H "Content-Type: application/json" \
-          --connect-timeout 10 \
-          --max-time 60)
-
-        # Check if curl command was successful
-        CURL_EXIT_CODE=$?
-        if [[ $CURL_EXIT_CODE -ne 0 ]]; then
-            print "HTTP request failed with curl exit code: $CURL_EXIT_CODE"
-            if [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; then
-                print "Will retry..."
-                continue
-            else
-                print "All retry attempts exhausted. Final failure."
-                return 1
-            fi
-        fi
-
-        # Check if we got a valid JSON response with status success
-        STATUS=$(print "$API_RESPONSE" | jq -r '.status' 2>/dev/null)
-        
-        if [[ "$STATUS" == "success" ]]; then
-            # Verify we have data array
-            DATA_COUNT=$(print "$API_RESPONSE" | jq -r '.count' 2>/dev/null)
-            if [[ "$DATA_COUNT" != "null" ]] && [[ -n "$DATA_COUNT" ]]; then
-                print "Successfully retrieved $DATA_COUNT records on attempt $RETRY_COUNT"
-                return 0
-            else
-                print "Invalid response: missing or null data count"
-                print "Response: $API_RESPONSE"
-                if [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; then
-                    print "Will retry..."
-                    continue
-                else
-                    print "All retry attempts exhausted. Final failure."
-                    return 1
-                fi
-            fi
-        else
-            print "API returned error status: $STATUS"
-            print "Response: $API_RESPONSE"
-            if [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; then
-                print "Will retry..."
-                continue
-            else
-                print "All retry attempts exhausted. Final failure."
-                return 1
-            fi
-        fi
-    done
-}
-
-# Call the retry function
-if ! get_api_data_with_retry; then
-    print "Failed to get API data after $MAX_RETRIES attempts"
-    exit 1
-fi
-
-print "API call successful"
-
-# Extract the data array and save to file
-print $API_RESPONSE | jq -r '.data[]' > $OUTPUT_FILE
-
-# Check if file was created successfully
-if [[ $? -eq 0 ]] && [[ -f "$OUTPUT_FILE" ]]; then
-    print "Data saved to $OUTPUT_FILE"
-    print "Records written: $(wc -l < $OUTPUT_FILE)"
-else
-    print "Failed to save data to file"
-    exit 1
-fi
-
-# Display summary
-print "\nSummary:"
-print $API_RESPONSE | jq '{status, message, type, count, timestamp}'
+ltsa_emit_result success dump "$OUTPUT_FILE" "dump published" "$written_count"
+exit 0

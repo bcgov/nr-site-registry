@@ -4,6 +4,7 @@
 
 - [Operational metrics overview](docs/operational-metrics-dashboard.md) — goals, metric families, **Sysdig dashboard panels**
 - [Application metrics & Sysdig setup](docs/application-metrics-sysdig.md) — backend instrumentation, pod verification, PromQL
+- [LTSA integration](docs/ltsa-integration.md) — end-to-end flow, API and script contracts, monitoring, recovery, and go-live checklist
 
 ## Monitoring (test)
 

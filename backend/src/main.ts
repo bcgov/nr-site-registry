@@ -21,6 +21,7 @@ async function main() {
   // GET /metrics on Express (not a Nest @Controller) so global Keycloak APP_GUARDs in
   // app.module.ts do not require a JWT for the cluster Prometheus/Sysdig scraper.
   http.get('/metrics', async (_req, res) => {
+    await metricsService.refreshLtsaGauges();
     const registry = metricsService.getPromRegistry();
     res.set('Content-Type', registry.contentType);
     res.end(await registry.metrics());

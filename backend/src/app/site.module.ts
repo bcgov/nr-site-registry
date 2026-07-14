@@ -1,9 +1,4 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SiteService } from './services/site/site.service';
 import { Sites } from './entities/sites.entity';
@@ -99,6 +94,10 @@ import { SiteRegistry } from './entities/siteRegistry.entity';
 import { ComsService } from './services/coms/coms.service';
 import { ComsResolver } from './resolvers/coms/coms.resolver';
 import { HttpModule } from '@nestjs/axios';
+import { LtsaRun } from './entities/ltsaRun.entity';
+import { LtsaRecord } from './entities/ltsaRecord.entity';
+import { LtsaRecordAudit } from './entities/ltsaRecordAudit.entity';
+import { MetricsModule } from './metrics/metrics.module';
 
 /**
  * Module for wrapping all functionalities in sites microserivce
@@ -162,8 +161,12 @@ import { HttpModule } from '@nestjs/axios';
       HistoryLog,
       Place,
       SiteRegistry,
+      LtsaRun,
+      LtsaRecord,
+      LtsaRecordAudit,
     ]),
     HttpModule,
+    MetricsModule,
   ],
   providers: [
     CsvService,

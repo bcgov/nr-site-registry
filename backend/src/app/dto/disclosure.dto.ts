@@ -1,6 +1,5 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { ResponseDto } from './response/response.dto';
-import { SiteProfiles } from '../entities/siteProfiles.entity';
 import {
   ChangeAuditEntityDTO,
   ChangeAuditObjectTypeDTO,
@@ -63,16 +62,27 @@ export class SiteProfilesDTO extends ChangeAuditObjectTypeDTO {
   whenUpdated: Date | null;
 
   @Field(() => [SiteProfileSchedule2RefDTO], { nullable: true })
-  siteProfileSchedule2Refs: SiteProfileSchedule2RefDTO[] | null;
+  siteProfileSchedule2Refs?: SiteProfileSchedule2RefDTO[] | null;
+
+  @Field(() => [SiteProfileQADTO], { nullable: true })
+  siteProfileQA?: SiteProfileQADTO[] | null;
 }
 
+@ObjectType()
+export class SiteProfileQADTO {
+  @Field({ nullable: true })
+  question: string | null;
+
+  @Field({ nullable: true })
+  category: string | null;
+}
+
+// Output DTO — keeps the original field names the frontend expects.
+// Backed by SiteProfileLandUses table; schedule2ReferenceCode maps to lutCode.
 @ObjectType()
 export class SiteProfileSchedule2RefDTO extends ChangeAuditObjectTypeDTO {
   @Field()
   id: string;
-
-  @Field()
-  profileId: string;
 
   @Field()
   schedule2ReferenceCode: string;
@@ -132,14 +142,13 @@ export class SiteProfilesInputDTO extends ChangeAuditEntityDTO {
   siteProfileSchedule2Refs: SiteProfileSchedule2RefInputDTO[] | null;
 }
 
+// Input DTO — keeps the original field names the frontend sends.
+// Backed by SiteProfileLandUses table; schedule2ReferenceCode maps to lutCode.
 @InputType()
 export class SiteProfileSchedule2RefInputDTO extends ChangeAuditEntityDTO {
-  @Field()
-  id: string;
+  @Field({ nullable: true })
+  id?: string;
 
-  @Field()
-  profileId: string;
-
-  @Field()
-  schedule2ReferenceCode: string;
+  @Field({ nullable: true })
+  schedule2ReferenceCode?: string;
 }

@@ -27,6 +27,9 @@ export class NotationDto extends ChangeAuditObjectTypeDTO {
   siteId: string;
 
   @Field({ nullable: true })
+  eventDate: Date | null;
+
+  @Field({ nullable: true })
   completionDate: Date | null;
 
   @Field()
@@ -53,6 +56,12 @@ export class NotationDto extends ChangeAuditObjectTypeDTO {
   @Field({ nullable: true })
   whenUpdated: Date | null;
 
+  @Field({ nullable: true })
+  whenDeleted: Date | null;
+
+  @Field({ nullable: true })
+  whenRestored: Date | null;
+
   @Field(() => [NotationParticipantDto], { nullable: true })
   notationParticipant: NotationParticipantDto[] | null;
 }
@@ -70,6 +79,9 @@ export class NotationIputDTO extends ChangeAuditEntityDTO {
   @Field({ nullable: true })
   @IsString()
   siteId?: string | null;
+
+  @Field({ nullable: true })
+  eventDate: Date | null;
 
   @Field({ nullable: true })
   completionDate: Date | null;
@@ -97,6 +109,12 @@ export class NotationIputDTO extends ChangeAuditEntityDTO {
 
   @Field({ nullable: true })
   whenUpdated: Date | null;
+
+  @Field({ nullable: true })
+  whenDeleted: Date | null;
+
+  @Field({ nullable: true })
+  whenRestored: Date | null;
 
   @Field(() => [NotationParticipantInputDTO], { nullable: true })
   notationParticipant: NotationParticipantInputDTO[] | null;

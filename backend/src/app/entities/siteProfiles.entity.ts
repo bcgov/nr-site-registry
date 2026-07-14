@@ -8,14 +8,11 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ProfileAnswers } from './profileAnswers.entity';
-import { ProfileSubmissions } from './profileSubmissions.entity';
 import { SiteProfileLandUses } from './siteProfileLandUses.entity';
-import { SiteProfileOwners } from './siteProfileOwners.entity';
-import { SitePartics } from './sitePartics.entity';
 import { Sites } from './sites.entity';
 import { ChangeAuditEntity } from './changeAuditEntity';
-import { SiteProfileSchedule2Ref } from './siteProfileSchedule2Ref';
+import { ProfileAnswers } from './profileAnswers.entity';
+import { ProfileSubmissions } from './profileSubmissions.entity';
 
 @ObjectType()
 @Index('site_profiles_pkey', ['dateCompleted', 'siteId'], { unique: true })
@@ -351,23 +348,26 @@ export class SiteProfiles extends ChangeAuditEntity {
   })
   govDocumentsComment: string | null;
 
-  // @OneToMany(
-  //   () => ProfileAnswers,
-  //   (profileAnswers) => profileAnswers.siteProfiles,
-  // )
-  // profileAnswers: ProfileAnswers[];
+  @Field(() => [ProfileAnswers], { nullable: true })
+  @OneToMany(
+    () => ProfileAnswers,
+    (profileAnswers) => profileAnswers.siteProfiles,
+  )
+  profileAnswers: ProfileAnswers[];
 
-  // @OneToMany(
-  //   () => ProfileSubmissions,
-  //   (profileSubmissions) => profileSubmissions.siteProfiles,
-  // )
-  // profileSubmissions: ProfileSubmissions[];
+  @Field(() => [ProfileSubmissions], { nullable: true })
+  @OneToMany(
+    () => ProfileSubmissions,
+    (profileSubmissions) => profileSubmissions.siteProfiles,
+  )
+  profileSubmissions: ProfileSubmissions[];
 
-  // @OneToMany(
-  //   () => SiteProfileLandUses,
-  //   (siteProfileLandUses) => siteProfileLandUses.siteProfiles,
-  // )
-  // siteProfileLandUses: SiteProfileLandUses[];
+  @Field(() => [SiteProfileLandUses], { nullable: true })
+  @OneToMany(
+    () => SiteProfileLandUses,
+    (siteProfileLandUses) => siteProfileLandUses.siteProfiles,
+  )
+  siteProfileLandUses: SiteProfileLandUses[];
 
   // @OneToMany(
   //   () => SiteProfileOwners,
@@ -404,10 +404,4 @@ export class SiteProfiles extends ChangeAuditEntity {
   // @ManyToOne(() => SitePartics, (sitePartics) => sitePartics.siteProfiles4)
   // @JoinColumn([{ name: 'site_reg_partic_id', referencedColumnName: 'id' }])
   // siteRegPartic: SitePartics;
-
-  @Field(() => [SiteProfileSchedule2Ref], { nullable: true })
-  @OneToMany(() => SiteProfileSchedule2Ref, (ref) => ref.siteProfile, {
-    eager: true,
-  })
-  siteProfileSchedule2Refs: SiteProfileSchedule2Ref[];
 }

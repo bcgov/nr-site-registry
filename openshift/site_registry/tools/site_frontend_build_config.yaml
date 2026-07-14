@@ -1,0 +1,30 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: site-frontend
+  namespace: c6a6e5-tools
+spec:
+  runPolicy: Serial
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/bcgov/nr-site-registry.git'
+      ref: 'dev'
+    contextDir: frontend
+  strategy:
+    type: Docker
+    dockerStrategy:
+      env:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'site-frontend:dev'
+  triggers:
+    - type: ConfigChange
+    - type: GitHub
+      github:
+        secretReference:
+          name: site-webhook-secret
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5

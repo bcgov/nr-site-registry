@@ -1,0 +1,76 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: site-postgres-cluster-db-init
+  namespace: c6a6e5-test
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: seed
+          image: image-registry.openshift-image-registry.svc:5000/c6a6e5-tools/site-postgres-cluster-db-init:latest
+          command:
+            - /bin/sh
+            - /app/scripts/initialize_database.sh
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: site-postgres-cluster-pguser-postgres
+                  key: host
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: site-postgres-cluster-pguser-postgres
+                  key: port
+            - name: POSTGRES_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: site-postgres-cluster-pguser-site
+                  key: dbname
+            - name: POSTGRES_DB_SCHEMA
+              valueFrom:
+                secretKeyRef:
+                  name: site-postgres-cluster
+                  key: postgres_db_schema
+            - name: POSTGRES_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: site-postgres-cluster-pguser-site
+                  key: user
+            - name: POSTGRES_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: site-postgres-cluster-pguser-site
+                  key: password
+            - name: POSTGRES_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: site-postgres-cluster-pguser-postgres
+                  key: user
+            - name: POSTGRES_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: site-postgres-cluster-pguser-postgres
+                  key: password
+            - name: BCGW_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: site-postgres-cluster-pguser-bcgw
+                  key: user
+            - name: BCGW_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: site-postgres-cluster-pguser-bcgw
+                  key: password
+            - name: SEED_DATA_PATH
+              value: /mnt/sql
+          volumeMounts:
+            - name: seed-data
+              mountPath: /mnt/sql
+      volumes:
+        - name: seed-data
+          persistentVolumeClaim:
+            claimName: site-postgres-cluster-db-init

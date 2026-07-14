@@ -1,5 +1,9 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import {
+  AuthenticatedUser,
+  RoleMatchingMode,
+  Roles,
+} from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { LandHistories } from '../../entities/landHistories.entity';
 import { LandHistoryResponse } from '../../dto/landHistory.dto';
@@ -20,12 +24,12 @@ export class LandHistoryResolver {
   ) {}
 
   @Roles({
-      roles: [
-        CustomRoles.External,
-        CustomRoles.Internal,
-        CustomRoles.SiteRegistrar,
-      ],
-      mode: RoleMatchingMode.ANY,
+    roles: [
+      CustomRoles.External,
+      CustomRoles.Internal,
+      CustomRoles.SiteRegistrar,
+    ],
+    mode: RoleMatchingMode.ANY,
   })
   @Query(() => LandHistoryResponse, { name: 'getLandHistoriesForSite' })
   async getLandHistoriesForSite(
@@ -40,6 +44,7 @@ export class LandHistoryResolver {
 
     @Args('pending', { type: () => Boolean, nullable: true })
     showPending: boolean,
+    @AuthenticatedUser() user: any,
   ) {
     this.sitesLogger.log(
       'LandHistoryResolver.getLandHistoriesForSite() start siteId:' +
@@ -58,8 +63,11 @@ export class LandHistoryResolver {
       searchTerm,
       sortDirection,
       showPending,
+      user,
     );
-    this.sitesLogger.log( `LandHistoryResolver.getLandHistoriesForSite() result: ${JSON.stringify(result)}`);
+    this.sitesLogger.log(
+      `LandHistoryResolver.getLandHistoriesForSite() result: ${JSON.stringify(result)}`,
+    );
     if (result?.length > 0) {
       this.sitesLogger.log(
         'LandHistoryResolver.getLandHistoriesForSite() RES:200 end',
@@ -74,17 +82,17 @@ export class LandHistoryResolver {
       this.sitesLogger.log(
         `Land uses not found for site id ${siteId} with search term ${searchTerm} and sort direction ${sortDirection}`,
       );
-      
+
       const response = this.genericResponseProvider.createResponse(
         `Land uses data not found for site id: ${siteId}`,
         HttpStatus.NOT_FOUND,
         false,
         [],
       );
-      
+
       this.sitesLogger.log(
         'LandHistoryResolver.getLandHistoriesForSite() response: ' +
-        JSON.stringify(response),
+          JSON.stringify(response),
       );
       this.sitesLogger.log(
         'LandHistoryResolver.getLandHistoriesForSite() RES:404 end',

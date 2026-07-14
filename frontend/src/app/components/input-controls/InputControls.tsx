@@ -54,12 +54,18 @@ export const Link: React.FC<InputProps> = ({
   stickyCol,
   href,
   customContainerCss,
+  componentName,
+  componentPath,
 }) => {
   return renderTableCell(
     <RouterLink
       to={href + value}
       className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
       aria-label={`${label + ' ' + value}`}
+      state={{
+        fromPath: componentPath ?? '',
+        fromLabel: componentName ?? '',
+      }}
     >
       {customIcon && customIcon}{' '}
       <span className="ps-1">{customLinkValue ?? value}</span>
@@ -92,13 +98,18 @@ export const DeleteIcon: React.FC<InputProps> = ({
   label,
   onChange,
   stickyCol,
+  customInputTextCss,
   customContainerCss,
 }) => {
   return renderTableCell(
-    <div onClick={onChange}>
+    <RouterLink
+      to="#"
+      className={`${customInputTextCss ?? ''}`}
+      onClick={onChange}
+    >
       <TrashCanIcon title="Remove" />
-      <span aria-label={label}>&nbsp;Remove</span>
-    </div>,
+      <span aria-label={label}>Remove</span>
+    </RouterLink>,
     stickyCol,
     customContainerCss,
   );
@@ -147,16 +158,28 @@ export const TextInput: React.FC<InputProps> = ({
   const ContainerElement = tableMode ? 'td' : 'div';
   const [error, setError] = useState<string | null>(null);
 
+  // Reset error when toggling between edit and view modes
+  useEffect(() => {
+    setError(null);
+  }, [isEditing]);
+
   const validateInput = (inputValue: string) => {
-    if (validation) {
-      if (validation.required && !inputValue.trim()) {
-        setError(validation.customMessage || ' ');
-        return false;
-      }
-      if (validation?.pattern && !validation.pattern?.test(inputValue)) {
-        setError(validation.customMessage || '');
-        return false;
-      }
+    if (validation?.required && !inputValue?.trim()) {
+      setError(validation?.customMessage || ' ');
+      return false;
+    }
+    if (validation?.pattern && !validation?.pattern?.test(inputValue)) {
+      setError(validation?.customMessage || '');
+      return false;
+    }
+    if (validation?.maxLength && inputValue?.length > validation?.maxLength) {
+      setError(`Maximum ${validation?.maxLength} characters allowed`);
+      return false;
+    }
+
+    if (allowNumbersOnly && /\D/.test(inputValue)) {
+      setError(validation?.customMessage || ' ');
+      return false;
     }
 
     setError(null);
@@ -164,16 +187,15 @@ export const TextInput: React.FC<InputProps> = ({
   };
 
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
+    let inputValue = e.target.value;
+
+    validateInput(inputValue);
+
+    if (allowNumbersOnly) {
+      inputValue = inputValue.replace(/\D/g, '');
+    }
+
     onChange(inputValue);
-
-    if (allowNumbersOnly || (inputValue && !validateInput(inputValue))) {
-      return;
-    }
-
-    if (validation?.required) {
-      validateInput(inputValue);
-    }
   };
 
   // Replace any spaces in the label with underscores to create a valid id
@@ -208,9 +230,6 @@ export const TextInput: React.FC<InputProps> = ({
           aria-label={label} // Accessibility
           required={error ? true : false}
           disabled={isDisabled ?? false}
-          {...(validation?.maxLength
-            ? { maxLength: validation.maxLength }
-            : {})}
           {...(validation?.minLength
             ? { minLength: validation.minLength }
             : {})}
@@ -230,7 +249,6 @@ export const TextInput: React.FC<InputProps> = ({
       )}
     </ContainerElement>
   );
-  // }
 };
 
 export const DropdownInput: React.FC<InputProps> = ({
@@ -702,6 +720,7 @@ export const DateInput: React.FC<InputProps> = ({
           value={parsedDate ?? null}
           onChange={handleDateChange}
           oneTap
+          disabled={isDisabled}
           readOnly={isDisabled}
         />
       ) : (
@@ -818,18 +837,28 @@ export const TextAreaInput: React.FC<InputProps> = ({
   const cols = textAreaColoum ?? undefined;
   const rows = textAreaRow ?? undefined;
   const [error, setError] = useState<string | null>(null);
-  const [currentValue, setCurrentValue] = useState(value ?? '');
+
+  useEffect(() => {
+    setError(null);
+  }, [isEditing]);
 
   const validateInput = (inputValue: string) => {
-    if (validation) {
-      if (validation?.pattern && !validation.pattern?.test(inputValue)) {
-        setError(validation.customMessage || ' ');
-        return false;
-      }
-      if (validation.required && !inputValue.trim()) {
-        setError(validation.customMessage || ' ');
-        return false;
-      }
+    if (validation?.required && !inputValue?.trim()) {
+      setError(validation?.customMessage || ' ');
+      return false;
+    }
+    if (validation?.pattern && !validation?.pattern?.test(inputValue)) {
+      setError(validation?.customMessage || '');
+      return false;
+    }
+    if (validation?.maxLength && inputValue?.length > validation?.maxLength) {
+      setError(`Maximum ${validation?.maxLength} characters allowed`);
+      return false;
+    }
+
+    if (allowNumbersOnly && /\D/.test(inputValue)) {
+      setError(validation?.customMessage || ' ');
+      return false;
     }
 
     setError(null);
@@ -837,13 +866,14 @@ export const TextAreaInput: React.FC<InputProps> = ({
   };
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const inputValue = e.target.value;
-    setCurrentValue(inputValue);
-    onChange(inputValue);
+    let inputValue = e.target.value;
 
-    if (allowNumbersOnly || (inputValue && !validateInput(inputValue))) {
-      return;
+    validateInput(inputValue);
+    if (allowNumbersOnly) {
+      inputValue = inputValue.replace(/\D/g, '');
     }
+
+    onChange(inputValue);
   };
 
   return (
@@ -870,7 +900,7 @@ export const TextAreaInput: React.FC<InputProps> = ({
             customEditInputTextCss ?? 'custom-input-text'
           } ${error && 'error'}`}
           placeholder={placeholder}
-          value={currentValue}
+          value={value}
           onChange={handleTextAreaChange}
           aria-label={label}
           rows={rows}

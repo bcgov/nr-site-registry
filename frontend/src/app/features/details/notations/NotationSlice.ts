@@ -16,13 +16,19 @@ const initialState: INotationState = {
 // Define the asynchronous thunk to fetch site participants from the backend
 export const fetchNotationParticipants = createAsyncThunk(
   'notationParticipant/fetchNotationParticipants',
-  async (args: { siteId: string; showPending: Boolean }) => {
+  async (args: {
+    siteId: string;
+    showPending: boolean;
+    includeDeleted?: boolean;
+  }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSiteNotationBySiteId',
         query: print(graphQLSiteNotationBySiteId()),
         variables: {
           siteId: args.siteId,
           pending: args.showPending,
+          includeDeleted: args.includeDeleted ?? false,
         },
       });
       return response.data.data.getSiteNotationBySiteId.data;

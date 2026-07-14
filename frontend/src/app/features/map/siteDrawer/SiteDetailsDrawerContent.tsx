@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Map } from 'leaflet';
 import {
-  useMapSearch_FindSiteBySiteIdQuery,
   MapSearch_FindSiteBySiteIdQuery,
+  useMapSearch_FindSiteBySiteIdLoggedInUserQuery,
+  useMapSearch_FindSiteBySiteIdQuery,
   useMapSearch_AddCartItemMutation,
 } from '../../../../graphql/generated';
 import {
@@ -20,6 +21,8 @@ import { useMapSearchContext } from '../mapSearchContext/MapSearchContext';
 import { AppDispatch } from '../../../Store';
 import { fetchCartItems } from '../../cart/CartSlice';
 import { notifyError, notifySuccess } from '../../../components/alert/Alert';
+import { isUserOfType, getUser, UserRoleType } from '../../../helpers/utility';
+import { useAuth } from 'react-oidc-context';
 
 const SummaryItem = ({
   label,
@@ -65,12 +68,22 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
   const { selectedSiteId } = useMapSearchContext();
 
   const dispatch = useDispatch<AppDispatch>();
+  const auth = useAuth();
 
-  const { data, loading: siteDetailsLoading } =
+  const isAuthenticated = auth?.user != null;
+
+  const { data: publicData, loading: publicLoading } =
     useMapSearch_FindSiteBySiteIdQuery({
       variables: { siteId: selectedSiteId || '' },
-      skip: !selectedSiteId,
+      skip: !selectedSiteId || isAuthenticated,
     });
+  const { data: loggedInData, loading: loggedInLoading } =
+    useMapSearch_FindSiteBySiteIdLoggedInUserQuery({
+      variables: { siteId: selectedSiteId || '' },
+      skip: !selectedSiteId || !isAuthenticated,
+    });
+
+  const siteDetailsLoading = isAuthenticated ? loggedInLoading : publicLoading;
 
   const [addCartItem, { loading: addCartItemLoading }] =
     useMapSearch_AddCartItemMutation({
@@ -84,6 +97,12 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
   const handleAddCartItemClick = () => {
     if (!selectedSiteId) return;
 
+    const loggedInUser = getUser();
+    if (loggedInUser === null) {
+      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+      return;
+    }
+
     addCartItem({
       variables: {
         siteId: selectedSiteId,
@@ -91,7 +110,9 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
     });
   };
 
-  const siteData = data?.findSiteBySiteId.data;
+  const siteData = isAuthenticated
+    ? loggedInData?.findSiteBySiteIdLoggedInUser?.data
+    : publicData?.findSiteBySiteId?.data;
 
   const zoomToSite = () => {
     if (!mapRef.current || !siteData || !siteData.latdeg || !siteData.longdeg)
@@ -123,6 +144,10 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
           <Link
             to={`/site/details/${selectedSiteId}`}
             className="justify-content-center"
+            state={{
+              fromPath: `${'map?site=' + selectedSiteId}`,
+              fromLabel: 'Map',
+            }}
           >
             <Button
               variant="secondary"
@@ -131,19 +156,23 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
               View Site Details
             </Button>
           </Link>
-          <AddToFolio
-            selectedSiteIds={[selectedSiteId || '']}
-            label="Add to Folio"
-            triggerClassName="justify-content-center"
-          />
-          <Button
-            onClick={handleAddCartItemClick}
-            disabled={addCartItemLoading}
-            className="justify-content-center"
-          >
-            <ShoppingCartIcon />
-            Add to Cart
-          </Button>
+          {!isUserOfType(UserRoleType.INTERNAL) && (
+            <>
+              <AddToFolio
+                selectedSiteIds={[selectedSiteId || '']}
+                label="Add to Folio"
+                triggerClassName="justify-content-center"
+              />
+              <Button
+                onClick={handleAddCartItemClick}
+                disabled={addCartItemLoading}
+                className="justify-content-center"
+              >
+                <ShoppingCartIcon />
+                Add to Cart
+              </Button>
+            </>
+          )}
         </div>
       </div>
       <div className="">

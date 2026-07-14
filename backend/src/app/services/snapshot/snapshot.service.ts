@@ -15,6 +15,7 @@ import { SnapshotSiteContent } from '../../dto/snapshotSiteContent';
 import { Events } from '../../entities/events.entity';
 import { LoggerService } from '../../logger/logger.service';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
+import { CartService } from '../cart/cart.service';
 
 @Injectable()
 export class SnapshotsService {
@@ -40,6 +41,7 @@ export class SnapshotsService {
     @InjectRepository(SiteProfiles)
     private siteProfilesRepo: Repository<SiteProfiles>,
     private readonly sitesLogger: LoggerService,
+    private readonly cartService: CartService,
   ) {}
 
   async getSnapshots() {
@@ -304,21 +306,27 @@ export class SnapshotsService {
 
   getDisclosureForSnapshotCreation = async (siteId: string) => {
     this.sitesLogger.log(
-      'SnapshotsService.getNotatioParticipantsForSnapshotCreation() start',
+      'SnapshotsService.getDisclosureForSnapshotCreation() start',
     );
     try {
       if (siteId === '' || siteId === null) {
         throw Error('site id cannot be empty');
       }
       this.sitesLogger.log(
-        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
+        'SnapshotsService.getDisclosureForSnapshotCreation() end',
       );
       return this.siteProfilesRepo.find({
         where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        relations: [
+          'siteProfileLandUses',
+          'profileAnswers',
+          'profileAnswers.question',
+          'profileAnswers.question.category',
+        ],
       });
     } catch (error) {
       this.sitesLogger.log(
-        'SnapshotsService.getNotatioParticipantsForSnapshotCreation() error' +
+        'SnapshotsService.getDisclosureForSnapshotCreation() error' +
           JSON.stringify(error),
       );
       throw error;
@@ -337,7 +345,10 @@ export class SnapshotsService {
         'SnapshotsService.getNotatioParticipantsForSnapshotCreation() end',
       );
       return await this.siteSubDivisionsRepo.find({
-        where: { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+        where: [
+          { siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+          { siteId, srAction: IsNull() },
+        ],
       });
     } catch (error) {
       this.sitesLogger.log(
@@ -389,7 +400,11 @@ export class SnapshotsService {
               new SnapshotSiteContent();
 
             snapShotContent.sitesSummary = await this.sitesRespository.findOne({
-              where: { id: siteId, srAction: SRApprovalStatusEnum.PUBLIC },
+              where: {
+                id: siteId,
+                srAction: SRApprovalStatusEnum.PUBLIC,
+                whoDeleted: IsNull(), // Prevent purchasing snapshots of deleted sites
+              },
             });
 
             if (snapShotContent.sitesSummary === null) {
@@ -457,6 +472,18 @@ export class SnapshotsService {
       const saveResult = await this.snapshotRepository.save(snapShotsToBeSaved);
 
       if (saveResult?.length > 0) {
+        // Delete purchased sites from cart
+        const siteIdsToDelete = inputDto
+          .filter((dto) => dto.siteId)
+          .map((dto) => ({ siteId: dto.siteId, userId: userInfo.sub }));
+
+        if (siteIdsToDelete.length > 0) {
+          await this.cartService.deleteCartWithSiteId(
+            siteIdsToDelete,
+            userInfo.sub,
+          );
+        }
+
         this.sitesLogger.log('SnapshotsService.createSnapshotForSites() end');
         this.sitesLogger.debug('SnapshotsService.createSnapshotForSites() end');
         return true;
@@ -473,6 +500,107 @@ export class SnapshotsService {
       throw new HttpException(
         `Failed to create snapshot.`,
         HttpStatus.EXPECTATION_FAILED,
+      );
+    }
+  }
+
+  async getPurchasedSitesForUser(
+    userId: string,
+    page: number = 1,
+    pageSize: number = 10,
+    sortBy: string = 'purchaseDate',
+    sortByDir: string = 'DESC',
+  ) {
+    this.sitesLogger.log('SnapshotsService.getPurchasedSitesForUser() start');
+    try {
+      const sortColumnMap: Record<string, string> = {
+        siteId: 'site_id',
+        address: 'addr_line_1',
+        city: 'city',
+        purchaseDate: 'purchase_date',
+        status: 'status',
+      };
+
+      const sortColumn = sortColumnMap[sortBy] || 'purchase_date';
+      const sortDirection = sortByDir?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+      const offset = (page - 1) * pageSize;
+
+      const query = `
+        WITH purchased AS (
+          SELECT
+            s.site_id,
+            si.addr_line_1,
+            si.addr_line_2,
+            si.addr_line_3,
+            si.city,
+            MAX(s.when_created) AS purchase_date,
+            CASE
+              WHEN EXISTS (
+                SELECT 1 FROM (
+                  SELECT id AS site_id, sr_action, when_updated FROM sites.sites WHERE id = s.site_id
+                  UNION ALL SELECT site_id, sr_action, when_updated FROM sites.events WHERE site_id = s.site_id
+                  UNION ALL SELECT site_id, sr_action, when_updated FROM sites.site_partics WHERE site_id = s.site_id
+                  UNION ALL SELECT site_id, sr_action, when_updated FROM sites.site_docs WHERE site_id = s.site_id
+                  UNION ALL SELECT site_id, sr_action, when_updated FROM sites.site_assocs WHERE site_id = s.site_id
+                  UNION ALL SELECT site_id, sr_action, when_updated FROM sites.land_histories WHERE site_id = s.site_id
+                  UNION ALL SELECT site_id, sr_action, when_updated FROM sites.site_profiles WHERE site_id = s.site_id
+                ) combined WHERE combined.sr_action = 'pending'
+              ) THEN 'pending'
+              WHEN EXISTS (
+                SELECT 1 FROM (
+                  SELECT id AS site_id, sr_action, when_updated FROM sites.sites WHERE id = s.site_id
+                  UNION ALL SELECT site_id, sr_action, when_updated FROM sites.events WHERE site_id = s.site_id
+                  UNION ALL SELECT site_id, sr_action, when_updated FROM sites.site_partics WHERE site_id = s.site_id
+                  UNION ALL SELECT site_id, sr_action, when_updated FROM sites.site_docs WHERE site_id = s.site_id
+                  UNION ALL SELECT site_id, sr_action, when_updated FROM sites.site_assocs WHERE site_id = s.site_id
+                  UNION ALL SELECT site_id, sr_action, when_updated FROM sites.land_histories WHERE site_id = s.site_id
+                  UNION ALL SELECT site_id, sr_action, when_updated FROM sites.site_profiles WHERE site_id = s.site_id
+                ) combined WHERE combined.sr_action = 'public' AND combined.when_updated > MAX(s.when_created)
+              ) THEN 'outdated'
+              ELSE 'current'
+            END AS status
+          FROM sites.snapshots s
+          JOIN sites.sites si ON si.id = s.site_id
+          WHERE s.user_id = $1
+          GROUP BY s.site_id, si.addr_line_1, si.addr_line_2, si.addr_line_3, si.city
+        )
+        SELECT *, COUNT(*) OVER() AS total_count
+        FROM purchased
+        ORDER BY ${sortColumn} ${sortDirection}
+        LIMIT $2 OFFSET $3
+      `;
+
+      const entityManager = this.snapshotRepository.manager;
+      const result = await entityManager.query(query, [
+        userId,
+        pageSize,
+        offset,
+      ]);
+
+      const totalRecords =
+        result.length > 0 ? parseInt(result[0].total_count, 10) : 0;
+
+      this.sitesLogger.log('SnapshotsService.getPurchasedSitesForUser() end');
+      return {
+        data: result.map((row: any) => ({
+          siteId: row.site_id,
+          address: [row.addr_line_1, row.addr_line_2, row.addr_line_3]
+            .filter(Boolean)
+            .join(' '),
+          city: row.city,
+          purchaseDate: row.purchase_date,
+          status: row.status,
+        })),
+        totalRecords,
+      };
+    } catch (error) {
+      this.sitesLogger.error(
+        'Exception in SnapshotsService.getPurchasedSitesForUser()',
+        JSON.stringify(error),
+      );
+      throw new HttpException(
+        'Failed to retrieve purchased sites.',
+        HttpStatus.NOT_FOUND,
       );
     }
   }
@@ -507,6 +635,9 @@ export class SnapshotsService {
             WHERE site_id = $1 AND sr_action <> 'private'
             UNION ALL
             SELECT site_id, sr_action, when_updated FROM sites.site_profiles
+            WHERE site_id = $1 AND sr_action <> 'private'
+            UNION ALL
+            SELECT site_id, sr_action, COALESCE(when_updated, when_created) as when_updated FROM sites.site_profile_land_uses
             WHERE site_id = $1 AND sr_action <> 'private'
           ),
           PendingCheck AS (

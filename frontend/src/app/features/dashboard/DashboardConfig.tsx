@@ -15,9 +15,11 @@ export const recentViewedColumns: TableColumn[] = [
       value: '',
       customInputTextCss: 'custom-dashboard-input-txt',
       tableMode: true,
-      href: 'site/details/',
+      href: '/dashboard/site/details/',
+      componentName: 'Dashboard',
+      componentPath: 'dashboard',
     },
-    linkRedirectionURL: 'site/details/',
+    linkRedirectionURL: '/dashboard/site/details/',
     dynamicColumn: true,
   },
   {
@@ -68,7 +70,7 @@ export const recentViewedColumns: TableColumn[] = [
   },
   {
     id: 5,
-    displayName: 'Last Updates',
+    displayName: 'Last Updated',
     active: true,
     graphQLPropertyName: 'whenUpdated',
     displayType: {
@@ -114,10 +116,12 @@ export const recentViewedColumns: TableColumn[] = [
       customLinkValue: 'View',
       customInputTextCss: 'custom-dashboard-link',
       tableMode: true,
-      href: 'site/details/',
+      href: '/dashboard/site/details/',
       customIcon: <FillEye />,
+      componentName: 'Dashboard',
+      componentPath: 'dashboard',
     },
-    linkRedirectionURL: 'site/details/',
+    linkRedirectionURL: '/dashboard/site/details/',
     dynamicColumn: true,
   },
 ];

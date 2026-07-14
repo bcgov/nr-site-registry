@@ -18,8 +18,7 @@ jobs:
 
   tests:
     name: Unit Tests
-    # TODO - Re-enable below before submitting PR, jsut have it disabled while I work via draft.
-    # if: ${{ ! github.event.pull_request.draft }}
+    if: ${{ ! github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     services:
@@ -40,17 +39,21 @@ jobs:
         include:
           - dir: backend
             token: SONAR_TOKEN_BACKEND
+            test_command: npm run test:cov
+            sonar_coverage_arg: -Dsonar.javascript.lcov.reportPaths=./src/coverage/lcov.info,./coverage/lcov.info
           - dir: frontend
             token: SONAR_TOKEN_FRONTEND
+            test_command: CI=true npm test -- --watchAll=false
+            sonar_coverage_arg: -Dsonar.coverage.exclusions=**/*
     steps:
-      - uses: bcgov/action-test-and-analyse@v1.2.1
+      - uses: bcgov/action-test-and-analyse@v1.6.0
         env:
           LOG_LEVEL: info
           LOG_FILE_LOCATION: /tmp/sites-%DATE%.log
         with:
           commands: |
             npm ci
-            npm run test:cov
+            ${{ matrix.test_command }}
           dir: ${{ matrix.dir }}
           node_version: "22"
           sonar_args: >
@@ -59,7 +62,7 @@ jobs:
              -Dsonar.projectKey=bcgov-sonarcloud_nr-site-registry-${{ matrix.dir }}
              -Dsonar.sources=src
              -Dsonar.tests.inclusions=**/*spec.ts
-             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
+             ${{ matrix.sonar_coverage_arg }}
              -Dsonar.cpd.exclusions=**/migrations/**
           sonar_token: ${{ secrets[matrix.token] }}
           

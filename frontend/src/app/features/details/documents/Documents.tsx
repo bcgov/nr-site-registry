@@ -10,6 +10,10 @@ import {
   siteDetailsMode,
   trackChanges,
 } from '../../site/dto/SiteSlice';
+import {
+  getFieldLabel,
+  ChangeContext,
+} from '../../../helpers/fieldLabelMapper';
 import { useCallback, useEffect, useState } from 'react';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
@@ -109,6 +113,7 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
         }
 
         const response = await getAxiosInstance().post(GRAPHQL, {
+          operationName: 'getPeopleOrgsCd',
           query: print(graphQLPeopleOrgsCd()),
           variables: { searchParam, entityType: 'ORG' },
         });
@@ -428,7 +433,8 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
 
             const tracker = new ChangeTracker(
               IChangeType.Added,
-              'New Site Document',
+              getFieldLabel('newDocument'),
+              ChangeContext.DOCUMENTS,
             );
             dispatch(trackChanges(tracker.toPlainObject()));
           }
@@ -519,11 +525,14 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
           setFormData(updatedDocuments);
           dispatch(updateSiteDocument(updatedDocuments));
           dispatch(setupDocumentsDataForSaving(updatedTrackedDocuments));
-          const tracker = new ChangeTracker(
-            IChangeType.Modified,
-            'Replace Site Document',
-          );
-          dispatch(trackChanges(tracker.toPlainObject()));
+          if (doc?.apiAction !== UserActionEnum.added) {
+            const tracker = new ChangeTracker(
+              IChangeType.Modified,
+              getFieldLabel('document'),
+              ChangeContext.DOCUMENTS,
+            );
+            dispatch(trackChanges(tracker.toPlainObject()));
+          }
           setCurrentDocument({});
           setCurrentFile({});
           setIsReplace(false);
@@ -575,7 +584,11 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
       dispatch(updateSiteDocument(filteredDocuments));
       dispatch(setupDocumentsDataForSaving(updatedTrackedDocuments));
 
-      const tracker = new ChangeTracker(IChangeType.Deleted, 'Document Delete');
+      const tracker = new ChangeTracker(
+        IChangeType.Deleted,
+        getFieldLabel('document'),
+        ChangeContext.DOCUMENTS,
+      );
       dispatch(trackChanges(tracker.toPlainObject()));
       setCurrentDocument({});
       setIsDelete(false);
@@ -718,17 +731,25 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
       viewMode === SiteDetailsMode.SRMode &&
       (value === 'checked' || value === 'unchecked')
     ) {
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Document: SR Status',
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      const currentDoc = updatedDocuments?.find((d: any) => d.id === id);
+      if (currentDoc?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel('srValue'),
+          ChangeContext.DOCUMENTS,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     } else {
-      const tracker = new ChangeTracker(
-        IChangeType.Modified,
-        'Document: ' + currLabel?.label,
-      );
-      dispatch(trackChanges(tracker.toPlainObject()));
+      const currentDoc = updatedDocuments?.find((d: any) => d.id === id);
+      if (currentDoc?.apiAction !== UserActionEnum.added) {
+        const tracker = new ChangeTracker(
+          IChangeType.Modified,
+          getFieldLabel(graphQLPropertyName),
+          ChangeContext.DOCUMENTS,
+        );
+        dispatch(trackChanges(tracker.toPlainObject()));
+      }
     }
   };
 
@@ -741,7 +762,9 @@ const Documents: React.FC<IComponentProps> = ({ showPending = false }) => {
     return (
       <Alert variant={hasDocuments ? 'info' : 'warning'} data-testid="no-site">
         {hasDocuments
-          ? 'No documents found for this site. Please add documents to it.'
+          ? userType === UserType.Internal
+            ? 'No documents found for this site.'
+            : 'No documents found for this site. To inquire about documents, submit a Site Information Request form, or contact Advisor.SiteInformation@gov.bc.ca'
           : 'Please create a site before adding documents. Once the site is created, you can add documents to it.'}
       </Alert>
     );

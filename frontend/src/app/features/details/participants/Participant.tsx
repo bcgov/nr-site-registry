@@ -13,6 +13,10 @@ import {
   ChangeTracker,
   IChangeType,
 } from '../../../components/common/IChangeType';
+import {
+  getFieldLabel,
+  ChangeContext,
+} from '../../../helpers/fieldLabelMapper';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import './Participant.css';
 import SearchInput from '../../../components/search/SearchInput';
@@ -126,6 +130,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
         }
 
         const response = await getAxiosInstance().post(GRAPHQL, {
+          operationName: 'getPeopleOrgsCd',
           query: print(graphQLPeopleOrgsCd()),
           variables: { searchParam },
         });
@@ -358,7 +363,8 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
       dispatch(setupSiteParticipantDataForSaving(updatedTrackNotatn));
       const tracker = new ChangeTracker(
         IChangeType.Deleted,
-        'Site Participant',
+        getFieldLabel('psnorgId'),
+        ChangeContext.SITE_PARTICIPANT,
       );
       dispatch(trackChanges(tracker.toPlainObject()));
       // Clear selectedRows state
@@ -477,17 +483,23 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
           (row) => row.graphQLPropertyName === event.property,
         );
       if (viewMode === SiteDetailsMode.SRMode && event.property === 'srValue') {
-        const tracker = new ChangeTracker(
-          IChangeType.Modified,
-          'Site Participant: SR Status',
-        );
-        dispatch(trackChanges(tracker.toPlainObject()));
+        if (event.row?.apiAction !== UserActionEnum.added) {
+          const tracker = new ChangeTracker(
+            IChangeType.Modified,
+            getFieldLabel('srValue'),
+            ChangeContext.SITE_PARTICIPANT,
+          );
+          dispatch(trackChanges(tracker.toPlainObject()));
+        }
       } else {
-        const tracker = new ChangeTracker(
-          IChangeType.Modified,
-          'Site Participant: ' + currLabel?.displayName,
-        );
-        dispatch(trackChanges(tracker.toPlainObject()));
+        if (event.row?.apiAction !== UserActionEnum.added) {
+          const tracker = new ChangeTracker(
+            IChangeType.Modified,
+            getFieldLabel(event.property),
+            ChangeContext.SITE_PARTICIPANT,
+          );
+          dispatch(trackChanges(tracker.toPlainObject()));
+        }
       }
     }
   };
@@ -552,7 +564,8 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
     );
     const tracker = new ChangeTracker(
       IChangeType.Added,
-      'New Site Participant',
+      getFieldLabel('psnorgId'),
+      ChangeContext.SITE_PARTICIPANT,
     );
     dispatch(trackChanges(tracker.toPlainObject()));
   };

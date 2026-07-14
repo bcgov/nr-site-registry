@@ -1,0 +1,24 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: site-postgres-cluster-db-init
+  namespace: c6a6e5-tools
+spec:
+  runPolicy: Serial
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/bcgov/nr-site-registry.git'
+      ref: 'dev'
+    contextDir: backend
+  strategy:
+    type: Docker
+    dockerStrategy:
+      env:
+      dockerfilePath: Dockerfile.db_init
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'site-postgres-cluster-db-init:latest'
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5

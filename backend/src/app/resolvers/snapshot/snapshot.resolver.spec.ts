@@ -21,12 +21,10 @@ describe('SnapshotResolver', () => {
         {
           provide: SnapshotsService,
           useValue: {
-            getSnapshots: jest.fn(),
-            getSnapshotsByUserId: jest.fn(),
             getSnapshotsBySiteId: jest.fn(),
-            getSnapshotsById: jest.fn(),
             createSnapshotForSites: jest.fn(),
             getBannerType: jest.fn(),
+            getPurchasedSitesForUser: jest.fn(),
           },
         },
         {
@@ -72,198 +70,6 @@ describe('SnapshotResolver', () => {
 
   it('should be define', () => {
     expect(resolver).toBeDefined();
-  });
-
-  describe('getSnapshots', () => {
-    const res: Snapshots[] = [
-      {
-        id: 1,
-        userId: '1',
-        siteId: '1',
-        transactionId: '1',
-        whenCreated: new Date(),
-        whoCreated: 'ABC',
-        whenUpdated: new Date(),
-        whoUpdated: 'ABC',
-        site: sampleSites[0],
-        snapshotData: {
-          sitesSummary: sampleSites[0],
-          documents: null,
-          events: null,
-          eventsParticipants: null,
-          landHistories: null,
-          profiles: null,
-          siteAssociations: null,
-          subDivisions: null,
-          siteParticipants: [
-            {
-              id: '1',
-              siteId: 'site123',
-              psnorgId: 'org1',
-              effectiveDate: new Date('2023-01-01'),
-              endDate: null,
-              note: 'Note 1',
-              whenCreated: new Date(),
-              whoCreated: 'ABC',
-              whenUpdated: new Date(),
-              whoUpdated: 'ABC',
-              rwmFlag: 1,
-              rwmNoteFlag: 1,
-              psnorg: null,
-              site: sampleSites[0],
-              siteParticRoles: [
-                {
-                  prCode: 'PR001',
-                  spId: '1',
-                  whenCreated: new Date(),
-                  whoCreated: 'ABC',
-                  whenUpdated: new Date(),
-                  whoUpdated: 'ABC',
-                  rwmFlag: 1,
-                  sp: null,
-                  id: 'hhh-jjj-lll',
-                  userAction: 'pending',
-                  srAction: 'pending',
-                  prCode2: {
-                    code: 'ABC',
-                    description: 'Desc',
-                    siteParticRoles: null,
-                  },
-                },
-              ],
-              userAction: '',
-              srAction: '',
-            },
-          ],
-        },
-      },
-    ];
-
-    it('should return snapshots', async () => {
-      const expectedResult: SnapshotResponse = {
-        message: 'Snapshot fetched successfully.',
-        httpStatusCode: 200,
-        success: true,
-        data: res,
-      };
-
-      jest.spyOn(service, 'getSnapshots').mockResolvedValueOnce(res);
-
-      const result = await resolver.getSnapshots();
-      expect(result).toEqual(expectedResult);
-    });
-
-    it('should return a not found response with HTTP status 404', async () => {
-      const mockResponse: SnapshotResponse = {
-        message: 'Snapshot not found.',
-        httpStatusCode: 404,
-        success: false,
-        data: null,
-      };
-      jest.spyOn(service, 'getSnapshots').mockResolvedValueOnce([]);
-
-      const result = await resolver.getSnapshots();
-
-      expect(result).toEqual(mockResponse);
-    });
-  });
-
-  describe('getSnapshotsByUserId', () => {
-    const res: Snapshots[] = [
-      {
-        id: 1,
-        userId: '1',
-        siteId: '1',
-        transactionId: '1',
-        whenCreated: new Date(),
-        whoCreated: 'ABC',
-        whenUpdated: new Date(),
-        whoUpdated: 'ABC',
-        site: sampleSites[0],
-        snapshotData: {
-          sitesSummary: sampleSites[0],
-          documents: null,
-          events: null,
-          eventsParticipants: null,
-          landHistories: null,
-          profiles: null,
-          siteAssociations: null,
-          subDivisions: null,
-          siteParticipants: [
-            {
-              id: '1',
-              siteId: 'site123',
-              psnorgId: 'org1',
-              effectiveDate: new Date('2023-01-01'),
-              endDate: null,
-              note: 'Note 1',
-              whenCreated: new Date(),
-              whoCreated: 'ABC',
-              whenUpdated: new Date(),
-              whoUpdated: 'ABC',
-              rwmFlag: 1,
-              rwmNoteFlag: 1,
-              psnorg: null,
-              site: sampleSites[0],
-              siteParticRoles: [
-                {
-                  prCode: 'PR001',
-                  spId: '1',
-                  whenCreated: new Date(),
-                  whoCreated: 'ABC',
-                  whenUpdated: new Date(),
-                  whoUpdated: 'ABC',
-                  rwmFlag: 1,
-                  sp: null,
-                  id: 'hhh-jjj-lll',
-                  userAction: 'pending',
-                  srAction: 'pending',
-                  prCode2: {
-                    code: 'ABC',
-                    description: 'Desc',
-                    siteParticRoles: null,
-                  },
-                },
-              ],
-              userAction: '',
-              srAction: '',
-            },
-          ],
-        },
-      },
-    ];
-
-    it('should return a success response with HTTP status 200', async () => {
-      const userId = '1';
-      const mockResponse: SnapshotResponse = {
-        httpStatusCode: 200,
-        success: true,
-        message: 'Snapshot fetched successfully.',
-        data: res,
-      };
-      jest
-        .spyOn(service, 'getSnapshotsByUserId')
-        .mockResolvedValueOnce(mockResponse.data);
-
-      const result = await resolver.getSnapshotsByUserId(userId);
-
-      expect(result).toEqual(mockResponse);
-    });
-
-    it('should return a not found response with HTTP status 404', async () => {
-      const userId = '1';
-      const mockResponse: SnapshotResponse = {
-        httpStatusCode: 404,
-        success: false,
-        message: `Snapshot not found for user id: ${userId}`,
-        data: null,
-      };
-      jest.spyOn(service, 'getSnapshotsByUserId').mockResolvedValueOnce(null);
-
-      const result = await resolver.getSnapshotsByUserId(userId);
-
-      expect(result).toEqual(mockResponse);
-    });
   });
 
   describe('getSnapshotsBySiteId', () => {
@@ -365,104 +171,6 @@ describe('SnapshotResolver', () => {
       expect(result).toEqual(mockResponse);
     });
   });
-  describe('getSnapshotsById', () => {
-    const res: Snapshots[] = [
-      {
-        id: 1,
-        userId: '1',
-        siteId: '1',
-        transactionId: '1',
-        whenCreated: new Date(),
-        whoCreated: 'ABC',
-        whenUpdated: new Date(),
-        whoUpdated: 'ABC',
-        site: sampleSites[0],
-        snapshotData: {
-          sitesSummary: sampleSites[0],
-          documents: null,
-          events: null,
-          eventsParticipants: null,
-          landHistories: null,
-          profiles: null,
-          siteAssociations: null,
-          subDivisions: null,
-          siteParticipants: [
-            {
-              id: '1',
-              siteId: 'site123',
-              psnorgId: 'org1',
-              effectiveDate: new Date('2023-01-01'),
-              endDate: null,
-              note: 'Note 1',
-              whenCreated: new Date(),
-              whoCreated: 'ABC',
-              whenUpdated: new Date(),
-              whoUpdated: 'ABC',
-              rwmFlag: 1,
-              rwmNoteFlag: 1,
-              psnorg: null,
-              site: sampleSites[0],
-              siteParticRoles: [
-                {
-                  prCode: 'PR001',
-                  spId: '1',
-                  id: 'hhh-jjj-lll',
-                  userAction: 'pending',
-                  srAction: 'pending',
-                  whenCreated: new Date(),
-                  whoCreated: 'ABC',
-                  whenUpdated: new Date(),
-                  whoUpdated: 'ABC',
-                  rwmFlag: 1,
-                  sp: null,
-                  prCode2: {
-                    code: 'ABC',
-                    description: 'Desc',
-                    siteParticRoles: null,
-                  },
-                },
-              ],
-              userAction: '',
-              srAction: '',
-            },
-          ],
-        },
-      },
-    ];
-
-    it('should return a success response with HTTP status 200', async () => {
-      const id = 1;
-      const mockResponse: SnapshotResponse = {
-        httpStatusCode: 200,
-        success: true,
-        message: 'Snapshot fetched successfully.',
-        data: res,
-      };
-      jest
-        .spyOn(service, 'getSnapshotsById')
-        .mockResolvedValueOnce(mockResponse.data);
-
-      const result = await resolver.getSnapshotsById(id);
-
-      expect(result).toEqual(mockResponse);
-    });
-
-    it('should return a not found response with HTTP status 404', async () => {
-      const id = 0;
-      const mockResponse: SnapshotResponse = {
-        httpStatusCode: 404,
-        success: false,
-        message: `Snapshot not found for snapshot id: ${id}`,
-        data: null,
-      };
-      jest.spyOn(service, 'getSnapshotsById').mockResolvedValueOnce(null);
-
-      const result = await resolver.getSnapshotsById(id);
-
-      expect(result).toEqual(mockResponse);
-    });
-  });
-
   describe('createSnapshot', () => {
     it('should return a success response with HTTP status 201', async () => {
       const snapshotDto: CreateSnapshotDto = {
@@ -524,6 +232,99 @@ describe('SnapshotResolver', () => {
       const result = await resolver.getBannerType(siteId, userId);
 
       expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getPurchasedSites', () => {
+    const mockUser = { sub: 'user-123' };
+
+    it('should return purchased sites with HTTP status 200', async () => {
+      const mockResult = {
+        data: [
+          {
+            siteId: '100',
+            address: '123 Main St',
+            city: 'Victoria',
+            purchaseDate: new Date('2026-01-15'),
+            status: 'current',
+          },
+        ],
+        totalRecords: 1,
+      };
+
+      jest
+        .spyOn(service, 'getPurchasedSitesForUser')
+        .mockResolvedValueOnce(mockResult);
+
+      const result = await resolver.getPurchasedSites(
+        mockUser,
+        1,
+        10,
+        'purchaseDate',
+        'DESC',
+      );
+
+      expect(result.httpStatusCode).toEqual(200);
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual(mockResult.data);
+      expect(result.totalRecords).toEqual(1);
+      expect(service.getPurchasedSitesForUser).toHaveBeenCalledWith(
+        'user-123',
+        1,
+        10,
+        'purchaseDate',
+        'DESC',
+      );
+    });
+
+    it('should return 404 when no purchased sites found', async () => {
+      const mockResult = { data: [], totalRecords: 0 };
+
+      jest
+        .spyOn(service, 'getPurchasedSitesForUser')
+        .mockResolvedValueOnce(mockResult);
+
+      const result = await resolver.getPurchasedSites(
+        mockUser,
+        1,
+        10,
+        'purchaseDate',
+        'DESC',
+      );
+
+      expect(result.httpStatusCode).toEqual(404);
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual([]);
+      expect(result.totalRecords).toEqual(0);
+    });
+
+    it('should pass custom pagination and sort params to service', async () => {
+      const mockResult = {
+        data: [
+          {
+            siteId: '200',
+            address: '456 Oak Ave',
+            city: 'Vancouver',
+            purchaseDate: new Date('2026-03-01'),
+            status: 'outdated',
+          },
+        ],
+        totalRecords: 1,
+      };
+
+      jest
+        .spyOn(service, 'getPurchasedSitesForUser')
+        .mockResolvedValueOnce(mockResult);
+
+      await resolver.getPurchasedSites(mockUser, 2, 5, 'siteId', 'ASC');
+
+      expect(service.getPurchasedSitesForUser).toHaveBeenCalledWith(
+        'user-123',
+        2,
+        5,
+        'siteId',
+        'ASC',
+      );
     });
   });
 });

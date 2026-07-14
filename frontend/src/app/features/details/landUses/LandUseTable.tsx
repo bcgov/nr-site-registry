@@ -2,7 +2,7 @@ import React from 'react';
 import { RequestStatus } from '../../../helpers/requests/status';
 import Widget from '../../../components/widget/Widget';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
-import { Minus, Plus } from '../../../components/common/icon';
+import { UserMinus, UserPlus } from '../../../components/common/icon';
 import { Button } from '../../../components/button/Button';
 
 interface ILandUseTable {
@@ -51,7 +51,7 @@ const LandUseTable: React.FC<ILandUseTable> = ({
       {editModeEnabled && (
         <div className="d-flex gap-2 flex-wrap ">
           <Button variant="secondary" onClick={handleAddLandUse}>
-            <Plus />
+            <UserPlus />
             Add Land Use
           </Button>
 
@@ -60,7 +60,7 @@ const LandUseTable: React.FC<ILandUseTable> = ({
             onClick={handleRemoveLandUse}
             disabled={selectedRowIds.size <= 0}
           >
-            <Minus />
+            <UserMinus />
             Remove Land Use
           </Button>
         </div>

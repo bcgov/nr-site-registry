@@ -186,13 +186,24 @@ div.tableWidth::-webkit-scrollbar-track {
   max-width: 40%;
 }
 
+.default {
+  width: 100%;
+  word-break: break-word;
+  white-space: normal;
+}
+
 table td {
-  white-space: nowrap; /* Prevent text from wrapping initially */
+  white-space: nowrap;
+  /* Prevent text from wrapping initially */
   /* overflow: hidden; */
-  text-overflow: ellipsis; /* Display ellipsis for overflowed text */
-  word-wrap: break-word; /* Allow word breaks */
-  overflow-wrap: break-word; /* Alternative for newer browsers */
-  word-break: break-all; /* Allow breaks within words */
+  text-overflow: ellipsis;
+  /* Display ellipsis for overflowed text */
+  word-wrap: break-word;
+  /* Allow word breaks */
+  overflow-wrap: break-word;
+  /* Alternative for newer browsers */
+  word-break: break-all;
+  /* Allow breaks within words */
   background-color: var(--surface-color-background-white) !important;
   border: 1px solid;
   border-color: var(--surface-color-border-default);
@@ -201,3 +212,42 @@ table td {
 /* table {
   overflow: hidden;
 } */
+
+.w400 {
+  max-width: 500px;
+  min-width: 300px;
+}
+
+.w300 {
+  max-width: 300px;
+  min-width: 200px;
+}
+
+.w200 {
+  max-width: 200px;
+  min-width: 150px;
+}
+
+.w100 {
+  width: 100px;
+}
+
+.w50 {
+  width: 50px;
+}
+
+.delete-icon-pointer {
+  cursor: pointer;
+}
+
+.delete-icon-pointer div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  text-decoration: none;
+  color: var(--surface-color-primary-default, #053662);
+  padding: 0;
+}

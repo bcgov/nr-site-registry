@@ -1,4 +1,4 @@
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, IsNull, Repository } from 'typeorm';
 import { SnapshotsService } from './snapshot.service';
 import { Snapshots } from '../../entities/snapshots.entity';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -19,6 +19,7 @@ import { SiteParticRoles } from '../../entities/siteParticRoles.entity';
 import { LoggerService } from '../../logger/logger.service';
 import { SRApprovalStatusEnum } from '../../common/srApprovalStatusEnum';
 import { PeopleOrgs } from '../../entities/peopleOrgs.entity';
+import { CartService } from '../cart/cart.service';
 
 describe('SnapshotService', () => {
   let service: SnapshotsService;
@@ -110,6 +111,10 @@ describe('SnapshotService', () => {
       userAction: 'pending',
       srAction: 'pending',
       eventPartics: sampleNotationParticipants,
+      whoDeleted: null,
+      whenDeleted: null,
+      whoRestored: null,
+      whenRestored: null,
     },
   ];
 
@@ -212,6 +217,8 @@ describe('SnapshotService', () => {
     whoUpdated: 'editor',
     whenCreated: new Date('2024-01-01T00:00:00Z'),
     whenUpdated: new Date('2024-01-01T00:00:00Z'),
+    whoDeleted: null,
+    whenDeleted: null,
     rwmFlag: 1,
     rwmGeneralDescFlag: 1,
     consultantSubmitted: 'Y',
@@ -387,7 +394,9 @@ describe('SnapshotService', () => {
       // The two below have been added much later, unsure why required now, but was causing PR unit tests to fail.
       completorParticId: '5001',
       contactParticId: '6001',
-      siteProfileSchedule2Refs: [],
+      siteProfileLandUses: [],
+      profileSubmissions: [],
+      profileAnswers: [],
     },
   ];
 
@@ -478,6 +487,12 @@ describe('SnapshotService', () => {
       providers: [
         SnapshotsService,
         LoggerService,
+        {
+          provide: CartService,
+          useValue: {
+            deleteCartWithSiteId: jest.fn().mockResolvedValue(true),
+          },
+        },
         {
           provide: getRepositoryToken(Snapshots),
           useValue: {
@@ -1375,6 +1390,12 @@ describe('SnapshotService', () => {
       service.getDisclosureForSnapshotCreation('1');
       expect(siteProfilesRepository.find).toHaveBeenCalledWith({
         where: { siteId: '1', srAction: SRApprovalStatusEnum.PUBLIC },
+        relations: [
+          'siteProfileLandUses',
+          'profileAnswers',
+          'profileAnswers.question',
+          'profileAnswers.question.category',
+        ],
       });
     });
 
@@ -1418,13 +1439,16 @@ describe('SnapshotService', () => {
       expect((await notations).length).toBe(1);
     });
 
-    it('getSubDivisionsForSnapshotCreation should be called with SRAction equals public', async () => {
+    it('getSubDivisionsForSnapshotCreation should be called with SRAction equals PUBLIC OR NULL', async () => {
       jest
         .spyOn(siteSubdivisionsRepository, 'find')
         .mockResolvedValue(sampleSiteSubDivions);
       service.getSubDivisionsForSnapshotCreation('1');
       expect(siteSubdivisionsRepository.find).toHaveBeenCalledWith({
-        where: { siteId: '1', srAction: SRApprovalStatusEnum.PUBLIC },
+        where: [
+          { siteId: '1', srAction: SRApprovalStatusEnum.PUBLIC },
+          { siteId: '1', srAction: IsNull() },
+        ],
       });
     });
 
@@ -1433,6 +1457,96 @@ describe('SnapshotService', () => {
       await expect(
         service.getSubDivisionsForSnapshotCreation(''),
       ).rejects.toThrow(mockError);
+    });
+  });
+
+  describe('getPurchasedSitesForUser', () => {
+    const mockQueryFn = jest.fn();
+
+    beforeEach(() => {
+      Object.defineProperty(snapshotRepository, 'manager', {
+        value: { query: mockQueryFn },
+        writable: true,
+      });
+    });
+
+    it('should return purchased sites with correct mapping', async () => {
+      const mockRows = [
+        {
+          site_id: '100',
+          addr_line_1: '123 Main St',
+          addr_line_2: null,
+          addr_line_3: null,
+          city: 'Victoria',
+          purchase_date: new Date('2026-01-15'),
+          status: 'current',
+          total_count: '2',
+        },
+        {
+          site_id: '200',
+          addr_line_1: '456 Oak Ave',
+          addr_line_2: 'Suite 5',
+          addr_line_3: null,
+          city: 'Vancouver',
+          purchase_date: new Date('2026-03-01'),
+          status: 'outdated',
+          total_count: '2',
+        },
+      ];
+
+      mockQueryFn.mockResolvedValueOnce(mockRows);
+
+      const result = await service.getPurchasedSitesForUser('user-123', 1, 10);
+
+      expect(result.totalRecords).toBe(2);
+      expect(result.data).toHaveLength(2);
+      expect(result.data[0]).toEqual({
+        siteId: '100',
+        address: '123 Main St',
+        city: 'Victoria',
+        purchaseDate: mockRows[0].purchase_date,
+        status: 'current',
+      });
+      expect(result.data[1].address).toBe('456 Oak Ave Suite 5');
+    });
+
+    it('should return empty data when no purchased sites exist', async () => {
+      mockQueryFn.mockResolvedValueOnce([]);
+
+      const result = await service.getPurchasedSitesForUser('user-123', 1, 10);
+
+      expect(result.totalRecords).toBe(0);
+      expect(result.data).toEqual([]);
+    });
+
+    it('should pass correct pagination params to query', async () => {
+      mockQueryFn.mockResolvedValueOnce([]);
+
+      await service.getPurchasedSitesForUser('user-123', 3, 5, 'siteId', 'ASC');
+
+      expect(mockQueryFn).toHaveBeenCalledWith(expect.any(String), [
+        'user-123',
+        5,
+        10,
+      ]);
+    });
+
+    it('should throw HttpException on query failure', async () => {
+      mockQueryFn.mockRejectedValueOnce(new Error('DB error'));
+
+      await expect(
+        service.getPurchasedSitesForUser('user-123', 1, 10),
+      ).rejects.toThrow('Failed to retrieve purchased sites.');
+    });
+
+    it('should default to purchaseDate DESC sorting', async () => {
+      mockQueryFn.mockResolvedValueOnce([]);
+
+      await service.getPurchasedSitesForUser('user-123', 1, 10);
+
+      const queryString = mockQueryFn.mock.calls[0][0];
+      expect(queryString).toContain('purchase_date');
+      expect(queryString).toContain('DESC');
     });
   });
 });

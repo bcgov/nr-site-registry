@@ -1,0 +1,86 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: site-promote-dev-to-test
+  namespace: c6a6e5-tools
+spec:
+  tasks:
+    - name: promote-dev-to-test
+      taskSpec:
+        steps:
+          - name: get-dev-image-hashes
+            image: 'image-registry.openshift-image-registry.svc:5000/openshift/cli:latest'
+            script: |
+              # Get the hashes for the current dev images.
+
+              set -eu
+
+              TOOLS_NAMESPACE="c6a6e5-tools"
+              SHARED_DIR="/workspace/shared"
+              mkdir -p "${SHARED_DIR}"
+
+              oc -n "${TOOLS_NAMESPACE}" get istag site-backend-init:dev -o jsonpath='{.image.dockerImageReference}' > "${SHARED_DIR}/site-backend-init.ref"
+              oc -n "${TOOLS_NAMESPACE}" get istag site-backend:dev -o jsonpath='{.image.dockerImageReference}' > "${SHARED_DIR}/site-backend.ref"
+              oc -n "${TOOLS_NAMESPACE}" get istag site-frontend:dev -o jsonpath='{.image.dockerImageReference}' > "${SHARED_DIR}/site-frontend.ref"
+
+          - name: tag-images
+            image: 'image-registry.openshift-image-registry.svc:5000/openshift/cli:latest'
+            script: |
+              # Retag the dev images with the test tag.
+
+              set -eu
+
+              TOOLS_NAMESPACE="c6a6e5-tools"
+              oc -n "${TOOLS_NAMESPACE}" tag site-backend-init:dev site-backend-init:test
+              oc -n "${TOOLS_NAMESPACE}" tag site-backend:dev site-backend:test
+              oc -n "${TOOLS_NAMESPACE}" tag site-frontend:dev site-frontend:test
+
+          - name: verify-test-tags
+            image: 'image-registry.openshift-image-registry.svc:5000/openshift/cli:latest'
+            script: |
+              # Wait until the test hashes match the dev hashes.
+
+              set -eu
+
+              TOOLS_NAMESPACE="c6a6e5-tools"
+              SHARED_DIR="/workspace/shared"
+              ATTEMPTS=30
+              SLEEP_SECONDS=2
+
+              EXPECTED_BACKEND_INIT_REF="$(cat "${SHARED_DIR}/site-backend-init.ref")"
+              EXPECTED_BACKEND_REF="$(cat "${SHARED_DIR}/site-backend.ref")"
+              EXPECTED_FRONTEND_REF="$(cat "${SHARED_DIR}/site-frontend.ref")"
+
+              i=1
+              while [ "${i}" -le "${ATTEMPTS}" ]; do
+                ACTUAL_BACKEND_INIT_REF="$(oc -n "${TOOLS_NAMESPACE}" get istag site-backend-init:test -o jsonpath='{.image.dockerImageReference}')"
+                ACTUAL_BACKEND_REF="$(oc -n "${TOOLS_NAMESPACE}" get istag site-backend:test -o jsonpath='{.image.dockerImageReference}')"
+                ACTUAL_FRONTEND_REF="$(oc -n "${TOOLS_NAMESPACE}" get istag site-frontend:test -o jsonpath='{.image.dockerImageReference}')"
+
+                if [ "${ACTUAL_BACKEND_INIT_REF}" = "${EXPECTED_BACKEND_INIT_REF}" ] && [ "${ACTUAL_BACKEND_REF}" = "${EXPECTED_BACKEND_REF}" ] && [ "${ACTUAL_FRONTEND_REF}" = "${EXPECTED_FRONTEND_REF}" ]; then
+                  echo "All test tags point to the expected image references."
+                  exit 0
+                fi
+
+                echo "Waiting for test tags to update (attempt ${i}/${ATTEMPTS})..."
+                sleep "${SLEEP_SECONDS}"
+                i=$((i + 1))
+              done
+
+              echo "Timed out waiting for test tags to match dev image references." >&2
+              exit 1
+
+          - name: restart-and-wait-rollouts
+            image: 'image-registry.openshift-image-registry.svc:5000/openshift/cli:latest'
+            script: |
+              # Restart the backend and frontend deployments and wait for completion.
+
+              set -eu
+
+              TEST_NAMESPACE="c6a6e5-test"
+
+              oc -n "${TEST_NAMESPACE}" rollout restart deployment/site-backend
+              oc -n "${TEST_NAMESPACE}" rollout restart deployment/site-frontend
+
+              oc -n "${TEST_NAMESPACE}" rollout status deployment/site-backend --timeout=5m
+              oc -n "${TEST_NAMESPACE}" rollout status deployment/site-frontend --timeout=5m

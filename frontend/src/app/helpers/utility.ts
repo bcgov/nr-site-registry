@@ -55,14 +55,14 @@ export const formatDateRange = (range: [Date, Date]) => {
   }
 
   // If both dates are valid, format them
-  const formattedStartDate = format(startDate, 'MMMM do, yyyy');
-  const formattedEndDate = format(endDate, 'MMMM do, yyyy');
+  const formattedStartDate = format(startDate, 'MMMM d, yyyy');
+  const formattedEndDate = format(endDate, 'MMMM d, yyyy');
 
   return `${formattedStartDate} - ${formattedEndDate}`;
 };
 
 /**
- * Formats a date as "March 2nd, 2025" without timezone shift
+ * Formats a date as "March 2, 2025" without timezone shift
  */
 export const formatDate = (input: Date | string | null): string => {
   let date: Date;
@@ -72,7 +72,7 @@ export const formatDate = (input: Date | string | null): string => {
   }
 
   date = parseDate(input) || new Date();
-  return format(date, 'MMMM do, yyyy');
+  return format(date, 'MMMM d, yyyy');
 };
 
 export const parseDate = (value: Date | string | null): Date | null => {
@@ -97,6 +97,13 @@ export const parseDate = (value: Date | string | null): Date | null => {
   }
 
   return null;
+};
+
+export const formatDateTime = (input: Date | string | null): string => {
+  if (!input) return '';
+  const date = typeof input === 'string' ? new Date(input) : input;
+  if (isNaN(date.getTime())) return '';
+  return format(date, 'yyyy-MM-dd HH:mm');
 };
 
 /*
@@ -130,7 +137,7 @@ export const flattenFormRows = (arr: IFormField[][]): IFormField[] => {
 export function getUser() {
   const { authority, client_id } = getClientSettings();
   const storageKey = `oidc.user:${authority}:${client_id}`;
-  const oidcStorage = sessionStorage.getItem(storageKey);
+  const oidcStorage = localStorage.getItem(storageKey);
   if (!oidcStorage) {
     return null;
   }
@@ -341,6 +348,7 @@ type UserAction = UserActionEnum;
 export const deepFilterByUserAction = (
   data: any,
   actions: UserAction[], // actions is an array of user actions to filter by
+  actionProperty = 'apiAction', // default property to filter by if not specified in the objects
 ): any[] => {
   const filterRecursive = (item: any, position: number): any => {
     // If the item is an array, apply recursive filtering to each element
@@ -353,27 +361,51 @@ export const deepFilterByUserAction = (
       return filteredArray.length > 0 ? filteredArray : undefined;
     }
 
-    // If the item is an object, recursively filter its properties
-    else if (item && typeof item === 'object') {
-      // Recursively filter nested objects and arrays
-      const filteredObject = Object.keys(item).reduce(
-        (acc: any, key: string) => {
-          const filteredValue = filterRecursive(item[key], position); // Pass index to recursive calls
-          if (filteredValue !== undefined) {
-            acc[key] = filteredValue; // Add the filtered value to the accumulator if it's valid
+    if (item && typeof item === 'object') {
+      const hasValidAction =
+        item[actionProperty] && actions.includes(item[actionProperty]);
+
+      // Recursively filter only object/array children to determine survival
+      const filteredObjectChildren: any = {};
+      let hasValidChildren = false;
+
+      Object.keys(item).forEach((key: string) => {
+        const child = item[key];
+
+        if (child && typeof child === 'object') {
+          const filteredChild = filterRecursive(child, position);
+
+          if (filteredChild !== undefined) {
+            // Child survived — mark that we have valid children
+            filteredObjectChildren[key] = filteredChild;
+            hasValidChildren = true;
+          } else if (hasValidAction) {
+            // Parent is valid but this child didn't survive:
+            // keep arrays as [] and drop non-matching objects
+            if (Array.isArray(child)) {
+              filteredObjectChildren[key] = [];
+            }
+            // object children that don't match are simply omitted
           }
-          return acc;
-        },
-        {}, // Start with an empty object for accumulating filtered values
-      );
+        }
+        // Primitives are NOT evaluated here — added later only if node survives
+      });
 
-      // Check if the current object has a `apiAction` property and whether it matches one of the user actions
-      const hasUserAction = item.apiAction && actions.includes(item.apiAction);
+      // Decision: keep this node?
+      if (!hasValidAction && !hasValidChildren) {
+        return undefined; // Neither this node nor any descendant matched
+      }
 
-      // Include index information in the object if it has valid properties or matching user action
-      return Object.keys(filteredObject).length > 0 || hasUserAction
-        ? { ...item, position, ...filteredObject }
-        : undefined; // Add the original index to the object
+      // Build the final object: primitives + surviving object/array children
+      const primitives = Object.keys(item).reduce((acc: any, key: string) => {
+        const child = item[key];
+        if (!child || typeof child !== 'object') {
+          acc[key] = child; // carry forward all primitive values
+        }
+        return acc;
+      }, {});
+
+      return { ...primitives, ...filteredObjectChildren, position };
     }
 
     // If the data is neither an object nor an array, return undefined
@@ -503,59 +535,152 @@ export function formatDistance(meters: number, kmDigits = 2): string {
   return `${kms} km`;
 }
 
+// Type for the configuration object that determines which user actions to filter by.
+type SkipConfig = {
+  fields: string | string[]; // one or many fields
+  values: any | any[]; // one or many values
+};
+
+// Helper function to determine if validation should be skipped based on the skipConfig
+const shouldSkip = (data: any, skipConfig?: SkipConfig): boolean => {
+  if (!skipConfig) return false;
+
+  // Normalize to arrays
+  const fields = Array.isArray(skipConfig.fields)
+    ? skipConfig.fields
+    : [skipConfig.fields];
+
+  const values = Array.isArray(skipConfig.values)
+    ? skipConfig.values
+    : [skipConfig.values];
+
+  // Check: any field matches any value
+  return fields.some((field) => values.includes(data?.[field]));
+};
+
+const buildErrorLabel = (
+  parentLabel: string,
+  parentIndex: string,
+  message: string,
+): string => {
+  if (!parentIndex) return `${parentLabel} ${message}`;
+  return `${parentLabel} [${Number.parseInt(parentIndex, 10) + 1}] ${message}`;
+};
+
+const validateField = (
+  row: IFormField,
+  fieldValue: any,
+  parentLabel: string,
+  parentIndex: string,
+): { label: string; errorMessage: string }[] => {
+  const errors: { label: string; errorMessage: string }[] = [];
+  const { validation, label } = row;
+
+  if (validation?.required && !fieldValue) {
+    errors.push({
+      label,
+      errorMessage: buildErrorLabel(
+        parentLabel,
+        parentIndex,
+        validation.customMessage ?? '',
+      ),
+    });
+  }
+
+  if (
+    validation?.maxLength &&
+    typeof fieldValue === 'string' &&
+    fieldValue.length > validation.maxLength
+  ) {
+    errors.push({
+      label,
+      errorMessage: buildErrorLabel(
+        parentLabel,
+        parentIndex,
+        `${label} exceeds maximum ${validation.maxLength} characters`,
+      ),
+    });
+  }
+
+  if (
+    validation?.minLength &&
+    typeof fieldValue === 'string' &&
+    fieldValue.length > 0 &&
+    fieldValue.length < validation.minLength
+  ) {
+    errors.push({
+      label,
+      errorMessage: buildErrorLabel(
+        parentLabel,
+        parentIndex,
+        `${label} must be at least ${validation.minLength} characters`,
+      ),
+    });
+  }
+
+  if (
+    validation?.pattern &&
+    typeof fieldValue === 'string' &&
+    fieldValue.length > 0 &&
+    !validation.pattern.test(fieldValue)
+  ) {
+    errors.push({
+      label,
+      errorMessage: buildErrorLabel(
+        parentLabel,
+        parentIndex,
+        validation.customMessage ?? `${label} has invalid format`,
+      ),
+    });
+  }
+
+  return errors;
+};
+
 export const validateForm = (
   formRows: IFormField[][],
   formData: any,
   source: string,
+  skipConfig?: SkipConfig, // Optional configuration to skip validation based on a field's value
 ) => {
   const errors: any[] = [];
+
   const traverse = (
     rows: IFormField[][],
     data: any,
     parentLabel: string = source,
     parentIndex: string = '',
   ) => {
+    // Skip validation if the data matches the skipConfig criteria
+    if (shouldSkip(data, skipConfig)) return;
+
+    // Iterate through the rows and validate each field
     rows.forEach((items) => {
       items.forEach((row) => {
         const propertyName = row.graphQLPropertyName;
+        if (!propertyName) return;
 
-        // Ensure graphQLPropertyName exists
-        if (propertyName) {
-          const fieldValue = data[propertyName];
+        const fieldValue = data[propertyName];
+        errors.push(
+          ...validateField(row, fieldValue, parentLabel, parentIndex),
+        );
 
-          // Validate the current field
-          if (row.validation?.required && !fieldValue) {
-            // Building the error label with index
-            const errorLabel = parentIndex
-              ? `${parentLabel} [${parseInt(parentIndex, 10) + 1}] ${row?.validation.customMessage}`
-              : `${parentLabel} ${row?.validation.customMessage}`;
-
-            errors.push({
-              label: row.label,
-              errorMessage: errorLabel,
-            });
-          }
-
-          // Recursively handle children
-          if (row.children && Array.isArray(data[propertyName])) {
-            const childData = data[propertyName];
-            childData.forEach((child: any, index: number) => {
-              traverse(
-                row.children as any,
-                child,
-                `${parentLabel} [${parentIndex}] ${row.label}`,
-                `${index + 1}`,
-              );
-            });
-          }
+        if (row.children && Array.isArray(fieldValue)) {
+          fieldValue.forEach((child: any, index: number) => {
+            traverse(
+              row.children as any,
+              child,
+              `${parentLabel} [${parentIndex}] ${row.label}`,
+              `${index + 1}`,
+            );
+          });
         }
       });
     });
   };
 
-  // Handle both arrays and single objects
   if (Array.isArray(formData)) {
-    formData.forEach((item, index) =>
+    formData.forEach((item) =>
       traverse(formRows, item, source, `${item.position}`),
     );
   } else {
@@ -602,4 +727,37 @@ export const removeProperty = (obj: any, propertyName: string): any => {
 export const safeParseFloat = (value: any): number | null => {
   const parsed = parseFloat(value);
   return isNaN(parsed) ? null : parsed;
+};
+
+/**
+ * Sorts an array of objects by a given field name.
+ *
+ * @param data - The array to sort.
+ * @param field - The property name to sort by. For multi-field columns use the first field (split on comma).
+ * @param ascending - Sort direction.
+ * @param dateFields - Set of field names that should be compared as dates.
+ * @param rawDateFieldMap - Map of display field name to raw ISO date field name for date comparison.
+ */
+export const sortTableData = <T extends Record<string, any>>(
+  data: T[],
+  field: string,
+  ascending: boolean,
+  dateFields: string[] = [],
+  rawDateFieldMap: Record<string, string> = {},
+): T[] => {
+  const sortField = field.split(',')[0];
+  return [...data].sort((a, b) => {
+    if (dateFields.includes(sortField)) {
+      const rawKey = rawDateFieldMap[sortField] || sortField;
+      const aTime = new Date(a[rawKey] || 0).getTime();
+      const bTime = new Date(b[rawKey] || 0).getTime();
+      return ascending ? aTime - bTime : bTime - aTime;
+    }
+    const aVal = a[sortField] ?? '';
+    const bVal = b[sortField] ?? '';
+    const comparison = String(aVal).localeCompare(String(bVal), undefined, {
+      numeric: true,
+    });
+    return ascending ? comparison : -comparison;
+  });
 };

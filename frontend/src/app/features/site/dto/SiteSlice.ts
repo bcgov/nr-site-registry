@@ -5,7 +5,6 @@ import {
   getSiteInsightsQL,
   graphqlSiteDetailsQuery,
   graphqlSiteDetailsQueryForLoggedIn,
-  graphQlSiteQueryForAuthenticatedUsers,
 } from '../graphql/Site';
 import { SiteState } from './SiteState';
 import { RequestStatus } from '../../../helpers/requests/status';
@@ -16,6 +15,7 @@ import { UserType } from '../../../helpers/requests/userType';
 
 const initialState: SiteState = {
   siteDetails: null,
+  siteDetailsLastFetchedSiteId: null,
   siteDetailsFetchStatus: RequestStatus.idle,
   siteDetailsDeleteStatus: RequestStatus.idle,
   siteDetailsAddedStatus: RequestStatus.idle,
@@ -35,15 +35,20 @@ export const fetchSitesDetails = createAsyncThunk(
       const { siteId } = args;
       const user = getUser();
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: user
+          ? 'findSiteBySiteIdLoggedInUser'
+          : 'findSiteBySiteId',
         query: print(
           user
             ? graphqlSiteDetailsQueryForLoggedIn()
             : graphqlSiteDetailsQuery(),
         ),
-        variables: {
-          siteId: args.siteId,
-          pending: args.showPending,
-        },
+        variables: user
+          ? {
+              siteId: args.siteId,
+              pending: args.showPending,
+            }
+          : { siteId: args.siteId },
       });
       return user
         ? response.data?.data?.findSiteBySiteIdLoggedInUser?.data
@@ -56,12 +61,14 @@ export const fetchSitesDetails = createAsyncThunk(
 
 export const fetchSitesInsights = createAsyncThunk(
   'sites/fetchSitesInsights',
-  async (args: { siteId: string }) => {
+  async (args: { siteId: string; showPending?: boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSiteInsights',
         query: print(getSiteInsightsQL()),
         variables: {
           siteId: args.siteId,
+          pending: args.showPending ?? false,
         },
       });
       return response.data?.data?.getSiteInsights?.data;
@@ -80,7 +87,8 @@ const siteSlice = createSlice({
       let recordExists = state.changeTracker.filter((tracked) => {
         return (
           tracked.changeType === action.payload.changeType &&
-          tracked.label === action.payload.label
+          tracked.label === action.payload.label &&
+          tracked.context === action.payload.context
         );
       });
 
@@ -134,12 +142,14 @@ const siteSlice = createSlice({
       .addCase(fetchSitesDetails.pending, (state, action) => {
         const newState = { ...state };
         newState.siteDetailsFetchStatus = RequestStatus.loading;
+        newState.siteDetailsLastFetchedSiteId = null;
         return newState;
       })
       .addCase(fetchSitesDetails.fulfilled, (state, action) => {
         const newState = { ...state };
         newState.siteDetails = action.payload;
         newState.siteDetailsFetchStatus = RequestStatus.success;
+        newState.siteDetailsLastFetchedSiteId = action.meta.arg.siteId;
         return newState;
       })
       .addCase(fetchSitesDetails.rejected, (state, action) => {
@@ -165,6 +175,10 @@ export const resultsCount = (state: any) => state.sites.resultsCount;
 export const siteDetailsLoadingState = (state: any) =>
   state.sites.fetchSitesDetails;
 export const selectSiteDetails = (state: any) => state.sites.siteDetails;
+export const selectSiteDetailsFetchStatus = (state: any) =>
+  state.sites.siteDetailsFetchStatus;
+export const selectSiteDetailsLastFetchedSiteId = (state: any) =>
+  state.sites.siteDetailsLastFetchedSiteId ?? null;
 export const trackedChanges = (state: any) => state.sites.changeTracker;
 export const siteDetailsMode = (state: any) => state.sites.siteDetailsMode;
 export const resetSiteDetails = (state: any) => state.sites.resetSiteDetails;

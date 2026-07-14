@@ -25,11 +25,14 @@ export class DashboardService {
     this.sitesLogger.log('DashboardService.getRecentViewsByUserId() start');
     this.sitesLogger.debug('DashboardService.getRecentViewsByUserId() start');
     try {
-      // Fetch recent views based on the provided userId
-      const result = await this.recentViewsRepository.find({
-        where: { userId },
-        order: { updated: 'DESC' },
-      });
+      // Fetch recent views for non-deleted sites only
+      const result = await this.recentViewsRepository
+        .createQueryBuilder('recentViews')
+        .innerJoin('recentViews.site', 'site')
+        .where('recentViews.userId = :userId', { userId })
+        .andWhere('site.who_deleted IS NULL')
+        .orderBy('recentViews.updated', 'DESC')
+        .getMany();
       if (result) {
         return result; // Return the fetched recent views
       } else {

@@ -19,6 +19,7 @@ export const fetchAssociatedSites = createAsyncThunk(
   async ({ siteId, showPending }: { siteId: string; showPending: boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getAssociatedSitesBySiteId',
         query: print(graphQLAssociatedSitesBySiteId()),
         variables: {
           siteId: siteId,

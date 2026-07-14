@@ -5,6 +5,7 @@ import { ButtonSize, ButtonVariant } from '../button/Button';
 export interface DropdownItem {
   label: string;
   value: any;
+  danger?: boolean;
 }
 
 export interface IActions {

@@ -13,28 +13,44 @@ export const ActionItems: DropdownItem[] = [
     label: 'SR Mode',
     value: SiteDetailsMode.SRMode,
   },
-  {
-    label: 'Delete',
-    value: SiteDetailsMode.ViewOnlyMode,
-  },
 ];
 
 export const getActionItems = (
-  inlcudeSRApprovalOptions: boolean,
+  includeSRApprovalOptions: boolean,
+  isSRUser: boolean = false,
+  canDownloadPdf: boolean = false,
 ): DropdownItem[] => {
-  if (inlcudeSRApprovalOptions) {
-    return [
-      ...ActionItems,
+  let items = [...ActionItems];
+
+  if (canDownloadPdf) {
+    items.push({
+      label: 'Download PDF',
+      value: SiteActionBtn.DOWNLOAD_PDF,
+    });
+  }
+
+  // Add Delete Site option only for SR users
+  if (isSRUser) {
+    items.push({
+      label: 'Delete Site',
+      value: SiteActionBtn.DELETE_SITE,
+      danger: true,
+    });
+  }
+
+  // Add SR approval actions if needed
+  if (includeSRApprovalOptions) {
+    items.push(
       {
-        label: 'Approve All Changes',
+        label: 'Make Changes Public',
         value: SiteActionBtn.ApproveAll,
       },
       {
-        label: 'Not Public',
+        label: 'Make Changes Private',
         value: SiteActionBtn.RejectAll,
       },
-    ];
-  } else {
-    return ActionItems;
+    );
   }
+
+  return items;
 };

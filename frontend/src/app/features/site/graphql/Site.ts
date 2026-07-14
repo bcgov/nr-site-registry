@@ -93,6 +93,7 @@ query searchSitesForAuthenticatedUsers($searchParam: String!,  $page: Int!, $pag
         whenCreated
         whenCreated
         consultantSubmitted
+        addrType
        }
        count
        page
@@ -104,8 +105,8 @@ query searchSitesForAuthenticatedUsers($searchParam: String!,  $page: Int!, $pag
 
 export const graphqlSiteDetailsQuery = () => {
   return gql`
-    query findSiteBySiteId($siteId: String!, $pending: Boolean) {
-      findSiteBySiteId(siteId: $siteId, pending: $pending) {
+    query findSiteBySiteId($siteId: String!) {
+      findSiteBySiteId(siteId: $siteId) {
         data {
           id
           commonName
@@ -122,10 +123,18 @@ export const graphqlSiteDetailsQuery = () => {
           latdeg
           longdeg
           city
+          provState
+          postalCode
           generalDescription
           siteRiskCode
+          whenCreated
           whenUpdated
           srAction
+          addrType
+          bcerCode
+          bcerCode2 {
+            description
+          }
         }
         httpStatusCode
       }
@@ -153,10 +162,18 @@ export const graphqlSiteDetailsQueryForLoggedIn = () => {
           latdeg
           longdeg
           city
+          provState
+          postalCode
           generalDescription
           siteRiskCode
+          whenCreated
           whenUpdated
           srAction
+          addrType
+          bcerCode
+          bcerCode2 {
+            description
+          }
         }
         httpStatusCode
       }
@@ -170,11 +187,15 @@ export const getPendingSiteForSRApprovalQL = () => {
       $searchParam: SearchParams
       $page: String!
       $pageSize: String!
+      $sortBy: SiteSortBy
+      $sortByDir: SortByDirection
     ) {
       getPendingSiteForSRApproval(
         searchParam: $searchParam
         page: $page
         pageSize: $pageSize
+        sortBy: $sortBy
+        sortByDir: $sortByDir
       ) {
         httpStatusCode
         message
@@ -206,8 +227,8 @@ export const bulkAproveRejectChangesQL = () => gql`
 `;
 
 export const getSiteInsightsQL = () => gql`
-  query getSiteInsights($siteId: String!) {
-    getSiteInsights(siteId: $siteId) {
+  query getSiteInsights($siteId: String!, $pending: Boolean) {
+    getSiteInsights(siteId: $siteId, pending: $pending) {
       data {
         eventCount
         eventParticCount
@@ -215,6 +236,7 @@ export const getSiteInsightsQL = () => gql`
         siteDocCount
         siteSubdivCount
         siteAssocCount
+        siteParticsCount
       }
     }
   }

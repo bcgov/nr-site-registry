@@ -1,8 +1,4 @@
-import {
-  FillEye,
-  FillPinMapFill,
-  TrashCanIcon,
-} from '../../components/common/icon';
+import { FillEye, FillPinMapFill } from '../../components/common/icon';
 import { FormFieldType } from '../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../components/table/TableColumn';
 
@@ -109,20 +105,20 @@ export const CartTableColumns: TableColumn[] = [
   },
   {
     id: 7,
-    displayName: '',
+    displayName: 'Actions',
     active: true,
     graphQLPropertyName: 'id',
     dynamicColumn: true,
     displayType: {
-      type: FormFieldType.IconButton,
+      type: FormFieldType.DeleteIcon,
       label: '',
       graphQLPropertyName: 'id',
       value: '',
-      customLinkValue: '',
-      customInputTextCss: 'custom-cart-input-txt text-danger',
+      customLabelCss: 'link-for-table',
+      customInputTextCss:
+        'link-for-table d-flex align-items-center justify-content-center pt-1  gap-1',
       tableMode: true,
-      customIcon: <TrashCanIcon />,
     },
-    customHeaderCss: 'custom-cart-table-header',
+    customHeaderCss: 'custom-cart-table-header text-center',
   },
 ];

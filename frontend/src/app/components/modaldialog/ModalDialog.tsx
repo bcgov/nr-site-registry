@@ -1,11 +1,12 @@
-import React, { Children, ReactNode, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import './ModalDialog.css';
-import { XmarkIcon, FloppyDisk } from '../common/icon';
+import { XmarkIcon } from '../common/icon';
 import {
   CancelButton,
   DiscardButton,
   SaveButton,
 } from '../simple/CustomButtons';
+import { ButtonIntent } from '../button/Button';
 
 interface ModalDialogCloseHandlerProps {
   closeHandler: (save: any) => void;
@@ -18,6 +19,9 @@ interface ModalDialogCloseHandlerProps {
   customHeaderCss?: string;
   discardOption?: boolean;
   errorOption?: boolean;
+  disableSaveButton?: boolean;
+  confirmBtnIntent?: ButtonIntent;
+  confirmBtnShowIcon?: boolean;
 }
 
 const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
@@ -31,10 +35,14 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
   errorOption,
   headerLabel,
   customHeaderCss,
+  disableSaveButton,
+  confirmBtnIntent,
+  confirmBtnShowIcon,
 }) => {
   saveBtnLabel = saveBtnLabel ?? '';
   cancelBtnLabel = cancelBtnLabel ?? '';
   dicardBtnLabel = dicardBtnLabel ?? '';
+  confirmBtnShowIcon = confirmBtnShowIcon ?? true;
 
   const [open, setOpen] = useState<boolean>(true);
   const displayLabel =
@@ -79,7 +87,13 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
                 clickHandler={handleClose}
                 label={cancelBtnLabel}
               />
-              <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
+              <SaveButton
+                clickHandler={handleSave}
+                label={saveBtnLabel}
+                intent={confirmBtnIntent}
+                showIcon={confirmBtnShowIcon}
+                isDisabled={disableSaveButton}
+              />
             </div>
           )}
           {discardOption && (
@@ -94,7 +108,11 @@ const ModalDialog: React.FC<ModalDialogCloseHandlerProps> = ({
                 label={dicardBtnLabel}
                 showIcon={false}
               />
-              <SaveButton clickHandler={handleSave} label={saveBtnLabel} />
+              <SaveButton
+                clickHandler={handleSave}
+                label={saveBtnLabel}
+                isDisabled={disableSaveButton}
+              />
             </div>
           )}
           {errorOption && (

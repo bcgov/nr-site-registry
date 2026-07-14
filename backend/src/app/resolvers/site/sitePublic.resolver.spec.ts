@@ -46,6 +46,7 @@ describe('SiteResolver', () => {
               return result;
             }),
             searchSiteIds: jest.fn(),
+            getSiteInsights: jest.fn(),
           },
         },
         {
@@ -90,7 +91,7 @@ describe('SiteResolver', () => {
   describe('findSiteBySiteId', () => {
     it('should call siteService.findSiteBySiteId with the provided siteId', () => {
       const siteId = '123';
-      siteResolver.findSiteBySiteId(siteId, false);
+      siteResolver.findSiteBySiteId(siteId);
       expect(siteService.findSiteBySiteId).toHaveBeenCalledWith(
         siteId,
         false,
@@ -105,7 +106,7 @@ describe('SiteResolver', () => {
       (siteService.findSiteBySiteId as jest.Mock).mockResolvedValue(
         expectedResult,
       );
-      const result = await siteResolver.findSiteBySiteId(siteId, false);
+      const result = await siteResolver.findSiteBySiteId(siteId);
       expect(result).toEqual(expectedResult);
     });
 
@@ -116,8 +117,40 @@ describe('SiteResolver', () => {
       (siteService.findSiteBySiteId as jest.Mock).mockResolvedValue(
         expectedResult,
       );
-      const result = await siteResolver.findSiteBySiteId(siteId, false);
+      const result = await siteResolver.findSiteBySiteId(siteId);
       expect(result).toEqual(expectedResult);
+    });
+  });
+
+  describe('getSiteInsights', () => {
+    const mockInsights = {
+      eventCount: 5,
+      siteDocCount: 3,
+      eventParticCount: 10,
+      landHistoryCount: 2,
+      siteAssocCount: 1,
+      siteSubdivCount: 0,
+      siteParticsCount: 4,
+    };
+
+    it('should call siteService.getSiteInsights with siteId and showPending true', async () => {
+      (siteService.getSiteInsights as jest.Mock).mockResolvedValue(
+        mockInsights,
+      );
+
+      await siteResolver.getSiteInsights('123', true);
+
+      expect(siteService.getSiteInsights).toHaveBeenCalledWith('123', true);
+    });
+
+    it('should call siteService.getSiteInsights with showPending false', async () => {
+      (siteService.getSiteInsights as jest.Mock).mockResolvedValue(
+        mockInsights,
+      );
+
+      await siteResolver.getSiteInsights('123', false);
+
+      expect(siteService.getSiteInsights).toHaveBeenCalledWith('123', false);
     });
   });
 });

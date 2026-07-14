@@ -18,6 +18,8 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CustomExceptionFilter } from './app/filters/customExceptionFilters';
 import { LatLngTupleScalar } from './app/scalars/latLngTuple';
+import { MetricsModule } from './app/metrics/metrics.module';
+import { GraphqlMetricsPlugin } from './app/metrics/graphql-metrics.plugin';
 
 /**
  * Application Module Wrapping All Functionality For User Micro Service
@@ -28,20 +30,21 @@ import { LatLngTupleScalar } from './app/scalars/latLngTuple';
     KeycloakConnectModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        authServerUrl: config.get('KEYCLOCK_AUTH_URL'),
-        realm: config.get('KEYCLOCK_REALM'),
-        clientId: config.get('KEYCLOCK_CLIENT_ID'),
-        secret: config.get('KEYCLOCK_SECRET'),
+        authServerUrl: config.get('KEYCLOAK_AUTH_URL'),
+        realm: config.get('KEYCLOAK_REALM'),
+        clientId: config.get('KEYCLOAK_CLIENT_ID'),
+        secret: config.get('KEYCLOAK_SECRET'),
       }),
       // Secret key of the client taken from keycloak server
     }),
     SiteModule,
+    MetricsModule, // prom-client registry + GraphqlMetricsPlugin provider
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        host: config.get('POSTGRESQL_HOST') || 'gldatabase',
-        port: parseInt(config.get('POSTGRESQL_PORT')) || 5432,
+        host: config.get('POSTGRES_HOST') || 'gldatabase',
+        port: parseInt(config.get('POSTGRES_PORT')) || 5432,
         database: config.get('POSTGRES_DATABASE') || 'xyz',
         username: config.get('POSTGRES_DB_USERNAME') || 'xyzuser',
         password: config.get('POSTGRES_DB_PASSWORD') || 'xyzuser',
@@ -51,14 +54,20 @@ import { LatLngTupleScalar } from './app/scalars/latLngTuple';
       }),
       // This changes the DB schema to match changes to entities, which we might not want.
     }),
-    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
-      // TODO - Experiment with using old files for localhsot if need be, and true for prod
-      autoSchemaFile: {
-        federation: 2,
-        path: process.env.GRAPHQL_SCHEMA_FILE_PATH || './schema.graphql',
-      },
-      context: () => {},
+      imports: [MetricsModule],
+      inject: [GraphqlMetricsPlugin],
+      // forRootAsync injects the plugin so every GraphQL operation is counted once on response.
+      useFactory: (graphqlMetricsPlugin: GraphqlMetricsPlugin) => ({
+        // TODO - Experiment with using old files for localhsot if need be, and true for prod
+        autoSchemaFile: {
+          federation: 2,
+          path: process.env.GRAPHQL_SCHEMA_FILE_PATH || './schema.graphql',
+        },
+        context: () => ({}),
+        plugins: [graphqlMetricsPlugin],
+      }),
     }),
   ],
   controllers: [AppController],

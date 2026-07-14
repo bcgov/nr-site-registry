@@ -18,6 +18,9 @@ spec:
     metadata:
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ .Values.backend.service.targetPort | quote }}
+        prometheus.io/path: "/metrics"
       labels:
         {{- include "backend.labels" . | nindent 8 }}
     spec:
@@ -52,12 +55,12 @@ spec:
                   name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DB_SCHEMA
               value: {{ .Values.global.config.schemaName }}
-            - name: POSTGRESQL_HOST
+            - name: POSTGRES_HOST
               valueFrom:
                 secretKeyRef:
                   key: host
                   name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
-            - name: POSTGRESQL_PORT
+            - name: POSTGRES_PORT
               valueFrom:
                 secretKeyRef:
                   key: port
@@ -116,12 +119,12 @@ spec:
         #           name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
         #     - name: POSTGRES_DB_SCHEMA
         #       value: {{ .Values.global.config.schemaName }}
-        #     - name: POSTGRESQL_HOST
+        #     - name: POSTGRES_HOST
         #       valueFrom:
         #         secretKeyRef:
         #           key: host
         #           name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
-        #     - name: POSTGRESQL_PORT
+        #     - name: POSTGRES_PORT
         #       valueFrom:
         #         secretKeyRef:
         #           key: port
@@ -186,12 +189,12 @@ spec:
                   name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
             - name: POSTGRES_DB_SCHEMA
               value: {{ .Values.global.config.schemaName }}
-            - name: POSTGRESQL_HOST
+            - name: POSTGRES_HOST
               valueFrom:
                 secretKeyRef:
                   key: host
                   name: postgres-crunchy-pguser-{{ .Values.global.config.dbUser }}
-            - name: POSTGRESQL_PORT
+            - name: POSTGRES_PORT
               valueFrom:
                 secretKeyRef:
                   key: port

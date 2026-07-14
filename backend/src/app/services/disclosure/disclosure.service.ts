@@ -9,12 +9,15 @@ import { plainToInstance } from 'class-transformer';
 import { SnapshotsService } from '../snapshot/snapshot.service';
 import { UserTypeEum } from '../../common/userType';
 import { SiteProfilesDTO } from '../../dto/disclosure.dto';
+import { ProfileQuestions } from '../../entities/profileQuestions.entity';
 
 @Injectable()
 export class DisclosureService {
   constructor(
     @InjectRepository(SiteProfiles)
     private readonly disclosureRepository: Repository<SiteProfiles>,
+    @InjectRepository(ProfileQuestions)
+    private readonly profileQuestionsRepository: Repository<ProfileQuestions>,
     private readonly sitesLogger: LoggerService,
     private snapshotService: SnapshotsService,
   ) {}
@@ -40,13 +43,14 @@ export class DisclosureService {
       if (user?.identity_provider === UserTypeEum.IDIR) {
         result = await this.disclosureRepository.find({
           where: { siteId },
+          relations: ['siteProfileLandUses'],
         });
 
         if (showPending) {
           result = result.filter(
             (profile) =>
               profile.srAction === SRApprovalStatusEnum.PENDING ||
-              profile.siteProfileSchedule2Refs?.some(
+              profile.siteProfileLandUses?.some(
                 (ref) => ref.srAction === SRApprovalStatusEnum.PENDING,
               ),
           );
@@ -74,27 +78,58 @@ export class DisclosureService {
       if (!result?.length) {
         return [];
       } else {
-        const res = result?.map((res) => {
-          return {
-            ...res,
-            srAction: res.srAction === SRApprovalStatusEnum.PUBLIC,
-            siteProfileSchedule2Refs: res?.siteProfileSchedule2Refs?.map(
-              (ref) => {
-                return {
+        const isExternalUser = user?.identity_provider !== UserTypeEum.IDIR;
+
+        const enrichedResults = await Promise.all(
+          result.map(async (profile) => {
+            let siteProfileQA: { question: string; category: string }[];
+
+            if (isExternalUser && profile.profileAnswers?.length) {
+              siteProfileQA = profile.profileAnswers
+                .filter((pa) => pa.question)
+                .map((pa) => ({
+                  question: pa.question?.description,
+                  category: pa.question?.category?.description,
+                }));
+            } else {
+              siteProfileQA = await this.profileQuestionsRepository
+                .createQueryBuilder('pq')
+                .distinct(true)
+                .innerJoin('pq.profileAnswers', 'pa')
+                .innerJoin('pq.category', 'pc')
+                .where(
+                  'pa.siteId = :siteId AND pa.sprofDateCompleted = :sprofDateCompleted',
+                  { siteId, sprofDateCompleted: profile.dateCompleted },
+                )
+                .select([
+                  'pq.description AS question',
+                  'pc.description AS category',
+                ])
+                .getRawMany();
+            }
+
+            return {
+              ...profile,
+              siteProfileQA,
+              srAction: profile.srAction === SRApprovalStatusEnum.PUBLIC,
+              siteProfileSchedule2Refs: profile?.siteProfileLandUses?.map(
+                (ref) => ({
                   ...ref,
+                  id: profile.siteId + '-' + ref.lutCode,
+                  schedule2ReferenceCode: ref.lutCode,
                   userAction: ref.userAction ?? UserActionEnum.DEFAULT,
                   srValue: ref.srAction === SRApprovalStatusEnum.PUBLIC,
                   srAction: ref.srAction,
-                };
-              },
-            ),
-          };
-        });
+                }),
+              ),
+            };
+          }),
+        );
         this.sitesLogger.log(
           'DisclosureService.getSiteDisclosureBySiteId() end',
         );
         // Convert the transformed objects into DTOs
-        const disclosure = plainToInstance(SiteProfilesDTO, res);
+        const disclosure = plainToInstance(SiteProfilesDTO, enrichedResults);
         return disclosure;
       }
     } catch (error) {

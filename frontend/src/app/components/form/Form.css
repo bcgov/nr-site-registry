@@ -72,6 +72,11 @@ input.rs-date-range-input::placeholder {
   cursor: not-allowed;
 }
 
+.rs-input:disabled,
+.rs-input-group.rs-input-group-disabled {
+  background-color: var(--surface-color-secondary-disabled) !important;
+}
+
 .custom-select {
   background-image: url('../../images/dropdown.png') !important;
   background-repeat: no-repeat !important;

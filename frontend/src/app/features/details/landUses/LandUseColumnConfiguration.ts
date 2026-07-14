@@ -1,10 +1,11 @@
 import { FormFieldType } from '../../../components/input-controls/IFormField';
-import { ColumnSize } from '../../../components/table/TableColumn';
+import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
 
 export const getLandUseColumns = (
   landUseCodes: any[] = [],
   editMode = false,
-) => {
+  isInternalUser = false,
+): TableColumn[] => {
   const landUseCodeColumns = editMode
     ? {
         id: 1,
@@ -58,6 +59,9 @@ export const getLandUseColumns = (
       customInputTextCss: 'custom-landuses-input-text',
       customEditLabelCss: 'custom-landuses-edit-label',
       customEditInputTextCss: 'custom-landuses-edit-input',
+      validation: {
+        maxLength: 225,
+      },
     },
   };
 
@@ -77,5 +81,7 @@ export const getLandUseColumns = (
     stickyCol: true,
   };
 
-  return [landUseCodeColumns, noteColumn, srColumn];
+  return isInternalUser
+    ? [landUseCodeColumns, noteColumn, srColumn]
+    : [landUseCodeColumns, noteColumn];
 };

@@ -107,16 +107,17 @@ const SRUpdates = () => {
     displayName: '',
     active: true,
     graphQLPropertyName: SRApprovalStatusEnum.Public,
-    columnSize: ColumnSize.Default,
+    columnSize: ColumnSize.XtraSmall,
+    dynamicColumn: true,
     displayType: {
       type: FormFieldType.IconButton,
       label: '',
-      placeholder: 'Approve',
+      placeholder: 'Public',
       graphQLPropertyName: SRApprovalStatusEnum.Public,
       value: '',
       tableMode: true,
       customIcon: <TickIcon />,
-      customLinkValue: 'Approve',
+      customLinkValue: 'Public',
       customInputTextCss: 'approve-tick-icon',
     },
   };
@@ -126,16 +127,17 @@ const SRUpdates = () => {
     displayName: '',
     active: true,
     graphQLPropertyName: SRApprovalStatusEnum.Private,
-    columnSize: ColumnSize.Default,
+    columnSize: ColumnSize.XtraSmall,
+    dynamicColumn: true,
     displayType: {
       type: FormFieldType.IconButton,
       label: '',
-      placeholder: 'Not Public',
+      placeholder: 'Private',
       graphQLPropertyName: SRApprovalStatusEnum.Private,
       value: '',
       tableMode: true,
       customIcon: <XmarkIcon />,
-      customLinkValue: 'Not Public',
+      customLinkValue: 'Private',
       customInputTextCss: 'close-tick-icon',
     },
   };
@@ -395,9 +397,7 @@ const SRUpdates = () => {
     }
   }, [updateRequestStatusFromState]);
 
-  const handleChange = (event: any) => {
-    console.log('No Change Hanlder Required Here', event);
-  };
+  const handleChange = () => {};
 
   const handleAndReturnBoolean = (event: any): boolean => {
     return true;
@@ -651,17 +651,55 @@ const SRUpdates = () => {
     isApproved: boolean,
   ) => {
     const updateDisclosureSchedule2Refs =
-      disclosure?.siteProfileSchedule2Refs.map((schedule: any) => {
-        return getUpdateRecordForComponentTypes(schedule, isApproved);
+      disclosure?.siteProfileSchedule2Refs?.map((schedule: any) => {
+        const updatedSchedule = getUpdateRecordForComponentTypes(
+          schedule,
+          isApproved,
+        );
+        // Only keep fields accepted by SiteProfileSchedule2RefInputDTO
+        return {
+          id: updatedSchedule.id,
+          schedule2ReferenceCode: updatedSchedule.schedule2ReferenceCode,
+          apiAction: updatedSchedule.apiAction,
+          srAction: updatedSchedule.srAction,
+          userAction: updatedSchedule.userAction,
+          srValue: updatedSchedule.srValue,
+        };
       });
+
+    const baseDisclosure = getUpdateRecordForComponentTypes(
+      disclosure,
+      isApproved,
+    );
+
+    // Only keep fields accepted by SiteProfilesInputDTO
     const updatedDisclosure = {
-      ...getUpdateRecordForComponentTypes(disclosure, isApproved),
+      id: baseDisclosure.id,
+      siteId: baseDisclosure.siteId,
+      dateCompleted: baseDisclosure.dateCompleted,
+      rwmDateDecision: baseDisclosure.rwmDateDecision,
+      localAuthDateRecd: baseDisclosure.localAuthDateRecd,
+      siteRegDateRecd: baseDisclosure.siteRegDateRecd,
+      siteRegDateEntered: baseDisclosure.siteRegDateEntered,
+      localAuthDateSubmitted: baseDisclosure.localAuthDateSubmitted,
+      localAuthDateForwarded: baseDisclosure.localAuthDateForwarded,
+      rwmDateReceived: baseDisclosure.rwmDateReceived,
+      rwmParticId: baseDisclosure.rwmParticId,
+      plannedActivityComment: baseDisclosure.plannedActivityComment,
+      siteDisclosureComment: baseDisclosure.siteDisclosureComment,
+      govDocumentsComment: baseDisclosure.govDocumentsComment,
+      whenCreated: baseDisclosure.whenCreated,
+      whenUpdated: baseDisclosure.whenUpdated,
+      apiAction: baseDisclosure.apiAction,
+      srAction: baseDisclosure.srAction,
+      userAction: baseDisclosure.userAction,
+      srValue: baseDisclosure.srValue,
       siteProfileSchedule2Refs: updateDisclosureSchedule2Refs,
     };
 
     let saveDTO = {
       ...getDefaultObjectForSaving(),
-      profiles: updatedDisclosure,
+      profiles: [updatedDisclosure],
     };
 
     dispatch(updateSiteDetailsForApproval(saveDTO));
@@ -691,6 +729,7 @@ const SRUpdates = () => {
         notationData.map((notation: any, index: number) => {
           return (
             <ApproveReject
+              key={notation.id ?? index}
               name="Notations"
               testId="srupdates-notation-component"
               link="?notations"
@@ -704,6 +743,8 @@ const SRUpdates = () => {
                   handleNotationFormRowFirstChild
                 }
                 handleChangeNotationFormRow={handleChange}
+                handleDeleteNotation={(_notationId: string) => {}}
+                handleRestoreNotation={(_notationId: string) => {}}
                 handleInputChange={handleChange}
                 userType={UserType.Internal}
                 handleNotationFormRowsInternal={handleNotationFormRowsInternal}
@@ -721,6 +762,11 @@ const SRUpdates = () => {
                 showApproveRejectSection={true}
                 approveRejectHandler={(value) =>
                   handleNotationApproveRejectHandler(notation, value)
+                }
+                isArchived={notation?.whenDeleted != null}
+                isRestored={
+                  notation?.whenRestored != null &&
+                  notation?.whenDeleted == null
                 }
               />
             </ApproveReject>
@@ -758,6 +804,7 @@ const SRUpdates = () => {
         documentsData.map((document: any, index: number) => {
           return (
             <ApproveReject
+              key={document.id ?? index}
               name="Documents"
               testId="srupdates-documents-component"
               link="?documents"
@@ -863,51 +910,61 @@ const SRUpdates = () => {
           </ApproveReject>
         )}
 
-      {disclosureData && (
-        <ApproveReject name="Site Disclosure" link="?disclosure">
-          <DisclosureComponent
-            viewMode={SiteDetailsMode.ViewOnlyMode}
-            userType={UserType.Internal}
-            handleWidgetCheckBox={handleChange}
-            formData={{
-              ...disclosureData,
-              siteProfileSchedule2Refs:
-                disclosureData?.siteProfileSchedule2Refs?.map((item: any) => {
-                  return {
-                    ...item,
-                    description: schedule2Ref?.data?.find(
-                      (ref: any) => ref.key === item.schedule2ReferenceCode,
-                    )?.metaData,
-                  };
-                }) ?? [],
-            }}
-            disclosureStatementConfig={disclosureStatementConfig}
-            handleInputChange={(
-              id: any,
-              name: any,
-              value: string | [Date, Date],
-            ) => {}}
-            handleTableChange={handleChange}
-            disclosureScheduleInternalConfig={disclosureScheduleInternalConfig}
-            disclosureScheduleExternalConfig={disclosureScheduleExternalConfig}
-            loading={RequestStatus.success}
-            handleTableSort={handleChange}
-            handleAddDisclosureSchedule={handleChange}
-            isAnyDisclosureScheduleSelected={(event: any) => {
-              return false;
-            }}
-            handleRemoveDisclosureSchedule={handleChange}
-            srVisibilityConfig={srVisibilityConfig}
-            handleItemClick={handleChange}
-            disclosureCommentsConfig={disclosureCommentsConfig}
-            showApproveRejectSection={true}
-            approveRejectHandler={(value) => {
-              handleDisclosureApproveRejectHandler(disclosureData, value);
-            }}
-          />
-        </ApproveReject>
-      )}
-      {!disclosureData &&
+      {disclosureData &&
+        disclosureData.length > 0 &&
+        disclosureData.map((disclosure: any, index: number) => (
+          <ApproveReject
+            key={disclosure.id ?? index}
+            name="Site Disclosure"
+            link="?disclosure"
+          >
+            <DisclosureComponent
+              viewMode={SiteDetailsMode.ViewOnlyMode}
+              userType={UserType.Internal}
+              handleWidgetCheckBox={handleChange}
+              formData={{
+                ...disclosure,
+                siteProfileSchedule2Refs:
+                  disclosure?.siteProfileSchedule2Refs?.map((item: any) => {
+                    return {
+                      ...item,
+                      description: schedule2Ref?.data?.find(
+                        (ref: any) => ref.key === item.schedule2ReferenceCode,
+                      )?.metaData,
+                    };
+                  }) ?? [],
+              }}
+              disclosureStatementConfig={disclosureStatementConfig}
+              handleInputChange={(
+                id: any,
+                name: any,
+                value: string | [Date, Date],
+              ) => {}}
+              handleTableChange={handleChange}
+              disclosureScheduleInternalConfig={
+                disclosureScheduleInternalConfig
+              }
+              disclosureScheduleExternalConfig={
+                disclosureScheduleExternalConfig
+              }
+              loading={RequestStatus.success}
+              handleTableSort={handleChange}
+              handleAddDisclosureSchedule={handleChange}
+              isAnyDisclosureScheduleSelected={(event: any) => {
+                return false;
+              }}
+              handleRemoveDisclosureSchedule={handleChange}
+              srVisibilityConfig={srVisibilityConfig}
+              handleItemClick={handleChange}
+              disclosureCommentsConfig={disclosureCommentsConfig}
+              showApproveRejectSection={true}
+              approveRejectHandler={(value) => {
+                handleDisclosureApproveRejectHandler(disclosure, value);
+              }}
+            />
+          </ApproveReject>
+        ))}
+      {(!disclosureData || disclosureData.length === 0) &&
         (!parcelDescriptionData ||
           (parcelDescriptionData && parcelDescriptionData.data.length === 0)) &&
         (!landUsesData || (landUsesData && landUsesData.length === 0)) &&

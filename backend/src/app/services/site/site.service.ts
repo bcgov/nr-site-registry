@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { Brackets, EntityManager, In, Repository } from 'typeorm';
+import { Brackets, EntityManager, In, IsNull, Repository } from 'typeorm';
 import {
   FetchSiteDetail,
   FetchSiteDetailsResponse,
@@ -59,7 +59,8 @@ import { SortByDirection } from '../../utils/enums/sortByDirection.enum';
 import { SiteSortBy } from '../../utils/enums/sortByFields.enum';
 import { SiteInsightsDto } from '../../dto/siteInsights.dto';
 import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
-import { SiteProfileSchedule2Ref } from '../../entities/siteProfileSchedule2Ref';
+import { SiteProfileLandUses } from '../../entities/siteProfileLandUses.entity';
+import { RecentViews } from '../../entities/recentViews.entity';
 
 /**
  * Nestjs Service For Region Entity
@@ -116,7 +117,9 @@ export class SiteService {
 
     response.httpStatusCode = 200;
 
-    response.data = await this.siteRepository.find();
+    response.data = await this.siteRepository.find({
+      where: { whoDeleted: IsNull() },
+    });
 
     this.sitesLogger.log('SiteService.findAll() end');
     this.sitesLogger.debug('SiteService.findAll() end');
@@ -160,225 +163,258 @@ export class SiteService {
     } = filters;
 
     this.sitesLogger.log('SiteService.searchSites() start');
+
     const siteUtil: SiteUtil = new SiteUtil();
     const response = new SearchSiteResponse();
 
-    const query = this.siteRepository.createQueryBuilder('sites');
+    if (!searchParam?.trim() && (!siteIds || siteIds.length === 0)) {
+      response.sites = [];
+      response.count = 0;
+      response.page = page;
+      response.pageSize = pageSize;
+      return response;
+    } else {
+      const query = this.siteRepository.createQueryBuilder('sites');
 
-    if (siteIds && siteIds.length === 0) {
-      throw new HttpException(
-        `If provided, siteIds filter array must not be empty`,
-        HttpStatus.BAD_REQUEST,
-      );
-    } else if (siteIds && siteIds.length > 0) {
-      query.whereInIds(siteIds);
+      // Exclude soft-deleted sites from search results.
+      query.andWhere('sites.who_deleted IS NULL');
+
+      if (siteIds && siteIds.length === 0) {
+        throw new HttpException(
+          `If provided, siteIds filter array must not be empty`,
+          HttpStatus.BAD_REQUEST,
+        );
+      } else if (siteIds && siteIds.length > 0) {
+        query.whereInIds(siteIds);
+      }
+
+      let pid;
+      if (searchParam?.length === 11 || searchParam?.length === 9) {
+        pid = searchParam.replace(/-/g, '');
+      }
+
+      if (pid) {
+        query
+          .innerJoin('sites.siteSubdivisions', 'siteSubdivisions')
+          .innerJoin('siteSubdivisions.subdivision', 'subdivision');
+      }
+
+      if (searchParam?.trim()) {
+        const keywords = searchParam.trim().toLowerCase().split(/\s+/);
+        query.andWhere(
+          new Brackets((qb) => {
+            for (const word of keywords) {
+              qb.andWhere(
+                new Brackets((subQb) => {
+                  subQb
+                    .orWhere('LOWER(sites.addr_line_1) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.addr_line_2) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.addr_line_3) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.addr_line_4) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.city) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.common_name) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.provState) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('LOWER(sites.postalCode) LIKE :word', {
+                      word: `%${word}%`,
+                    })
+                    .orWhere('CAST(sites.id AS TEXT) LIKE :word', {
+                      word: `%${word}%`,
+                    });
+                }),
+              );
+            }
+            if (pid) {
+              qb.orWhere('subdivision.pid = :pid', { pid });
+              qb.orWhere('subdivision.pin = :pin', { pin: pid });
+            }
+          }),
+        );
+      }
+
+      if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR) {
+        query.andWhere('sites.srAction = :srAction', {
+          srAction: SRApprovalStatusEnum.PUBLIC,
+        });
+      }
+
+      if (id) {
+        const ids = id.split(',').map((v) => v.trim());
+        this.sitesLogger.log(`Applying id filter: ${JSON.stringify(ids)}`);
+        // Build OR conditions for each ID
+        query.andWhere(
+          new Brackets((qb) => {
+            ids.forEach((siteId, index) => {
+              if (index === 0) {
+                qb.where(`CAST(sites.id AS TEXT) = :id${index}`, {
+                  [`id${index}`]: siteId,
+                });
+              } else {
+                qb.orWhere(`CAST(sites.id AS TEXT) = :id${index}`, {
+                  [`id${index}`]: siteId,
+                });
+              }
+            });
+          }),
+        );
+      }
+
+      if (srStatus) {
+        query.andWhere('sites.srStatus = :srStatus', { srStatus: srStatus });
+      }
+
+      if (siteRiskCode) {
+        query.andWhere('sites.site_risk_code = :siteRiskCode', {
+          siteRiskCode: siteRiskCode,
+        });
+      }
+
+      if (commonName) {
+        query.andWhere('sites.common_name = :commonName', {
+          commonName: commonName,
+        });
+      }
+
+      if (addrLine_1) {
+        const cleanedAddress = siteUtil.removeSpecialCharacters(addrLine_1);
+        query.andWhere(
+          `regexp_replace(concat_ws('', sites.addr_line_1, sites.addr_line_2, sites.addr_line_3, sites.addr_line_4), '[^a-zA-Z0-9]', '', 'g') LIKE :cleanedAddress`,
+          { cleanedAddress: `%${cleanedAddress}%` },
+        );
+      }
+
+      if (city) query.andWhere('sites.city = :city', { city });
+      if (whoCreated)
+        query.andWhere('sites.who_created = :whoCreated', { whoCreated });
+      if (latlongReliabilityFlag)
+        query.andWhere(
+          'sites.latlong_reliability_flag = :latlongReliabilityFlag',
+          { latlongReliabilityFlag },
+        );
+
+      if (latdeg) query.andWhere('sites.latdeg = :latdeg', { latdeg });
+      if (latDegrees)
+        query.andWhere('sites.lat_degrees = :latDegrees', { latDegrees });
+      if (latMinutes)
+        query.andWhere('sites.lat_minutes = :latMinutes', { latMinutes });
+      if (latSeconds)
+        query.andWhere('sites.lat_seconds = :latSeconds', { latSeconds });
+      if (longdeg) query.andWhere('sites.longdeg = :longdeg', { longdeg });
+      if (longDegrees)
+        query.andWhere('sites.long_degrees = :longDeg', {
+          longDeg: longDegrees,
+        });
+      if (longMinutes)
+        query.andWhere('sites.long_minutes = :longMinutes', { longMinutes });
+      if (longSeconds)
+        query.andWhere('sites.long_seconds = :longSeconds', { longSeconds });
+
+      if (
+        whenCreated?.length === 2 &&
+        whenCreated.every((date) => date instanceof Date)
+      ) {
+        query.andWhere('sites.whenCreated BETWEEN :start AND :end', {
+          start: whenCreated[0],
+          end: whenCreated[1],
+        });
+      }
+
+      if (
+        whenUpdated?.length === 2 &&
+        whenUpdated.every((date) => date instanceof Date)
+      ) {
+        query.andWhere('sites.whenUpdated BETWEEN :start AND :end', {
+          start: whenUpdated[0],
+          end: whenUpdated[1],
+        });
+      }
+
+      const sortFieldMap: Record<SiteSortBy, string> = {
+        [SiteSortBy.ID]: 'sites.id',
+        [SiteSortBy.SR_STATUS]: 'sites.srStatus',
+        [SiteSortBy.SITE_RISK_CODE]: 'sites.site_risk_code',
+        [SiteSortBy.COMMON_NAME]: 'sites.common_name',
+        [SiteSortBy.CITY]: 'sites.city',
+        [SiteSortBy.SITE_ADDRESS]: `
+        CASE
+          WHEN sites.addr_line_1 IS NOT NULL THEN sites.addr_line_1
+          WHEN sites.addr_line_2 IS NOT NULL THEN sites.addr_line_2
+          WHEN sites.addr_line_3 IS NOT NULL THEN sites.addr_line_3
+          ELSE ''
+        END
+      `,
+        [SiteSortBy.WHO_CREATED]: 'sites.who_created',
+        [SiteSortBy.LAT_DEGREES_MINUTES_SECONDS]: `
+        CASE
+          WHEN sites.lat_degrees IS NOT NULL THEN sites.lat_degrees
+          WHEN sites.lat_minutes IS NOT NULL THEN sites.lat_minutes
+          WHEN sites.lat_seconds IS NOT NULL THEN sites.lat_seconds
+          ELSE NULL
+        END
+      `,
+        [SiteSortBy.LONG_DEGREES_MINUTES_SECONDS]: `
+        CASE
+          WHEN sites.long_degrees IS NOT NULL THEN sites.long_degrees
+          WHEN sites.long_minutes IS NOT NULL THEN sites.long_minutes
+          WHEN sites.long_seconds IS NOT NULL THEN sites.long_seconds
+          ELSE NULL
+        END
+      `,
+        [SiteSortBy.WHEN_CREATED]: 'sites.whenCreated',
+        [SiteSortBy.WHEN_UPDATED]: 'sites.whenUpdated',
+        [SiteSortBy.GENERAL_DESCRIPTION]: 'sites.general_description',
+        [SiteSortBy.LAT_LONG_RELIABILITY_FLAG]:
+          'sites.latlong_reliability_flag',
+        [SiteSortBy.LAT_DEG]: 'sites.latdeg',
+        [SiteSortBy.LONG_DEG]: 'sites.longdeg',
+        [SiteSortBy.CONSULTANT_SUBMITTED]: 'sites.consultant_submitted',
+      };
+
+      if (sortBy && sortFieldMap[sortBy]) {
+        query.orderBy(
+          sortFieldMap[sortBy],
+          sortByDir === SortByDirection.DESC ? 'DESC' : 'ASC',
+        );
+      }
+
+      const result = await query
+        .skip((page - 1) * pageSize)
+        .take(pageSize)
+        .getManyAndCount();
+
+      response.sites = result[0] || [];
+      response.count = result[1] || 0;
+      response.page = page;
+      response.pageSize = pageSize;
+
+      this.sitesLogger.log('SiteService.searchSites() end');
+      return response;
     }
-
-    let pid;
-    if (searchParam?.length === 11 || searchParam?.length === 9) {
-      pid = searchParam.replace(/-/g, '');
-    }
-
-    if (pid) {
-      query
-        .innerJoin('sites.siteSubdivisions', 'siteSubdivisions')
-        .innerJoin('siteSubdivisions.subdivision', 'subdivision');
-    }
-
-    if (searchParam?.trim()) {
-      const keywords = searchParam.trim().toLowerCase().split(/\s+/);
-      query.andWhere(
-        new Brackets((qb) => {
-          for (const word of keywords) {
-            qb.andWhere(
-              new Brackets((subQb) => {
-                subQb
-                  .orWhere('LOWER(sites.addr_line_1) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.addr_line_2) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.addr_line_3) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.addr_line_4) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.city) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.common_name) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.provState) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('LOWER(sites.postalCode) LIKE :word', {
-                    word: `%${word}%`,
-                  })
-                  .orWhere('CAST(sites.id AS TEXT) LIKE :word', {
-                    word: `%${word}%`,
-                  });
-              }),
-            );
-          }
-          if (pid) {
-            qb.orWhere('subdivision.pid = :pid', { pid });
-            qb.orWhere('subdivision.pin = :pin', { pin: pid });
-          }
-        }),
-      );
-    }
-
-    if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR) {
-      query.andWhere('sites.srAction = :srAction', {
-        srAction: SRApprovalStatusEnum.PUBLIC,
-      });
-    }
-
-    if (id) {
-      const ids = id.split(',').map((v) => v.trim());
-      query.andWhere('sites.id IN (:...ids)', { ids });
-    }
-
-    if (srStatus) {
-      query.andWhere('sites.srStatus = :srStatus', { srStatus: srStatus });
-    }
-
-    if (siteRiskCode) {
-      query.andWhere('sites.site_risk_code = :siteRiskCode', {
-        siteRiskCode: siteRiskCode,
-      });
-    }
-
-    if (commonName) {
-      query.andWhere('sites.common_name = :commonName', {
-        commonName: commonName,
-      });
-    }
-
-    if (addrLine_1) {
-      const cleanedAddress = siteUtil.removeSpecialCharacters(addrLine_1);
-      query.andWhere(
-        `regexp_replace(concat_ws('', sites.addr_line_1, sites.addr_line_2, sites.addr_line_3, sites.addr_line_4), '[^a-zA-Z0-9]', '', 'g') LIKE :cleanedAddress`,
-        { cleanedAddress: `%${cleanedAddress}%` },
-      );
-    }
-
-    if (city) query.andWhere('sites.city = :city', { city });
-    if (whoCreated)
-      query.andWhere('sites.who_created = :whoCreated', { whoCreated });
-    if (latlongReliabilityFlag)
-      query.andWhere(
-        'sites.latlong_reliability_flag = :latlongReliabilityFlag',
-        { latlongReliabilityFlag },
-      );
-
-    if (latdeg) query.andWhere('sites.latdeg = :latdeg', { latdeg });
-    if (latDegrees)
-      query.andWhere('sites.lat_degrees = :latDegrees', { latDegrees });
-    if (latMinutes)
-      query.andWhere('sites.lat_minutes = :latMinutes', { latMinutes });
-    if (latSeconds)
-      query.andWhere('sites.lat_seconds = :latSeconds', { latSeconds });
-    if (longdeg) query.andWhere('sites.longdeg = :longdeg', { longdeg });
-    if (longDegrees)
-      query.andWhere('sites.long_degrees = :longDeg', { longDeg: longDegrees });
-    if (longMinutes)
-      query.andWhere('sites.long_minutes = :longMinutes', { longMinutes });
-    if (longSeconds)
-      query.andWhere('sites.long_seconds = :longSeconds', { longSeconds });
-
-    if (
-      whenCreated?.length === 2 &&
-      whenCreated.every((date) => date instanceof Date)
-    ) {
-      query.andWhere('sites.whenCreated BETWEEN :start AND :end', {
-        start: whenCreated[0],
-        end: whenCreated[1],
-      });
-    }
-
-    if (
-      whenUpdated?.length === 2 &&
-      whenUpdated.every((date) => date instanceof Date)
-    ) {
-      query.andWhere('sites.whenUpdated BETWEEN :start AND :end', {
-        start: whenUpdated[0],
-        end: whenUpdated[1],
-      });
-    }
-
-    const sortFieldMap: Record<SiteSortBy, string> = {
-      [SiteSortBy.ID]: 'sites.id',
-      [SiteSortBy.SR_STATUS]: 'sites.srStatus',
-      [SiteSortBy.SITE_RISK_CODE]: 'sites.site_risk_code',
-      [SiteSortBy.COMMON_NAME]: 'sites.common_name',
-      [SiteSortBy.CITY]: 'sites.city',
-      [SiteSortBy.SITE_ADDRESS]: `
-      CASE
-        WHEN sites.addr_line_1 IS NOT NULL THEN sites.addr_line_1
-        WHEN sites.addr_line_2 IS NOT NULL THEN sites.addr_line_2
-        WHEN sites.addr_line_3 IS NOT NULL THEN sites.addr_line_3
-        ELSE ''
-      END
-    `,
-      [SiteSortBy.WHO_CREATED]: 'sites.who_created',
-      [SiteSortBy.LAT_DEGREES_MINUTES_SECONDS]: `
-      CASE
-        WHEN sites.lat_degrees IS NOT NULL THEN sites.lat_degrees
-        WHEN sites.lat_minutes IS NOT NULL THEN sites.lat_minutes
-        WHEN sites.lat_seconds IS NOT NULL THEN sites.lat_seconds
-        ELSE NULL
-      END
-    `,
-      [SiteSortBy.LONG_DEGREES_MINUTES_SECONDS]: `
-      CASE
-        WHEN sites.long_degrees IS NOT NULL THEN sites.long_degrees
-        WHEN sites.long_minutes IS NOT NULL THEN sites.long_minutes
-        WHEN sites.long_seconds IS NOT NULL THEN sites.long_seconds
-        ELSE NULL
-      END
-    `,
-      [SiteSortBy.WHEN_CREATED]: 'sites.whenCreated',
-      [SiteSortBy.WHEN_UPDATED]: 'sites.whenUpdated',
-      [SiteSortBy.GENERAL_DESCRIPTION]: 'sites.general_description',
-      [SiteSortBy.LAT_LONG_RELIABILITY_FLAG]: 'sites.latlong_reliability_flag',
-      [SiteSortBy.LAT_DEG]: 'sites.latdeg',
-      [SiteSortBy.LONG_DEG]: 'sites.longdeg',
-      [SiteSortBy.CONSULTANT_SUBMITTED]: 'sites.consultant_submitted',
-    };
-
-    if (sortBy && sortFieldMap[sortBy]) {
-      query.orderBy(
-        sortFieldMap[sortBy],
-        sortByDir === SortByDirection.DESC ? 'DESC' : 'ASC',
-      );
-    }
-
-    const result = await query
-      .skip((page - 1) * pageSize)
-      .take(pageSize)
-      .getManyAndCount();
-
-    response.sites = result[0] || [];
-    response.count = result[1] || 0;
-    response.page = page;
-    response.pageSize = pageSize;
-
-    this.sitesLogger.log('SiteService.searchSites() end');
-    return response;
   }
 
   async mapSearch({
     searchTerm,
     polygon,
     circle,
+    userInfo,
   }: {
     searchTerm?: string;
     polygon?: LatLngTuple[];
     circle?: RadiusSearchParams;
+    userInfo?: any;
   }) {
     this.sitesLogger.log('SiteService.mapSearch() start');
 
@@ -392,29 +428,35 @@ export class SiteService {
     const searchTermClean = (searchTerm ?? '').toLowerCase().trim();
     const query = this.siteRepository.createQueryBuilder('sites');
 
+    // Always exclude soft-deleted sites on map views
+    query.where('sites.who_deleted IS NULL');
+
     if (searchTermClean.length) {
-      query
-        .where('LOWER(sites.addr_line_1) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        })
-        .orWhere('LOWER(sites.addr_line_2) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        })
-        .orWhere('LOWER(sites.addr_line_3) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        })
-        .orWhere('LOWER(sites.addr_line_4) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        })
-        .orWhere('LOWER(sites.city) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        })
-        .orWhere('LOWER(sites.provState) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        })
-        .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchTerm)', {
-          searchTerm: `%${searchTermClean}%`,
-        });
+      query.andWhere(
+        new Brackets((qb) => {
+          qb.where('LOWER(sites.addr_line_1) LIKE LOWER(:searchTerm)', {
+            searchTerm: `%${searchTermClean}%`,
+          })
+            .orWhere('LOWER(sites.addr_line_2) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${searchTermClean}%`,
+            })
+            .orWhere('LOWER(sites.addr_line_3) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${searchTermClean}%`,
+            })
+            .orWhere('LOWER(sites.addr_line_4) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${searchTermClean}%`,
+            })
+            .orWhere('LOWER(sites.city) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${searchTermClean}%`,
+            })
+            .orWhere('LOWER(sites.provState) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${searchTermClean}%`,
+            })
+            .orWhere('LOWER(sites.postalCode) LIKE LOWER(:searchTerm)', {
+              searchTerm: `%${searchTermClean}%`,
+            });
+        }),
+      );
     }
 
     if (polygon) {
@@ -429,7 +471,7 @@ export class SiteService {
         .map(([lat, long]) => `${long} ${lat}`)
         .join(', ');
 
-      query.where(
+      query.andWhere(
         `ST_Within(
           ST_Transform(sites.geometry, ${BC_ALBERS}), 
           ST_Transform(ST_GeomFromText('POLYGON((${polygonString}))', ${WGS_84}), ${BC_ALBERS})
@@ -470,7 +512,7 @@ export class SiteService {
       const { center, radius } = circle;
       const [latitude, longitude] = center;
 
-      query.where(
+      query.andWhere(
         `ST_DWithin(
           ST_Transform(sites.geometry, ${BC_ALBERS}),
           ST_Transform(ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}),${WGS_84}), ${BC_ALBERS}),
@@ -479,12 +521,14 @@ export class SiteService {
       );
     }
 
+    this.applyPublicVisibilityFilterForNonIdirUsers(query, userInfo);
+
     const [result] = await query.getManyAndCount();
     this.sitesLogger.log('SiteService.mapSearch() end');
     return result;
   }
 
-  async findSitesAndPlaces(searchTerm = '', limit = 3) {
+  async findSitesAndPlaces(searchTerm = '', limit = 3, userInfo?: any) {
     this.sitesLogger.log('SiteService.findSitesAndPlaces() start');
 
     const searchTermClean = searchTerm.toLowerCase().trim();
@@ -499,12 +543,16 @@ export class SiteService {
     }
 
     sitesQuery
-      .where('CAST(sites.id AS TEXT) = :searchTermId', {
-        searchTermId: searchTermClean,
-      })
-      .orWhere('LOWER(sites.common_name) LIKE LOWER(:searchTermName)', {
-        searchTermName: `%${searchTermClean}%`,
-      })
+      .where('sites.who_deleted IS NULL')
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('CAST(sites.id AS TEXT) = :searchTermId', {
+            searchTermId: searchTermClean,
+          }).orWhere('LOWER(sites.common_name) LIKE LOWER(:searchTermName)', {
+            searchTermName: `%${searchTermClean}%`,
+          });
+        }),
+      )
       .limit(limit)
       // This makes sure that sites found by ID match appear first on the list, sites found by common_name match follow
       .orderBy(
@@ -515,6 +563,8 @@ export class SiteService {
         'ASC',
       )
       .addOrderBy('sites.id', 'ASC');
+
+    this.applyPublicVisibilityFilterForNonIdirUsers(sitesQuery, userInfo);
     placesQuery
       .where('LOWER(places.name) LIKE LOWER(:searchTerm)', {
         searchTerm: `%${searchTermClean}%`,
@@ -530,6 +580,56 @@ export class SiteService {
     return { sites, places };
   }
 
+  private applyPublicVisibilityFilterForNonIdirUsers(
+    query: any,
+    userInfo?: any,
+  ) {
+    // `sr_action` is a disclosure/visibility flag. Non-IDIR users must never receive non-public sites
+    // (e.g., private sites) from "list-style" endpoints like map pins or autocomplete.
+    if (!userInfo || userInfo?.identity_provider !== UserTypeEum.IDIR) {
+      query.andWhere('sites.srAction = :srAction', {
+        srAction: SRApprovalStatusEnum.PUBLIC,
+      });
+    }
+  }
+
+  async getMostRecentSnapshotForUser(
+    siteId: string,
+    userInfo: any,
+  ): Promise<Snapshots | null> {
+    if (!userInfo) {
+      this.sitesLogger.log('SiteService.findSiteBySiteId() user not logged in');
+      return null;
+    }
+
+    if (userInfo?.identity_provider === UserTypeEum.IDIR) {
+      this.sitesLogger.log(
+        'SiteService.findSiteBySiteId() idir user - no snapshot',
+      );
+      return null;
+    }
+
+    return await this.snapShotService.getMostRecentSnapshot(
+      siteId,
+      userInfo.sub,
+    );
+  }
+
+  buildFindSiteBySiteIdWhereClause(
+    siteId: string,
+    pending: boolean,
+    userInfo: any,
+  ) {
+    const isIdir = userInfo?.identity_provider === UserTypeEum.IDIR;
+    if (pending && isIdir) {
+      return { id: siteId, srAction: SRApprovalStatusEnum.PENDING };
+    }
+
+    return isIdir
+      ? { id: siteId }
+      : { id: siteId, srAction: SRApprovalStatusEnum.PUBLIC };
+  }
+
   /**
    * Find sites by its ID
    * @param siteId site Id
@@ -542,40 +642,42 @@ export class SiteService {
 
     response.httpStatusCode = 200;
 
-    let snapShot: Snapshots = null;
+    const siteStatus = await this.siteRepository.findOne({
+      where: { id: siteId },
+      select: ['id', 'whoDeleted'],
+    });
 
-    if (!userInfo) {
-      this.sitesLogger.log('SiteService.findSiteBySiteId() user not logged in');
-
-      snapShot = null;
-    } else if (userInfo?.identity_provider === 'idir') {
+    if (!siteStatus || siteStatus.whoDeleted) {
+      response.data = null;
       this.sitesLogger.log(
-        'SiteService.findSiteBySiteId() idir user - no snapshot',
+        `SiteService.findSiteBySiteId() blocked deleted/missing site: ${siteId}`,
       );
-    } else {
-      snapShot = await this.snapShotService.getMostRecentSnapshot(
-        siteId,
-        userInfo.sub,
-      );
+      this.sitesLogger.debug('SiteService.findSiteBySiteId() end');
+      return response;
     }
 
-    if (!snapShot) {
-      if (pending) {
-        const result = await this.siteRepository.findOne({
-          where: { id: siteId, srAction: SRApprovalStatusEnum.PENDING },
-          relations: ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'],
-        });
-        response.data = result ? result : null;
-      } else {
-        const result = await this.siteRepository.findOne({
-          where: { id: siteId },
-          relations: ['siteAssocs', 'siteAssocs.siteIdAssociatedWith2'],
-        });
-        response.data = result ? result : null;
-      }
-    } else {
+    const snapShot = await this.getMostRecentSnapshotForUser(siteId, userInfo);
+    if (snapShot) {
       response.data = snapShot.snapshotData?.sitesSummary;
+      this.sitesLogger.log('SiteService.findSiteBySiteId() end');
+      this.sitesLogger.debug('SiteService.findSiteBySiteId() end');
+      return response;
     }
+
+    const whereClause = this.buildFindSiteBySiteIdWhereClause(
+      siteId,
+      pending,
+      userInfo,
+    );
+    const result = await this.siteRepository.findOne({
+      where: whereClause,
+      relations: [
+        'siteAssocs',
+        'siteAssocs.siteIdAssociatedWith2',
+        'bcerCode2',
+      ],
+    });
+    response.data = result ? result : null;
 
     this.sitesLogger.log('SiteService.findSiteBySiteId() end');
     this.sitesLogger.debug('SiteService.findSiteBySiteId() end');
@@ -593,6 +695,7 @@ export class SiteService {
         .where('CAST(sites.id AS TEXT) LIKE :searchParam', {
           searchParam: `%${searchParam}%`,
         })
+        .andWhere('sites.who_deleted IS NULL')
         .orderBy('sites.id', 'ASC'); // Ordering by 'id' in ascending order;
       const result = await queryBuilder.getMany();
       if (result) {
@@ -902,6 +1005,37 @@ export class SiteService {
         transactionalEntityManager,
         siteId,
         userInfo,
+      );
+    }
+
+    // Update the site's last modified date when SR mark as public or private any edits
+    const hasSrAction = (srAction: string) =>
+      srAction === SRApprovalStatusEnum.PUBLIC ||
+      srAction === SRApprovalStatusEnum.PRIVATE;
+
+    const hasSrApprovalOrRejection =
+      (sitesSummary?.srAction && hasSrAction(sitesSummary.srAction)) ||
+      events?.some(
+        (event) =>
+          hasSrAction(event.srAction) ||
+          event.notationParticipant?.some((p) => hasSrAction(p.srAction)),
+      ) ||
+      eventsParticipants?.some((p) => hasSrAction(p.srAction)) ||
+      siteParticipants?.some((p) => hasSrAction(p.srAction)) ||
+      documents?.some((doc) => hasSrAction(doc.srAction)) ||
+      siteAssociations?.some((assoc) => hasSrAction(assoc.srAction)) ||
+      parcelDescriptions?.some((parcel) => hasSrAction(parcel.srAction)) ||
+      landHistories?.some((history) => hasSrAction(history.srAction)) ||
+      profiles?.some((profile) => hasSrAction(profile.srAction));
+
+    if (hasSrApprovalOrRejection && !sitesSummary) {
+      await transactionalEntityManager.update(
+        Sites,
+        { id: siteId },
+        {
+          whenUpdated: new Date(),
+          whoUpdated: userInfo?.givenName || '',
+        },
       );
     }
 
@@ -1467,6 +1601,13 @@ export class SiteService {
             ...new Events(),
             ...eventData,
           };
+          const dbEvent =
+            apiAction === UserActionEnum.DELETED ||
+            apiAction === UserActionEnum.RESTORED
+              ? await this.eventsRepositoryRepo.findOneByOrFail({
+                  id: notationId,
+                })
+              : null;
           switch (apiAction) {
             case UserActionEnum.ADDED:
               // Get the ID of the newly created event
@@ -1477,7 +1618,7 @@ export class SiteService {
                 ...event,
                 id: notationId,
                 siteId: siteId,
-                eventDate: new Date(),
+                eventDate: event.eventDate || new Date(),
                 userAction: UserActionEnum.ADDED,
                 whenCreated: currentDate,
                 whoCreated: userInfo ? userInfo.givenName : '',
@@ -1516,9 +1657,51 @@ export class SiteService {
               break;
 
             case UserActionEnum.DELETED:
-              // Handle deletion if necessary
+              if (dbEvent) {
+                // Deleting is just a special form of updating, so it's safe to push.
+                updatedEvents.push({
+                  id: notation.id,
+                  changes: {
+                    ...new Events(),
+                    ...dbEvent,
+                    ...event,
+                    srAction: SRApprovalStatusEnum.PENDING,
+                    userAction: UserActionEnum.UPDATED,
+                    whoDeleted: userInfo ? userInfo.givenName : '',
+                    whenDeleted: new Date(),
+                    whoRestored: null,
+                    whenRestored: null,
+                  },
+                });
+              } else {
+                this.sitesLogger.log(
+                  `SiteService.processEvents(): Event with id ${notation.id} not found for deletion`,
+                );
+              }
               break;
-
+            case UserActionEnum.RESTORED:
+              if (dbEvent) {
+                // Restoring is just a special form of updating, so it's safe to push.
+                updatedEvents.push({
+                  id: notation.id,
+                  changes: {
+                    ...new Events(),
+                    ...dbEvent,
+                    ...event,
+                    srAction: SRApprovalStatusEnum.PENDING,
+                    userAction: UserActionEnum.UPDATED,
+                    whoRestored: userInfo ? userInfo.givenName : '',
+                    whenRestored: new Date(),
+                    whoDeleted: null,
+                    whenDeleted: null,
+                  },
+                });
+              } else {
+                this.sitesLogger.log(
+                  `SiteService.processEvents(): Event with id ${notation.id} not found for restoration`,
+                );
+              }
+              break;
             default:
               this.sitesLogger.warn(
                 'SiteService.processEvents Unknown action for event',
@@ -1526,17 +1709,31 @@ export class SiteService {
               break;
           }
 
-          // Process related participants regardless of event action
-          if (notationParticipant?.length > 0) {
-            await processParticipants(notationId, notationParticipant);
+          // Process related participants regardless of event action, except when event is deleted (archived)
+          if (
+            apiAction === UserActionEnum.DELETED ||
+            apiAction === UserActionEnum.RESTORED
+          ) {
+            // If event is deleted (archived), we won't process participants as they are also considered archived and there is no UI to manage participants of an archived event.
+            // If event is restored, we also won't process participants as part of restore action, as there is no UI to restore participants separately from event restoration.
+            // Participants will be restored as part of event restoration and there is no need to process them separately in the restore action.
+            this.sitesLogger.log(
+              `SiteService.processEvents(): Skipping participant processing for event with id ${notation.id} due to event action ${apiAction === UserActionEnum.DELETED ? 'Archived' : 'Restored'}.`,
+            );
+            return;
           } else {
-            this.sitesLogger.warn(
-              `SiteService.processEvents(): There is no notation participants. Atleast every notation should have one notation participant.`,
-            );
-            throw new HttpException(
-              `Failed to process site notation participants. There is no notation participants. Atleast every notation should have one notation participant.`,
-              HttpStatus.NOT_FOUND,
-            );
+            // Process related participants regardless of event action
+            if (notationParticipant?.length > 0) {
+              await processParticipants(notationId, notationParticipant);
+            } else {
+              this.sitesLogger.warn(
+                `SiteService.processEvents(): There is no notation participants. Atleast every notation should have one notation participant.`,
+              );
+              throw new HttpException(
+                `Failed to process site notation participants. There is no notation participants. Atleast every notation should have one notation participant.`,
+                HttpStatus.NOT_FOUND,
+              );
+            }
           }
         });
 
@@ -1698,18 +1895,14 @@ export class SiteService {
           const {
             apiAction,
             id,
+            // siteProfileSchedule2Refs backed by SiteProfileLandUses table
             siteProfileSchedule2Refs = [],
             ...disclosureData
           } = disclosure;
-          let siteProfile: SiteProfiles = {
-            ...new SiteProfiles(),
-            id,
-            ...disclosureData,
-          };
-
+          const currentDate = new Date();
+          let siteProfile: SiteProfiles | null = null;
           switch (apiAction) {
             case UserActionEnum.ADDED:
-              const currentDate = new Date();
               siteProfile = transactionalEntityManager.create(SiteProfiles, {
                 ...disclosureData,
                 siteId,
@@ -1726,9 +1919,16 @@ export class SiteService {
               );
               break;
             case UserActionEnum.UPDATED:
+              if (!id) {
+                this.sitesLogger.warn(
+                  'processSiteDisclosure: UPDATE missing id',
+                );
+                return;
+              }
+
               const existing = await this.siteProfilesRepo.findOne({
                 where: { id },
-                relations: ['siteProfileSchedule2Refs'],
+                relations: ['siteProfileLandUses'],
               });
 
               if (!existing) {
@@ -1736,38 +1936,83 @@ export class SiteService {
                 return;
               }
 
-              Object.assign(existing, {
-                ...disclosureData,
-                userAction:
-                  disclosure.srAction === SRApprovalStatusEnum.PUBLIC ||
-                  disclosure.srAction === SRApprovalStatusEnum.PRIVATE
-                    ? UserActionEnum.DEFAULT
-                    : UserActionEnum.UPDATED,
-                whenUpdated: new Date(),
-                whoUpdated: userInfo?.givenName || '',
-              });
+              const isSrApproval =
+                disclosure.srAction === SRApprovalStatusEnum.PUBLIC ||
+                disclosure.srAction === SRApprovalStatusEnum.PRIVATE;
+
+              if (isSrApproval) {
+                existing.srAction = disclosure.srAction;
+                existing.userAction = UserActionEnum.DEFAULT;
+              } else {
+                Object.assign(existing, {
+                  ...disclosureData,
+                  userAction: UserActionEnum.UPDATED,
+                });
+              }
+
+              existing.whenUpdated = currentDate;
+              existing.whoUpdated = userInfo?.givenName || '';
 
               siteProfile = await transactionalEntityManager.save(
                 SiteProfiles,
                 existing,
               );
               break;
+            case UserActionEnum.DELETED:
+              if (!id) {
+                this.sitesLogger.warn(
+                  'processSiteDisclosure: DELETE missing id',
+                );
+                return;
+              }
+
+              const existingToDelete = await transactionalEntityManager.findOne(
+                SiteProfiles,
+                {
+                  where: { id },
+                },
+              );
+
+              if (!existingToDelete) {
+                this.sitesLogger.warn(
+                  `No site profile found for delete id: ${id}`,
+                );
+                return;
+              }
+
+              await transactionalEntityManager.remove(
+                SiteProfiles,
+                existingToDelete,
+              );
+
+              break;
+
             default:
-              this.sitesLogger.warn(`Unknown apiAction: ${apiAction}`);
+              // No parent action
+              // This can happen when only child refs changed
+              if (id) {
+                siteProfile = await transactionalEntityManager.findOne(
+                  SiteProfiles,
+                  {
+                    where: { id },
+                  },
+                );
+              }
               break;
           }
 
-          if (siteProfile?.id && siteProfileSchedule2Refs.length > 0) {
+          if (siteProfile && siteProfileSchedule2Refs.length > 0) {
             await this.processSchedule2Refs(
               siteProfileSchedule2Refs,
-              siteProfile.id,
+              siteProfile.siteId ?? siteId,
+              siteProfile.dateCompleted,
               userInfo,
               transactionalEntityManager,
             );
           }
         });
 
-        // Handle schedule2Ref (ADD, UPDATE, DELETE)
+        // Handle siteProfileSchedule2Refs (backed by SiteProfileLandUses)
         await Promise.all(disclosurePromises);
       }
     } catch (error) {
@@ -1778,87 +2023,193 @@ export class SiteService {
     }
   }
 
+  /**
+   * Processes site profile land uses (ADD / UPDATE / DELETE).
+   *
+   * Field mapping (frontend → DB):
+   *   schedule2ReferenceCode → lutCode  (composite PK column)
+   *   id                     → used only to carry the original lutCode back on
+   *                            UPDATE/DELETE via the GET response field "id"
+   *
+   * Action rules:
+   *   ADDED   — id is a client-side v4() UUID, not a DB key. Use schedule2ReferenceCode directly.
+   *   UPDATED — id is "<profileSiteId>-<originalLutCode>" set by the GET mapping.
+   *             lutCode is part of the composite PK so a code change = delete old + insert new.
+   *   DELETED — id is the same "<profileSiteId>-<originalLutCode>" format.
+   *             schedule2ReferenceCode holds the code to delete.
+   */
   private async processSchedule2Refs(
     refs: any[],
-    profileId: string,
+    siteId: string,
+    sprofDateCompleted: Date,
     userInfo: any,
     transactionalEntityManager: EntityManager,
   ) {
-    // Get current DB state
     const currentRefs = await transactionalEntityManager.find(
-      SiteProfileSchedule2Ref,
-      {
-        where: { profileId },
-      },
+      SiteProfileLandUses,
+      { where: { siteId, sprofDateCompleted } },
     );
 
-    const currentMap = new Map(currentRefs.map((r) => [r.id, r]));
+    const currentMap = new Map(currentRefs.map((r) => [r.lutCode, r]));
 
-    const toSave: SiteProfileSchedule2Ref[] = [];
-    const toDelete: SiteProfileSchedule2Ref[] = [];
+    const toSave: SiteProfileLandUses[] = [];
+    const toDelete: SiteProfileLandUses[] = [];
 
     for (const ref of refs) {
-      const { apiAction, id, schedule2ReferenceCode } = ref;
-      const existing = currentMap.get(id);
+      const { apiAction, schedule2ReferenceCode } = ref;
 
       switch (apiAction) {
-        case UserActionEnum.ADDED:
-          if (!existing) {
+        case UserActionEnum.ADDED: {
+          // id is a client-side v4() — never use it for DB lookups.
+          // schedule2ReferenceCode is the code the user selected.
+          if (!schedule2ReferenceCode) {
+            this.sitesLogger.warn(
+              'processSchedule2Refs: ADDED ref has no schedule2ReferenceCode — skipping',
+            );
+            break;
+          }
+          if (currentMap.has(schedule2ReferenceCode)) {
+            this.sitesLogger.warn(
+              `processSchedule2Refs: lutCode=${schedule2ReferenceCode} already exists — skipping duplicate ADD`,
+            );
+            break;
+          }
+          toSave.push(
+            transactionalEntityManager.create(SiteProfileLandUses, {
+              lutCode: schedule2ReferenceCode,
+              siteId,
+              sprofDateCompleted,
+              srAction: ref.srAction,
+              userAction: UserActionEnum.ADDED,
+              whoCreated: userInfo?.givenName || '',
+              whenCreated: new Date(),
+              whoUpdated: userInfo?.givenName || '',
+              whenUpdated: new Date(),
+            }),
+          );
+          break;
+        }
+
+        case UserActionEnum.UPDATED: {
+          // schedule2ReferenceCode is the NEW code the user selected.
+          // The original code (before the edit) is what's stored in the DB —
+          // find it by looking up the current map with the new code first,
+          // then fall back to finding any row whose lutCode matches the old value
+          // carried in the ref's original schedule2ReferenceCode before the edit.
+          // The safest approach: the GET sets id = "<siteId>-<originalLutCode>".
+          // Since siteId is always a numeric bigint (no hyphens), we can safely
+          // extract originalLutCode as everything after the first "-".
+          if (!schedule2ReferenceCode) {
+            this.sitesLogger.warn(
+              'processSchedule2Refs: UPDATED ref has no schedule2ReferenceCode — skipping',
+            );
+            break;
+          }
+
+          const originalLutCode = this.extractOriginalLutCode(ref.id, siteId);
+          const existingRow = currentMap.get(originalLutCode);
+
+          if (!existingRow) {
+            this.sitesLogger.warn(
+              `processSchedule2Refs: no DB row found for originalLutCode=${originalLutCode} on UPDATE — skipping`,
+            );
+            break;
+          }
+
+          const resolvedUserAction =
+            ref.srAction === SRApprovalStatusEnum.PUBLIC ||
+            ref.srAction === SRApprovalStatusEnum.PRIVATE
+              ? UserActionEnum.DEFAULT
+              : UserActionEnum.UPDATED;
+
+          if (originalLutCode !== schedule2ReferenceCode) {
+            // Code changed — composite PK cannot be updated in-place.
+            // Delete the old row and insert a new one preserving audit origin.
+            toDelete.push(existingRow);
             toSave.push(
-              transactionalEntityManager.create(SiteProfileSchedule2Ref, {
-                schedule2ReferenceCode,
-                profileId,
+              transactionalEntityManager.create(SiteProfileLandUses, {
+                lutCode: schedule2ReferenceCode,
+                siteId,
+                sprofDateCompleted,
                 srAction: ref.srAction,
-                userAction: UserActionEnum.ADDED,
-                whoCreated: userInfo?.givenName || '',
-                whenCreated: new Date(),
+                userAction: resolvedUserAction,
+                whoCreated: existingRow.whoCreated,
+                whenCreated: existingRow.whenCreated,
                 whoUpdated: userInfo?.givenName || '',
                 whenUpdated: new Date(),
               }),
             );
-          }
-          break;
-
-        case UserActionEnum.UPDATED:
-          if (existing) {
-            Object.assign(existing, {
-              ...ref,
-              userAction:
-                ref.srAction === SRApprovalStatusEnum.PUBLIC ||
-                ref.srAction === SRApprovalStatusEnum.PRIVATE
-                  ? UserActionEnum.DEFAULT
-                  : UserActionEnum.UPDATED,
+          } else {
+            // Same code — only audit fields change
+            Object.assign(existingRow, {
+              srAction: ref.srAction,
+              userAction: resolvedUserAction,
               whoUpdated: userInfo?.givenName || '',
               whenUpdated: new Date(),
             });
-            toSave.push(existing);
+            toSave.push(existingRow);
           }
           break;
+        }
 
-        case UserActionEnum.DELETED:
-          if (existing) {
-            toDelete.push(existing);
+        case UserActionEnum.DELETED: {
+          // schedule2ReferenceCode holds the code to delete.
+          if (!schedule2ReferenceCode) {
+            this.sitesLogger.warn(
+              'processSchedule2Refs: DELETED ref has no schedule2ReferenceCode — skipping',
+            );
+            break;
+          }
+          const rowToDelete = currentMap.get(schedule2ReferenceCode);
+          if (rowToDelete) {
+            toDelete.push(rowToDelete);
+          } else {
+            this.sitesLogger.warn(
+              `processSchedule2Refs: no DB row found for lutCode=${schedule2ReferenceCode} on DELETE — skipping`,
+            );
           }
           break;
+        }
+
+        default:
+          this.sitesLogger.warn(
+            `processSchedule2Refs: unknown apiAction="${apiAction}" — skipping`,
+          );
       }
     }
 
+    // Deletes must run before saves to avoid composite PK conflicts
     if (toDelete.length) {
-      await transactionalEntityManager.remove(
-        SiteProfileSchedule2Ref,
-        toDelete,
-      );
+      await transactionalEntityManager.remove(SiteProfileLandUses, toDelete);
     }
 
     if (toSave.length) {
-      await transactionalEntityManager.save(SiteProfileSchedule2Ref, toSave);
+      await transactionalEntityManager.save(SiteProfileLandUses, toSave);
     }
+  }
+
+  /**
+   * Extracts the original lutCode from the composite id set by the GET response.
+   * Format: "<siteId>-<lutCode>" where siteId is always a numeric bigint (no hyphens).
+   * Falls back to the current schedule2ReferenceCode if parsing fails.
+   */
+  private extractOriginalLutCode(refId: string, siteId: string): string {
+    if (!refId) return '';
+    const prefix = siteId + '-';
+    if (refId.startsWith(prefix)) {
+      return refId.slice(prefix.length);
+    }
+    // Fallback: take everything after the first '-'
+    const firstDash = refId.indexOf('-');
+    return firstDash !== -1 ? refId.slice(firstDash + 1) : refId;
   }
 
   async getSiteDetailsPendingSRApproval(
     searchParam: SearchParams,
     page: number,
     pageSize: number,
+    sortBy: SiteSortBy = SiteSortBy.ID,
+    sortByDir: SortByDirection = SortByDirection.ASC,
   ): Promise<QueryResultForPendingSites> {
     try {
       this.sitesLogger.log(
@@ -1926,8 +2277,13 @@ export class SiteService {
               
               SELECT sp.site_id, sp.when_Updated , sp.who_updated 
               FROM sites.site_profiles sp
-              INNER JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
-              WHERE sp.sr_action = 'pending' or sp.user_action = 'updated' or sp2r.sr_action = 'pending' or sp2r.user_action = 'updated'
+              WHERE sp.sr_action = 'pending' or sp.user_action = 'updated'
+              
+              UNION ALL
+              
+              SELECT splu.site_id, splu.when_Updated , COALESCE(splu.who_updated, splu.who_created) as who_updated 
+              FROM sites.site_profile_land_uses splu
+              WHERE splu.sr_action = 'pending' or splu.user_action = 'updated'
           ) AS updates
           GROUP BY site_id, who_updated
       )
@@ -1986,10 +2342,15 @@ export class SiteService {
           
           UNION ALL
           
-          SELECT site_id, 'site profiles' AS Change, sp.when_Updated, sp.who_updated ,  '' , '', '' 
+          SELECT sp.site_id, 'site disclosure' AS Change, sp.when_Updated, sp.who_updated ,  '' , '', '' 
           FROM sites.site_profiles sp
-          INNER JOIN sites.site_profile_schedule2_ref sp2r ON sp2r.site_profile_id = sp.id
-          WHERE sp.sr_action = 'pending' or sp.user_action = 'updated' or sp2r.sr_action = 'pending' or sp2r.user_action = 'updated'
+          WHERE sp.sr_action = 'pending' or sp.user_action = 'updated'
+          
+          UNION ALL
+          
+          SELECT splu.site_id, 'site disclosure' AS Change, splu.when_Updated, COALESCE(splu.who_updated, splu.who_created) as who_updated ,  '' , '', '' 
+          FROM sites.site_profile_land_uses splu
+          WHERE splu.sr_action = 'pending' or splu.user_action = 'updated'
       ) AS c
       GROUP BY c.site_id,c.who_updated) Final
       JOIN LatestUpdates lu ON Final.site_id = lu.site_id and Final.who_updated = lu.who ) ResultInFo
@@ -2065,6 +2426,8 @@ export class SiteService {
       }
 
       const startIndex = (page - 1) * pageSize;
+
+      result = sortSRReviewTableResults(result, sortBy, sortByDir);
 
       const paginatedRecords = result.slice(startIndex, startIndex + pageSize);
 
@@ -2364,7 +2727,7 @@ export class SiteService {
         }
       }
 
-      if (site.changes.indexOf('site profiles') !== -1) {
+      if (site.changes.includes('site disclosure')) {
         const profiles = !fromSiteDetails
           ? await transactionalEntityManager.find(SiteProfiles, {
               where: {
@@ -2389,6 +2752,37 @@ export class SiteService {
         } else {
           this.sitesLogger.log(
             'SiteService.processSRBulkUpdates() no profiles to process.',
+          );
+        }
+
+        // Also approve/reject pending schedule2 references (SiteProfileLandUses)
+        const pendingLandUses = !fromSiteDetails
+          ? await transactionalEntityManager.find(SiteProfileLandUses, {
+              where: {
+                siteId: site.siteId,
+                whoUpdated: site.whoUpdated,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            })
+          : await transactionalEntityManager.find(SiteProfileLandUses, {
+              where: {
+                siteId: site.siteId,
+                srAction: SRApprovalStatusEnum.PENDING,
+              },
+            });
+
+        if (pendingLandUses?.length > 0) {
+          pendingLandUses.forEach((landUse) => {
+            this.setUpdatedStatus(landUse, isApproved, userInfo);
+          });
+
+          await transactionalEntityManager.save(
+            SiteProfileLandUses,
+            pendingLandUses,
+          );
+        } else {
+          this.sitesLogger.log(
+            'SiteService.processSRBulkUpdates() no pending schedule2 refs to process.',
           );
         }
       }
@@ -2449,6 +2843,16 @@ export class SiteService {
           );
         }
       }
+
+      // Update the site's last modified date whenever any change is approved/rejected
+      await transactionalEntityManager.update(
+        Sites,
+        { id: site.siteId },
+        {
+          whenUpdated: new Date(),
+          whoUpdated: userInfo?.givenName || '',
+        },
+      );
 
       const historyLog: HistoryLog = {
         userId: userInfo ? userInfo.sub : '',
@@ -2545,7 +2949,7 @@ export class SiteService {
         .getRawOne();
 
       return result?.maxid ? Number(result.maxid) : 0; // Return 0 if no result found
-    } catch (error) {
+    } catch (error: any) {
       this.sitesLogger.error(
         `Error fetching max ID from ${repository.metadata.tableName}:`,
         error,
@@ -2554,20 +2958,32 @@ export class SiteService {
     }
   }
 
-  async getSiteInsights(siteId: string): Promise<SiteInsightsDto> {
+  async getSiteInsights(
+    siteId: string,
+    showPending?: boolean,
+  ): Promise<SiteInsightsDto> {
     try {
+      const srFilter = showPending
+        ? ''
+        : `AND (sr_action IS NULL OR sr_action != '${SRApprovalStatusEnum.PENDING}')`;
+
+      const sdSrFilter = showPending
+        ? ''
+        : `AND (sd.sr_action IS NULL OR sd.sr_action != '${SRApprovalStatusEnum.PENDING}')`;
+
       const result = await this.siteRepository.query(
         `
         SELECT
-          (SELECT COUNT(id) FROM sites.events WHERE site_id = $1) AS event_count,
+          (SELECT COUNT(id) FROM sites.events WHERE site_id = $1 ${srFilter}) AS event_count,
           (SELECT COUNT(sd.id) FROM sites.site_docs sd
-		  join sites.site_doc_partics  spr on sdoc_id = sd.id
-		  where site_id = $1) AS site_doc_count,
+		  join sites.site_doc_partics spr on sdoc_id = sd.id
+		  where site_id = $1 ${sdSrFilter}) AS site_doc_count,
           (SELECT COUNT(id) FROM sites.event_partics WHERE event_id IN (
-              SELECT id FROM sites.events WHERE site_id = $1
+              SELECT id FROM sites.events WHERE site_id = $1 ${srFilter}
           )) AS event_partic_count,
-          (SELECT COUNT(Lut_code) FROM sites.land_histories WHERE site_id = $1) AS land_history_count,
-          (SELECT COUNT(id) FROM sites.site_assocs WHERE site_id = $1) AS site_assoc_count,
+           (SELECT COUNT(id) FROM sites.site_partics WHERE site_id = $1 ${srFilter}) AS site_participants,
+          (SELECT COUNT(Lut_code) FROM sites.land_histories WHERE site_id = $1 ${srFilter}) AS land_history_count,
+          (SELECT COUNT(id) FROM sites.site_assocs WHERE site_id = $1 ${srFilter}) AS site_assoc_count,
           (SELECT COUNT(subdiv_id) FROM sites.site_subdivisions WHERE site_id = $1) AS site_subdiv_count
         `,
         [siteId],
@@ -2585,10 +3001,11 @@ export class SiteService {
         landHistoryCount: Number(raw.land_history_count),
         siteAssocCount: Number(raw.site_assoc_count),
         siteSubdivCount: Number(raw.site_subdiv_count),
+        siteParticsCount: Number(raw.site_participants),
       };
 
       return dto;
-    } catch (error) {
+    } catch (error: any) {
       // ✅ Optional: log error, rethrow as NestJS exception
       this.sitesLogger.error(
         `Error fetching site insights for siteId= ${siteId}:`,
@@ -2597,4 +3014,115 @@ export class SiteService {
       throw new InternalServerErrorException('Failed to fetch site counts');
     }
   }
+
+  /**
+   * Soft deletes a site and all its related entities
+   * @param siteId - The ID of the site to delete
+   * @param userId - The ID of the user performing the deletion
+   * @returns Success message or throws an exception
+   */
+  async deleteSite(siteId: string, userId: string): Promise<string> {
+    this.sitesLogger.log(`SiteService.deleteSite() start siteId: ${siteId}`);
+
+    return await this.entityManager.transaction(
+      async (transactionalEntityManager) => {
+        try {
+          const site = await transactionalEntityManager.findOne(Sites, {
+            where: { id: siteId },
+          });
+
+          if (!site) {
+            throw new HttpException(
+              `Site with ID ${siteId} not found`,
+              HttpStatus.NOT_FOUND,
+            );
+          }
+
+          if (site.whoDeleted) {
+            throw new HttpException(
+              `Site with ID ${siteId} is already deleted`,
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+
+          const deletionTimestamp = new Date();
+          const auditUser = (userId || 'SYSTEM').toString().slice(0, 30);
+
+          // Soft delete the main site only
+          // Related entities (participants, documents, events) will remain but won't be accessible
+          // since they're accessed through the site which is now soft-deleted
+          await transactionalEntityManager.update(
+            Sites,
+            { id: siteId },
+            {
+              whoDeleted: auditUser,
+              whenDeleted: deletionTimestamp,
+            },
+          );
+
+          // Remove stale dashboard records for this site
+          await transactionalEntityManager.delete(RecentViews, { siteId });
+
+          // Log the deletion in history log
+          const historyLogEntry = this.historyLogRepository.create({
+            userId: userId,
+            siteId: siteId,
+            content: {
+              action: 'SITE_DELETED',
+              deletedAt: deletionTimestamp.toISOString(),
+              siteName: site.commonName,
+              siteAddress: site.addrLine_1,
+            },
+            whoCreated: auditUser,
+            whenCreated: deletionTimestamp,
+            whoUpdated: auditUser,
+            whenUpdated: deletionTimestamp,
+          });
+          await transactionalEntityManager.save(HistoryLog, historyLogEntry);
+
+          this.sitesLogger.log(
+            `SiteService.deleteSite() end - successfully deleted site ${siteId}`,
+          );
+
+          return `Site ${siteId} and all related entities have been successfully deleted`;
+        } catch (error: any) {
+          this.sitesLogger.error(
+            `SiteService.deleteSite() error for siteId ${siteId}:`,
+            error,
+          );
+          throw error;
+        }
+      },
+    );
+  }
+}
+
+export function sortSRReviewTableResults(
+  results: any[],
+  sortBy: SiteSortBy = SiteSortBy.ID,
+  sortByDir: SortByDirection = SortByDirection.ASC,
+): any[] {
+  const pendingSortFieldMap: Record<string, string> = {
+    [SiteSortBy.ID]: 'siteId',
+    [SiteSortBy.WHEN_UPDATED]: 'whenUpdated',
+    [SiteSortBy.WHO_CREATED]: 'whoUpdated',
+    [SiteSortBy.SITE_ADDRESS]: 'address',
+  };
+
+  const sortField = pendingSortFieldMap[sortBy] || 'siteId';
+  const dateFields = new Set(['whenUpdated']);
+
+  return [...results].sort((a, b) => {
+    const aVal = a[sortField] ?? '';
+    const bVal = b[sortField] ?? '';
+    let comparison: number;
+    if (dateFields.has(sortField)) {
+      comparison = new Date(aVal).getTime() - new Date(bVal).getTime();
+    } else {
+      comparison = String(aVal).localeCompare(String(bVal), undefined, {
+        numeric: true,
+      });
+    }
+    return sortByDir === SortByDirection.DESC ? -comparison : comparison;
+  });
 }

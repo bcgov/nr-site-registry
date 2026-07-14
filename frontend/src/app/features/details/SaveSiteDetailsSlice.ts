@@ -28,6 +28,7 @@ export const saveSiteDetails = createAsyncThunk(
   async (_, { getState }) => {
     const saveDTO = getSiteDetailsToBeSaved(getState());
     const request = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'updateSiteDetails',
       query: print(updateSiteDetails()),
       variables: {
         siteDetailsDTO: saveDTO,
@@ -36,6 +37,26 @@ export const saveSiteDetails = createAsyncThunk(
     return request.data;
   },
 );
+
+function normalizeParcelDescription(dto: {
+  id: any;
+  apiAction: UserActionEnum;
+}) {
+  const isExisting = Number(dto.id) > 0;
+
+  // Deleted rows
+  if (dto.apiAction === UserActionEnum.deleted) {
+    return { ...dto, apiAction: UserActionEnum.deleted };
+  }
+
+  // Existing DB rows
+  if (isExisting) {
+    return { ...dto, apiAction: UserActionEnum.updated };
+  }
+
+  // Newly added rows (negative IDs)
+  return { ...dto, apiAction: UserActionEnum.added };
+}
 
 const siteDetailsSlice = createSlice({
   name: 'siteDetails',
@@ -109,10 +130,15 @@ const siteDetailsSlice = createSlice({
       return newState;
     },
     setupParcelDescriptionsDataForSaving: (state, action) => {
-      const newState = {
-        ...state,
-      };
-      newState.parcelDescriptionsData = action.payload;
+      const newState = { ...state };
+
+      // ⭐ Normalize all parcel description actions before saving
+      const normalized = action.payload.map(
+        (dto: { id: any; apiAction: UserActionEnum }) =>
+          normalizeParcelDescription(dto),
+      );
+
+      newState.parcelDescriptionsData = normalized;
       return newState;
     },
     setupSiteAssociationDataForSaving: (state, action) => {
@@ -163,6 +189,7 @@ export const getSiteDetailsToBeSaved = (state: any) => {
     sitesSummary: state?.siteDetails?.sitesSummary
       ? {
           ...state.siteDetails.sitesSummary,
+          bcerCode2: undefined,
           latDegrees: safeParseFloat(
             state.siteDetails?.sitesSummary?.latDegrees,
           ),
@@ -206,6 +233,10 @@ export const getParentBucket = (state: any) => state.siteDetails.parentBucket;
 
 export const getSiteSummary = (state: any) => state.siteDetails.sitesSummary;
 
+export const getSiteLandHistories = (state: any) =>
+  state.siteDetails.landHistoriesData;
+export const getSiteDisclosures = (state: any) =>
+  state.siteDetails.profilesData;
 export const {
   resetSaveSiteDetailsRequestStatus,
   resetSaveSiteDetails,

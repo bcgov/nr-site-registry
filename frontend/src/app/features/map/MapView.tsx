@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { LatLngBounds, LatLngTuple, Map } from 'leaflet';
+import { LatLngTuple, Map } from 'leaflet';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import clsx from 'clsx';
+import { useAuth } from 'react-oidc-context';
+import { notifyInfo } from '../../components/alert/Alert';
 
 import { MyLocationMarker } from './MyLocationMarker'; // Import the MyLocationMarker component
 
@@ -12,12 +14,12 @@ import './MapView.css';
 import { MapSearch } from './MapSearch';
 import {
   MapSearchQuery,
-  MapSearchQueryVariables,
   useMapSearchQuery,
+  useMapSearch_FindSiteBySiteIdLoggedInUserQuery,
+  useMapSearch_FindSiteBySiteIdQuery,
 } from '../../../graphql/generated';
 import { SiteMarkers } from './siteMarkers/SiteMarkers';
 import { MapControls } from './MapControls';
-import { MAP_FLY_OPTIONS } from './mapOptions';
 import {
   MapSearchQueryProvider,
   useMapSearchContext,
@@ -27,6 +29,13 @@ import { RadiusSearchLayer } from './layers/RadiusSearchLayer';
 import { PolygonSearchLayer } from './layers/PolygonSearchLayer';
 import { MIN_CIRCLE_RADIUS } from '../../constants/Constant';
 import { MapDataLayers } from './dataLayers/MapDataLayers';
+import { buildSitesToShow } from './buildSitesToShow';
+import { useFlyToSelectedSite } from './useFlyToSelectedSite';
+import {
+  flyToBoundsForTextSearch,
+  sitesWhenMapToolCleared,
+} from './mapViewHelpers';
+import { buildMapSearchQueryVariables } from './mapSearchVariables';
 
 // Set the position of the marker for center of BC
 const CENTER_OF_BC: LatLngTuple = [53.7267, -127.6476];
@@ -37,54 +46,98 @@ export type Site = MapSearchQuery['mapSearch']['data'][number];
  * Renders a map with a marker at the supplied location
  */
 function MapView() {
+  const auth = useAuth();
+  const lastUnavailableToastSiteIdRef = useRef<string | null>(null);
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
   // Feature flag for turning OpenStreetMap tiles gray
   const osmGrayscale = false;
 
-  const { searchTerm, activeTool, polygonVertices, center, radius } =
-    useMapSearchContext();
+  const {
+    searchTerm,
+    activeTool,
+    polygonVertices,
+    center,
+    radius,
+    selectedSiteId,
+    setQuery,
+  } = useMapSearchContext();
 
-  const variables: MapSearchQueryVariables = {
-    searchParam: searchTerm || '',
-    ...(polygonVertices.length > 0 && { polygon: polygonVertices }),
-  };
+  const mapRef = useRef<Map>(null);
+  const [sites, setSites] = useState<Site[]>([]);
 
-  if (center && radius >= MIN_CIRCLE_RADIUS) {
-    variables.circle = { center, radius };
-  }
+  const searchParam = searchTerm ?? '';
+
+  const variables = buildMapSearchQueryVariables(
+    searchParam,
+    polygonVertices,
+    center,
+    radius,
+    MIN_CIRCLE_RADIUS,
+  );
 
   const { data, loading: sitesLoading } = useMapSearchQuery({
     variables,
-    onCompleted: ({ mapSearch: { data } }) => {
-      flyToSiteBounds(data);
-      setSites(data);
+    onCompleted: ({ mapSearch: { data: siteData } }) => {
+      flyToBoundsForTextSearch(searchParam, siteData, mapRef.current);
+      setSites(siteData);
     },
   });
 
-  const flyToSiteBounds = (sites: Site[]) => {
-    if (!searchTerm || !mapRef.current) return;
-
-    const bounds = new LatLngBounds([]);
-    sites.forEach((site) => {
-      if (!site.latdeg || !site.longdeg) return;
-      const lat = site.latdeg;
-      const lng = site.longdeg;
-      bounds.extend({ lat, lng });
-    });
-    if (bounds.isValid()) {
-      mapRef.current.flyToBounds(bounds, MAP_FLY_OPTIONS);
-    }
-  };
-
-  const mapRef = useRef<Map>(null);
   const [isLocationVisible, setLocationVisible] = useState(false);
-  const [sites, setSites] = useState<Site[]>([]);
   const clearSites = () => setSites([]);
 
+  const isAuthenticated = auth?.user != null;
+  const { data: publicSelectedSiteData, loading: publicSelectedSiteLoading } =
+    useMapSearch_FindSiteBySiteIdQuery({
+      variables: { siteId: selectedSiteId ?? '' },
+      skip: !selectedSiteId || isAuthenticated,
+    });
+  const {
+    data: loggedInSelectedSiteData,
+    loading: loggedInSelectedSiteLoading,
+  } = useMapSearch_FindSiteBySiteIdLoggedInUserQuery({
+    variables: { siteId: selectedSiteId ?? '' },
+    skip: !selectedSiteId || !isAuthenticated,
+  });
+
+  const selectedSiteLoading = isAuthenticated
+    ? loggedInSelectedSiteLoading
+    : publicSelectedSiteLoading;
+  const selectedSite = isAuthenticated
+    ? loggedInSelectedSiteData?.findSiteBySiteIdLoggedInUser?.data
+    : publicSelectedSiteData?.findSiteBySiteId?.data;
+
   useEffect(() => {
-    if (activeTool === null) {
-      setSites(data?.mapSearch.data || []);
+    if (!selectedSiteId || selectedSiteLoading) return;
+    if (selectedSite) return;
+    if (lastUnavailableToastSiteIdRef.current !== selectedSiteId) {
+      notifyInfo(
+        'This site is private or unavailable. The map selection has been cleared.',
+        'Site unavailable',
+      );
+      lastUnavailableToastSiteIdRef.current = selectedSiteId;
+    }
+    setQuery({ site: undefined }, 'replace');
+  }, [selectedSiteId, selectedSiteLoading, selectedSite, setQuery]);
+
+  const sitesToShow = buildSitesToShow(
+    sites,
+    selectedSiteId,
+    selectedSite ?? undefined,
+  );
+
+  useFlyToSelectedSite(
+    mapRef,
+    selectedSiteId,
+    selectedSite?.latdeg ?? undefined,
+    selectedSite?.longdeg ?? undefined,
+  );
+
+  useEffect(() => {
+    const next = sitesWhenMapToolCleared(activeTool, data?.mapSearch.data);
+    if (next !== null) {
+      setSites(next);
     }
   }, [activeTool]);
 
@@ -110,7 +163,7 @@ function MapView() {
           setLocationVisible={setLocationVisible}
         />
         {<MyLocationMarker isLocationVisible={isLocationVisible} />}
-        <SiteMarkers sites={sites} />
+        <SiteMarkers sites={sitesToShow} />
         <RadiusSearchLayer
           onCrossHairClick={clearSites}
           sites={sites}

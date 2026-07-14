@@ -28,6 +28,7 @@ export const fetchCartItems = createAsyncThunk(
   async () => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getCartItemsForUser',
         query: print(getCartItemsForUserQL()),
       });
       return response.data;
@@ -41,6 +42,7 @@ export const addCartItem = createAsyncThunk(
   'addCartItem',
   async (cartInputDTO: Cart[]) => {
     const request = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'addCartItem',
       query: print(addCartItemQL()),
       variables: {
         cartDTO: cartInputDTO,
@@ -54,6 +56,7 @@ export const deleteCartItem = createAsyncThunk(
   'deleteCartItem',
   async (cartDeleteDTO: CartDeleteDTO[]) => {
     const request = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'deleteCartItem',
       query: print(deleteCartItemQL()),
       variables: {
         cartDeleteDTO: cartDeleteDTO,
@@ -67,6 +70,7 @@ export const deleteCartItemWithSiteId = createAsyncThunk(
   'deleteCartItemWithSiteId',
   async (cartDeleteDTO: CartDeleteDTOWithSiteId[]) => {
     const request = await getAxiosInstance().post(GRAPHQL, {
+      operationName: 'deleteCartItemWithSiteId',
       query: print(deleteCartWithSiteIdItemQL()),
       variables: {
         cartDeleteDTO: cartDeleteDTO,
@@ -92,7 +96,7 @@ const cartSlice = createSlice({
       const newState = {
         ...state,
       };
-      newState.deleteRequestStatus = RequestStatus.pending;
+      newState.deleteRequestStatus = RequestStatus.idle;
       return newState;
     },
   },
@@ -102,11 +106,13 @@ const cartSlice = createSlice({
         state.fetchRequestStatus = RequestStatus.loading;
       })
       .addCase(fetchCartItems.fulfilled, (state, action) => {
+        const response = action?.payload?.data?.getCartItemsForUser;
         if (
-          action?.payload?.data?.getCartItemsForUser?.httpStatusCode === 200
+          response?.httpStatusCode === 200 ||
+          response?.httpStatusCode === 404
         ) {
           state.fetchRequestStatus = RequestStatus.success;
-          state.cartItems = action.payload.data.getCartItemsForUser.data;
+          state.cartItems = response?.data ?? [];
         } else {
           state.fetchRequestStatus = RequestStatus.failed;
         }

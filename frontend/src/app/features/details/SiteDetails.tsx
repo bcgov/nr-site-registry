@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
@@ -12,6 +17,8 @@ import {
 import {
   fetchSitesDetails,
   selectSiteDetails,
+  selectSiteDetailsFetchStatus,
+  selectSiteDetailsLastFetchedSiteId,
   trackedChanges,
   clearTrackChanges,
   siteDetailsMode,
@@ -24,6 +31,10 @@ import { AppDispatch } from '../../Store';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
 import { getNavComponents } from './navigation/NavigationPillsConfig';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
+import DownloadSitePdfButton from './pdf/DownloadSitePdfButton';
+import { useSiteDetailsPdfData } from './pdf/useSiteDetailsPdfData';
+import { pdf } from '@react-pdf/renderer';
+import SiteDetailsPdf from './pdf/SiteDetailsPdf';
 import {
   CancelButton,
   SaveButton,
@@ -32,6 +43,7 @@ import {
   ChangeTracker,
   IChangeType,
 } from '../../components/common/IChangeType';
+import { getFieldLabel, ChangeContext } from '../../helpers/fieldLabelMapper';
 
 import './SiteDetails.css'; // Ensure this import is correct
 import { SiteActionBtn, SiteDetailsMode } from './dto/SiteDetailsMode';
@@ -47,6 +59,8 @@ import {
   showNotification,
   UserRoleType,
   validateForm,
+  getAxiosInstance,
+  formatDateTime,
 } from '../../helpers/utility';
 import { addRecentView } from '../dashboard/DashboardSlice';
 import {
@@ -59,6 +73,7 @@ import {
 } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
+import { notifyInfo, notifyError } from '../../components/alert/Alert';
 import {
   fetchNotationParticipants,
   updateSiteNotation,
@@ -88,8 +103,9 @@ import BannerDetails from '../../components/banners/BannerDetails';
 import {
   getParentBucket,
   getSiteAssociated,
-  getSiteDisclosure,
+  getSiteDisclosures,
   getSiteDocuments,
+  getSiteLandHistories,
   getSiteNoatations,
   getSiteParticipants,
   getSiteSummary,
@@ -98,6 +114,7 @@ import {
   saveRequestStatus,
   saveSiteDetails,
   setupDocumentsDataForSaving,
+  setupLandHistoriesDataForSaving,
   setupNotationDataForSaving,
   setupSiteAssociationDataForSaving,
   setupSiteDisclosureDataForSaving,
@@ -148,14 +165,26 @@ import {
 import { HttpStatusCode } from '../../common/httpStatusCode';
 import { GetSummaryConfig } from './summary/SummaryConfig';
 import { siteDisclosureConfig } from './disclosure/DisclosureConfig';
+import DeleteSiteModal from './DeleteSiteModal';
+import { GRAPHQL } from '../../helpers/endpoints';
+import { print } from 'graphql';
+import { DELETE_SITE_MUTATION } from '../site/graphql/DeleteSite';
+import { getLandUseColumns } from './landUses/LandUseColumnConfiguration';
 
 const SiteDetails = () => {
-  const { disclosureStatementConfigEditMode } = siteDisclosureConfig(
-    useSelector(schedule2ReferenceCdDrpdown)?.data,
-  );
+  const { disclosureStatementConfigEditMode, disclosureCommentsConfig } =
+    siteDisclosureConfig(useSelector(schedule2ReferenceCdDrpdown)?.data);
   const auth = useAuth();
+  const isUnauthenticated = auth?.user == null;
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromPath =
+    location.state?.fromPath || location.state?.fromLabel || 'Search'; // Default to "search" if no state is passed
+  const fromScreen = location.state?.fromLabel || 'Search'; // Default to "Unknown Screen" if no state is passed
+  const fromPathRef = useRef(fromPath);
+  const fromScreenRef = useRef(fromScreen);
+  const lastUnavailableToastSiteIdRef = useRef<string | null>(null);
   const loggedInUser = getUser();
   // TODO: this is for future use when we support automatic flow of creating new site for specific application.
   // We need applicationid and newly created siteId to fill cats db  in order to keep both application in sync.
@@ -167,6 +196,10 @@ const SiteDetails = () => {
 
   const mode = useSelector(siteDetailsMode);
   const details = useSelector(selectSiteDetails);
+  const siteDetailsFetchStatus = useSelector(selectSiteDetailsFetchStatus);
+  const siteDetailsLastFetchedSiteId = useSelector(
+    selectSiteDetailsLastFetchedSiteId,
+  );
   const bulkApproveRejectStatus = useSelector(bulkUpdateApproveRejectStatus);
   const hasNoPendingUpdatesFromState = useSelector(hasNoPendingUpdates);
   const srUpdates = useSelector(selectAllSites);
@@ -176,7 +209,8 @@ const SiteDetails = () => {
   const savedChanges = useSelector(trackedChanges);
   const siteNotation = useSelector(getSiteNoatations);
   const siteSummary = useSelector(getSiteSummary);
-  const disclosure = useSelector(getSiteDisclosure);
+  const siteLandUses = useSelector(getSiteLandHistories);
+  const siteDisclosure = useSelector(getSiteDisclosures);
   const sitePartics = useSelector(getSiteParticipants);
   const siteAssocs = useSelector(getSiteAssociated);
   const siteDocuments = useSelector(getSiteDocuments);
@@ -190,11 +224,13 @@ const SiteDetails = () => {
   const { associateColumnInternal } = GetAssociateConfig();
   const { documentFormRowsEditMode } = GetDocumentsConfig();
   const { createSiteFormRows, summaryFormRows } = GetSummaryConfig();
+  const landUseFormRows = getLandUseColumns();
 
   const [errorList, setErrorList] = useState<any[]>([]);
   const [confirmSiteReview, SetConfirmSiteReview] = useState<Boolean | null>(
     null,
   );
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [navComponents, SetNavComponents] = useState<any[]>();
   const [isVisible, setIsVisible] = useState(false);
   const [edit, setEdit] = useState(false);
@@ -204,6 +240,11 @@ const SiteDetails = () => {
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
   const [isLoading, setIsLoading] = useState(true);
   const [siteDetailsForSRMode, SetSiteDetailsForSRMode] = useState(details);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(),
+  );
+
+  const { fetchForPdf, isSiteReady } = useSiteDetailsPdfData();
 
   const userActions = [UserActionEnum.added, UserActionEnum.updated];
 
@@ -215,7 +256,9 @@ const SiteDetails = () => {
     if (
       isUserOfType(UserRoleType.SR) &&
       !hasNoPendingUpdatesFromState &&
-      viewMode !== SiteDetailsMode.EditMode
+      viewMode !== SiteDetailsMode.EditMode &&
+      (!isUserOfType(UserRoleType.INTERNAL) ||
+        viewMode === SiteDetailsMode.SRMode)
     ) {
       SetNavComponents(getNavComponents(true));
     } else {
@@ -229,7 +272,12 @@ const SiteDetails = () => {
       saveSiteDetailsRequestStatus === RequestStatus.failed
     ) {
       if (saveSiteDetailsRequestStatus === RequestStatus.success) {
-        dispatch(fetchSitesInsights({ siteId: id ?? '' }));
+        dispatch(
+          fetchSitesInsights({
+            siteId: id ?? '',
+            showPending: userType === UserType.Internal,
+          }),
+        );
         dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false }));
         dispatch(resetSaveSiteDetails(null));
         dispatch(clearTrackChanges(null));
@@ -277,7 +325,7 @@ const SiteDetails = () => {
   }, [bulkApproveRejectStatus]);
 
   const onClickBackButton = () => {
-    navigate(-1);
+    navigate(`/${fromPathRef.current.replace(/\s+/g, '').toLowerCase()}`);
   };
 
   useEffect(() => {
@@ -340,17 +388,58 @@ const SiteDetails = () => {
       isUserOfType(UserRoleType.PUBLIC)
     ) {
       setUserType(UserType.External);
-    } else if (isUserOfType(UserRoleType.INTERNAL)) {
+    } else if (
+      isUserOfType(UserRoleType.INTERNAL) ||
+      isUserOfType(UserRoleType.SR)
+    ) {
       setUserType(UserType.Internal);
     }
   }, [loggedInUser]);
+
+  useEffect(() => {
+    if (!id?.trim()) return;
+    if (siteDetailsFetchStatus !== RequestStatus.success) return;
+    if (siteDetailsLastFetchedSiteId !== id) return;
+    if (details) return;
+
+    const shouldRedirectExternalOrUnauthenticated =
+      userType === UserType.External ||
+      (isUnauthenticated && userType !== UserType.Internal);
+
+    if (!shouldRedirectExternalOrUnauthenticated) return;
+
+    // Cart and purchases details: do not auto-redirect (user can use back / cart / purchases UI).
+    const isPurchasedSiteView =
+      location.pathname.includes('/site/cart/site/details/') ||
+      location.pathname.includes('/site-details/site/details/');
+    if (isPurchasedSiteView) return;
+
+    if (lastUnavailableToastSiteIdRef.current !== id) {
+      notifyInfo(
+        'This site is private or unavailable. You have been returned to Search.',
+        'Site unavailable',
+      );
+      lastUnavailableToastSiteIdRef.current = id;
+    }
+    navigate('/search', { replace: true });
+  }, [
+    id,
+    details,
+    siteDetailsFetchStatus,
+    siteDetailsLastFetchedSiteId,
+    userType,
+    isUnauthenticated,
+    location.pathname,
+    navigate,
+  ]);
 
   useEffect(() => {
     setViewMode(mode);
     if (
       isUserOfType(UserRoleType.SR) &&
       !hasNoPendingUpdatesFromState &&
-      mode !== SiteDetailsMode.EditMode
+      mode !== SiteDetailsMode.EditMode &&
+      (!isUserOfType(UserRoleType.INTERNAL) || mode === SiteDetailsMode.SRMode)
     ) {
       SetNavComponents(getNavComponents(true));
     } else {
@@ -375,11 +464,17 @@ const SiteDetails = () => {
   useEffect(() => {
     setIsLoading(true); // Set loading state to true before starting API calls
     dispatch(resetSaveSiteDetails(null));
+    dispatch(updateSiteDetail(null));
     fetchAllDropdownDetails();
     if (!!id?.trim()) {
       checkForRecordsPendingReview(id);
       dispatch(setupSiteIdForSaving(id));
-      dispatch(fetchSitesInsights({ siteId: id ?? '' }));
+      dispatch(
+        fetchSitesInsights({
+          siteId: id ?? '',
+          showPending: userType === UserType.Internal,
+        }),
+      );
       if (auth.user !== null) {
         Promise.all([
           dispatch(fetchSnapshots(id ?? '')),
@@ -402,8 +497,6 @@ const SiteDetails = () => {
           ),
           // should be based on condition for External and Internal User.
           dispatch(fetchSitesDetails({ siteId: id ?? '', showPending: false })),
-
-          // dispatch(fetchNotationParticipants({ siteId: id ?? '', showPending: false})),
         ])
           .then(() => {
             setIsLoading(false); // Set loading state to false after all API calls are resolved
@@ -429,6 +522,22 @@ const SiteDetails = () => {
       }
     }
   }, [id, userType]);
+
+  useEffect(() => {
+    if (!id?.trim() || isLoading) {
+      return;
+    }
+
+    if (!details) {
+      showNotification(
+        RequestStatus.failed,
+        '',
+        `Site ${id} was not found or has been deleted.`,
+        'Site Not Found',
+      );
+      navigate('/search');
+    }
+  }, [id, isLoading, details, navigate]);
 
   useEffect(() => {
     if (srUpdateRequestStatus === RequestStatus.success) {
@@ -519,6 +628,30 @@ const SiteDetails = () => {
     }
   };
 
+  const groupChangesByContextAndType = (changes: any[]) => {
+    const grouped: { [key: string]: any[] } = {};
+    changes.forEach((item) => {
+      const key = `${item.changeType}-${item.context || ''}`;
+      if (!grouped[key]) {
+        grouped[key] = [];
+      }
+      grouped[key].push(item);
+    });
+    return grouped;
+  };
+
+  const toggleSection = (key: string) => {
+    setExpandedSections((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) {
+        newSet.delete(key);
+      } else {
+        newSet.add(key);
+      }
+      return newSet;
+    });
+  };
+
   const handleItemClick = async (value: string) => {
     switch (value) {
       case SiteDetailsMode.EditMode:
@@ -543,6 +676,12 @@ const SiteDetails = () => {
       case SiteActionBtn.RejectAll:
         setEdit(false);
         SetConfirmSiteReview(false);
+        break;
+      case SiteActionBtn.DELETE_SITE:
+        setShowDeleteModal(true);
+        break;
+      case SiteActionBtn.DOWNLOAD_PDF:
+        handleDownloadPdf();
         break;
       case SiteActionBtn.SAVE:
         const errors = await validateSiteForms();
@@ -578,6 +717,7 @@ const SiteDetails = () => {
         siteAssocErrors,
         siteDisclosureErrors,
         siteSummaryErrors,
+        siteLandUsesErrors,
       ] = await Promise.all([
         validateNotationsForm(),
         validateSiteParticipantForm(),
@@ -585,6 +725,7 @@ const SiteDetails = () => {
         validateAssociatedSitesForm(),
         validateSiteDisclosureForm(),
         validateSiteSummaryForm(),
+        validateSiteLandUsesForm(),
       ]);
 
       // Combine all errors into one list
@@ -593,13 +734,51 @@ const SiteDetails = () => {
         ...siteParticErrors,
         ...siteDocErrors,
         ...siteAssocErrors,
-        ...siteDisclosureErrors,
+        ...(siteDisclosureErrors || []), // Type assertion if siteDisclosureErrors can be undefined
         ...siteSummaryErrors,
+        ...siteLandUsesErrors,
       ];
       // You can now use `allErrors` for further processing
       return errors;
     } catch (error) {
       return []; // Return empty array in case of error to avoid breaking further logic
+    }
+  };
+
+  const validateSiteLandUsesForm = async () => {
+    try {
+      if (siteLandUses?.length > 0) {
+        const landUseTable: IFormField[][] = [
+          landUseFormRows
+            .map((column) => column.displayType)
+            .filter(
+              (displayType): displayType is IFormField =>
+                displayType !== undefined,
+            ),
+        ];
+        let updatedSiteLandUses = deepFilterByUserAction(
+          siteLandUses,
+          userActions,
+          'userAction',
+        );
+        const errors = validateForm(
+          landUseTable,
+          updatedSiteLandUses,
+          'Land Uses',
+        );
+        if (errors?.length > 0) {
+          return errors;
+        } else {
+          updatedSiteLandUses = removeProperty(updatedSiteLandUses, 'position');
+          dispatch(setupLandHistoriesDataForSaving(updatedSiteLandUses));
+          return [];
+        }
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.error(error);
+      return [];
     }
   };
 
@@ -724,36 +903,78 @@ const SiteDetails = () => {
 
   const validateSiteDisclosureForm = async () => {
     try {
-      if (
-        disclosure &&
-        typeof disclosure === 'object' &&
-        Object.keys(disclosure).length > 0
-      ) {
-        const siteDisclosureErrors: any[] = [];
-        let updatedSiteDisclosure = deepFilterByUserAction(disclosure, [
+      if (siteDisclosure.length > 0) {
+        let updatedSiteDisclosure = deepFilterByUserAction(siteDisclosure, [
           ...userActions,
           UserActionEnum.deleted,
         ]);
+
+        if (
+          !updatedSiteDisclosure ||
+          Object.keys(updatedSiteDisclosure).length === 0
+        ) {
+          return [];
+        }
+
+        const siteDisclosureErrors: any[] = [];
         const errors = validateForm(
-          disclosureStatementConfigEditMode,
+          [...disclosureStatementConfigEditMode, ...disclosureCommentsConfig],
           updatedSiteDisclosure,
           'Site Disclosure',
         );
         if (errors?.length > 0) {
           siteDisclosureErrors.push(...errors);
         }
-        const { siteRegDateRecd, dateCompleted } = disclosure;
-        if (!!siteRegDateRecd && !!dateCompleted) {
-          if (
-            new Date(disclosure?.dateCompleted) <
-            new Date(disclosure?.siteRegDateRecd)
-          ) {
-            siteDisclosureErrors.push({
-              label: 'Site Disclosure',
-              errorMessage: `Site Disclosure Date Completed is always equal or greater than Date Received.`,
-            });
-          }
-        }
+
+        (updatedSiteDisclosure ?? []).forEach(
+          (disclosure: any, index: number) => {
+            const { dateCompleted, siteRegDateRecd, id } = disclosure ?? {};
+
+            // ── Existing: date range validation ──────────────────────────────
+            if (dateCompleted && siteRegDateRecd) {
+              if (new Date(dateCompleted) < new Date(siteRegDateRecd)) {
+                siteDisclosureErrors.push({
+                  label: 'Site Disclosure',
+                  errorMessage: `Site Disclosure [${index + 1}] Date Completed must be equal to or greater than Date Received.`,
+                });
+              }
+            }
+
+            // ── New: duplicate dateCompleted check against full original list ─
+            if (dateCompleted) {
+              const normalizedUpdatedDate = new Date(dateCompleted)
+                .toISOString()
+                .split('T')[0];
+
+              // Find where this item sits in the original list
+              const selfOriginalIndex = siteDisclosure.findIndex(
+                (d: any) => d?.id === id,
+              );
+
+              siteDisclosure.forEach(
+                (originalDisclosure: any, originalIndex: number) => {
+                  // Skip itself and entries before it to avoid reporting A↔B and B↔A
+                  if (originalIndex <= selfOriginalIndex) return;
+
+                  const originalDateCompleted =
+                    originalDisclosure?.dateCompleted;
+                  if (!originalDateCompleted) return;
+
+                  const normalizedOriginalDate = new Date(originalDateCompleted)
+                    .toISOString()
+                    .split('T')[0];
+
+                  if (normalizedUpdatedDate === normalizedOriginalDate) {
+                    siteDisclosureErrors.push({
+                      label: 'Site Disclosure',
+                      errorMessage: `Site Disclosure [${selfOriginalIndex + 1}] has the same Date Completed as Site Disclosure [${originalIndex + 1}].`,
+                    });
+                  }
+                },
+              );
+            }
+          },
+        );
 
         if (siteDisclosureErrors?.length > 0) {
           return siteDisclosureErrors;
@@ -766,26 +987,32 @@ const SiteDetails = () => {
             updatedSiteDisclosure,
             'description',
           );
+          updatedSiteDisclosure = removeProperty(
+            updatedSiteDisclosure,
+            'siteProfileQA',
+          );
           dispatch(setupSiteDisclosureDataForSaving(updatedSiteDisclosure));
           return [];
         }
-      } else {
-        return [];
       }
     } catch (error) {
       console.error(error);
       return [];
     }
   };
-
   const validateNotationsForm = async () => {
     try {
       // Run both validations in parallel and wait for them to finish
       if (siteNotation?.length > 0) {
-        let updatedSiteNotations = deepFilterByUserAction(
-          siteNotation,
-          userActions,
-        );
+        // First filter the notations based on user actions to get the updated notations
+        // We want to include notations that are added, updated, deleted, or restored
+        // in the validation process, but we will handle the deleted notations differently in the validation functions.
+        let updatedSiteNotations = deepFilterByUserAction(siteNotation, [
+          ...userActions,
+          UserActionEnum.deleted,
+          UserActionEnum.restored,
+        ]);
+
         const [notationErrors, notationParticipantErrors] = await Promise.all([
           validateNotations(updatedSiteNotations), // Async function handling Notation validation
           validateNotationParticipants(updatedSiteNotations), // Async function handling Notation Participant validation
@@ -821,6 +1048,16 @@ const SiteDetails = () => {
         notationFormRowEditMode,
         updatedSiteNotations,
         'Notation',
+        // Pass the additional parameter to exclude deleted notations from validation
+        // and keep them for saving. We can pass the single parameter or multiple parameters
+        // as needed for different contexts. In this case, we want to exclude deleted notations from validation,
+        // but we still want to include them in the data sent for saving, so we pass the UserActionEnum.deleted
+        // as a parameter to indicate that notations with this userAction should be excluded from validation
+        // but included in saving.
+        {
+          fields: 'apiAction',
+          values: [UserActionEnum.deleted, UserActionEnum.restored],
+        },
       );
     } catch (error) {
       console.error(error);
@@ -840,33 +1077,77 @@ const SiteDetails = () => {
       ];
 
       const notationParticipantErrors: any[] = [];
-      // Loop through siteNotation and their notationParticipants
+
+      //Pre-map siteNotation for quick access in loop
+      const siteNotationMap = new Map(
+        (siteNotation ?? []).map((n: any) => [n.id, n]),
+      );
+
       for (const [index, notation] of updatedSiteNotations?.entries()) {
+        const originalNotation: any = siteNotationMap.get(notation.id);
+        if (originalNotation?.apiAction === UserActionEnum.deleted) {
+          continue; // Skip deleted notations
+        }
+
+        const originalParticipants =
+          originalNotation?.notationParticipant || [];
+        const updatedParticipants = notation?.notationParticipant || [];
+
+        //Build lookup sets
+        const deletedIds = new Set(
+          updatedParticipants
+            .filter((p: any) => p.apiAction === UserActionEnum.deleted)
+            .map((p: any) => p.eventParticId),
+        );
+
+        const addedCount = updatedParticipants.filter(
+          (p: any) => p.apiAction === UserActionEnum.added,
+        ).length;
+
+        // Count remaining
+        const remainingCount = originalParticipants.reduce(
+          (count: number, orig: any) =>
+            deletedIds.has(orig.eventParticId) ? count : count + 1,
+          0,
+        );
+
+        const numOfNotationParticipants = remainingCount + addedCount;
+
+        // Skip participant validation for deleted or restored notations since they can be in any state (including having zero participants) and it's not a requirement for them to have participants to be valid.
+        // We will still validate participants for notations that are being added or updated, and we will validate all participants for those notations, including any that are marked for deletion,
+        // because we want to ensure that the data is valid even if the user has marked it for deletion (in case they change their mind and restore it, or in case of accidental deletion).
+        const skipAtLeastOneParticipantValidation =
+          notation?.apiAction === UserActionEnum.deleted ||
+          notation?.apiAction === UserActionEnum.restored;
+        // Must have at least one
         if (
-          notation?.notationParticipant &&
-          notation?.notationParticipant?.length > 0
+          numOfNotationParticipants === 0 &&
+          !skipAtLeastOneParticipantValidation
         ) {
-          for (const [
-            participantIndex,
-            notationParticipant,
-          ] of notation.notationParticipant.entries()) {
-            // Validate and accumulate errors for each notation participant
+          notationParticipantErrors.push({
+            label: `Notation Participants`,
+            errorMessage: `Notation [${notation?.position + 1}] Atleast one Notation Participant is required.`,
+          });
+        }
+
+        //Validation loop (unchanged logic, just faster access)
+        if (updatedParticipants.length > 0) {
+          for (const notationParticipant of updatedParticipants) {
             const errors = validateForm(
               notationParticipantTable,
               notationParticipant,
               `Notation [${notation?.position + 1}] Notation Participant [${notationParticipant?.position + 1}]`,
+              {
+                fields: 'apiAction',
+                values: [UserActionEnum.deleted, UserActionEnum.restored],
+              },
             );
+
             notationParticipantErrors.push(...errors);
           }
-        } else {
-          notationParticipantErrors.push({
-            label: 'Notation Participants',
-            errorMessage: `Notation [${notation?.position + 1}] Atleast one  Notation Participant is required.`,
-          });
         }
       }
 
-      // Return the accumulated errors
       return notationParticipantErrors;
     } catch (error) {
       console.error(error);
@@ -918,13 +1199,53 @@ const SiteDetails = () => {
     }
   };
 
+  const handleDeleteSite = async () => {
+    try {
+      const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'DeleteSite',
+        query: print(DELETE_SITE_MUTATION),
+        variables: {
+          input: {
+            siteId: id,
+          },
+        },
+      });
+
+      const result = response.data?.data?.deleteSite;
+
+      if (result?.success) {
+        showNotification(
+          RequestStatus.success,
+          `Site ${id} has been successfully deleted`,
+          '',
+        );
+        setShowDeleteModal(false);
+        navigate('/search');
+      } else {
+        showNotification(
+          RequestStatus.failed,
+          'Failed to delete site',
+          result?.message || 'An error occurred while deleting the site',
+        );
+      }
+    } catch (error: any) {
+      console.error('Error deleting site:', error);
+      showNotification(
+        RequestStatus.failed,
+        'Failed to delete site',
+        error?.message || 'An unexpected error occurred',
+      );
+    }
+  };
+
   const getActionItemsToRender = () => {
     let userTypeSR: boolean = isUserOfType(UserRoleType.SR) ?? false;
     let includeSRApprovalActions =
       userTypeSR &&
       !hasNoPendingUpdatesFromState &&
       viewMode !== SiteDetailsMode.EditMode;
-    return getActionItems(includeSRApprovalActions);
+    const canDownloadPdf = isSiteReady && !!id;
+    return getActionItems(includeSRApprovalActions, userTypeSR, canDownloadPdf);
   };
 
   if (id && (isLoading || snapshot.status === RequestStatus.loading)) {
@@ -939,6 +1260,22 @@ const SiteDetails = () => {
 
   if (snapshot.status === RequestStatus.failed)
     return <div>Error: {snapshot.error || 'Failed to load data'}</div>;
+
+  const handleDownloadPdf = async () => {
+    notifyInfo('Please wait generating PDF report', 'PDF');
+    try {
+      const data = await fetchForPdf();
+      const blob = await pdf(<SiteDetailsPdf data={data} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `site-${data.site?.id ?? 'details'}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      notifyError('Failed to generate PDF. Please try again.', 'PDF Error');
+    }
+  };
 
   const renderOptionsForExternalUser = () => {
     if (
@@ -1005,6 +1342,7 @@ const SiteDetails = () => {
     dispatch(
       setupSiteSummaryForSaving({
         ...details,
+        apiAction: UserActionEnum.updated,
         userAction: UserActionEnum.updated,
         srAction:
           event?.target?.checked === true
@@ -1013,7 +1351,11 @@ const SiteDetails = () => {
       }),
     );
 
-    const tracker = new ChangeTracker(IChangeType.Modified, 'Site : SR Status');
+    const tracker = new ChangeTracker(
+      IChangeType.Modified,
+      getFieldLabel('srValue'),
+      ChangeContext.SITE,
+    );
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
@@ -1123,7 +1465,7 @@ const SiteDetails = () => {
           <div className="d-flex gap-2 flex-wrap align-items-center">
             <Button variant="secondary" onClick={onClickBackButton}>
               <AngleLeft />
-              Back
+              {`Back to ${fromScreenRef.current}`}
             </Button>
             <div className="d-flex flex-wrap align-items-center gap-2 pe-3 custom-sticky-header-lbl">
               {!!id?.trim() ? (
@@ -1155,7 +1497,6 @@ const SiteDetails = () => {
                   onItemClick={handleItemClick}
                 />
               )}
-
             {/* For Edit / SR Dropdown*/}
             <div className="gap-3 align-items-center d-none d-md-flex d-lg-flex d-xl-flex">
               {edit && userType === UserType.Internal && (
@@ -1206,6 +1547,7 @@ const SiteDetails = () => {
                     <ShoppingCartIcon />
                     Add to Cart
                   </Button>
+                  {isSiteReady && id && <DownloadSitePdfButton />}
                 </>
               )}
           </div>
@@ -1215,7 +1557,11 @@ const SiteDetails = () => {
         {confirmSiteReview != null &&
           (confirmSiteReview === false || confirmSiteReview === true) && (
             <ModalDialog
-              label={`Are you sure to proceed`}
+              label={
+                confirmSiteReview
+                  ? 'Are you sure you want to make these changes public?'
+                  : 'Are you sure you want to make these changes private?'
+              }
               closeHandler={(response) => {
                 if (response) {
                   if (confirmSiteReview) {
@@ -1244,7 +1590,20 @@ const SiteDetails = () => {
                 }
                 SetConfirmSiteReview(null);
               }}
-            />
+            >
+              {confirmSiteReview && (
+                <p>
+                  Saving these changes will allow others to see them on the Site
+                  Registry.
+                </p>
+              )}
+              {!confirmSiteReview && (
+                <p>
+                  Saving these changes will hide your changes from others. They
+                  will not see them on the Site Registry.
+                </p>
+              )}
+            </ModalDialog>
           )}
 
         {(save || hasError) && (
@@ -1252,6 +1611,8 @@ const SiteDetails = () => {
             errorOption={hasError}
             customHeaderCss={hasError ? 'custom-modal-error-header-text' : ''}
             headerLabel={hasError ? 'Please fix the errors' : ''}
+            label="Are you sure you want to save changes ?"
+            saveBtnLabel="Yes, Save Changes"
             closeHandler={async (response) => {
               setSave(false);
               if (response && errorList?.length === 0) {
@@ -1292,19 +1653,49 @@ const SiteDetails = () => {
               <React.Fragment>
                 <div>
                   <span className="custom-modal-data-text">
-                    {savedChanges.length > 0
-                      ? 'The following fields will be updated:'
-                      : 'No changes to save'}
+                    {savedChanges.length > 0 ? '' : 'No changes to save'}
                   </span>
                 </div>
                 {savedChanges.length > 0 && (
                   <div>
-                    <ul className="custom-modal-data-text">
-                      {savedChanges.map((item: any) => (
-                        <li key={item.label}>
-                          {IChangeType[item.changeType]} {item.label}
-                        </li>
-                      ))}
+                    <ul className="custom-modal-data-text change-group-list">
+                      {Object.entries(
+                        groupChangesByContextAndType(savedChanges),
+                      ).map(([key, items]) => {
+                        const isExpanded = expandedSections.has(key);
+                        const firstItem = items[0];
+                        const changeTypeName =
+                          IChangeType[firstItem.changeType];
+                        const context = firstItem.context || '';
+                        const isModified =
+                          firstItem.changeType === IChangeType.Modified;
+                        return (
+                          <li key={key} className="change-group-item">
+                            <div
+                              onClick={
+                                isModified
+                                  ? () => toggleSection(key)
+                                  : undefined
+                              }
+                              className={`change-group-header${isModified ? ' change-group-header--expandable' : ''}`}
+                            >
+                              {isModified && (
+                                <span>{isExpanded ? '▼' : '▶'}</span>
+                              )}
+                              <span>
+                                {changeTypeName} {context}
+                              </span>
+                            </div>
+                            {isModified && isExpanded && (
+                              <ul className="change-group-details">
+                                {items.map((item: any, idx: number) => (
+                                  <li key={`${key}-${idx}`}>{item.label}</li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 )}
@@ -1316,7 +1707,7 @@ const SiteDetails = () => {
         {!isVisible && (
           <div className="d-flex justify-content-between">
             <Button variant="secondary" onClick={onClickBackButton}>
-              <AngleLeft /> Back to
+              <AngleLeft /> {`Back to ${fromScreenRef.current}`}
             </Button>
 
             <div className="d-flex gap-2 justify-align-center pe-2 pos-relative">
@@ -1382,6 +1773,7 @@ const SiteDetails = () => {
                       <ShoppingCartIcon />
                       Add to Cart
                     </Button>
+                    {isSiteReady && id && <DownloadSitePdfButton />}
                   </>
                 )}
             </div>
@@ -1396,7 +1788,7 @@ const SiteDetails = () => {
                 snapshotDate={
                   snapshot.status === RequestStatus.success &&
                   snapshot.snapshot.data !== null
-                    ? `Snapshot Taken: ${formatDateWithNoTimzoneName(new Date(snapshotTakenDate))}`
+                    ? `Snapshot Taken: ${formatDateTime(new Date(snapshotTakenDate))}`
                     : ''
                 }
               />
@@ -1477,6 +1869,16 @@ const SiteDetails = () => {
               !(savedChanges?.length > 0))
           }
         />
+
+        {/* Delete Site Modal */}
+        {id && (
+          <DeleteSiteModal
+            isOpen={showDeleteModal}
+            siteId={id}
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={handleDeleteSite}
+          />
+        )}
       </PageContainer>
     </>
   );

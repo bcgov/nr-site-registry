@@ -31,10 +31,21 @@ export const fetchSearchSites = createAsyncThunk(
     filter?: {};
   }) => {
     try {
+      const trimmedSearch = args.searchParam?.trim();
+      if (!trimmedSearch) {
+        // early return empty results
+        return {
+          sites: [],
+          count: 0,
+          page: args.page ?? initialState.page,
+          pageSize: args.pageSize ?? initialState.pageSize,
+        };
+      }
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'searchSites',
         query: print(graphQlSiteQuery()),
         variables: {
-          searchParam: args.searchParam,
+          searchParam: args.searchParam?.trim(),
           page: args.page ?? initialState.page,
           pageSize: args.pageSize ?? initialState.pageSize,
           sortBy: args.sortBy ?? initialState.sortBy,

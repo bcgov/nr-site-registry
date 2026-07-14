@@ -1,4 +1,3 @@
-import { graphQLSiteParticipantsBySiteId } from '../../site/graphql/Participant';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getAxiosInstance } from '../../../helpers/utility';
@@ -9,7 +8,7 @@ import { graphQLSiteDisclosureBySiteId } from '../../site/graphql/Disclosure';
 
 // Define the initial state
 const initialState: IDisclosureState = {
-  siteDisclosure: {},
+  siteDisclosure: [],
   status: RequestStatus.idle,
   error: '',
 };
@@ -20,6 +19,7 @@ export const fetchSiteDisclosure = createAsyncThunk(
   async ({ siteId, showPending }: { siteId: string; showPending: boolean }) => {
     try {
       const response = await getAxiosInstance().post(GRAPHQL, {
+        operationName: 'getSiteDisclosureBySiteId',
         query: print(graphQLSiteDisclosureBySiteId()),
         variables: {
           siteId: siteId,
@@ -29,12 +29,7 @@ export const fetchSiteDisclosure = createAsyncThunk(
 
       // Once get actual source of data for disclosure schedule, delete this line of code because it is just for sake of completing the functionality and demo purpose
       // const res = {...response.data.data.getSiteDisclosureBySiteId.data[0], disclosureSchedule:[]};
-
-      const res = response.data.data.getSiteDisclosureBySiteId.data[0];
-      if (res) {
-        return res;
-      }
-      return [{}];
+      return response.data.data.getSiteDisclosureBySiteId.data;
     } catch (error) {
       throw error;
     }

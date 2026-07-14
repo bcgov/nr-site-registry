@@ -10,21 +10,24 @@ import {
   FileExportIcon,
   ShoppingCartIcon,
 } from '../../../components/common/icon';
-import { downloadCSV } from '../../../helpers/csvExport/csvExport';
+import { TableColumn } from '../../../components/table/TableColumn';
+import { downloadSelectedColumnsCSV } from '../../../helpers/csvExport/csvExport';
 import { addCartItem, resetCartItemAddedStatus } from '../../cart/CartSlice';
 
 interface SearchResultsActionsProps {
   selectedRows: any[]; // TODO: type this properly, should be Site
+  selectedColumns?: TableColumn[];
 }
 export const SearchResultsActions: FC<SearchResultsActionsProps> = ({
   selectedRows,
+  selectedColumns = [],
 }) => {
   const auth = useAuth();
   const dispatch = useDispatch<AppDispatch>();
 
   const handleExport = () => {
-    if (selectedRows.length > 0) {
-      downloadCSV(selectedRows);
+    if (selectedRows.length > 0 && selectedColumns.length > 0) {
+      downloadSelectedColumnsCSV(selectedRows, selectedColumns);
     }
   };
 

@@ -69,7 +69,7 @@ spec:
           - "ReadWriteOnce"
         resources:
           requests:
-            storage: 450Mi
+            storage: 1Gi
         storageClassName: netapp-block-standard
 
       affinity:

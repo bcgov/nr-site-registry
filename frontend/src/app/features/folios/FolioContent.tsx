@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PageContainer from '../../components/simple/PageContainer';
 import CustomLabel from '../../components/simple/CustomLabel';
 import Table from '../../components/table/Table';
@@ -104,6 +104,12 @@ const FolioContents = () => {
       } else {
         SetSelectedRows([...selectedRows, event.row]);
       }
+    } else if (event && event.property === 'select_all') {
+      if (event.selected) {
+        SetSelectedRows(event.value);
+      } else {
+        SetSelectedRows([]);
+      }
     }
   };
 
@@ -165,7 +171,7 @@ const FolioContents = () => {
     setSortAsc(ascSort);
   };
 
-  const getSortedFolioContent = () => {
+  const sortedFolioContent = useMemo(() => {
     const mapped = sitesInFolioArr.map((x) => {
       const merged = { ...x, ...x.site };
       const rawDate = merged.whenUpdated || (x as any).whenUpdated;
@@ -179,7 +185,7 @@ const FolioContents = () => {
     return sortTableData(mapped, sortColumn, sortAsc, ['whenUpdated'], {
       whenUpdated: '_rawWhenUpdated',
     });
-  };
+  }, [sitesInFolioArr, sortColumn, sortAsc]);
 
   return (
     <PageContainer role="Folio Contents">
@@ -230,10 +236,11 @@ const FolioContents = () => {
             label="Folios"
             isLoading={RequestStatus.success}
             columns={FolioContentTableColumns}
-            data={getSortedFolioContent()}
+            data={sortedFolioContent}
             totalResults={[].length}
             allowRowsSelect={true}
             showPageOptions={false}
+            currentPage={1}
             changeHandler={(event) => {
               handleChangeEventFromTable(event);
             }}

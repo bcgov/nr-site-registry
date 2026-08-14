@@ -142,9 +142,9 @@ describe('SiteResolver', () => {
     });
 
     it('rejects a missing azp', () => {
-      expect(() =>
-        siteResolver.findSiteBySiteIdForService('123', {}),
-      ).toThrow('not allowed to call this service query');
+      expect(() => siteResolver.findSiteBySiteIdForService('123', {})).toThrow(
+        'not allowed to call this service query',
+      );
       expect(siteService.findSiteBySiteIdForService).not.toHaveBeenCalled();
     });
   });

@@ -22,7 +22,8 @@ describe('serviceClientAllowlist', () => {
     });
 
     it('parses a comma-separated allowlist', () => {
-      process.env.SITE_SERVICE_ALLOWED_CLIENT_IDS = 'site-service, cats-service';
+      process.env.SITE_SERVICE_ALLOWED_CLIENT_IDS =
+        'site-service, cats-service';
       expect(getAllowedServiceClientIds()).toEqual([
         'site-service',
         'cats-service',
@@ -44,9 +45,9 @@ describe('serviceClientAllowlist', () => {
     });
 
     it('rejects a user token from another client', () => {
-      expect(() =>
-        assertAllowedServiceClient({ azp: 'site-web' }),
-      ).toThrow(ForbiddenException);
+      expect(() => assertAllowedServiceClient({ azp: 'site-web' })).toThrow(
+        ForbiddenException,
+      );
     });
   });
 });

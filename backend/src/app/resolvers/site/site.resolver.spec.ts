@@ -45,6 +45,12 @@ describe('SiteResolver', () => {
               result.data = sampleSites[0];
               return result;
             }),
+            findSiteBySiteIdForService: jest.fn(() => {
+              const result = new FetchSiteDetail();
+              result.httpStatusCode = 200;
+              result.data = sampleSites[0];
+              return result;
+            }),
             searchSiteIds: jest.fn(),
           },
         },
@@ -114,4 +120,32 @@ describe('SiteResolver', () => {
       expect(siteService.searchSites).toHaveBeenCalledWith(searchParam, page, pageSize, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined);
       expect(result).toEqual(expectedFilteredSites);
     });*/
+
+  describe('findSiteBySiteIdForService', () => {
+    it('calls siteService when azp is site-service', async () => {
+      const result = await siteResolver.findSiteBySiteIdForService('123', {
+        azp: 'site-service',
+      });
+
+      expect(siteService.findSiteBySiteIdForService).toHaveBeenCalledWith(
+        '123',
+      );
+      expect(result.httpStatusCode).toBe(200);
+      expect(result.data).toEqual(sampleSites[0]);
+    });
+
+    it('rejects a token from another client', () => {
+      expect(() =>
+        siteResolver.findSiteBySiteIdForService('123', { azp: 'site-web' }),
+      ).toThrow('not allowed to call this service query');
+      expect(siteService.findSiteBySiteIdForService).not.toHaveBeenCalled();
+    });
+
+    it('rejects a missing azp', () => {
+      expect(() =>
+        siteResolver.findSiteBySiteIdForService('123', {}),
+      ).toThrow('not allowed to call this service query');
+      expect(siteService.findSiteBySiteIdForService).not.toHaveBeenCalled();
+    });
+  });
 });

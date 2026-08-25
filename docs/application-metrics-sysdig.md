@@ -11,7 +11,7 @@ Summary for **nr-site-registry**: instrument the backend so each API/GraphQL ope
 - See **per-operation** health: successes, failures, and volume over time.
 - Use **Sysdig** for dashboards (org standard on BC Gov OpenShift).
 - Start in **test**; extend to prod after validation.
-- **Out of scope for v1:** alerts, ticket automation, full SLO program.
+- **Out of scope for the original v1:** general-purpose alerts, ticket automation, and a full SLO program. The LTSA hardening requires targeted batch/freshness alerts as a go-live control; see [LTSA batch integration](#ltsa-batch-integration-target-design).
 
 ---
 
@@ -66,7 +66,7 @@ cd backend && npm install prom-client
 
 ### 1.2 Metrics to expose
 
-Five metric families (prefix `site_registry_`):
+Five currently documented general metric families (prefix `site_registry_`):
 
 | Metric | Type | Labels | Purpose |
 |--------|------|--------|---------|
@@ -85,6 +85,8 @@ Five metric families (prefix `site_registry_`):
 **Auth labels:** `reason` = `unauthorized` (401) or `forbidden` (403); `guard` = `http` today.
 
 **Avoid** high-cardinality labels (user IDs, raw IDs in paths).
+
+LTSA batch metrics are a separate target design. Their anticipated names and labels are documented below so dashboards are not mistaken for already-deployed telemetry.
 
 ### 1.3 Suggested files
 
@@ -304,6 +306,226 @@ sum(rate(site_registry_graphql_operations_total{kube_namespace_name="c6a6e5-test
 ```
 
 Use **Explore** to confirm exact label names (`kube_namespace_name`, `kube_workload_name`, etc.) — they can vary slightly by platform.
+
+### LTSA batch integration
+
+The LTSA exchange is initiated by an external on-prem scheduler and includes DMZ/SFTP steps that may fail before the backend receives a request. HTTP/GraphQL metrics therefore cannot prove that the integration is current. The primary control is a database-backed last-success timestamp exported after startup and refreshed after each run.
+
+The backend now exposes these metric names. They remain operationally unverified until the hardened version is deployed and confirmed in Sysdig Explore. Keep labels low-cardinality: never use filename, file hash, run ID, PID, user, legal description, exception text, pod, or free-form stage text as application labels.
+
+| Metric | Type | Labels | Meaning |
+|---|---|---|---|
+| `site_registry_ltsa_runs_total` | Counter | `operation` (`dump_1`, `dump_2`, `load`), `outcome` (`success`, `warning`, `failure`) | Completed attempts by result |
+| `site_registry_ltsa_run_duration_seconds` | Histogram | `operation`, `outcome` | End-to-end backend operation duration |
+| `site_registry_ltsa_records_total` | Counter | `operation`, `result` (`returned`, `loaded`, `skipped`, `changed`) | Records handled across completed attempts |
+| `site_registry_ltsa_stage_failures_total` | Counter | `operation`, `stage` (`auth`, `validation`, `parse`, `lock`, `stage`, `merge`, `audit`, `retention`, `unknown`) | Failure point, using an enumerated stage |
+| `site_registry_ltsa_lock_conflicts_total` | Counter | `operation` (`load`) | Non-blocking advisory-lock conflicts |
+| `site_registry_ltsa_last_success_unixtime_seconds` | Gauge | `operation` | Completion time of the last successful/accepted-warning operation, restored from run metadata |
+| `site_registry_ltsa_last_run_records` | Gauge | `operation`, `result` (`returned`, `loaded`, `skipped`, `changed`) | Counts from the most recently completed run, restored from run metadata |
+
+Accepted `warning` loads count as successful for freshness but remain visible in the warning and skipped-row panels. Failed run metadata is persisted outside a rolled-back merge transaction. Run metadata is retained indefinitely; detailed per-record before/after audit is retained for 90 days.
+
+#### Validate the metric contract
+
+1. Confirm `/metrics` contains every `site_registry_ltsa_*` HELP/TYPE declaration.
+2. Execute controlled dump halves, a valid load, a partial-malformed warning, a zero-valid rejection and an overlapping-load conflict.
+3. Confirm counters increase once, labels stay within the enumerated values, and the last-success gauge changes only for `success` or accepted `warning`.
+4. Restart/replace all backend pods and confirm last-success/last-run gauges recover from durable run metadata.
+5. In Sysdig Explore, discover the actual namespace/workload label names before saving panels. Examples below use `kube_namespace_name`.
+
+Use a dashboard variable or replace `$namespace` with the production namespace. If Sysdig does not support that variable syntax, save an explicit namespace filter.
+
+**Last successful load age (hours)**
+
+```promql
+(time() - max(site_registry_ltsa_last_success_unixtime_seconds{
+  operation="load",
+  kube_namespace_name="$namespace"
+})) / 3600
+```
+
+**Completed loads by outcome**
+
+```promql
+sum(increase(site_registry_ltsa_runs_total{
+  operation="load",
+  kube_namespace_name="$namespace"
+}[24h])) by (outcome)
+```
+
+**Failures by operation**
+
+```promql
+sum(increase(site_registry_ltsa_runs_total{
+  outcome="failure",
+  kube_namespace_name="$namespace"
+}[24h])) by (operation)
+```
+
+**Failure stage**
+
+```promql
+sum(increase(site_registry_ltsa_stage_failures_total{
+  kube_namespace_name="$namespace"
+}[24h])) by (operation, stage)
+```
+
+**Skipped records**
+
+```promql
+sum(increase(site_registry_ltsa_records_total{
+  operation="load",
+  result="skipped",
+  kube_namespace_name="$namespace"
+}[24h]))
+```
+
+**Latest accepted load counts**
+
+```promql
+max(site_registry_ltsa_last_run_records{
+  operation="load",
+  kube_namespace_name="$namespace"
+}) by (result)
+```
+
+**Load p95 duration**
+
+```promql
+histogram_quantile(
+  0.95,
+  sum(rate(site_registry_ltsa_run_duration_seconds_bucket{
+    operation="load",
+    kube_namespace_name="$namespace"
+  }[30m])) by (le)
+)
+```
+
+**Lock conflicts**
+
+```promql
+sum(increase(site_registry_ltsa_lock_conflicts_total{
+  operation="load",
+  kube_namespace_name="$namespace"
+}[1h]))
+```
+
+When multiple pods export the same database-restored gauge, use `max` rather than `sum` to avoid multiplying the value by replica count. Counters may be summed across pods; use `increase`/`rate` so pod restarts are handled correctly.
+
+#### Dashboard panels
+
+Create an **LTSA Integration** dashboard or section with:
+
+- last successful load time and age;
+- runs by operation/outcome;
+- failures by stage;
+- latest loaded/skipped/changed counts;
+- loaded and changed volume by cycle;
+- p50/p95 load duration;
+- advisory-lock conflicts;
+- deployment/pod health alongside the batch signals.
+
+Sysdig configuration is manual/platform-managed because this repository has no alert-as-code mechanism. Record dashboard/alert ownership and links in the release/operations system.
+
+#### Required alerts
+
+Route every LTSA alert to both the SITE application/operations team and the on-prem scheduling/transfer team.
+
+**No successful load by the next expected cycle — critical**
+
+The precise schedule is unknown and **must be confirmed** before this alert is created. Set the threshold to the time from one expected successful load through the next expected load plus an agreed grace period. Do not assume daily or use a guessed number of hours.
+
+```promql
+time() - max(site_registry_ltsa_last_success_unixtime_seconds{
+  operation="load",
+  kube_namespace_name="$namespace"
+}) > $confirmed_cycle_and_grace_seconds
+```
+
+Also handle an absent series as critical (for example with a Sysdig no-data condition), because no historical success is not healthy.
+
+**Load failure — critical**
+
+```promql
+sum(increase(site_registry_ltsa_runs_total{
+  operation="load",
+  outcome="failure",
+  kube_namespace_name="$namespace"
+}[15m])) > 0
+```
+
+**Dump-half failure — high**
+
+```promql
+sum(increase(site_registry_ltsa_runs_total{
+  operation=~"dump_1|dump_2",
+  outcome="failure",
+  kube_namespace_name="$namespace"
+}[15m])) by (operation) > 0
+```
+
+This alert cannot detect a scheduler that never invokes the dump API. Add no-data/expected-cycle checks for each dump half after the actual schedule is confirmed, and correlate them with on-prem scheduler monitoring.
+
+**Accepted warning or skipped rows — high**
+
+```promql
+sum(increase(site_registry_ltsa_runs_total{
+  operation="load",
+  outcome="warning",
+  kube_namespace_name="$namespace"
+}[15m])) > 0
+```
+
+```promql
+sum(increase(site_registry_ltsa_records_total{
+  operation="load",
+  result="skipped",
+  kube_namespace_name="$namespace"
+}[15m])) > 0
+```
+
+**Repeated load-lock conflicts — high**
+
+```promql
+sum(increase(site_registry_ltsa_lock_conflicts_total{
+  operation="load",
+  kube_namespace_name="$namespace"
+}[30m])) >= 2
+```
+
+**Abnormal volume — high**
+
+Choose bounds only after observing and reconciling representative cycles. Compare the durable latest-run loaded count with approved absolute bounds or a recording-rule baseline; avoid dividing by zero when no historical cycles exist.
+
+```promql
+max(site_registry_ltsa_last_run_records{
+  operation="load",
+  result="loaded",
+  kube_namespace_name="$namespace"
+}) < $approved_min_records
+or
+max(site_registry_ltsa_last_run_records{
+  operation="load",
+  result="loaded",
+  kube_namespace_name="$namespace"
+}) > $approved_max_records
+```
+
+**Sustained timeout risk — warning**
+
+Set `$backend_timeout_seconds` from the deployed ingress/client timeout and alert below it with enough headroom for safe completion.
+
+```promql
+histogram_quantile(
+  0.95,
+  sum(rate(site_registry_ltsa_run_duration_seconds_bucket{
+    operation="load",
+    kube_namespace_name="$namespace"
+  }[30m])) by (le)
+) > $approved_duration_warning_seconds
+```
+
+Test each alert with a controlled failure before production sign-off. Capture notification evidence from both recipient teams. The full flow, runbook, reconciliation gate and go-live checklist are in [LTSA integration](./ltsa-integration.md).
 
 ### 3.3 Dashboard: SiteRegistry-Test-Graphql (built)
 

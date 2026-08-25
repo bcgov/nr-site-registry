@@ -4,6 +4,11 @@ import { CustomExceptionFilter } from './customExceptionFilters';
 
 describe('CustomExceptionFilter', () => {
   let customExceptionFilter: CustomExceptionFilter;
+  const graphqlHost = {
+    switchToHttp: jest.fn(),
+    getType: jest.fn().mockReturnValue('graphql'),
+    getArgs: jest.fn().mockReturnValue([]),
+  } as unknown as ArgumentsHost;
 
   beforeEach(() => {
     customExceptionFilter = new CustomExceptionFilter();
@@ -11,7 +16,10 @@ describe('CustomExceptionFilter', () => {
 
   it('should format HttpException correctly', () => {
     const exception = new HttpException('User not found', HttpStatus.NOT_FOUND);
-    const response = customExceptionFilter.catch(exception);
+    const response = customExceptionFilter.catch(
+      exception,
+      graphqlHost,
+    ) as GenericResponse<unknown>;
 
     expect(response).toBeInstanceOf(GenericResponse);
     expect(response.message).toBe('User not found');
@@ -23,13 +31,10 @@ describe('CustomExceptionFilter', () => {
   it('should format generic error correctly', () => {
     const exception = new Error('Generic error');
 
-    const host = {
-      switchToHttp: jest.fn(),
-      getType: jest.fn().mockReturnValue('graphql'),
-      getArgs: jest.fn().mockReturnValue([]),
-    } as unknown as ArgumentsHost;
-
-    const response = customExceptionFilter.catch(exception as any);
+    const response = customExceptionFilter.catch(
+      exception,
+      graphqlHost,
+    ) as GenericResponse<unknown>;
 
     expect(response).toBeInstanceOf(GenericResponse);
     expect(response.message).toBe('Internal server error');
@@ -48,18 +53,41 @@ describe('CustomExceptionFilter', () => {
       HttpStatus.BAD_REQUEST,
     );
 
-    const host = {
-      switchToHttp: jest.fn(),
-      getType: jest.fn().mockReturnValue('graphql'),
-      getArgs: jest.fn().mockReturnValue([]),
-    } as unknown as ArgumentsHost;
-
-    const response = customExceptionFilter.catch(exception);
+    const response = customExceptionFilter.catch(
+      exception,
+      graphqlHost,
+    ) as GenericResponse<unknown>;
 
     expect(response).toBeInstanceOf(GenericResponse);
     expect(response.message).toBe('Custom error message');
     expect(response.httpStatusCode).toBe(HttpStatus.BAD_REQUEST);
     expect(response.success).toBe(false);
     expect(response.data).toBeNull();
+  });
+
+  it('writes the HTTP status and response body for REST errors', () => {
+    const status = jest.fn().mockReturnThis();
+    const json = jest.fn();
+    const host = {
+      getType: jest.fn().mockReturnValue('http'),
+      switchToHttp: jest.fn().mockReturnValue({
+        getResponse: () => ({ status, json }),
+      }),
+    } as unknown as ArgumentsHost;
+
+    const result = customExceptionFilter.catch(
+      new HttpException('Invalid request', HttpStatus.BAD_REQUEST),
+      host,
+    );
+
+    expect(result).toBeUndefined();
+    expect(status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+    expect(json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Invalid request',
+        httpStatusCode: HttpStatus.BAD_REQUEST,
+        success: false,
+      }),
+    );
   });
 });

@@ -1,104 +1,110 @@
 #!/bin/ksh
 
-# Usage: ./lto_load_new.sh [data_file]
-# data_file: path to the .txt file to upload (optional, defaults to load_test_data.txt)
+# Usage: ./lto_load_new.sh /real/path/PARCEL_DESCRIPTION_RESPONSE_*.TXT
 
-# Configuration - all environment variables are required
-API_URL="${API_URL}"
-DEFAULT_DATA_FILE="load_test_data.txt"
-# DEFAULT_DATA_FILE="load_test_data_subset.txt"
+SCRIPT_DIR=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || exit 1
+. "$SCRIPT_DIR/ltsa_common.sh" || exit 1
 
-# Check if required environment variables are set
-if [[ -z "$API_URL" ]]; then
-    print "Error: API_URL environment variable is required"
-    print ""
-    print "Usage:"
-    print "  API_URL=http://your-api-url:port \\"
-    print "  KEYCLOAK_URL=https://your-keycloak-url/auth \\"
-    print "  KEYCLOAK_REALM=your-realm \\"
-    print "  KEYCLOAK_CLIENT_ID=your-client-id \\"
-    print "  KEYCLOAK_CLIENT_SECRET=your-secret \\"
-    print "  ./lto_load_new.sh [data_file]"
-    print ""
-    print "Required environment variables:"
-    print "  API_URL - Site registry API URL"
-    print "  KEYCLOAK_URL - Keycloak server URL with /auth path"
-    print "  KEYCLOAK_REALM - Keycloak realm name"
-    print "  KEYCLOAK_CLIENT_ID - Keycloak client ID"
-    print "  KEYCLOAK_CLIENT_SECRET - Keycloak client secret"
-    print ""
-    print "Parameters:"
-    print "  data_file: path to the .txt file to upload (optional, defaults to load_test_data.txt)"
+API_URL=${API_URL:-}
+DATA_FILE_ARG=${1:-}
+MAX_RETRIES=${LTSA_MAX_RETRIES:-5}
+CURL_CONNECT_TIMEOUT=${LTSA_CONNECT_TIMEOUT:-10}
+CURL_MAX_TIME=${LTSA_LOAD_MAX_TIME:-120}
+TOKEN_COMMAND=${LTSA_TOKEN_COMMAND:-"$SCRIPT_DIR/get_keycloak_token.sh"}
+
+if [ -z "$API_URL" ] || [ -z "$DATA_FILE_ARG" ]; then
+    ltsa_log "Usage: API_URL=... KEYCLOAK_... $0 <data_file>"
+    exit 1
+fi
+ltsa_require_command curl || exit 1
+ltsa_require_command jq || exit 1
+
+DATA_FILE=$(ltsa_resolve_file "$DATA_FILE_ARG" "$SCRIPT_DIR")
+if [ $? -ne 0 ] || [ -z "$DATA_FILE" ] || [ ! -f "$DATA_FILE" ]; then
+    ltsa_log "ERROR: data file not found: $DATA_FILE_ARG"
+    exit 1
+fi
+if [ ! -r "$DATA_FILE" ]; then
+    ltsa_log "ERROR: data file is not readable: $DATA_FILE"
     exit 1
 fi
 
-# Check if data file parameter is provided, otherwise use default
-if [[ $# -eq 0 ]]; then
-    DATA_FILE="$DEFAULT_DATA_FILE"
-else
-    DATA_FILE="$1"
-fi
-
-# Get the directory where this script is located
-SCRIPT_DIR=$(dirname "$0")
-
-# Check if data file exists
-if [[ ! -f "$SCRIPT_DIR/$DATA_FILE" ]]; then
-    print "Error: Data file '$DATA_FILE' not found in $SCRIPT_DIR"
-    print "Available data files in $SCRIPT_DIR:"
-    ls -la "$SCRIPT_DIR"/*.txt 2>/dev/null || print "  No .txt files found"
+ACCESS_TOKEN=$("$TOKEN_COMMAND")
+token_status=$?
+if [ "$token_status" -ne 0 ] || [ -z "$ACCESS_TOKEN" ]; then
+    ltsa_log "ERROR: failed to obtain access token"
     exit 1
 fi
 
-print "API URL: $API_URL"
-print "Data file: $DATA_FILE"
+body_file="${TMPDIR:-/tmp}/ltsa_load.$$.body"
+trap 'rm -f "$body_file"' 0 1 2 3 15
 
-# Step 1: Get access token
-print "\nGetting access token..."
-ACCESS_TOKEN=$("$SCRIPT_DIR/get_keycloak_token.sh")
+attempt=1
+request_ok=no
+while [ "$attempt" -le "$MAX_RETRIES" ]; do
+    delay=$(ltsa_retry_delay "$attempt")
+    [ "$delay" -eq 0 ] || sleep "$delay"
+    : > "$body_file" || exit 1
 
-# Check if token retrieval was successful
-if [[ $? -ne 0 ]] || [[ -z "$ACCESS_TOKEN" ]]; then
-    print "Failed to get access token"
-    exit 1
-fi
+    http_status=$(curl -sS -o "$body_file" -w '%{http_code}' -X POST \
+        "${API_URL}/ltsa/load" \
+        -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+        -H "Accept: application/json" \
+        -F "file=@${DATA_FILE}" \
+        --connect-timeout "$CURL_CONNECT_TIMEOUT" \
+        --max-time "$CURL_MAX_TIME")
+    curl_status=$?
 
-print "\nUploading file to API endpoint..."
-
-# Upload the file using curl
-API_RESPONSE=$(curl -s -X POST \
-  "${API_URL}/ltsa/load" \
-  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-  -F "file=@${SCRIPT_DIR}/${DATA_FILE}")
-
-# Check if API request was successful
-if [[ $? -ne 0 ]]; then
-    print "Failed to make API request"
-    exit 1
-fi
-
-print "API call successful"
-
-# Display the response
-print "\nAPI Response:"
-print "$API_RESPONSE"
-
-print "\nTrying to parse JSON..."
-if print "$API_RESPONSE" | jq '.' > /dev/null 2>&1; then
-    print "JSON is valid, formatting:"
-    print "$API_RESPONSE" | jq '.'
-    
-    # Check if the response indicates success
-    STATUS=$(print "$API_RESPONSE" | jq -r '.status')
-    if [[ "$STATUS" == "success" ]]; then
-        print "\nFile successfully processed!"
-        print "Check the backend console for the file content output."
-    else
-        print "\nAPI returned an error status"
+    if [ "$curl_status" -ne 0 ] && ltsa_is_retryable_curl "$curl_status"; then
+        ltsa_log "Load network failure (curl $curl_status, attempt $attempt/$MAX_RETRIES)"
+        retry=yes
+    elif [ "$curl_status" -ne 0 ]; then
+        ltsa_log "ERROR: load failed with non-retryable curl exit $curl_status"
         exit 1
+    elif ltsa_is_retryable_http "$http_status"; then
+        ltsa_log "Load received retryable HTTP $http_status (attempt $attempt/$MAX_RETRIES)"
+        retry=yes
+    elif [ "$http_status" -lt 200 ] 2>/dev/null || [ "$http_status" -ge 300 ] 2>/dev/null; then
+        ltsa_log "ERROR: load failed with non-retryable HTTP $http_status"
+        exit 1
+    else
+        request_ok=yes
+        break
     fi
-else
-    print "JSON parsing failed. Raw response above."
-    print "This might indicate an API error or malformed JSON."
+
+    if [ "$retry" = yes ] && [ "$attempt" -lt "$MAX_RETRIES" ]; then
+        attempt=$((attempt + 1))
+        continue
+    fi
+    break
+done
+
+if [ "$request_ok" != yes ]; then
+    ltsa_log "ERROR: load request exhausted $MAX_RETRIES attempts"
     exit 1
 fi
+
+api_status=$(jq -er '.status | select(type == "string")' "$body_file" 2>/dev/null)
+if [ $? -ne 0 ]; then
+    ltsa_log "ERROR: load response is not valid status JSON"
+    exit 1
+fi
+case "$api_status" in
+    success|warning) ;;
+    *)
+        api_message=$(jq -r '.message // "application rejected file"' "$body_file" 2>/dev/null)
+        ltsa_log "ERROR: $api_message"
+        exit 1
+        ;;
+esac
+
+api_message=$(jq -r '.message // "file accepted"' "$body_file" 2>/dev/null)
+api_count=$(jq -r '
+    (.recordsLoaded // .count // .recordsProcessed // .processed // 0)
+    | if type == "number" then . else 0 end
+' "$body_file" 2>/dev/null)
+case "$api_count" in
+    ''|*[!0-9]*) api_count=0 ;;
+esac
+ltsa_emit_result "$api_status" load "$DATA_FILE" "$api_message" "$api_count"
+exit 0

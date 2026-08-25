@@ -42,7 +42,13 @@ scp -pr /apps_ux/sis/admin/lto oraapp@#{dmz_server}:#{test_prod_path}/admin
 echo extract the data from the tables
 cd ${import_path}
 
-sqlplus $account_pwd @${admin_lto_path}/ltodump_2
+# Call the new API-based dump script with type 2
+API_URL="${API_URL}" \
+KEYCLOAK_URL="${KEYCLOAK_URL}" \
+KEYCLOAK_REALM="${KEYCLOAK_REALM}" \
+KEYCLOAK_CLIENT_ID="${KEYCLOAK_CLIENT_ID}" \
+KEYCLOAK_CLIENT_SECRET="${KEYCLOAK_CLIENT_SECRET}" \
+lto_dump.sh 2
 
 datestamp=`date '+%y%m%d_%H'`
 mv ltodump.lis ${import_path}/PARCEL_ID_LIST_${datestamp}.TXT

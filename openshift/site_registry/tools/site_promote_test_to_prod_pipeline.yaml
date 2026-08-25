@@ -8,9 +8,79 @@ spec:
     - name: promote-test-to-prod
       taskSpec:
         steps:
-          - name: promote
+          - name: get-test-image-hashes
             image: 'image-registry.openshift-image-registry.svc:5000/openshift/cli:latest'
             script: |
-              oc -n c6a6e5-tools tag site-backend-init:test site-backend-init:prod
-              oc -n c6a6e5-tools tag site-backend:test site-backend:prod
-              oc -n c6a6e5-tools tag site-frontend:test site-frontend:prod
+              # Get the hashes for the current test images.
+
+              set -eu
+
+              TOOLS_NAMESPACE="c6a6e5-tools"
+              SHARED_DIR="/workspace/shared"
+              mkdir -p "${SHARED_DIR}"
+
+              oc -n "${TOOLS_NAMESPACE}" get istag site-backend-init:test -o jsonpath='{.image.dockerImageReference}' > "${SHARED_DIR}/site-backend-init.ref"
+              oc -n "${TOOLS_NAMESPACE}" get istag site-backend:test -o jsonpath='{.image.dockerImageReference}' > "${SHARED_DIR}/site-backend.ref"
+              oc -n "${TOOLS_NAMESPACE}" get istag site-frontend:test -o jsonpath='{.image.dockerImageReference}' > "${SHARED_DIR}/site-frontend.ref"
+
+          - name: tag-images
+            image: 'image-registry.openshift-image-registry.svc:5000/openshift/cli:latest'
+            script: |
+              # Retag the test images with the prod tag.
+
+              set -eu
+
+              TOOLS_NAMESPACE="c6a6e5-tools"
+              oc -n "${TOOLS_NAMESPACE}" tag site-backend-init:test site-backend-init:prod
+              oc -n "${TOOLS_NAMESPACE}" tag site-backend:test site-backend:prod
+              oc -n "${TOOLS_NAMESPACE}" tag site-frontend:test site-frontend:prod
+
+          - name: verify-prod-tags
+            image: 'image-registry.openshift-image-registry.svc:5000/openshift/cli:latest'
+            script: |
+              # Wait until the prod hashes match the test hashes.
+
+              set -eu
+
+              TOOLS_NAMESPACE="c6a6e5-tools"
+              SHARED_DIR="/workspace/shared"
+              ATTEMPTS=30
+              SLEEP_SECONDS=2
+
+              EXPECTED_BACKEND_INIT_REF="$(cat "${SHARED_DIR}/site-backend-init.ref")"
+              EXPECTED_BACKEND_REF="$(cat "${SHARED_DIR}/site-backend.ref")"
+              EXPECTED_FRONTEND_REF="$(cat "${SHARED_DIR}/site-frontend.ref")"
+
+              i=1
+              while [ "${i}" -le "${ATTEMPTS}" ]; do
+                ACTUAL_BACKEND_INIT_REF="$(oc -n "${TOOLS_NAMESPACE}" get istag site-backend-init:prod -o jsonpath='{.image.dockerImageReference}')"
+                ACTUAL_BACKEND_REF="$(oc -n "${TOOLS_NAMESPACE}" get istag site-backend:prod -o jsonpath='{.image.dockerImageReference}')"
+                ACTUAL_FRONTEND_REF="$(oc -n "${TOOLS_NAMESPACE}" get istag site-frontend:prod -o jsonpath='{.image.dockerImageReference}')"
+
+                if [ "${ACTUAL_BACKEND_INIT_REF}" = "${EXPECTED_BACKEND_INIT_REF}" ] && [ "${ACTUAL_BACKEND_REF}" = "${EXPECTED_BACKEND_REF}" ] && [ "${ACTUAL_FRONTEND_REF}" = "${EXPECTED_FRONTEND_REF}" ]; then
+                  echo "All prod tags point to the expected image references."
+                  exit 0
+                fi
+
+                echo "Waiting for prod tags to update (attempt ${i}/${ATTEMPTS})..."
+                sleep "${SLEEP_SECONDS}"
+                i=$((i + 1))
+              done
+
+              echo "Timed out waiting for prod tags to match test image references." >&2
+              exit 1
+
+          - name: restart-and-wait-rollouts
+            image: 'image-registry.openshift-image-registry.svc:5000/openshift/cli:latest'
+            script: |
+              # Restart the backend and frontend deployments and wait for completion.
+
+              set -eu
+
+              PROD_NAMESPACE="c6a6e5-prod"
+
+              oc -n "${PROD_NAMESPACE}" rollout restart deployment/site-backend
+              oc -n "${PROD_NAMESPACE}" rollout restart deployment/site-frontend
+
+              oc -n "${PROD_NAMESPACE}" rollout status deployment/site-backend --timeout=5m
+              oc -n "${PROD_NAMESPACE}" rollout status deployment/site-frontend --timeout=5m

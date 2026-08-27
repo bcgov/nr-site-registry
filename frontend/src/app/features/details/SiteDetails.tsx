@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  Outlet,
   useLocation,
   useNavigate,
   useParams,
@@ -29,7 +30,7 @@ import {
 } from '../site/dto/SiteSlice';
 import { AppDispatch } from '../../Store';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
-import { getNavComponents } from './navigation/NavigationPillsConfig';
+import { getSiteTabCatalog } from './navigation/siteTabCatalog';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import DownloadSitePdfButton from './pdf/DownloadSitePdfButton';
 import { useSiteDetailsPdfData } from './pdf/useSiteDetailsPdfData';
@@ -250,7 +251,7 @@ const SiteDetails = () => {
   const userActions = [UserActionEnum.added, UserActionEnum.updated];
 
   useEffect(() => {
-    SetNavComponents(getNavComponents(false));
+    SetNavComponents(getSiteTabCatalog(false));
   }, [auth.user]);
 
   useEffect(() => {
@@ -261,9 +262,9 @@ const SiteDetails = () => {
       (!isUserOfType(UserRoleType.INTERNAL) ||
         viewMode === SiteDetailsMode.SRMode)
     ) {
-      SetNavComponents(getNavComponents(true));
+      SetNavComponents(getSiteTabCatalog(true));
     } else {
-      SetNavComponents(getNavComponents(false));
+      SetNavComponents(getSiteTabCatalog(false));
     }
   }, [hasNoPendingUpdatesFromState]);
 
@@ -442,9 +443,9 @@ const SiteDetails = () => {
       mode !== SiteDetailsMode.EditMode &&
       (!isUserOfType(UserRoleType.INTERNAL) || mode === SiteDetailsMode.SRMode)
     ) {
-      SetNavComponents(getNavComponents(true));
+      SetNavComponents(getSiteTabCatalog(true));
     } else {
-      SetNavComponents(getNavComponents(false));
+      SetNavComponents(getSiteTabCatalog(false));
     }
   }, [mode]);
 
@@ -1870,6 +1871,7 @@ const SiteDetails = () => {
               !(savedChanges?.length > 0))
           }
         />
+        <Outlet />
 
         {/* Delete Site Modal */}
         {id && (

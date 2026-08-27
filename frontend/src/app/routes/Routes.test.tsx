@@ -49,3 +49,70 @@ describe('roleBasedRoutes default entry behavior', () => {
     });
   });
 });
+
+describe('roleBasedRoutes site details tab children', () => {
+  const roles: UserRoleType[] = [
+    UserRoleType.CLIENT,
+    UserRoleType.INTERNAL,
+    UserRoleType.SR,
+    UserRoleType.PUBLIC,
+  ];
+
+  const isSiteDetailsOrCreatePath = (path?: string) =>
+    Boolean(
+      path &&
+        (path.includes('/site/details/') || path.endsWith('/site/create')),
+    );
+
+  const hasIndexAndTabChildren = (
+    route?: (typeof roleBasedRoutes)[UserRoleType][number],
+  ) => {
+    const children = route?.children ?? [];
+    return (
+      children.some((child) => child.index === true) &&
+      children.some((child) => child.path === ':tab')
+    );
+  };
+
+  it.each(roles)(
+    'nests the same index and tab children on every site details and create-site route for %s',
+    (role) => {
+      const detailsRoutes = roleBasedRoutes[role].filter((route) =>
+        isSiteDetailsOrCreatePath(route.path),
+      );
+
+      expect(detailsRoutes.length).toBeGreaterThan(0);
+      detailsRoutes.forEach((route) => {
+        expect(hasIndexAndTabChildren(route)).toBe(true);
+      });
+    },
+  );
+
+  it('registers known tab paths for anonymous visitors so they do not 404', () => {
+    const publicDetails = roleBasedRoutes[UserRoleType.PUBLIC].find(
+      (route) => route.path === '/site/details/:id',
+    );
+    const publicSearchDetails = roleBasedRoutes[UserRoleType.PUBLIC].find(
+      (route) => route.path === '/search/site/details/:id',
+    );
+
+    expect(hasIndexAndTabChildren(publicDetails)).toBe(true);
+    expect(hasIndexAndTabChildren(publicSearchDetails)).toBe(true);
+  });
+
+  it('uses the same nested children for cart, purchases, dashboard, and create prefixes', () => {
+    const client = roleBasedRoutes[UserRoleType.CLIENT];
+    const internal = roleBasedRoutes[UserRoleType.INTERNAL];
+    const paths = [
+      client.find((route) => route.path === '/site/cart/site/details/:id'),
+      client.find((route) => route.path === '/site-details/site/details/:id'),
+      internal.find((route) => route.path === '/dashboard/site/details/:id'),
+      internal.find((route) => route.path === '/dashboard/site/create'),
+    ];
+
+    paths.forEach((route) => {
+      expect(route).toBeDefined();
+      expect(hasIndexAndTabChildren(route)).toBe(true);
+    });
+  });
+});

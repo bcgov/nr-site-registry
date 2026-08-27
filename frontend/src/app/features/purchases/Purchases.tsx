@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from 'react-oidc-context';
+import { signInWithReturnUrl } from '../../auth/returnUrl';
 import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
 import Table from '../../components/table/Table';
@@ -32,7 +33,7 @@ const Purchases = () => {
 
   useEffect(() => {
     if (user === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+      signInWithReturnUrl(auth);
     }
   }, []);
 

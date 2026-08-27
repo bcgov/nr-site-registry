@@ -9,6 +9,7 @@ import {
 import { notifyError, notifySuccess } from '../../components/alert/Alert';
 import { getUser } from '../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
+import { signInWithReturnUrl } from '../../auth/returnUrl';
 import { Placement } from 'react-bootstrap/esm/types';
 import clsx from 'clsx';
 import { Button } from '../../components/button/Button';
@@ -52,9 +53,7 @@ const AddToFolio: FC<AddToFolioProps> = ({
   const checkUserAuthentication = () => {
     const loggedInUser = getUser();
     if (loggedInUser === null) {
-      auth.signinRedirect({
-        extraQueryParams: { kc_idp_hint: 'bceid' },
-      });
+      signInWithReturnUrl(auth);
       return false;
     }
 

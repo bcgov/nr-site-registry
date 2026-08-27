@@ -23,6 +23,7 @@ import { fetchCartItems } from '../../cart/CartSlice';
 import { notifyError, notifySuccess } from '../../../components/alert/Alert';
 import { isUserOfType, getUser, UserRoleType } from '../../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
+import { signInWithReturnUrl } from '../../../auth/returnUrl';
 
 const SummaryItem = ({
   label,
@@ -99,7 +100,7 @@ export const SiteDetailsDrawerContent: FC<SiteDetailsDrawerContentProps> = ({
 
     const loggedInUser = getUser();
     if (loggedInUser === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+      signInWithReturnUrl(auth);
       return;
     }
 

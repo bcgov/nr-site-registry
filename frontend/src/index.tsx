@@ -16,6 +16,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider, useAuth } from 'react-oidc-context';
 import { UserManagerSettings } from 'oidc-client-ts';
 import { getClientSettings } from './app/auth/UserManagerSetting';
+import { handleSigninCallback } from './app/auth/returnUrl';
 import { RouterProvider } from 'react-router-dom';
 import siteRouter from './app/routes/Routes';
 import { getLoggedInUserType, getUser } from './app/helpers/utility';
@@ -87,7 +88,7 @@ function AppWrapper() {
 
 root.render(
   <React.StrictMode>
-    <AuthProvider {...authOptions}>
+    <AuthProvider {...authOptions} onSigninCallback={handleSigninCallback}>
       <AppWrapper />
     </AuthProvider>
   </React.StrictMode>,

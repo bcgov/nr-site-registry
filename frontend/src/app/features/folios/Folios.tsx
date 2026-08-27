@@ -38,6 +38,7 @@ import SearchInput from '../../components/search/SearchInput';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import { useBlocker } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
+import { signInWithReturnUrl } from '../../auth/returnUrl';
 
 import { notifyError, notifySuccess } from '../../components/alert/Alert';
 import { Button } from '../../components/button/Button';
@@ -81,7 +82,7 @@ const Folios = () => {
 
   useEffect(() => {
     if (user === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+      signInWithReturnUrl(auth);
     }
     dispatch(fetchFolioItems(user?.profile.sub ? user.profile.sub : ''));
   }, []);

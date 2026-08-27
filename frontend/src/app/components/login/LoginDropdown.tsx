@@ -1,5 +1,6 @@
 import { Dropdown } from 'react-bootstrap';
 import { useAuth } from 'react-oidc-context';
+import { signInWithReturnUrl } from '../../auth/returnUrl';
 import './LoginDropdown.css';
 
 export const LoginDropdown = (title: string, width_override?: number) => {
@@ -18,9 +19,7 @@ export const LoginDropdown = (title: string, width_override?: number) => {
           as="button"
           id="login-button-bceid"
           className="dropdown-item"
-          onClick={() =>
-            auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } })
-          }
+          onClick={() => signInWithReturnUrl(auth, { kc_idp_hint: 'bceid' })}
         >
           Basic/Business BCeID
         </Dropdown.Item>
@@ -28,9 +27,7 @@ export const LoginDropdown = (title: string, width_override?: number) => {
           as="button"
           id="login-button-bceid"
           className="dropdown-item"
-          onClick={() =>
-            auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bcsc' } })
-          }
+          onClick={() => signInWithReturnUrl(auth, { kc_idp_hint: 'bcsc' })}
         >
           BC Services Card
         </Dropdown.Item>
@@ -38,9 +35,7 @@ export const LoginDropdown = (title: string, width_override?: number) => {
         <Dropdown.Item
           as="button"
           id="login-button-idir"
-          onClick={() =>
-            auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'idir' } })
-          }
+          onClick={() => signInWithReturnUrl(auth, { kc_idp_hint: 'idir' })}
         >
           IDIR
         </Dropdown.Item>

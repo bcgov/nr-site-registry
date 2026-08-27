@@ -1,6 +1,4 @@
-import { ReactNode } from 'react';
-
 export interface INavigationPills {
   isDisable?: boolean;
-  components?: any;
+  components?: { label: string; value: string }[];
 }

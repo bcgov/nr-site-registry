@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { render, fireEvent, screen } from '@testing-library/react';
 import SRUpdates from './srUpdates';
 import { RequestStatus } from '../../../helpers/requests/status';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, MemoryRouter, Route, Routes, RouterProvider } from 'react-router-dom';
 import React, { act } from 'react';
 
 const mockStore = configureStore([thunk]);
@@ -213,5 +213,31 @@ describe('Site Registry Review Tab', () => {
     );
     const pageComponent = screen.getByTestId('srupdates-parceldesc-component');
     expect(pageComponent).toBeInTheDocument();
+  });
+
+  it('View links use sibling tab paths', () => {
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={['/site/details/9/updates']}>
+          <Routes>
+            <Route path="/site/details/:id">
+              <Route path=":tab" element={<SRUpdates />} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </Provider>,
+    );
+
+    const summary = screen.getByTestId('site-summary-component');
+    expect(summary.querySelector('a')).toHaveAttribute(
+      'href',
+      '/site/details/9/summary',
+    );
+
+    const notations = screen.getByTestId('srupdates-notation-component');
+    expect(notations.querySelector('a')).toHaveAttribute(
+      'href',
+      '/site/details/9/notations',
+    );
   });
 });

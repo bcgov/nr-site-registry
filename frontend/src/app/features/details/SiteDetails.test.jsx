@@ -106,8 +106,8 @@ jest.mock('react-redux', () => {
   return { ...actual, useSelector: jest.fn(), useDispatch: jest.fn() };
 });
 jest.mock('react-oidc-context', () => ({ useAuth: jest.fn() }));
-jest.mock('./navigation/NavigationPillsConfig', () => ({
-  getNavComponents: jest.fn(() => []),
+jest.mock('./navigation/siteTabCatalog', () => ({
+  getSiteTabCatalog: jest.fn(() => []),
 }));
 jest.mock(
   '../../components/navigation/navigationpills/NavigationPills',

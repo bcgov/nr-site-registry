@@ -21,16 +21,7 @@ import { RequestStatus } from '../../../helpers/requests/status';
 import Table from '../../../components/table/Table';
 import './Summary.css';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
-import { ShoppingCartIcon } from '../../../components/common/icon';
-import {
-  addCartItem,
-  addCartItemRequestStatus,
-  fetchCartItems,
-  resetCartItemAddedStatus,
-} from '../../cart/CartSlice';
-import { getUser, isUserOfType, UserRoleType } from '../../../helpers/utility';
-import { useAuth } from 'react-oidc-context';
-import { signInWithReturnUrl } from '../../../auth/returnUrl';
+import { isUserOfType, UserRoleType } from '../../../helpers/utility';
 import {
   getSiteSummaryEdits,
   setupSiteSummaryForSaving,
@@ -42,13 +33,10 @@ import { SRApprovalStatusEnum } from '../../../common/srApprovalStatusEnum';
 import { useParams } from 'react-router-dom';
 import SummaryInfo from './SummaryInfo';
 import { hasUserPurchasedSnapshot } from '../snapshot/SnapshotSlice';
-import AddToFolio from '../../folios/AddToFolio';
-import { Button } from '../../../components/button/Button';
 import { GetSummaryConfig } from './SummaryConfig';
+import PurchaseAccessPrompt from '../navigation/PurchaseAccessPrompt';
 
 const Summary = () => {
-  const auth = useAuth();
-  const user = getUser();
   const { id } = useParams();
   const dispatch = useDispatch<AppDispatch>();
   const {
@@ -60,7 +48,6 @@ const Summary = () => {
   } = GetSummaryConfig();
 
   const isUserPurchasedSite = useSelector(hasUserPurchasedSnapshot);
-  const addCartItemStatus = useSelector(addCartItemRequestStatus);
   const detailsMode = useSelector(siteDetailsMode);
   const details = useSelector(selectSiteDetails);
   const savedEdits = useSelector(getSiteSummaryEdits);
@@ -79,12 +66,6 @@ const Summary = () => {
   const initialParcelIds = [0];
 
   const [parcelIds, setParcelIds] = useState(initialParcelIds);
-
-  useEffect(() => {
-    if (isUserOfType(UserRoleType.CLIENT) && user !== null) {
-      dispatch(fetchCartItems());
-    }
-  }, [addCartItemStatus]);
 
   useEffect(() => {
     if (savedEdits) {
@@ -202,24 +183,6 @@ const Summary = () => {
     setParcelIds(parcelIdsLocal);
   };
 
-  const handleAddToCart = () => {
-    dispatch(resetCartItemAddedStatus);
-    const loggedInUser = getUser();
-    if (loggedInUser === null) {
-      signInWithReturnUrl(auth);
-    } else {
-      dispatch(resetCartItemAddedStatus(null));
-      dispatch(
-        addCartItem([
-          {
-            siteId: editSiteDetailsObject.id,
-            price: 200.11,
-          },
-        ]),
-      ).unwrap();
-    }
-  };
-
   return (
     <div className="summary-section-details">
       <SummaryInfo
@@ -315,26 +278,7 @@ const Summary = () => {
         </div>
       )}
       {id && isUserOfType(UserRoleType.CLIENT) && !isUserPurchasedSite && (
-        <div className="external-purchase-section">
-          <div className="external-purchase-info">
-            <span>
-              In order to view this site’s details, please purchase access using
-              the button below.
-            </span>
-          </div>
-          <div className="external-purchase-buttons">
-            <Button onClick={handleAddToCart}>
-              <ShoppingCartIcon /> Purchase Site Details
-            </Button>
-            {id && (
-              <AddToFolio
-                selectedSiteIds={[id]}
-                label="Add to Folio"
-                popupPlacement="top-start"
-              />
-            )}
-          </div>
-        </div>
+        <PurchaseAccessPrompt />
       )}
     </div>
   );

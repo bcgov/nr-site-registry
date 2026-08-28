@@ -1,4 +1,5 @@
 import { isUserOfType, UserRoleType } from '../../../helpers/utility';
+import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 
 export const DEFAULT_SITE_TAB = 'summary' as const;
 
@@ -56,6 +57,25 @@ export function getLegacyTabFlag(
   return SITE_TAB_PATHS.find(
     (tab) => searchParams.has(tab) && searchParams.get(tab) === '',
   );
+}
+
+export function shouldShowUpdatesTab({
+  hasPendingUpdates,
+  mode,
+}: {
+  hasPendingUpdates: boolean;
+  mode: SiteDetailsMode;
+}): boolean {
+  if (!isUserOfType(UserRoleType.SR) || !hasPendingUpdates) {
+    return false;
+  }
+  if (mode === SiteDetailsMode.EditMode) {
+    return false;
+  }
+  if (isUserOfType(UserRoleType.INTERNAL) && mode !== SiteDetailsMode.SRMode) {
+    return false;
+  }
+  return true;
 }
 
 export function getSiteTabCatalog(includeUpdatesTab: boolean): SiteTabItem[] {

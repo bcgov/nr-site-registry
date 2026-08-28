@@ -1,10 +1,12 @@
 import { isUserOfType, UserRoleType } from '../../../helpers/utility';
+import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import {
   DEFAULT_SITE_TAB,
   getLegacyTabFlag,
   getSiteTabCatalog,
   getSiteTabFromPathname,
   isSiteTabPath,
+  shouldShowUpdatesTab,
 } from './siteTabCatalog';
 
 jest.mock('../../../helpers/utility', () => {
@@ -67,6 +69,48 @@ describe('site tab catalog', () => {
 
     expect(tabs.map((tab) => tab.value)).not.toContain('updates');
     expect(tabs[0].value).toBe('summary');
+  });
+
+  it('shows Updates only for a Site Registrar with pending updates and a matching mode', () => {
+    mockedIsUserOfType.mockImplementation((role) => role === UserRoleType.SR);
+
+    expect(
+      shouldShowUpdatesTab({
+        hasPendingUpdates: true,
+        mode: SiteDetailsMode.ViewOnlyMode,
+      }),
+    ).toBe(true);
+    expect(
+      shouldShowUpdatesTab({
+        hasPendingUpdates: false,
+        mode: SiteDetailsMode.ViewOnlyMode,
+      }),
+    ).toBe(false);
+    expect(
+      shouldShowUpdatesTab({
+        hasPendingUpdates: true,
+        mode: SiteDetailsMode.EditMode,
+      }),
+    ).toBe(false);
+  });
+
+  it('hides Updates for a Site Registrar who is also Internal unless they are in SR mode', () => {
+    mockedIsUserOfType.mockImplementation(
+      (role) => role === UserRoleType.SR || role === UserRoleType.INTERNAL,
+    );
+
+    expect(
+      shouldShowUpdatesTab({
+        hasPendingUpdates: true,
+        mode: SiteDetailsMode.SRMode,
+      }),
+    ).toBe(true);
+    expect(
+      shouldShowUpdatesTab({
+        hasPendingUpdates: true,
+        mode: SiteDetailsMode.ViewOnlyMode,
+      }),
+    ).toBe(false);
   });
 
   it('prepends Updates only for a Site Registrar when requested', () => {

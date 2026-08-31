@@ -35,6 +35,7 @@ import {
   resetCartItemDeleteStatus,
 } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
+import { signInWithReturnUrl } from '../../auth/returnUrl';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import { Button } from '../../components/button/Button';
 import { TableColumn } from '../../components/table/TableColumn';
@@ -116,7 +117,7 @@ const FolioContents = () => {
   const handleAddToShoppingCart = () => {
     const loggedInUser = getUser();
     if (loggedInUser === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+      signInWithReturnUrl(auth);
     } else {
       const cartItem = selectedRows.map((folio) => {
         return {
@@ -133,7 +134,7 @@ const FolioContents = () => {
   const handleDeleteFromFolio = () => {
     const loggedInUser = getUser();
     if (loggedInUser === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+      signInWithReturnUrl(auth);
     } else {
       const sitesinFolio = selectedRows.map((folio) => {
         return {
@@ -152,7 +153,7 @@ const FolioContents = () => {
   const handleDeleteFromShoppingCart = () => {
     const loggedInUser = getUser();
     if (loggedInUser === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+      signInWithReturnUrl(auth);
     } else {
       const cartItemsToDelete = selectedRows.map((folio) => {
         return {

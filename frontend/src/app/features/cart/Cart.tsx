@@ -17,6 +17,7 @@ import {
   resetCartItemDeleteStatus,
 } from './CartSlice';
 import { useAuth } from 'react-oidc-context';
+import { signInWithReturnUrl } from '../../auth/returnUrl';
 import {
   getUser,
   showNotification,
@@ -49,7 +50,7 @@ const Cart = () => {
 
   useEffect(() => {
     if (user === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+      signInWithReturnUrl(auth);
     }
   }, []);
 
@@ -80,7 +81,7 @@ const Cart = () => {
   const handleDeleteFromShoppingCart = () => {
     const loggedInUser = getUser();
     if (loggedInUser === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+      signInWithReturnUrl(auth);
     } else {
       const cartItemsToDelete = cartItemsArr.map((cart: any) => {
         return {

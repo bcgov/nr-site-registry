@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../Store';
 import { Button } from '../../../components/button/Button';
 import { getUser, isUserOfType, UserRoleType } from '../../../helpers/utility';
+import { signInWithReturnUrl } from '../../../auth/returnUrl';
 import AddToFolio from '../../folios/AddToFolio';
 import {
   FileExportIcon,
@@ -34,7 +35,7 @@ export const SearchResultsActions: FC<SearchResultsActionsProps> = ({
   const handleAddToShoppingCart = () => {
     const loggedInUser = getUser();
     if (loggedInUser === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+      signInWithReturnUrl(auth);
     } else {
       const cartItems = selectedRows.map((row) => {
         return {

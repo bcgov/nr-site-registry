@@ -30,6 +30,7 @@ import {
 } from '../../cart/CartSlice';
 import { getUser, isUserOfType, UserRoleType } from '../../../helpers/utility';
 import { useAuth } from 'react-oidc-context';
+import { signInWithReturnUrl } from '../../../auth/returnUrl';
 import {
   getSiteSummaryEdits,
   setupSiteSummaryForSaving,
@@ -205,7 +206,7 @@ const Summary = () => {
     dispatch(resetCartItemAddedStatus);
     const loggedInUser = getUser();
     if (loggedInUser === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+      signInWithReturnUrl(auth);
     } else {
       dispatch(resetCartItemAddedStatus(null));
       dispatch(

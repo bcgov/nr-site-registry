@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Dashboard from './Dashboard';
+import { recentViewedColumns } from './DashboardConfig';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
@@ -40,5 +41,17 @@ describe('Dashboard Component', () => {
       </Provider>,
     );
     expect(getByText('Recently Viewed')).toBeInTheDocument();
+  });
+
+  it('links Site ID and Details to /site/details/ without a dashboard prefix', () => {
+    const siteIdColumn = recentViewedColumns.find(
+      (c) => c.displayName === 'Site ID',
+    );
+    const detailsColumn = recentViewedColumns.find(
+      (c) => c.displayName === 'Details',
+    );
+
+    expect(siteIdColumn?.displayType?.href).toBe('/site/details/');
+    expect(detailsColumn?.displayType?.href).toBe('/site/details/');
   });
 });

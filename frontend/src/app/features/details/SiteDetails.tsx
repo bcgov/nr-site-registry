@@ -73,6 +73,7 @@ import {
 } from './disclosure/DisclosureSlice';
 import { addCartItem, resetCartItemAddedStatus } from '../cart/CartSlice';
 import { useAuth } from 'react-oidc-context';
+import { signInWithReturnUrl } from '../../auth/returnUrl';
 import { notifyInfo, notifyError } from '../../components/alert/Alert';
 import {
   fetchNotationParticipants,
@@ -1185,7 +1186,7 @@ const SiteDetails = () => {
   const handleAddToCart = () => {
     dispatch(resetCartItemAddedStatus);
     if (loggedInUser === null) {
-      auth.signinRedirect({ extraQueryParams: { kc_idp_hint: 'bceid' } });
+      signInWithReturnUrl(auth);
     } else {
       dispatch(resetCartItemAddedStatus(null));
       dispatch(

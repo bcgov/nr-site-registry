@@ -4,7 +4,13 @@ import { Provider } from 'react-redux';
 import { render, fireEvent, screen } from '@testing-library/react';
 import SRUpdates from './srUpdates';
 import { RequestStatus } from '../../../helpers/requests/status';
-import { createBrowserRouter, MemoryRouter, Route, Routes, RouterProvider } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  MemoryRouter,
+  Route,
+  Routes,
+  RouterProvider,
+} from 'react-router-dom';
 import React, { act } from 'react';
 
 const mockStore = configureStore([thunk]);

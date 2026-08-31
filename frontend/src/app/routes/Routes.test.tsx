@@ -61,7 +61,7 @@ describe('roleBasedRoutes site details tab children', () => {
   const isSiteDetailsOrCreatePath = (path?: string) =>
     Boolean(
       path &&
-        (path.includes('/site/details/') || path.endsWith('/site/create')),
+      (path.includes('/site/details/') || path.endsWith('/site/create')),
     );
 
   const hasIndexAndTabChildren = (

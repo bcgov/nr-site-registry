@@ -1,36 +1,43 @@
+import { isValidElement } from 'react';
 import { Navigate } from 'react-router-dom';
 import Search from '../features/site/Search';
 import { roleBasedRoutes } from './Routes';
 import { UserRoleType } from '../helpers/utility';
+
+const getRouteElement = (
+  route?: (typeof roleBasedRoutes)[UserRoleType][number],
+) => {
+  expect(route).toBeDefined();
+  if (!route || !isValidElement(route.element)) {
+    throw new Error('Expected route.element to be a React element');
+  }
+  return route.element;
+};
 
 describe('roleBasedRoutes default entry behavior', () => {
   const getRoute = (role: UserRoleType, path: string) =>
     roleBasedRoutes[role].find((route) => route.path === path);
 
   it('redirects internal root route to dashboard', () => {
-    const route = getRoute(UserRoleType.INTERNAL, '/');
+    const element = getRouteElement(getRoute(UserRoleType.INTERNAL, '/'));
 
-    expect(route).toBeDefined();
-    expect(route?.element.type).toBe(Navigate);
-    expect(route?.element.props.to).toBe('/dashboard');
+    expect(element.type).toBe(Navigate);
+    expect(element.props.to).toBe('/dashboard');
   });
 
   it('redirects SR root route to dashboard', () => {
-    const route = getRoute(UserRoleType.SR, '/');
+    const element = getRouteElement(getRoute(UserRoleType.SR, '/'));
 
-    expect(route).toBeDefined();
-    expect(route?.element.type).toBe(Navigate);
-    expect(route?.element.props.to).toBe('/dashboard');
+    expect(element.type).toBe(Navigate);
+    expect(element.props.to).toBe('/dashboard');
   });
 
   it('keeps client and public root routes on search', () => {
-    const clientRoot = getRoute(UserRoleType.CLIENT, '/');
-    const publicRoot = getRoute(UserRoleType.PUBLIC, '/');
+    const clientRoot = getRouteElement(getRoute(UserRoleType.CLIENT, '/'));
+    const publicRoot = getRouteElement(getRoute(UserRoleType.PUBLIC, '/'));
 
-    expect(clientRoot).toBeDefined();
-    expect(publicRoot).toBeDefined();
-    expect(clientRoot?.element.type).toBe(Search);
-    expect(publicRoot?.element.type).toBe(Search);
+    expect(clientRoot.type).toBe(Search);
+    expect(publicRoot.type).toBe(Search);
   });
 
   it('keeps /search route available for all roles', () => {
@@ -42,10 +49,9 @@ describe('roleBasedRoutes default entry behavior', () => {
     ];
 
     roles.forEach((role) => {
-      const searchRoute = getRoute(role, '/search');
+      const searchRoute = getRouteElement(getRoute(role, '/search'));
 
-      expect(searchRoute).toBeDefined();
-      expect(searchRoute?.element.type).toBe(Search);
+      expect(searchRoute.type).toBe(Search);
     });
   });
 });

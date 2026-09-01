@@ -45,6 +45,10 @@ jest.mock('../srUpdates/srUpdates', () => ({
   __esModule: true,
   default: () => <div>updates-view</div>,
 }));
+jest.mock('./SiteTabAccessGate', () => ({
+  __esModule: true,
+  default: ({ children }) => children,
+}));
 
 const LocationDisplay = () => {
   const location = useLocation();

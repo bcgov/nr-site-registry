@@ -108,6 +108,7 @@ jest.mock('react-redux', () => {
 jest.mock('react-oidc-context', () => ({ useAuth: jest.fn() }));
 jest.mock('./navigation/siteTabCatalog', () => ({
   getSiteTabCatalog: jest.fn(() => []),
+  shouldShowUpdatesTab: jest.fn(() => false),
 }));
 jest.mock(
   '../../components/navigation/navigationpills/NavigationPills',

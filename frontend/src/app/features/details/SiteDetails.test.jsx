@@ -1,12 +1,21 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import SiteDetails from './SiteDetails';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom';
+import {
+  MemoryRouter,
+  Route,
+  Routes,
+  useLocation,
+  useParams,
+} from 'react-router-dom';
 import { RequestStatus } from '../../helpers/requests/status';
 import { useAuth } from 'react-oidc-context';
 import * as utility from '../../helpers/utility';
+import { updateSiteDetailsMode } from '../site/dto/SiteSlice';
+import { SiteDetailsMode } from './dto/SiteDetailsMode';
+import { resetEditQueryState } from './navigation/editQuery';
 
 // ---- Module Mocks (must be before component mocks) ----
 jest.mock('@react-pdf/renderer', () => ({
@@ -106,10 +115,14 @@ jest.mock('react-redux', () => {
   return { ...actual, useSelector: jest.fn(), useDispatch: jest.fn() };
 });
 jest.mock('react-oidc-context', () => ({ useAuth: jest.fn() }));
-jest.mock('./navigation/siteTabCatalog', () => ({
-  getSiteTabCatalog: jest.fn(() => []),
-  shouldShowUpdatesTab: jest.fn(() => false),
-}));
+jest.mock('./navigation/siteTabCatalog', () => {
+  const actual = jest.requireActual('./navigation/siteTabCatalog');
+  return {
+    ...actual,
+    getSiteTabCatalog: jest.fn(() => []),
+    shouldShowUpdatesTab: jest.fn(() => false),
+  };
+});
 jest.mock(
   '../../components/navigation/navigationpills/NavigationPills',
   () => ({
@@ -233,6 +246,16 @@ const buildState = (override = {}) => {
 
 const mockStore = configureStore([thunk]);
 
+const SearchProbe = () => {
+  const { pathname, search } = useLocation();
+  return (
+    <div data-testid="outlet-location">
+      {pathname}
+      {search}
+    </div>
+  );
+};
+
 // ---- Setup Helpers ----
 let dispatch, signinRedirect;
 
@@ -273,16 +296,18 @@ const setup = ({
   jest.spyOn(utility, 'removeProperty').mockImplementation((d) => d);
 };
 
-const renderSite = (stateOverride = {}, id = '9') => {
+const renderSite = (stateOverride = {}, id = '9', entry) => {
   useParams.mockReturnValue({ id });
   const state = buildState(stateOverride);
   useSelector.mockImplementation((cb) => cb(state));
   const store = mockStore(state);
   return render(
     <Provider store={store}>
-      <MemoryRouter initialEntries={[`/site/details/${id}`]}>
+      <MemoryRouter initialEntries={[entry || `/site/details/${id}`]}>
         <Routes>
-          <Route path="/site/details/:id" element={<SiteDetails />} />
+          <Route path="/site/details/:id" element={<SiteDetails />}>
+            <Route path=":tab" element={<SearchProbe />} />
+          </Route>
         </Routes>
       </MemoryRouter>
     </Provider>,
@@ -294,6 +319,7 @@ describe('SiteDetails', () => {
   afterEach(() => {
     jest.restoreAllMocks();
     jest.clearAllMocks();
+    resetEditQueryState();
   });
 
   // --- Loading ---
@@ -524,6 +550,64 @@ describe('SiteDetails', () => {
       });
       await screen.findByTestId('page-container');
       expect(dispatch).toHaveBeenCalled();
+    });
+  });
+
+  describe('?edit query', () => {
+    const editModeAction = updateSiteDetailsMode(SiteDetailsMode.EditMode);
+
+    it('enters edit mode and strips ?edit for an Internal user', async () => {
+      setup({ isInternal: true });
+      renderSite({}, '9', '/site/details/9/notations?edit');
+
+      await waitFor(() => {
+        expect(screen.getByTestId('outlet-location')).toHaveTextContent(
+          '/site/details/9/notations',
+        );
+      });
+      expect(screen.getByTestId('outlet-location').textContent).not.toContain(
+        'edit',
+      );
+      expect(dispatch).toHaveBeenCalledWith(editModeAction);
+    });
+
+    it('enters edit on Summary and strips ?edit', async () => {
+      setup({ isInternal: true });
+      renderSite({}, '9', '/site/details/9/summary?edit=true');
+
+      await waitFor(() => {
+        expect(screen.getByTestId('outlet-location')).toHaveTextContent(
+          '/site/details/9/summary',
+        );
+      });
+      expect(dispatch).toHaveBeenCalledWith(editModeAction);
+    });
+
+    it('strips ?edit for an External user without entering edit', async () => {
+      setup({ isClient: true });
+      renderSite({}, '9', '/site/details/9/notations?edit');
+
+      await waitFor(() => {
+        expect(screen.getByTestId('outlet-location')).toHaveTextContent(
+          '/site/details/9/notations',
+        );
+      });
+      expect(screen.getByTestId('outlet-location').textContent).not.toContain(
+        'edit',
+      );
+      expect(dispatch).not.toHaveBeenCalledWith(editModeAction);
+    });
+
+    it('leaves ?edit in the URL for anonymous visitors', async () => {
+      setup({ loggedIn: false });
+      renderSite({}, '9', '/site/details/9/notations?edit');
+
+      await waitFor(() => {
+        expect(screen.getByTestId('outlet-location')).toHaveTextContent(
+          '/site/details/9/notations?edit',
+        );
+      });
+      expect(dispatch).not.toHaveBeenCalledWith(editModeAction);
     });
   });
 });

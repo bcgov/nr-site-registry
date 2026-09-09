@@ -45,7 +45,8 @@ export class GraphqlMetricsPlugin implements ApolloServerPlugin {
           httpStatus,
           graphqlErrors: singleResult?.errors,
           responseData: singleResult?.data as
-            Record<string, unknown> | undefined,
+            | Record<string, unknown>
+            | undefined,
         });
 
         this.metrics.recordGraphqlOperation({

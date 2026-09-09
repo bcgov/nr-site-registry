@@ -711,7 +711,7 @@ const SRUpdates = () => {
         <ApproveReject
           name="Summary"
           testId="site-summary-component"
-          link="?summary"
+          link="../summary"
         >
           <SummaryInfo
             summaryFormRows={summaryFormRows}
@@ -732,7 +732,7 @@ const SRUpdates = () => {
               key={notation.id ?? index}
               name="Notations"
               testId="srupdates-notation-component"
-              link="?notations"
+              link="../notations"
             >
               <Notation
                 index={index}
@@ -777,7 +777,7 @@ const SRUpdates = () => {
         <ApproveReject
           name="Site Participants"
           testId="srupdates-participant-component"
-          link="?participants"
+          link="../participants"
         >
           <ParticipantTable
             handleTableChange={handleParticipantsApproveRejectHandler}
@@ -807,7 +807,7 @@ const SRUpdates = () => {
               key={document.id ?? index}
               name="Documents"
               testId="srupdates-documents-component"
-              link="?documents"
+              link="../documents"
             >
               <Document
                 userType={UserType.Internal}
@@ -837,7 +837,7 @@ const SRUpdates = () => {
         <ApproveReject
           name="Associated Sites"
           testId="srupdates-siteassociations-component"
-          link="?associated"
+          link="../associated"
         >
           <AssociateSiteComponent
             handleTableChange={handleAssociatedSiteApproveRejectHandler}
@@ -867,7 +867,7 @@ const SRUpdates = () => {
         <ApproveReject
           name="Suspect Land Uses"
           testId="srupdates-landuses-component"
-          link="?landuses"
+          link="../landuses"
         >
           <LandUseTable
             onTableChange={approveRejectHandlerForLandUses}
@@ -889,7 +889,7 @@ const SRUpdates = () => {
           <ApproveReject
             name="Parcel Description"
             testId="srupdates-parceldesc-component"
-            link="?parceldesc"
+            link="../parceldesc"
           >
             <ParcelDescriptionTable
               tableChangeHandler={handleParcelDescriptionApproveRejectHandler}
@@ -916,7 +916,7 @@ const SRUpdates = () => {
           <ApproveReject
             key={disclosure.id ?? index}
             name="Site Disclosure"
-            link="?disclosure"
+            link="../disclosure"
           >
             <DisclosureComponent
               viewMode={SiteDetailsMode.ViewOnlyMode}

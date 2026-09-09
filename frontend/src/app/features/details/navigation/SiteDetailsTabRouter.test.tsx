@@ -47,7 +47,7 @@ jest.mock('../srUpdates/srUpdates', () => ({
 }));
 jest.mock('./SiteTabAccessGate', () => ({
   __esModule: true,
-  default: ({ children }) => children,
+  default: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 const LocationDisplay = () => {

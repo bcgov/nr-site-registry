@@ -118,6 +118,7 @@ const Notation: React.FC<INotationProps> = ({
 
   return (
     <PanelWithUpDown
+      isDefaultOpen={true}
       firstChild={
         <div className="w-100" key={`notation-first-${notation?.id}`}>
           {isArchived && showApproveRejectSection && (

@@ -34,6 +34,14 @@ import {
   getSiteTabCatalog,
   shouldShowUpdatesTab,
 } from './navigation/siteTabCatalog';
+import {
+  clearPendingEnterEdit,
+  decideEditQueryAction,
+  hasEditParam,
+  hasPendingEnterEdit,
+  markPendingEnterEdit,
+  stripEditParam,
+} from './navigation/editQuery';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import DownloadSitePdfButton from './pdf/DownloadSitePdfButton';
 import { useSiteDetailsPdfData } from './pdf/useSiteDetailsPdfData';
@@ -285,6 +293,7 @@ const SiteDetails = () => {
         dispatch(clearTrackChanges(null));
         dispatch(updateSiteDetailsMode(SiteDetailsMode.ViewOnlyMode));
         setEdit(false);
+        clearPendingEnterEdit();
         if (id) checkForRecordsPendingReview(id);
       } else {
         // dont close edit mode
@@ -457,6 +466,44 @@ const SiteDetails = () => {
       }),
     );
   }, []);
+
+  useEffect(() => {
+    const shouldApplyEditQuery =
+      hasEditParam(location.search) || hasPendingEnterEdit(location.pathname);
+
+    if (!shouldApplyEditQuery) {
+      clearPendingEnterEdit();
+      return;
+    }
+
+    const decision = decideEditQueryAction({
+      userType,
+      hasSiteId: Boolean(id?.trim()),
+    });
+
+    if (decision.action === 'noop') {
+      return;
+    }
+
+    if (decision.action === 'enterEdit') {
+      setEdit(true);
+      setViewMode(SiteDetailsMode.EditMode);
+      dispatch(updateSiteDetailsMode(SiteDetailsMode.EditMode));
+      markPendingEnterEdit(location.pathname);
+    } else {
+      clearPendingEnterEdit();
+    }
+
+    if (hasEditParam(location.search)) {
+      const nextSearch = stripEditParam(location.search);
+      if (nextSearch !== location.search) {
+        navigate(
+          { pathname: location.pathname, search: nextSearch },
+          { replace: true },
+        );
+      }
+    }
+  }, [userType, id, location.pathname, location.search, navigate, dispatch]);
 
   // NEEDS TO FETCH DATA BASED ON CONDITION WHEATHER IT IS EXTERNAL USER OR INTERNAL USER
   // BY DOING THIS WE CAN STOP UNNECCESSARY CALL TO DATABASE
@@ -1162,6 +1209,7 @@ const SiteDetails = () => {
     setSave(false);
     setHasError(false);
     setEdit(false);
+    clearPendingEnterEdit();
   };
 
   const handleAddRecentView = async (details: any) => {

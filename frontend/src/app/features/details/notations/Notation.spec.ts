@@ -64,10 +64,14 @@ jest.mock('../../../components/simple/PanelWithUpDown', () => {
   return function MockPanel(props: {
     firstChild: React.ReactNode;
     secondChild: React.ReactNode;
+    isDefaultOpen?: boolean;
   }) {
     return React.createElement(
       'div',
-      null,
+      {
+        'data-testid': 'notation-panel',
+        'data-default-open': String(Boolean(props.isDefaultOpen)),
+      },
       React.createElement('div', null, props.firstChild),
       React.createElement('div', null, props.secondChild),
     );
@@ -127,6 +131,20 @@ describe('Notation – Widget isRequired logic', () => {
     expect(screen.getByTestId('mock-widget')).toHaveAttribute(
       'data-isrequired',
       'false',
+    );
+  });
+
+  it('opens the panel by default', () => {
+    render(
+      React.createElement(Notation, {
+        ...baseProps,
+        viewMode: SiteDetailsMode.ViewOnlyMode,
+      }),
+    );
+
+    expect(screen.getByTestId('notation-panel')).toHaveAttribute(
+      'data-default-open',
+      'true',
     );
   });
 });

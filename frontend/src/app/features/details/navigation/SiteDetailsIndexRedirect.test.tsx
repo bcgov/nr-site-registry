@@ -75,6 +75,13 @@ describe('getIndexRedirectTarget', () => {
     });
   });
 
+  it('keeps ?edit while rewriting a legacy notations flag', () => {
+    expect(getIndexRedirectTarget('?notations&edit')).toEqual({
+      pathname: 'notations',
+      search: '?edit=',
+    });
+  });
+
   it('leaves a query that is not a known empty tab flag alone and still defaults to Summary', () => {
     expect(getIndexRedirectTarget('?applicationId=abc')).toEqual({
       pathname: 'summary',
@@ -110,6 +117,13 @@ describe('SiteDetailsIndexRedirect', () => {
     renderAt('/site/details/9?notations');
     expect(screen.getByTestId('location')).toHaveTextContent(
       '/site/details/9/notations',
+    );
+  });
+
+  it('keeps ?edit when rewriting a legacy notations flag', () => {
+    renderAt('/site/details/9?notations&edit');
+    expect(screen.getByTestId('location')).toHaveTextContent(
+      '/site/details/9/notations?edit=',
     );
   });
 

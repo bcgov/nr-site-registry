@@ -957,7 +957,6 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       ],
     };
 
-    // Add the new notation to formData
     setFormData((prevData) => [newNotation, ...(prevData || [])]);
     dispatch(updateSiteNotation([newNotation, ...(formData || [])]));
     dispatch(

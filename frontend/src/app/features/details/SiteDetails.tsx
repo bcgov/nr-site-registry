@@ -30,7 +30,10 @@ import {
 } from '../site/dto/SiteSlice';
 import { AppDispatch } from '../../Store';
 import NavigationPills from '../../components/navigation/navigationpills/NavigationPills';
-import { getSiteTabCatalog } from './navigation/siteTabCatalog';
+import {
+  getSiteTabCatalog,
+  shouldShowUpdatesTab,
+} from './navigation/siteTabCatalog';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import DownloadSitePdfButton from './pdf/DownloadSitePdfButton';
 import { useSiteDetailsPdfData } from './pdf/useSiteDetailsPdfData';
@@ -255,17 +258,14 @@ const SiteDetails = () => {
   }, [auth.user]);
 
   useEffect(() => {
-    if (
-      isUserOfType(UserRoleType.SR) &&
-      !hasNoPendingUpdatesFromState &&
-      viewMode !== SiteDetailsMode.EditMode &&
-      (!isUserOfType(UserRoleType.INTERNAL) ||
-        viewMode === SiteDetailsMode.SRMode)
-    ) {
-      SetNavComponents(getSiteTabCatalog(true));
-    } else {
-      SetNavComponents(getSiteTabCatalog(false));
-    }
+    SetNavComponents(
+      getSiteTabCatalog(
+        shouldShowUpdatesTab({
+          hasPendingUpdates: !hasNoPendingUpdatesFromState,
+          mode: viewMode,
+        }),
+      ),
+    );
   }, [hasNoPendingUpdatesFromState]);
 
   useEffect(() => {
@@ -437,16 +437,14 @@ const SiteDetails = () => {
 
   useEffect(() => {
     setViewMode(mode);
-    if (
-      isUserOfType(UserRoleType.SR) &&
-      !hasNoPendingUpdatesFromState &&
-      mode !== SiteDetailsMode.EditMode &&
-      (!isUserOfType(UserRoleType.INTERNAL) || mode === SiteDetailsMode.SRMode)
-    ) {
-      SetNavComponents(getSiteTabCatalog(true));
-    } else {
-      SetNavComponents(getSiteTabCatalog(false));
-    }
+    SetNavComponents(
+      getSiteTabCatalog(
+        shouldShowUpdatesTab({
+          hasPendingUpdates: !hasNoPendingUpdatesFromState,
+          mode,
+        }),
+      ),
+    );
   }, [mode]);
 
   useEffect(() => {

@@ -11,6 +11,7 @@ import Participants from '../participants/Participant';
 import SRUpdates from '../srUpdates/srUpdates';
 import Summary from '../summary/Summary';
 import { DEFAULT_SITE_TAB, isSiteTabPath, SiteTabPath } from './siteTabCatalog';
+import SiteTabAccessGate from './SiteTabAccessGate';
 
 const SITE_TAB_VIEWS: Record<SiteTabPath, ComponentType> = {
   summary: Summary,
@@ -42,7 +43,11 @@ const SiteDetailsTabRouter = () => {
   }
 
   const TabView = SITE_TAB_VIEWS[tab];
-  return <TabView />;
+  return (
+    <SiteTabAccessGate tab={tab}>
+      <TabView />
+    </SiteTabAccessGate>
+  );
 };
 
 export default SiteDetailsTabRouter;

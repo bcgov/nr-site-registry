@@ -12,14 +12,15 @@ import {
   AuthGuard,
   KeycloakConnectModule,
   ResourceGuard,
-  RoleGuard,
 } from 'nest-keycloak-connect';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { CustomExceptionFilter } from './app/filters/customExceptionFilters';
 import { LatLngTupleScalar } from './app/scalars/latLngTuple';
 import { MetricsModule } from './app/metrics/metrics.module';
 import { GraphqlMetricsPlugin } from './app/metrics/graphql-metrics.plugin';
+import { SiteRoleGuard } from './app/auth/site-role.guard';
 
 /**
  * Application Module Wrapping All Functionality For User Micro Service
@@ -27,6 +28,7 @@ import { GraphqlMetricsPlugin } from './app/metrics/graphql-metrics.plugin';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    JwtModule.register({}),
     KeycloakConnectModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -65,7 +67,7 @@ import { GraphqlMetricsPlugin } from './app/metrics/graphql-metrics.plugin';
           federation: 2,
           path: process.env.GRAPHQL_SCHEMA_FILE_PATH || './schema.graphql',
         },
-        context: () => ({}),
+        context: ({ req }) => ({ req }),
         plugins: [graphqlMetricsPlugin],
       }),
     }),
@@ -84,7 +86,7 @@ import { GraphqlMetricsPlugin } from './app/metrics/graphql-metrics.plugin';
     },
     {
       provide: APP_GUARD,
-      useClass: RoleGuard,
+      useClass: SiteRoleGuard,
     },
     {
       provide: APP_FILTER,

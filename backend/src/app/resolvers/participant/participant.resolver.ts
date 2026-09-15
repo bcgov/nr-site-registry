@@ -3,13 +3,13 @@ import { Args, Query, Resolver } from '@nestjs/graphql';
 import {
   AuthenticatedUser,
   RoleMatchingMode,
-  Roles,
 } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { SiteParticsDto, SiteParticsResponse } from '../../dto/sitePartics.dto';
 import { ParticipantService } from '../../services/participant/participant.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { CustomRoles } from '../../common/role';
+import { SiteRoles } from '../../auth/site-roles.decorator';
 import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => SiteParticsDto)
@@ -22,7 +22,7 @@ export class ParticipantResolver {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,

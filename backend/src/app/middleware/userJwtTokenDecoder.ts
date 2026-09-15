@@ -22,13 +22,20 @@ export class UserJWTTokenDecoderMiddleware implements NestMiddleware {
     if (token && token !== 'undefined' && token.trim() !== '') {
       try {
         const decodedToken: any = this.jwtService.decode(token);
-        const { email, sub, identity_provider, given_name, family_name } =
-          decodedToken;
+        const { email, sub, given_name, family_name } = decodedToken;
+        const identityProvider =
+          decodedToken.identity_provider ?? decodedToken.loginSource;
+        // The application expects `user.profile.identity_provider` to be in
+        // lower case for legacy development reasons. Rather than changing the
+        // check everywhere, we normalize it here.
+        const normalizedIdentityProvider = identityProvider
+          ? String(identityProvider).toLowerCase()
+          : undefined;
 
         await this.userService.createUserIfNotFound(
           email,
           sub,
-          identity_provider,
+          normalizedIdentityProvider,
           given_name,
           family_name,
         );

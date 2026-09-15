@@ -1,9 +1,6 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { HttpStatus, UsePipes } from '@nestjs/common';
-import {
-  AuthenticatedUser,
-  RoleMatchingMode,
-} from 'nest-keycloak-connect';
+import { AuthenticatedUser, RoleMatchingMode } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SiteProfiles } from '../../entities/siteProfiles.entity';

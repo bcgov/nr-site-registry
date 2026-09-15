@@ -1,9 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
-import {
-  AuthenticatedUser,
-  RoleMatchingMode,
-} from 'nest-keycloak-connect';
+import { AuthenticatedUser, RoleMatchingMode } from 'nest-keycloak-connect';
 import {} from '../../dto/recentView.dto';
 import { CustomRoles } from '../../common/role';
 import { SiteRoles } from '../../auth/site-roles.decorator';

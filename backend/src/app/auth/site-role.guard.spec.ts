@@ -1,6 +1,5 @@
 import { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
 import { RoleMatchingMode } from 'nest-keycloak-connect';
 import { SiteRoleGuard } from './site-role.guard';
 
@@ -15,18 +14,12 @@ describe('SiteRoleGuard', () => {
       })),
     }) as any;
 
-  const createGuard = (rolesOptions: any, decodedToken: any = undefined) => {
+  const createGuard = (rolesOptions: any) => {
     const reflector = {
       getAllAndOverride: jest.fn(() => rolesOptions),
     } as unknown as Reflector;
-    const jwtService = {
-      decode: jest.fn(() => decodedToken),
-    } as unknown as JwtService;
 
-    return {
-      guard: new SiteRoleGuard(reflector, jwtService),
-      jwtService,
-    };
+    return { guard: new SiteRoleGuard(reflector) };
   };
 
   it('allows requests without site role metadata', () => {
@@ -86,18 +79,17 @@ describe('SiteRoleGuard', () => {
     ).toBe(true);
   });
 
-  it('decodes bearer tokens when request user data is unavailable', () => {
-    const { guard, jwtService } = createGuard(
-      { roles: ['site-external-user'], mode: RoleMatchingMode.ANY },
-      { site_roles: ['site-external-user'] },
-    );
+  it('denies requests when no authenticated user is present', () => {
+    const { guard } = createGuard({
+      roles: ['site-external-user'],
+      mode: RoleMatchingMode.ANY,
+    });
 
     expect(
       guard.canActivate(
         createContext({ headers: { authorization: 'Bearer test-token' } }),
       ),
-    ).toBe(true);
-    expect(jwtService.decode).toHaveBeenCalledWith('test-token');
+    ).toBe(false);
   });
 
   it('normalizes loginSource to identity_provider for downstream services', () => {

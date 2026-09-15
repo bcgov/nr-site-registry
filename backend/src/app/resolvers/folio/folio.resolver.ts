@@ -1,9 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
-import {
-  AuthenticatedUser,
-  RoleMatchingMode,
-} from 'nest-keycloak-connect';
+import { AuthenticatedUser, RoleMatchingMode } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { Folio } from '../../entities/folio.entity';

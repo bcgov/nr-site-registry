@@ -1,18 +1,15 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { JwtService } from '@nestjs/jwt';
 import { RoleMatchingMode } from 'nest-keycloak-connect';
 import { SITE_ROLES_KEY, SiteRolesOptions } from './site-roles.decorator';
 
 // This replaces the nest-keycloak-connect @Roles guard with a custom
-// implementation for site roles.
+// implementation for site roles. Must run after the package AuthGuard, which
+// verifies the token and populates request.user.
 @Injectable()
 export class SiteRoleGuard implements CanActivate {
-  constructor(
-    private readonly reflector: Reflector,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
     const request = this.getRequest(context);
@@ -46,19 +43,12 @@ export class SiteRoleGuard implements CanActivate {
   }
 
   private getTokenData(request: any): any {
-    if (request?.user) {
-      this.normalizeUserClaims(request.user);
-      return request.user;
-    }
-
-    const token = request?.headers?.authorization?.split(' ')[1];
-    if (!token || token === 'undefined' || token.trim() === '') {
+    if (!request?.user) {
       return undefined;
     }
 
-    const decodedToken = this.jwtService.decode(token);
-    this.normalizeUserClaims(decodedToken);
-    return decodedToken;
+    this.normalizeUserClaims(request.user);
+    return request.user;
   }
 
   private normalizeUserClaims(user: any): void {

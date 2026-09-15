@@ -1,9 +1,6 @@
 import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
-import {
-  AuthenticatedUser,
-  RoleMatchingMode,
-} from 'nest-keycloak-connect';
+import { AuthenticatedUser, RoleMatchingMode } from 'nest-keycloak-connect';
 import { CreateSnapshotDto, SnapshotResponse } from '../../dto/snapshot.dto';
 import { BannerTypeResponse } from '../../dto/response/bannerTypeResponse';
 import { PurchasedSitesResponse } from '../../dto/purchasedSite.dto';

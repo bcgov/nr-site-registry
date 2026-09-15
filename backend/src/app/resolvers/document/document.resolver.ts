@@ -1,10 +1,7 @@
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { SiteDocs } from '../../entities/siteDocs.entity';
 import { DocumentService } from '../../services/document/document.service';
-import {
-  AuthenticatedUser,
-  RoleMatchingMode,
-} from 'nest-keycloak-connect';
+import { AuthenticatedUser, RoleMatchingMode } from 'nest-keycloak-connect';
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { HttpStatus, UsePipes } from '@nestjs/common';

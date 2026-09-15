@@ -1,5 +1,5 @@
 import { Query, Resolver } from '@nestjs/graphql';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import { RoleMatchingMode } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { LandUseCd } from '../../entities/landUseCd.entity';
 import { LandUseCodeService } from '../../services/landUseCode/landUseCode.service';
@@ -7,6 +7,7 @@ import { LandUseCodeResponse } from '../../dto/landUseCodeResponse.dto';
 import { LoggerService } from '../../logger/logger.service';
 import { HttpStatus } from '@nestjs/common';
 import { CustomRoles } from 'src/app/common/role';
+import { SiteRoles } from '../../auth/site-roles.decorator';
 
 @Resolver(() => LandUseCd)
 export class LandUseCodeResolver {
@@ -18,7 +19,7 @@ export class LandUseCodeResolver {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,

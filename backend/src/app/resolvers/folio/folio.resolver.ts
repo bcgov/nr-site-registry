@@ -1,10 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
-import {
-  AuthenticatedUser,
-  RoleMatchingMode,
-  Roles,
-} from 'nest-keycloak-connect';
+import { AuthenticatedUser, RoleMatchingMode } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { Folio } from '../../entities/folio.entity';
@@ -21,6 +17,7 @@ import {
 } from '../../dto/folioContent.dto';
 import { FolioContents } from '../../entities/folioContents.entity';
 import { CustomRoles } from '../../common/role';
+import { SiteRoles } from '../../auth/site-roles.decorator';
 import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => Folio)
@@ -34,7 +31,7 @@ export class FolioResolver {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
+  @SiteRoles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Query(() => FolioResponse, { name: 'getFolioItemsForUser' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getFolioItemsForUser(
@@ -65,7 +62,7 @@ export class FolioResolver {
     }
   }
 
-  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
+  @SiteRoles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Query(() => FolioContentResponse, { name: 'getSitesForFolio' })
   @UsePipes(new GenericValidationPipe()) // Apply generic validation pipe
   async getSitesForFolio(
@@ -100,7 +97,7 @@ export class FolioResolver {
     }
   }
 
-  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
+  @SiteRoles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => FolioResponse, { name: 'addFolioItem' })
   async addFolioItem(
     @Args('folioDTO', { type: () => FolioDTO }, new ValidationPipe())
@@ -132,7 +129,7 @@ export class FolioResolver {
     }
   }
 
-  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
+  @SiteRoles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => FolioResponse, { name: 'addSiteToFolio' })
   async addSiteToFolio(
     @Args(
@@ -171,7 +168,7 @@ export class FolioResolver {
     }
   }
 
-  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
+  @SiteRoles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => FolioResponse, { name: 'updateFolioItem' })
   async updateFolioItem(
     @Args('folioDTO', { type: () => [FolioDTO] }, new ValidationPipe())
@@ -203,7 +200,7 @@ export class FolioResolver {
     }
   }
 
-  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
+  @SiteRoles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => FolioResponse, { name: 'deleteFolioItem' })
   async deleteFolio(
     @Args('folioId', new ValidationPipe())
@@ -233,7 +230,7 @@ export class FolioResolver {
     }
   }
 
-  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
+  @SiteRoles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => FolioResponse, { name: 'deleteSitesInFolio' })
   async deleteSitesInFolio(
     @Args('folioDTO', { type: () => [FolioContentDTO] }, new ValidationPipe())

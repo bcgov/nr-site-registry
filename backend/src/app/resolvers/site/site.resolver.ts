@@ -12,7 +12,6 @@ import {
   AuthenticatedUser,
   Resource,
   RoleMatchingMode,
-  Roles,
 } from 'nest-keycloak-connect';
 import {
   FetchSiteDetail,
@@ -28,6 +27,7 @@ import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
 import { CustomRoles } from '../../common/role';
+import { SiteRoles } from '../../auth/site-roles.decorator';
 import { LoggerService } from '../../logger/logger.service';
 import {
   BulkApproveRejectChangesDTO,
@@ -67,7 +67,7 @@ export class SiteResolver {
   /**
    * Find All Sites
    */
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,
@@ -80,7 +80,7 @@ export class SiteResolver {
     return this.siteService.findAll();
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,
@@ -115,7 +115,7 @@ export class SiteResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,
@@ -161,7 +161,7 @@ export class SiteResolver {
    * @param pageSize size of the page
    * @returns sites where id or address matches the search param along with pagination params
    */
-  @Roles({
+  @SiteRoles({
     roles: [CustomRoles.SiteRegistrar],
     mode: RoleMatchingMode.ANY,
   })
@@ -204,7 +204,7 @@ export class SiteResolver {
     );
   }
 
-  @Roles({ roles: [CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
+  @SiteRoles({ roles: [CustomRoles.SiteRegistrar], mode: RoleMatchingMode.ANY })
   @Mutation(() => SRApproveRejectResponse, { name: 'bulkAproveRejectChanges' })
   async bulkAproveRejectChanges(
     @Args('approveRejectDTO', { type: () => BulkApproveRejectChangesDTO })
@@ -241,7 +241,7 @@ export class SiteResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,
@@ -284,7 +284,7 @@ export class SiteResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,
@@ -313,7 +313,7 @@ export class SiteResolver {
   /**
    * Soft delete a site
    */
-  @Roles({
+  @SiteRoles({
     roles: [CustomRoles.SiteRegistrar, CustomRoles.Internal],
     mode: RoleMatchingMode.ANY,
   })

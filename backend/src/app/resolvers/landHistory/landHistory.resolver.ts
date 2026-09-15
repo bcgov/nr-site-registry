@@ -1,9 +1,5 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
-import {
-  AuthenticatedUser,
-  RoleMatchingMode,
-  Roles,
-} from 'nest-keycloak-connect';
+import { AuthenticatedUser, RoleMatchingMode } from 'nest-keycloak-connect';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { LandHistories } from '../../entities/landHistories.entity';
 import { LandHistoryResponse } from '../../dto/landHistory.dto';
@@ -11,6 +7,7 @@ import { LandHistoryService } from '../../services/landHistory/landHistory.servi
 import { LoggerService } from '../../logger/logger.service';
 import { HttpStatus } from '@nestjs/common';
 import { CustomRoles } from '../../common/role';
+import { SiteRoles } from '../../auth/site-roles.decorator';
 type SortDirection = 'ASC' | 'DESC';
 
 @Resolver(() => LandHistories)
@@ -23,7 +20,7 @@ export class LandHistoryResolver {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,

@@ -231,7 +231,7 @@ export const isUserOfType = (roleType: UserRoleType) => {
   const user = getUser();
 
   if (user !== null) {
-    const userRoles: any = user.profile?.role;
+    const userRoles: any = user.profile?.site_roles;
     switch (roleType) {
       case 'client':
         const externalUserRole =

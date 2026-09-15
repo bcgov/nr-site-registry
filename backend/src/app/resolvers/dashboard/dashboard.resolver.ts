@@ -1,12 +1,13 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
-import { RoleMatchingMode, Roles } from 'nest-keycloak-connect';
+import { RoleMatchingMode } from 'nest-keycloak-connect';
 import { RecentViews } from '../../entities/recentViews.entity';
 import { DashboardService } from '../../services/dashboard/dashboard.service';
 import { RecentViewDto, RecentViewResponse } from '../../dto/recentView.dto';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { CustomRoles } from '../../common/role';
+import { SiteRoles } from '../../auth/site-roles.decorator';
 import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => RecentViews)
@@ -19,7 +20,7 @@ export class DashboardResolver {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,
@@ -59,7 +60,7 @@ export class DashboardResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,

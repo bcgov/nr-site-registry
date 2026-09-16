@@ -685,6 +685,48 @@ export class SiteService {
     return response;
   }
 
+  /**
+   * Find a site by ID for a trusted service caller.
+   * No IDIR/public visibility filter - the caller is not a person.
+   */
+  async findSiteBySiteIdForService(siteId: string) {
+    this.sitesLogger.log('SiteService.findSiteBySiteIdForService() start');
+    const response = new FetchSiteDetailsResponse();
+    response.httpStatusCode = 200;
+
+    const siteStatus = await this.siteRepository.findOne({
+      where: { id: siteId },
+      select: ['id', 'whoDeleted'],
+    });
+
+    if (!siteStatus || siteStatus.whoDeleted) {
+      response.data = null;
+      this.sitesLogger.log(
+        `SiteService.findSiteBySiteIdForService() blocked deleted/missing site: ${siteId}`,
+      );
+      this.sitesLogger.log('SiteService.findSiteBySiteIdForService() end');
+      return response;
+    }
+
+    const result = await this.siteRepository.findOne({
+      where: { id: siteId },
+      relations: [
+        'siteAssocs',
+        'siteAssocs.siteIdAssociatedWith2',
+        'bcerCode2',
+        'landHistories',
+        'landHistories.landUse',
+      ],
+    });
+    if (result) {
+      result.landHistories = result.landHistories ?? [];
+    }
+    response.data = result ? result : null;
+
+    this.sitesLogger.log('SiteService.findSiteBySiteIdForService() end');
+    return response;
+  }
+
   async searchSiteIds(searchParam: string) {
     this.sitesLogger.log('SiteService.searchSiteIds() start');
     this.sitesLogger.debug('SiteService.searchSiteIds() start');

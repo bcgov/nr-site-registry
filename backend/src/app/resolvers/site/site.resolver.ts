@@ -27,7 +27,8 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
-import { CustomRoles } from '../../common/role';
+import { CustomRoles, keycloakRoleAliases } from '../../common/role';
+import { assertAllowedServiceClient } from '../../common/serviceClientAllowlist';
 import { LoggerService } from '../../logger/logger.service';
 import {
   BulkApproveRejectChangesDTO,
@@ -308,6 +309,22 @@ export class SiteResolver {
     );
 
     return this.siteService.findSiteBySiteId(siteId, showPending, userInfo);
+  }
+
+  @Roles({
+    roles: keycloakRoleAliases(CustomRoles.ServiceCaller),
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => FetchSiteDetail, { name: 'findSiteBySiteIdForService' })
+  findSiteBySiteIdForService(
+    @Args('siteId', { type: () => String }) siteId: string,
+    @AuthenticatedUser() userInfo,
+  ) {
+    this.sitesLogger.log(
+      'SiteResolver.findSiteBySiteIdForService() start siteId:' + ' ' + siteId,
+    );
+    assertAllowedServiceClient(userInfo);
+    return this.siteService.findSiteBySiteIdForService(siteId);
   }
 
   /**

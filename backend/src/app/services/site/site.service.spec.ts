@@ -688,6 +688,81 @@ describe('SiteService', () => {
     });
   });
 
+  describe('findSiteBySiteIdForService', () => {
+    const relations = [
+      'siteAssocs',
+      'siteAssocs.siteIdAssociatedWith2',
+      'bcerCode2',
+      'landHistories',
+      'landHistories.landUse',
+    ];
+
+    it('loads a non-public site by id without srAction or snapshot filtering', async () => {
+      const siteId = '555';
+      const privateSite = {
+        id: siteId,
+        srAction: SRApprovalStatusEnum.PRIVATE,
+        whoDeleted: null,
+      };
+      (siteRepository.findOne as jest.Mock)
+        .mockResolvedValueOnce({ id: siteId, whoDeleted: null })
+        .mockResolvedValueOnce(privateSite);
+
+      const result = await siteService.findSiteBySiteIdForService(siteId);
+
+      expect(siteRepository.findOne).toHaveBeenNthCalledWith(2, {
+        where: { id: siteId },
+        relations,
+      });
+      expect(result.data).toEqual(privateSite);
+      expect(
+        (snapShotService as any).getMostRecentSnapshot,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('returns land uses including non-public records', async () => {
+      const siteId = '555';
+      const privateLandUse = {
+        lutCode: 'IND',
+        note: 'private industry use',
+        srAction: SRApprovalStatusEnum.PRIVATE,
+        landUse: { code: 'IND', description: 'Industrial' },
+      };
+      const siteWithLandUses = {
+        id: siteId,
+        whoDeleted: null,
+        landHistories: [privateLandUse],
+      };
+      (siteRepository.findOne as jest.Mock)
+        .mockResolvedValueOnce({ id: siteId, whoDeleted: null })
+        .mockResolvedValueOnce(siteWithLandUses);
+
+      const result = await siteService.findSiteBySiteIdForService(siteId);
+
+      expect(result.data).toMatchObject({ landHistories: [privateLandUse] });
+    });
+
+    it('returns null data for deleted sites', async () => {
+      (siteRepository.findOne as jest.Mock).mockResolvedValueOnce({
+        id: '2002',
+        whoDeleted: 'tester',
+      });
+
+      const result = await siteService.findSiteBySiteIdForService('2002');
+
+      expect(result.data).toBeNull();
+      expect(siteRepository.findOne).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns null data for missing sites', async () => {
+      (siteRepository.findOne as jest.Mock).mockResolvedValueOnce(null);
+
+      const result = await siteService.findSiteBySiteIdForService('999999');
+
+      expect(result.data).toBeNull();
+    });
+  });
+
   describe('updateSiteRegistryRecord', () => {
     beforeEach(() => {
       entityManager.save = jest.fn();

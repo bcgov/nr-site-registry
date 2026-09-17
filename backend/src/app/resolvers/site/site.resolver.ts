@@ -27,7 +27,12 @@ import { GenericResponseProvider } from '../../dto/response/genericResponseProvi
 import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { SaveSiteDetailsDTO } from '../../dto/saveSiteDetails.dto';
-import { CustomRoles } from '../../common/role';
+import {
+  SaveSiteDisclosureForServiceResponse,
+  SiteDisclosureServiceInputDTO,
+} from '../../dto/disclosure.dto';
+import { CustomRoles, keycloakRoleAliases } from '../../common/role';
+import { assertAllowedServiceClient } from '../../common/serviceClientAllowlist';
 import { LoggerService } from '../../logger/logger.service';
 import {
   BulkApproveRejectChangesDTO,
@@ -308,6 +313,52 @@ export class SiteResolver {
     );
 
     return this.siteService.findSiteBySiteId(siteId, showPending, userInfo);
+  }
+
+  /**
+   * Find a site by ID for an allowlisted service caller.
+   * Guards on the service-caller realm role plus an authorized-party allowlist.
+   */
+  @Roles({
+    roles: keycloakRoleAliases(CustomRoles.ServiceCaller),
+    mode: RoleMatchingMode.ANY,
+  })
+  @Query(() => FetchSiteDetail, { name: 'findSiteBySiteIdForService' })
+  findSiteBySiteIdForService(
+    @Args('siteId', { type: () => String }) siteId: string,
+    @AuthenticatedUser() userInfo,
+  ) {
+    this.sitesLogger.log(
+      'SiteResolver.findSiteBySiteIdForService() start siteId:' + ' ' + siteId,
+    );
+    assertAllowedServiceClient(userInfo);
+    return this.siteService.findSiteBySiteIdForService(siteId);
+  }
+
+  /**
+   * Add a site disclosure for an allowlisted service caller.
+   * Add-only: never updates or deletes existing disclosures.
+   */
+  @Roles({
+    roles: keycloakRoleAliases(CustomRoles.ServiceCaller),
+    mode: RoleMatchingMode.ANY,
+  })
+  @Mutation(() => SaveSiteDisclosureForServiceResponse, {
+    name: 'saveSiteDisclosureForService',
+  })
+  saveSiteDisclosureForService(
+    @Args('siteId', { type: () => String }) siteId: string,
+    @Args('input', { type: () => SiteDisclosureServiceInputDTO })
+    input: SiteDisclosureServiceInputDTO,
+    @AuthenticatedUser() userInfo,
+  ) {
+    this.sitesLogger.log(
+      'SiteResolver.saveSiteDisclosureForService() start siteId:' +
+        ' ' +
+        siteId,
+    );
+    assertAllowedServiceClient(userInfo);
+    return this.siteService.saveSiteDisclosureForService(siteId, input);
   }
 
   /**

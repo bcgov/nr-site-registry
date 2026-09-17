@@ -123,6 +123,10 @@ spec:
               value: "7d"
             - name: GRAPHQL_SCHEMA_FILE_PATH
               value: "/graphql/schema.graphql"
+            - name: ROLES_SERVICE_CALLER
+              value: "site-service-caller"
+            - name: SITE_SERVICE_ALLOWED_CLIENT_IDS
+              value: "site-service"
           ports:
             - name: http
               containerPort: 3000

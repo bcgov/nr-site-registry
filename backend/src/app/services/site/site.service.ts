@@ -61,6 +61,21 @@ import { SiteInsightsDto } from '../../dto/siteInsights.dto';
 import { RadiusSearchParams } from '../../dto/radiusSearchParams.dto';
 import { SiteProfileLandUses } from '../../entities/siteProfileLandUses.entity';
 import { RecentViews } from '../../entities/recentViews.entity';
+import {
+  SaveSiteDisclosureForServiceResponse,
+  SiteDisclosureServiceInputDTO,
+} from '../../dto/disclosure.dto';
+import {
+  SITE_DISCLOSURE_ERROR_CODES,
+  SiteDisclosureDuplicateException,
+  isSiteDisclosureDuplicateViolation,
+} from '../../common/siteDisclosureErrors';
+
+/**
+ * Stable system actor stamped on service-created disclosure audit columns.
+ * who_created on site_profile_land_uses is capped at 16 chars, so keep it short.
+ */
+const SYSTEM_ACTOR = 'CATS';
 
 /**
  * Nestjs Service For Region Entity
@@ -682,6 +697,49 @@ export class SiteService {
     this.sitesLogger.log('SiteService.findSiteBySiteId() end');
     this.sitesLogger.debug('SiteService.findSiteBySiteId() end');
 
+    return response;
+  }
+
+  /**
+   * Find a site by ID for a trusted service caller.
+   * No IDIR/public visibility filter - the caller is not a person.
+   * Unknown or soft-deleted sites return null.
+   */
+  async findSiteBySiteIdForService(siteId: string) {
+    this.sitesLogger.log('SiteService.findSiteBySiteIdForService() start');
+    const response = new FetchSiteDetail();
+    response.httpStatusCode = 200;
+
+    const siteStatus = await this.siteRepository.findOne({
+      where: { id: siteId },
+      select: ['id', 'whoDeleted'],
+    });
+
+    if (!siteStatus || siteStatus.whoDeleted) {
+      response.data = null;
+      this.sitesLogger.log(
+        `SiteService.findSiteBySiteIdForService() blocked deleted/missing site: ${siteId}`,
+      );
+      this.sitesLogger.log('SiteService.findSiteBySiteIdForService() end');
+      return response;
+    }
+
+    const result = await this.siteRepository.findOne({
+      where: { id: siteId },
+      relations: [
+        'siteAssocs',
+        'siteAssocs.siteIdAssociatedWith2',
+        'bcerCode2',
+        'landHistories',
+        'landHistories.landUse',
+      ],
+    });
+    if (result) {
+      result.landHistories = result.landHistories ?? [];
+    }
+    response.data = result ? result : null;
+
+    this.sitesLogger.log('SiteService.findSiteBySiteIdForService() end');
     return response;
   }
 
@@ -1888,7 +1946,7 @@ export class SiteService {
     userInfo: any,
     transactionalEntityManager: EntityManager,
     siteId: string,
-  ) {
+  ): Promise<SiteProfiles[]> {
     try {
       if (siteDisclosure?.length > 0) {
         const disclosurePromises = siteDisclosure?.map(async (disclosure) => {
@@ -2010,15 +2068,113 @@ export class SiteService {
               transactionalEntityManager,
             );
           }
+
+          return siteProfile;
         });
 
         // Handle siteProfileSchedule2Refs (backed by SiteProfileLandUses)
-        await Promise.all(disclosurePromises);
+        const savedProfiles = await Promise.all(disclosurePromises);
+        return savedProfiles.filter((profile) => !!profile);
       }
+      return [];
     } catch (error) {
+      if (isSiteDisclosureDuplicateViolation(error)) {
+        throw new SiteDisclosureDuplicateException();
+      }
       throw new HttpException(
         `Failed to process site disclosure.`,
         HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  /**
+   * Service-to-service disclosure add.
+   *
+   * Reuses the human "Add disclosure" path (`processSiteDisclosure`), but:
+   *  - takes only the SDS-mapped fields,
+   *  - lets SITE generate the record identity and audit columns,
+   *  - stamps a stable system actor on the audit columns,
+   *  - returns a typed duplicate error when (site_id, date_completed) collides.
+   * Existing disclosures are never updated or deleted.
+   */
+  async saveSiteDisclosureForService(
+    siteId: string,
+    input: SiteDisclosureServiceInputDTO,
+  ): Promise<SaveSiteDisclosureForServiceResponse> {
+    this.sitesLogger.log(
+      'SiteService.saveSiteDisclosureForService() start siteId:' +
+        ' ' +
+        siteId,
+    );
+
+    const schedule2Refs = (input?.schedule2ReferenceCodes ?? [])
+      .filter((code) => !!code)
+      .map((schedule2ReferenceCode) => ({
+        apiAction: UserActionEnum.ADDED,
+        schedule2ReferenceCode,
+        srAction: SRApprovalStatusEnum.PENDING,
+      }));
+
+    const disclosurePayload = {
+      apiAction: UserActionEnum.ADDED,
+      dateCompleted: input?.dateCompleted,
+      siteRegDateRecd: input?.siteRegDateRecd ?? null,
+      localAuthDateRecd: input?.localAuthDateRecd ?? null,
+      rwmDateDecision: input?.rwmDateDecision ?? null,
+      plannedActivityComment: input?.plannedActivityComment ?? null,
+      siteDisclosureComment: input?.siteDisclosureComment ?? null,
+      govDocumentsComment: input?.govDocumentsComment ?? null,
+      srAction: SRApprovalStatusEnum.PENDING,
+      siteProfileSchedule2Refs: schedule2Refs,
+    };
+
+    const systemUser = { givenName: SYSTEM_ACTOR };
+
+    try {
+      let createdProfile: SiteProfiles | null = null;
+      await this.entityManager.transaction(async (transactionalEntityManager) => {
+        const savedProfiles = await this.processSiteDisclosure(
+          [disclosurePayload],
+          systemUser,
+          transactionalEntityManager,
+          siteId,
+        );
+        createdProfile = savedProfiles[0] ?? null;
+      });
+
+      const response = new SaveSiteDisclosureForServiceResponse(
+        'Site disclosure added successfully',
+        HttpStatus.OK,
+        true,
+        createdProfile,
+      );
+      this.sitesLogger.log('SiteService.saveSiteDisclosureForService() end');
+      return response;
+    } catch (error) {
+      if (
+        error instanceof SiteDisclosureDuplicateException ||
+        isSiteDisclosureDuplicateViolation(error)
+      ) {
+        this.sitesLogger.warn(
+          `SiteService.saveSiteDisclosureForService() duplicate disclosure for site ${siteId}`,
+        );
+        return new SaveSiteDisclosureForServiceResponse(
+          error.message,
+          HttpStatus.CONFLICT,
+          false,
+          null,
+          SITE_DISCLOSURE_ERROR_CODES.DUPLICATE_DATE_COMPLETED,
+        );
+      }
+
+      this.sitesLogger.error(
+        'Exception occured in SiteService.saveSiteDisclosureForService()',
+        JSON.stringify(error),
+      );
+      throw new HttpException(
+        'Failed to add site disclosure.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

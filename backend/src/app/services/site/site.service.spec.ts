@@ -1284,6 +1284,211 @@ describe('SiteService', () => {
     });
   });
 
+  describe('findSiteBySiteIdForService', () => {
+    const relations = [
+      'siteAssocs',
+      'siteAssocs.siteIdAssociatedWith2',
+      'bcerCode2',
+      'landHistories',
+      'landHistories.landUse',
+    ];
+
+    it('loads a non-public site by id without snapshot filtering', async () => {
+      const siteId = '555';
+      const privateSite = {
+        id: siteId,
+        srAction: SRApprovalStatusEnum.PRIVATE,
+        whoDeleted: null,
+        landHistories: [],
+      };
+      (siteRepository.findOne as jest.Mock)
+        .mockResolvedValueOnce({ id: siteId, whoDeleted: null })
+        .mockResolvedValueOnce(privateSite);
+
+      const result = await siteService.findSiteBySiteIdForService(siteId);
+
+      expect(siteRepository.findOne).toHaveBeenNthCalledWith(2, {
+        where: { id: siteId },
+        relations,
+      });
+      expect(result.data).toEqual(privateSite);
+      expect(
+        (snapShotService as any).getMostRecentSnapshot,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('returns land uses including non-public records', async () => {
+      const siteId = '555';
+      const privateLandUse = {
+        lutCode: 'IND',
+        note: 'private industry use',
+        srAction: SRApprovalStatusEnum.PRIVATE,
+        landUse: { code: 'IND', description: 'Industrial' },
+      };
+      const siteWithLandUses = {
+        id: siteId,
+        whoDeleted: null,
+        landHistories: [privateLandUse],
+      };
+      (siteRepository.findOne as jest.Mock)
+        .mockResolvedValueOnce({ id: siteId, whoDeleted: null })
+        .mockResolvedValueOnce(siteWithLandUses);
+
+      const result = await siteService.findSiteBySiteIdForService(siteId);
+
+      expect(result.data).toMatchObject({ landHistories: [privateLandUse] });
+    });
+
+    it('returns null data for deleted sites', async () => {
+      (siteRepository.findOne as jest.Mock).mockResolvedValueOnce({
+        id: '2002',
+        whoDeleted: 'tester',
+      });
+
+      const result = await siteService.findSiteBySiteIdForService('2002');
+
+      expect(result.data).toBeNull();
+      expect(siteRepository.findOne).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns null data for missing sites', async () => {
+      (siteRepository.findOne as jest.Mock).mockResolvedValueOnce(null);
+
+      const result = await siteService.findSiteBySiteIdForService('999999');
+
+      expect(result.data).toBeNull();
+    });
+  });
+
+  describe('saveSiteDisclosureForService', () => {
+    const dateCompleted = new Date('2024-06-01');
+
+    const primeTransaction = () => {
+      (entityManager.transaction as jest.Mock).mockImplementationOnce(
+        async (cb: any) => cb(entityManager),
+      );
+    };
+
+    const primeManager = () => {
+      (entityManager.create as jest.Mock) = jest.fn(
+        (_entity: any, data: any) => ({ ...data, id: 'new-profile-uuid' }),
+      );
+      (entityManager.save as jest.Mock) = jest.fn(
+        async (_entity: any, data: any) => data,
+      );
+      (entityManager.find as jest.Mock) = jest.fn(async () => []);
+    };
+
+    it('adds a disclosure with a stable system actor and Schedule 2 rows', async () => {
+      primeTransaction();
+      primeManager();
+
+      const response = await siteService.saveSiteDisclosureForService('555', {
+        dateCompleted,
+        siteRegDateRecd: null,
+        localAuthDateRecd: null,
+        rwmDateDecision: null,
+        schedule2ReferenceCodes: ['AG'],
+        plannedActivityComment: 'planned',
+        siteDisclosureComment: 'disclosure',
+        govDocumentsComment: 'gov',
+      });
+
+      expect(response.success).toBe(true);
+      expect(response.httpStatusCode).toBe(200);
+      expect(response.data).toMatchObject({
+        id: 'new-profile-uuid',
+        siteId: '555',
+      });
+
+      const profileCreate = (entityManager.create as jest.Mock).mock.calls.find(
+        ([entity]) => entity === SiteProfiles,
+      );
+      expect(profileCreate[1]).toMatchObject({
+        siteId: '555',
+        dateCompleted,
+        userAction: UserActionEnum.ADDED,
+        srAction: SRApprovalStatusEnum.PENDING,
+        whoCreated: 'CATS',
+        whoUpdated: 'CATS',
+        plannedActivityComment: 'planned',
+        siteDisclosureComment: 'disclosure',
+        govDocumentsComment: 'gov',
+      });
+
+      const landUseSave = (entityManager.save as jest.Mock).mock.calls.find(
+        ([entity]) => entity === SiteProfileLandUses,
+      );
+      expect(landUseSave[1][0]).toMatchObject({
+        lutCode: 'AG',
+        siteId: '555',
+        srAction: SRApprovalStatusEnum.PENDING,
+        whoCreated: 'CATS',
+      });
+    });
+
+    it('never updates or deletes existing disclosures', async () => {
+      primeTransaction();
+      primeManager();
+      (entityManager.update as jest.Mock) = jest.fn();
+      (entityManager.delete as jest.Mock) = jest.fn();
+
+      await siteService.saveSiteDisclosureForService('555', { dateCompleted });
+
+      expect(entityManager.update).not.toHaveBeenCalled();
+      expect(entityManager.delete).not.toHaveBeenCalled();
+    });
+
+    it('does not persist unrelated profile columns', async () => {
+      primeTransaction();
+      primeManager();
+
+      await siteService.saveSiteDisclosureForService('555', {
+        dateCompleted,
+        siteAddress: '1 Fake St',
+        localAuthName: 'Should Not Persist',
+      } as any);
+
+      const profileCreate = (entityManager.create as jest.Mock).mock.calls.find(
+        ([entity]) => entity === SiteProfiles,
+      );
+      expect(profileCreate[1].siteAddress).toBeUndefined();
+      expect(profileCreate[1].localAuthName).toBeUndefined();
+    });
+
+    it('returns a typed duplicate error on unique (site_id, date_completed) violation', async () => {
+      primeTransaction();
+      primeManager();
+      const duplicateError: any = new Error('duplicate key value');
+      duplicateError.code = '23505';
+      duplicateError.constraint = 'site_profiles_pkey';
+      (entityManager.save as jest.Mock) = jest.fn(async (entity: any) => {
+        if (entity === SiteProfiles) throw duplicateError;
+        return [];
+      });
+
+      const response = await siteService.saveSiteDisclosureForService('555', {
+        dateCompleted,
+      });
+
+      expect(response.success).toBe(false);
+      expect(response.httpStatusCode).toBe(409);
+      expect(response.errorCode).toBe('DUPLICATE_DATE_COMPLETED');
+    });
+
+    it('throws a generic error for non-duplicate failures', async () => {
+      primeTransaction();
+      primeManager();
+      (entityManager.save as jest.Mock) = jest.fn(async () => {
+        throw new Error('boom');
+      });
+
+      await expect(
+        siteService.saveSiteDisclosureForService('555', { dateCompleted }),
+      ).rejects.toThrow('Failed to add site disclosure.');
+    });
+  });
+
   describe('processProfileLandUses (via processSiteDisclosure)', () => {
     it('should add a new land use when action is ADDED and lutCode does not exist', async () => {
       const profileDate = new Date('2020-01-01');

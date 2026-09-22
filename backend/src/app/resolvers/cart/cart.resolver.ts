@@ -1,12 +1,9 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
-import {
-  AuthenticatedUser,
-  RoleMatchingMode,
-  Roles,
-} from 'nest-keycloak-connect';
+import { AuthenticatedUser, RoleMatchingMode } from 'nest-keycloak-connect';
 import {} from '../../dto/recentView.dto';
 import { CustomRoles } from '../../common/role';
+import { SiteRoles } from '../../auth/site-roles.decorator';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { Cart } from '../../entities/cart.entity';
@@ -27,7 +24,7 @@ export class CartResolver {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
+  @SiteRoles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Query(() => CartResponse, { name: 'getCartItemsForUser' })
   async getCartItemsForUser(@AuthenticatedUser() user: any) {
     this.sitesLogger.log(
@@ -53,7 +50,7 @@ export class CartResolver {
     }
   }
 
-  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
+  @SiteRoles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => CartResponse, { name: 'addCartItem' })
   async addCartItem(
     @Args('cartDTO', { type: () => [CartDTO] }, new ValidationPipe())
@@ -83,7 +80,7 @@ export class CartResolver {
     }
   }
 
-  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
+  @SiteRoles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => CartResponse, { name: 'deleteCartItem' })
   async deleteCartItem(
     @Args(
@@ -121,7 +118,7 @@ export class CartResolver {
     }
   }
 
-  @Roles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
+  @SiteRoles({ roles: [CustomRoles.External], mode: RoleMatchingMode.ANY })
   @Mutation(() => CartResponse, { name: 'deleteCartItemWithSiteId' })
   async deleteCartItemWithSiteId(
     @Args(

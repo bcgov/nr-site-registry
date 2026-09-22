@@ -1,16 +1,13 @@
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { SiteDocs } from '../../entities/siteDocs.entity';
 import { DocumentService } from '../../services/document/document.service';
-import {
-  AuthenticatedUser,
-  RoleMatchingMode,
-  Roles,
-} from 'nest-keycloak-connect';
+import { AuthenticatedUser, RoleMatchingMode } from 'nest-keycloak-connect';
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { HttpStatus, UsePipes } from '@nestjs/common';
 import { DocumentDto, DocumentResponse } from '../../dto/document.dto';
 import { CustomRoles } from '../../common/role';
+import { SiteRoles } from '../../auth/site-roles.decorator';
 import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => SiteDocs)
@@ -23,7 +20,7 @@ export class DocumentResolver {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,

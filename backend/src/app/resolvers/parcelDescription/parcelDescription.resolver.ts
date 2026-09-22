@@ -3,11 +3,11 @@ import {
   AuthenticatedUser,
   Resource,
   RoleMatchingMode,
-  Roles,
 } from 'nest-keycloak-connect';
 import { Subdivisions } from '../../entities/subdivisions.entity';
 import { ParcelDescriptionsService } from '../../services/parcelDescriptions/parcelDescriptions.service';
 import { CustomRoles } from '../../common/role';
+import { SiteRoles } from '../../auth/site-roles.decorator';
 import { ParcelDescriptionsResponse } from '../../dto/parcelDescription.dto';
 import { LoggerService } from '../../logger/logger.service';
 
@@ -32,7 +32,7 @@ export class ParcelDescriptionResolver {
    * @param sortByDir sorting direction. Either ASC or DESC.
    * @returns parcel descriptions (subdivisions) belonging to the given site.
    */
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.Internal,
       CustomRoles.SiteRegistrar,

@@ -1,10 +1,6 @@
 import { HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
-import {
-  AuthenticatedUser,
-  RoleMatchingMode,
-  Roles,
-} from 'nest-keycloak-connect';
+import { AuthenticatedUser, RoleMatchingMode } from 'nest-keycloak-connect';
 import { CreateSnapshotDto, SnapshotResponse } from '../../dto/snapshot.dto';
 import { BannerTypeResponse } from '../../dto/response/bannerTypeResponse';
 import { PurchasedSitesResponse } from '../../dto/purchasedSite.dto';
@@ -13,6 +9,7 @@ import { SnapshotsService } from '../../services/snapshot/snapshot.service';
 import { GenericValidationPipe } from '../../utils/validations/genericValidationPipe';
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { CustomRoles } from '../../common/role';
+import { SiteRoles } from '../../auth/site-roles.decorator';
 import { LoggerService } from '../../logger/logger.service';
 
 @Resolver(() => Snapshots)
@@ -25,7 +22,7 @@ export class SnapshotsResolver {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,
@@ -70,7 +67,7 @@ export class SnapshotsResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [CustomRoles.External],
     mode: RoleMatchingMode.ANY,
   })
@@ -121,7 +118,7 @@ export class SnapshotsResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [CustomRoles.External],
     mode: RoleMatchingMode.ANY,
   })
@@ -176,7 +173,7 @@ export class SnapshotsResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [CustomRoles.External],
     mode: RoleMatchingMode.ANY,
   })

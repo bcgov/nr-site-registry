@@ -1,5 +1,5 @@
 import { Resolver, Query, Args } from '@nestjs/graphql';
-import { RoleMatchingMode, Roles, Unprotected } from 'nest-keycloak-connect';
+import { RoleMatchingMode, Unprotected } from 'nest-keycloak-connect';
 import {
   DropdownDto,
   DropdownResponse,
@@ -9,6 +9,7 @@ import {
 import { GenericResponseProvider } from '../../dto/response/genericResponseProvider';
 import { DropdownService } from '../../services/dropdown/dropdown.service';
 import { CustomRoles } from '../../common/role';
+import { SiteRoles } from '../../auth/site-roles.decorator';
 import { LoggerService } from '../../logger/logger.service';
 import { HttpStatus } from '@nestjs/common';
 
@@ -25,7 +26,7 @@ export class DropdownResolver {
     private readonly sitesLogger: LoggerService,
   ) {}
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,
@@ -60,7 +61,7 @@ export class DropdownResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,
@@ -98,7 +99,7 @@ export class DropdownResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,
@@ -128,7 +129,7 @@ export class DropdownResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,
@@ -158,7 +159,7 @@ export class DropdownResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,
@@ -194,7 +195,7 @@ export class DropdownResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [CustomRoles.Internal, CustomRoles.SiteRegistrar],
     mode: RoleMatchingMode.ANY,
   })
@@ -291,7 +292,7 @@ export class DropdownResolver {
     }
   }
 
-  @Roles({
+  @SiteRoles({
     roles: [
       CustomRoles.External,
       CustomRoles.Internal,

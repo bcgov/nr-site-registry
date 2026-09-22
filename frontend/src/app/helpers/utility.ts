@@ -231,7 +231,9 @@ export const isUserOfType = (roleType: UserRoleType) => {
   const user = getUser();
 
   if (user !== null) {
-    const userRoles: any = user.profile?.role;
+    const userRoles = Array.isArray(user.profile?.site_roles)
+      ? user.profile.site_roles
+      : [];
     switch (roleType) {
       case 'client':
         const externalUserRole =
@@ -262,7 +264,7 @@ export const isUserOfType = (roleType: UserRoleType) => {
           process.env.REACT_APP_SITE_REGISTRAR_USER_ROLE ||
           ((window as any)._env_ &&
             (window as any)._env_.REACT_APP_SITE_REGISTRAR_USER_ROLE) ||
-          'site-site-registrar';
+          'site-registrar';
 
         if (userRoles.includes(srUserRole)) {
           return true;

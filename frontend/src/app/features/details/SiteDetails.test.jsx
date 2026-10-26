@@ -610,4 +610,43 @@ describe('SiteDetails', () => {
       expect(dispatch).not.toHaveBeenCalledWith(editModeAction);
     });
   });
+
+  describe('Site not found', () => {
+    const missingSiteState = {
+      siteDetails: null,
+      siteDetailsFetchStatus: RequestStatus.success,
+    };
+
+    it('does not toast when a fetch for a different site is still in flight', async () => {
+      setup({ isInternal: true });
+      renderSite({
+        sites: {
+          ...missingSiteState,
+          siteDetailsLastFetchedSiteId: '8',
+        },
+      });
+
+      expect(await screen.findByTestId('page-container')).toBeInTheDocument();
+      expect(utility.showNotification).not.toHaveBeenCalled();
+    });
+
+    it('toasts and leaves when this site was fetched and is missing', async () => {
+      setup({ isInternal: true });
+      renderSite({
+        sites: {
+          ...missingSiteState,
+          siteDetailsLastFetchedSiteId: '9',
+        },
+      });
+
+      await waitFor(() => {
+        expect(utility.showNotification).toHaveBeenCalledWith(
+          RequestStatus.failed,
+          '',
+          'Site 9 was not found or has been deleted.',
+          'Site Not Found',
+        );
+      });
+    });
+  });
 });

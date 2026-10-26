@@ -1,18 +1,13 @@
-import { useLocation } from 'react-router-dom';
 import { DropdownItem } from '../../../components/action/IActions';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import { RequestStatus } from '../../../helpers/requests/status';
 
+/** Always open associated sites at the canonical details URL, not relative to the current tab path. */
+export const ASSOCIATED_SITE_DETAILS_HREF = '/site/details/';
+
 export const GetAssociateConfig = () => {
-  const location = useLocation();
-  // Get the current path
-  const currentPath = location.pathname;
-
-  // Remove the last segment from the path
-  const parentPath = currentPath.split('/').slice(0, -1).join('/');
-
   const associateColumnInternal: TableColumn[] = [
     {
       id: 1,
@@ -132,14 +127,14 @@ export const GetAssociateConfig = () => {
         customEditLabelCss: 'custom-associate-edit-label',
         customEditInputTextCss: 'custom-associate-edit-input',
         tableMode: true,
-        href: `${parentPath}/`,
+        href: ASSOCIATED_SITE_DETAILS_HREF,
         validation: {
           required: true,
           pattern: /^[0-9,\s]*$/,
           customMessage: 'Site ID is required and can only contain numbers.',
         },
       },
-      linkRedirectionURL: `${parentPath}/`,
+      linkRedirectionURL: ASSOCIATED_SITE_DETAILS_HREF,
     },
     {
       id: 2,
@@ -228,14 +223,14 @@ export const GetAssociateConfig = () => {
         customEditLabelCss: 'custom-associate-edit-label',
         customEditInputTextCss: 'custom-associate-edit-input',
         tableMode: true,
-        href: `${parentPath}/`,
+        href: ASSOCIATED_SITE_DETAILS_HREF,
         validation: {
           required: true,
           pattern: /^[0-9,\s]*$/,
           customMessage: 'Site ID is required and can only contain numbers.',
         },
       },
-      linkRedirectionURL: `${parentPath}/`,
+      linkRedirectionURL: ASSOCIATED_SITE_DETAILS_HREF,
     },
     {
       id: 2,

@@ -12,24 +12,43 @@ import {
   ShoppingCartIcon,
 } from '../../../components/common/icon';
 import { TableColumn } from '../../../components/table/TableColumn';
-import { downloadSelectedColumnsCSV } from '../../../helpers/csvExport/csvExport';
+import {
+  downloadLabeledValues,
+  downloadSelectedColumnsCSV,
+} from '../../../helpers/csvExport/csvExport';
+import { SearchSiteRow } from '../searchSites';
 import { addCartItem, resetCartItemAddedStatus } from '../../cart/CartSlice';
 
 interface SearchResultsActionsProps {
-  selectedRows: any[]; // TODO: type this properly, should be Site
+  selectedRows: SearchSiteRow[];
   selectedColumns?: TableColumn[];
+  visibleCellText?: (column: TableColumn, row: SearchSiteRow) => string;
 }
 export const SearchResultsActions: FC<SearchResultsActionsProps> = ({
   selectedRows,
   selectedColumns = [],
+  visibleCellText,
 }) => {
   const auth = useAuth();
   const dispatch = useDispatch<AppDispatch>();
 
   const handleExport = () => {
-    if (selectedRows.length > 0 && selectedColumns.length > 0) {
-      downloadSelectedColumnsCSV(selectedRows, selectedColumns);
+    if (selectedRows.length === 0 || selectedColumns.length === 0) {
+      return;
     }
+    if (!visibleCellText) {
+      downloadSelectedColumnsCSV(selectedRows, selectedColumns);
+      return;
+    }
+
+    const visibleColumns = selectedColumns.filter((column) => column.isChecked);
+    downloadLabeledValues(
+      selectedRows,
+      visibleColumns.map((column) => ({
+        label: column.displayName,
+        value: (row) => visibleCellText(column, row as SearchSiteRow),
+      })),
+    );
   };
 
   const handleAddToShoppingCart = () => {
@@ -39,7 +58,7 @@ export const SearchResultsActions: FC<SearchResultsActionsProps> = ({
     } else {
       const cartItems = selectedRows.map((row) => {
         return {
-          siteId: row.id,
+          siteId: String(row.id),
           price: 200.11,
         };
       });
@@ -64,7 +83,7 @@ export const SearchResultsActions: FC<SearchResultsActionsProps> = ({
         <AddToFolio
           label="Add Selected To Folio"
           disabled={selectedRows.length === 0}
-          selectedSiteIds={selectedRows.map((row) => row.id)}
+          selectedSiteIds={selectedRows.map((row) => String(row.id))}
         />
       )}
 

@@ -1,101 +1,26 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { RequestStatus } from '../../helpers/requests/status';
-import { ISiteSearchState } from './ISiteSearchState';
-import { getAxiosInstance } from '../../helpers/utility';
-import { GRAPHQL } from '../../helpers/endpoints';
-import { print } from 'graphql';
-import { graphQlSiteQuery } from './graphql/Site';
-import { SiteSortBy, SortByDirection } from '../../../graphql/generated';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SiteSearchFilterState } from './ISiteSearchState';
 
-const initialState: ISiteSearchState = {
-  sites: [],
-  searchParam: '',
-  page: 1,
-  pageSize: 5,
-  count: 0,
-  sortBy: SiteSortBy.Id,
-  sortByDir: SortByDirection.Asc,
+const initialState: SiteSearchFilterState = {
   filter: {},
-  error: '',
-  status: RequestStatus.idle,
 };
-
-export const fetchSearchSites = createAsyncThunk(
-  'site/fetchSearchSites',
-  async (args: {
-    searchParam?: string;
-    page?: number;
-    pageSize?: number;
-    sortBy?: SiteSortBy;
-    sortByDir?: SortByDirection;
-    filter?: {};
-  }) => {
-    try {
-      const trimmedSearch = args.searchParam?.trim();
-      if (!trimmedSearch) {
-        // early return empty results
-        return {
-          sites: [],
-          count: 0,
-          page: args.page ?? initialState.page,
-          pageSize: args.pageSize ?? initialState.pageSize,
-        };
-      }
-      const response = await getAxiosInstance().post(GRAPHQL, {
-        operationName: 'searchSites',
-        query: print(graphQlSiteQuery()),
-        variables: {
-          searchParam: args.searchParam?.trim(),
-          page: args.page ?? initialState.page,
-          pageSize: args.pageSize ?? initialState.pageSize,
-          sortBy: args.sortBy ?? initialState.sortBy,
-          sortByDir: args.sortByDir ?? initialState.sortByDir,
-          filters: args.filter ?? initialState.filter,
-        },
-      });
-
-      return {
-        sites: response.data.data.searchSites.sites,
-        count: response.data.data.searchSites.count,
-        page: response.data.data.searchSites.page,
-        pageSize: response.data.data.searchSites.pageSize,
-      };
-    } catch (error) {
-      throw error;
-    }
-  },
-);
 
 const siteSearchSlice = createSlice({
   name: 'siteSearch',
   initialState,
   reducers: {
-    resetSiteSearch: () => initialState,
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchSearchSites.pending, (state) => {
-        state.status = RequestStatus.loading;
-      })
-      .addCase(fetchSearchSites.fulfilled, (state, action) => {
-        state.status = RequestStatus.success;
-        state.sites = action.payload.sites;
-        state.count = action.payload.count;
-        state.searchParam = action.meta.arg.searchParam || state.searchParam;
-        state.page = action.payload.page;
-        state.pageSize = action.payload.pageSize;
-
-        state.sortBy = action.meta.arg.sortBy || state.sortBy;
-        state.sortByDir = action.meta.arg.sortByDir || state.sortByDir;
-        state.filter = action.meta.arg.filter || state.filter;
-      })
-      .addCase(fetchSearchSites.rejected, (state, action) => {
-        state.status = RequestStatus.failed;
-        state.error = action?.error?.message || '';
-      });
+    setSearchFilter(
+      state,
+      action: PayloadAction<SiteSearchFilterState['filter']>,
+    ) {
+      state.filter = action.payload;
+    },
   },
 });
 
-export const getSites = (state: any) => state.siteSearch;
-export const { resetSiteSearch } = siteSearchSlice.actions;
+export const selectSearchFilter = (state: {
+  siteSearch: SiteSearchFilterState;
+}) => state.siteSearch.filter;
+
+export const { setSearchFilter } = siteSearchSlice.actions;
 export default siteSearchSlice.reducer;

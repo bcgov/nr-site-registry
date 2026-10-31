@@ -1,4 +1,10 @@
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
+import {
+  NumberParam,
+  StringParam,
+  useQueryParams,
+  withDefault,
+} from 'use-query-params';
 import { Site } from '../MapView';
 import { SearchResultsFilters } from '../../site/searchResults/SearchResultsFilters';
 import { SearchResultsActions } from '../../site/searchResults/SearchResultsActions';
@@ -8,28 +14,48 @@ import { TableColumn } from '../../../components/table/TableColumn';
 import {
   MapSearch_FilterSearchResultsQuery,
   SiteFilters,
+  SiteSortBy,
+  SortByDirection,
   useMapSearch_FilterSearchResultsLazyQuery,
 } from '../../../../graphql/generated';
 import {
   BarsIcon,
   FilterIcon,
-  SpinnerIcon,
   TableColumnsIcon,
 } from '../../../components/common/icon';
-import useDebouncedValue from '../../../helpers/useDebouncedValue';
 import { formRowsMap } from '../../site/dto/SiteFilterConfig';
 import { formatDateRange } from '../../../helpers/utility';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import Widget from '../../../components/widget/Widget';
-import { RequestStatus } from '../../../helpers/requests/status';
 import { Button } from '../../../components/button/Button';
 import { Dropdown } from 'react-bootstrap';
+import Grid from '../../../components/grid/Grid';
+import Pagination from '../../../components/table/pagination/Pagination';
+import { SearchSiteRow } from '../../site/searchSites';
+import {
+  buildSearchResultColumns,
+  columnIdForSortField,
+  columnSortField,
+} from '../../site/searchResults/searchResultColumns';
+import {
+  isRowSelected as rowIsSelected,
+  toggleSelectedRow,
+} from '../../site/searchResults/selectedRows';
+import { positiveInteger } from '../../../helpers/positiveInteger';
+import {
+  gridSortDirection,
+  nextSortDirection,
+  sortDirectionFromQuery,
+  sortFieldFromQuery,
+} from '../../../helpers/pagedList';
 
 const defaultColumns = getSiteSearchResultsColumns(new Set(['map']));
 
-type Pagination = {
-  page: number;
-  pageSize: number;
+const resultQueryParams = {
+  page: withDefault(NumberParam, 1),
+  pageSize: withDefault(NumberParam, 5),
+  sortBy: withDefault(StringParam, SiteSortBy.Id),
+  sortByDir: withDefault(StringParam, SortByDirection.Asc),
 };
 
 interface SearchResultsDrawerContentProps {
@@ -54,44 +80,80 @@ export const SearchResultsDrawerContent: FC<
     useState<TableColumn[]>(defaultColumns);
   const [filtersFormData, setFiltersFormData] = useState<SiteFilters>({});
   const [queryFilters, setQueryFilters] = useState<SiteFilters>({});
-  const [selectedRows, setSelectedRows] = useState<any[]>([]);
-
-  const [pagination, setPagination] = useState<Pagination>({
-    page: 1,
-    pageSize: 5,
+  const [selectedRows, setSelectedRows] = useState<SearchSiteRow[]>([]);
+  const [query, setQuery] = useQueryParams(resultQueryParams, {
+    removeDefaultsFromUrl: true,
   });
+  const page = positiveInteger(query.page, 1);
+  const pageSize = positiveInteger(query.pageSize, 5);
+  const sortBy = sortFieldFromQuery(
+    query.sortBy,
+    Object.values(SiteSortBy),
+    SiteSortBy.Id,
+  );
+  const sortByDir = sortDirectionFromQuery(
+    query.sortByDir,
+    SortByDirection.Asc,
+  );
 
-  const [searchSitesQuery, { loading: siteDetailsLoading }] =
-    useMapSearch_FilterSearchResultsLazyQuery({
-      onCompleted: (data) => {
-        setSearchResults(data.searchSites);
-      },
-    });
+  const [searchSitesQuery, { loading: siteDetailsLoading, called, error }] =
+    useMapSearch_FilterSearchResultsLazyQuery();
 
-  const searchSitesWithFilters = useCallback(() => {
-    if (siteIds.length === 0) {
+  const siteIdsRef = useRef(siteIds);
+  siteIdsRef.current = siteIds;
+  const siteIdKey = [...siteIds].sort().join('\0');
+  const appliedSiteIds = useRef<string | null>(null);
+  const requestId = useRef(0);
+
+  useEffect(() => {
+    if (siteIdsLoading) {
       return;
     }
+
+    const previousSiteIds = appliedSiteIds.current;
+    if (previousSiteIds === null && siteIdKey.length === 0) {
+      return;
+    }
+    const siteIdsChanged =
+      previousSiteIds !== null && previousSiteIds !== siteIdKey;
+    if (previousSiteIds === null || siteIdsChanged) {
+      appliedSiteIds.current = siteIdKey;
+    }
+    if (siteIdsChanged && page !== 1) {
+      setQuery({ page: 1 });
+      return;
+    }
+    if (siteIdKey.length === 0) {
+      return;
+    }
+
+    const id = ++requestId.current;
     setSelectedRows([]);
     searchSitesQuery({
       variables: {
-        ...pagination,
-        filters: { siteIds, ...queryFilters },
+        page,
+        pageSize,
+        sortBy,
+        sortByDir,
+        filters: { siteIds: siteIdsRef.current, ...queryFilters },
       },
+    }).then((result) => {
+      if (id !== requestId.current || !result.data?.searchSites) {
+        return;
+      }
+      setSearchResults(result.data.searchSites);
     });
-  }, [pagination, queryFilters, searchSitesQuery, siteIds]);
-
-  useEffect(() => {
-    searchSitesWithFilters();
-  }, [searchSitesWithFilters]);
-
-  useEffect(() => {
-    // If the set of sites returned by map search changed, we reset the pagination
-    // to prevent users from being stuck on pages that may be irrelevant to the new set
-    setPagination((prev) => ({ ...prev, page: 1 }));
-  }, [siteIds]);
-
-  const siteDetailsLoadingDebounced = useDebouncedValue(siteDetailsLoading);
+  }, [
+    page,
+    pageSize,
+    queryFilters,
+    searchSitesQuery,
+    setQuery,
+    siteIdKey,
+    siteIdsLoading,
+    sortBy,
+    sortByDir,
+  ]);
 
   const toggleColumnSelectionForDisplay = (column: TableColumn) => {
     setColumnsToDisplay((prevColumns) =>
@@ -113,22 +175,20 @@ export const SearchResultsDrawerContent: FC<
   const onFiltersSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setQueryFilters(filtersFormData);
-    setPagination((prev) => ({ ...prev, page: 1 }));
-    searchSitesWithFilters();
+    setQuery({ page: 1 });
   };
 
   const onFiltersReset = () => {
     setFiltersFormData({});
     setQueryFilters({});
-    setPagination((prev) => ({ ...prev, page: 1 }));
-    searchSitesWithFilters();
+    setQuery({ page: 1 });
   };
 
   const onRemoveFilter = (filter: FilterPill) => {
     const { [filter.key as keyof SiteFilters]: _, ...rest } = filtersFormData;
     setFiltersFormData(rest);
     setQueryFilters(rest);
-    searchSitesWithFilters();
+    setQuery({ page: 1 });
   };
 
   const filterPillsData: FilterPill[] = Object.entries(queryFilters)
@@ -147,41 +207,46 @@ export const SearchResultsDrawerContent: FC<
     })
     .filter((data): data is FilterPill => data !== null);
 
-  const changeHandler = (event: any) => {
-    if (!event) return;
-    const { property, value, row, selected: selectAllChecked } = event;
+  const sites = searchResults.sites as SearchSiteRow[];
+  const waitingForFirstResults = siteIds.length > 0 && !called;
+  const resultsInFlight =
+    siteIdsLoading || siteDetailsLoading || waitingForFirstResults;
+  const searchFailed = Boolean(error) && !resultsInFlight && sites.length === 0;
+  const isRowSelected = (row: SearchSiteRow) =>
+    rowIsSelected(selectedRows, row);
 
-    if (property === 'select_row') {
-      setSelectedRows((prevRows) =>
-        value
-          ? prevRows.some((r) => r.id === row.id)
-            ? prevRows
-            : [...prevRows, row]
-          : prevRows.filter((r) => r.id !== row.id),
-      );
-    } else if (property === 'select_all') {
-      setSelectedRows(selectAllChecked ? [...value] : []);
+  const gridColumns = buildSearchResultColumns(columnsToDisplay, {
+    pageRows: sites,
+    isSelected: isRowSelected,
+    onToggleRow: (row, selected) => {
+      setSelectedRows((current) => toggleSelectedRow(current, row, selected));
+    },
+    onTogglePage: (selected) => {
+      setSelectedRows(selected ? [...sites] : []);
+    },
+  });
+  const activeColumnId = columnIdForSortField(columnsToDisplay, sortBy);
+  const gridSort = activeColumnId
+    ? {
+        id: activeColumnId,
+        direction: gridSortDirection(sortByDir),
+      }
+    : null;
+
+  const handleSortChange = (columnId: string) => {
+    const nextField = columnSortField(columnsToDisplay, columnId);
+    if (!nextField) {
+      return;
     }
+    setQuery({
+      sortBy: nextField,
+      sortByDir: nextSortDirection(sortBy, sortByDir, nextField),
+      page: 1,
+    });
   };
 
-  const loading = siteIdsLoading || siteDetailsLoadingDebounced;
   type PanelOption = 'filters' | 'columns' | null;
   const [panelToShow, setPanelToShow] = useState<PanelOption>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [resultsPerPage, setResultsPerPage] = useState(5);
-
-  const totalResults = searchResults.count || 0;
-  const selectPage = (pageNumber: number): void => {
-    setCurrentPage(pageNumber);
-  };
-
-  const changeResultsPerPage = (pageNumber: number): void => {
-    setResultsPerPage(pageNumber);
-  };
-
-  useEffect(() => {
-    setPagination({ page: currentPage, pageSize: resultsPerPage });
-  }, [currentPage, resultsPerPage]);
 
   const togglePanel = (panel: PanelOption) => {
     if (panelToShow === panel) {
@@ -193,29 +258,10 @@ export const SearchResultsDrawerContent: FC<
 
   return (
     <div className="d-flex flex-column gap-3">
-      {loading && <SpinnerIcon size={20} className="site-fa-spin" />}
       <Widget
-        changeHandler={changeHandler}
         title={'Results'}
-        tableColumns={columnsToDisplay.filter((x) => x.isChecked === true)}
-        tableData={searchResults.sites}
-        tableIsLoading={loading ? RequestStatus.loading : RequestStatus.idle}
-        allowRowsSelect={true}
-        aria-label="Site Participant Widget"
         customLabelCss="custom-search-widget-lbl"
-        hideTable={false}
-        hideTitle={false}
-        editMode={false}
-        srMode={false}
-        hideWidgetCheckbox={true}
-        primaryKeycolumnName="id"
-        // sortHandler={handleTableSortChange}
-        totalResults={searchResults.count}
-        selectPage={selectPage}
-        changeResultsPerPage={changeResultsPerPage}
-        currentPage={currentPage}
-        resultsPerPage={resultsPerPage}
-        showPageOptions={true}
+        hideTable
         filter={
           <div>
             <div className="table-actions d-none d-md-flex ">
@@ -285,6 +331,37 @@ export const SearchResultsDrawerContent: FC<
           filters={filterPillsData}
           onRemoveFilter={onRemoveFilter}
         />
+        <div className="me-1">
+          {searchFailed ? (
+            <div className="noContent" role="alert">
+              <span className="noContentText">Search failed</span>
+            </div>
+          ) : (
+            <Grid
+              label="Results"
+              rows={sites}
+              columns={gridColumns}
+              sort={gridSort}
+              onSortChange={handleSortChange}
+              loading={resultsInFlight && sites.length === 0}
+              fetching={resultsInFlight && sites.length > 0}
+              empty={!resultsInFlight && !error && sites.length === 0}
+            />
+          )}
+        </div>
+        {sites.length > 0 ? (
+          <Pagination
+            changeResultsPerPage={(nextSize) => {
+              setQuery({ pageSize: nextSize, page: 1 });
+            }}
+            selectPage={(nextPage) => {
+              setQuery({ page: nextPage });
+            }}
+            currentPage={page}
+            resultsPerPage={pageSize}
+            totalResults={searchResults.count}
+          />
+        ) : null}
       </Widget>
     </div>
   );

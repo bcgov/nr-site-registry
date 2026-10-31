@@ -1,30 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Form from '../../../components/form/Form';
 import SRUpdatesFilterRows from './srUpdatesTableFilterConfig';
 import { formatDateRange } from '../../../helpers/utility';
-import {
-  fetchPendingSiteForSRApproval,
-  updateSearchParam,
-} from './state/srUpdatesTableSlice';
-import { AppDispatch } from '../../../Store';
-import { useDispatch } from 'react-redux';
-import { fetchInternalUserNameForDropdown } from '../dropdowns/DropdownSlice';
-import SRUpdatesTableConfiguration from './srUpdatesTableConfiguration';
 import { Button } from '../../../components/button/Button';
 import './srUpdatesTableFilter.css';
+import { ApprovalSearch } from './pendingSiteApprovals';
 
 interface ISRUpdatesTableFilter {
   closeSection: () => void;
-  currentPage: number;
-  resultsPerPage: number;
+  onApply: (search: ApprovalSearch) => void;
+  onReset: () => void;
 }
 
 const SRUpdatesTableFilter: React.FC<ISRUpdatesTableFilter> = ({
   closeSection,
-  currentPage,
-  resultsPerPage,
+  onApply,
+  onReset,
 }) => {
-  const dispatch = useDispatch<AppDispatch>();
   const [columnConfig, SetColumnConfig] = useState(SRUpdatesFilterRows());
 
   const [formData, setFormData] = useState<{
@@ -41,43 +33,30 @@ const SRUpdatesTableFilter: React.FC<ISRUpdatesTableFilter> = ({
     }));
   };
 
-  const [selectedFilters, setSelectedFilters] = useState<
-    { key: any; value: any; label: string }[]
-  >([]);
-
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    let dtoToAPI = {
-      ...formData,
+    const dtoToAPI: ApprovalSearch = {
+      id: typeof formData.id === 'string' ? formData.id : undefined,
+      changes:
+        typeof formData.changes === 'string' ? formData.changes : undefined,
+      addrLine:
+        typeof formData.addrLine === 'string' ? formData.addrLine : undefined,
+      whoCreated:
+        typeof formData.whoCreated === 'string'
+          ? formData.whoCreated
+          : undefined,
       whenUpdated: formData.whenUpdated
-        ? formatDateRange(formData.whenUpdated)
-        : '',
+        ? formatDateRange(formData.whenUpdated as [Date, Date])
+        : undefined,
     };
 
-    dispatch(updateSearchParam(dtoToAPI));
-
-    dispatch(
-      fetchPendingSiteForSRApproval({
-        searchParam: dtoToAPI,
-        page: currentPage,
-        pageSize: resultsPerPage,
-      }),
-    );
+    onApply(dtoToAPI);
   };
 
   const handleReset = () => {
     setFormData({});
-    setSelectedFilters([]);
-    dispatch(updateSearchParam(null));
-
-    dispatch(
-      fetchPendingSiteForSRApproval({
-        searchParam: null,
-        page: currentPage,
-        pageSize: resultsPerPage,
-      }),
-    );
+    onReset();
   };
 
   return (

@@ -1,5 +1,4 @@
 interface IDashboard {
-  recentView: [];
   recentFolios: [];
   recentAssigned: [];
 }

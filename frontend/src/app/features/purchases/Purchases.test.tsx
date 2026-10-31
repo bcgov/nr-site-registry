@@ -1,15 +1,15 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import configureStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+import { render, screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { RequestStatus } from '../../helpers/requests/status';
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import { GRAPHQL } from '../../helpers/endpoints';
+import * as utility from '../../helpers/utility';
 import Purchases from './Purchases';
 
-const mockStore = configureStore([thunk]);
-
-// Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
@@ -31,103 +31,133 @@ jest.mock('react-oidc-context', () => ({
   }),
 }));
 
-jest.mock('../../helpers/utility', () => ({
-  ...jest.requireActual('../../helpers/utility'),
-  getUser: jest.fn().mockReturnValue({
-    profile: { sub: 'user-123', given_name: 'Test' },
-  }),
-}));
+const purchasedSites = [
+  {
+    siteId: '100',
+    address: '123 Main St',
+    city: 'Victoria',
+    purchaseDate: '2026-01-15T00:00:00Z',
+    status: 'current',
+  },
+  {
+    siteId: '200',
+    address: '456 Oak Ave',
+    city: 'Vancouver',
+    purchaseDate: '2026-03-01T00:00:00Z',
+    status: 'outdated',
+  },
+];
 
-const renderWithProviders = (store: any) => {
-  return render(
-    <Provider store={store}>
-      <MemoryRouter>
-        <Purchases />
-      </MemoryRouter>
-    </Provider>,
-  );
+type PurchaseBody = {
+  operationName?: string;
+  variables?: {
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    sortByDir?: string;
+  };
 };
 
+function renderPurchases() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <QueryParamProvider adapter={ReactRouter6Adapter}>
+          <Purchases />
+        </QueryParamProvider>
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
+
+function purchaseResponse(
+  data: typeof purchasedSites,
+  totalRecords: number,
+): [number, object] {
+  return [
+    200,
+    {
+      data: {
+        getPurchasedSites: {
+          httpStatusCode: data.length > 0 ? 200 : 404,
+          data,
+          totalRecords,
+        },
+      },
+    },
+  ];
+}
+
 describe('Purchases Component', () => {
-  let store: any;
+  let mock: MockAdapter;
+  let requests: PurchaseBody['variables'][];
 
   beforeEach(() => {
-    store = mockStore({
-      purchases: {
-        fetchStatus: RequestStatus.success,
-        purchasedSites: [
-          {
-            siteId: '100',
-            address: '123 Main St',
-            city: 'Victoria',
-            purchaseDate: '2026-01-15T00:00:00Z',
-            status: 'current',
-          },
-          {
-            siteId: '200',
-            address: '456 Oak Ave',
-            city: 'Vancouver',
-            purchaseDate: '2026-03-01T00:00:00Z',
-            status: 'outdated',
-          },
-        ],
-        totalRecords: 2,
+    requests = [];
+    jest.spyOn(utility, 'getUser').mockReturnValue({
+      profile: { sub: 'user-123', given_name: 'Test' },
+    } as ReturnType<typeof utility.getUser>);
+    jest.spyOn(utility, 'getAxiosInstance').mockReturnValue(axios);
+    mock = new MockAdapter(axios);
+    mock.onPost(GRAPHQL).reply((config) => {
+      const body: PurchaseBody =
+        typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
+      requests.push(body.variables);
+      const rows =
+        body.variables?.page === 1
+          ? purchasedSites
+          : ([] as typeof purchasedSites);
+      return purchaseResponse(rows, rows.length);
+    });
+  });
+
+  afterEach(() => {
+    mock.restore();
+    jest.restoreAllMocks();
+  });
+
+  test('renders the Site Details heading', async () => {
+    renderPurchases();
+    expect(await screen.findByText('Site Details')).toBeInTheDocument();
+  });
+
+  test('requests purchased sites on mount', async () => {
+    renderPurchases();
+    await screen.findByText('100');
+    expect(requests[0]).toEqual(
+      expect.objectContaining({
         page: 1,
         pageSize: 10,
         sortBy: 'purchaseDate',
         sortByDir: 'DESC',
-      },
-    });
+      }),
+    );
+    expect(mock.history.post[0].signal).toEqual(expect.any(AbortSignal));
   });
 
-  test('renders the Site Details heading', () => {
-    renderWithProviders(store);
-    expect(screen.getByText('Site Details')).toBeInTheDocument();
-  });
-
-  test('dispatches fetchPurchasedSites on mount', async () => {
-    renderWithProviders(store);
-    await waitFor(() => {
-      const actions = store.getActions();
-      expect(actions).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            type: expect.stringContaining('purchases/fetchPurchasedSites'),
-          }),
-        ]),
-      );
-    });
-  });
-
-  test('renders site data in the table', () => {
-    renderWithProviders(store);
-    expect(screen.getByText('100')).toBeInTheDocument();
+  test('renders site data in the table', async () => {
+    renderPurchases();
+    expect(await screen.findByText('100')).toBeInTheDocument();
     expect(screen.getByText('200')).toBeInTheDocument();
     expect(screen.getByText('Victoria')).toBeInTheDocument();
     expect(screen.getByText('Vancouver')).toBeInTheDocument();
   });
 
-  test('renders empty table when no purchased sites', () => {
-    store = mockStore({
-      purchases: {
-        fetchStatus: RequestStatus.success,
-        purchasedSites: [],
-        totalRecords: 0,
-        page: 1,
-        pageSize: 10,
-        sortBy: 'purchaseDate',
-        sortByDir: 'DESC',
-      },
-    });
-
-    renderWithProviders(store);
+  test('renders empty table when no purchased sites', async () => {
+    mock.reset();
+    mock.onPost(GRAPHQL).reply(() => purchaseResponse([], 0));
+    renderPurchases();
+    expect(await screen.findByText('No Results Found')).toBeInTheDocument();
     expect(screen.getByText('Site Details')).toBeInTheDocument();
     expect(screen.queryByText('100')).not.toBeInTheDocument();
   });
 
-  test('formats purchaseDate as locale string', () => {
-    renderWithProviders(store);
-    // The date should be formatted, not raw ISO
+  test('formats purchaseDate as locale string', async () => {
+    renderPurchases();
+    await screen.findByText('100');
     expect(screen.queryByText('2026-01-15T00:00:00Z')).not.toBeInTheDocument();
   });
 });

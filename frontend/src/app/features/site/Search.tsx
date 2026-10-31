@@ -26,6 +26,14 @@ import FilterPills from './filters/FilterPills';
 import { formRows } from './dto/SiteFilterConfig';
 import { SearchResultsFilters } from './searchResults/SearchResultsFilters';
 import { SearchResultsActions } from './searchResults/SearchResultsActions';
+import { positiveInteger } from '../../helpers/positiveInteger';
+import {
+  gridSortDirection,
+  nextSortDirection,
+  pagedListFlags,
+  sortDirectionFromQuery,
+  sortFieldFromQuery,
+} from '../../helpers/pagedList';
 import useDebouncedValue from '../../helpers/useDebouncedValue';
 import Grid from '../../components/grid/Grid';
 import Pagination from '../../components/table/pagination/Pagination';
@@ -73,31 +81,23 @@ function filterObjectFrom(filters: StoredFilter[]): Record<string, unknown> {
   }, {});
 }
 
-function sortFieldFromAddress(value: string | null | undefined): SiteSortBy {
-  if (value && Object.values(SiteSortBy).includes(value as SiteSortBy)) {
-    return value as SiteSortBy;
-  }
-  return SiteSortBy.Id;
-}
-
-function sortDirectionFromAddress(
-  value: string | null | undefined,
-): SortByDirection {
-  return value === SortByDirection.Desc
-    ? SortByDirection.Desc
-    : SortByDirection.Asc;
-}
-
 const Search = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [query, setQuery] = useQueryParams(searchQueryParams, {
     removeDefaultsFromUrl: true,
   });
   const search = query.search ?? '';
-  const page = query.page ?? 1;
-  const pageSize = query.pageSize ?? 5;
-  const sortBy = sortFieldFromAddress(query.sortBy);
-  const sortByDir = sortDirectionFromAddress(query.sortByDir);
+  const page = positiveInteger(query.page, 1);
+  const pageSize = positiveInteger(query.pageSize, 5);
+  const sortBy = sortFieldFromQuery(
+    query.sortBy,
+    Object.values(SiteSortBy),
+    SiteSortBy.Id,
+  );
+  const sortByDir = sortDirectionFromQuery(
+    query.sortByDir,
+    SortByDirection.Asc,
+  );
 
   const [searchText, setSearchText] = useState(search);
   const debouncedSearchText = useDebouncedValue(searchText);
@@ -149,12 +149,10 @@ const Search = () => {
 
   const sites = searchQuery.data?.sites ?? [];
   const count = searchQuery.data?.count ?? 0;
-  const loading = searchQuery.isLoading;
-  const fetching = searchQuery.isFetching && !searchQuery.isLoading;
-  const empty =
-    searchQuery.isSuccess &&
-    !searchQuery.isPlaceholderData &&
-    sites.length === 0;
+  const { loading, fetching, empty } = pagedListFlags(
+    sites.length,
+    searchQuery,
+  );
 
   useEffect(() => {
     if (search !== lastWrittenSearch.current) {
@@ -285,10 +283,7 @@ const Search = () => {
     if (!nextField) {
       return;
     }
-    const nextDirection =
-      nextField === sortBy && sortByDir === SortByDirection.Asc
-        ? SortByDirection.Desc
-        : SortByDirection.Asc;
+    const nextDirection = nextSortDirection(sortBy, sortByDir, nextField);
     rememberQueryChange();
     setQuery({
       sortBy: nextField,
@@ -333,10 +328,7 @@ const Search = () => {
   const gridSort = activeColumnId
     ? {
         id: activeColumnId,
-        direction:
-          sortByDir === SortByDirection.Desc
-            ? ('desc' as const)
-            : ('asc' as const),
+        direction: gridSortDirection(sortByDir),
       }
     : null;
 

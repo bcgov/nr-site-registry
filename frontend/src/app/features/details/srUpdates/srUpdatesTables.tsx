@@ -12,6 +12,14 @@ import {
   useQueryParams,
   withDefault,
 } from 'use-query-params';
+import { positiveInteger } from '../../../helpers/positiveInteger';
+import {
+  gridSortDirection,
+  nextSortDirection,
+  pagedListFlags,
+  sortDirectionFromQuery,
+  sortFieldFromQuery,
+} from '../../../helpers/pagedList';
 import { RequestStatus } from '../../../helpers/requests/status';
 import PageContainer from '../../../components/simple/PageContainer';
 import {
@@ -57,31 +65,6 @@ const approvalQueryParams = {
   search: withDefault(JsonParam, null),
 };
 
-function sortFieldFromAddress(value: string | null | undefined): SiteSortBy {
-  if (value && approvalSortFields.has(value)) {
-    return value as SiteSortBy;
-  }
-  return SiteSortBy.Id;
-}
-
-function sortDirectionFromAddress(
-  value: string | null | undefined,
-): SortByDirection {
-  return value === SortByDirection.Desc
-    ? SortByDirection.Desc
-    : SortByDirection.Asc;
-}
-
-function positiveInteger(
-  value: number | null | undefined,
-  fallback: number,
-): number {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value < 1) {
-    return fallback;
-  }
-  return Math.floor(value);
-}
-
 const SRUpdatesTables = () => {
   const dispatch = useDispatch<AppDispatch>();
   const queryClient = useQueryClient();
@@ -90,8 +73,15 @@ const SRUpdatesTables = () => {
   });
   const page = positiveInteger(query.page, 1);
   const pageSize = positiveInteger(query.pageSize, 5);
-  const sortBy = sortFieldFromAddress(query.sortBy);
-  const sortByDir = sortDirectionFromAddress(query.sortByDir);
+  const sortBy = sortFieldFromQuery(
+    query.sortBy,
+    approvalSortFields,
+    SiteSortBy.Id,
+  );
+  const sortByDir = sortDirectionFromQuery(
+    query.sortByDir,
+    SortByDirection.Asc,
+  );
   const search = approvalSearchFrom(query.search);
 
   const [displayFilters, SetDisplayFilters] = useState(false);
@@ -148,12 +138,10 @@ const SRUpdatesTables = () => {
 
   const sites: PendingApprovalRow[] = approvalsQuery.data?.sites ?? [];
   const count = approvalsQuery.data?.count ?? 0;
-  const loading = approvalsQuery.isLoading;
-  const fetching = approvalsQuery.isFetching && !approvalsQuery.isLoading;
-  const empty =
-    approvalsQuery.isSuccess &&
-    !approvalsQuery.isPlaceholderData &&
-    sites.length === 0;
+  const { loading, fetching, empty } = pagedListFlags(
+    sites.length,
+    approvalsQuery,
+  );
 
   const isRowSelected = (row: PendingApprovalRow) =>
     selectedRows.some((item) => item.siteId === row.siteId);
@@ -189,8 +177,7 @@ const SRUpdatesTables = () => {
 
   const gridSort = {
     id: columnIdForApprovalSort(sortBy),
-    direction:
-      sortByDir === SortByDirection.Desc ? ('desc' as const) : ('asc' as const),
+    direction: gridSortDirection(sortByDir),
   };
 
   const handleSortChange = (columnId: string) => {
@@ -198,10 +185,7 @@ const SRUpdatesTables = () => {
     if (!nextField) {
       return;
     }
-    const nextDirection =
-      nextField === sortBy && sortByDir === SortByDirection.Asc
-        ? SortByDirection.Desc
-        : SortByDirection.Asc;
+    const nextDirection = nextSortDirection(sortBy, sortByDir, nextField);
     setQuery({
       sortBy: nextField,
       sortByDir: nextDirection,

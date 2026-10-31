@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import './Search.css';
 import '@bcgov/design-tokens/css/variables.css';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import {
+  NumberParam,
+  StringParam,
+  useQueryParams,
+  withDefault,
+} from 'use-query-params';
 import { AppDispatch } from '../../Store';
 import {
   BarsIcon,
@@ -19,66 +26,161 @@ import FilterPills from './filters/FilterPills';
 import { formRows } from './dto/SiteFilterConfig';
 import { SearchResultsFilters } from './searchResults/SearchResultsFilters';
 import { SearchResultsActions } from './searchResults/SearchResultsActions';
-import { debounce } from 'lodash';
 import useDebouncedValue from '../../helpers/useDebouncedValue';
-import Table from '../../components/table/Table';
-import { fetchSearchSites, getSites, resetSiteSearch } from './SiteSearchSlice';
-import { RequestStatus } from '../../helpers/requests/status';
+import Grid from '../../components/grid/Grid';
+import Pagination from '../../components/table/pagination/Pagination';
+import { selectSearchFilter, setSearchFilter } from './SiteSearchSlice';
 import { SiteSortBy, SortByDirection } from '../../../graphql/generated';
 import { fetchSiteRiskCd } from '../details/dropdowns/DropdownSlice';
 import Widget from '../../components/widget/Widget';
 import { Dropdown } from 'react-bootstrap';
 import { Button } from '../../components/button/Button';
+import { searchSites, SearchSiteRow } from './searchSites';
+import {
+  buildSearchResultColumns,
+  columnIdForSortField,
+  columnSortField,
+  displayedSearchCellText,
+} from './searchResults/searchResultColumns';
+
+const searchQueryParams = {
+  page: withDefault(NumberParam, 1),
+  pageSize: withDefault(NumberParam, 5),
+  sortBy: withDefault(StringParam, SiteSortBy.Id),
+  sortByDir: withDefault(StringParam, SortByDirection.Asc),
+  search: withDefault(StringParam, ''),
+};
+
+type StoredFilter = { key: string; value: string; label: string };
+
+function readStoredFilters(): StoredFilter[] {
+  try {
+    const stored = localStorage.getItem('siteFilterPills');
+    if (!stored) {
+      return [];
+    }
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function filterObjectFrom(filters: StoredFilter[]): Record<string, unknown> {
+  return filters.reduce<Record<string, unknown>>((accumulator, filter) => {
+    accumulator[filter.key] = filter.value;
+    return accumulator;
+  }, {});
+}
+
+function sortFieldFromAddress(value: string | null | undefined): SiteSortBy {
+  if (value && Object.values(SiteSortBy).includes(value as SiteSortBy)) {
+    return value as SiteSortBy;
+  }
+  return SiteSortBy.Id;
+}
+
+function sortDirectionFromAddress(
+  value: string | null | undefined,
+): SortByDirection {
+  return value === SortByDirection.Desc
+    ? SortByDirection.Desc
+    : SortByDirection.Asc;
+}
 
 const Search = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [searchText, setSearchText] = useState('');
+  const [query, setQuery] = useQueryParams(searchQueryParams, {
+    removeDefaultsFromUrl: true,
+  });
+  const search = query.search ?? '';
+  const page = query.page ?? 1;
+  const pageSize = query.pageSize ?? 5;
+  const sortBy = sortFieldFromAddress(query.sortBy);
+  const sortByDir = sortDirectionFromAddress(query.sortByDir);
+
+  const [searchText, setSearchText] = useState(search);
   const debouncedSearchText = useDebouncedValue(searchText);
+  const lastWrittenSearch = useRef(search);
+
   const columns = getSiteSearchResultsColumns();
   const [columnsToDisplay, setColumnsToDisplay] = useState<TableColumn[]>([
     ...columns,
   ]);
-  const [selectedRows, setSelectedRows] = useState<any[]>([]);
-  const [selectedFilters, setSelectedFilters] = useState<
-    { key: string; value: string; label: string }[]
-  >([]);
+  const [selectedRows, setSelectedRows] = useState<SearchSiteRow[]>([]);
+  const [selectedFilters, setSelectedFilters] =
+    useState<StoredFilter[]>(readStoredFilters);
   const [formData, setFormData] = useState<{
     [key: string]: any | [Date, Date];
-  }>({});
-  const {
-    sites,
-    page,
-    pageSize,
-    count,
-    sortBy,
-    sortByDir,
-    status,
-    searchParam,
-  } = useSelector(getSites);
+  }>(filterObjectFrom(selectedFilters));
 
-  const debouncedSearch = debounce(
-    (
-      searchParam: string,
-      page: number,
-      pageSize: number,
-      sortBy: SiteSortBy = SiteSortBy.Id,
-      sortByDir: SortByDirection = SortByDirection.Asc,
-      filters: any,
-    ) => {
-      setSelectedRows([]);
-      dispatch(
-        fetchSearchSites({
-          searchParam,
-          page,
-          pageSize,
-          sortBy,
-          sortByDir,
-          filter: filters,
-        }),
-      );
-    },
-    50,
+  const submittedFilter = useMemo(
+    () => filterObjectFrom(selectedFilters),
+    [selectedFilters],
   );
+  const searchFilter = useSelector(selectSearchFilter);
+  const searchFilterReady =
+    JSON.stringify(searchFilter) === JSON.stringify(submittedFilter);
+
+  const searchQuery = useQuery({
+    queryKey: [
+      'searchSites',
+      search,
+      page,
+      pageSize,
+      sortBy,
+      sortByDir,
+      searchFilter,
+    ],
+    queryFn: ({ signal }) =>
+      searchSites({
+        searchParam: search,
+        page,
+        pageSize,
+        sortBy,
+        sortByDir,
+        filter: searchFilter,
+        signal,
+      }),
+    enabled: searchFilterReady && search.trim().length >= 3,
+    placeholderData: keepPreviousData,
+    retry: false,
+  });
+
+  const sites = searchQuery.data?.sites ?? [];
+  const count = searchQuery.data?.count ?? 0;
+  const loading = searchQuery.isLoading;
+  const fetching = searchQuery.isFetching && !searchQuery.isLoading;
+  const empty =
+    searchQuery.isSuccess &&
+    !searchQuery.isPlaceholderData &&
+    sites.length === 0;
+
+  useEffect(() => {
+    if (search !== lastWrittenSearch.current) {
+      lastWrittenSearch.current = search;
+      setSearchText(search);
+    }
+  }, [search]);
+
+  useEffect(() => {
+    if (debouncedSearchText === lastWrittenSearch.current) {
+      return;
+    }
+    if (debouncedSearchText === searchText && debouncedSearchText !== search) {
+      lastWrittenSearch.current = debouncedSearchText;
+      setSelectedRows([]);
+      setQuery({ search: debouncedSearchText, page: 1 });
+    }
+  }, [debouncedSearchText, searchText, search, setQuery]);
+
+  useEffect(() => {
+    dispatch(setSearchFilter(submittedFilter));
+  }, [dispatch, submittedFilter]);
+
+  useEffect(() => {
+    dispatch(fetchSiteRiskCd());
+  }, [dispatch]);
 
   const toggleColumnSelectionForDisplay = (column: TableColumn) => {
     const index = columnsToDisplay.findIndex((item) => item.id === column.id);
@@ -97,69 +199,25 @@ const Search = () => {
     setColumnsToDisplay(columns);
   };
 
-  const handleClearSearch = () => {
-    setSearchText('');
-    dispatch(resetSiteSearch());
+  const rememberQueryChange = () => {
+    setSelectedRows([]);
   };
 
-  useEffect(() => {
-    if (debouncedSearchText.length === 0) {
-      return;
-    }
-    if (debouncedSearchText.length >= 3) {
-      const filterData: any = {};
-      selectedFilters.forEach((filter: any) => {
-        filterData[filter.key] = filter.value;
-      });
-      setSelectedRows([]);
-      dispatch(
-        fetchSearchSites({
-          searchParam: debouncedSearchText,
-          page,
-          pageSize,
-          sortBy: SiteSortBy.Id,
-          sortByDir: SortByDirection.Asc,
-          filter: filterData,
-        }),
-      );
-    }
-  }, [debouncedSearchText]); // eslint-disable-line react-hooks/exhaustive-deps
+  const handleClearSearch = () => {
+    lastWrittenSearch.current = '';
+    setSearchText('');
+    rememberQueryChange();
+    setQuery({ search: '', page: 1 });
+  };
 
-  const handleTextChange = (event: any) => {
+  const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setSearchText(value);
 
-    if (value.length === 0) {
-      dispatch(resetSiteSearch());
-    }
-  };
-
-  const changeHandler = (event: any) => {
-    if (event && event.property === 'select_row') {
-      if (event.value) {
-        const index = selectedRows.findIndex((r: any) => r.id === event.row.id);
-        if (index === -1) {
-          setSelectedRows([...selectedRows, event.row]);
-        }
-      } else {
-        setSelectedRows(selectedRows.filter((r: any) => r.id !== event.row.id));
-      }
-    } else if (event && event.property === 'select_all') {
-      const newRows = event.value;
-      if (event.selected) {
-        setSelectedRows((prevArray) => {
-          const existingIds = new Set(prevArray.map((obj) => obj.id));
-          const uniqueRows = newRows.filter(
-            (row: any) => !existingIds.has(row.id),
-          );
-          return [...prevArray, ...uniqueRows];
-        });
-      } else {
-        setSelectedRows((prevArray) => {
-          const idsToRemove = new Set(newRows.map((row: any) => row.id));
-          return prevArray.filter((obj) => !idsToRemove.has(obj.id));
-        });
-      }
+    if (value.trim().length === 0) {
+      lastWrittenSearch.current = '';
+      rememberQueryChange();
+      setQuery({ search: '', page: 1 });
     }
   };
 
@@ -172,41 +230,32 @@ const Search = () => {
 
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    const filteredFormData: { [key: string]: string } = {};
-    const filters: { key: string; value: string; label: string }[] = [];
+    const filteredFormData: { [key: string]: any } = {};
+    const filters: StoredFilter[] = [];
     const flattedArr = flattenFormRows(formRows);
-    // Filter out form data with non-empty values and construct filteredFormData and filters
     for (const [key, value] of Object.entries(formData)) {
-      let currLabel =
+      const currLabel =
         flattedArr && flattedArr.find((row) => row.graphQLPropertyName === key);
       if (key === 'whenCreated' || key === 'whenUpdated') {
-        let dateRangeValue = formatDateRange(value);
+        const dateRangeValue = formatDateRange(value);
         filteredFormData[key] = value;
         filters.push({
           key,
           value: dateRangeValue,
           label: currLabel?.label ?? '',
         });
-      } else if (value.trim() !== '') {
+      } else if (typeof value === 'string' && value.trim() !== '') {
         filteredFormData[key] = value;
         filters.push({ key, value, label: currLabel?.label ?? '' });
       }
     }
 
-    // show and format pill.
     if (filters.length !== 0) {
-      debouncedSearch(
-        searchParam,
-        1,
-        pageSize,
-        sortBy,
-        sortByDir,
-        filteredFormData,
-      );
       setSelectedFilters(filters);
-
-      // Save filter selections to local storage
+      setFormData(filteredFormData);
       localStorage.setItem('siteFilterPills', JSON.stringify(filters));
+      rememberQueryChange();
+      setQuery({ page: 1 });
     }
   };
 
@@ -214,129 +263,82 @@ const Search = () => {
     setFormData({});
     setSelectedFilters([]);
     localStorage.removeItem('siteFilterPills');
-    debouncedSearch(searchParam, 1, pageSize, sortBy, sortByDir, {});
+    rememberQueryChange();
+    setQuery({ page: 1 });
   };
 
-  useEffect(() => {
-    const storedFilters = localStorage.getItem('siteFilterPills');
-    if (storedFilters) {
-      const parsedFilters = JSON.parse(storedFilters);
-      const initialFormData: any = {};
-      parsedFilters.forEach((filter: any) => {
-        initialFormData[filter.key] = filter.value;
-      });
-      setFormData(initialFormData);
-      setSelectedFilters(parsedFilters);
-    }
-  }, []);
-
-  useEffect(() => {
-    dispatch(fetchSiteRiskCd());
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleRemoveFilter = (filter: any) => {
-    setFormData((prevData) => {
-      const updatedFilter = { ...prevData };
-      delete updatedFilter[filter.key]; // Remove the filter key from the form data
-      debouncedSearch(
-        searchParam,
-        1,
-        pageSize,
-        sortBy,
-        sortByDir,
-        updatedFilter,
-      );
-
-      return updatedFilter;
-    });
-    let currFilter = selectedFilters.filter((item) => item.key !== filter.key);
-    setSelectedFilters(currFilter);
-    localStorage.setItem('siteFilterPills', JSON.stringify(currFilter));
-  };
-
-  const handlePageSizeChange = (pageSize: number) => {
-    dispatch(
-      fetchSearchSites({
-        searchParam,
-        page: 1,
-        pageSize,
-        sortBy,
-        sortByDir,
-        filter: formData,
-      }),
+  const handleRemoveFilter = (filter: StoredFilter) => {
+    const nextFormData = { ...formData };
+    delete nextFormData[filter.key];
+    const nextFilters = selectedFilters.filter(
+      (item) => item.key !== filter.key,
     );
+    setFormData(nextFormData);
+    setSelectedFilters(nextFilters);
+    localStorage.setItem('siteFilterPills', JSON.stringify(nextFilters));
+    rememberQueryChange();
+    setQuery({ page: 1 });
   };
 
-  const handlePageChange = (page: number) => {
-    // Use only submitted filters (selectedFilters), not unsubmitted formData
-    const submittedFilters: any = {};
-    selectedFilters.forEach((filter) => {
-      submittedFilters[filter.key] = filter.value;
+  const handleSortChange = (columnId: string) => {
+    const nextField = columnSortField(columnsToDisplay, columnId);
+    if (!nextField) {
+      return;
+    }
+    const nextDirection =
+      nextField === sortBy && sortByDir === SortByDirection.Asc
+        ? SortByDirection.Desc
+        : SortByDirection.Asc;
+    rememberQueryChange();
+    setQuery({
+      sortBy: nextField,
+      sortByDir: nextDirection,
+      page: 1,
     });
-    debouncedSearch(
-      searchParam,
-      page,
-      pageSize,
-      sortBy,
-      sortByDir,
-      submittedFilters,
-    );
   };
 
-  // Mapping between GraphQL field names and SiteSortBy enum values
-  const columnToSortByMap: Record<string, SiteSortBy> = {
-    id: SiteSortBy.Id,
-    srStatus: SiteSortBy.SrStatus,
-    siteRiskCode: SiteSortBy.SiteRiskCode,
-    commonName: SiteSortBy.CommonName,
-    site_address: SiteSortBy.SiteAddress,
-    generalDescription: SiteSortBy.GeneralDescription,
-    city: SiteSortBy.City,
-    whoCreated: SiteSortBy.WhoCreated,
-    latdeg: SiteSortBy.LatDeg,
-    longdeg: SiteSortBy.LongDeg,
-    latDegressMinutesSeconds: SiteSortBy.LatDegreesMinutesSeconds,
-    longDegreesMinutesSeconds: SiteSortBy.LongDegreesMinutesSeconds,
-    whenCreated: SiteSortBy.WhenCreated,
-    whenUpdated: SiteSortBy.WhenUpdated,
-    latlongReliabilityFlag: SiteSortBy.LatLongReliabilityFlag,
-    consultantSubmitted: SiteSortBy.ConsultantSubmitted,
-  };
+  const isRowSelected = (row: SearchSiteRow) =>
+    selectedRows.some((item) => item.id === row.id);
 
-  const handleTableSortChange = (column: TableColumn, descending: boolean) => {
-    const sortByDir: SortByDirection = descending
-      ? SortByDirection.Desc
-      : SortByDirection.Asc;
-    let sortBy: SiteSortBy = columnToSortByMap[column.graphQLPropertyName];
-    if (column.graphQLPropertyName === 'addrLine_1,addrLine_2,addrLine_3') {
-      sortBy = columnToSortByMap['site_address'];
-    } else if (
-      column.graphQLPropertyName === 'longDegrees,longMinutes,longSeconds'
-    ) {
-      sortBy = columnToSortByMap['longDegreesMinutesSeconds'];
-    } else if (
-      column.graphQLPropertyName === 'latDegrees,latMinutes,latSeconds'
-    ) {
-      sortBy = columnToSortByMap['latDegressMinutesSeconds'];
-    } else {
-      sortBy = columnToSortByMap[column.graphQLPropertyName];
-    }
-    if (sortBy) {
-      // Use only submitted filters (selectedFilters), not unsubmitted formData
-      const submittedFilters: any = {};
-      selectedFilters.forEach((filter) => {
-        submittedFilters[filter.key] = filter.value;
+  const gridColumns = buildSearchResultColumns(columnsToDisplay, {
+    pageRows: sites,
+    isSelected: isRowSelected,
+    onToggleRow: (row, selected) => {
+      setSelectedRows((current) => {
+        if (selected) {
+          if (current.some((item) => item.id === row.id)) {
+            return current;
+          }
+          return [...current, row];
+        }
+        return current.filter((item) => item.id !== row.id);
       });
-      debouncedSearch(
-        searchParam,
-        page,
-        pageSize,
-        sortBy,
-        sortByDir,
-        submittedFilters,
-      );
-    }
-  };
+    },
+    onTogglePage: (selected) => {
+      setSelectedRows((current) => {
+        if (selected) {
+          const existingIds = new Set(current.map((item) => item.id));
+          return [
+            ...current,
+            ...sites.filter((row: SearchSiteRow) => !existingIds.has(row.id)),
+          ];
+        }
+        const pageIds = new Set(sites.map((row: SearchSiteRow) => row.id));
+        return current.filter((item) => !pageIds.has(item.id));
+      });
+    },
+  });
+
+  const activeColumnId = columnIdForSortField(columnsToDisplay, sortBy);
+  const gridSort = activeColumnId
+    ? {
+        id: activeColumnId,
+        direction:
+          sortByDir === SortByDirection.Desc
+            ? ('desc' as const)
+            : ('asc' as const),
+      }
+    : null;
 
   type PanelOption = 'filters' | 'columns' | null;
   const [panelToShow, setPanelToShow] = useState<PanelOption>(null);
@@ -349,7 +351,7 @@ const Search = () => {
     setPanelToShow(panel);
   };
 
-  const noUserAction = sites.length === 0 && searchText.length === 0;
+  const noUserAction = searchText.trim().length === 0;
 
   return (
     <PageContainer role="Search" aria-label="Search">
@@ -399,27 +401,9 @@ const Search = () => {
       ) : (
         <div className="search-parent">
           <Widget
-            changeHandler={changeHandler}
             title={'Results'}
-            tableColumns={columnsToDisplay.filter((x) => x.isChecked === true)}
-            tableData={sites}
-            tableIsLoading={status ?? RequestStatus.idle}
-            allowRowsSelect={true}
-            aria-label="Site Participant Widget"
             customLabelCss="custom-search-widget-lbl"
-            hideTable={false}
-            hideTitle={false}
-            editMode={false}
-            srMode={false}
-            hideWidgetCheckbox={true}
-            primaryKeycolumnName="id"
-            sortHandler={handleTableSortChange}
-            totalResults={count}
-            selectPage={handlePageChange}
-            changeResultsPerPage={handlePageSizeChange}
-            currentPage={page}
-            resultsPerPage={pageSize}
-            showPageOptions={true}
+            hideTable
             filter={
               <div>
                 <div className="table-actions d-none d-md-flex ">
@@ -469,6 +453,7 @@ const Search = () => {
             <SearchResultsActions
               selectedRows={selectedRows}
               selectedColumns={columnsToDisplay}
+              visibleCellText={displayedSearchCellText}
               aria-label="search-results-actions"
             />
             <SearchResultsFilters
@@ -491,6 +476,37 @@ const Search = () => {
                 handleRemoveFilter(filter);
               }}
             />
+            {searchQuery.isError ? (
+              <div className="noContent" role="alert">
+                <span className="noContentText">Search failed</span>
+              </div>
+            ) : (
+              <Grid
+                label="Search Results"
+                rows={sites}
+                columns={gridColumns}
+                sort={gridSort}
+                onSortChange={handleSortChange}
+                loading={loading}
+                fetching={fetching}
+                empty={empty}
+              />
+            )}
+            {sites.length > 0 ? (
+              <Pagination
+                changeResultsPerPage={(nextSize) => {
+                  rememberQueryChange();
+                  setQuery({ pageSize: nextSize, page: 1 });
+                }}
+                selectPage={(nextPage) => {
+                  rememberQueryChange();
+                  setQuery({ page: nextPage });
+                }}
+                currentPage={page}
+                resultsPerPage={pageSize}
+                totalResults={count}
+              />
+            ) : null}
           </Widget>
         </div>
       )}

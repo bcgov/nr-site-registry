@@ -795,6 +795,22 @@ export type Place = {
   name: Scalars['String']['output'];
 };
 
+export type ProfileAnswers = {
+  __typename?: 'ProfileAnswers';
+  questionId: Scalars['String']['output'];
+  siteId: Scalars['String']['output'];
+  sprofDateCompleted: Scalars['DateTime']['output'];
+  whenCreated: Scalars['DateTime']['output'];
+  whoCreated: Scalars['String']['output'];
+};
+
+export type ProfileSubmissions = {
+  __typename?: 'ProfileSubmissions';
+  sprofDateCompleted: Scalars['DateTime']['output'];
+  sprofSiteId: Scalars['String']['output'];
+  submcdCode: Scalars['String']['output'];
+};
+
 export type PurchasedSiteDto = {
   __typename?: 'PurchasedSiteDto';
   address?: Maybe<Scalars['String']['output']>;
@@ -1319,6 +1335,12 @@ export type SiteProfileLandUses = {
   whoUpdated?: Maybe<Scalars['String']['output']>;
 };
 
+export type SiteProfileQadto = {
+  __typename?: 'SiteProfileQADTO';
+  category?: Maybe<Scalars['String']['output']>;
+  question?: Maybe<Scalars['String']['output']>;
+};
+
 export type SiteProfileSchedule2RefDto = {
   __typename?: 'SiteProfileSchedule2RefDTO';
   apiAction?: Maybe<Scalars['String']['output']>;
@@ -1369,6 +1391,8 @@ export type SiteProfiles = {
   numberOfPins?: Maybe<Scalars['Float']['output']>;
   ownerParticId?: Maybe<Scalars['String']['output']>;
   plannedActivityComment?: Maybe<Scalars['String']['output']>;
+  profileAnswers?: Maybe<Array<ProfileAnswers>>;
+  profileSubmissions?: Maybe<Array<ProfileSubmissions>>;
   rwmDateDecision?: Maybe<Scalars['DateTime']['output']>;
   rwmDateReceived?: Maybe<Scalars['DateTime']['output']>;
   rwmFaxAreaCode?: Maybe<Scalars['String']['output']>;
@@ -1408,6 +1432,7 @@ export type SiteProfilesDto = {
   rwmParticId?: Maybe<Scalars['String']['output']>;
   siteDisclosureComment?: Maybe<Scalars['String']['output']>;
   siteId?: Maybe<Scalars['String']['output']>;
+  siteProfileQA?: Maybe<Array<SiteProfileQadto>>;
   siteProfileSchedule2Refs?: Maybe<Array<SiteProfileSchedule2RefDto>>;
   siteRegDateEntered?: Maybe<Scalars['DateTime']['output']>;
   siteRegDateRecd?: Maybe<Scalars['DateTime']['output']>;

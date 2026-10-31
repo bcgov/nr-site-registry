@@ -168,12 +168,10 @@ export function convertRowsToCSV(
   return `${escapedHeader}\n${escapedRows}`;
 }
 
-export function downloadSelectedColumnsCSV(
-  selectedRows: Record<string, unknown>[],
-  columns: TableColumn[],
+export function downloadCsvDocument(
+  csvString: string,
   filename: string = 'export.csv',
 ) {
-  const csvString = convertSelectedColumnsToCSV(selectedRows, columns);
   if (!csvString) {
     return;
   }
@@ -193,6 +191,42 @@ export function downloadSelectedColumnsCSV(
     globalThis.URL.revokeObjectURL(url);
   }, 0);
   document.body.removeChild(a);
+}
+
+export type LabeledCsvColumn = {
+  label: string;
+  value: (row: Record<string, unknown>) => string;
+};
+
+export function downloadLabeledValues(
+  rows: Record<string, unknown>[],
+  columns: LabeledCsvColumn[],
+  filename: string = 'export.csv',
+) {
+  if (rows.length === 0 || columns.length === 0) {
+    return;
+  }
+
+  const headers = columns.map((column) => column.label);
+  const formattedRows = rows.map((row) =>
+    columns.reduce<Record<string, unknown>>((record, column) => {
+      record[column.label] = column.value(row);
+      return record;
+    }, {}),
+  );
+
+  downloadCsvDocument(convertRowsToCSV(formattedRows, headers), filename);
+}
+
+export function downloadSelectedColumnsCSV(
+  selectedRows: Record<string, unknown>[],
+  columns: TableColumn[],
+  filename: string = 'export.csv',
+) {
+  downloadCsvDocument(
+    convertSelectedColumnsToCSV(selectedRows, columns),
+    filename,
+  );
 }
 
 export function convertSelectedColumnsToCSV(

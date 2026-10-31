@@ -50,6 +50,10 @@ import {
   columnSortField,
   displayedSearchCellText,
 } from './searchResults/searchResultColumns';
+import {
+  isRowSelected as rowIsSelected,
+  toggleSelectedRow,
+} from './searchResults/selectedRows';
 
 const searchQueryParams = {
   page: withDefault(NumberParam, 1),
@@ -293,21 +297,13 @@ const Search = () => {
   };
 
   const isRowSelected = (row: SearchSiteRow) =>
-    selectedRows.some((item) => item.id === row.id);
+    rowIsSelected(selectedRows, row);
 
   const gridColumns = buildSearchResultColumns(columnsToDisplay, {
     pageRows: sites,
     isSelected: isRowSelected,
     onToggleRow: (row, selected) => {
-      setSelectedRows((current) => {
-        if (selected) {
-          if (current.some((item) => item.id === row.id)) {
-            return current;
-          }
-          return [...current, row];
-        }
-        return current.filter((item) => item.id !== row.id);
-      });
+      setSelectedRows((current) => toggleSelectedRow(current, row, selected));
     },
     onTogglePage: (selected) => {
       setSelectedRows((current) => {

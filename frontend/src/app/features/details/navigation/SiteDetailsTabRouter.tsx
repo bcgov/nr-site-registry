@@ -1,5 +1,5 @@
-import { ComponentType } from 'react';
-import { Navigate, useLocation, useParams } from 'react-router-dom';
+import { ComponentType, useEffect } from 'react';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import Associate from '../associates/Associate';
 import Disclosure from '../disclosure/Disclosure';
@@ -11,6 +11,7 @@ import Participants from '../participants/Participant';
 import SRUpdates from '../srUpdates/srUpdates';
 import Summary from '../summary/Summary';
 import { DEFAULT_SITE_TAB, isSiteTabPath, SiteTabPath } from './siteTabCatalog';
+import { searchWithoutSectionListParams } from '../sectionListQuery';
 import SiteTabAccessGate from './SiteTabAccessGate';
 
 const SITE_TAB_VIEWS: Record<SiteTabPath, ComponentType> = {
@@ -28,6 +29,20 @@ const SITE_TAB_VIEWS: Record<SiteTabPath, ComponentType> = {
 const SiteDetailsTabRouter = () => {
   const { tab } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (tab !== 'notations' && tab !== 'disclosure') {
+      return;
+    }
+    const nextSearch = searchWithoutSectionListParams(location.search);
+    if (nextSearch !== location.search) {
+      navigate(
+        { pathname: location.pathname, search: nextSearch },
+        { replace: true },
+      );
+    }
+  }, [tab, location.pathname, location.search, navigate]);
 
   if (!isSiteTabPath(tab)) {
     return (

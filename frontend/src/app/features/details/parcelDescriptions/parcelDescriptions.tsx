@@ -1,6 +1,5 @@
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
-import { TableColumn } from '../../../components/table/TableColumn';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../Store';
@@ -20,9 +19,18 @@ import {
   updateSortByInputValue,
   updateUpdatedRows,
 } from './parcelDescriptionsSlice';
+import { useParcelListQuery } from '../sectionListQuery';
+import { GridSort } from '../../../components/grid/Grid';
+import {
+  gridSortDirection,
+  nextSortDirection,
+} from '../../../helpers/pagedList';
+import { SortByDirection } from '../../../../graphql/generated';
 import {
   getAddDeleteParcelDescriptionTableColumns,
   getParcelDescriptionsTableColumns,
+  parcelColumnIdForSort,
+  parcelSortFieldForColumn,
   ParcelDescriptionType,
 } from './parcelDescriptionsConfig';
 import { useParams } from 'react-router-dom';
@@ -81,6 +89,13 @@ type ParcelDescriptionsChangeEvent = {
 
 const ParcelDescriptions = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const {
+    page: urlPage,
+    pageSize: urlPageSize,
+    sortBy: urlSortBy,
+    sortByDir: urlSortByDir,
+    setQuery,
+  } = useParcelListQuery();
   const reduxState = useSelector(parcelDescriptions);
   const viewMode: SiteDetailsMode = useSelector(siteDetailsMode);
   const saveSiteDetailsRequestStatus: RequestStatus =
@@ -94,13 +109,17 @@ const ParcelDescriptions = () => {
     dispatch(resetAllDataForSite(siteId));
     const fetchParams: IFetchParcelDescriptionsParams = {
       siteId: siteId,
-      page: initialParcelDescriptionsState.currentPage,
-      pageSize: initialParcelDescriptionsState.resultsPerPage,
+      page: urlPage,
+      pageSize: urlPageSize,
       searchParam: initialParcelDescriptionsState.searchParam,
-      sortBy: initialParcelDescriptionsState.sortBy,
-      sortByDir: initialParcelDescriptionsState.sortByDir,
+      sortBy: urlSortBy,
+      sortByDir: urlSortByDir,
       showPending: false, // Unused in this component.
     };
+    dispatch(updateCurrentPage(urlPage));
+    dispatch(updateResultsPerPage(urlPageSize));
+    dispatch(updateSortBy(urlSortBy));
+    dispatch(updateSortByDir(urlSortByDir));
     dispatch(fetchParcelDescriptions(fetchParams));
   }
 
@@ -159,16 +178,22 @@ const ParcelDescriptions = () => {
   }, [loggedInUser]);
 
   const handleSelectPage = (newPage: number) => {
-    if (newPage !== currentPage) {
+    if (newPage !== urlPage) {
+      setQuery({ page: newPage });
       dispatch(updateCurrentPage(newPage));
       fetchNewParcelDescriptions({ newPage: newPage });
     }
   };
 
   const handleChangeResultsPerPage = (newResultsPerPage: number) => {
-    if (newResultsPerPage !== resultsPerPage) {
+    if (newResultsPerPage !== urlPageSize) {
+      setQuery({ pageSize: newResultsPerPage, page: 1 });
       dispatch(updateResultsPerPage(newResultsPerPage));
-      fetchNewParcelDescriptions({ newPageSize: newResultsPerPage });
+      dispatch(updateCurrentPage(1));
+      fetchNewParcelDescriptions({
+        newPage: 1,
+        newPageSize: newResultsPerPage,
+      });
     }
   };
 
@@ -210,8 +235,14 @@ const ParcelDescriptions = () => {
         break;
     }
     if (sortByInputValue[graphQLPropertyName] !== newSortByInputValue) {
+      setQuery({
+        sortBy: newSortBy,
+        sortByDir: newSortByDir,
+        page: 1,
+      });
       dispatch(updateSortBy(newSortBy));
       dispatch(updateSortByDir(newSortByDir));
+      dispatch(updateCurrentPage(1));
       dispatch(
         updateSortByInputValue({
           ...sortByInputValue,
@@ -221,37 +252,45 @@ const ParcelDescriptions = () => {
       fetchNewParcelDescriptions({
         newSortBy: newSortBy,
         newSortByDir: newSortByDir,
+        newPage: 1,
       });
     }
   };
 
-  const handleTableSortChange = (column: TableColumn, descending: boolean) => {
-    let newSortBy = 'id';
-    let newSortByDir = descending ? 'DESC' : 'ASC';
-    switch (column.graphQLPropertyName) {
-      case 'descriptionType':
-        newSortBy = 'description_type';
-        break;
-      case 'idPinNumber':
-        newSortBy = 'id_pin_number';
-        break;
-      case 'dateNoted':
-        newSortBy = 'date_noted';
-        break;
-      case 'landDescription':
-        newSortBy = 'land_description';
-        break;
+  const handleColumnSort = (columnId: string) => {
+    const newSortBy = parcelSortFieldForColumn(columnId);
+    if (!newSortBy) {
+      return;
     }
-
-    if (newSortBy !== sortBy) {
-      dispatch(updateSortBy(newSortBy));
-      dispatch(updateSortByDir(newSortByDir));
-      fetchNewParcelDescriptions({
-        newSortBy: newSortBy,
-        newSortByDir: newSortByDir,
-      });
-    }
+    const newSortByDir = nextSortDirection(
+      urlSortBy,
+      urlSortByDir === SortByDirection.Desc
+        ? SortByDirection.Desc
+        : SortByDirection.Asc,
+      newSortBy,
+    );
+    setQuery({ sortBy: newSortBy, sortByDir: newSortByDir, page: 1 });
+    dispatch(updateSortBy(newSortBy));
+    dispatch(updateSortByDir(newSortByDir));
+    dispatch(updateCurrentPage(1));
+    fetchNewParcelDescriptions({
+      newSortBy,
+      newSortByDir,
+      newPage: 1,
+    });
   };
+
+  const parcelSortColumnId = parcelColumnIdForSort(urlSortBy);
+  const parcelGridSort: GridSort | null = parcelSortColumnId
+    ? {
+        id: parcelSortColumnId,
+        direction: gridSortDirection(
+          urlSortByDir === SortByDirection.Desc
+            ? SortByDirection.Desc
+            : SortByDirection.Asc,
+        ),
+      }
+    : null;
 
   const handleRowUpdate = (newRow: IParcelDescriptionDto) => {
     let rowExistsInMemory = false;
@@ -562,6 +601,42 @@ const ParcelDescriptions = () => {
     dispatch(fetchParcelDescriptions(fetchParams));
   };
 
+  useEffect(() => {
+    if (!id?.trim() || reduxState.siteId !== siteId) {
+      return;
+    }
+    if (
+      reduxState.currentPage === urlPage &&
+      reduxState.resultsPerPage === urlPageSize &&
+      reduxState.sortBy === urlSortBy &&
+      reduxState.sortByDir === urlSortByDir
+    ) {
+      return;
+    }
+    dispatch(updateCurrentPage(urlPage));
+    dispatch(updateResultsPerPage(urlPageSize));
+    dispatch(updateSortBy(urlSortBy));
+    dispatch(updateSortByDir(urlSortByDir));
+    fetchNewParcelDescriptions({
+      newPage: urlPage,
+      newPageSize: urlPageSize,
+      newSortBy: urlSortBy,
+      newSortByDir: urlSortByDir,
+    });
+  }, [
+    urlPage,
+    urlPageSize,
+    urlSortBy,
+    urlSortByDir,
+    siteId,
+    id,
+    reduxState.siteId,
+    reduxState.currentPage,
+    reduxState.resultsPerPage,
+    reduxState.sortBy,
+    reduxState.sortByDir,
+  ]);
+
   React.useEffect(() => {
     dispatch(
       setupParcelDescriptionsDataForSaving([
@@ -637,7 +712,6 @@ const ParcelDescriptions = () => {
             handleChangeResultsPerPage={() => {}}
             currentPage={1}
             resultsPerPage={addedRows.length}
-            handleTableSortChange={() => {}}
             viewMode={viewMode}
             tableChangeHandler={handleAddTableChange}
             deleteHandler={handleAddedRowRemoval}
@@ -668,7 +742,6 @@ const ParcelDescriptions = () => {
             handleChangeResultsPerPage={() => {}}
             currentPage={1}
             resultsPerPage={deletedRows.length}
-            handleTableSortChange={() => {}}
             viewMode={SiteDetailsMode.ViewOnlyMode}
             tableChangeHandler={() => {}}
             deleteHandler={handleDeletedRowRemoval}
@@ -719,7 +792,11 @@ const ParcelDescriptions = () => {
             handleChangeResultsPerPage={handleChangeResultsPerPage}
             currentPage={currentPage}
             resultsPerPage={resultsPerPage}
-            handleTableSortChange={handleTableSortChange}
+            sortControl={{
+              manual: true,
+              sort: parcelGridSort,
+              onSortChange: handleColumnSort,
+            }}
             viewMode={viewMode}
             tableChangeHandler={handleEditTableChange}
             deleteHandler={() => {}}

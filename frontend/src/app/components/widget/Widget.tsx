@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { IWidget } from './IWidget';
-import Table from '../table/Table';
 import './Widget.css';
 import { CheckBoxInput } from '../input-controls/InputControls';
 import { FormFieldType } from '../input-controls/IFormField';
 import { RequestStatus } from '../../helpers/requests/status';
+import SectionGrid from '../grid/SectionGrid';
 
 const Widget: React.FC<IWidget> = ({
   title,
@@ -22,7 +22,6 @@ const Widget: React.FC<IWidget> = ({
   currentPage,
   changeHandler,
   handleCheckBoxChange,
-  sortHandler,
   showPageOptions,
   isRequired,
   widgetIschecked,
@@ -33,13 +32,9 @@ const Widget: React.FC<IWidget> = ({
   totalResults,
   deleteHandler,
   filter,
+  sortControl,
+  empty,
 }) => {
-  let widgetSortHandler = sortHandler ?? (() => {});
-  const [widgetData, setWidgetData] = useState(tableData);
-  useEffect(() => {
-    setWidgetData(tableData);
-  }, [tableData]);
-
   return (
     <div className={`d-flex flex-column widget-container`}>
       {!hideTitle && title && (
@@ -67,24 +62,25 @@ const Widget: React.FC<IWidget> = ({
       {children && <div>{children}</div>}
       {!hideTable && (
         <div className="me-1">
-          <Table
+          <SectionGrid
             label={title ?? ''}
-            isLoading={tableIsLoading ?? RequestStatus.idle}
             columns={tableColumns ?? []}
-            data={widgetData}
+            rows={tableData ?? []}
+            isLoading={tableIsLoading ?? RequestStatus.idle}
             showPageOptions={showPageOptions}
-            allowRowsSelect={allowRowsSelect}
+            allowRowsSelect={allowRowsSelect ?? false}
             changeHandler={changeHandler ?? (() => {})}
             editMode={editMode ?? false}
             srMode={srMode ?? false}
             idColumnName={primaryKeycolumnName ?? ''}
-            sortHandler={widgetSortHandler}
             currentPage={currentPage}
             selectPage={selectPage}
             changeResultsPerPage={changeResultsPerPage}
             resultsPerPage={resultsPerPage}
             totalResults={totalResults}
             deleteHandler={deleteHandler ?? (() => {})}
+            sortControl={sortControl}
+            empty={empty}
           />
         </div>
       )}

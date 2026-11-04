@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Actions from '../../action/Actions';
 import { Button } from '../../button/Button';
 import useMediaQuery from '../../../hooks/useMediaQuery';
+import { searchWithoutSectionListParams } from '../../../features/details/sectionListQuery';
 
 const getTabFromPathname = (
   pathname: string,
@@ -30,7 +31,10 @@ const NavigationPills: React.FC<INavigationPills> = ({
     if (isDisable || !tabKey || tabKey === activeTabKey) {
       return;
     }
-    navigate({ pathname: tabKey, search: location.search });
+    navigate({
+      pathname: tabKey,
+      search: searchWithoutSectionListParams(location.search),
+    });
   };
 
   const isActiveTabFirstPosition = () => getCurrentElementIndex() === 0;

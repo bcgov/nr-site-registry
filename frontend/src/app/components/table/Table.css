@@ -65,6 +65,7 @@
 }
 
 .tableWidth {
+  position: relative;
   width: 100%;
   overflow-x: scroll;
 }

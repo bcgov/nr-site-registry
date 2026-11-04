@@ -4,6 +4,7 @@ import Widget from '../../../components/widget/Widget';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { UserMinus, UserPlus } from '../../../components/common/icon';
 import { Button } from '../../../components/button/Button';
+import { SectionSortControl } from '../../../components/grid/SectionGrid';
 
 interface ILandUseTable {
   approveRejectHandler?: (value: boolean) => void;
@@ -13,7 +14,7 @@ interface ILandUseTable {
   editModeEnabled: boolean;
   tableLoading: RequestStatus | undefined;
   viewMode: SiteDetailsMode;
-  handleTableSort: (row: any, ascDir: boolean) => void;
+  sortControl?: SectionSortControl;
   selectedRowIds: any;
   handleRemoveLandUse: (event: any) => void;
   handleAddLandUse: (event: any) => void;
@@ -27,7 +28,7 @@ const LandUseTable: React.FC<ILandUseTable> = ({
   editModeEnabled,
   tableLoading,
   viewMode,
-  handleTableSort,
+  sortControl,
   selectedRowIds,
   handleRemoveLandUse,
   handleAddLandUse,
@@ -45,8 +46,8 @@ const LandUseTable: React.FC<ILandUseTable> = ({
       editMode={editModeEnabled}
       srMode={viewMode === SiteDetailsMode.SRMode}
       primaryKeycolumnName="guid"
-      sortHandler={handleTableSort}
       hideWidgetCheckbox={true}
+      sortControl={sortControl}
     >
       {editModeEnabled && (
         <div className="d-flex gap-2 flex-wrap ">

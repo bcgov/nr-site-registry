@@ -5,6 +5,8 @@ import { Provider } from 'react-redux';
 import { render, screen } from '@testing-library/react';
 import Folios from './Folios';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { RequestStatus } from '../../helpers/requests/status';
 
 import { useAuth } from '../../../../node_modules/react-oidc-context';
@@ -24,7 +26,11 @@ jest.mock('../../helpers/utility', () => ({
 
 const router = createBrowserRouter([
   {
-    element: <Folios />,
+    element: (
+      <QueryParamProvider adapter={ReactRouter6Adapter}>
+        <Folios />
+      </QueryParamProvider>
+    ),
     path: '/',
   },
 ]);

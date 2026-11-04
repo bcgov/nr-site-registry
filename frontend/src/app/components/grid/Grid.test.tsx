@@ -3,6 +3,17 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import Grid, { GridColumn, GridSort } from './Grid';
 
+function RememberedInput({ label }: { label: string }) {
+  const [value, setValue] = useState('');
+  return (
+    <input
+      aria-label={label}
+      value={value}
+      onChange={(event) => setValue(event.target.value)}
+    />
+  );
+}
+
 type SampleRow = { name: string; note: string };
 
 const columns: GridColumn<SampleRow>[] = [
@@ -193,6 +204,48 @@ describe('Grid', () => {
       'colspan',
       '2',
     );
+  });
+
+  test('keeps an edited cell when the column definitions are replaced', async () => {
+    const user = userEvent.setup();
+    const columnsFor = (): GridColumn<SampleRow>[] => [
+      {
+        id: 'name',
+        label: 'Name',
+        sortable: false,
+        cell: (row) => <RememberedInput label={row.name} />,
+      },
+    ];
+
+    const { rerender } = render(
+      <Grid
+        label="Sites"
+        rows={rows}
+        columns={columnsFor()}
+        sort={null}
+        onSortChange={() => {}}
+        loading={false}
+        fetching={false}
+        empty={false}
+      />,
+    );
+
+    await user.type(screen.getByRole('textbox', { name: 'Alpha' }), 'kept');
+
+    rerender(
+      <Grid
+        label="Sites"
+        rows={rows}
+        columns={columnsFor()}
+        sort={null}
+        onSortChange={() => {}}
+        loading={false}
+        fetching={false}
+        empty={false}
+      />,
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Alpha' })).toHaveValue('kept');
   });
 
   test('keeps the current rows on screen while a later page is fetching', () => {

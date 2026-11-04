@@ -10,11 +10,22 @@
   cursor: pointer;
 }
 
+.grid-frame {
+  display: grid;
+}
+
+.grid-frame > .grid-fetching,
+.grid-frame > .tableWidth {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
 .grid-fetching {
-  position: absolute;
-  top: 0.25rem;
-  right: 0.5rem;
+  justify-self: end;
+  align-self: start;
   z-index: 2;
+  margin-top: 0.25rem;
+  margin-right: 0.5rem;
   pointer-events: none;
   color: var(--icons-color-disabled);
 }

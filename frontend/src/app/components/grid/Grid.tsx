@@ -1,5 +1,6 @@
 import { Fragment, ReactNode, useMemo } from 'react';
 import {
+  CellContext,
   ColumnDef,
   flexRender,
   getCoreRowModel,
@@ -63,6 +64,10 @@ function columnSource<Row>(columnDef: ColumnDef<Row>): GridColumn<Row> {
   return (columnDef.meta as GridColumnMeta<Row>).source;
 }
 
+function GridCell<Row>(context: CellContext<Row, unknown>) {
+  return columnSource(context.column.columnDef).cell(context.row.original);
+}
+
 const emptySorting: { id: string; desc: boolean }[] = [];
 
 function Grid<Row>({
@@ -80,7 +85,7 @@ function Grid<Row>({
     id: column.id,
     accessorFn: (row) => column.sortValue?.(row) ?? '',
     header: column.label,
-    cell: (info) => columnSource(info.column.columnDef).cell(info.row.original),
+    cell: GridCell,
     enableSorting: Boolean(column.sortable),
     meta: { source: column } satisfies GridColumnMeta<Row>,
   }));
@@ -108,104 +113,106 @@ function Grid<Row>({
   const showEmptyRow = empty && !showLoadingRow && rows.length === 0;
 
   return (
-    <div className="tableWidth table-border-radius">
+    <div className="grid-frame">
       {fetching && !showLoadingRow ? (
         <div className="grid-fetching" role="status">
           <SpinnerIcon aria-label="Updating results" className="fa-spin" />
         </div>
       ) : null}
-      <table
-        className="table"
-        aria-label={label}
-        aria-busy={loading || fetching}
-      >
-        <thead aria-label={`${label} Header`}>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="table-header">
-              {headerGroup.headers.map((header) => {
-                const column = columnSource(header.column.columnDef);
-                const ariaSort = sortStateFor(column, sort);
-                const headerContent = column.header ?? column.label;
-                return (
-                  <th
-                    key={header.id}
-                    scope="col"
-                    aria-sort={ariaSort}
-                    className={`table-header-th ${column.headerClassName ?? ''}`}
-                  >
-                    {column.sortable ? (
-                      <button
-                        type="button"
-                        className="grid-sort-button"
-                        onClick={() => onSortChange(column.id)}
-                      >
-                        {headerContent}
-                        <SortGlyph direction={ariaSort} />
-                      </button>
-                    ) : (
-                      headerContent
-                    )}
-                  </th>
-                );
-              })}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {showLoadingRow ? (
-            <tr>
-              <td
-                colSpan={columnCount}
-                className="noContent table-border-light"
-              >
-                <div className="content-loading">
-                  <SpinnerIcon
-                    data-testid="loading-spinner"
-                    className="fa-spin"
-                  />
-                  <span className="noContentText">Searching</span>
-                </div>
-              </td>
-            </tr>
-          ) : null}
-          {showEmptyRow ? (
-            <tr>
-              <td
-                colSpan={columnCount}
-                className="noContent table-border-light"
-              >
-                <span className="noContentText">No Results Found</span>
-              </td>
-            </tr>
-          ) : null}
-          {!showLoadingRow &&
-            table.getRowModel().rows.map((row) => (
-              <tr key={row.id} data-testid="table-row">
-                {row.getVisibleCells().map((cell) => {
-                  const column = columnSource(cell.column.columnDef);
-                  const content = flexRender(
-                    cell.column.columnDef.cell,
-                    cell.getContext(),
-                  );
-                  if (column?.rendersOwnCell) {
-                    return <Fragment key={cell.id}>{content}</Fragment>;
-                  }
+      <div className="tableWidth table-border-radius">
+        <table
+          className="table"
+          aria-label={label}
+          aria-busy={loading || fetching}
+        >
+          <thead aria-label={`${label} Header`}>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} className="table-header">
+                {headerGroup.headers.map((header) => {
+                  const column = columnSource(header.column.columnDef);
+                  const ariaSort = sortStateFor(column, sort);
+                  const headerContent = column.header ?? column.label;
                   return (
-                    <td
-                      key={cell.id}
-                      className={
-                        column?.cellClassName ??
-                        'table-border-light content-text align-content-center'
-                      }
+                    <th
+                      key={header.id}
+                      scope="col"
+                      aria-sort={ariaSort}
+                      className={`table-header-th ${column.headerClassName ?? ''}`}
                     >
-                      {content}
-                    </td>
+                      {column.sortable ? (
+                        <button
+                          type="button"
+                          className="grid-sort-button"
+                          onClick={() => onSortChange(column.id)}
+                        >
+                          {headerContent}
+                          <SortGlyph direction={ariaSort} />
+                        </button>
+                      ) : (
+                        headerContent
+                      )}
+                    </th>
                   );
                 })}
               </tr>
             ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {showLoadingRow ? (
+              <tr>
+                <td
+                  colSpan={columnCount}
+                  className="noContent table-border-light"
+                >
+                  <div className="content-loading">
+                    <SpinnerIcon
+                      data-testid="loading-spinner"
+                      className="fa-spin"
+                    />
+                    <span className="noContentText">Searching</span>
+                  </div>
+                </td>
+              </tr>
+            ) : null}
+            {showEmptyRow ? (
+              <tr>
+                <td
+                  colSpan={columnCount}
+                  className="noContent table-border-light"
+                >
+                  <span className="noContentText">No Results Found</span>
+                </td>
+              </tr>
+            ) : null}
+            {!showLoadingRow &&
+              table.getRowModel().rows.map((row) => (
+                <tr key={row.id} data-testid="table-row">
+                  {row.getVisibleCells().map((cell) => {
+                    const column = columnSource(cell.column.columnDef);
+                    const content = flexRender(
+                      cell.column.columnDef.cell,
+                      cell.getContext(),
+                    );
+                    if (column?.rendersOwnCell) {
+                      return <Fragment key={cell.id}>{content}</Fragment>;
+                    }
+                    return (
+                      <td
+                        key={cell.id}
+                        className={
+                          column?.cellClassName ??
+                          'table-border-light content-text align-content-center'
+                        }
+                      >
+                        {content}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

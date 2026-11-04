@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useSectionSortQuery } from '../sectionListQuery';
+import { SortByDirection } from '../../../../graphql/generated';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,7 +19,6 @@ import {
   getUser,
   isUserOfType,
   resultCache,
-  sortArray,
   UpdateDisplayTypeParams,
   updateTableColumn,
   UserRoleType,
@@ -80,7 +81,14 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   >([]);
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
-  const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
+  const { sortBy, sortByDir, gridSort, setQuery, setColumnSort } =
+    useSectionSortQuery(['siteIdAssociatedWith', 'effectiveDate', 'note']);
+  const sortByValue =
+    sortBy === 'effectiveDate'
+      ? {
+          sortBy: sortByDir === SortByDirection.Desc ? 'newToOld' : 'oldTonew',
+        }
+      : {};
   const [selectedRows, setSelectedRows] = useState<
     { siteId: String; siteIdAssociatedWith: string; id: string }[]
   >([]);
@@ -333,40 +341,22 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     return false;
   };
 
-  const handleSortChange = useCallback(
-    (graphQLPropertyName: any, value: string | [Date, Date]) => {
-      setSortByValue((prevData) => ({
-        ...prevData,
-        [graphQLPropertyName]: value,
-      }));
-      sortItems(value, formData);
-    },
-    [formData],
-  );
-
-  const sortItems = (sortBy: any, data: any) => {
-    let sorted = [...data];
-    switch (sortBy) {
-      case 'newToOld':
-        sorted.sort(
-          (a, b) =>
-            new Date(b.effectiveDate).getTime() -
-            new Date(a.effectiveDate).getTime(),
-        ); // Sorting by date from new to old
-        break;
-      case 'oldTonew':
-        sorted.sort(
-          (a, b) =>
-            new Date(a.effectiveDate).getTime() -
-            new Date(b.effectiveDate).getTime(),
-        ); // Sorting by date from new to old
-        break;
-      // Add more cases for additional sorting options
-      default:
-        break;
-    }
-    setFormData(sorted);
+  const handleColumnSort = (columnId: string) => {
+    setColumnSort(columnId);
   };
+
+  const handleSortChange = useCallback(
+    (_graphQLPropertyName: any, value: string | [Date, Date]) => {
+      if (value === 'newToOld' || value === 'oldTonew') {
+        setQuery({
+          sortBy: 'effectiveDate',
+          sortByDir:
+            value === 'newToOld' ? SortByDirection.Desc : SortByDirection.Asc,
+        });
+      }
+    },
+    [setQuery],
+  );
 
   const handleTableChange = (event: any) => {
     if (
@@ -503,24 +493,6 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     }
   };
 
-  const handleTableSort = (row: any, ascDir: any) => {
-    let property = row['graphQLPropertyName'];
-    setFormData((prevData) => {
-      // Create a shallow copy of the previous data
-      let updatedAssociatedSites = [...prevData];
-
-      // Call the common sort function to sort the updatedParticipant array
-      updatedAssociatedSites = sortArray(
-        updatedAssociatedSites,
-        property,
-        ascDir,
-      );
-
-      // Return the sorted array
-      return updatedAssociatedSites;
-    });
-  };
-
   const handleItemClick = (value: string) => {
     switch (value) {
       case SRVisibility.ShowSR:
@@ -651,7 +623,11 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
             associateColumnExternal={associateColumnExternal}
             formData={formData}
             loading={loading}
-            handleTableSort={handleTableSort}
+            sortControl={{
+              manual: false,
+              sort: gridSort,
+              onSortChange: handleColumnSort,
+            }}
             handleAddAssociate={handleAddAssociate}
             selectedRows={selectedRows}
             handleRemoveAssociate={handleRemoveAssociate}

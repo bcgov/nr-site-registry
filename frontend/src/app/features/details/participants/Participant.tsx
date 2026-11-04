@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useSectionSortQuery } from '../sectionListQuery';
+import { SortByDirection } from '../../../../graphql/generated';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { RequestStatus } from '../../../helpers/requests/status';
@@ -35,7 +37,6 @@ import {
   isUserOfType,
   parseDate,
   resultCache,
-  sortArray,
   UpdateDisplayTypeParams,
   updateTableColumn,
   UserRoleType,
@@ -80,7 +81,20 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [formData, setFormData] = useState<
     { [key: string]: any | [Date, Date] }[]
   >(siteParticipant ?? []);
-  const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
+  const { sortBy, sortByDir, gridSort, setQuery, setColumnSort } =
+    useSectionSortQuery([
+      'psnorgId',
+      'prCode',
+      'effectiveDate',
+      'endDate',
+      'note',
+    ]);
+  const sortByValue =
+    sortBy === 'effectiveDate'
+      ? {
+          sortBy: sortByDir === SortByDirection.Desc ? 'newToOld' : 'oldTonew',
+        }
+      : {};
   const [searchTerm, setSearchTerm] = useState('');
   const [searchSiteParticipant, setSearchSiteParticipant] = useState('');
   const [selectedRows, setSelectedRows] = useState<
@@ -504,39 +518,21 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
     }
   };
 
-  const handleSortChange = (
-    graphQLPropertyName: any,
-    value: String | [Date, Date],
-  ) => {
-    setSortByValue((prevData) => ({
-      ...prevData,
-      [graphQLPropertyName]: value,
-    }));
-    sortItems(value, formData);
+  const handleColumnSort = (columnId: string) => {
+    setColumnSort(columnId);
   };
 
-  const sortItems = (sortBy: any, data: any) => {
-    let sorted = [...data];
-    switch (sortBy) {
-      case 'newToOld':
-        sorted.sort(
-          (a, b) =>
-            new Date(b.effectiveDate).getTime() -
-            new Date(a.effectiveDate).getTime(),
-        ); // Sorting by date from new to old
-        break;
-      case 'oldTonew':
-        sorted.sort(
-          (a, b) =>
-            new Date(a.effectiveDate).getTime() -
-            new Date(b.effectiveDate).getTime(),
-        ); // Sorting by date from new to old
-        break;
-      // Add more cases for additional sorting options
-      default:
-        break;
+  const handleSortChange = (
+    _graphQLPropertyName: any,
+    value: String | [Date, Date],
+  ) => {
+    if (value === 'newToOld' || value === 'oldTonew') {
+      setQuery({
+        sortBy: 'effectiveDate',
+        sortByDir:
+          value === 'newToOld' ? SortByDirection.Desc : SortByDirection.Asc,
+      });
     }
-    setFormData(sorted);
   };
 
   const handleAddParticipant = () => {
@@ -568,20 +564,6 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
       ChangeContext.SITE_PARTICIPANT,
     );
     dispatch(trackChanges(tracker.toPlainObject()));
-  };
-
-  const handleTableSort = (row: any, ascDir: any) => {
-    let property = row['graphQLPropertyName'];
-    setFormData((prevData) => {
-      // Create a shallow copy of the previous data
-      let updatedParticipant = [...prevData];
-
-      // Call the common sort function to sort the updatedParticipant array
-      updatedParticipant = sortArray(updatedParticipant, property, ascDir);
-
-      // Return the sorted array
-      return updatedParticipant;
-    });
   };
 
   const handleItemClick = (value: string) => {
@@ -629,7 +611,11 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
         formData={formData}
         status={status}
         viewMode={viewMode}
-        handleTableSort={handleTableSort}
+        sortControl={{
+          manual: false,
+          sort: gridSort,
+          onSortChange: handleColumnSort,
+        }}
         handleAddParticipant={handleAddParticipant}
         selectedRows={selectedRows}
         handleRemoveParticipant={handleRemoveParticipant}

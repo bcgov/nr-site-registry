@@ -183,6 +183,8 @@ export const trackedChanges = (state: any) => state.sites.changeTracker;
 export const siteDetailsMode = (state: any) => state.sites.siteDetailsMode;
 export const resetSiteDetails = (state: any) => state.sites.resetSiteDetails;
 export const selectSiteInsights = (state: any) => state.sites.siteInsights;
+export const selectSiteInsightsFetchStatus = (state: any) =>
+  state.sites.siteInsightsFetchStatus;
 
 export const {
   trackChanges,

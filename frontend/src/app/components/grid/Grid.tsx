@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { Fragment, ReactNode, useMemo } from 'react';
 import {
   ColumnDef,
   flexRender,
@@ -27,6 +27,7 @@ export type GridColumn<Row> = {
   sortValue?: (row: Row) => string | number;
   cellClassName?: string;
   headerClassName?: string;
+  rendersOwnCell?: boolean;
 };
 
 type GridColumnMeta<Row> = {
@@ -62,6 +63,8 @@ function columnSource<Row>(columnDef: ColumnDef<Row>): GridColumn<Row> {
   return (columnDef.meta as GridColumnMeta<Row>).source;
 }
 
+const emptySorting: { id: string; desc: boolean }[] = [];
+
 function Grid<Row>({
   label,
   rows,
@@ -82,14 +85,21 @@ function Grid<Row>({
     meta: { source: column } satisfies GridColumnMeta<Row>,
   }));
 
+  const sorting = useMemo(
+    () =>
+      sort ? [{ id: sort.id, desc: sort.direction === 'desc' }] : emptySorting,
+    [sort?.id, sort?.direction],
+  );
+
   const table = useReactTable({
     data: rows,
     columns: columnDefs,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: manualSorting ? undefined : getSortedRowModel(),
     manualSorting,
+    autoResetPageIndex: false,
     state: {
-      sorting: sort ? [{ id: sort.id, desc: sort.direction === 'desc' }] : [],
+      sorting,
     },
   });
 
@@ -173,6 +183,13 @@ function Grid<Row>({
               <tr key={row.id} data-testid="table-row">
                 {row.getVisibleCells().map((cell) => {
                   const column = columnSource(cell.column.columnDef);
+                  const content = flexRender(
+                    cell.column.columnDef.cell,
+                    cell.getContext(),
+                  );
+                  if (column?.rendersOwnCell) {
+                    return <Fragment key={cell.id}>{content}</Fragment>;
+                  }
                   return (
                     <td
                       key={cell.id}
@@ -181,10 +198,7 @@ function Grid<Row>({
                         'table-border-light content-text align-content-center'
                       }
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                      {content}
                     </td>
                   );
                 })}

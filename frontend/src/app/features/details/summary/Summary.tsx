@@ -9,6 +9,7 @@ import {
   resetSiteDetails,
   selectSiteDetails,
   selectSiteInsights,
+  selectSiteInsightsFetchStatus,
   siteDetailsMode,
   trackChanges,
   updateSiteDetail,
@@ -18,7 +19,7 @@ import {
   ChangeContext,
 } from '../../../helpers/fieldLabelMapper';
 import { RequestStatus } from '../../../helpers/requests/status';
-import Table from '../../../components/table/Table';
+import SectionGrid from '../../../components/grid/SectionGrid';
 import './Summary.css';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { isUserOfType, UserRoleType } from '../../../helpers/utility';
@@ -52,6 +53,7 @@ const Summary = () => {
   const details = useSelector(selectSiteDetails);
   const savedEdits = useSelector(getSiteSummaryEdits);
   const insights = useSelector(selectSiteInsights);
+  const insightsStatus = useSelector(selectSiteInsightsFetchStatus);
   const resetDetails = useSelector(resetSiteDetails);
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
   const userPurchasedSnapshot = useSelector(hasUserPurchasedSnapshot);
@@ -262,16 +264,23 @@ const Summary = () => {
             <span className="summary-details-header">Summary Details</span>
           </div>
           <div className="col-12 overflow-auto w-100">
-            <Table
+            <SectionGrid
               label="Summary Details"
-              isLoading={RequestStatus.success}
+              isLoading={
+                !insights &&
+                insightsStatus !== RequestStatus.success &&
+                insightsStatus !== RequestStatus.failed
+                  ? RequestStatus.loading
+                  : RequestStatus.success
+              }
+              empty={insightsStatus === RequestStatus.success && !insights}
               columns={summaryColumns}
-              data={[insights]}
-              totalResults={0}
+              rows={insights ? [insights] : []}
               allowRowsSelect={false}
-              showPageOptions={false}
               changeHandler={() => {}}
+              deleteHandler={() => {}}
               editMode={false}
+              srMode={false}
               idColumnName="id"
             />
           </div>

@@ -1,5 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { Provider, useSelector } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import LandUses from './LandUses';
@@ -78,7 +81,11 @@ describe('LandUses – SR column visibility', () => {
 
     render(
       <Provider store={store}>
-        <LandUses />
+        <MemoryRouter>
+          <QueryParamProvider adapter={ReactRouter6Adapter}>
+            <LandUses />
+          </QueryParamProvider>
+        </MemoryRouter>
       </Provider>,
     );
 

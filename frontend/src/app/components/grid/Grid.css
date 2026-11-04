@@ -11,8 +11,10 @@
 }
 
 .grid-fetching {
-  display: flex;
-  justify-content: flex-end;
-  min-height: 1.25rem;
+  position: absolute;
+  top: 0.25rem;
+  right: 0.5rem;
+  z-index: 2;
+  pointer-events: none;
   color: var(--icons-color-disabled);
 }

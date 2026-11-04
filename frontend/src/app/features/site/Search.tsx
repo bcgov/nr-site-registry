@@ -18,8 +18,8 @@ import {
   TableColumnsIcon,
 } from '../../components/common/icon';
 import Intro from './Intro';
-import { TableColumn } from '../../components/table/TableColumn';
 import { getSiteSearchResultsColumns } from './dto/Columns';
+import { SearchResultColumn } from './searchResults/SearchResultColumn';
 import PageContainer from '../../components/simple/PageContainer';
 import { flattenFormRows, formatDateRange } from '../../helpers/utility';
 import FilterPills from './filters/FilterPills';
@@ -48,7 +48,7 @@ import {
   buildSearchResultColumns,
   columnIdForSortField,
   columnSortField,
-  displayedSearchCellText,
+  searchExportColumns,
 } from './searchResults/searchResultColumns';
 import {
   isRowSelected as rowIsSelected,
@@ -108,9 +108,9 @@ const Search = () => {
   const lastWrittenSearch = useRef(search);
 
   const columns = getSiteSearchResultsColumns();
-  const [columnsToDisplay, setColumnsToDisplay] = useState<TableColumn[]>([
-    ...columns,
-  ]);
+  const [columnsToDisplay, setColumnsToDisplay] = useState<
+    SearchResultColumn[]
+  >([...columns]);
   const [selectedRows, setSelectedRows] = useState<SearchSiteRow[]>([]);
   const [selectedFilters, setSelectedFilters] =
     useState<StoredFilter[]>(readStoredFilters);
@@ -184,7 +184,7 @@ const Search = () => {
     dispatch(fetchSiteRiskCd());
   }, [dispatch]);
 
-  const toggleColumnSelectionForDisplay = (column: TableColumn) => {
+  const toggleColumnSelectionForDisplay = (column: SearchResultColumn) => {
     const index = columnsToDisplay.findIndex((item) => item.id === column.id);
 
     if (index !== -1 && !columnsToDisplay[index].disabled) {
@@ -440,8 +440,7 @@ const Search = () => {
           >
             <SearchResultsActions
               selectedRows={selectedRows}
-              selectedColumns={columnsToDisplay}
-              visibleCellText={displayedSearchCellText}
+              exportColumns={searchExportColumns(columnsToDisplay)}
               aria-label="search-results-actions"
             />
             <SearchResultsFilters

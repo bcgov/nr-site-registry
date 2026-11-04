@@ -1,6 +1,7 @@
+import { SectionColumn } from '../../../components/grid/SectionColumn';
 import React from 'react';
 import { RequestStatus } from '../../../helpers/requests/status';
-import { TableColumn } from '../../../components/table/TableColumn';
+
 import { SectionSortControl } from '../../../components/grid/SectionGrid';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import Widget from '../../../components/widget/Widget';
@@ -9,7 +10,7 @@ import { UserMinus, UserPlus } from '../../../components/common/icon';
 
 interface IParcelDescriptionTable {
   requestStatus: RequestStatus;
-  columns: TableColumn[];
+  columns: SectionColumn[];
   data: any;
   totalResults: number | undefined;
   handleSelectPage: (event: any) => void;

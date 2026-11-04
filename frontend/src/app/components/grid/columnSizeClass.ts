@@ -1,4 +1,4 @@
-import { ColumnSize } from '../table/TableColumn';
+import { ColumnSize } from './columnSize';
 
 export function columnSizeClass(columnSize: ColumnSize | undefined) {
   switch (columnSize) {

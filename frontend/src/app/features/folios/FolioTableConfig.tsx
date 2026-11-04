@@ -1,3 +1,8 @@
+import { ColumnSize } from '../../components/grid/columnSize';
+import {
+  SectionColumn,
+  sectionColumn,
+} from '../../components/grid/SectionColumn';
 import {
   FillEye,
   FolderIcon,
@@ -7,7 +12,6 @@ import {
   FormFieldType,
   IFormField,
 } from '../../components/input-controls/IFormField';
-import { ColumnSize, TableColumn } from '../../components/table/TableColumn';
 
 const getLinkColumnType = (
   label: string,
@@ -45,7 +49,7 @@ const getColumnType = (
   };
 };
 
-export const FolioTableColumns: TableColumn[] = [
+export const FolioTableColumns: SectionColumn[] = [
   {
     id: 1,
     displayName: 'Folio Name',
@@ -115,7 +119,7 @@ export const getFolioTableColumnsBasedOnMode = (editMode: boolean) => {
   else
     return [
       ...FolioTableColumns,
-      new TableColumn(
+      sectionColumn(
         18,
         'Actions',
         true,

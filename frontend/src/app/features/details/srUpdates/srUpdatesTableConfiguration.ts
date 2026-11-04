@@ -1,7 +1,7 @@
+import { SectionColumn } from '../../../components/grid/SectionColumn';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
-import { TableColumn } from '../../../components/table/TableColumn';
 
-const SRUpdatesTableConfiguration: TableColumn[] = [
+const SRUpdatesTableConfiguration: SectionColumn[] = [
   {
     id: 1,
     displayName: 'Date',

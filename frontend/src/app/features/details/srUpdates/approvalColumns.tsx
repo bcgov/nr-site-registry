@@ -1,8 +1,9 @@
+import { SectionColumn } from '../../../components/grid/SectionColumn';
 import { Link as RouterLink } from 'react-router-dom';
 import { SiteSortBy } from '../../../../graphql/generated';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { GridColumn } from '../../../components/grid/Grid';
-import { TableColumn } from '../../../components/table/TableColumn';
+
 import { formatDate } from '../../../helpers/utility';
 import SRUpdatesTableConfiguration from './srUpdatesTableConfiguration';
 import { PendingApprovalRow } from './pendingSiteApprovals';
@@ -21,7 +22,7 @@ type SelectionControls = {
   onTogglePage: (selected: boolean) => void;
 };
 
-function cellText(column: TableColumn, row: PendingApprovalRow): string {
+function cellText(column: SectionColumn, row: PendingApprovalRow): string {
   const value = row[column.graphQLPropertyName as keyof PendingApprovalRow];
   return value == null ? '' : String(value);
 }
@@ -30,7 +31,7 @@ function ApprovalCell({
   column,
   row,
 }: {
-  column: TableColumn;
+  column: SectionColumn;
   row: PendingApprovalRow;
 }) {
   const field = column.displayType;

@@ -1,12 +1,8 @@
-import { FormFieldType } from '../../components/input-controls/IFormField';
-import { TableColumn } from '../../components/table/TableColumn';
 import { formatDate } from '../utility';
 
 function isObject(item: unknown): item is Record<string, unknown> {
   return typeof item === 'object' && item !== null;
 }
-
-const EXCLUDED_COLUMN_NAMES = new Set(['Map', 'Details']);
 
 // Excel follows CSV quoting rules for cells containing commas, quotes, or line breaks.
 // Wrap those values in quotes and double any inner quotes so the cell is parsed correctly.
@@ -91,21 +87,12 @@ export function getValueByPath(
   return currentValue;
 }
 
-function getExportableColumns(columns: TableColumn[]): TableColumn[] {
-  return columns.filter(
-    (column) =>
-      Boolean(column.isChecked) &&
-      Boolean(column.graphQLPropertyName) &&
-      !column.dynamicColumn &&
-      !EXCLUDED_COLUMN_NAMES.has(column.displayName),
-  );
-}
-
-export function getColumnValue(
+export function propertyText(
   row: Record<string, unknown>,
-  column: TableColumn,
+  property: string,
+  options?: { date?: boolean },
 ): string {
-  const propertyNames = column.graphQLPropertyName
+  const propertyNames = property
     .split(',')
     .map((propertyName) => propertyName.trim())
     .filter((propertyName) => propertyName.length > 0);
@@ -114,7 +101,7 @@ export function getColumnValue(
     return '';
   }
 
-  if (column.displayType?.type === FormFieldType.Date) {
+  if (options?.date) {
     const rawDate = getValueByPath(row, propertyNames[0]);
     if (rawDate instanceof Date) {
       if (Number.isNaN(rawDate.getTime())) {
@@ -216,35 +203,4 @@ export function downloadLabeledValues(
   );
 
   downloadCsvDocument(convertRowsToCSV(formattedRows, headers), filename);
-}
-
-export function downloadSelectedColumnsCSV(
-  selectedRows: Record<string, unknown>[],
-  columns: TableColumn[],
-  filename: string = 'export.csv',
-) {
-  downloadCsvDocument(
-    convertSelectedColumnsToCSV(selectedRows, columns),
-    filename,
-  );
-}
-
-export function convertSelectedColumnsToCSV(
-  selectedRows: Record<string, unknown>[],
-  columns: TableColumn[],
-) {
-  const exportColumns = getExportableColumns(columns);
-  if (selectedRows.length === 0 || exportColumns.length === 0) {
-    return '';
-  }
-
-  const headers = exportColumns.map((column) => column.displayName);
-  const formattedRows = selectedRows.map((row) => {
-    return exportColumns.reduce<Record<string, unknown>>((acc, column) => {
-      acc[column.displayName] = getColumnValue(row, column);
-      return acc;
-    }, {});
-  });
-
-  return convertRowsToCSV(formattedRows, headers);
 }

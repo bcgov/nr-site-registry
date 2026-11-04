@@ -1,3 +1,4 @@
+import { SectionColumn } from '../components/grid/SectionColumn';
 import { nanoid } from '@reduxjs/toolkit';
 import { API } from './endpoints';
 import axios from 'axios';
@@ -10,7 +11,7 @@ import {
 } from '../components/input-controls/IFormField';
 import { RequestStatus } from './requests/status';
 import { notifyError, notifySuccess } from '../components/alert/Alert';
-import { TableColumn } from '../components/table/TableColumn';
+
 import { UserActionEnum } from '../common/userActionEnum';
 import { MyLocationData, MyLocationSuccess } from '../features/map/ILocation';
 
@@ -288,9 +289,9 @@ export const isUserRoleInternalUser = () => {};
 export const isUserRoleSiteRegistrar = () => {};
 
 export const updateTableColumn = (
-  columns: TableColumn[],
+  columns: SectionColumn[],
   params: UpdateDisplayTypeParams,
-): TableColumn[] => {
+): SectionColumn[] => {
   const { indexToUpdate, updates } = params;
 
   if (indexToUpdate === -1) {
@@ -299,7 +300,7 @@ export const updateTableColumn = (
 
   const itemToUpdate = columns[indexToUpdate];
 
-  const updatedItem: TableColumn = {
+  const updatedItem: SectionColumn = {
     ...itemToUpdate,
     displayType: {
       ...itemToUpdate.displayType, // Use fallback if displayType is undefined

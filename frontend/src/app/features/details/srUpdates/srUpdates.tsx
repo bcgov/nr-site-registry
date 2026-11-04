@@ -1,3 +1,4 @@
+import { ColumnSize } from '../../../components/grid/columnSize';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../Store';
@@ -62,7 +63,7 @@ import { GetAssociateConfig } from '../associates/AssociateConfig';
 import { useParams } from 'react-router-dom';
 import './srUpdates.css';
 import { TickIcon, XmarkIcon } from '../../../components/common/icon';
-import { ColumnSize } from '../../../components/table/TableColumn';
+
 import LandUseTable from '../landUses/LandUseTable';
 import { selectLandUseCodes } from '../landUses/LandUsesSlice';
 import { getLandUseColumns } from '../landUses/LandUseColumnConfiguration';

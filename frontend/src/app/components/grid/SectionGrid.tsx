@@ -50,8 +50,19 @@ type SectionGridProps = {
   empty?: boolean;
 };
 
-function columnKey(column: TableColumn): string {
-  return column.graphQLPropertyName || String(column.id);
+function columnIds(columns: TableColumn[]): string[] {
+  const seen = new Map<string, number>();
+  return columns.map((column) => {
+    const base = column.graphQLPropertyName || String(column.id);
+    const count = seen.get(base) ?? 0;
+    seen.set(base, count + 1);
+    return count === 0 ? base : `${base}__${count}`;
+  });
+}
+
+export function sortableColumnIds(columns: TableColumn[]): string[] {
+  const ids = columnIds(columns);
+  return ids.filter((_, index) => !columns[index].dynamicColumn);
 }
 
 function comparableValue(value: unknown): string | number {
@@ -79,6 +90,12 @@ function comparableValue(value: unknown): string | number {
 function sortValue(row: any, propertyName: string): string | number {
   const names = propertyName.split(',').filter((name) => name.length > 0);
   if (names.length === 1) {
+    // A locale date string does not sort in time order. Screens that format
+    // whenUpdated for display keep the original value on _rawWhenUpdated.
+    if (names[0] === 'whenUpdated' && row?._rawWhenUpdated) {
+      const time = new Date(row._rawWhenUpdated).getTime();
+      return Number.isNaN(time) ? 0 : time;
+    }
     return comparableValue(get(row, names[0]));
   }
   return columnDisplayValue(row, propertyName);
@@ -149,8 +166,9 @@ function buildColumns(
     },
   };
 
+  const ids = columnIds(columns);
   const dataColumns: GridColumn<any>[] = columns.map((column, columnIndex) => ({
-    id: columnKey(column),
+    id: ids[columnIndex],
     label: column.displayName,
     sortable: !column.dynamicColumn,
     headerClassName: headerClassName(column),

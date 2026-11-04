@@ -4,10 +4,10 @@ import Grid, { GridColumn, GridSort } from './Grid';
 import { SortByDirection } from '../../../graphql/generated';
 import { gridSortDirection, nextSortDirection } from '../../helpers/pagedList';
 import { RequestStatus } from '../../helpers/requests/status';
-import { TableColumn } from '../table/TableColumn';
-import { columnDisplayValue, get } from '../table/utils';
+import { SectionColumn } from './SectionColumn';
+import { columnDisplayValue, get } from './rowValue';
 import Pagination from '../table/pagination/Pagination';
-import { renderTableField } from '../table/body/renderTableField';
+import { renderTableField } from './renderTableField';
 
 export type SectionSortControl = {
   manual: boolean;
@@ -31,7 +31,7 @@ export function nextGridSort(
 
 type SectionGridProps = {
   label: string;
-  columns: TableColumn[];
+  columns: SectionColumn[];
   rows: any[];
   isLoading?: RequestStatus;
   editMode: boolean;
@@ -50,7 +50,7 @@ type SectionGridProps = {
   empty?: boolean;
 };
 
-function columnIds(columns: TableColumn[]): string[] {
+function columnIds(columns: SectionColumn[]): string[] {
   const seen = new Map<string, number>();
   return columns.map((column) => {
     const base = column.graphQLPropertyName || String(column.id);
@@ -60,7 +60,7 @@ function columnIds(columns: TableColumn[]): string[] {
   });
 }
 
-export function sortableColumnIds(columns: TableColumn[]): string[] {
+export function sortableColumnIds(columns: SectionColumn[]): string[] {
   const ids = columnIds(columns);
   return ids.filter((_, index) => !columns[index].dynamicColumn);
 }
@@ -109,7 +109,7 @@ function rowKey(row: any, index: number, idColumnName: string): string {
   return String(value);
 }
 
-function headerClassName(column: TableColumn): string {
+function headerClassName(column: SectionColumn): string {
   return [
     columnSizeClass(column.columnSize),
     column.stickyCol ? 'positionSticky' : '',
@@ -120,7 +120,7 @@ function headerClassName(column: TableColumn): string {
 }
 
 function buildColumns(
-  columns: TableColumn[],
+  columns: SectionColumn[],
   rows: any[],
   editMode: boolean,
   srMode: boolean,

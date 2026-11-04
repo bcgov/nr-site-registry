@@ -1,8 +1,9 @@
+import { SectionColumn } from '../../components/grid/SectionColumn';
 import { Link as RouterLink } from 'react-router-dom';
 import { columnSizeClass } from '../../components/grid/columnSizeClass';
 import { GridColumn } from '../../components/grid/Grid';
 import { FormFieldType } from '../../components/input-controls/IFormField';
-import { TableColumn } from '../../components/table/TableColumn';
+
 import { formatDate } from '../../helpers/utility';
 import { recentViewedColumns } from './DashboardConfig';
 import { RecentView } from './recentViews';
@@ -16,7 +17,7 @@ function RecentViewCell({
   column,
   row,
 }: {
-  column: TableColumn;
+  column: SectionColumn;
   row: RecentView;
 }) {
   const field = column.displayType;

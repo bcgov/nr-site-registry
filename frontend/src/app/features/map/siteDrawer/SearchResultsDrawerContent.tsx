@@ -10,7 +10,7 @@ import { SearchResultsFilters } from '../../site/searchResults/SearchResultsFilt
 import { SearchResultsActions } from '../../site/searchResults/SearchResultsActions';
 import FilterPills, { FilterPill } from '../../site/filters/FilterPills';
 import { getSiteSearchResultsColumns } from '../../site/dto/Columns';
-import { TableColumn } from '../../../components/table/TableColumn';
+import { SearchResultColumn } from '../../site/searchResults/SearchResultColumn';
 import {
   MapSearch_FilterSearchResultsQuery,
   SiteFilters,
@@ -36,6 +36,7 @@ import {
   buildSearchResultColumns,
   columnIdForSortField,
   columnSortField,
+  searchExportColumns,
 } from '../../site/searchResults/searchResultColumns';
 import {
   isRowSelected as rowIsSelected,
@@ -77,7 +78,7 @@ export const SearchResultsDrawerContent: FC<
   });
 
   const [columnsToDisplay, setColumnsToDisplay] =
-    useState<TableColumn[]>(defaultColumns);
+    useState<SearchResultColumn[]>(defaultColumns);
   const [filtersFormData, setFiltersFormData] = useState<SiteFilters>({});
   const [queryFilters, setQueryFilters] = useState<SiteFilters>({});
   const [selectedRows, setSelectedRows] = useState<SearchSiteRow[]>([]);
@@ -159,7 +160,7 @@ export const SearchResultsDrawerContent: FC<
     sortByDir,
   ]);
 
-  const toggleColumnSelectionForDisplay = (column: TableColumn) => {
+  const toggleColumnSelectionForDisplay = (column: SearchResultColumn) => {
     setColumnsToDisplay((prevColumns) =>
       prevColumns.map((item) =>
         item.id === column.id && !item.disabled
@@ -314,7 +315,7 @@ export const SearchResultsDrawerContent: FC<
       >
         <SearchResultsActions
           selectedRows={selectedRows}
-          selectedColumns={columnsToDisplay}
+          exportColumns={searchExportColumns(columnsToDisplay)}
           aria-label="search-results-actions"
         />
         <SearchResultsFilters

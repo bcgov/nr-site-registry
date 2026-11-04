@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { FormFieldType, IFormField } from '../../input-controls/IFormField';
+import { FormFieldType, IFormField } from '../input-controls/IFormField';
 import {
   CheckBoxInput,
   DateInput,
@@ -12,7 +12,7 @@ import {
   SearchCustomInput,
   TextAreaInput,
   TextInput,
-} from '../../input-controls/InputControls';
+} from '../input-controls/InputControls';
 
 type RenderTableFieldProps = {
   field: IFormField;

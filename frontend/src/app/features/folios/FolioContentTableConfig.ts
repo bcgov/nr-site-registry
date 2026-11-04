@@ -1,8 +1,11 @@
 import {
+  SectionColumn,
+  sectionColumn,
+} from '../../components/grid/SectionColumn';
+import {
   FormFieldType,
   IFormField,
 } from '../../components/input-controls/IFormField';
-import { TableColumn } from '../../components/table/TableColumn';
 
 const getLinkColumnType = (
   label: string,
@@ -40,7 +43,7 @@ const getColumnType = (
   };
 };
 
-export const FolioContentTableColumns: TableColumn[] = [
+export const FolioContentTableColumns: SectionColumn[] = [
   {
     id: 1,
     displayName: 'Site ID',
@@ -100,7 +103,7 @@ export const FolioContentTableColumns: TableColumn[] = [
       tableMode: true,
     },
   },
-  new TableColumn(
+  sectionColumn(
     17,
     'Map',
     true,
@@ -114,7 +117,7 @@ export const FolioContentTableColumns: TableColumn[] = [
     '/map?site=',
     true,
   ),
-  new TableColumn(
+  sectionColumn(
     18,
     'Details',
     true,
@@ -128,7 +131,7 @@ export const FolioContentTableColumns: TableColumn[] = [
     '/search/site/details/',
     true,
   ),
-  // new TableColumn(
+  // sectionColumn(
   //   18,
   //   "Actions",
   //   true,

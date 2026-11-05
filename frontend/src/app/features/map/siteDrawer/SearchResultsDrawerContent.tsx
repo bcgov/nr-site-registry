@@ -101,7 +101,11 @@ export const SearchResultsDrawerContent: FC<
 
   const siteIdsRef = useRef(siteIds);
   siteIdsRef.current = siteIds;
-  const siteIdKey = [...siteIds].sort().join('\0');
+  const siteIdKey = [...siteIds]
+    .sort((left, right) =>
+      left.localeCompare(right, undefined, { numeric: true }),
+    )
+    .join('\0');
   const appliedSiteIds = useRef<string | null>(null);
   const requestId = useRef(0);
 

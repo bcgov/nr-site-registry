@@ -1,69 +1,24 @@
 import { useEffect, useState } from 'react';
-import { RequestStatus } from '../../helpers/requests/status';
-import { actionsItemsConfig, recentViewedColumns } from './DashboardConfig';
-import { useDispatch, useSelector } from 'react-redux';
+import { useQuery } from '@tanstack/react-query';
 import { UserType } from '../../helpers/requests/userType';
 import './Dashboard.css';
 import PageContainer from '../../components/simple/PageContainer';
 import Widget from '../../components/widget/Widget';
+import Grid from '../../components/grid/Grid';
 import { getUser, isUserOfType, UserRoleType } from '../../helpers/utility';
 import Actions from '../../components/action/Actions';
 import { useNavigate } from 'react-router-dom';
-import { fetchRecentViews } from './DashboardSlice';
-import { AppDispatch } from '../../Store';
-
-interface DashboardWidgetProps {
-  title?: string;
-  buttonText?: string;
-  columns: any[];
-  loading: RequestStatus;
-  data: any[];
-  allowRowsSelect?: boolean;
-  onButtonClick?: () => void;
-}
-
-const changeHandler = (event: any) => {};
-
-const DashboardTableWidget: React.FC<DashboardWidgetProps> = ({
-  title,
-  buttonText,
-  columns,
-  loading,
-  data,
-  allowRowsSelect,
-  onButtonClick,
-}) => (
-  <Widget
-    changeHandler={changeHandler}
-    title={title}
-    tableColumns={columns}
-    tableData={data}
-    tableIsLoading={loading}
-    allowRowsSelect={allowRowsSelect}
-    primaryKeycolumnName="siteId"
-  >
-    {buttonText && onButtonClick && (
-      <button
-        className="dashboard-btn"
-        type="button"
-        onClick={onButtonClick}
-        aria-label={buttonText}
-      >
-        <span className="btn-lbl">{buttonText}</span>
-      </button>
-    )}
-  </Widget>
-);
+import { pagedListFlags } from '../../helpers/pagedList';
+import { actionsItemsConfig } from './DashboardConfig';
+import { buildRecentViewColumns } from './recentViewColumns';
+import { fetchRecentViews } from './recentViews';
 
 const Dashboard = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const sites = useSelector((state: any) => state.dashboard);
   const loggedInUser = getUser();
+  const userId = loggedInUser?.profile.preferred_username;
 
   const [name, setName] = useState('');
-  const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
-  const [data, setData] = useState<any[]>([]);
   const [userType, setUserType] = useState<UserType>(UserType.External);
 
   useEffect(() => {
@@ -81,20 +36,18 @@ const Dashboard = () => {
       : setName('');
   }, [loggedInUser]);
 
-  useEffect(() => {
-    if (loggedInUser?.profile.preferred_username) {
-      dispatch(fetchRecentViews(loggedInUser.profile.preferred_username));
-    }
-  }, [dispatch]);
+  const recentViewsQuery = useQuery({
+    queryKey: ['recentViews', userId],
+    queryFn: ({ signal }) => fetchRecentViews(userId ?? '', signal),
+    enabled: Boolean(userId),
+    retry: false,
+  });
 
-  useEffect(() => {
-    if (sites.status === RequestStatus.success) {
-      setData(sites.dashboard.recentView.data);
-      setLoading(sites.status);
-    } else {
-      setLoading(RequestStatus.idle);
-    }
-  }, [sites.status]);
+  const recentViews = recentViewsQuery.data ?? [];
+  const { loading, fetching, empty } = pagedListFlags(
+    recentViews.length,
+    recentViewsQuery,
+  );
 
   const handleActionItemClick = (item: any) => {
     switch (item.toLowerCase()) {
@@ -124,13 +77,20 @@ const Dashboard = () => {
           />
         )}
       </div>
-      <DashboardTableWidget
-        title="Recently Viewed"
-        columns={recentViewedColumns}
-        loading={loading}
-        data={data ?? []}
-        allowRowsSelect={false}
-      />
+      <Widget title="Recently Viewed" hideTable>
+        <div className="me-1">
+          <Grid
+            label="Recently Viewed"
+            rows={recentViews}
+            columns={buildRecentViewColumns()}
+            sort={null}
+            onSortChange={() => {}}
+            loading={loading}
+            fetching={fetching}
+            empty={empty}
+          />
+        </div>
+      </Widget>
     </PageContainer>
   );
 };

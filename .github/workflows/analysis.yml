@@ -20,6 +20,9 @@ jobs:
     name: Unit Tests
     if: ${{ ! github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: write
     timeout-minutes: 5
     services:
       postgres:

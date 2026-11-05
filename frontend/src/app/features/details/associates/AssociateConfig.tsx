@@ -1,6 +1,8 @@
+import { ColumnSize } from '../../../components/grid/columnSize';
+import { SectionColumn } from '../../../components/grid/SectionColumn';
 import { DropdownItem } from '../../../components/action/IActions';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
-import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
+
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import { RequestStatus } from '../../../helpers/requests/status';
 
@@ -8,7 +10,7 @@ import { RequestStatus } from '../../../helpers/requests/status';
 export const ASSOCIATED_SITE_DETAILS_HREF = '/site/details/';
 
 export const GetAssociateConfig = () => {
-  const associateColumnInternal: TableColumn[] = [
+  const associateColumnInternal: SectionColumn[] = [
     {
       id: 1,
       displayName: 'Site ID',
@@ -107,7 +109,7 @@ export const GetAssociateConfig = () => {
     },
   ];
 
-  const associateColumnInternalSRandViewMode: TableColumn[] = [
+  const associateColumnInternalSRandViewMode: SectionColumn[] = [
     {
       id: 1,
       displayName: 'Site ID',
@@ -203,7 +205,7 @@ export const GetAssociateConfig = () => {
     },
   ];
 
-  const associateColumnExternal: TableColumn[] = [
+  const associateColumnExternal: SectionColumn[] = [
     {
       id: 1,
       displayName: 'Site ID',

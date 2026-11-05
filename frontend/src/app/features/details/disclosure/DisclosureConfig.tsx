@@ -1,9 +1,11 @@
+import { ColumnSize } from '../../../components/grid/columnSize';
+import { SectionColumn } from '../../../components/grid/SectionColumn';
 import { DropdownItem } from '../../../components/action/IActions';
 import {
   FormFieldType,
   IFormField,
 } from '../../../components/input-controls/IFormField';
-import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
+
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 
@@ -213,7 +215,7 @@ export const siteDisclosureConfig = (
     ],
   ];
 
-  const disclosureScheduleConfig: TableColumn[] = [
+  const disclosureScheduleConfig: SectionColumn[] = [
     {
       id: 1,
       displayName: 'Schedule 2 Reference',
@@ -259,7 +261,7 @@ export const siteDisclosureConfig = (
     },
   ];
 
-  const disclosureScheduleDescription: TableColumn[] = [
+  const disclosureScheduleDescription: SectionColumn[] = [
     {
       id: 2,
       displayName: 'Description',
@@ -280,7 +282,7 @@ export const siteDisclosureConfig = (
     },
   ];
 
-  const disclosureScheduleExternalConfig: TableColumn[] = [
+  const disclosureScheduleExternalConfig: SectionColumn[] = [
     {
       id: 1,
       displayName: 'Schedule 2 Reference',

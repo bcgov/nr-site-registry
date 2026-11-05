@@ -1,8 +1,9 @@
+import { SectionColumn } from '../../../components/grid/SectionColumn';
 import React from 'react';
 import Widget from '../../../components/widget/Widget';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import { UserType } from '../../../helpers/requests/userType';
-import { TableColumn } from '../../../components/table/TableColumn';
+
 import { RequestStatus } from '../../../helpers/requests/status';
 import { UserMinus, UserPlus } from '../../../components/common/icon';
 import Actions from '../../../components/action/Actions';
@@ -15,8 +16,8 @@ import { SectionSortControl } from '../../../components/grid/SectionGrid';
 interface IParticipantTableProps {
   handleTableChange: (event: any) => void;
   handleWidgetCheckBox: (event: any) => void;
-  internalRow: TableColumn[];
-  externalRow: TableColumn[];
+  internalRow: SectionColumn[];
+  externalRow: SectionColumn[];
   userType: UserType;
   formData: {
     [key: string]: any;

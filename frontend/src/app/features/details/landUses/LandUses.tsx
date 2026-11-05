@@ -33,7 +33,7 @@ import {
   ChangeTracker,
   IChangeType,
 } from '../../../components/common/IChangeType';
-import { set } from '../../../components/table/utils';
+import { set } from '../../../components/grid/rowValue';
 import './LandUses.css';
 import { setupLandHistoriesDataForSaving } from '../SaveSiteDetailsSlice';
 import { UserActionEnum } from '../../../common/userActionEnum';

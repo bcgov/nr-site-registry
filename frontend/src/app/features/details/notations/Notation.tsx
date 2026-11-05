@@ -37,7 +37,6 @@ interface INotationProps {
   internalTableColumn: TableColumn[];
   externalTableColumn: TableColumn[];
   loading: RequestStatus;
-  handleTableSort: (row: any, ascDir: any, id: any) => void;
   handleAddParticipant: (id: any) => void;
   isAnyParticipantSelected: (id: any) => boolean;
   handleRemoveParticipant: (
@@ -68,7 +67,6 @@ const Notation: React.FC<INotationProps> = ({
   internalTableColumn,
   externalTableColumn,
   loading,
-  handleTableSort,
   handleAddParticipant,
   isAnyParticipantSelected,
   handleRemoveParticipant,
@@ -180,11 +178,7 @@ const Notation: React.FC<INotationProps> = ({
                 : externalTableColumn
             }
             tableData={notation.notationParticipant}
-            tableIsLoading={
-              notation.notationParticipant?.length > 0
-                ? loading
-                : RequestStatus.idle
-            }
+            tableIsLoading={loading}
             allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
             aria-label="Notation Widget"
             hideTable={false}
@@ -196,9 +190,6 @@ const Notation: React.FC<INotationProps> = ({
             srMode={viewMode === SiteDetailsMode.SRMode}
             hideWidgetCheckbox={true}
             primaryKeycolumnName="eventParticId"
-            sortHandler={(row, ascDir) => {
-              handleTableSort(row, ascDir, notation.id);
-            }}
           >
             {viewMode === SiteDetailsMode.EditMode &&
               userType === UserType.Internal && (

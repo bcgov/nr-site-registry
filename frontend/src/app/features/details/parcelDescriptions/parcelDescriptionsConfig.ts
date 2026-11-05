@@ -138,6 +138,24 @@ const DeleteColumn: TableColumn = {
   customHeaderCss: 'text-center',
 };
 
+const parcelSortFieldByColumnId: Record<string, string> = {
+  descriptionType: 'description_type',
+  idPinNumber: 'id_pin_number',
+  dateNoted: 'date_noted',
+  landDescription: 'land_description',
+};
+
+export function parcelSortFieldForColumn(columnId: string): string | null {
+  return parcelSortFieldByColumnId[columnId] ?? null;
+}
+
+export function parcelColumnIdForSort(sortBy: string): string | null {
+  const match = Object.entries(parcelSortFieldByColumnId).find(
+    ([, field]) => field === sortBy,
+  );
+  return match ? match[0] : null;
+}
+
 export const getAddDeleteParcelDescriptionTableColumns = () => {
   return [...columns, DeleteColumn];
 };

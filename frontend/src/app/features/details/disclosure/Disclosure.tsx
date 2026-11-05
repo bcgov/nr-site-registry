@@ -22,7 +22,6 @@ import {
   getUser,
   isUserOfType,
   serializeDate,
-  sortArray,
   UserRoleType,
 } from '../../../helpers/utility';
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
@@ -295,33 +294,6 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
     }
   };
 
-  const handleTableSort = (row: any, ascDir: any, disclosureId: any) => {
-    let property = row['graphQLPropertyName'];
-    setFormData((prevData) => {
-      return prevData.map((tempDisclosure) => {
-        if (disclosureId === tempDisclosure.id) {
-          // Filter out selected rows from disclosureParticipant array
-          let updatedSchedule2Refs = [
-            ...tempDisclosure.siteProfileSchedule2Refs,
-          ];
-          // Call the common sort function to sort the updatedParticipant array
-          updatedSchedule2Refs = sortArray(
-            updatedSchedule2Refs,
-            property,
-            ascDir,
-          );
-
-          return {
-            ...tempDisclosure,
-            siteProfileSchedule2Refs: updatedSchedule2Refs,
-          };
-        }
-        return tempDisclosure;
-      });
-    });
-  };
-
-  // this need to be tracked and also change once get actual source of data.
   const handleAddDisclosureSchedule = (disclosureId: any) => {
     const newDisclosureSchedule = {
       id: v4(),
@@ -536,8 +508,7 @@ const Disclosure: React.FC<IComponentProps> = ({ showPending = false }) => {
               disclosureScheduleExternalConfig={
                 disclosureScheduleExternalConfig
               }
-              loading={RequestStatus.loading}
-              handleTableSort={handleTableSort}
+              loading={status}
               handleAddDisclosureSchedule={handleAddDisclosureSchedule}
               isAnyDisclosureScheduleSelected={isAnyDisclosureScheduleSelected}
               handleRemoveDisclosureSchedule={handleRemoveDisclosureSchedule}

@@ -1,81 +1,103 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
 import { useAuth } from 'react-oidc-context';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import {
+  NumberParam,
+  StringParam,
+  useQueryParams,
+  withDefault,
+} from 'use-query-params';
 import { signInWithReturnUrl } from '../../auth/returnUrl';
 import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
-import Table from '../../components/table/Table';
-import { RequestStatus } from '../../helpers/requests/status';
-import { getUser } from '../../helpers/utility';
-import { AppDispatch } from '../../Store';
-import { TableColumn } from '../../components/table/TableColumn';
-import { PurchasesTableColumns } from './PurchasesTableConfig';
+import Grid from '../../components/grid/Grid';
+import Pagination from '../../components/table/pagination/Pagination';
+import { positiveInteger } from '../../helpers/positiveInteger';
 import {
-  fetchPurchasedSites,
-  selectPurchasedSites,
-  selectPurchasesTotalRecords,
-  selectPurchasesSortBy,
-  selectPurchasesSortByDir,
-} from './PurchasesSlice';
+  gridSortDirection,
+  nextSortDirection,
+  pagedListFlags,
+  sortDirectionFromQuery,
+  sortFieldFromQuery,
+} from '../../helpers/pagedList';
+import { getUser } from '../../helpers/utility';
+import { SortByDirection } from '../../../graphql/generated';
+import {
+  buildPurchaseColumns,
+  columnIdForPurchaseSort,
+  sortFieldForPurchaseColumn,
+} from './purchaseColumns';
+import { fetchPurchasedSites, purchaseSortFields } from './purchasedSites';
+
+const purchaseQueryParams = {
+  page: withDefault(NumberParam, 1),
+  pageSize: withDefault(NumberParam, 10),
+  sortBy: withDefault(StringParam, 'purchaseDate'),
+  sortByDir: withDefault(StringParam, SortByDirection.Desc),
+  search: withDefault(StringParam, ''),
+};
 
 const Purchases = () => {
   const auth = useAuth();
-  const user = getUser();
-  const dispatch = useDispatch<AppDispatch>();
-
-  const purchasedSites = useSelector(selectPurchasedSites);
-  const totalRecords = useSelector(selectPurchasesTotalRecords);
-  const sortBy = useSelector(selectPurchasesSortBy);
-  const sortByDir = useSelector(selectPurchasesSortByDir);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [resultsPerPage, setResultsPerPage] = useState(10);
+  const [query, setQuery] = useQueryParams(purchaseQueryParams, {
+    removeDefaultsFromUrl: true,
+  });
+  const page = positiveInteger(query.page, 1);
+  const pageSize = positiveInteger(query.pageSize, 10);
+  const sortBy = sortFieldFromQuery(
+    query.sortBy,
+    purchaseSortFields,
+    'purchaseDate',
+  );
+  const sortByDir = sortDirectionFromQuery(
+    query.sortByDir,
+    SortByDirection.Desc,
+  );
 
   useEffect(() => {
-    if (user === null) {
+    if (getUser() === null) {
       signInWithReturnUrl(auth);
     }
-  }, []);
+  }, [auth]);
 
-  useEffect(() => {
-    dispatch(
+  const purchasesQuery = useQuery({
+    queryKey: ['purchasedSites', page, pageSize, sortBy, sortByDir],
+    queryFn: ({ signal }) =>
       fetchPurchasedSites({
-        page: currentPage,
-        pageSize: resultsPerPage,
+        page,
+        pageSize,
         sortBy,
         sortByDir,
+        signal,
       }),
-    );
-  }, [currentPage, resultsPerPage]);
+    placeholderData: keepPreviousData,
+    retry: false,
+  });
 
-  const columnToSortByMap: Record<string, string> = {
-    siteId: 'siteId',
-    address: 'address',
-    city: 'city',
-    purchaseDate: 'purchaseDate',
-    status: 'status',
+  const sites = purchasesQuery.data?.sites ?? [];
+  const count = purchasesQuery.data?.count ?? 0;
+  const { loading, fetching, empty } = pagedListFlags(
+    sites.length,
+    purchasesQuery,
+  );
+
+  const gridSort = {
+    id: columnIdForPurchaseSort(sortBy),
+    direction: gridSortDirection(sortByDir),
   };
 
-  const handleSortChange = (column: TableColumn, ascSort: boolean) => {
-    const newSortBy =
-      columnToSortByMap[column.graphQLPropertyName] ?? 'purchaseDate';
-    const newSortByDir = ascSort ? 'ASC' : 'DESC';
-    dispatch(
-      fetchPurchasedSites({
-        page: currentPage,
-        pageSize: resultsPerPage,
-        sortBy: newSortBy,
-        sortByDir: newSortByDir,
-      }),
-    );
+  const handleSortChange = (columnId: string) => {
+    const nextField = sortFieldForPurchaseColumn(columnId);
+    if (!nextField) {
+      return;
+    }
+    const nextDirection = nextSortDirection(sortBy, sortByDir, nextField);
+    setQuery({
+      sortBy: nextField,
+      sortByDir: nextDirection,
+      page: 1,
+    });
   };
-
-  const formattedData = purchasedSites.map((site: any) => ({
-    ...site,
-    purchaseDate: site.purchaseDate
-      ? new Date(site.purchaseDate).toLocaleString()
-      : '',
-  }));
 
   return (
     <PageContainer role="purchases">
@@ -83,23 +105,29 @@ const Purchases = () => {
         <CustomLabel label="Site Details" labelType="b-h1" />
       </div>
       <div className="col-12">
-        <Table
-          showPageOptions={true}
+        <Grid
           label="Site Details"
-          isLoading={RequestStatus.success}
-          columns={PurchasesTableColumns}
-          data={formattedData}
-          totalResults={totalRecords}
-          selectPage={(page: number) => setCurrentPage(page)}
-          changeResultsPerPage={(size: number) => setResultsPerPage(size)}
-          currentPage={currentPage}
-          resultsPerPage={resultsPerPage}
-          allowRowsSelect={false}
-          changeHandler={() => {}}
-          editMode={false}
-          idColumnName="siteId"
-          sortHandler={handleSortChange}
+          rows={sites}
+          columns={buildPurchaseColumns()}
+          sort={gridSort}
+          onSortChange={handleSortChange}
+          loading={loading}
+          fetching={fetching}
+          empty={empty}
         />
+        {count > 0 ? (
+          <Pagination
+            changeResultsPerPage={(nextSize) => {
+              setQuery({ pageSize: nextSize, page: 1 });
+            }}
+            selectPage={(nextPage) => {
+              setQuery({ page: nextPage });
+            }}
+            currentPage={page}
+            resultsPerPage={pageSize}
+            totalResults={count}
+          />
+        ) : null}
       </div>
     </PageContainer>
   );

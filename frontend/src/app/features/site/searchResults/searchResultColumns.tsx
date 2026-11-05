@@ -1,8 +1,9 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { SiteSortBy } from '../../../../graphql/generated';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
+import { columnSizeClass } from '../../../components/grid/columnSizeClass';
 import { GridColumn } from '../../../components/grid/Grid';
-import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
+import { TableColumn } from '../../../components/table/TableColumn';
 import { getColumnValue } from '../../../helpers/csvExport/csvExport';
 import { SearchSiteRow } from '../searchSites';
 
@@ -24,29 +25,6 @@ const sortFieldByProperty: Record<string, SiteSortBy> = {
   latlongReliabilityFlag: SiteSortBy.LatLongReliabilityFlag,
   consultantSubmitted: SiteSortBy.ConsultantSubmitted,
 };
-
-function columnSizeClass(columnSize: ColumnSize | undefined) {
-  switch (columnSize) {
-    case ColumnSize.Triple:
-      return 'triple';
-    case ColumnSize.Double:
-      return 'double';
-    case ColumnSize.Small:
-      return 'custom-small';
-    case ColumnSize.XtraSmall:
-      return 'xtraSmall';
-    case ColumnSize.w300:
-      return 'w300';
-    case ColumnSize.w200:
-      return 'w200';
-    case ColumnSize.w100:
-      return 'w100';
-    case ColumnSize.w50:
-      return 'w50';
-    default:
-      return '';
-  }
-}
 
 export function sortFieldForColumn(column: TableColumn): SiteSortBy | null {
   if (column.dynamicColumn) {

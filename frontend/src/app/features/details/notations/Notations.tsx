@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSectionSearchQuery } from '../sectionListQuery';
 import { orderedByDate } from '../../../helpers/viewOrder';
 import './Notations.css';
 import { RequestStatus } from '../../../helpers/requests/status';
@@ -105,7 +106,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   >([]);
 
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
-  const [searchTerm, setSearchTerm] = useState('');
+  const { search, setSearch } = useSectionSearchQuery();
   const [isDelete, setIsDelete] = useState(false);
   const [isUpdated, setIsUpdated] = useState(false);
   const [updatedNotationFormRowEditMode, setUpdatedNotationFormRowEditMode] =
@@ -278,20 +279,6 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
           }),
         );
       }
-
-      const unarchivedNotations = getUnarchivedNotations(notations);
-      const archivedNotations = getArchivedNotations(notations);
-
-      setFormData((prev) =>
-        areNotationsEqual(prev as any[], unarchivedNotations)
-          ? prev
-          : unarchivedNotations,
-      );
-      setArchivedFormData((prev) =>
-        areNotationsEqual(prev as any[], archivedNotations)
-          ? prev
-          : archivedNotations,
-      );
     }
   }, [notations, status]);
 
@@ -406,20 +393,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   }, [resetDetails, saveSiteDetailsRequestStatus, showArchivedNotations]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = event.target.value;
-    setSearchTerm(searchTerm);
-
-    const sourceNotations = mergeFetchedAndTrackedNotations(
-      notations,
-      trackNotation,
-    );
-
-    const filteredData = sourceNotations?.filter((notation: any) => {
-      // Check if any property of the notation object contains the searchTerm
-      return deepSearch(notation, searchTerm.toLowerCase().trim());
-    });
-    setFormData(getUnarchivedNotations(filteredData));
-    setArchivedFormData(getArchivedNotations(filteredData));
+    setSearch(event.target.value);
   };
 
   const deepSearch = (obj: any, searchTerm: string): boolean => {
@@ -486,14 +460,32 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     return false;
   };
 
-  const clearSearch = () => {
-    setSearchTerm('');
-    const sourceNotations = mergeFetchedAndTrackedNotations(
-      notations,
-      trackNotation,
+  useEffect(() => {
+    if (status !== RequestStatus.success || !notations) {
+      return;
+    }
+    const term = search.toLowerCase().trim();
+    const source = term
+      ? mergeFetchedAndTrackedNotations(notations, trackNotation).filter(
+          (notation: any) => deepSearch(notation, term),
+        )
+      : notations;
+    const unarchivedNotations = getUnarchivedNotations(source);
+    const archivedNotations = getArchivedNotations(source);
+    setFormData((prev) =>
+      areNotationsEqual(prev as any[], unarchivedNotations)
+        ? prev
+        : unarchivedNotations,
     );
-    setFormData(getUnarchivedNotations(sourceNotations));
-    setArchivedFormData(getArchivedNotations(sourceNotations));
+    setArchivedFormData((prev) =>
+      areNotationsEqual(prev as any[], archivedNotations)
+        ? prev
+        : archivedNotations,
+    );
+  }, [search, notations, status, trackNotation]);
+
+  const clearSearch = () => {
+    setSearch('');
   };
 
   const handleToggleArchivedNotations = () => {
@@ -1291,7 +1283,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
               >
                 <SearchInput
                   label={'Search'}
-                  searchTerm={searchTerm}
+                  searchTerm={search}
                   clearSearch={clearSearch}
                   handleSearchChange={handleSearchChange}
                 />

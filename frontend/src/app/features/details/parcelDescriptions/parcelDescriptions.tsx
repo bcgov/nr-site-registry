@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../Store';
 import {
   fetchParcelDescriptions,
-  initialParcelDescriptionsState,
   parcelDescriptions,
   resetAllDataForSite,
   updateAddedRows,
@@ -94,6 +93,7 @@ const ParcelDescriptions = () => {
     pageSize: urlPageSize,
     sortBy: urlSortBy,
     sortByDir: urlSortByDir,
+    search: urlSearch,
     setQuery,
   } = useParcelListQuery();
   const reduxState = useSelector(parcelDescriptions);
@@ -111,7 +111,7 @@ const ParcelDescriptions = () => {
       siteId: siteId,
       page: urlPage,
       pageSize: urlPageSize,
-      searchParam: initialParcelDescriptionsState.searchParam,
+      searchParam: urlSearch,
       sortBy: urlSortBy,
       sortByDir: urlSortByDir,
       showPending: false, // Unused in this component.
@@ -120,6 +120,7 @@ const ParcelDescriptions = () => {
     dispatch(updateResultsPerPage(urlPageSize));
     dispatch(updateSortBy(urlSortBy));
     dispatch(updateSortByDir(urlSortByDir));
+    dispatch(updateSearchParam(urlSearch));
     dispatch(fetchParcelDescriptions(fetchParams));
   }
 
@@ -135,9 +136,7 @@ const ParcelDescriptions = () => {
   const [totalResults, setTotalResults] = React.useState<number>(
     reduxState.totalResults,
   );
-  const [searchParam, setSearchParam] = React.useState<string>(
-    reduxState.searchParam,
-  );
+  const [searchParam, setSearchParam] = React.useState<string>(urlSearch);
   const [sortBy, setSortBy] = React.useState<string>(reduxState.sortBy);
   const [sortByDir, setSortByDir] = React.useState<string>(
     reduxState.sortByDir,
@@ -199,14 +198,18 @@ const ParcelDescriptions = () => {
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newSearchParam = event.target.value;
-    if (newSearchParam !== searchParam) {
+    if (newSearchParam !== urlSearch) {
+      setSearchParam(newSearchParam);
+      setQuery({ search: newSearchParam || undefined }, 'replaceIn');
       dispatch(updateSearchParam(newSearchParam));
       fetchNewParcelDescriptions({ newSearchParam: newSearchParam });
     }
   };
 
   const handleSearchClear = () => {
-    if (searchParam !== '') {
+    if (urlSearch !== '') {
+      setSearchParam('');
+      setQuery({ search: undefined }, 'replaceIn');
       dispatch(updateSearchParam(''));
       fetchNewParcelDescriptions({
         newSearchParam: '',
@@ -677,12 +680,26 @@ const ParcelDescriptions = () => {
   }, [resetDetails, saveSiteDetailsRequestStatus]);
 
   React.useEffect(() => {
+    setSearchParam(urlSearch);
+  }, [urlSearch]);
+
+  React.useEffect(() => {
+    if (!id?.trim() || reduxState.siteId !== siteId) {
+      return;
+    }
+    if (reduxState.searchParam === urlSearch) {
+      return;
+    }
+    dispatch(updateSearchParam(urlSearch));
+    fetchNewParcelDescriptions({ newSearchParam: urlSearch });
+  }, [urlSearch, id, siteId, reduxState.siteId, reduxState.searchParam]);
+
+  React.useEffect(() => {
     // Update local state with redux state.
     setDbRows(reduxState.data);
     setCurrentPage(reduxState.currentPage);
     setRequestStatus(reduxState.requestStatus);
     setResultsPerPage(reduxState.resultsPerPage);
-    setSearchParam(reduxState.searchParam);
     setSortBy(reduxState.sortBy);
     setSortByDir(reduxState.sortByDir);
     setSortByInputValue(reduxState.sortByInputValue);

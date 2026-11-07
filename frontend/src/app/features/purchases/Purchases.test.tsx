@@ -141,6 +141,9 @@ describe('Purchases Component', () => {
   test('renders site data in the table', async () => {
     renderPurchases();
     expect(await screen.findByText('100')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Site ID 100' })).toHaveClass(
+      'table-cell-link',
+    );
     expect(screen.getByText('200')).toBeInTheDocument();
     expect(screen.getByText('Victoria')).toBeInTheDocument();
     expect(screen.getByText('Vancouver')).toBeInTheDocument();

@@ -18,4 +18,5 @@ export interface IActions {
   onItemClick: (value: string, index?: any) => void;
   toggleButtonVariant?: ButtonVariant;
   toggleButtonSize?: ButtonSize;
+  menuAlign?: 'start' | 'end';
 }

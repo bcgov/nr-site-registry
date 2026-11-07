@@ -22,12 +22,14 @@ export const sectionListParamKeys = [
   'pageSize',
 ] as const;
 
-export function searchWithoutSectionListParams(search: string): string {
+export const sectionSearchParam = 'search';
+
+function withoutQueryParams(search: string, keys: readonly string[]): string {
   const params = new URLSearchParams(
     search.startsWith('?') ? search.slice(1) : search,
   );
   let changed = false;
-  sectionListParamKeys.forEach((key) => {
+  keys.forEach((key) => {
     if (params.has(key)) {
       params.delete(key);
       changed = true;
@@ -38,6 +40,34 @@ export function searchWithoutSectionListParams(search: string): string {
   }
   const next = params.toString();
   return next ? `?${next}` : '';
+}
+
+export function searchWithoutSectionListParams(search: string): string {
+  return withoutQueryParams(search, sectionListParamKeys);
+}
+
+export function searchWithoutSectionNavigationParams(search: string): string {
+  return withoutQueryParams(search, [
+    ...sectionListParamKeys,
+    sectionSearchParam,
+  ]);
+}
+
+const sectionSearchQueryParams = {
+  search: withDefault(StringParam, ''),
+};
+
+export function useSectionSearchQuery() {
+  const [query, setQuery] = useQueryParams(sectionSearchQueryParams, {
+    removeDefaultsFromUrl: true,
+  });
+  const search = query.search ?? '';
+
+  const setSearch = (value: string) => {
+    setQuery({ search: value ? value : undefined }, 'replaceIn');
+  };
+
+  return { search, setSearch };
 }
 
 const sortQueryParams = {
@@ -91,6 +121,7 @@ const parcelQueryParams = {
   pageSize: withDefault(NumberParam, 5),
   sortBy: withDefault(StringParam, 'id'),
   sortByDir: withDefault(StringParam, SortByDirection.Asc),
+  search: withDefault(StringParam, ''),
 };
 
 export function useParcelListQuery() {
@@ -104,6 +135,7 @@ export function useParcelListQuery() {
     query.sortByDir,
     SortByDirection.Asc,
   );
+  const search = query.search ?? '';
 
-  return { page, pageSize, sortBy, sortByDir, setQuery };
+  return { page, pageSize, sortBy, sortByDir, search, setQuery };
 }

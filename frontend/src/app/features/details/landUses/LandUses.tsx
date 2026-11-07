@@ -1,5 +1,8 @@
 import { FC, useEffect, useMemo, useState } from 'react';
-import { useSectionSortQuery } from '../sectionListQuery';
+import {
+  useSectionSearchQuery,
+  useSectionSortQuery,
+} from '../sectionListQuery';
 import { orderedByDate } from '../../../helpers/viewOrder';
 import { gridSortDirection } from '../../../helpers/pagedList';
 import { SortByDirection } from '../../../../graphql/generated';
@@ -62,7 +65,7 @@ const LandUses: FC = () => {
     landUseCodesFetchRequestStatus,
   } = useSelector(landUses);
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const { search, setSearch } = useSectionSearchQuery();
 
   const viewMode = useSelector(siteDetailsMode);
   const resetDetails = useSelector(resetSiteDetails);
@@ -338,10 +341,10 @@ const LandUses: FC = () => {
     );
   }, [tableData, sortByValue]);
 
-  const dataWithTextSearchApplied = !searchTerm
+  const dataWithTextSearchApplied = !search
     ? rowsInDateOrder
     : rowsInDateOrder.filter((rowData) => {
-        const term = searchTerm.toLowerCase().trim();
+        const term = search.toLowerCase().trim();
         return (
           rowData.note?.toLowerCase().includes(term) ||
           rowData.landUse?.description?.toLowerCase().includes(term)
@@ -354,9 +357,9 @@ const LandUses: FC = () => {
         <div className={`mb-3 col-lg-8`}>
           <SearchInput
             label={'Search'}
-            searchTerm={searchTerm}
-            clearSearch={() => setSearchTerm('')}
-            handleSearchChange={(e) => setSearchTerm(e.target.value)}
+            searchTerm={search}
+            clearSearch={() => setSearch('')}
+            handleSearchChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <div className={`col-lg-4`}>

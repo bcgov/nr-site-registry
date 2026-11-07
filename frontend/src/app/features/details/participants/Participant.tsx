@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useSectionSortQuery } from '../sectionListQuery';
+import {
+  useSectionSearchQuery,
+  useSectionSortQuery,
+} from '../sectionListQuery';
 import { SortByDirection } from '../../../../graphql/generated';
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
@@ -95,7 +98,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
           sortBy: sortByDir === SortByDirection.Desc ? 'newToOld' : 'oldTonew',
         }
       : {};
-  const [searchTerm, setSearchTerm] = useState('');
+  const { search, setSearch } = useSectionSearchQuery();
   const [searchSiteParticipant, setSearchSiteParticipant] = useState('');
   const [selectedRows, setSelectedRows] = useState<
     {
@@ -213,7 +216,6 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
       };
       setExternalRow(updateTableColumn(externalRow, params));
       setInternalRow(updateTableColumn(internalRow, params));
-      setFormData(siteParticipant);
     }
   }, [siteParticipant, status]);
 
@@ -281,12 +283,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   }, [particRoleDropdwn]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = event.target.value;
-    setSearchTerm(searchTerm);
-    const filteredData = siteParticipant.filter((paticipant: any) => {
-      return deepSearch(paticipant, searchTerm.toLowerCase().trim());
-    });
-    setFormData(filteredData);
+    setSearch(event.target.value);
   };
 
   const deepSearch = (obj: any, searchTerm: string): boolean => {
@@ -327,9 +324,22 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
   };
 
   const clearSearch = () => {
-    setSearchTerm('');
-    setFormData(siteParticipant);
+    setSearch('');
   };
+
+  useEffect(() => {
+    if (status !== RequestStatus.success || !siteParticipant) {
+      return;
+    }
+    const term = search.toLowerCase().trim();
+    setFormData(
+      term
+        ? siteParticipant.filter((participant: any) =>
+            deepSearch(participant, term),
+          )
+        : siteParticipant,
+    );
+  }, [siteParticipant, status, search]);
 
   const handleRemoveParticipant = (particIsDelete: boolean = false) => {
     if (particIsDelete) {
@@ -588,7 +598,7 @@ const Participants: React.FC<IComponentProps> = ({ showPending = false }) => {
           <div className={`mb-3 col-lg-8`}>
             <SearchInput
               label={'Search'}
-              searchTerm={searchTerm}
+              searchTerm={search}
               clearSearch={clearSearch}
               handleSearchChange={handleSearchChange}
             />

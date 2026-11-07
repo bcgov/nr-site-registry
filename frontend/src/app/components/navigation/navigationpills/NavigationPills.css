@@ -1,3 +1,7 @@
+.custom-nav-action-menu {
+  min-width: 14rem;
+}
+
 .custom-nav-carousel-left-icon {
   background-image: url(../../../images/carousel-left-button.svg) !important;
   padding: var(--layout-padding-xsmall) var(--layout-padding-small)
@@ -57,6 +61,5 @@
     background-color: var(--surface-color-background-white) !important;
     box-shadow: var(--surface-shadow-medium);
     border: none !important;
-    width: 100%;
   }
 }

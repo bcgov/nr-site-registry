@@ -1,5 +1,5 @@
 import { SectionColumn } from '../../../components/grid/SectionColumn';
-import { Link as RouterLink } from 'react-router-dom';
+import { TableLink } from '../../../components/grid/TableLink';
 import { SiteSortBy } from '../../../../graphql/generated';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { GridColumn } from '../../../components/grid/Grid';
@@ -39,17 +39,17 @@ function ApprovalCell({
 
   if (field?.type === FormFieldType.Link) {
     return (
-      <RouterLink
+      <TableLink
         to={`${field.href ?? ''}${value}`}
-        className={`d-flex pt-1 ${field.customInputTextCss ?? ''}`}
-        aria-label={`${field.label} ${value}`}
+        label={field.label}
+        value={value}
+        text={field.customLinkValue ?? value}
+        className={field.customInputTextCss}
         state={{
           fromPath: field.componentPath ?? '',
           fromLabel: field.componentName ?? '',
         }}
-      >
-        <span className="ps-1">{field.customLinkValue ?? value}</span>
-      </RouterLink>
+      />
     );
   }
 

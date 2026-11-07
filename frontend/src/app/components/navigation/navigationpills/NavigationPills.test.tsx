@@ -82,6 +82,17 @@ describe('URL-driven navigation pills', () => {
     );
   });
 
+  it('drops the section search when switching tabs and keeps other parameters', () => {
+    renderPills(
+      '/site/details/9/notations?search=road&sortBy=note&applicationId=abc',
+    );
+    fireEvent.click(screen.getAllByRole('button', { name: 'Summary' })[0]);
+    expect(screen.getByTestId('location')).toHaveTextContent(
+      '/site/details/9/summary?applicationId=abc',
+      { exact: true },
+    );
+  });
+
   it('preserves the query string when switching tabs', () => {
     renderPills('/site/details/9/summary?applicationId=abc');
     fireEvent.click(screen.getAllByRole('button', { name: 'Notations' })[0]);
@@ -136,6 +147,16 @@ describe('URL-driven navigation pills', () => {
     expect(screen.getByTestId('location')).toHaveTextContent(
       '/site/details/9/notations',
     );
+  });
+
+  it('opens the page menu from the left of the Select Page button', () => {
+    renderPills('/site/details/9/summary');
+    fireEvent.click(screen.getByRole('button', { name: /Select Page/i }));
+    const menu = document.querySelector('.custom-nav-action-menu');
+    expect(menu).not.toHaveClass('dropdown-menu-end');
+    expect(menu).toHaveTextContent('Summary');
+    expect(menu).toHaveTextContent('Notations');
+    expect(menu).toHaveTextContent('Documents');
   });
 
   it('navigates from Select Page on small screens', () => {

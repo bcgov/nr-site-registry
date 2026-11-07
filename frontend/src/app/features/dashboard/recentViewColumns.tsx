@@ -1,5 +1,5 @@
 import { SectionColumn } from '../../components/grid/SectionColumn';
-import { Link as RouterLink } from 'react-router-dom';
+import { TableLink } from '../../components/grid/TableLink';
 import { columnSizeClass } from '../../components/grid/columnSizeClass';
 import { GridColumn } from '../../components/grid/Grid';
 import { FormFieldType } from '../../components/input-controls/IFormField';
@@ -25,18 +25,18 @@ function RecentViewCell({
 
   if (field?.type === FormFieldType.Link) {
     return (
-      <RouterLink
+      <TableLink
         to={`${field.href ?? ''}${value}`}
-        className={`d-flex pt-1 ${field.customInputTextCss ?? ''}`}
-        aria-label={`${field.label} ${value}`}
+        label={field.label}
+        value={value}
+        text={field.customLinkValue ?? value}
+        icon={field.customIcon}
+        className={field.customInputTextCss}
         state={{
           fromPath: field.componentPath ?? '',
           fromLabel: field.componentName ?? '',
         }}
-      >
-        {field.customIcon ? field.customIcon : null}{' '}
-        <span className="ps-1">{field.customLinkValue ?? value}</span>
-      </RouterLink>
+      />
     );
   }
 

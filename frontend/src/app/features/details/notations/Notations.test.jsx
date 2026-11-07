@@ -1,9 +1,17 @@
 import { render, fireEvent, screen } from '@testing-library/react';
+import { MemoryRouter, useLocation } from 'react-router-dom';
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import Notations from './Notations';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { GetNotationConfig } from './NotationsConfig';
+
+const LocationSearch = () => {
+  const location = useLocation();
+  return <div data-testid="location">{location.search}</div>;
+};
 
 // Example of a Jest mock for GetNotationConfig
 jest.mock('./NotationsConfig', () => ({
@@ -1324,34 +1332,37 @@ describe('Notations component', () => {
     });
     useDispatch.mockReturnValue(dispatch); // Return the mock dispatch function
   });
-  it('renders Notations component', () => {
+  const renderNotations = () =>
     render(
       <Provider store={store}>
-        <Notations showPending={false} />
+        <MemoryRouter>
+          <QueryParamProvider adapter={ReactRouter6Adapter}>
+            <Notations showPending={false} />
+            <LocationSearch />
+          </QueryParamProvider>
+        </MemoryRouter>
       </Provider>,
     );
+
+  it('renders Notations component', () => {
+    renderNotations();
     const notationsComponent = screen.getByTestId('notations-component');
     expect(notationsComponent).toBeInTheDocument();
   });
 
   it('search functionality works correctly', () => {
-    render(
-      <Provider store={store}>
-        <Notations showPending={false} />
-      </Provider>,
-    );
+    renderNotations();
     const searchInput = screen.getByLabelText('Search');
     fireEvent.change(searchInput, { target: { value: 'CERTIFICATE' } });
     const notationRows = screen.getByTestId('notation-rows');
     expect(notationRows.children.length).toBeGreaterThan(0);
+    expect(screen.getByTestId('location')).toHaveTextContent(
+      'search=CERTIFICATE',
+    );
   });
 
   it('clearing the search works correctly', () => {
-    const { container } = render(
-      <Provider store={store}>
-        <Notations showPending={false} />
-      </Provider>,
-    );
+    const { container } = renderNotations();
     const searchInput = screen.getByLabelText('Search');
     fireEvent.change(searchInput, { target: { value: 'CERTIFICATE' } });
     const clearIcon = container.querySelector('#clear-icon');

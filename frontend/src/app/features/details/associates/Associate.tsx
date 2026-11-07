@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useSectionSortQuery } from '../sectionListQuery';
+import {
+  useSectionSearchQuery,
+  useSectionSortQuery,
+} from '../sectionListQuery';
 import { SortByDirection } from '../../../../graphql/generated';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
@@ -72,7 +75,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
   const trackAssociatedSite = useSelector(getSiteAssociated);
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const { search, setSearch } = useSectionSearchQuery();
   const [formData, setFormData] = useState<
     { [key: string]: any | [Date, Date] }[]
   >([]);
@@ -182,7 +185,6 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
         ).values(),
       );
       setExistingSiteIds(uniqueSiteIdAssociatedWith);
-      setFormData(sitesAssociated);
     } else {
       setLoading(RequestStatus.loading);
     }
@@ -284,22 +286,13 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     return () => clearTimeout(timeoutId);
   }, [searchParam]);
 
-  const clearSearch = useCallback(() => {
-    setSearchTerm('');
-    setFormData(sitesAssociated);
-  }, [sitesAssociated]);
+  const clearSearch = () => {
+    setSearch('');
+  };
 
-  const handleSearchChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const searchTerm = event.target.value;
-      setSearchTerm(searchTerm);
-      const filteredData = sitesAssociated.filter((associate: any) =>
-        deepSearch(associate, searchTerm.toLowerCase().trim()),
-      );
-      setFormData(filteredData);
-    },
-    [sitesAssociated],
-  );
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+  };
 
   const deepSearch = (obj: any, searchTerm: string): boolean => {
     for (const key in obj) {
@@ -340,6 +333,20 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
 
     return false;
   };
+
+  useEffect(() => {
+    if (status !== RequestStatus.success || !sitesAssociated) {
+      return;
+    }
+    const term = search.toLowerCase().trim();
+    setFormData(
+      term
+        ? sitesAssociated.filter((associate: any) =>
+            deepSearch(associate, term),
+          )
+        : sitesAssociated,
+    );
+  }, [sitesAssociated, status, search]);
 
   const handleColumnSort = (columnId: string) => {
     setColumnSort(columnId);
@@ -598,7 +605,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
         <div className={`mb-3 col-lg-8`}>
           <SearchInput
             label={'Search'}
-            searchTerm={searchTerm}
+            searchTerm={search}
             clearSearch={clearSearch}
             handleSearchChange={handleSearchChange}
           />

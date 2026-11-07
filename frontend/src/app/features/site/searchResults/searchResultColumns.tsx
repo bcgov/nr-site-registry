@@ -1,5 +1,5 @@
-import { Link as RouterLink } from 'react-router-dom';
 import { SiteSortBy } from '../../../../graphql/generated';
+import { TableLink } from '../../../components/grid/TableLink';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { columnSizeClass } from '../../../components/grid/columnSizeClass';
 import { GridColumn } from '../../../components/grid/Grid';
@@ -89,18 +89,18 @@ function SearchResultCell({
 
   if (field?.type === FormFieldType.Link) {
     return (
-      <RouterLink
+      <TableLink
         to={`${field.href ?? ''}${value}`}
-        className={`d-flex pt-1 ${field.customInputTextCss ?? ''}`}
-        aria-label={`${field.label} ${value}`}
+        label={field.label}
+        value={value}
+        text={visibleText}
+        icon={field.customIcon}
+        className={field.customInputTextCss}
         state={{
           fromPath: field.componentPath ?? '',
           fromLabel: field.componentName ?? '',
         }}
-      >
-        {field.customIcon ? field.customIcon : null}{' '}
-        <span className="ps-1">{visibleText}</span>
-      </RouterLink>
+      />
     );
   }
 

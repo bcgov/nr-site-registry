@@ -29,3 +29,20 @@
   pointer-events: none;
   color: var(--icons-color-disabled);
 }
+
+a.table-cell-link,
+a.table-cell-link:hover,
+a.table-cell-link:focus,
+a.table-cell-link:visited,
+a.table-cell-link:active {
+  display: flex;
+  align-items: center;
+  padding-top: 0.25rem;
+  padding-bottom: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: left;
+  color: var(--surface-color-primary-default, #053662);
+  text-decoration: none;
+}

@@ -82,6 +82,17 @@ describe('URL-driven navigation pills', () => {
     );
   });
 
+  it('drops the section search when switching tabs and keeps other parameters', () => {
+    renderPills(
+      '/site/details/9/notations?search=road&sortBy=note&applicationId=abc',
+    );
+    fireEvent.click(screen.getAllByRole('button', { name: 'Summary' })[0]);
+    expect(screen.getByTestId('location')).toHaveTextContent(
+      '/site/details/9/summary?applicationId=abc',
+      { exact: true },
+    );
+  });
+
   it('preserves the query string when switching tabs', () => {
     renderPills('/site/details/9/summary?applicationId=abc');
     fireEvent.click(screen.getAllByRole('button', { name: 'Notations' })[0]);

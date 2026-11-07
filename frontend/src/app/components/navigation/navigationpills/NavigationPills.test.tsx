@@ -149,6 +149,16 @@ describe('URL-driven navigation pills', () => {
     );
   });
 
+  it('opens the page menu from the left of the Select Page button', () => {
+    renderPills('/site/details/9/summary');
+    fireEvent.click(screen.getByRole('button', { name: /Select Page/i }));
+    const menu = document.querySelector('.custom-nav-action-menu');
+    expect(menu).not.toHaveClass('dropdown-menu-end');
+    expect(menu).toHaveTextContent('Summary');
+    expect(menu).toHaveTextContent('Notations');
+    expect(menu).toHaveTextContent('Documents');
+  });
+
   it('navigates from Select Page on small screens', () => {
     renderPills('/site/details/9/summary');
     fireEvent.click(screen.getByRole('button', { name: /Select Page/i }));

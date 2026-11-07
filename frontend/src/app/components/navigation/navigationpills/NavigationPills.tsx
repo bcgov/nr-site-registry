@@ -79,6 +79,7 @@ const NavigationPills: React.FC<INavigationPills> = ({
               }
               customCssToggleBtn={'custom-nav-btn'}
               customCssMenu={'custom-nav-action-menu'}
+              menuAlign="start"
               disable={isDisable}
               toggleButtonVariant={'secondary'}
               toggleButtonSize={isMobileScreen ? 'medium' : 'small'}

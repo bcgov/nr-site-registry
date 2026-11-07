@@ -15,6 +15,7 @@ const Actions: React.FC<IActions> = ({
   onItemClick,
   toggleButtonVariant,
   toggleButtonSize,
+  menuAlign = 'end',
 }) => {
   return (
     <Dropdown>
@@ -33,7 +34,7 @@ const Actions: React.FC<IActions> = ({
       </Dropdown.Toggle>
       <Dropdown.Menu
         className={`${customCssMenu ?? 'custom-action-menu'}`}
-        align={'end'}
+        align={menuAlign}
       >
         {items?.map((item, index) => {
           if (!isValidElement(item) && 'value' in item) {

@@ -87,9 +87,8 @@ describe('URL-driven navigation pills', () => {
       '/site/details/9/notations?search=road&sortBy=note&applicationId=abc',
     );
     fireEvent.click(screen.getAllByRole('button', { name: 'Summary' })[0]);
-    expect(screen.getByTestId('location')).toHaveTextContent(
+    expect(screen.getByTestId('location').textContent).toBe(
       '/site/details/9/summary?applicationId=abc',
-      { exact: true },
     );
   });
 

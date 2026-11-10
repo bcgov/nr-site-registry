@@ -19,8 +19,10 @@ import { getClientSettings } from './app/auth/UserManagerSetting';
 import { handleSigninCallback } from './app/auth/returnUrl';
 import { RouterProvider } from 'react-router-dom';
 import siteRouter from './app/routes/Routes';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { getLoggedInUserType, getUser } from './app/helpers/utility';
 import { API, GRAPHQL } from './app/helpers/endpoints';
+import { queryClient } from './app/queryClient';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLDivElement,
@@ -78,11 +80,13 @@ function AppWrapper() {
   }, [events, isAuthenticated, user, tryTokenRefresh]);
 
   return (
-    <ApolloProvider client={client}>
-      <Provider store={store}>
-        <RouterProvider router={siteRouter(userType)} />
-      </Provider>
-    </ApolloProvider>
+    <QueryClientProvider client={queryClient}>
+      <ApolloProvider client={client}>
+        <Provider store={store}>
+          <RouterProvider router={siteRouter(userType)} />
+        </Provider>
+      </ApolloProvider>
+    </QueryClientProvider>
   );
 }
 

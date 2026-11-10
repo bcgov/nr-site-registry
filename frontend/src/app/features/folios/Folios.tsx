@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
-import Table from '../../components/table/Table';
+import SectionGrid, {
+  sortableColumnIds,
+} from '../../components/grid/SectionGrid';
 import { RequestStatus } from '../../helpers/requests/status';
-import { getFolioTableColumnsBasedOnMode } from './FolioTableConfig';
+import {
+  FolioTableColumns,
+  getFolioTableColumnsBasedOnMode,
+} from './FolioTableConfig';
+import { useSectionSortQuery } from '../details/sectionListQuery';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addFolioItem,
@@ -19,12 +25,7 @@ import {
   updateRequestStatus,
 } from './redux/FolioSlice';
 import { Folio } from './dto/Folio';
-import {
-  deepSearch,
-  getUser,
-  showNotification,
-  sortTableData,
-} from '../../helpers/utility';
+import { deepSearch, getUser, showNotification } from '../../helpers/utility';
 import { AppDispatch } from '../../Store';
 import './Folios.css';
 import {
@@ -42,7 +43,8 @@ import { signInWithReturnUrl } from '../../auth/returnUrl';
 
 import { notifyError, notifySuccess } from '../../components/alert/Alert';
 import { Button } from '../../components/button/Button';
-import { TableColumn } from '../../components/table/TableColumn';
+
+const folioSortFields = sortableColumnIds(FolioTableColumns);
 
 const Folios = () => {
   let blocker = useBlocker(
@@ -54,6 +56,7 @@ const Folios = () => {
   const [tempArr, setTempArr] = useState(folioItemsArr);
 
   const dispatch = useDispatch<AppDispatch>();
+  const { gridSort, setColumnSort } = useSectionSortQuery(folioSortFields);
 
   const [editMode, SetEditMode] = useState(false);
 
@@ -64,9 +67,6 @@ const Folios = () => {
   const [showUpdatesConfirmModal, SetShowUpdatesConfirmModal] = useState(false);
 
   const [showDeleteConfirmModal, SetShowDeleteConfirmModal] = useState(false);
-
-  const [sortColumn, setSortColumn] = useState<string>('');
-  const [sortAsc, setSortAsc] = useState<boolean>(true);
 
   const addStatus = useSelector(addFolioItemRequestStatus);
 
@@ -162,24 +162,17 @@ const Folios = () => {
     SetShowUpdatesConfirmModal(true);
   };
 
-  const handleSortChange = (column: TableColumn, ascSort: boolean) => {
-    setSortColumn(column.graphQLPropertyName);
-    setSortAsc(ascSort);
-  };
-
-  const getSortedData = () => {
-    const formatted = tempArr.map((item: any) => ({
-      ...item,
-      _rawWhenUpdated: item.whenUpdated,
-      whenUpdated: item.whenUpdated
-        ? new Date(item.whenUpdated).toLocaleString()
-        : '',
-    }));
-    if (!sortColumn) return formatted;
-    return sortTableData(formatted, sortColumn, sortAsc, ['whenUpdated'], {
-      whenUpdated: '_rawWhenUpdated',
-    });
-  };
+  const folioRows = useMemo(
+    () =>
+      tempArr.map((item) => ({
+        ...item,
+        _rawWhenUpdated: item.whenUpdated,
+        whenUpdated: item.whenUpdated
+          ? new Date(item.whenUpdated).toLocaleString()
+          : '',
+      })),
+    [tempArr],
+  );
 
   return (
     <PageContainer role="Folios">
@@ -223,24 +216,27 @@ const Folios = () => {
         />
       </div>
       <div className="col-12 overflow-auto w-100">
-        <Table
+        <SectionGrid
           label="Folios"
           isLoading={RequestStatus.success}
           columns={getFolioTableColumnsBasedOnMode(editMode)}
-          data={getSortedData()}
-          totalResults={tempArr.length}
+          rows={folioRows}
           allowRowsSelect={false}
-          showPageOptions={false}
           changeHandler={(event) => {
             handleChange(event);
           }}
           editMode={editMode}
+          srMode={false}
           idColumnName="id"
           deleteHandler={(event) => {
             SetShowDeleteConfirmModal(true);
             SetDeleteRow(event.row);
           }}
-          sortHandler={handleSortChange}
+          sortControl={{
+            manual: false,
+            sort: gridSort,
+            onSortChange: setColumnSort,
+          }}
         />
       </div>
 

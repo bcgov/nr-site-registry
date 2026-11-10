@@ -1708,6 +1708,8 @@ export type MapSearch_FindSiteBySiteIdLoggedInUserQuery = { __typename?: 'Query'
 export type MapSearch_FilterSearchResultsQueryVariables = Exact<{
   page: Scalars['Int']['input'];
   pageSize: Scalars['Int']['input'];
+  sortBy?: InputMaybe<SiteSortBy>;
+  sortByDir?: InputMaybe<SortByDirection>;
   filters: SiteFilters;
 }>;
 
@@ -2012,11 +2014,13 @@ export type MapSearch_FindSiteBySiteIdLoggedInUserLazyQueryHookResult = ReturnTy
 export type MapSearch_FindSiteBySiteIdLoggedInUserSuspenseQueryHookResult = ReturnType<typeof useMapSearch_FindSiteBySiteIdLoggedInUserSuspenseQuery>;
 export type MapSearch_FindSiteBySiteIdLoggedInUserQueryResult = Apollo.QueryResult<MapSearch_FindSiteBySiteIdLoggedInUserQuery, MapSearch_FindSiteBySiteIdLoggedInUserQueryVariables>;
 export const MapSearch_FilterSearchResultsDocument = gql`
-    query MapSearch_filterSearchResults($page: Int!, $pageSize: Int!, $filters: SiteFilters!) {
+    query MapSearch_filterSearchResults($page: Int!, $pageSize: Int!, $sortBy: SiteSortBy, $sortByDir: SortByDirection, $filters: SiteFilters!) {
   searchSites(
     searchParam: ""
     page: $page
     pageSize: $pageSize
+    sortBy: $sortBy
+    sortByDir: $sortByDir
     filters: $filters
   ) {
     sites {
@@ -2064,6 +2068,8 @@ export const MapSearch_FilterSearchResultsDocument = gql`
  *   variables: {
  *      page: // value for 'page'
  *      pageSize: // value for 'pageSize'
+ *      sortBy: // value for 'sortBy'
+ *      sortByDir: // value for 'sortByDir'
  *      filters: // value for 'filters'
  *   },
  * });

@@ -10,6 +10,7 @@ import { DropdownItem } from '../../../components/action/IActions';
 import { ApproveRejectButtons } from '../../../components/approve/ApproveReject';
 import { Button } from '../../../components/button/Button';
 import { UserActionEnum } from '../../../common/userActionEnum';
+import { SectionSortControl } from '../../../components/grid/SectionGrid';
 
 interface IParticipantTableProps {
   handleTableChange: (event: any) => void;
@@ -22,7 +23,7 @@ interface IParticipantTableProps {
   }[];
   status: RequestStatus;
   viewMode: SiteDetailsMode;
-  handleTableSort: (row: any, ascDir: any) => void;
+  sortControl?: SectionSortControl;
   handleAddParticipant: () => void;
   selectedRows: {
     participantId: any;
@@ -48,7 +49,7 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
   formData,
   status,
   viewMode,
-  handleTableSort,
+  sortControl,
   handleAddParticipant,
   selectedRows,
   handleRemoveParticipant,
@@ -87,9 +88,7 @@ const ParticipantTable: React.FC<IParticipantTableProps> = ({
         srMode={viewMode === SiteDetailsMode.SRMode}
         hideWidgetCheckbox={true}
         primaryKeycolumnName="particRoleId"
-        sortHandler={(row, ascDir) => {
-          handleTableSort(row, ascDir);
-        }}
+        sortControl={sortControl}
       >
         {viewMode === SiteDetailsMode.EditMode &&
           userType === UserType.Internal && (

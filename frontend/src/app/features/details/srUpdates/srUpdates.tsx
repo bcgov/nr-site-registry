@@ -752,7 +752,6 @@ const SRUpdates = () => {
                 handleWidgetCheckBox={handleChange}
                 internalTableColumn={notationColumnInternalLocal}
                 externalTableColumn={[]}
-                handleTableSort={handleChange}
                 loading={RequestStatus.success}
                 handleAddParticipant={handleChange}
                 isAnyParticipantSelected={handleAndReturnBoolean}
@@ -788,7 +787,6 @@ const SRUpdates = () => {
             formData={siteParticipantData}
             status={RequestStatus.success}
             viewMode={SiteDetailsMode.ViewOnlyMode}
-            handleTableSort={handleChange}
             handleAddParticipant={() => {}}
             selectedRows={siteParticipantData}
             handleRemoveParticipant={handleChange}
@@ -851,7 +849,6 @@ const SRUpdates = () => {
             associateColumnExternal={null}
             formData={associatedSitesData}
             loading={RequestStatus.success}
-            handleTableSort={handleChange}
             handleAddAssociate={handleChange}
             selectedRows={[]}
             handleRemoveAssociate={() => {}}
@@ -876,7 +873,6 @@ const SRUpdates = () => {
             editModeEnabled={false}
             tableLoading={RequestStatus.success}
             viewMode={SiteDetailsMode.ViewOnlyMode}
-            handleTableSort={handleChange}
             selectedRowIds={[]}
             handleRemoveLandUse={handleChange}
             handleAddLandUse={handleChange}
@@ -903,7 +899,6 @@ const SRUpdates = () => {
               currentPage={1}
               resultsPerPage={undefined}
               viewMode={SiteDetailsMode.ViewOnlyMode}
-              handleTableSortChange={handleChange}
               deleteHandler={() => {}}
               allowRowsSelect={false}
             />
@@ -948,7 +943,6 @@ const SRUpdates = () => {
                 disclosureScheduleExternalConfig
               }
               loading={RequestStatus.success}
-              handleTableSort={handleChange}
               handleAddDisclosureSchedule={handleChange}
               isAnyDisclosureScheduleSelected={(event: any) => {
                 return false;

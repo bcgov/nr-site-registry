@@ -79,9 +79,9 @@ describe('Search', () => {
 
     await waitFor(() => {
       expect(searchParams).toContain('abc');
-      expect(
-        screen.getByRole('link', { name: 'Site ID 1' }),
-      ).toBeInTheDocument();
+      const siteId = screen.getByRole('link', { name: 'Site ID 1' });
+      expect(siteId).toBeInTheDocument();
+      expect(siteId).toHaveClass('table-cell-link');
     });
   });
 

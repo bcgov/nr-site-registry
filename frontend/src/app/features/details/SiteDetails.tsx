@@ -1510,11 +1510,7 @@ const SiteDetails = () => {
         await saveSiteDocumentData();
       }
       if (errorList.length === 0) {
-        const res = await dispatch(saveSiteDetails()).unwrap();
-        const { httpStatusCode, success } = res?.data?.updateSiteDetails;
-        if (httpStatusCode === HttpStatusCode.OK && success) {
-          navigate(-1);
-        }
+        await dispatch(saveSiteDetails()).unwrap();
       }
     } catch (error) {
       console.error('Error while saving site details:', error);

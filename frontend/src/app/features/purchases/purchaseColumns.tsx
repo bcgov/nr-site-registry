@@ -1,5 +1,5 @@
 import { SectionColumn } from '../../components/grid/SectionColumn';
-import { Link as RouterLink } from 'react-router-dom';
+import { TableLink } from '../../components/grid/TableLink';
 import { columnSizeClass } from '../../components/grid/columnSizeClass';
 import { GridColumn } from '../../components/grid/Grid';
 
@@ -35,13 +35,13 @@ function PurchaseCell({
   const value = cellText(field, row);
   if (field === 'siteId') {
     return (
-      <RouterLink
+      <TableLink
         to={`${column.displayType?.href ?? ''}${row.siteId}`}
-        className="d-flex pt-1"
-        aria-label={`${column.displayName} ${row.siteId}`}
-      >
-        <span className="ps-1">{value}</span>
-      </RouterLink>
+        label={column.displayName}
+        value={row.siteId}
+        text={value}
+        className={column.displayType?.customInputTextCss}
+      />
     );
   }
 

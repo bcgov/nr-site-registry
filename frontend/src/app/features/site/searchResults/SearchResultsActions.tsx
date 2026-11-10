@@ -11,44 +11,26 @@ import {
   FileExportIcon,
   ShoppingCartIcon,
 } from '../../../components/common/icon';
-import { TableColumn } from '../../../components/table/TableColumn';
 import {
   downloadLabeledValues,
-  downloadSelectedColumnsCSV,
+  LabeledCsvColumn,
 } from '../../../helpers/csvExport/csvExport';
 import { SearchSiteRow } from '../searchSites';
 import { addCartItem, resetCartItemAddedStatus } from '../../cart/CartSlice';
 
 interface SearchResultsActionsProps {
   selectedRows: SearchSiteRow[];
-  selectedColumns?: TableColumn[];
-  visibleCellText?: (column: TableColumn, row: SearchSiteRow) => string;
+  exportColumns: LabeledCsvColumn[];
 }
 export const SearchResultsActions: FC<SearchResultsActionsProps> = ({
   selectedRows,
-  selectedColumns = [],
-  visibleCellText,
+  exportColumns,
 }) => {
   const auth = useAuth();
   const dispatch = useDispatch<AppDispatch>();
 
   const handleExport = () => {
-    if (selectedRows.length === 0 || selectedColumns.length === 0) {
-      return;
-    }
-    if (!visibleCellText) {
-      downloadSelectedColumnsCSV(selectedRows, selectedColumns);
-      return;
-    }
-
-    const visibleColumns = selectedColumns.filter((column) => column.isChecked);
-    downloadLabeledValues(
-      selectedRows,
-      visibleColumns.map((column) => ({
-        label: column.displayName,
-        value: (row) => visibleCellText(column, row as SearchSiteRow),
-      })),
-    );
+    downloadLabeledValues(selectedRows, exportColumns);
   };
 
   const handleAddToShoppingCart = () => {

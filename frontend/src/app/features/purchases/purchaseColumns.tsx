@@ -1,7 +1,8 @@
+import { SectionColumn } from '../../components/grid/SectionColumn';
 import { Link as RouterLink } from 'react-router-dom';
 import { columnSizeClass } from '../../components/grid/columnSizeClass';
 import { GridColumn } from '../../components/grid/Grid';
-import { TableColumn } from '../../components/table/TableColumn';
+
 import { PurchasesTableColumns } from './PurchasesTableConfig';
 import {
   isPurchaseSortField,
@@ -24,7 +25,7 @@ function PurchaseCell({
   column,
   row,
 }: {
-  column: TableColumn;
+  column: SectionColumn;
   row: PurchasedSite;
 }) {
   const field = column.graphQLPropertyName;

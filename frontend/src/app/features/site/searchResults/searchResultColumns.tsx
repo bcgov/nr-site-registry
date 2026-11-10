@@ -3,9 +3,12 @@ import { SiteSortBy } from '../../../../graphql/generated';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
 import { columnSizeClass } from '../../../components/grid/columnSizeClass';
 import { GridColumn } from '../../../components/grid/Grid';
-import { TableColumn } from '../../../components/table/TableColumn';
-import { getColumnValue } from '../../../helpers/csvExport/csvExport';
+import {
+  LabeledCsvColumn,
+  propertyText,
+} from '../../../helpers/csvExport/csvExport';
 import { SearchSiteRow } from '../searchSites';
+import { SearchResultColumn } from './SearchResultColumn';
 
 const sortFieldByProperty: Record<string, SiteSortBy> = {
   id: SiteSortBy.Id,
@@ -26,7 +29,9 @@ const sortFieldByProperty: Record<string, SiteSortBy> = {
   consultantSubmitted: SiteSortBy.ConsultantSubmitted,
 };
 
-export function sortFieldForColumn(column: TableColumn): SiteSortBy | null {
+export function sortFieldForColumn(
+  column: SearchResultColumn,
+): SiteSortBy | null {
   if (column.dynamicColumn) {
     return null;
   }
@@ -45,10 +50,12 @@ export function sortFieldForColumn(column: TableColumn): SiteSortBy | null {
 }
 
 export function displayedSearchCellText(
-  column: TableColumn,
+  column: SearchResultColumn,
   row: Record<string, unknown>,
 ): string {
-  const value = getColumnValue(row, column);
+  const value = propertyText(row, column.graphQLPropertyName, {
+    date: column.displayType?.type === FormFieldType.Date,
+  });
   const visibleLabel = column.displayType?.customLinkValue;
   if (column.displayType?.type === FormFieldType.Link && visibleLabel) {
     return String(visibleLabel);
@@ -56,14 +63,27 @@ export function displayedSearchCellText(
   return value;
 }
 
+export function searchExportColumns(
+  columns: SearchResultColumn[],
+): LabeledCsvColumn[] {
+  return columns
+    .filter((column) => column.isChecked)
+    .map((column) => ({
+      label: column.displayName,
+      value: (row) => displayedSearchCellText(column, row),
+    }));
+}
+
 function SearchResultCell({
   column,
   row,
 }: {
-  column: TableColumn;
+  column: SearchResultColumn;
   row: SearchSiteRow;
 }) {
-  const value = getColumnValue(row, column);
+  const value = propertyText(row, column.graphQLPropertyName, {
+    date: column.displayType?.type === FormFieldType.Date,
+  });
   const visibleText = displayedSearchCellText(column, row);
   const field = column.displayType;
 
@@ -102,7 +122,7 @@ type SelectionControls = {
 };
 
 export function buildSearchResultColumns(
-  tableColumns: TableColumn[],
+  tableColumns: SearchResultColumn[],
   selection: SelectionControls,
 ): GridColumn<SearchSiteRow>[] {
   const pageRows = selection.pageRows;
@@ -161,7 +181,7 @@ export function buildSearchResultColumns(
 }
 
 export function columnSortField(
-  tableColumns: TableColumn[],
+  tableColumns: SearchResultColumn[],
   columnId: string,
 ): SiteSortBy | null {
   const column = tableColumns.find((item) => String(item.id) === columnId);
@@ -172,7 +192,7 @@ export function columnSortField(
 }
 
 export function columnIdForSortField(
-  tableColumns: TableColumn[],
+  tableColumns: SearchResultColumn[],
   sortField: string,
 ): string | null {
   const column = tableColumns.find(

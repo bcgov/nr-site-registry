@@ -1,11 +1,13 @@
+import { ColumnSize } from '../../../components/grid/columnSize';
+import { SectionColumn } from '../../../components/grid/SectionColumn';
 import { DropdownItem } from '../../../components/action/IActions';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
-import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
+
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import { RequestStatus } from '../../../helpers/requests/status';
 
 export const GetConfig = () => {
-  const participantColumnInternal: TableColumn[] = [
+  const participantColumnInternal: SectionColumn[] = [
     {
       id: 1,
       displayName: 'Participant Name',
@@ -152,7 +154,7 @@ export const GetConfig = () => {
     },
   ];
 
-  const participantColumnExternal: TableColumn[] = [
+  const participantColumnExternal: SectionColumn[] = [
     {
       id: 1,
       displayName: 'Participant Name',

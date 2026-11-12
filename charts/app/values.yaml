@@ -27,6 +27,10 @@ global:
     dbUser: ~ # either site or pr specific user.
     seed:
       enabled: true
+    # Realm role granted to the service account CATS uses to call the service endpoints.
+    ROLES_SERVICE_CALLER: site-service-caller
+    # Comma-separated authorized-party (azp) allowlist for service-caller tokens.
+    SITE_SERVICE_ALLOWED_CLIENT_IDS: site-service
   #-- domain of the application, it is required, apps.silver.devops.gov.bc.ca for silver cluster and apps.devops.gov.bc.ca for gold cluster
   domain: "apps.silver.devops.gov.bc.ca" # it is apps.gold.devops.gov.bc.ca for gold cluster
   #-- the database Alias gives a nice way to switch to different databases, crunchy, patroni ... etc.

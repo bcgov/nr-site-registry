@@ -172,6 +172,10 @@ spec:
               value: {{ .Values.backend.service.targetPort | quote }}
             - name: GRAPHQL_SCHEMA_FILE_PATH
               value: "/graphql/schema.graphql"
+            - name: ROLES_SERVICE_CALLER
+              value: {{ .Values.global.config.ROLES_SERVICE_CALLER | quote }}
+            - name: SITE_SERVICE_ALLOWED_CLIENT_IDS
+              value: {{ .Values.global.config.SITE_SERVICE_ALLOWED_CLIENT_IDS | quote }}
             - name: POSTGRES_DB_PASSWORD
               valueFrom:
                 secretKeyRef:

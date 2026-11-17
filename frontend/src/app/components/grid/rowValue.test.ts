@@ -1,4 +1,4 @@
-import { get, set } from './index';
+import { get, set } from './rowValue';
 
 describe('get function', () => {
   const obj = {

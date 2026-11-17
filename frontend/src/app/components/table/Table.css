@@ -64,6 +64,7 @@
   }
 }
 
+/* Static on purpose. A positioned scroll box clips the search menus used in edit mode. */
 .tableWidth {
   width: 100%;
   overflow-x: scroll;

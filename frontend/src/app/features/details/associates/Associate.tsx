@@ -1,4 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
+import {
+  useSectionSearchQuery,
+  useSectionSortQuery,
+} from '../sectionListQuery';
+import { SortByDirection } from '../../../../graphql/generated';
 import SearchInput from '../../../components/search/SearchInput';
 import Sort from '../../../components/sort/Sort';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,7 +22,6 @@ import {
   getUser,
   isUserOfType,
   resultCache,
-  sortArray,
   UpdateDisplayTypeParams,
   updateTableColumn,
   UserRoleType,
@@ -71,7 +75,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   const saveSiteDetailsRequestStatus = useSelector(saveRequestStatus);
   const trackAssociatedSite = useSelector(getSiteAssociated);
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const { search, setSearch } = useSectionSearchQuery();
   const [formData, setFormData] = useState<
     { [key: string]: any | [Date, Date] }[]
   >([]);
@@ -80,7 +84,14 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
   >([]);
   const [userType, setUserType] = useState<UserType>(UserType.External);
   const [viewMode, setViewMode] = useState(SiteDetailsMode.ViewOnlyMode);
-  const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
+  const { sortBy, sortByDir, gridSort, setQuery, setColumnSort } =
+    useSectionSortQuery(['siteIdAssociatedWith', 'effectiveDate', 'note']);
+  const sortByValue =
+    sortBy === 'effectiveDate'
+      ? {
+          sortBy: sortByDir === SortByDirection.Desc ? 'newToOld' : 'oldTonew',
+        }
+      : {};
   const [selectedRows, setSelectedRows] = useState<
     { siteId: String; siteIdAssociatedWith: string; id: string }[]
   >([]);
@@ -174,7 +185,6 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
         ).values(),
       );
       setExistingSiteIds(uniqueSiteIdAssociatedWith);
-      setFormData(sitesAssociated);
     } else {
       setLoading(RequestStatus.loading);
     }
@@ -276,22 +286,13 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     return () => clearTimeout(timeoutId);
   }, [searchParam]);
 
-  const clearSearch = useCallback(() => {
-    setSearchTerm('');
-    setFormData(sitesAssociated);
-  }, [sitesAssociated]);
+  const clearSearch = () => {
+    setSearch('');
+  };
 
-  const handleSearchChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const searchTerm = event.target.value;
-      setSearchTerm(searchTerm);
-      const filteredData = sitesAssociated.filter((associate: any) =>
-        deepSearch(associate, searchTerm.toLowerCase().trim()),
-      );
-      setFormData(filteredData);
-    },
-    [sitesAssociated],
-  );
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
+  };
 
   const deepSearch = (obj: any, searchTerm: string): boolean => {
     for (const key in obj) {
@@ -333,40 +334,36 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     return false;
   };
 
-  const handleSortChange = useCallback(
-    (graphQLPropertyName: any, value: string | [Date, Date]) => {
-      setSortByValue((prevData) => ({
-        ...prevData,
-        [graphQLPropertyName]: value,
-      }));
-      sortItems(value, formData);
-    },
-    [formData],
-  );
-
-  const sortItems = (sortBy: any, data: any) => {
-    let sorted = [...data];
-    switch (sortBy) {
-      case 'newToOld':
-        sorted.sort(
-          (a, b) =>
-            new Date(b.effectiveDate).getTime() -
-            new Date(a.effectiveDate).getTime(),
-        ); // Sorting by date from new to old
-        break;
-      case 'oldTonew':
-        sorted.sort(
-          (a, b) =>
-            new Date(a.effectiveDate).getTime() -
-            new Date(b.effectiveDate).getTime(),
-        ); // Sorting by date from new to old
-        break;
-      // Add more cases for additional sorting options
-      default:
-        break;
+  useEffect(() => {
+    if (status !== RequestStatus.success || !sitesAssociated) {
+      return;
     }
-    setFormData(sorted);
+    const term = search.toLowerCase().trim();
+    setFormData(
+      term
+        ? sitesAssociated.filter((associate: any) =>
+            deepSearch(associate, term),
+          )
+        : sitesAssociated,
+    );
+  }, [sitesAssociated, status, search]);
+
+  const handleColumnSort = (columnId: string) => {
+    setColumnSort(columnId);
   };
+
+  const handleSortChange = useCallback(
+    (_graphQLPropertyName: any, value: string | [Date, Date]) => {
+      if (value === 'newToOld' || value === 'oldTonew') {
+        setQuery({
+          sortBy: 'effectiveDate',
+          sortByDir:
+            value === 'newToOld' ? SortByDirection.Desc : SortByDirection.Asc,
+        });
+      }
+    },
+    [setQuery],
+  );
 
   const handleTableChange = (event: any) => {
     if (
@@ -503,24 +500,6 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
     }
   };
 
-  const handleTableSort = (row: any, ascDir: any) => {
-    let property = row['graphQLPropertyName'];
-    setFormData((prevData) => {
-      // Create a shallow copy of the previous data
-      let updatedAssociatedSites = [...prevData];
-
-      // Call the common sort function to sort the updatedParticipant array
-      updatedAssociatedSites = sortArray(
-        updatedAssociatedSites,
-        property,
-        ascDir,
-      );
-
-      // Return the sorted array
-      return updatedAssociatedSites;
-    });
-  };
-
   const handleItemClick = (value: string) => {
     switch (value) {
       case SRVisibility.ShowSR:
@@ -626,7 +605,7 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
         <div className={`mb-3 col-lg-8`}>
           <SearchInput
             label={'Search'}
-            searchTerm={searchTerm}
+            searchTerm={search}
             clearSearch={clearSearch}
             handleSearchChange={handleSearchChange}
           />
@@ -651,7 +630,11 @@ const Associate: React.FC<IComponentProps> = ({ showPending = false }) => {
             associateColumnExternal={associateColumnExternal}
             formData={formData}
             loading={loading}
-            handleTableSort={handleTableSort}
+            sortControl={{
+              manual: false,
+              sort: gridSort,
+              onSortChange: handleColumnSort,
+            }}
             handleAddAssociate={handleAddAssociate}
             selectedRows={selectedRows}
             handleRemoveAssociate={handleRemoveAssociate}

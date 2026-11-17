@@ -574,17 +574,33 @@ const SiteDetails = () => {
     if (!id?.trim() || isLoading) {
       return;
     }
-
-    if (!details) {
-      showNotification(
-        RequestStatus.failed,
-        '',
-        `Site ${id} was not found or has been deleted.`,
-        'Site Not Found',
-      );
-      navigate('/search');
+    // Wait until the fetch for this id has finished. Clearing details on
+    // in-place associated-site navigation must not toast "not found".
+    if (siteDetailsFetchStatus !== RequestStatus.success) {
+      return;
     }
-  }, [id, isLoading, details, navigate]);
+    if (siteDetailsLastFetchedSiteId !== id) {
+      return;
+    }
+    if (details) {
+      return;
+    }
+
+    showNotification(
+      RequestStatus.failed,
+      '',
+      `Site ${id} was not found or has been deleted.`,
+      'Site Not Found',
+    );
+    navigate('/search');
+  }, [
+    id,
+    isLoading,
+    details,
+    siteDetailsFetchStatus,
+    siteDetailsLastFetchedSiteId,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (srUpdateRequestStatus === RequestStatus.success) {
@@ -1494,11 +1510,7 @@ const SiteDetails = () => {
         await saveSiteDocumentData();
       }
       if (errorList.length === 0) {
-        const res = await dispatch(saveSiteDetails()).unwrap();
-        const { httpStatusCode, success } = res?.data?.updateSiteDetails;
-        if (httpStatusCode === HttpStatusCode.OK && success) {
-          navigate(-1);
-        }
+        await dispatch(saveSiteDetails()).unwrap();
       }
     } catch (error) {
       console.error('Error while saving site details:', error);

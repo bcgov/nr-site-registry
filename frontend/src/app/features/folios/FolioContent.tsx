@@ -1,15 +1,14 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PageContainer from '../../components/simple/PageContainer';
 import CustomLabel from '../../components/simple/CustomLabel';
-import Table from '../../components/table/Table';
+import SectionGrid, {
+  sortableColumnIds,
+} from '../../components/grid/SectionGrid';
+import { useSectionSortQuery } from '../details/sectionListQuery';
 import { RequestStatus } from '../../helpers/requests/status';
 import { FolioContentTableColumns } from './FolioContentTableConfig';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  getUser,
-  showNotification,
-  sortTableData,
-} from '../../helpers/utility';
+import { getUser, showNotification } from '../../helpers/utility';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../Store';
 import {
@@ -38,7 +37,8 @@ import { useAuth } from 'react-oidc-context';
 import { signInWithReturnUrl } from '../../auth/returnUrl';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import { Button } from '../../components/button/Button';
-import { TableColumn } from '../../components/table/TableColumn';
+
+const folioContentSortFields = sortableColumnIds(FolioContentTableColumns);
 
 const FolioContents = () => {
   const { id } = useParams();
@@ -51,6 +51,9 @@ const FolioContents = () => {
   }, []);
 
   const dispatch = useDispatch<AppDispatch>();
+  const { gridSort, setColumnSort } = useSectionSortQuery(
+    folioContentSortFields,
+  );
 
   const sitesInFolioArr: [FolioContentDTO] = useSelector(sitesInFolio);
 
@@ -63,9 +66,6 @@ const FolioContents = () => {
   const sitesDeleteStatus = useSelector(deleteSiteInFolioStatus);
 
   const [showDeleteConfirmModal, SetShowDeleteConfirmModal] = useState(false);
-
-  const [sortColumn, setSortColumn] = useState<string>('');
-  const [sortAsc, setSortAsc] = useState<boolean>(true);
 
   useEffect(() => {
     const dto = { id: parseInt(id ?? '0') };
@@ -167,26 +167,17 @@ const FolioContents = () => {
     }
   };
 
-  const handleSortChange = (column: TableColumn, ascSort: boolean) => {
-    setSortColumn(column.graphQLPropertyName);
-    setSortAsc(ascSort);
-  };
-
-  const sortedFolioContent = useMemo(() => {
-    const mapped = sitesInFolioArr.map((x) => {
-      const merged = { ...x, ...x.site };
-      const rawDate = merged.whenUpdated || (x as any).whenUpdated;
+  const folioSiteRows = useMemo(() => {
+    return sitesInFolioArr.map((site) => {
+      const merged = { ...site, ...site.site };
+      const rawDate = merged.whenUpdated || (site as any).whenUpdated;
       return {
         ...merged,
         _rawWhenUpdated: rawDate,
         whenUpdated: rawDate ? new Date(rawDate).toLocaleString() : '',
       };
     });
-    if (!sortColumn) return mapped;
-    return sortTableData(mapped, sortColumn, sortAsc, ['whenUpdated'], {
-      whenUpdated: '_rawWhenUpdated',
-    });
-  }, [sitesInFolioArr, sortColumn, sortAsc]);
+  }, [sitesInFolioArr]);
 
   return (
     <PageContainer role="Folio Contents">
@@ -233,22 +224,24 @@ const FolioContents = () => {
           </Button>
         </div>
         <div className="col-12 overflow-auto w-100">
-          <Table
-            label="Folios"
+          <SectionGrid
+            label="Folio Contents"
             isLoading={RequestStatus.success}
             columns={FolioContentTableColumns}
-            data={sortedFolioContent}
-            totalResults={[].length}
+            rows={folioSiteRows}
             allowRowsSelect={true}
-            showPageOptions={false}
-            currentPage={1}
             changeHandler={(event) => {
               handleChangeEventFromTable(event);
             }}
             editMode={false}
+            srMode={false}
             idColumnName="id"
             deleteHandler={() => {}}
-            sortHandler={handleSortChange}
+            sortControl={{
+              manual: false,
+              sort: gridSort,
+              onSortChange: setColumnSort,
+            }}
           />
         </div>
       </div>

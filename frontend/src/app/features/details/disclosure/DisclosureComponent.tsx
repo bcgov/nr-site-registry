@@ -28,7 +28,6 @@ interface IDisclosureComponent {
   disclosureScheduleInternalConfig: any;
   disclosureScheduleExternalConfig: any;
   loading: RequestStatus;
-  handleTableSort: (row: any, direction: any, id: any) => any;
   handleAddDisclosureSchedule: (event: any) => void;
   isAnyDisclosureScheduleSelected: (event: any) => boolean;
   handleRemoveDisclosureSchedule: (event: any) => void;
@@ -50,7 +49,6 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
   disclosureScheduleInternalConfig,
   disclosureScheduleExternalConfig,
   loading,
-  handleTableSort,
   handleAddDisclosureSchedule,
   isAnyDisclosureScheduleSelected,
   handleRemoveDisclosureSchedule,
@@ -151,12 +149,7 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                       : disclosureScheduleExternalConfig
                   }
                   tableData={formData?.siteProfileSchedule2Refs ?? []}
-                  tableIsLoading={
-                    formData?.siteProfileSchedule2Refs &&
-                    formData?.siteProfileSchedule2Refs?.length > 0
-                      ? loading
-                      : RequestStatus.idle
-                  }
+                  tableIsLoading={loading}
                   allowRowsSelect={viewMode === SiteDetailsMode.EditMode}
                   aria-label="Site Disclosure Schedule"
                   hideTable={false}
@@ -168,9 +161,6 @@ const DisclosureComponent: React.FC<IDisclosureComponent> = ({
                   hideWidgetCheckbox={true}
                   srMode={viewMode === SiteDetailsMode.SRMode}
                   primaryKeycolumnName="id"
-                  sortHandler={(row, ascDir) => {
-                    handleTableSort(row, ascDir, formData.id);
-                  }}
                 >
                   {viewMode === SiteDetailsMode.EditMode &&
                     userType === UserType.Internal && (

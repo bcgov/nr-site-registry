@@ -1,0 +1,48 @@
+.grid-sort-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.grid-frame {
+  display: grid;
+}
+
+.grid-frame > .grid-fetching,
+.grid-frame > .tableWidth {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.grid-fetching {
+  justify-self: end;
+  align-self: start;
+  z-index: 2;
+  margin-top: 0.25rem;
+  margin-right: 0.5rem;
+  pointer-events: none;
+  color: var(--icons-color-disabled);
+}
+
+a.table-cell-link,
+a.table-cell-link:hover,
+a.table-cell-link:focus,
+a.table-cell-link:visited,
+a.table-cell-link:active {
+  display: flex;
+  align-items: center;
+  padding-top: 0.25rem;
+  padding-bottom: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: left;
+  color: var(--surface-color-primary-default, #053662);
+  text-decoration: none;
+}

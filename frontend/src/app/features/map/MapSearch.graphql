@@ -1,4 +1,8 @@
-query mapSearch($searchParam: String, $polygon: [LatLngTuple!], $circle: RadiusSearchParams) {
+query mapSearch(
+  $searchParam: String
+  $polygon: [LatLngTuple!]
+  $circle: RadiusSearchParams
+) {
   mapSearch(searchParam: $searchParam, polygon: $polygon, circle: $circle) {
     data {
       id
@@ -58,12 +62,16 @@ query MapSearch_findSiteBySiteIdLoggedInUser($siteId: String!) {
 query MapSearch_filterSearchResults(
   $page: Int!
   $pageSize: Int!
+  $sortBy: SiteSortBy
+  $sortByDir: SortByDirection
   $filters: SiteFilters!
 ) {
   searchSites(
     searchParam: ""
     page: $page
     pageSize: $pageSize
+    sortBy: $sortBy
+    sortByDir: $sortByDir
     filters: $filters
   ) {
     sites {

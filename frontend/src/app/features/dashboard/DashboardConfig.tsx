@@ -1,8 +1,9 @@
+import { ColumnSize } from '../../components/grid/columnSize';
+import { SectionColumn } from '../../components/grid/SectionColumn';
 import { FillEye, FillPinMapFill } from '../../components/common/icon';
 import { FormFieldType } from '../../components/input-controls/IFormField';
-import { ColumnSize, TableColumn } from '../../components/table/TableColumn';
 
-export const recentViewedColumns: TableColumn[] = [
+export const recentViewedColumns: SectionColumn[] = [
   {
     id: 1,
     displayName: 'Site ID',

@@ -1,9 +1,10 @@
+import { SectionColumn } from '../../../components/grid/SectionColumn';
 import { id } from 'date-fns/locale';
 import {
   FormFieldType,
   IFormField,
 } from '../../../components/input-controls/IFormField';
-import { TableColumn } from '../../../components/table/TableColumn';
+
 import './SummaryForm.css';
 import {
   bceRegionCodeDrpdown,
@@ -390,7 +391,7 @@ export const GetSummaryConfig = () => {
     [formRows.commonName],
   ];
 
-  const summaryColumns: TableColumn[] = [
+  const summaryColumns: SectionColumn[] = [
     {
       id: 4,
       displayName: 'Notations',
@@ -531,7 +532,7 @@ export const GetSummaryConfig = () => {
     },
   ];
 
-  const summaryActivityColumns: TableColumn[] = [
+  const summaryActivityColumns: SectionColumn[] = [
     {
       id: 1,
       displayName: 'Activity',

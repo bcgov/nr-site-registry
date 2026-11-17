@@ -1,0 +1,202 @@
+import { SiteSortBy } from '../../../../graphql/generated';
+import { TableLink } from '../../../components/grid/TableLink';
+import { FormFieldType } from '../../../components/input-controls/IFormField';
+import { columnSizeClass } from '../../../components/grid/columnSizeClass';
+import { GridColumn } from '../../../components/grid/Grid';
+import {
+  LabeledCsvColumn,
+  propertyText,
+} from '../../../helpers/csvExport/csvExport';
+import { SearchSiteRow } from '../searchSites';
+import { SearchResultColumn } from './SearchResultColumn';
+
+const sortFieldByProperty: Record<string, SiteSortBy> = {
+  id: SiteSortBy.Id,
+  srStatus: SiteSortBy.SrStatus,
+  siteRiskCode: SiteSortBy.SiteRiskCode,
+  commonName: SiteSortBy.CommonName,
+  site_address: SiteSortBy.SiteAddress,
+  generalDescription: SiteSortBy.GeneralDescription,
+  city: SiteSortBy.City,
+  whoCreated: SiteSortBy.WhoCreated,
+  latdeg: SiteSortBy.LatDeg,
+  longdeg: SiteSortBy.LongDeg,
+  latDegressMinutesSeconds: SiteSortBy.LatDegreesMinutesSeconds,
+  longDegreesMinutesSeconds: SiteSortBy.LongDegreesMinutesSeconds,
+  whenCreated: SiteSortBy.WhenCreated,
+  whenUpdated: SiteSortBy.WhenUpdated,
+  latlongReliabilityFlag: SiteSortBy.LatLongReliabilityFlag,
+  consultantSubmitted: SiteSortBy.ConsultantSubmitted,
+};
+
+export function sortFieldForColumn(
+  column: SearchResultColumn,
+): SiteSortBy | null {
+  if (column.dynamicColumn) {
+    return null;
+  }
+
+  if (column.graphQLPropertyName === 'addrLine_1,addrLine_2,addrLine_3') {
+    return SiteSortBy.SiteAddress;
+  }
+  if (column.graphQLPropertyName === 'longDegrees,longMinutes,longSeconds') {
+    return SiteSortBy.LongDegreesMinutesSeconds;
+  }
+  if (column.graphQLPropertyName === 'latDegrees,latMinutes,latSeconds') {
+    return SiteSortBy.LatDegreesMinutesSeconds;
+  }
+
+  return sortFieldByProperty[column.graphQLPropertyName] ?? null;
+}
+
+export function displayedSearchCellText(
+  column: SearchResultColumn,
+  row: Record<string, unknown>,
+): string {
+  const value = propertyText(row, column.graphQLPropertyName, {
+    date: column.displayType?.type === FormFieldType.Date,
+  });
+  const visibleLabel = column.displayType?.customLinkValue;
+  if (column.displayType?.type === FormFieldType.Link && visibleLabel) {
+    return String(visibleLabel);
+  }
+  return value;
+}
+
+export function searchExportColumns(
+  columns: SearchResultColumn[],
+): LabeledCsvColumn[] {
+  return columns
+    .filter((column) => column.isChecked)
+    .map((column) => ({
+      label: column.displayName,
+      value: (row) => displayedSearchCellText(column, row),
+    }));
+}
+
+function SearchResultCell({
+  column,
+  row,
+}: {
+  column: SearchResultColumn;
+  row: SearchSiteRow;
+}) {
+  const value = propertyText(row, column.graphQLPropertyName, {
+    date: column.displayType?.type === FormFieldType.Date,
+  });
+  const visibleText = displayedSearchCellText(column, row);
+  const field = column.displayType;
+
+  if (field?.type === FormFieldType.Link) {
+    return (
+      <TableLink
+        to={`${field.href ?? ''}${value}`}
+        label={field.label}
+        value={value}
+        text={visibleText}
+        icon={field.customIcon}
+        className={field.customInputTextCss}
+        state={{
+          fromPath: field.componentPath ?? '',
+          fromLabel: field.componentName ?? '',
+        }}
+      />
+    );
+  }
+
+  return (
+    <span
+      aria-label={column.displayName}
+      className={`d-flex pt-1 ${field?.customInputTextCss ?? ''}`}
+    >
+      {value}
+    </span>
+  );
+}
+
+type SelectionControls = {
+  pageRows: SearchSiteRow[];
+  isSelected: (row: SearchSiteRow) => boolean;
+  onToggleRow: (row: SearchSiteRow, selected: boolean) => void;
+  onTogglePage: (selected: boolean) => void;
+};
+
+export function buildSearchResultColumns(
+  tableColumns: SearchResultColumn[],
+  selection: SelectionControls,
+): GridColumn<SearchSiteRow>[] {
+  const pageRows = selection.pageRows;
+  const allSelected =
+    pageRows.length > 0 && pageRows.every((row) => selection.isSelected(row));
+
+  const selectColumn: GridColumn<SearchSiteRow> = {
+    id: 'select',
+    label: '',
+    sortable: false,
+    headerClassName: 'checkbox-column positionSticky',
+    cellClassName:
+      'table-border-light content-text positionSticky align-content-center',
+    header: (
+      <input
+        type="checkbox"
+        className="checkbox-color"
+        aria-label="Select all rows on this page"
+        checked={allSelected}
+        onChange={(event) => selection.onTogglePage(event.target.checked)}
+      />
+    ),
+    cell: (row) => (
+      <input
+        type="checkbox"
+        className="checkbox-color"
+        aria-label="Select Row"
+        checked={selection.isSelected(row)}
+        onChange={(event) => selection.onToggleRow(row, event.target.checked)}
+      />
+    ),
+  };
+
+  const visibleColumns = tableColumns
+    .filter((column) => column.isChecked)
+    .map((column) => {
+      const sortField = sortFieldForColumn(column);
+      const sizeClass = columnSizeClass(column.columnSize);
+      const stickyClass = column.stickyCol ? 'positionSticky' : '';
+      return {
+        id: String(column.id),
+        label: column.displayName,
+        sortable: sortField !== null,
+        headerClassName: `${sizeClass} ${stickyClass}`.trim(),
+        cellClassName:
+          `table-border-light align-content-center ${sizeClass} ${stickyClass} ${
+            column.displayType?.customContainerCss ?? ''
+          }`.trim(),
+        cell: (row: SearchSiteRow) => (
+          <SearchResultCell column={column} row={row} />
+        ),
+      };
+    });
+
+  return [selectColumn, ...visibleColumns];
+}
+
+export function columnSortField(
+  tableColumns: SearchResultColumn[],
+  columnId: string,
+): SiteSortBy | null {
+  const column = tableColumns.find((item) => String(item.id) === columnId);
+  if (!column) {
+    return null;
+  }
+  return sortFieldForColumn(column);
+}
+
+export function columnIdForSortField(
+  tableColumns: SearchResultColumn[],
+  sortField: string,
+): string | null {
+  const column = tableColumns.find(
+    (item) => item.isChecked && sortFieldForColumn(item) === sortField,
+  );
+  return column ? String(column.id) : null;
+}

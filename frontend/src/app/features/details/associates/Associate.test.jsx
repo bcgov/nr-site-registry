@@ -4,6 +4,8 @@ import { Provider, useSelector, useDispatch } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { GetAssociateConfig } from './AssociateConfig';
 
 const mockAssocs = [
@@ -606,7 +608,9 @@ describe('Associate component', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <Associate showPending={false} />
+          <QueryParamProvider adapter={ReactRouter6Adapter}>
+            <Associate showPending={false} />
+          </QueryParamProvider>
         </MemoryRouter>
       </Provider>,
     );
@@ -618,7 +622,9 @@ describe('Associate component', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <Associate showPending={false} />
+          <QueryParamProvider adapter={ReactRouter6Adapter}>
+            <Associate showPending={false} />
+          </QueryParamProvider>
         </MemoryRouter>
       </Provider>,
     );
@@ -637,7 +643,9 @@ describe('Associate component', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <Associate showPending={false} />
+          <QueryParamProvider adapter={ReactRouter6Adapter}>
+            <Associate showPending={false} />
+          </QueryParamProvider>
         </MemoryRouter>
       </Provider>,
     );
@@ -664,7 +672,9 @@ describe('Associate component', () => {
     render(
       <Provider store={store}>
         <MemoryRouter>
-          <Associate showPending={false} />
+          <QueryParamProvider adapter={ReactRouter6Adapter}>
+            <Associate showPending={false} />
+          </QueryParamProvider>
         </MemoryRouter>
       </Provider>,
     );

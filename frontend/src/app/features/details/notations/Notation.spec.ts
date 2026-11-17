@@ -91,7 +91,6 @@ describe('Notation – Widget isRequired logic', () => {
     handleInputChange: jest.fn(),
     handleTableChange: jest.fn(),
     handleWidgetCheckBox: jest.fn(),
-    handleTableSort: jest.fn(),
     handleAddParticipant: jest.fn(),
     handleRemoveParticipant: jest.fn(),
     handleDeleteNotation: jest.fn(),

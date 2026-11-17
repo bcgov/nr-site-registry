@@ -1,9 +1,11 @@
+import { ColumnSize } from '../../../components/grid/columnSize';
+import { SectionColumn } from '../../../components/grid/SectionColumn';
 import { DropdownItem } from '../../../components/action/IActions';
 import {
   FormFieldType,
   IFormField,
 } from '../../../components/input-controls/IFormField';
-import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
+
 import { SRVisibility } from '../../../helpers/requests/srVisibility';
 import { RequestStatus } from '../../../helpers/requests/status';
 
@@ -484,7 +486,7 @@ export const GetNotationConfig = () => {
     ],
   ];
 
-  const notationColumnInternal: TableColumn[] = [
+  const notationColumnInternal: SectionColumn[] = [
     {
       id: 1,
       displayName: 'Role',
@@ -557,7 +559,7 @@ export const GetNotationConfig = () => {
     },
   ];
 
-  const notationColumnExternal: TableColumn[] = [
+  const notationColumnExternal: SectionColumn[] = [
     {
       id: 1,
       displayName: 'Role',

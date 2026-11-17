@@ -15,6 +15,7 @@ import {
   TrashCanIcon,
 } from '../common/icon';
 import { Link as RouterLink } from 'react-router-dom';
+import { TableLink, tableCellLinkClassName } from '../grid/TableLink';
 import { v4 } from 'uuid';
 import Dropdown from 'react-bootstrap/Dropdown';
 
@@ -58,18 +59,18 @@ export const Link: React.FC<InputProps> = ({
   componentPath,
 }) => {
   return renderTableCell(
-    <RouterLink
-      to={href + value}
-      className={`d-flex pt-1 ${customInputTextCss ?? ''}`}
-      aria-label={`${label + ' ' + value}`}
+    <TableLink
+      to={`${href ?? ''}${value ?? ''}`}
+      label={label}
+      value={value ?? ''}
+      text={customLinkValue ?? value}
+      icon={customIcon}
+      className={customInputTextCss}
       state={{
         fromPath: componentPath ?? '',
         fromLabel: componentName ?? '',
       }}
-    >
-      {customIcon && customIcon}{' '}
-      <span className="ps-1">{customLinkValue ?? value}</span>
-    </RouterLink>,
+    />,
     stickyCol,
     customContainerCss,
   );
@@ -104,7 +105,7 @@ export const DeleteIcon: React.FC<InputProps> = ({
   return renderTableCell(
     <RouterLink
       to="#"
-      className={`${customInputTextCss ?? ''}`}
+      className={tableCellLinkClassName(customInputTextCss)}
       onClick={onChange}
     >
       <TrashCanIcon title="Remove" />

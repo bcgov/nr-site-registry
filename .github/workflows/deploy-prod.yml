@@ -20,6 +20,9 @@ jobs:
   get-pr-info:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       pr: ${{ steps.set-pr.outputs.pr }}
     steps:
@@ -53,6 +56,9 @@ jobs:
   builds:
     name: Builds
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
     strategy:
       matrix:
         package: [backend, frontend, backend-migration]

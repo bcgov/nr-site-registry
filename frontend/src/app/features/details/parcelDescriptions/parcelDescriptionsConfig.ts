@@ -1,5 +1,7 @@
+import { ColumnSize } from '../../../components/grid/columnSize';
+import { SectionColumn } from '../../../components/grid/SectionColumn';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
-import { ColumnSize, TableColumn } from '../../../components/table/TableColumn';
+
 import { UserType } from '../../../helpers/requests/userType';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 
@@ -9,7 +11,7 @@ export enum ParcelDescriptionType {
   CrownLandFileNumber = 'Crown Land File Number',
 }
 
-export const columns: TableColumn[] = [
+export const columns: SectionColumn[] = [
   {
     id: 1,
     displayName: 'Description Type',
@@ -98,7 +100,7 @@ export const columns: TableColumn[] = [
   },
 ];
 
-const SRColumn: TableColumn = {
+const SRColumn: SectionColumn = {
   id: 4,
   displayName: 'SR',
   active: true,
@@ -117,7 +119,7 @@ const SRColumn: TableColumn = {
   dynamicColumn: true,
 };
 
-const DeleteColumn: TableColumn = {
+const DeleteColumn: SectionColumn = {
   id: 5,
   displayName: 'Remove',
   active: true,
@@ -138,6 +140,24 @@ const DeleteColumn: TableColumn = {
   customHeaderCss: 'text-center',
 };
 
+const parcelSortFieldByColumnId: Record<string, string> = {
+  descriptionType: 'description_type',
+  idPinNumber: 'id_pin_number',
+  dateNoted: 'date_noted',
+  landDescription: 'land_description',
+};
+
+export function parcelSortFieldForColumn(columnId: string): string | null {
+  return parcelSortFieldByColumnId[columnId] ?? null;
+}
+
+export function parcelColumnIdForSort(sortBy: string): string | null {
+  const match = Object.entries(parcelSortFieldByColumnId).find(
+    ([, field]) => field === sortBy,
+  );
+  return match ? match[0] : null;
+}
+
 export const getAddDeleteParcelDescriptionTableColumns = () => {
   return [...columns, DeleteColumn];
 };
@@ -145,7 +165,7 @@ export const getAddDeleteParcelDescriptionTableColumns = () => {
 export const getParcelDescriptionsTableColumns = (
   viewMode: SiteDetailsMode,
   userType: UserType,
-): TableColumn[] => {
+): SectionColumn[] => {
   if (userType === UserType.Internal) {
     return [...columns, SRColumn];
   } else {

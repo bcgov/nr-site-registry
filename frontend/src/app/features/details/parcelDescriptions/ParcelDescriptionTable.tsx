@@ -1,6 +1,8 @@
+import { SectionColumn } from '../../../components/grid/SectionColumn';
 import React from 'react';
 import { RequestStatus } from '../../../helpers/requests/status';
-import { TableColumn } from '../../../components/table/TableColumn';
+
+import { SectionSortControl } from '../../../components/grid/SectionGrid';
 import { SiteDetailsMode } from '../dto/SiteDetailsMode';
 import Widget from '../../../components/widget/Widget';
 import { Button } from '../../../components/button/Button';
@@ -8,14 +10,13 @@ import { UserMinus, UserPlus } from '../../../components/common/icon';
 
 interface IParcelDescriptionTable {
   requestStatus: RequestStatus;
-  columns: TableColumn[];
+  columns: SectionColumn[];
   data: any;
   totalResults: number | undefined;
   handleSelectPage: (event: any) => void;
   handleChangeResultsPerPage: (event: any) => void;
   currentPage: number | undefined;
   resultsPerPage: number | undefined;
-  handleTableSortChange: (column: TableColumn, descending: boolean) => void;
   showPageOptions: boolean;
   viewMode: SiteDetailsMode;
   tableChangeHandler: (event: any) => void;
@@ -26,6 +27,7 @@ interface IParcelDescriptionTable {
   selectedRows?: any[];
   showAddRemoveButtons?: boolean;
   title?: string;
+  sortControl?: SectionSortControl;
 }
 
 const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
@@ -37,7 +39,6 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
   handleChangeResultsPerPage,
   currentPage,
   resultsPerPage,
-  handleTableSortChange,
   showPageOptions,
   viewMode,
   tableChangeHandler,
@@ -48,6 +49,7 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
   selectedRows = [],
   showAddRemoveButtons,
   title,
+  sortControl,
 }) => {
   return (
     <Widget
@@ -66,8 +68,8 @@ const ParcelDescriptionTable: React.FC<IParcelDescriptionTable> = ({
       changeHandler={tableChangeHandler}
       editMode={viewMode === SiteDetailsMode.EditMode}
       primaryKeycolumnName="id"
-      sortHandler={handleTableSortChange}
       deleteHandler={deleteHandler}
+      sortControl={sortControl}
       srMode={viewMode === SiteDetailsMode.SRMode}
       hideWidgetCheckbox={true}
     >

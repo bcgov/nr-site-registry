@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Dashboard from './Dashboard';
 import { recentViewedColumns } from './DashboardConfig';
 import { Provider } from 'react-redux';
@@ -33,12 +34,17 @@ describe('Dashboard Component', () => {
   });
 
   it('renders Recently Viewed table', () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
     const { getByText } = render(
-      <Provider store={store}>
-        <MemoryRouter>
-          <Dashboard />
-        </MemoryRouter>
-      </Provider>,
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>
+          <MemoryRouter>
+            <Dashboard />
+          </MemoryRouter>
+        </Provider>
+      </QueryClientProvider>,
     );
     expect(getByText('Recently Viewed')).toBeInTheDocument();
   });

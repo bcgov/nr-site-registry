@@ -7,6 +7,7 @@ import { UserMinus, UserPlus } from '../../../components/common/icon';
 import Actions from '../../../components/action/Actions';
 import { DropdownItem } from '../../../components/action/IActions';
 import { Button } from '../../../components/button/Button';
+import { SectionSortControl } from '../../../components/grid/SectionGrid';
 
 interface IAssociateSiteComponent {
   handleTableChange: (event: any) => void;
@@ -18,7 +19,7 @@ interface IAssociateSiteComponent {
   associateColumnExternal: any;
   formData: any[];
   loading: RequestStatus;
-  handleTableSort: (row: any, ascDir: any) => void;
+  sortControl?: SectionSortControl;
   handleAddAssociate: (event: any) => void;
   selectedRows: any;
   handleRemoveAssociate: () => void;
@@ -39,7 +40,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
   associateColumnExternal,
   formData,
   loading,
-  handleTableSort,
+  sortControl,
   handleAddAssociate,
   selectedRows,
   handleRemoveAssociate,
@@ -83,9 +84,7 @@ const AssociateSiteComponent: React.FC<IAssociateSiteComponent> = ({
         srMode={viewMode === SiteDetailsMode.SRMode}
         hideWidgetCheckbox={true}
         primaryKeycolumnName="id"
-        sortHandler={(row: any, ascDir: any) => {
-          handleTableSort(row, ascDir);
-        }}
+        sortControl={sortControl}
       >
         {viewMode === SiteDetailsMode.EditMode &&
           userType === UserType.Internal && (

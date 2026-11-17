@@ -1,13 +1,17 @@
 import React from 'react';
 import { FormFieldType } from '../../../components/input-controls/IFormField';
-import { TableColumn, ColumnSize } from '../../../components/table/TableColumn';
+import { ColumnSize } from '../../../components/grid/columnSize';
+import {
+  SearchResultColumn,
+  searchResultColumn,
+} from '../searchResults/SearchResultColumn';
 import { FillEye, FillPinMapFill } from '../../../components/common/icon';
 import '../Search.css';
 
 const getSiteSearchResultsColumns = (
   hiddenColumns: Set<string> = new Set(),
 ) => {
-  const columns: TableColumn[] = [
+  const columns: SearchResultColumn[] = [
     {
       id: 1,
       displayName: 'Site ID',
@@ -28,7 +32,7 @@ const getSiteSearchResultsColumns = (
       stickyCol: true,
       columnSize: ColumnSize.w100,
     },
-    new TableColumn(
+    searchResultColumn(
       6,
       'Site Address',
       true,
@@ -52,7 +56,7 @@ const getSiteSearchResultsColumns = (
       '',
       ColumnSize.w300,
     ),
-    new TableColumn(
+    searchResultColumn(
       7,
       'City',
       true,
@@ -64,7 +68,7 @@ const getSiteSearchResultsColumns = (
       true,
       getColumnType('City', 'city', ''),
     ),
-    new TableColumn(
+    searchResultColumn(
       2,
       'Site Remediation Status',
       true,
@@ -76,7 +80,7 @@ const getSiteSearchResultsColumns = (
       false,
       getColumnType('Site Remediation Status', 'srStatus', ''),
     ),
-    new TableColumn(
+    searchResultColumn(
       3,
       'Site Risk code',
       true,
@@ -88,7 +92,7 @@ const getSiteSearchResultsColumns = (
       false,
       getColumnType('Site Risk code', 'siteRiskCode', ''),
     ),
-    new TableColumn(
+    searchResultColumn(
       4,
       'General Description',
       true,
@@ -112,7 +116,7 @@ const getSiteSearchResultsColumns = (
       undefined,
       ColumnSize.w400,
     ),
-    new TableColumn(
+    searchResultColumn(
       5,
       'Common Name',
       true,
@@ -124,7 +128,7 @@ const getSiteSearchResultsColumns = (
       false,
       getColumnType('Common Name', 'commonName', ''),
     ),
-    new TableColumn(
+    searchResultColumn(
       8,
       'Latitude',
       true,
@@ -136,7 +140,7 @@ const getSiteSearchResultsColumns = (
       false,
       getColumnType('Latitude', 'latdeg', ''),
     ),
-    new TableColumn(
+    searchResultColumn(
       9,
       'Latitude(D,M,S)',
       true,
@@ -148,7 +152,7 @@ const getSiteSearchResultsColumns = (
       false,
       getColumnType('Latitude(D,M,S)', 'latDegrees,latMinutes,latSeconds', ''),
     ),
-    new TableColumn(
+    searchResultColumn(
       10,
       'Longitude',
       true,
@@ -160,7 +164,7 @@ const getSiteSearchResultsColumns = (
       false,
       getColumnType('Longitude', 'longdeg', ''),
     ),
-    new TableColumn(
+    searchResultColumn(
       11,
       'Longitude(D,M,S)',
       true,
@@ -176,7 +180,7 @@ const getSiteSearchResultsColumns = (
         '',
       ),
     ),
-    new TableColumn(
+    searchResultColumn(
       12,
       'Lat/Long Reliability',
       true,
@@ -188,7 +192,7 @@ const getSiteSearchResultsColumns = (
       false,
       getColumnType('Lat/Long Reliability', 'latlongReliabilityFlag', ''),
     ),
-    new TableColumn(
+    searchResultColumn(
       13,
       'Created By',
       true,
@@ -200,7 +204,7 @@ const getSiteSearchResultsColumns = (
       false,
       getColumnType('Created By', 'whoCreated', ''),
     ),
-    new TableColumn(
+    searchResultColumn(
       14,
       'Date Created',
       true,
@@ -212,7 +216,7 @@ const getSiteSearchResultsColumns = (
       false,
       getColumnType('Date Created', 'whenCreated', '', FormFieldType.Date),
     ),
-    new TableColumn(
+    searchResultColumn(
       15,
       'Last Updated',
       true,
@@ -229,7 +233,7 @@ const getSiteSearchResultsColumns = (
       ColumnSize.w200,
       false,
     ),
-    new TableColumn(
+    searchResultColumn(
       16,
       'Consultant Submitted',
       true,
@@ -289,7 +293,7 @@ const getSiteSearchResultsColumns = (
       dynamicColumn: true,
       stickyCol: true,
     },
-  ].filter((column): column is TableColumn => column !== null);
+  ].filter((column): column is SearchResultColumn => column !== null);
 
   return columns;
 };

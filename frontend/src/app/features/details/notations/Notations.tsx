@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSectionSearchQuery } from '../sectionListQuery';
+import { orderedByDate } from '../../../helpers/viewOrder';
 import './Notations.css';
 import { RequestStatus } from '../../../helpers/requests/status';
 import { UserType } from '../../../helpers/requests/userType';
@@ -25,7 +27,6 @@ import {
   isUserOfType,
   parseDate,
   resultCache,
-  sortArray,
   UpdateDisplayTypeParams,
   updateTableColumn,
   UserRoleType,
@@ -103,10 +104,9 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   const [archivedFormData, setArchivedFormData] = useState<
     { [key: string]: any }[]
   >([]);
-  const [loading, setLoading] = useState<RequestStatus>(RequestStatus.loading);
 
   const [sortByValue, setSortByValue] = useState<{ [key: string]: any }>({});
-  const [searchTerm, setSearchTerm] = useState('');
+  const { search, setSearch } = useSectionSearchQuery();
   const [isDelete, setIsDelete] = useState(false);
   const [isUpdated, setIsUpdated] = useState(false);
   const [updatedNotationFormRowEditMode, setUpdatedNotationFormRowEditMode] =
@@ -279,20 +279,6 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
           }),
         );
       }
-
-      const unarchivedNotations = getUnarchivedNotations(notations);
-      const archivedNotations = getArchivedNotations(notations);
-
-      setFormData((prev) =>
-        areNotationsEqual(prev as any[], unarchivedNotations)
-          ? prev
-          : unarchivedNotations,
-      );
-      setArchivedFormData((prev) =>
-        areNotationsEqual(prev as any[], archivedNotations)
-          ? prev
-          : archivedNotations,
-      );
     }
   }, [notations, status]);
 
@@ -407,20 +393,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
   }, [resetDetails, saveSiteDetailsRequestStatus, showArchivedNotations]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = event.target.value;
-    setSearchTerm(searchTerm);
-
-    const sourceNotations = mergeFetchedAndTrackedNotations(
-      notations,
-      trackNotation,
-    );
-
-    const filteredData = sourceNotations?.filter((notation: any) => {
-      // Check if any property of the notation object contains the searchTerm
-      return deepSearch(notation, searchTerm.toLowerCase().trim());
-    });
-    setFormData(getUnarchivedNotations(filteredData));
-    setArchivedFormData(getArchivedNotations(filteredData));
+    setSearch(event.target.value);
   };
 
   const deepSearch = (obj: any, searchTerm: string): boolean => {
@@ -487,14 +460,32 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     return false;
   };
 
-  const clearSearch = () => {
-    setSearchTerm('');
-    const sourceNotations = mergeFetchedAndTrackedNotations(
-      notations,
-      trackNotation,
+  useEffect(() => {
+    if (status !== RequestStatus.success || !notations) {
+      return;
+    }
+    const term = search.toLowerCase().trim();
+    const source = term
+      ? mergeFetchedAndTrackedNotations(notations, trackNotation).filter(
+          (notation: any) => deepSearch(notation, term),
+        )
+      : notations;
+    const unarchivedNotations = getUnarchivedNotations(source);
+    const archivedNotations = getArchivedNotations(source);
+    setFormData((prev) =>
+      areNotationsEqual(prev as any[], unarchivedNotations)
+        ? prev
+        : unarchivedNotations,
     );
-    setFormData(getUnarchivedNotations(sourceNotations));
-    setArchivedFormData(getArchivedNotations(sourceNotations));
+    setArchivedFormData((prev) =>
+      areNotationsEqual(prev as any[], archivedNotations)
+        ? prev
+        : archivedNotations,
+    );
+  }, [search, notations, status, trackNotation]);
+
+  const clearSearch = () => {
+    setSearch('');
   };
 
   const handleToggleArchivedNotations = () => {
@@ -906,30 +897,20 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
       ...prevData,
       [graphQLPropertyName]: value,
     }));
-    sortItems(value, formData);
   };
 
-  const sortItems = (sortBy: any, data: any) => {
-    let sorted = !data?.length ? [] : [...data];
-    switch (sortBy) {
-      case 'newToOld':
-        sorted.sort(
-          (a, b) =>
-            new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime(),
-        ); // Sorting by date from new to old
-        break;
-      case 'oldTonew':
-        sorted.sort(
-          (a, b) =>
-            new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime(),
-        ); // Sorting by date from old to new
-        break;
-      // Add more cases for additional sorting options
-      default:
-        break;
+  const notationsInOrder = useMemo(() => {
+    const rows = formData ?? [];
+    const direction = sortByValue.sortBy;
+    if (direction !== 'newToOld' && direction !== 'oldTonew') {
+      return rows;
     }
-    setFormData(getUnarchivedNotations(sorted));
-  };
+    return orderedByDate(
+      rows,
+      (row) => row.eventDate,
+      direction === 'newToOld',
+    );
+  }, [formData, sortByValue]);
 
   const handleOnAddNotation = () => {
     const newNotation = {
@@ -1118,32 +1099,6 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
     return selectedRows.some((row) => row.id === id);
   };
 
-  const handleTableSort = (row: any, ascDir: any, id: any) => {
-    let property = row['graphQLPropertyName'];
-    setFormData((prevData) => {
-      return prevData.map((tempNotation) => {
-        if (id === tempNotation.id) {
-          // Filter out selected rows from notationParticipant array
-          let updatedNotationParticipant = [
-            ...tempNotation.notationParticipant,
-          ];
-          // Call the common sort function to sort the updatedParticipant array
-          updatedNotationParticipant = sortArray(
-            updatedNotationParticipant,
-            property,
-            ascDir,
-          );
-
-          return {
-            ...tempNotation,
-            notationParticipant: updatedNotationParticipant,
-          };
-        }
-        return tempNotation;
-      });
-    });
-  };
-
   const handleItemClick = (value: string) => {
     switch (value) {
       case SRVisibility.ShowSR:
@@ -1328,7 +1283,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
               >
                 <SearchInput
                   label={'Search'}
-                  searchTerm={searchTerm}
+                  searchTerm={search}
                   clearSearch={clearSearch}
                   handleSearchChange={handleSearchChange}
                 />
@@ -1350,58 +1305,54 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
         data-testid="notation-rows"
         className={`col-lg-12 p-0 ${viewMode === SiteDetailsMode.SRMode ? ' ps-4' : ''}`}
       >
-        {formData &&
-          formData.map((notation, index) => (
-            <div key={`active-${notation.id}`}>
-              {!showPending &&
-                viewMode === SiteDetailsMode.SRMode &&
-                userType === UserType.Internal && (
-                  <CheckBoxInput
-                    type={FormFieldType.Checkbox}
-                    label={''}
-                    isLabel={false}
-                    isChecked={
-                      notation.srAction === 'true' ||
-                      notation.srAction === SRApprovalStatusEnum.Public
-                    }
-                    onChange={(value) =>
-                      handleInputChange(
-                        notation.id,
-                        '',
-                        value ? 'checked' : 'unchecked',
-                      )
-                    }
-                    srMode={viewMode === SiteDetailsMode.SRMode}
-                  />
-                )}
-              <Notation
-                notation={notation}
-                handleNotationFormRowFirstChild={
-                  handleNotationFormRowFirstChild
-                }
-                viewMode={viewMode}
-                handleInputChange={handleInputChange}
-                userType={userType}
-                handleNotationFormRowExternal={handleNotationFormRowExternal}
-                handleChangeNotationFormRow={handleChangeNotationFormRow}
-                handleNotationFormRowsInternal={handleNotationFormRowsInternal}
-                handleTableChange={handleTableChange}
-                handleWidgetCheckBox={handleWidgetCheckBox}
-                internalTableColumn={internalTableColumn}
-                externalTableColumn={externalTableColumn}
-                loading={loading}
-                handleTableSort={handleTableSort}
-                handleAddParticipant={handleAddParticipant}
-                isAnyParticipantSelected={isAnyParticipantSelected}
-                handleRemoveParticipant={handleRemoveParticipant}
-                handleDeleteNotation={handleDeleteNotation}
-                handleRestoreNotation={handleRestoreNotation}
-                srVisibilityConfig={srVisibilityConfig}
-                handleItemClick={handleItemClick}
-                isArchived={false}
-              />
-            </div>
-          ))}
+        {notationsInOrder.map((notation, index) => (
+          <div key={`active-${notation.id}`}>
+            {!showPending &&
+              viewMode === SiteDetailsMode.SRMode &&
+              userType === UserType.Internal && (
+                <CheckBoxInput
+                  type={FormFieldType.Checkbox}
+                  label={''}
+                  isLabel={false}
+                  isChecked={
+                    notation.srAction === 'true' ||
+                    notation.srAction === SRApprovalStatusEnum.Public
+                  }
+                  onChange={(value) =>
+                    handleInputChange(
+                      notation.id,
+                      '',
+                      value ? 'checked' : 'unchecked',
+                    )
+                  }
+                  srMode={viewMode === SiteDetailsMode.SRMode}
+                />
+              )}
+            <Notation
+              notation={notation}
+              handleNotationFormRowFirstChild={handleNotationFormRowFirstChild}
+              viewMode={viewMode}
+              handleInputChange={handleInputChange}
+              userType={userType}
+              handleNotationFormRowExternal={handleNotationFormRowExternal}
+              handleChangeNotationFormRow={handleChangeNotationFormRow}
+              handleNotationFormRowsInternal={handleNotationFormRowsInternal}
+              handleTableChange={handleTableChange}
+              handleWidgetCheckBox={handleWidgetCheckBox}
+              internalTableColumn={internalTableColumn}
+              externalTableColumn={externalTableColumn}
+              loading={status}
+              handleAddParticipant={handleAddParticipant}
+              isAnyParticipantSelected={isAnyParticipantSelected}
+              handleRemoveParticipant={handleRemoveParticipant}
+              handleDeleteNotation={handleDeleteNotation}
+              handleRestoreNotation={handleRestoreNotation}
+              srVisibilityConfig={srVisibilityConfig}
+              handleItemClick={handleItemClick}
+              isArchived={false}
+            />
+          </div>
+        ))}
 
         {showArchivedNotations && (
           <div className="mt-3">
@@ -1431,8 +1382,7 @@ const Notations: React.FC<IComponentProps> = ({ showPending = false }) => {
                     handleWidgetCheckBox={handleWidgetCheckBox}
                     internalTableColumn={internalTableColumn}
                     externalTableColumn={externalTableColumn}
-                    loading={loading}
-                    handleTableSort={handleTableSort}
+                    loading={status}
                     handleAddParticipant={handleAddParticipant}
                     isAnyParticipantSelected={isAnyParticipantSelected}
                     handleRemoveParticipant={handleRemoveParticipant}

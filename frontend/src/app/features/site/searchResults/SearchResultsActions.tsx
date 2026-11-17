@@ -11,25 +11,26 @@ import {
   FileExportIcon,
   ShoppingCartIcon,
 } from '../../../components/common/icon';
-import { TableColumn } from '../../../components/table/TableColumn';
-import { downloadSelectedColumnsCSV } from '../../../helpers/csvExport/csvExport';
+import {
+  downloadLabeledValues,
+  LabeledCsvColumn,
+} from '../../../helpers/csvExport/csvExport';
+import { SearchSiteRow } from '../searchSites';
 import { addCartItem, resetCartItemAddedStatus } from '../../cart/CartSlice';
 
 interface SearchResultsActionsProps {
-  selectedRows: any[]; // TODO: type this properly, should be Site
-  selectedColumns?: TableColumn[];
+  selectedRows: SearchSiteRow[];
+  exportColumns: LabeledCsvColumn[];
 }
 export const SearchResultsActions: FC<SearchResultsActionsProps> = ({
   selectedRows,
-  selectedColumns = [],
+  exportColumns,
 }) => {
   const auth = useAuth();
   const dispatch = useDispatch<AppDispatch>();
 
   const handleExport = () => {
-    if (selectedRows.length > 0 && selectedColumns.length > 0) {
-      downloadSelectedColumnsCSV(selectedRows, selectedColumns);
-    }
+    downloadLabeledValues(selectedRows, exportColumns);
   };
 
   const handleAddToShoppingCart = () => {
@@ -39,7 +40,7 @@ export const SearchResultsActions: FC<SearchResultsActionsProps> = ({
     } else {
       const cartItems = selectedRows.map((row) => {
         return {
-          siteId: row.id,
+          siteId: String(row.id),
           price: 200.11,
         };
       });
@@ -64,7 +65,7 @@ export const SearchResultsActions: FC<SearchResultsActionsProps> = ({
         <AddToFolio
           label="Add Selected To Folio"
           disabled={selectedRows.length === 0}
-          selectedSiteIds={selectedRows.map((row) => row.id)}
+          selectedSiteIds={selectedRows.map((row) => String(row.id))}
         />
       )}
 

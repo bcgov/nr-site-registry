@@ -8,7 +8,7 @@ import {
 import { Dropdown } from 'react-bootstrap';
 import { Button } from '../../../components/button/Button';
 import Column from '../columns/Column';
-import type { TableColumn } from '../../../components/table/TableColumn';
+import type { SearchResultColumn } from './SearchResultColumn';
 import SiteFilterForm from '../filters/SiteFilterForm';
 import { formRows } from '../dto/SiteFilterConfig';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,8 +16,8 @@ import { siteRiskCodeDrpdown } from '../../details/dropdowns/DropdownSlice';
 import { updateFields } from '../../../helpers/utility';
 
 interface SearchResultsFiltersProps {
-  columns: TableColumn[];
-  onColumnSelectionChange: (column: TableColumn) => void;
+  columns: SearchResultColumn[];
+  onColumnSelectionChange: (column: SearchResultColumn) => void;
   resetColumns: () => void;
   filtersFormData: { [key: string]: any | [Date, Date] };
   onFiltersChange: (key: string, value: any) => void;

@@ -1,12 +1,12 @@
 import { useDispatch, useSelector } from 'react-redux';
 import CustomLabel from '../../components/simple/CustomLabel';
 import PageContainer from '../../components/simple/PageContainer';
-import Table from '../../components/table/Table';
+import SectionGrid from '../../components/grid/SectionGrid';
 import { RequestStatus } from '../../helpers/requests/status';
 import './Cart.css';
 import { CartTableColumns } from './CartTableConfig';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AppDispatch } from '../../Store';
 import {
   cartItems,
@@ -18,11 +18,7 @@ import {
 } from './CartSlice';
 import { useAuth } from 'react-oidc-context';
 import { signInWithReturnUrl } from '../../auth/returnUrl';
-import {
-  getUser,
-  showNotification,
-  sortTableData,
-} from '../../helpers/utility';
+import { getUser, showNotification } from '../../helpers/utility';
 import ModalDialog from '../../components/modaldialog/ModalDialog';
 import { AngleRight } from '../../components/common/icon';
 import {
@@ -31,7 +27,6 @@ import {
   resetCreateSnapshotForSitesStatus,
 } from '../details/snapshot/SnapshotSlice';
 import { CreateSnapshotInputDto } from '../details/snapshot/ISnapshotState';
-import { TableColumn } from '../../components/table/TableColumn';
 import { Button } from '../../components/button/Button';
 
 const Cart = () => {
@@ -41,8 +36,6 @@ const Cart = () => {
 
   const [delteConfirm, setDeleteConfirm] = useState(false);
   const [cartIdToDelte, setCartIdToDelete] = useState('');
-  const [sortColumn, setSortColumn] = useState<string>('');
-  const [sortAsc, setSortAsc] = useState<boolean>(true);
 
   const cartItemsArr = useSelector(cartItems);
   const deleteStatus = useSelector(deleteRequestStatus);
@@ -111,24 +104,21 @@ const Cart = () => {
     dispatch(createSnapshotForSites(inputDto)).unwrap();
   };
 
-  const handleSortChange = (column: TableColumn, ascSort: boolean) => {
-    setSortColumn(column.graphQLPropertyName);
-    setSortAsc(ascSort);
-  };
-
-  const getSortedCartData = () => {
-    const mapped = cartItemsArr.map((x: any) => {
-      const {
-        site: { id, ...siteWithoutId },
-        ...xWithoutSite
-      } = x;
-      const mergedObject = { ...xWithoutSite, ...siteWithoutId };
-      return { ...mergedObject, price: `$ ${x.price}` };
-    });
-
-    if (!sortColumn) return mapped;
-    return sortTableData(mapped, sortColumn, sortAsc);
-  };
+  const cartRows = useMemo(
+    () =>
+      cartItemsArr.map((item: any) => {
+        const {
+          site: { id, ...siteWithoutId },
+          ...itemWithoutSite
+        } = item;
+        return {
+          ...itemWithoutSite,
+          ...siteWithoutId,
+          price: `$ ${item.price}`,
+        };
+      }),
+    [cartItemsArr],
+  );
 
   return (
     <PageContainer role="cart">
@@ -136,21 +126,19 @@ const Cart = () => {
         <CustomLabel label="Cart" labelType="b-h1" />
       </div>
       <div className="col-12">
-        <Table
+        <SectionGrid
           label="Cart"
           isLoading={RequestStatus.success}
           columns={CartTableColumns}
-          data={getSortedCartData()}
-          totalResults={[].length}
+          rows={cartRows}
           allowRowsSelect={false}
-          showPageOptions={false}
           changeHandler={() => {}}
           editMode={false}
+          srMode={false}
           idColumnName="id"
           deleteHandler={(event) => {
             handleCartItemDelete(event.row.id);
           }}
-          sortHandler={handleSortChange}
         />
       </div>
       {cartItemsArr.length > 0 && (

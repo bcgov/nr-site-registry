@@ -1,3 +1,4 @@
+import { ColumnSize } from '../../../components/grid/columnSize';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../Store';
@@ -62,7 +63,7 @@ import { GetAssociateConfig } from '../associates/AssociateConfig';
 import { useParams } from 'react-router-dom';
 import './srUpdates.css';
 import { TickIcon, XmarkIcon } from '../../../components/common/icon';
-import { ColumnSize } from '../../../components/table/TableColumn';
+
 import LandUseTable from '../landUses/LandUseTable';
 import { selectLandUseCodes } from '../landUses/LandUsesSlice';
 import { getLandUseColumns } from '../landUses/LandUseColumnConfiguration';
@@ -752,7 +753,6 @@ const SRUpdates = () => {
                 handleWidgetCheckBox={handleChange}
                 internalTableColumn={notationColumnInternalLocal}
                 externalTableColumn={[]}
-                handleTableSort={handleChange}
                 loading={RequestStatus.success}
                 handleAddParticipant={handleChange}
                 isAnyParticipantSelected={handleAndReturnBoolean}
@@ -788,7 +788,6 @@ const SRUpdates = () => {
             formData={siteParticipantData}
             status={RequestStatus.success}
             viewMode={SiteDetailsMode.ViewOnlyMode}
-            handleTableSort={handleChange}
             handleAddParticipant={() => {}}
             selectedRows={siteParticipantData}
             handleRemoveParticipant={handleChange}
@@ -851,7 +850,6 @@ const SRUpdates = () => {
             associateColumnExternal={null}
             formData={associatedSitesData}
             loading={RequestStatus.success}
-            handleTableSort={handleChange}
             handleAddAssociate={handleChange}
             selectedRows={[]}
             handleRemoveAssociate={() => {}}
@@ -876,7 +874,6 @@ const SRUpdates = () => {
             editModeEnabled={false}
             tableLoading={RequestStatus.success}
             viewMode={SiteDetailsMode.ViewOnlyMode}
-            handleTableSort={handleChange}
             selectedRowIds={[]}
             handleRemoveLandUse={handleChange}
             handleAddLandUse={handleChange}
@@ -903,7 +900,6 @@ const SRUpdates = () => {
               currentPage={1}
               resultsPerPage={undefined}
               viewMode={SiteDetailsMode.ViewOnlyMode}
-              handleTableSortChange={handleChange}
               deleteHandler={() => {}}
               allowRowsSelect={false}
             />
@@ -948,7 +944,6 @@ const SRUpdates = () => {
                 disclosureScheduleExternalConfig
               }
               loading={RequestStatus.success}
-              handleTableSort={handleChange}
               handleAddDisclosureSchedule={handleChange}
               isAnyDisclosureScheduleSelected={(event: any) => {
                 return false;

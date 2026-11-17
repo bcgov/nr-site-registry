@@ -1,12 +1,12 @@
 import React from 'react';
 import { getSiteSearchResultsColumns } from '../dto/Columns';
-import { TableColumn } from '../../../components/table/TableColumn';
+import { SearchResultColumn } from '../searchResults/SearchResultColumn';
 import './Column.css';
 import { Button } from '../../../components/button/Button';
 
 interface ColumnProps {
-  toggleColumnSelectionForDisplay: (item: TableColumn) => void;
-  columns: TableColumn[];
+  toggleColumnSelectionForDisplay: (item: SearchResultColumn) => void;
+  columns: SearchResultColumn[];
   reset: () => void;
   close: () => void;
 }
@@ -23,7 +23,7 @@ const Column: React.FC<ColumnProps> = ({
     );
   };
 
-  const columnItem = (item: TableColumn, index: number) => {
+  const columnItem = (item: SearchResultColumn, index: number) => {
     return (
       <div key={index} className="column-item more-gap">
         <input

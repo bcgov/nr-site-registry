@@ -36,6 +36,7 @@ const SiteFilterForm: React.FC<SiteFilterProps> = ({
         <div className="d-flex flex-wrap justify-content-between w-100 mt-3">
           <div>
             <Button
+              type="button"
               variant="secondary"
               onClick={onReset}
               data-testid="Reset Filters"
@@ -56,6 +57,7 @@ const SiteFilterForm: React.FC<SiteFilterProps> = ({
               Apply
             </Button>
             <Button
+              type="button"
               variant="tertiary"
               onClick={cancelSearchFilter}
               data-testid="Cancel"

@@ -1,4 +1,5 @@
 import { RequestStatus } from '../../helpers/requests/status';
+import { SectionSortControl } from '../grid/SectionGrid';
 
 export interface IWidget {
   title?: string;
@@ -17,7 +18,6 @@ export interface IWidget {
   primaryKeycolumnName?: string;
   changeHandler?: (event: any) => void;
   handleCheckBoxChange?: (event: any) => void;
-  sortHandler?: (row: any, ascSort: boolean) => void;
   showPageOptions?: boolean;
   widgetIschecked?: boolean;
   hideWidgetCheckbox?: boolean;
@@ -27,4 +27,6 @@ export interface IWidget {
   totalResults?: number;
   deleteHandler?: (event: any) => void;
   filter?: React.ReactNode;
+  sortControl?: SectionSortControl;
+  empty?: boolean;
 }

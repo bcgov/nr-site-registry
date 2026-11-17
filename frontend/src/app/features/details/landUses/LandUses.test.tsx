@@ -1,5 +1,8 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter, useLocation } from 'react-router-dom';
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { Provider, useSelector } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import LandUses from './LandUses';
@@ -78,10 +81,42 @@ describe('LandUses – SR column visibility', () => {
 
     render(
       <Provider store={store}>
-        <LandUses />
+        <MemoryRouter>
+          <QueryParamProvider adapter={ReactRouter6Adapter}>
+            <LandUses />
+          </QueryParamProvider>
+        </MemoryRouter>
       </Provider>,
     );
 
     expect(await screen.findByText('SR')).toBeInTheDocument();
   });
+
+  it('keeps the search text in the address bar', () => {
+    isUserOfType.mockReturnValue(false);
+
+    render(
+      <Provider store={store}>
+        <MemoryRouter
+          initialEntries={['/site/details/123/landuses?search=park']}
+        >
+          <QueryParamProvider adapter={ReactRouter6Adapter}>
+            <LandUses />
+            <LocationSearch />
+          </QueryParamProvider>
+        </MemoryRouter>
+      </Provider>,
+    );
+
+    const input = screen.getByLabelText('Search');
+    expect(input).toHaveValue('park');
+
+    fireEvent.change(input, { target: { value: 'trail' } });
+    expect(screen.getByTestId('location')).toHaveTextContent('search=trail');
+  });
 });
+
+function LocationSearch() {
+  const location = useLocation();
+  return <div data-testid="location">{location.search}</div>;
+}

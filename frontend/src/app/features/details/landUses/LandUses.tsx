@@ -1,4 +1,11 @@
 import { FC, useEffect, useMemo, useState } from 'react';
+import {
+  useSectionSearchQuery,
+  useSectionSortQuery,
+} from '../sectionListQuery';
+import { orderedByDate } from '../../../helpers/viewOrder';
+import { gridSortDirection } from '../../../helpers/pagedList';
+import { SortByDirection } from '../../../../graphql/generated';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../../Store';
 import {
@@ -29,7 +36,7 @@ import {
   ChangeTracker,
   IChangeType,
 } from '../../../components/common/IChangeType';
-import { get, set } from '../../../components/table/utils';
+import { set } from '../../../components/grid/rowValue';
 import './LandUses.css';
 import { setupLandHistoriesDataForSaving } from '../SaveSiteDetailsSlice';
 import { UserActionEnum } from '../../../common/userActionEnum';
@@ -58,11 +65,29 @@ const LandUses: FC = () => {
     landUseCodesFetchRequestStatus,
   } = useSelector(landUses);
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const { search, setSearch } = useSectionSearchQuery();
 
   const viewMode = useSelector(siteDetailsMode);
   const resetDetails = useSelector(resetSiteDetails);
-  const [sortByValue, setSortByValue] = useState<createdAtSortDirection>();
+  const { sortBy, sortByDir, setQuery, setColumnSort } = useSectionSortQuery([
+    'landUse.code',
+    'landUse.description',
+    'note',
+    'whenCreated',
+  ]);
+  const sortByValue: createdAtSortDirection | undefined =
+    sortBy === 'whenCreated'
+      ? sortByDir === SortByDirection.Desc
+        ? 'newToOld'
+        : 'oldTonew'
+      : undefined;
+  const gridSort =
+    sortBy && sortBy !== 'whenCreated'
+      ? {
+          id: sortBy,
+          direction: gridSortDirection(sortByDir),
+        }
+      : null;
 
   const [tableData, setTableData] = useState<{ [key: string]: any }[]>([]);
   const [selectedRowIds, setSelectedRowIds] = useState(new Set<string>());
@@ -291,55 +316,35 @@ const LandUses: FC = () => {
     dispatch(trackChanges(tracker.toPlainObject()));
   };
 
+  const handleColumnSort = (columnId: string) => {
+    setColumnSort(columnId);
+  };
+
   const handleSortChange = (_: any, value: string | [Date, Date]) => {
-    const sortDirection = value as createdAtSortDirection;
-    setSortByValue(sortDirection as createdAtSortDirection);
-    sortByDate(sortDirection, tableData);
-  };
-
-  const sortByDate = (sortDirection: createdAtSortDirection, data: any) => {
-    let sorted = [...data];
-    switch (sortDirection) {
-      case 'newToOld':
-        sorted.sort(
-          (a, b) =>
-            new Date(b.whenCreated).getTime() -
-            new Date(a.whenCreated).getTime(),
-        );
-        break;
-      case 'oldTonew':
-        sorted.sort(
-          (a, b) =>
-            new Date(a.whenCreated).getTime() -
-            new Date(b.whenCreated).getTime(),
-        );
-        break;
-      default:
-        break;
-    }
-    setTableData(sorted);
-  };
-
-  const handleTableSort = (row: any, ascDir: boolean) => {
-    const property = row['graphQLPropertyName'];
-    setTableData((prevData) => {
-      let landUses = [...prevData];
-      landUses.sort(function (rowA: any, rowB: any) {
-        const valueA = get(rowA, property);
-        const valueB = get(rowB, property);
-
-        if (valueA > valueB) return ascDir ? 1 : -1;
-        if (valueA < valueB) return ascDir ? -1 : 1;
-        return 0;
+    if (value === 'newToOld' || value === 'oldTonew') {
+      setQuery({
+        sortBy: 'whenCreated',
+        sortByDir:
+          value === 'newToOld' ? SortByDirection.Desc : SortByDirection.Asc,
       });
-      return landUses;
-    });
+    }
   };
 
-  const dataWithTextSearchApplied = !searchTerm
-    ? tableData
-    : tableData.filter((rowData) => {
-        const term = searchTerm.toLowerCase().trim();
+  const rowsInDateOrder = useMemo(() => {
+    if (sortByValue !== 'newToOld' && sortByValue !== 'oldTonew') {
+      return tableData;
+    }
+    return orderedByDate(
+      tableData,
+      (row) => row.whenCreated,
+      sortByValue === 'newToOld',
+    );
+  }, [tableData, sortByValue]);
+
+  const dataWithTextSearchApplied = !search
+    ? rowsInDateOrder
+    : rowsInDateOrder.filter((rowData) => {
+        const term = search.toLowerCase().trim();
         return (
           rowData.note?.toLowerCase().includes(term) ||
           rowData.landUse?.description?.toLowerCase().includes(term)
@@ -352,9 +357,9 @@ const LandUses: FC = () => {
         <div className={`mb-3 col-lg-8`}>
           <SearchInput
             label={'Search'}
-            searchTerm={searchTerm}
-            clearSearch={() => setSearchTerm('')}
-            handleSearchChange={(e) => setSearchTerm(e.target.value)}
+            searchTerm={search}
+            clearSearch={() => setSearch('')}
+            handleSearchChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <div className={`col-lg-4`}>
@@ -372,7 +377,11 @@ const LandUses: FC = () => {
         editModeEnabled={editModeEnabled}
         tableLoading={tableLoading}
         viewMode={viewMode}
-        handleTableSort={handleTableSort}
+        sortControl={{
+          manual: false,
+          sort: gridSort,
+          onSortChange: handleColumnSort,
+        }}
         selectedRowIds={selectedRowIds}
         handleRemoveLandUse={handleRemoveLandUse}
         handleAddLandUse={handleAddLandUse}

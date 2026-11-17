@@ -77,3 +77,16 @@ export function set(obj: any, path: string | string[], value: any): any {
 
   return obj;
 }
+
+export function columnDisplayValue(
+  row: any,
+  propertyName: string | undefined,
+): string {
+  if (!propertyName) {
+    return '';
+  }
+  return propertyName
+    .split(',')
+    .map((name) => get(row, name))
+    .join(' ');
+}

@@ -17,6 +17,17 @@ jest.mock('react-router-dom', () => ({
   useParams: () => ({ id: '1' }),
 }));
 
+jest.mock('use-query-params', () => {
+  const actual = jest.requireActual('use-query-params');
+  return {
+    ...actual,
+    useQueryParams: () => [
+      { page: 1, pageSize: 5, sortBy: 'id', sortByDir: 'ASC' },
+      jest.fn(),
+    ],
+  };
+});
+
 type TestState = {
   sites: { siteDetailsMode: string };
   siteDetails: { saveRequestStatus: RequestStatus };
@@ -609,7 +620,7 @@ describe('Parcel Descriptions Component', () => {
 
   describe('when clicking the description type table sort', () => {
     const newSortBy = 'description_type';
-    const newSortByDir = 'DESC';
+    const newSortByDir = 'ASC';
 
     it('updates the redux cache state.', () => {
       render(
@@ -617,10 +628,7 @@ describe('Parcel Descriptions Component', () => {
           <ParcelDescriptions />
         </Provider>,
       );
-      const descriptionTypeSortButton = screen.getByTestId(
-        /^descriptionType-table-sort.*/,
-      );
-      fireEvent.click(descriptionTypeSortButton);
+      fireEvent.click(screen.getByRole('button', { name: 'Description Type' }));
 
       const actions = store.getActions();
       expect(actions).toEqual(
@@ -633,6 +641,10 @@ describe('Parcel Descriptions Component', () => {
             type: 'parcelDescriptions/updateSortByDir',
             payload: newSortByDir,
           }),
+          expect.objectContaining({
+            type: 'parcelDescriptions/updateCurrentPage',
+            payload: 1,
+          }),
         ]),
       );
     });
@@ -643,10 +655,7 @@ describe('Parcel Descriptions Component', () => {
           <ParcelDescriptions />
         </Provider>,
       );
-      const descriptionTypeSortButton = screen.getByTestId(
-        /^descriptionType-table-sort.*/,
-      );
-      fireEvent.click(descriptionTypeSortButton);
+      fireEvent.click(screen.getByRole('button', { name: 'Description Type' }));
 
       const actions = store.getActions();
       expect(actions).toEqual(

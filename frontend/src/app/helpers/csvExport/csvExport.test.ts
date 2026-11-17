@@ -1,15 +1,12 @@
-import { FormFieldType } from '../../components/input-controls/IFormField';
-import { TableColumn } from '../../components/table/TableColumn';
 import {
   convertRowsToCSV,
-  convertSelectedColumnsToCSV,
   toExcelFriendlyCSVContent,
   escapeCSVValue,
   normalizeValue,
   neutralizeSpreadsheetFormula,
   getValueByPath,
-  getColumnValue,
-  downloadSelectedColumnsCSV,
+  propertyText,
+  downloadLabeledValues,
 } from './csvExport';
 
 describe('escapeCSVValue', () => {
@@ -136,95 +133,84 @@ describe('getValueByPath', () => {
   });
 });
 
-describe('getColumnValue', () => {
-  it('should return empty string for columns with empty property names', () => {
-    const row = { name: 'test' };
-    const column = new TableColumn(
-      1,
-      'Empty',
-      true,
-      '',
-      1,
-      false,
-      true,
-      1,
-      true,
-      { type: FormFieldType.Label, label: 'Empty' },
-    );
-
-    expect(getColumnValue(row, column)).toBe('');
+describe('propertyText', () => {
+  it('should return empty string for an empty property path', () => {
+    expect(propertyText({ name: 'test' }, '')).toBe('');
   });
 
   it('should return simple property value for non-date columns', () => {
-    const row = { name: 'John' };
-    const column = new TableColumn(
-      1,
-      'Name',
-      true,
-      'name',
-      1,
-      false,
-      true,
-      1,
-      true,
-      { type: FormFieldType.Label, label: 'Name' },
-    );
-
-    expect(getColumnValue(row, column)).toBe('John');
+    expect(propertyText({ name: 'John' }, 'name')).toBe('John');
   });
 
   it('should join multiple properties with space separator', () => {
-    const row = { first: 'John', last: 'Doe', middle: 'Q' };
-    const column = new TableColumn(
-      1,
-      'Full Name',
-      true,
-      'first,middle,last',
-      1,
-      false,
-      true,
-      1,
-      true,
-      { type: FormFieldType.Label, label: 'Full Name' },
-    );
-
-    expect(getColumnValue(row, column)).toBe('John Q Doe');
+    expect(
+      propertyText(
+        { first: 'John', last: 'Doe', middle: 'Q' },
+        'first,middle,last',
+      ),
+    ).toBe('John Q Doe');
   });
 
   it('should handle missing properties in multi-field columns', () => {
-    const row = { first: 'John' };
-    const column = new TableColumn(
-      1,
-      'Full Name',
-      true,
-      'first,middle,last',
-      1,
-      false,
-      true,
-      1,
-      true,
-      { type: FormFieldType.Label, label: 'Full Name' },
-    );
-
-    expect(getColumnValue(row, column)).toBe('John');
+    expect(propertyText({ first: 'John' }, 'first,middle,last')).toBe('John');
   });
 
   it('should return empty for invalid Date objects', () => {
-    const row = { whenCreated: new Date('invalid-date') };
-    const column = new TableColumn(
-      1,
-      'Last Updated',
-      true,
-      'whenCreated',
-      1,
-      false,
-      true,
-      1,
-      true,
-      { type: FormFieldType.Date, label: 'Last Updated' },
-    );
+    expect(
+      propertyText({ whenCreated: new Date('invalid-date') }, 'whenCreated', {
+        date: true,
+      }),
+    ).toBe('');
+  });
 
-    expect(getColumnValue(row, column)).toBe('');
+  it('should format a valid date string', () => {
+    expect(
+      propertyText({ whenCreated: '1995-04-26T00:00:00.000Z' }, 'whenCreated', {
+        date: true,
+      }),
+    ).toBe('April 26, 1995');
+  });
+
+  it('should return empty for an invalid date string', () => {
+    expect(
+      propertyText({ whenCreated: 'not-a-date' }, 'whenCreated', {
+        date: true,
+      }),
+    ).toBe('');
+  });
+
+  it('should resolve nested array index paths like items[0].name', () => {
+    expect(
+      propertyText(
+        { items: [{ name: 'Alpha' }, { name: 'Beta' }] },
+        'items[0].name',
+      ),
+    ).toBe('Alpha');
+  });
+
+  it('should return an empty cell for a missing property', () => {
+    expect(propertyText({ id: 1 }, 'nonexistent')).toBe('');
+  });
+
+  it('should treat null and undefined as empty cells', () => {
+    expect(propertyText({ value1: null, value2: undefined }, 'value1')).toBe(
+      '',
+    );
+    expect(propertyText({ value1: null, value2: undefined }, 'value2')).toBe(
+      '',
+    );
+  });
+
+  it('should stringify numbers and booleans', () => {
+    expect(propertyText({ id: 123, active: true, score: 45.67 }, 'id')).toBe(
+      '123',
+    );
+    expect(
+      propertyText({ id: 123, active: true, score: 45.67 }, 'active'),
+    ).toBe('true');
+    expect(propertyText({ id: 123, active: true, score: 45.67 }, 'score')).toBe(
+      '45.67',
+    );
   });
 });
 
@@ -300,350 +286,12 @@ describe('convertRowsToCSV', () => {
   });
 });
 
-describe('convertSelectedColumnsToCSV', () => {
-  const selectedRows = [
+describe('downloadLabeledValues', () => {
+  const columns = [
     {
-      id: 411,
-      addrLine_1: '7477 6TH STREET',
-      addrLine_2: '',
-      addrLine_3: null,
-      generalDescription: 'LOCATION DERIVED BY BC ENVIRONMENT, NAD 83 "ORTHO"',
-      whenCreated: '1995-04-26T00:00:00.000Z',
-      city: 'NEW WESTMINSTER',
-    },
-  ];
-
-  const selectedColumns: TableColumn[] = [
-    new TableColumn(1, 'Site ID', true, 'id', 1, false, true, 1, true, {
-      type: FormFieldType.Link,
-      label: 'Site ID',
-    }),
-    new TableColumn(
-      2,
-      'Site Address',
-      true,
-      'addrLine_1,addrLine_2,addrLine_3',
-      1,
-      false,
-      true,
-      1,
-      true,
-      { type: FormFieldType.Label, label: 'Site Address' },
-    ),
-    new TableColumn(
-      3,
-      'General Description',
-      true,
-      'generalDescription',
-      1,
-      false,
-      true,
-      1,
-      true,
-      { type: FormFieldType.Label, label: 'General Description' },
-    ),
-    new TableColumn(
-      4,
-      'Last Updated',
-      true,
-      'whenCreated',
-      1,
-      false,
-      true,
-      1,
-      true,
-      { type: FormFieldType.Date, label: 'Last Updated' },
-    ),
-    new TableColumn(5, 'City', true, 'city', 1, false, true, 1, false, {
-      type: FormFieldType.Label,
-      label: 'City',
-    }),
-    new TableColumn(
-      6,
-      'Map',
-      true,
-      'id',
-      1,
-      true,
-      true,
-      1,
-      true,
-      { type: FormFieldType.Link, label: 'Map' },
-      '/map?site=',
-      true,
-    ),
-  ];
-
-  it('should export only selected data columns with friendly names and formatted values', () => {
-    const expectedCSV =
-      'Site ID,Site Address,General Description,Last Updated\n' +
-      '411,7477 6TH STREET,"LOCATION DERIVED BY BC ENVIRONMENT, NAD 83 ""ORTHO""","April 26, 1995"';
-
-    expect(convertSelectedColumnsToCSV(selectedRows, selectedColumns)).toBe(
-      expectedCSV,
-    );
-  });
-
-  it('should return empty string when no rows are selected', () => {
-    expect(convertSelectedColumnsToCSV([], selectedColumns)).toBe('');
-  });
-
-  it('should resolve nested array index paths like items[0].name', () => {
-    const rowsWithArrayPath = [
-      {
-        items: [{ name: 'Alpha' }, { name: 'Beta' }],
-      },
-    ];
-
-    const columnsWithArrayPath: TableColumn[] = [
-      new TableColumn(
-        1,
-        'First Item',
-        true,
-        'items[0].name',
-        1,
-        false,
-        true,
-        1,
-        true,
-        { type: FormFieldType.Label, label: 'First Item' },
-      ),
-    ];
-
-    expect(
-      convertSelectedColumnsToCSV(rowsWithArrayPath, columnsWithArrayPath),
-    ).toBe('First Item\nAlpha');
-  });
-
-  it('should export empty value for invalid datetime values', () => {
-    const rowsWithInvalidDate = [
-      {
-        whenCreated: 'not-a-date',
-      },
-    ];
-
-    const dateColumns: TableColumn[] = [
-      new TableColumn(
-        1,
-        'Last Updated',
-        true,
-        'whenCreated',
-        1,
-        false,
-        true,
-        1,
-        true,
-        { type: FormFieldType.Date, label: 'Last Updated' },
-      ),
-    ];
-
-    expect(convertSelectedColumnsToCSV(rowsWithInvalidDate, dateColumns)).toBe(
-      'Last Updated\n',
-    );
-  });
-
-  it('should join multiple properties with spaces', () => {
-    const rows = [
-      {
-        firstName: 'John',
-        lastName: 'Doe',
-        middleName: 'Q',
-      },
-    ];
-
-    const columns: TableColumn[] = [
-      new TableColumn(
-        1,
-        'Full Name',
-        true,
-        'firstName, middleName, lastName',
-        1,
-        false,
-        true,
-        1,
-        true,
-        { type: FormFieldType.Label, label: 'Full Name' },
-      ),
-    ];
-
-    expect(convertSelectedColumnsToCSV(rows, columns)).toBe(
-      'Full Name\nJohn Q Doe',
-    );
-  });
-
-  it('should exclude action columns like Map and Details from export', () => {
-    const rows = [
-      {
-        id: 1,
-        name: 'Test',
-      },
-    ];
-
-    const columns: TableColumn[] = [
-      new TableColumn(1, 'ID', true, 'id', 1, false, true, 1, true, {
-        type: FormFieldType.Label,
-        label: 'ID',
-      }),
-      new TableColumn(
-        2,
-        'Map',
-        true,
-        'id',
-        1,
-        true,
-        true,
-        1,
-        true,
-        { type: FormFieldType.Link, label: 'Map' },
-        '/map?site=',
-        true,
-      ),
-      new TableColumn(3, 'Name', true, 'name', 1, false, true, 1, true, {
-        type: FormFieldType.Label,
-        label: 'Name',
-      }),
-    ];
-
-    expect(convertSelectedColumnsToCSV(rows, columns)).toBe('ID,Name\n1,Test');
-  });
-
-  it('should handle missing properties by returning empty values', () => {
-    const rows = [
-      {
-        id: 1,
-      },
-    ];
-
-    const columns: TableColumn[] = [
-      new TableColumn(1, 'ID', true, 'id', 1, false, true, 1, true, {
-        type: FormFieldType.Label,
-        label: 'ID',
-      }),
-      new TableColumn(
-        2,
-        'Missing Field',
-        true,
-        'nonexistent',
-        1,
-        false,
-        true,
-        1,
-        true,
-        { type: FormFieldType.Label, label: 'Missing Field' },
-      ),
-    ];
-
-    expect(convertSelectedColumnsToCSV(rows, columns)).toBe(
-      'ID,Missing Field\n1,',
-    );
-  });
-
-  it('should handle null and undefined values in cells', () => {
-    const rows = [
-      {
-        name: 'Test',
-        value1: null,
-        value2: undefined,
-      },
-    ];
-
-    const columns: TableColumn[] = [
-      new TableColumn(1, 'Name', true, 'name', 1, false, true, 1, true, {
-        type: FormFieldType.Label,
-        label: 'Name',
-      }),
-      new TableColumn(2, 'Value 1', true, 'value1', 1, false, true, 1, true, {
-        type: FormFieldType.Label,
-        label: 'Value 1',
-      }),
-      new TableColumn(3, 'Value 2', true, 'value2', 1, false, true, 1, true, {
-        type: FormFieldType.Label,
-        label: 'Value 2',
-      }),
-    ];
-
-    expect(convertSelectedColumnsToCSV(rows, columns)).toBe(
-      'Name,Value 1,Value 2\nTest,,',
-    );
-  });
-
-  it('should handle numeric and special values', () => {
-    const rows = [
-      {
-        id: 123,
-        active: true,
-        score: 45.67,
-      },
-    ];
-
-    const columns: TableColumn[] = [
-      new TableColumn(1, 'ID', true, 'id', 1, false, true, 1, true, {
-        type: FormFieldType.Label,
-        label: 'ID',
-      }),
-      new TableColumn(2, 'Active', true, 'active', 1, false, true, 1, true, {
-        type: FormFieldType.Label,
-        label: 'Active',
-      }),
-      new TableColumn(3, 'Score', true, 'score', 1, false, true, 1, true, {
-        type: FormFieldType.Label,
-        label: 'Score',
-      }),
-    ];
-
-    expect(convertSelectedColumnsToCSV(rows, columns)).toBe(
-      'ID,Active,Score\n123,true,45.67',
-    );
-  });
-
-  it('should handle multiple rows with mixed data', () => {
-    const rows = [
-      {
-        id: 1,
-        name: 'First',
-        email: 'first@test.com',
-      },
-      {
-        id: 2,
-        name: 'Second',
-        email: 'second@test.com',
-      },
-      {
-        id: 3,
-        name: 'Third',
-        email: 'third@test.com',
-      },
-    ];
-
-    const columns: TableColumn[] = [
-      new TableColumn(1, 'ID', true, 'id', 1, false, true, 1, true, {
-        type: FormFieldType.Label,
-        label: 'ID',
-      }),
-      new TableColumn(2, 'Name', true, 'name', 1, false, true, 1, true, {
-        type: FormFieldType.Label,
-        label: 'Name',
-      }),
-      new TableColumn(3, 'Email', true, 'email', 1, false, true, 1, true, {
-        type: FormFieldType.Label,
-        label: 'Email',
-      }),
-    ];
-
-    const result = convertSelectedColumnsToCSV(rows, columns);
-    expect(result).toContain('ID,Name,Email');
-    expect(result).toContain('1,First,first@test.com');
-    expect(result).toContain('2,Second,second@test.com');
-    expect(result).toContain('3,Third,third@test.com');
-  });
-});
-
-describe('downloadSelectedColumnsCSV', () => {
-  const exportColumns: TableColumn[] = [
-    new TableColumn(1, 'ID', true, 'id', 1, false, true, 1, true, {
-      type: FormFieldType.Label,
       label: 'ID',
-    }),
+      value: (row: Record<string, unknown>) => String(row.id ?? ''),
+    },
   ];
 
   it('should return early when there is no CSV content to export', () => {
@@ -656,7 +304,7 @@ describe('downloadSelectedColumnsCSV', () => {
       value: createObjectURLMock,
     });
 
-    downloadSelectedColumnsCSV([], exportColumns);
+    downloadLabeledValues([], columns);
 
     expect(createObjectURLMock).not.toHaveBeenCalled();
 
@@ -691,8 +339,7 @@ describe('downloadSelectedColumnsCSV', () => {
     const appendSpy = jest.spyOn(document.body, 'appendChild');
     const removeSpy = jest.spyOn(document.body, 'removeChild');
 
-    const rows = [{ id: 123 }];
-    downloadSelectedColumnsCSV(rows, exportColumns, 'sites.csv');
+    downloadLabeledValues([{ id: 123 }], columns, 'sites.csv');
     jest.runAllTimers();
 
     expect(createObjectURLMock).toHaveBeenCalledTimes(1);

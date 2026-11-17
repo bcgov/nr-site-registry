@@ -1,7 +1,8 @@
+import { ColumnSize } from '../../components/grid/columnSize';
+import { SectionColumn } from '../../components/grid/SectionColumn';
 import { FormFieldType } from '../../components/input-controls/IFormField';
-import { ColumnSize, TableColumn } from '../../components/table/TableColumn';
 
-export const PurchasesTableColumns: TableColumn[] = [
+export const PurchasesTableColumns: SectionColumn[] = [
   {
     id: 1,
     displayName: 'Site ID',

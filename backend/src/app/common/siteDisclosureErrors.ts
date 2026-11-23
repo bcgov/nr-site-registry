@@ -29,9 +29,7 @@ export class SiteDisclosureDuplicateException extends HttpException {
 }
 
 export function isSiteDisclosureDuplicateViolation(error: unknown): boolean {
-  const dbError = error as
-    | { code?: string; constraint?: string }
-    | undefined;
+  const dbError = error as { code?: string; constraint?: string } | undefined;
   if (dbError?.code !== POSTGRES_UNIQUE_VIOLATION) {
     return false;
   }

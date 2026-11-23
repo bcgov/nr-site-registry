@@ -2103,9 +2103,7 @@ export class SiteService {
     input: SiteDisclosureServiceInputDTO,
   ): Promise<SaveSiteDisclosureForServiceResponse> {
     this.sitesLogger.log(
-      'SiteService.saveSiteDisclosureForService() start siteId:' +
-        ' ' +
-        siteId,
+      'SiteService.saveSiteDisclosureForService() start siteId:' + ' ' + siteId,
     );
 
     const schedule2Refs = (input?.schedule2ReferenceCodes ?? [])
@@ -2133,15 +2131,17 @@ export class SiteService {
 
     try {
       let createdProfile: SiteProfiles | null = null;
-      await this.entityManager.transaction(async (transactionalEntityManager) => {
-        const savedProfiles = await this.processSiteDisclosure(
-          [disclosurePayload],
-          systemUser,
-          transactionalEntityManager,
-          siteId,
-        );
-        createdProfile = savedProfiles[0] ?? null;
-      });
+      await this.entityManager.transaction(
+        async (transactionalEntityManager) => {
+          const savedProfiles = await this.processSiteDisclosure(
+            [disclosurePayload],
+            systemUser,
+            transactionalEntityManager,
+            siteId,
+          );
+          createdProfile = savedProfiles[0] ?? null;
+        },
+      );
 
       const response = new SaveSiteDisclosureForServiceResponse(
         'Site disclosure added successfully',

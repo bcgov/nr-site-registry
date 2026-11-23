@@ -144,9 +144,9 @@ describe('SiteResolver', () => {
     });
 
     it('rejects a missing azp', () => {
-      expect(() =>
-        siteResolver.findSiteBySiteIdForService('123', {}),
-      ).toThrow('not allowed to call this service endpoint');
+      expect(() => siteResolver.findSiteBySiteIdForService('123', {})).toThrow(
+        'not allowed to call this service endpoint',
+      );
       expect(siteService.findSiteBySiteIdForService).not.toHaveBeenCalled();
     });
 
@@ -212,7 +212,8 @@ describe('SiteResolver', () => {
 
     it('passes through a typed duplicate response', async () => {
       const duplicate = {
-        message: 'A site disclosure already exists for this site and date completed.',
+        message:
+          'A site disclosure already exists for this site and date completed.',
         httpStatusCode: 409,
         success: false,
         data: null,

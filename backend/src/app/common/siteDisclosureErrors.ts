@@ -6,6 +6,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
  */
 export const SITE_DISCLOSURE_ERROR_CODES = {
   DUPLICATE_DATE_COMPLETED: 'DUPLICATE_DATE_COMPLETED',
+  SITE_NOT_FOUND: 'SITE_NOT_FOUND',
 } as const;
 
 export type SiteDisclosureErrorCode =

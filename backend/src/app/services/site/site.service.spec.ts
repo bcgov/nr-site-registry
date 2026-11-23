@@ -1363,6 +1363,13 @@ describe('SiteService', () => {
   describe('saveSiteDisclosureForService', () => {
     const dateCompleted = new Date('2024-06-01');
 
+    const primeLiveSite = (siteId = '555') => {
+      (siteRepository.findOne as jest.Mock).mockResolvedValueOnce({
+        id: siteId,
+        whoDeleted: null,
+      });
+    };
+
     const primeTransaction = () => {
       (entityManager.transaction as jest.Mock).mockImplementationOnce(
         async (cb: any) => cb(entityManager),
@@ -1380,6 +1387,7 @@ describe('SiteService', () => {
     };
 
     it('adds a disclosure with a stable system actor and Schedule 2 rows', async () => {
+      primeLiveSite();
       primeTransaction();
       primeManager();
 
@@ -1428,6 +1436,7 @@ describe('SiteService', () => {
     });
 
     it('never updates or deletes existing disclosures', async () => {
+      primeLiveSite();
       primeTransaction();
       primeManager();
       (entityManager.update as jest.Mock) = jest.fn();
@@ -1440,6 +1449,7 @@ describe('SiteService', () => {
     });
 
     it('does not persist unrelated profile columns', async () => {
+      primeLiveSite();
       primeTransaction();
       primeManager();
 
@@ -1457,6 +1467,7 @@ describe('SiteService', () => {
     });
 
     it('returns a typed duplicate error on unique (site_id, date_completed) violation', async () => {
+      primeLiveSite();
       primeTransaction();
       primeManager();
       const duplicateError: any = new Error('duplicate key value');
@@ -1476,7 +1487,38 @@ describe('SiteService', () => {
       expect(response.errorCode).toBe('DUPLICATE_DATE_COMPLETED');
     });
 
+    it('rejects a soft-deleted site before writing a disclosure', async () => {
+      (siteRepository.findOne as jest.Mock).mockResolvedValueOnce({
+        id: '555',
+        whoDeleted: 'tester',
+      });
+
+      const response = await siteService.saveSiteDisclosureForService('555', {
+        dateCompleted,
+      });
+
+      expect(response.success).toBe(false);
+      expect(response.httpStatusCode).toBe(404);
+      expect(response.data).toBeNull();
+      expect(response.errorCode).toBe('SITE_NOT_FOUND');
+      expect(entityManager.transaction).not.toHaveBeenCalled();
+    });
+
+    it('rejects a missing site before writing a disclosure', async () => {
+      (siteRepository.findOne as jest.Mock).mockResolvedValueOnce(null);
+
+      const response = await siteService.saveSiteDisclosureForService('555', {
+        dateCompleted,
+      });
+
+      expect(response.success).toBe(false);
+      expect(response.httpStatusCode).toBe(404);
+      expect(response.errorCode).toBe('SITE_NOT_FOUND');
+      expect(entityManager.transaction).not.toHaveBeenCalled();
+    });
+
     it('throws a generic error for non-duplicate failures', async () => {
+      primeLiveSite();
       primeTransaction();
       primeManager();
       (entityManager.save as jest.Mock) = jest.fn(async () => {

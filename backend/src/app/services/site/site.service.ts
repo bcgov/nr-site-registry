@@ -710,12 +710,9 @@ export class SiteService {
     const response = new FetchSiteDetail();
     response.httpStatusCode = 200;
 
-    const siteStatus = await this.siteRepository.findOne({
-      where: { id: siteId },
-      select: ['id', 'whoDeleted'],
-    });
+    const siteStatus = await this.findAvailableSiteForService(siteId);
 
-    if (!siteStatus || siteStatus.whoDeleted) {
+    if (!siteStatus) {
       response.data = null;
       this.sitesLogger.log(
         `SiteService.findSiteBySiteIdForService() blocked deleted/missing site: ${siteId}`,
@@ -741,6 +738,23 @@ export class SiteService {
 
     this.sitesLogger.log('SiteService.findSiteBySiteIdForService() end');
     return response;
+  }
+
+  /**
+   * A service caller may only read or write a site that exists and is not
+   * soft-deleted. Missing and whoDeleted are the same outcome.
+   */
+  private async findAvailableSiteForService(siteId: string) {
+    const siteStatus = await this.siteRepository.findOne({
+      where: { id: siteId },
+      select: ['id', 'whoDeleted'],
+    });
+
+    if (!siteStatus || siteStatus.whoDeleted) {
+      return null;
+    }
+
+    return siteStatus;
   }
 
   async searchSiteIds(searchParam: string) {
@@ -2095,7 +2109,8 @@ export class SiteService {
    *  - takes only the SDS-mapped fields,
    *  - lets SITE generate the record identity and audit columns,
    *  - stamps a stable system actor on the audit columns,
-   *  - returns a typed duplicate error when (site_id, date_completed) collides.
+   *  - returns a typed duplicate error when (site_id, date_completed) collides,
+   *  - rejects a missing or soft-deleted site before any disclosure write.
    * Existing disclosures are never updated or deleted.
    */
   async saveSiteDisclosureForService(
@@ -2105,6 +2120,20 @@ export class SiteService {
     this.sitesLogger.log(
       'SiteService.saveSiteDisclosureForService() start siteId:' + ' ' + siteId,
     );
+
+    const siteStatus = await this.findAvailableSiteForService(siteId);
+    if (!siteStatus) {
+      this.sitesLogger.log(
+        `SiteService.saveSiteDisclosureForService() blocked deleted/missing site: ${siteId}`,
+      );
+      return new SaveSiteDisclosureForServiceResponse(
+        'Site was not found.',
+        HttpStatus.NOT_FOUND,
+        false,
+        null,
+        SITE_DISCLOSURE_ERROR_CODES.SITE_NOT_FOUND,
+      );
+    }
 
     const schedule2Refs = (input?.schedule2ReferenceCodes ?? [])
       .filter((code) => !!code)

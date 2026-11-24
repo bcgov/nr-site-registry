@@ -1,5 +1,6 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { ResponseDto } from './response/response.dto';
+import { BaseHttpResponse } from './response/baseHttpResponse';
 import {
   ChangeAuditEntityDTO,
   ChangeAuditObjectTypeDTO,
@@ -151,4 +152,57 @@ export class SiteProfileSchedule2RefInputDTO extends ChangeAuditEntityDTO {
 
   @Field({ nullable: true })
   schedule2ReferenceCode?: string;
+}
+
+/**
+ * Narrow service-to-service input for adding a site disclosure.
+ * Only the SDS-mapped dates, Schedule 2 codes and three comments are settable;
+ * SITE generates the record identity and audit columns.
+ */
+@InputType()
+export class SiteDisclosureServiceInputDTO {
+  @Field()
+  dateCompleted: Date;
+
+  @Field({ nullable: true })
+  siteRegDateRecd?: Date | null;
+
+  @Field({ nullable: true })
+  localAuthDateRecd?: Date | null;
+
+  @Field({ nullable: true })
+  rwmDateDecision?: Date | null;
+
+  @Field(() => [String], { nullable: true })
+  schedule2ReferenceCodes?: string[] | null;
+
+  @Field({ nullable: true })
+  plannedActivityComment?: string | null;
+
+  @Field({ nullable: true })
+  siteDisclosureComment?: string | null;
+
+  @Field({ nullable: true })
+  govDocumentsComment?: string | null;
+}
+
+@ObjectType()
+export class SaveSiteDisclosureForServiceResponse extends BaseHttpResponse {
+  @Field(() => SiteProfilesDTO, { nullable: true })
+  data?: SiteProfilesDTO | null;
+
+  @Field({ nullable: true })
+  errorCode?: string;
+
+  constructor(
+    message?: string,
+    httpStatusCode?: number,
+    success?: boolean,
+    data?: SiteProfilesDTO | null,
+    errorCode?: string,
+  ) {
+    super(message, httpStatusCode, success);
+    this.data = data;
+    this.errorCode = errorCode;
+  }
 }

@@ -7,7 +7,7 @@ export const BASELINE_FILE = path.join(VERIFY_DIR, 'baseline.json');
 export const LAST_DIFF_FILE = path.join(VERIFY_DIR, 'last-diff.json');
 export const ORA2PG_DIR = path.join(REPO_ROOT, 'ora2pg');
 export const ORA2PG_CONF = path.join(ORA2PG_DIR, 'ora2pg.conf');
-/** This run's export. Never ora2pg/data, which holds older investigation files. */
+/** SQL written by this run's export. */
 export const EXPORT_DIR = path.join(VERIFY_DIR, '.export');
 export const RAW_SQL = path.join(EXPORT_DIR, 'output.sql');
 export const LOAD_SQL = path.join(EXPORT_DIR, 'output_new.sql');

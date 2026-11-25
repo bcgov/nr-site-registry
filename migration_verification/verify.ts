@@ -260,7 +260,7 @@ async function exportOracle(): Promise<void> {
     { mode: 0o600 },
   );
   try {
-    log('Exporting production Oracle into migration_verification/.export. This does not use ora2pg/data.');
+    log('Exporting production Oracle into migration_verification/.export.');
     await run('docker', [
       'run',
       '--rm',
@@ -283,7 +283,7 @@ async function exportOracle(): Promise<void> {
   }
   for (const file of [RAW_SQL, LOAD_SQL]) {
     if (!fs.existsSync(file) || fs.statSync(file).size === 0) {
-      throw new Error(`Export did not write ${file}. The files in ora2pg/data are not used.`);
+      throw new Error(`Export did not write ${file}.`);
     }
   }
   if (fs.statSync(RAW_SQL).mtimeMs < startedAt) {

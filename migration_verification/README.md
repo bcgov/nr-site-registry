@@ -6,7 +6,7 @@ The comparison is the data, after the documented transforms. It does not check h
 
 Oracle credentials come from `.env` (`ORACLE_USER`, `ORACLE_PASSWORD`, `ORACLE_CONN_STRING`). `ORACLE_CONN_STRING` is `host:port/service`. A VPN connection to the BC Gov network is required to reach that database. The script does not print the password. A full run reads all of production and can take a long time.
 
-The export is written to `migration_verification/.export` and that directory is emptied at the start of a full run. Files in `ora2pg/data` are not read.
+The export is written to `migration_verification/.export` and that directory is emptied at the start of a full run.
 
 ### Usage
 

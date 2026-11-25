@@ -9,3 +9,9 @@
 .env.test.local
 .env.production.local
 .env.local
+
+# unaccepted diffs from the last verify run
+last-diff.json
+
+# SQL written by this run's export
+.export/

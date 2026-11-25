@@ -47,12 +47,10 @@ ENV TNS_ADMIN=/usr/lib/oracle/$ORAVERSION/client64/network/admin
 ENV LD_LIBRARY_PATH=/usr/lib/oracle/$ORAVERSION/client64/lib 
 ENV PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/oracle/$ORAVERSION/client64/bin
 
-# Install DBI module with Postgres, Oracle and Compress::Zlib module
-RUN cpan install Test::NoWarnings &&\
-    cpan install DBI &&\
-    cpan install DBD::Pg &&\
-    cpan install Bundle::Compress::Zlib &&\
-    cpanm install DBD::Oracle@1.82
+# Install DBI module with Postgres, Oracle and Compress::Zlib module.
+# cpan's test run fails here: Module::Signature needs IPC::Run, and those
+# tests do not pass under the amd64 emulation this image requires.
+RUN cpanm --notest Test::NoWarnings DBI DBD::Pg Bundle::Compress::Zlib DBD::Oracle@1.82
 
 # Install ora2pg
 RUN curl -L -o /tmp/ora2pg.zip https://github.com/darold/ora2pg/archive/v$ORA2PG_VERSION.zip &&\

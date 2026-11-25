@@ -1,4 +1,9 @@
 {
+  "name": "migration_verification",
+  "private": true,
+  "scripts": {
+    "verify": "ts-node --transpile-only --project tsconfig.verify.json verify.ts"
+  },
   "dependencies": {
     "dotenv": "^17.2.1",
     "oracledb": "^6.9.0",
